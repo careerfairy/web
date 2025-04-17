@@ -1,20 +1,51 @@
-import { Box, styled } from "@mui/material"
+import { Box, Grid, Typography, styled } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 import BaseDialogView from "../../BaseDialogView"
 import { AnimatedBackground } from "./AnimatedBackground"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
+
 const styles = sxStyles({
    root: {
       padding: [0, "!important"],
       height: "100%",
       width: "100%",
+      overflow: "auto",
+   },
+   container: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 4,
+      zIndex: 1,
+      position: "relative",
+      overflowY: "auto",
+      overflowX: "hidden",
+      width: "100%",
+      minHeight: "100%",
+   },
+   title: {
+      color: "common.white",
+      mb: 2,
+      fontWeight: 600,
+      textShadow: "0px 0px 8px rgba(0,0,0,0.5)",
+   },
+   variantLabel: {
+      color: "common.white",
+      mb: 1,
+      fontWeight: 500,
+      textShadow: "0px 0px 8px rgba(0,0,0,0.5)",
+   },
+   gridContainer: {
+      width: "100%",
+      maxWidth: 1200,
    },
 })
 
 const Layout = styled(Box)({
-   height: "100%",
+   minHeight: "100%",
    position: "relative",
 })
 
@@ -27,8 +58,139 @@ const RecommendationsView = () => {
          mainContent={
             <Layout>
                <AnimatedBackground />
-               <GetNotifiedCard isAppDownloaded />
-               <GetNotifiedCard />
+
+               <Box sx={styles.container}>
+                  <Typography variant="h4" sx={styles.title}>
+                     GetNotifiedCard - All Variants
+                  </Typography>
+
+                  <Grid
+                     container
+                     spacing={4}
+                     sx={styles.gridContainer}
+                     justifyContent="center"
+                  >
+                     {/* Mobile Variants */}
+                     <Grid
+                        item
+                        xs={12}
+                        md={6}
+                        lg={6}
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                     >
+                        <Typography variant="h6" sx={styles.variantLabel}>
+                           Mobile - App Download Variant
+                        </Typography>
+                        <GetNotifiedCard
+                           isAppDownloaded={false}
+                           onClose={() => console.log("Card closed")}
+                        />
+                     </Grid>
+
+                     <Grid
+                        item
+                        xs={12}
+                        md={6}
+                        lg={6}
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                     >
+                        <Typography variant="h6" sx={styles.variantLabel}>
+                           Mobile - Calendar Only Variant
+                        </Typography>
+                        <GetNotifiedCard
+                           isAppDownloaded={true}
+                           onClose={() => console.log("Card closed")}
+                        />
+                     </Grid>
+
+                     {/* Desktop Variants */}
+                     <Grid
+                        item
+                        xs={12}
+                        md={6}
+                        lg={6}
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                     >
+                        <Typography variant="h6" sx={styles.variantLabel}>
+                           Desktop - App Download Variant
+                        </Typography>
+                        <GetNotifiedCard
+                           isDesktop={true}
+                           isExpanded={false}
+                           isAppDownloaded={false}
+                           onClose={() => console.log("Card closed")}
+                        />
+                     </Grid>
+
+                     <Grid
+                        item
+                        xs={12}
+                        md={6}
+                        lg={6}
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                     >
+                        <Typography variant="h6" sx={styles.variantLabel}>
+                           Desktop - Calendar Only Variant
+                        </Typography>
+                        <GetNotifiedCard
+                           isDesktop={true}
+                           isExpanded={false}
+                           isAppDownloaded={true}
+                           onClose={() => console.log("Card closed")}
+                        />
+                     </Grid>
+
+                     {/* Desktop Expanded Variants */}
+                     <Grid
+                        item
+                        xs={12}
+                        md={12}
+                        lg={12}
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                     >
+                        <Typography variant="h6" sx={styles.variantLabel}>
+                           Desktop Expanded - App Download Variant
+                        </Typography>
+                        <GetNotifiedCard
+                           isDesktop={true}
+                           isExpanded={true}
+                           isAppDownloaded={false}
+                           onClose={() => console.log("Card closed")}
+                        />
+                     </Grid>
+
+                     <Grid
+                        item
+                        xs={12}
+                        md={12}
+                        lg={12}
+                        display="flex"
+                        flexDirection="column"
+                        alignItems="center"
+                     >
+                        <Typography variant="h6" sx={styles.variantLabel}>
+                           Desktop Expanded - Calendar Only Variant
+                        </Typography>
+                        <GetNotifiedCard
+                           isDesktop={true}
+                           isExpanded={true}
+                           isAppDownloaded={true}
+                           onClose={() => console.log("Card closed")}
+                        />
+                     </Grid>
+                  </Grid>
+               </Box>
+
                {Boolean(isMobile) && <RecommendationsNav />}
             </Layout>
          }

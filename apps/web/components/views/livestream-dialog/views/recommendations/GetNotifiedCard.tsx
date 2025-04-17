@@ -6,6 +6,8 @@ import {
    CardContent,
    Stack,
    Typography,
+   useMediaQuery,
+   useTheme,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import {
@@ -18,9 +20,13 @@ import {
 const StyledCard = styled(Card)(({ theme }) => ({
    backgroundColor: theme.palette.common.white,
    borderRadius: 16,
-   boxShadow: "none",
+   boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
    padding: 0,
    maxWidth: 343,
+   [theme.breakpoints.up("md")]: {
+      maxWidth: "none",
+      width: "auto",
+   },
 }))
 
 // Event details section
@@ -56,17 +62,52 @@ const CloseButton = styled(Box)(({ theme }) => ({
    zIndex: 1,
 }))
 
+// QR Code container
+const QRCodeContainer = styled(Box)({
+   display: "flex",
+   flexDirection: "column",
+   alignItems: "center",
+   gap: 12,
+   padding: 16,
+   backgroundColor: "#F1FCF9",
+   borderRadius: 17,
+   border: "1px solid #95DDD2",
+   alignSelf: "stretch",
+})
+
+// QR Code image
+const QRCodeImage = styled(Box)(({ theme }) => ({
+   width: 120,
+   height: 120,
+   backgroundColor: theme.palette.common.white,
+   borderRadius: 12,
+   backgroundSize: "contain",
+   backgroundPosition: "center",
+   boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
+}))
+
 interface GetNotifiedCardProps {
    /** If true, shows only calendar button. If false, shows download app and calendar buttons */
    isAppDownloaded?: boolean
+   /** If true, renders the desktop version with different layouts */
+   isDesktop?: boolean
+   /** If true and isDesktop is true, shows the expanded version with centered content */
+   isExpanded?: boolean
    /** Optional callback when close button is clicked */
    onClose?: () => void
 }
 
 export const GetNotifiedCard = ({
    isAppDownloaded = false,
+   isDesktop: isDesktopProp,
+   isExpanded = false,
    onClose,
 }: GetNotifiedCardProps) => {
+   const theme = useTheme()
+   // Auto-detect desktop if not explicitly provided
+   const mdUp = useMediaQuery(theme.breakpoints.up("md"))
+   const isDesktop = isDesktopProp !== undefined ? isDesktopProp : mdUp
+
    // Dummy handler functions
    const handleDownloadApp = () => console.log("Download app clicked")
    const handleAddToCalendar = () => console.log("Add to calendar clicked")
@@ -76,7 +117,12 @@ export const GetNotifiedCard = ({
    }
 
    return (
-      <StyledCard>
+      <StyledCard
+         sx={{
+            width: isDesktop ? (isExpanded ? 570 : 402) : 343,
+            height: isDesktop && isExpanded ? "auto" : "auto",
+         }}
+      >
          {/* Close button */}
          <CloseButton onClick={handleClose}>
             <CloseIcon />
@@ -97,7 +143,7 @@ export const GetNotifiedCard = ({
                sx={{
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "center",
+                  alignItems: isDesktop && isExpanded ? "center" : "flex-start",
                   px: 2,
                   gap: 1,
                }}
@@ -109,6 +155,8 @@ export const GetNotifiedCard = ({
                      alignItems: "center",
                      width: "100%",
                      gap: 1,
+                     justifyContent:
+                        isDesktop && isExpanded ? "center" : "flex-start",
                   }}
                >
                   <Avatar
@@ -130,6 +178,7 @@ export const GetNotifiedCard = ({
                   color="text.primary"
                   fontWeight={600}
                   width="100%"
+                  align={isDesktop && isExpanded ? "center" : "left"}
                >
                   Technology Consulting @EY
                </Typography>
@@ -141,6 +190,8 @@ export const GetNotifiedCard = ({
                      alignItems: "center",
                      width: "100%",
                      gap: 1,
+                     justifyContent:
+                        isDesktop && isExpanded ? "center" : "flex-start",
                   }}
                >
                   <CalendarIcon size={16} color="#5C5C6A" />
@@ -155,48 +206,104 @@ export const GetNotifiedCard = ({
          <CardContent sx={{ px: 0 }}>
             <Stack spacing={2}>
                {/* Text content */}
-               <Box sx={{ px: 2 }}>
+               <Box sx={{ px: isDesktop ? 3 : 2 }}>
                   <Typography
-                     variant="brandedH4"
+                     variant={isDesktop ? "brandedH3" : "brandedH4"}
                      color="text.primary"
                      gutterBottom
+                     align={isDesktop ? "center" : "left"}
                   >
                      {isAppDownloaded ? "Get Notified! 🎉" : "Get Notified!"}
                   </Typography>
-                  <Typography variant="medium" color="text.secondary">
+                  <Typography
+                     variant="medium"
+                     color="text.secondary"
+                     align={isDesktop ? "center" : "left"}
+                  >
                      {isAppDownloaded
                         ? "Stay updated on this live stream and future job opportunities by adding this event to your calendar."
                         : "Download our mobile app to get notified when this live stream starts and stay updated on future job opportunities!"}
                   </Typography>
                </Box>
 
-               {/* Buttons */}
-               <Box sx={{ px: 2 }}>
-                  <Stack spacing={1.5}>
-                     {!isAppDownloaded && (
-                        <Button
-                           fullWidth
-                           variant="contained"
-                           color="primary"
-                           startIcon={<DownloadIcon size={16} />}
-                           onClick={handleDownloadApp}
+               {/* Desktop QR Code and Buttons */}
+               {isDesktop && !isAppDownloaded ? (
+                  <Box sx={{ px: 2 }}>
+                     <QRCodeContainer>
+                        <QRCodeImage
+                           sx={{
+                              backgroundImage:
+                                 "url('https://placehold.co/120x120')",
+                           }}
+                        />
+                        <Typography
+                           variant="medium"
+                           color="text.primary"
+                           fontWeight={600}
+                           align="center"
                         >
-                           Download app
+                           Scan to download CareerFairy App!
+                        </Typography>
+                        <Typography
+                           variant="small"
+                           color="text.disabled"
+                           align="center"
+                        >
+                           or
+                        </Typography>
+                        <Button
+                           variant="outlined"
+                           color="primary"
+                           startIcon={<CalendarIcon size={16} />}
+                           onClick={handleAddToCalendar}
+                           sx={{ alignSelf: "center" }}
+                        >
+                           Add to calendar
                         </Button>
-                     )}
-                     <Button
-                        fullWidth
-                        variant={isAppDownloaded ? "contained" : "outlined"}
-                        color="primary"
-                        startIcon={<CalendarIcon size={16} />}
-                        onClick={handleAddToCalendar}
-                     >
-                        {isAppDownloaded
-                           ? "Add to calendar"
-                           : "Add live stream to calendar"}
-                     </Button>
-                  </Stack>
-               </Box>
+                     </QRCodeContainer>
+                  </Box>
+               ) : (
+                  /* Mobile Buttons or App Downloaded Buttons */
+                  <Box sx={{ px: 2 }}>
+                     <Stack spacing={1.5} sx={{ width: "100%" }}>
+                        {!isAppDownloaded && !isDesktop && (
+                           <Button
+                              fullWidth
+                              variant="contained"
+                              color="primary"
+                              startIcon={<DownloadIcon size={16} />}
+                              onClick={handleDownloadApp}
+                           >
+                              Download app
+                           </Button>
+                        )}
+                        <Button
+                           fullWidth={!isDesktop}
+                           variant={
+                              isAppDownloaded
+                                 ? "contained"
+                                 : isDesktop
+                                 ? "contained"
+                                 : "outlined"
+                           }
+                           color="primary"
+                           startIcon={<CalendarIcon size={16} />}
+                           onClick={handleAddToCalendar}
+                           size={isDesktop ? "large" : "medium"}
+                           sx={{
+                              padding: isDesktop ? "12px 28px" : undefined,
+                              alignSelf: isDesktop ? "center" : undefined,
+                              width:
+                                 isDesktop && isExpanded ? "100%" : undefined,
+                           }}
+                        >
+                           {isAppDownloaded || isDesktop
+                              ? "Add to calendar"
+                              : "Add live stream to calendar"}
+                        </Button>
+                     </Stack>
+                  </Box>
+               )}
 
                {/* Email notification info */}
                <Box
