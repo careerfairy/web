@@ -71,6 +71,7 @@ const styles = sxStyles({
       borderTopRightRadius: `${theme.spacing(2)} !important`,
    }),
    dialogPaper: {
+      transition: (theme) => theme.transitions.create("max-width"),
       ...NICE_SCROLLBAR_STYLES,
       borderRadius: {
          md: 5,

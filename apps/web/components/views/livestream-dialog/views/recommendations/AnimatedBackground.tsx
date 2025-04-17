@@ -11,6 +11,12 @@ const rotate = keyframes`
   }
 `
 
+const Root = styled(Box)({
+   position: "absolute",
+   inset: 0,
+   zIndex: -1,
+})
+
 // Styled container for the animation
 const AnimatedContainer = styled(Box)(({ theme }) => ({
    position: "relative",
@@ -18,7 +24,6 @@ const AnimatedContainer = styled(Box)(({ theme }) => ({
    height: "100%",
    overflow: "hidden",
    backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#f5f5f5",
-   borderRadius: theme.shape.borderRadius,
 }))
 
 // Styled element for the blur effect container
@@ -75,13 +80,15 @@ const PinkCircle = styled(Box)(({ theme }) => ({
 
 export const AnimatedBackground = () => {
    return (
-      <AnimatedContainer>
-         <BlurContainer>
-            <PurpleCircle />
-            <TealCircle />
-            <BlueCircle />
-            <PinkCircle />
-         </BlurContainer>
-      </AnimatedContainer>
+      <Root>
+         <AnimatedContainer>
+            <BlurContainer>
+               <PurpleCircle />
+               <TealCircle />
+               <BlueCircle />
+               <PinkCircle />
+            </BlurContainer>
+         </AnimatedContainer>
+      </Root>
    )
 }
