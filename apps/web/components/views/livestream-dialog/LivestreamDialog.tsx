@@ -28,7 +28,6 @@ import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
-import { RegistrationSuccessAnimation } from "./animations/register-success/RegistrationSuccessAnimation"
 import {
    RegistrationAction,
    RegistrationState,
@@ -41,6 +40,7 @@ import RedirectingView from "./views/common/RedirectingView"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
+import { RecommendationsViewSkeleton } from "./views/recommendations/RecommendationsViewSkeleton"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
 import SpeakerDetailsViewSkeleton from "./views/speaker-details/SpeakerDetailsViewSkeleton"
@@ -183,6 +183,11 @@ const views = [
       viewPath: "speaker-details/SpeakerDetailsView",
       loadingComponent: () => <SpeakerDetailsViewSkeleton />,
    }),
+   createView({
+      key: "recommendations",
+      viewPath: "recommendations/RecommendationsView",
+      loadingComponent: () => <RecommendationsViewSkeleton />,
+   }),
 ] as const
 
 export type ViewKey = (typeof views)[number]["key"]
@@ -261,6 +266,7 @@ const Content: FC<ContentProps> = ({
 
    const [value, setValue] = useState<number>(getPageIndex(page))
    const activeView = views[value].key
+   console.log("🚀 ~ activeView:", activeView)
 
    const [currentJobId, setCurrentJobId] = useState<string | null>(jobId)
    const [currentSpeakerId, setCurrentSpeakerId] = useState<string | null>(
@@ -321,7 +327,7 @@ const Content: FC<ContentProps> = ({
 
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
-                  view = "register-success"
+                  view = "recommendations"
                }
                break
          }
@@ -486,7 +492,7 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
-         {activeView === "register-success" && <RegistrationSuccessAnimation />}
+         {/* {activeView === "recommendations" && <RegistrationSuccessAnimation />} */}
       </DialogContext.Provider>
    )
 }
@@ -560,6 +566,9 @@ type DialogContextType = {
 }
 
 const getPageIndex = (page: Props["page"]): number => {
+   // To fast track development, we return the recommendations view index
+   return views.findIndex((view) => view.key === "recommendations")
+
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")

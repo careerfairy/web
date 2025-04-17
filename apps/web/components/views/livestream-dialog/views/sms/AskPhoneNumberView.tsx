@@ -52,7 +52,7 @@ const AskPhoneNumberView = () => {
          ])
          successNotification("We will remind you about this livestream!")
          handleDiscoverCompanySparks()
-         goToView("register-success")
+         goToView("recommendations")
       } catch (error) {
          errorNotification(
             error,
@@ -73,7 +73,7 @@ const AskPhoneNumberView = () => {
          sx={styles.fullHeight}
          mainContent={
             <MainContent
-               onBackClick={() => goToView("register-success")}
+               onBackClick={() => goToView("recommendations")}
                onBackPosition="top-left"
                sx={styles.fullHeight}
             >

@@ -1,0 +1,111 @@
+import {
+   swissGermanCountryFilters,
+   userIsTargetedLevels,
+} from "@careerfairy/shared-lib/countries/filters"
+import { CompanyIcon } from "components/views/common/icons"
+import { HomeIcon } from "components/views/common/icons/HomeIcon"
+import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
+import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
+import { RecordingIcon } from "components/views/common/icons/RecordingIcon"
+import { SparksIcon } from "components/views/common/icons/SparksIcon"
+import { useAuth } from "HOCs/AuthProvider"
+import { useMemo } from "react"
+import useUserCountryCode from "../components/custom-hook/useUserCountryCode"
+import { INavLink } from "../layouts/types"
+
+// Constants for reusable nav paths
+export const NextLivestreamsPath: INavLink = {
+   id: "next-live-streams",
+   href: `/next-livestreams`,
+   pathname: `/next-livestreams/[[...livestreamDialog]]`,
+   title: "Live streams",
+   Icon: LiveStreamsIcon,
+}
+
+export const PastLivestreamsPath: INavLink = {
+   id: "all-past-live-streams",
+   href: `/past-livestreams`,
+   pathname: `/past-livestreams/[[...livestreamDialog]]`,
+   title: "Recordings",
+   Icon: RecordingIcon,
+}
+
+/**
+ * Hook that provides filtered navigation links based on user permissions and country
+ * @param isMobile - Whether the screen is mobile
+ * @returns Array of filtered navigation links
+ */
+export const useNavLinks = (isMobile: boolean) => {
+   const { userData } = useAuth()
+   const { userCountryCode } = useUserCountryCode()
+
+   return useMemo(() => {
+      // Define base navigation links
+      const links: INavLink[] = [
+         {
+            id: "home-page",
+            href: `/portal`,
+            pathname: `/portal/[[...livestreamDialog]]`,
+            Icon: HomeIcon,
+            title: "Home page",
+            mobileTitle: "Home",
+         },
+         {
+            id: "live-streams",
+            title: "Live streams",
+            mobileTitle: "Live streams",
+            Icon: LiveStreamsIcon,
+            href: `/next-livestreams`,
+            pathname: `/next-livestreams/[[...livestreamDialog]]`,
+            ...(isMobile
+               ? {
+                    childLinks: [NextLivestreamsPath, PastLivestreamsPath],
+                 }
+               : []),
+         },
+         {
+            id: "sparks",
+            href: `/sparks`,
+            pathname: `/sparks/[sparkId]`,
+            Icon: SparksIcon,
+            title: "Sparks",
+         },
+         ...(!isMobile
+            ? [
+                 {
+                    id: "past-live-streams",
+                    title: "Recordings",
+                    mobileTitle: "Recordings",
+                    Icon: RecordingIcon,
+                    href: `/past-livestreams`,
+                    pathname: `/past-livestreams/[[...livestreamDialog]]`,
+                 },
+              ]
+            : []),
+         {
+            id: "levels",
+            href: `/levels`,
+            pathname: `/levels`,
+            Icon: LevelsIcon,
+            title: "Levels",
+         },
+         {
+            id: "company",
+            href: `/companies`,
+            pathname: `/companies`,
+            Icon: CompanyIcon,
+            title: "Companies",
+         },
+      ]
+
+      // Apply filtering
+      return links.filter((link) => {
+         if (link.id === "levels") {
+            return userData
+               ? userIsTargetedLevels(userData)
+               : swissGermanCountryFilters.includes(userCountryCode)
+         }
+         return true
+      })
+   }, [isMobile, userData, userCountryCode])
+}

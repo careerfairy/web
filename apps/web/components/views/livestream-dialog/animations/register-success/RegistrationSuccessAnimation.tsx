@@ -106,7 +106,7 @@ type Props = {
  * @example
  * ```tsx
  * // In LivestreamDialog.tsx
- * {activeView === "register-success" && (
+ * {activeView === "recommendations" && (
  *   <RegistrationSuccessAnimation
  *     onAnimationComplete={() => doSomethingAfterAnimation()}
  *   />
