@@ -18,11 +18,14 @@ import {
 
 // Card container
 const StyledCard = styled(Card)(({ theme }) => ({
+   position: "relative",
    backgroundColor: theme.palette.common.white,
    borderRadius: 16,
    boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
    padding: 0,
    maxWidth: 343,
+   display: "flex",
+   flexDirection: "column",
    [theme.breakpoints.up("md")]: {
       maxWidth: "none",
       width: "auto",
@@ -45,7 +48,6 @@ const EventBanner = styled(Box)(({ theme }) => ({
 // Banner image
 const BannerImage = styled(Box)(({ theme }) => ({
    width: "100%",
-   height: 160,
    backgroundColor: theme.palette.grey[300],
    backgroundSize: "cover",
    backgroundPosition: "center",
@@ -59,7 +61,7 @@ const CloseButton = styled(Box)(({ theme }) => ({
    right: 12,
    cursor: "pointer",
    color: theme.palette.common.white,
-   zIndex: 1,
+   zIndex: 10,
 }))
 
 // QR Code container
@@ -108,31 +110,32 @@ export const GetNotifiedCard = ({
    const mdUp = useMediaQuery(theme.breakpoints.up("md"))
    const isDesktop = isDesktopProp !== undefined ? isDesktopProp : mdUp
 
+   const buttonsSize = isDesktop ? "large" : "medium"
+
    // Dummy handler functions
    const handleDownloadApp = () => console.log("Download app clicked")
    const handleAddToCalendar = () => console.log("Add to calendar clicked")
-   const handleClose = () => {
-      console.log("Close clicked")
-      onClose?.()
-   }
 
    return (
       <StyledCard
          sx={{
             width: isDesktop ? (isExpanded ? 570 : 402) : 343,
-            height: isDesktop && isExpanded ? "auto" : "auto",
+            height: isDesktop ? 755 : 572,
          }}
       >
          {/* Close button */}
-         <CloseButton onClick={handleClose}>
-            <CloseIcon />
-         </CloseButton>
+         {Boolean(onClose) && (
+            <CloseButton onClick={onClose}>
+               <CloseIcon />
+            </CloseButton>
+         )}
 
          {/* Event details section */}
          <EventBanner>
             {/* Banner image with overlay */}
             <BannerImage
                sx={{
+                  height: isDesktop ? 120 : 95,
                   backgroundImage:
                      "linear-gradient(rgba(22, 33, 40, 0.7), rgba(22, 33, 40, 0.7)), url('https://placehold.co/600x400')",
                }}
@@ -203,8 +206,17 @@ export const GetNotifiedCard = ({
          </EventBanner>
 
          {/* Call to action section */}
-         <CardContent sx={{ px: 0 }}>
-            <Stack spacing={2}>
+         <CardContent
+            sx={{
+               px: 0,
+               py: 0,
+               flexGrow: 1,
+               pb: "0px !important",
+               display: "flex",
+               flexDirection: "column",
+            }}
+         >
+            <Stack spacing={2} my="auto">
                {/* Text content */}
                <Box sx={{ px: isDesktop ? 3 : 2 }}>
                   <Typography
@@ -215,6 +227,7 @@ export const GetNotifiedCard = ({
                   >
                      {isAppDownloaded ? "Get Notified! 🎉" : "Get Notified!"}
                   </Typography>
+                  <br />
                   <Typography
                      variant="medium"
                      color="text.secondary"
@@ -256,6 +269,7 @@ export const GetNotifiedCard = ({
                            color="primary"
                            startIcon={<CalendarIcon size={16} />}
                            onClick={handleAddToCalendar}
+                           size={buttonsSize}
                            sx={{ alignSelf: "center" }}
                         >
                            Add to calendar
@@ -273,6 +287,7 @@ export const GetNotifiedCard = ({
                               color="primary"
                               startIcon={<DownloadIcon size={16} />}
                               onClick={handleDownloadApp}
+                              size={buttonsSize}
                            >
                               Download app
                            </Button>
@@ -289,9 +304,8 @@ export const GetNotifiedCard = ({
                            color="primary"
                            startIcon={<CalendarIcon size={16} />}
                            onClick={handleAddToCalendar}
-                           size={isDesktop ? "large" : "medium"}
+                           size={buttonsSize}
                            sx={{
-                              padding: isDesktop ? "12px 28px" : undefined,
                               alignSelf: isDesktop ? "center" : undefined,
                               width:
                                  isDesktop && isExpanded ? "100%" : undefined,
@@ -304,24 +318,24 @@ export const GetNotifiedCard = ({
                      </Stack>
                   </Box>
                )}
-
-               {/* Email notification info */}
-               <Box
-                  sx={{
-                     borderTop: 1,
-                     borderColor: "divider",
-                     backgroundColor: "background.paper",
-                     px: 2,
-                     py: 1,
-                  }}
-               >
-                  <Typography variant="xsmall" color="text.disabled">
-                     You&apos;ll also receive reminders on
-                     hubertus.groneweegen@myemailprovider.com before the start
-                     of the live stream
-                  </Typography>
-               </Box>
             </Stack>
+
+            {/* Email notification info */}
+            <Box
+               sx={{
+                  borderTop: 1,
+                  borderColor: "divider",
+                  backgroundColor: "background.paper",
+                  px: 2,
+                  py: 1,
+               }}
+            >
+               <Typography variant="xsmall" color="text.disabled">
+                  You&apos;ll also receive reminders on
+                  hubertus.groneweegen@myemailprovider.com before the start of
+                  the live stream
+               </Typography>
+            </Box>
          </CardContent>
       </StyledCard>
    )
