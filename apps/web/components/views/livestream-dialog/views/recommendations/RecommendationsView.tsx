@@ -2,7 +2,6 @@ import { Box, Grid, Typography, styled } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 import BaseDialogView from "../../BaseDialogView"
-import { AnimatedBackground } from "./AnimatedBackground"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
 
@@ -57,8 +56,6 @@ const RecommendationsView = () => {
          sx={styles.root}
          mainContent={
             <Layout>
-               <AnimatedBackground />
-
                <Box sx={styles.container}>
                   <Typography variant="h4" sx={styles.title}>
                      GetNotifiedCard - All Variants

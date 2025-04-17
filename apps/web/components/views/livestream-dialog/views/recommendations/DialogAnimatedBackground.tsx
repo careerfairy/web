@@ -1,4 +1,4 @@
-import { Box, keyframes } from "@mui/material"
+import { Box, BoxProps, keyframes } from "@mui/material"
 import { styled } from "@mui/material/styles"
 
 // Keyframes for the rotation animation
@@ -14,7 +14,6 @@ const rotate = keyframes`
 const Root = styled(Box)({
    position: "absolute",
    inset: 0,
-   zIndex: -1,
 })
 
 // Styled container for the animation
@@ -78,17 +77,20 @@ const PinkCircle = styled(Box)(({ theme }) => ({
    right: "20%",
 }))
 
-export const AnimatedBackground = () => {
+export const DialogAnimatedBackground = ({ children, ...props }: BoxProps) => {
    return (
-      <Root>
-         <AnimatedContainer>
-            <BlurContainer>
-               <PurpleCircle />
-               <TealCircle />
-               <BlueCircle />
-               <PinkCircle />
-            </BlurContainer>
-         </AnimatedContainer>
-      </Root>
+      <Box {...props}>
+         <Root>
+            <AnimatedContainer>
+               <BlurContainer>
+                  <PurpleCircle />
+                  <TealCircle />
+                  <BlueCircle />
+                  <PinkCircle />
+               </BlurContainer>
+            </AnimatedContainer>
+         </Root>
+         {children}
+      </Box>
    )
 }

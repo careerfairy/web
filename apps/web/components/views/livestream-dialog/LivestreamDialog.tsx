@@ -11,6 +11,7 @@ import {
    ComponentType,
    Dispatch,
    FC,
+   SetStateAction,
    createContext,
    useCallback,
    useContext,
@@ -40,6 +41,7 @@ import RedirectingView from "./views/common/RedirectingView"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
+import { DialogAnimatedBackground } from "./views/recommendations/DialogAnimatedBackground"
 import { RecommendationsViewSkeleton } from "./views/recommendations/RecommendationsViewSkeleton"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
@@ -198,12 +200,16 @@ const LivestreamDialog: FC<Props> = ({
    open,
    livestreamId,
    appear,
+   page = "details",
    ...rest
 }) => {
    const isMobile = useIsMobile()
    const onClose = useCallback(() => {
       handleClose()
    }, [handleClose])
+
+   const [value, setValue] = useState<number>(getPageIndex(page))
+   const activeView = views[value].key
 
    return (
       <Dialog
@@ -221,6 +227,9 @@ const LivestreamDialog: FC<Props> = ({
          }}
          PaperProps={{
             sx: styles.dialogPaper,
+            ...(activeView === "recommendations" && {
+               component: DialogAnimatedBackground,
+            }),
          }}
       >
          <DialogContent sx={styles.content}>
@@ -228,6 +237,10 @@ const LivestreamDialog: FC<Props> = ({
                <Content
                   handleClose={onClose}
                   livestreamId={livestreamId}
+                  value={value}
+                  activeView={activeView}
+                  setValue={setValue}
+                  page={page}
                   {...rest}
                />
             ) : (
@@ -238,7 +251,11 @@ const LivestreamDialog: FC<Props> = ({
    )
 }
 
-type ContentProps = Omit<Props, "open">
+type ContentProps = Omit<Props, "open"> & {
+   value: number
+   activeView: ViewKey
+   setValue: Dispatch<SetStateAction<number>>
+}
 
 const Content: FC<ContentProps> = ({
    handleClose,
@@ -246,13 +263,16 @@ const Content: FC<ContentProps> = ({
    updatedStats,
    serverUserEmail,
    onRegisterSuccess,
-   page = "details",
    livestreamId,
    mode = "page",
    currentSparkId,
    jobId,
    speakerId,
    setting,
+   value,
+   activeView,
+   setValue,
+   page,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -264,10 +284,6 @@ const Content: FC<ContentProps> = ({
    const isRecommended = isFromNewsletter(query)
 
    const theme = useTheme()
-
-   const [value, setValue] = useState<number>(getPageIndex(page))
-   const activeView = views[value].key
-   console.log("🚀 ~ activeView:", activeView)
 
    const [currentJobId, setCurrentJobId] = useState<string | null>(jobId)
    const [currentSpeakerId, setCurrentSpeakerId] = useState<string | null>(
@@ -335,7 +351,14 @@ const Content: FC<ContentProps> = ({
 
          setValue(views.findIndex((v) => v.key === view))
       },
-      [livestreamId, push, router, livestream?.questionsDisabled, isPageMode]
+      [
+         setValue,
+         isPageMode,
+         livestream?.questionsDisabled,
+         push,
+         router,
+         livestreamId,
+      ]
    )
 
    const goToJobDetails = useCallback(
@@ -358,7 +381,7 @@ const Content: FC<ContentProps> = ({
             setValue(views.findIndex((v) => v.key === "job-details"))
          }
       },
-      [livestreamId, mode, push, router]
+      [livestreamId, mode, push, router, setValue]
    )
 
    const goToSpeakerDetails = useCallback(
@@ -381,7 +404,7 @@ const Content: FC<ContentProps> = ({
             setValue(views.findIndex((v) => v.key === "speaker-details"))
          }
       },
-      [livestreamId, mode, push, router]
+      [livestreamId, mode, push, router, setValue]
    )
 
    const onClose = useCallback(() => {
@@ -400,7 +423,7 @@ const Content: FC<ContentProps> = ({
    // This allows conditional navigation not covered by useMemo.
    useEffect(() => {
       setValue(getPageIndex(page))
-   }, [page])
+   }, [page, setValue])
 
    const [registrationState, registrationDispatch] = useReducer(
       registrationReducer,
