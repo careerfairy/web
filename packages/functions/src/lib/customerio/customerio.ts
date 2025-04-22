@@ -4,9 +4,9 @@ import {
    transformUserDataForCustomerIO,
 } from "@careerfairy/shared-lib/customerio"
 import { UserData } from "@careerfairy/shared-lib/users"
-import { logger } from "firebase-functions/v2"
-import { onDocumentWritten } from "firebase-functions/v2/firestore"
-import { onRequest } from "firebase-functions/v2/https"
+import { logger } from "firebase-functions"
+import { onDocumentWritten } from "firebase-functions/firestore"
+import { onRequest } from "firebase-functions/https"
 import { userRepo } from "../../api/repositories"
 import {
    customerIOWebhookSignatureMiddleware,
@@ -114,6 +114,10 @@ const getReasonForExclusion = (user: UserData) => {
    const lastActivityDate = user.lastActivityAt.toDate()
    if (lastActivityDate < CUTOFF_DATE) {
       return `inactive since before ${CUTOFF_DATE.toLocaleDateString()} (last activity: ${lastActivityDate.toLocaleDateString()})`
+   }
+
+   if (!user.emailVerified) {
+      return "email not verified"
    }
 
    return "unknown"
