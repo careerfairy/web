@@ -3248,7 +3248,9 @@ class FirebaseService {
 
    // Backfill user data
    backfillUserData = async ({ timezone }: Pick<UserData, "timezone">) => {
-      return this.functions.httpsCallable("backfillUserData")({ timezone })
+      return this.functions.httpsCallable(FUNCTION_NAMES.backfillUserData)({
+         timezone,
+      })
    }
 
    // DB functions

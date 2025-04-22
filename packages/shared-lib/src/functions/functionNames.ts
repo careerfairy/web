@@ -42,4 +42,7 @@ export const FUNCTION_NAMES = {
 
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",
+
+   // Auth functions
+   backfillUserData: "backfillUserData_v2",
 } as const
