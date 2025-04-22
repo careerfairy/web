@@ -87,7 +87,7 @@ const QRCodeImage = styled(Box)(({ theme }) => ({
    boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
 }))
 
-interface GetNotifiedCardProps {
+type Props = {
    /** If true, shows only calendar button. If false, shows download app and calendar buttons */
    isAppDownloaded?: boolean
    /** Controls the responsive layout. "desktop" forces desktop layout, "mobile" forces mobile layout, "auto" uses media queries */
@@ -103,7 +103,7 @@ export const GetNotifiedCard = ({
    responsiveMode = "auto",
    isExpanded = false,
    onClose,
-}: GetNotifiedCardProps) => {
+}: Props) => {
    const theme = useTheme()
    // Auto-detect desktop if not explicitly provided
    const mdUp = useMediaQuery(theme.breakpoints.up("md"))
@@ -128,7 +128,7 @@ export const GetNotifiedCard = ({
          }}
       >
          {/* Close button */}
-         {Boolean(onClose) && (
+         {Boolean(onClose) && !isDesktop && (
             <CloseButton onClick={onClose}>
                <CloseIcon />
             </CloseButton>
