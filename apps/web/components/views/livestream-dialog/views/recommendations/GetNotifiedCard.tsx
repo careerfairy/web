@@ -9,6 +9,7 @@ import {
    useMediaQuery,
 } from "@mui/material"
 import { styled, useTheme } from "@mui/material/styles"
+import Image from "next/image"
 import {
    Calendar as CalendarIcon,
    X as CloseIcon,
@@ -44,14 +45,20 @@ const EventBanner = styled(Box)(({ theme }) => ({
    gap: 8,
 }))
 
-// Banner image
-const BannerImage = styled(Box)(({ theme }) => ({
+// Banner image container
+const BannerImageContainer = styled(Box)(({ theme }) => ({
    width: "100%",
-   backgroundColor: theme.palette.grey[300],
-   backgroundSize: "cover",
-   backgroundPosition: "center",
    position: "relative",
+   backgroundColor: theme.palette.grey[300],
 }))
+
+// Gradient overlay
+const GradientOverlay = styled(Box)({
+   position: "absolute",
+   inset: 0,
+   zIndex: 1,
+   background: "linear-gradient(rgba(22, 33, 40, 0.7), rgba(22, 33, 40, 0.7))",
+})
 
 // Close button
 const CloseButton = styled(Box)(({ theme }) => ({
@@ -137,13 +144,16 @@ export const GetNotifiedCard = ({
          {/* Event details section */}
          <EventBanner>
             {/* Banner image with overlay */}
-            <BannerImage
-               sx={{
-                  height: isDesktop ? 120 : 95,
-                  backgroundImage:
-                     "linear-gradient(rgba(22, 33, 40, 0.7), rgba(22, 33, 40, 0.7)), url('https://placehold.co/600x400')",
-               }}
-            />
+            <BannerImageContainer sx={{ height: isDesktop ? 120 : 95 }}>
+               <Image
+                  src="https://placehold.co/600x400"
+                  alt="Event banner"
+                  fill
+                  style={{ objectFit: "cover" }}
+                  sizes={isDesktop ? "402px" : "343px"}
+               />
+               <GradientOverlay />
+            </BannerImageContainer>
 
             {/* Event content */}
             <Box

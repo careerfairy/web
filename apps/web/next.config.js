@@ -366,7 +366,10 @@ const moduleExports = {
          "127.0.0.1",
          "eu-west-2.graphassets.com",
          "icon.horse", // for fetching favicons
+         "placehold.co",
       ],
+      dangerouslyAllowSVG: true,
+      contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
    },
    webpack: (config) => {
       config.module.rules.push({
