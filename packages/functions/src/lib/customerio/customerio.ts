@@ -7,6 +7,7 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/firestore"
 import { onRequest } from "firebase-functions/https"
+import { auth } from "../../api/firestoreAdmin"
 import { userRepo } from "../../api/repositories"
 import {
    customerIOWebhookSignatureMiddleware,
@@ -19,7 +20,7 @@ import { CustomerIOWebhookEvent } from "./types"
 /**
  * Set to false when running backfill
  */
-const CHECK_FOR_CHANGES = true
+const CHECK_FOR_CHANGES = false
 
 export const syncUserToCustomerIO = onDocumentWritten(
    {
@@ -55,6 +56,15 @@ export const syncUserToCustomerIO = onDocumentWritten(
       }
 
       if (shouldSyncUser(after)) {
+         const userRecord = await auth.getUser(authId)
+
+         if (!userRecord?.emailVerified) {
+            logger.info(
+               `User ${authId} email not verified, skipping sync to CustomerIO`
+            )
+            return
+         }
+
          const oldData = before ? transformUserDataForCustomerIO(before) : null
          const newData = transformUserDataForCustomerIO(after)
 
@@ -101,8 +111,7 @@ export const syncUserToCustomerIO = onDocumentWritten(
 const shouldSyncUser = (user: UserData) => {
    return (
       user.lastActivityAt && // User has an activity date
-      user.lastActivityAt.toDate() >= CUTOFF_DATE && // User is active since before Sept 2023
-      user.emailVerified
+      user.lastActivityAt.toDate() >= CUTOFF_DATE // User is active since before Sept 2023
    )
 }
 
@@ -114,10 +123,6 @@ const getReasonForExclusion = (user: UserData) => {
    const lastActivityDate = user.lastActivityAt.toDate()
    if (lastActivityDate < CUTOFF_DATE) {
       return `inactive since before ${CUTOFF_DATE.toLocaleDateString()} (last activity: ${lastActivityDate.toLocaleDateString()})`
-   }
-
-   if (!user.emailVerified) {
-      return "email not verified"
    }
 
    return "unknown"
