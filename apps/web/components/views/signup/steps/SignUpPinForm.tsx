@@ -25,7 +25,10 @@ import { AnalyticsEvents } from "util/analyticsConstants"
 import { errorLogAndNotify } from "util/CommonUtil"
 import * as yup from "yup"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import {
+   analyticsSetUser,
+   dataLayerEvent,
+} from "../../../../util/analyticsUtils"
 import {
    IMultiStepContext,
    MultiStepContext,
@@ -104,6 +107,7 @@ const SignUpPinForm = () => {
          // reload user auth on both redux state and firebase instance
          await firebase.auth.currentUser.reload()
          await reloadAuth(dispatch, firebase.app) // redux action
+         analyticsSetUser(user.uid)
 
          updateActiveStep()
          dataLayerEvent(AnalyticsEvents.SignupPinComplete)

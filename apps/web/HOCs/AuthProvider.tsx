@@ -234,7 +234,9 @@ const AuthProvider = ({ children }) => {
             clearFirestoreCache()
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
-            analyticsSetUser(user.uid)
+            if (user.emailVerified) {
+               analyticsSetUser(user.uid)
+            }
             setIsLoggedIn(true)
             setIsLoggedOut(false)
             const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
