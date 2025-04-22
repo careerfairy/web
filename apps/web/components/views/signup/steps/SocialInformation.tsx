@@ -253,8 +253,8 @@ const UserLinkedInLink = () => {
    )
 
    useEffect(() => {
-      setDebouncedLink(userData.linkedinUrl)
-   }, [userData.linkedinUrl])
+      setDebouncedLink(userData?.linkedinUrl)
+   }, [userData?.linkedinUrl])
 
    const isLinkedInLinkValid =
       debouncedLink?.length > 0 && isValidLinkedInLink(debouncedLink)
