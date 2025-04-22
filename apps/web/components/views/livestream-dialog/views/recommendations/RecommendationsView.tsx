@@ -81,6 +81,7 @@ const RecommendationsView = () => {
                            Mobile - App Download Variant
                         </Typography>
                         <GetNotifiedCard
+                           responsiveMode="mobile"
                            isAppDownloaded={false}
                            onClose={() => console.log("Card closed")}
                         />
@@ -100,6 +101,7 @@ const RecommendationsView = () => {
                         </Typography>
                         <GetNotifiedCard
                            isAppDownloaded={true}
+                           responsiveMode="mobile"
                            onClose={() => console.log("Card closed")}
                         />
                      </Grid>
@@ -118,7 +120,7 @@ const RecommendationsView = () => {
                            Desktop - App Download Variant
                         </Typography>
                         <GetNotifiedCard
-                           isDesktop={true}
+                           responsiveMode="desktop"
                            isExpanded={false}
                            isAppDownloaded={false}
                            onClose={() => console.log("Card closed")}
@@ -138,7 +140,7 @@ const RecommendationsView = () => {
                            Desktop - Calendar Only Variant
                         </Typography>
                         <GetNotifiedCard
-                           isDesktop={true}
+                           responsiveMode="desktop"
                            isExpanded={false}
                            isAppDownloaded={true}
                            onClose={() => console.log("Card closed")}
@@ -159,7 +161,7 @@ const RecommendationsView = () => {
                            Desktop Expanded - App Download Variant
                         </Typography>
                         <GetNotifiedCard
-                           isDesktop={true}
+                           responsiveMode="desktop"
                            isExpanded={true}
                            isAppDownloaded={false}
                            onClose={() => console.log("Card closed")}
@@ -179,7 +181,7 @@ const RecommendationsView = () => {
                            Desktop Expanded - Calendar Only Variant
                         </Typography>
                         <GetNotifiedCard
-                           isDesktop={true}
+                           responsiveMode="desktop"
                            isExpanded={true}
                            isAppDownloaded={true}
                            onClose={() => console.log("Card closed")}

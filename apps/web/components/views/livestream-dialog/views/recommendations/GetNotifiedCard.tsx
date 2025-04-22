@@ -7,9 +7,8 @@ import {
    Stack,
    Typography,
    useMediaQuery,
-   useTheme,
 } from "@mui/material"
-import { styled } from "@mui/material/styles"
+import { styled, useTheme } from "@mui/material/styles"
 import {
    Calendar as CalendarIcon,
    X as CloseIcon,
@@ -91,8 +90,8 @@ const QRCodeImage = styled(Box)(({ theme }) => ({
 interface GetNotifiedCardProps {
    /** If true, shows only calendar button. If false, shows download app and calendar buttons */
    isAppDownloaded?: boolean
-   /** If true, renders the desktop version with different layouts */
-   isDesktop?: boolean
+   /** Controls the responsive layout. "desktop" forces desktop layout, "mobile" forces mobile layout, "auto" uses media queries */
+   responsiveMode?: "desktop" | "mobile" | "auto"
    /** If true and isDesktop is true, shows the expanded version with centered content */
    isExpanded?: boolean
    /** Optional callback when close button is clicked */
@@ -101,14 +100,19 @@ interface GetNotifiedCardProps {
 
 export const GetNotifiedCard = ({
    isAppDownloaded = false,
-   isDesktop: isDesktopProp,
+   responsiveMode = "auto",
    isExpanded = false,
    onClose,
 }: GetNotifiedCardProps) => {
    const theme = useTheme()
    // Auto-detect desktop if not explicitly provided
    const mdUp = useMediaQuery(theme.breakpoints.up("md"))
-   const isDesktop = isDesktopProp !== undefined ? isDesktopProp : mdUp
+   const isDesktop =
+      responsiveMode === "auto"
+         ? mdUp
+         : responsiveMode === "desktop"
+         ? true
+         : false
 
    const buttonsSize = isDesktop ? "large" : "medium"
 
@@ -119,8 +123,8 @@ export const GetNotifiedCard = ({
    return (
       <StyledCard
          sx={{
-            width: isDesktop ? (isExpanded ? 570 : 402) : 343,
-            height: isDesktop ? 755 : 572,
+            width: `${isDesktop ? (isExpanded ? 570 : 402) : 343}px !important`,
+            height: isDesktop ? 755 : isAppDownloaded ? 534 : 572,
          }}
       >
          {/* Close button */}
@@ -214,25 +218,30 @@ export const GetNotifiedCard = ({
                pb: "0px !important",
                display: "flex",
                flexDirection: "column",
+               width: "100%",
             }}
          >
-            <Stack spacing={2} my="auto">
+            <Stack
+               spacing={2}
+               m="auto"
+               display="flex"
+               maxWidth={isAppDownloaded ? 434 : undefined}
+            >
                {/* Text content */}
-               <Box sx={{ px: isDesktop ? 3 : 2 }}>
+               <Box
+                  px={isDesktop ? 3 : 2}
+                  textAlign={isDesktop && isExpanded ? "center" : "left"}
+               >
                   <Typography
                      variant={isDesktop ? "brandedH3" : "brandedH4"}
                      color="text.primary"
                      gutterBottom
-                     align={isDesktop ? "center" : "left"}
+                     fontWeight={700}
                   >
                      {isAppDownloaded ? "Get Notified! 🎉" : "Get Notified!"}
                   </Typography>
                   <br />
-                  <Typography
-                     variant="medium"
-                     color="text.secondary"
-                     align={isDesktop ? "center" : "left"}
-                  >
+                  <Typography variant="medium" color="text.secondary">
                      {isAppDownloaded
                         ? "Stay updated on this live stream and future job opportunities by adding this event to your calendar."
                         : "Download our mobile app to get notified when this live stream starts and stay updated on future job opportunities!"}
@@ -242,7 +251,12 @@ export const GetNotifiedCard = ({
                {/* Desktop QR Code and Buttons */}
                {isDesktop && !isAppDownloaded ? (
                   <Box sx={{ px: 2 }}>
-                     <QRCodeContainer>
+                     <QRCodeContainer
+                        sx={{
+                           alignItems:
+                              isDesktop && isExpanded ? "center" : "flex-start",
+                        }}
+                     >
                         <QRCodeImage
                            sx={{
                               backgroundImage:
@@ -250,16 +264,15 @@ export const GetNotifiedCard = ({
                            }}
                         />
                         <Typography
-                           variant="medium"
+                           variant="desktopBrandedH5"
                            color="text.primary"
                            fontWeight={600}
-                           align="center"
                         >
                            Scan to download CareerFairy App!
                         </Typography>
                         <Typography
                            variant="small"
-                           color="text.disabled"
+                           color="neutral.600"
                            align="center"
                         >
                            or
@@ -267,10 +280,10 @@ export const GetNotifiedCard = ({
                         <Button
                            variant="outlined"
                            color="primary"
+                           fullWidth
                            startIcon={<CalendarIcon size={16} />}
                            onClick={handleAddToCalendar}
                            size={buttonsSize}
-                           sx={{ alignSelf: "center" }}
                         >
                            Add to calendar
                         </Button>
@@ -293,7 +306,7 @@ export const GetNotifiedCard = ({
                            </Button>
                         )}
                         <Button
-                           fullWidth={!isDesktop}
+                           // fullWidth={!isDesktop}
                            variant={
                               isAppDownloaded
                                  ? "contained"
@@ -310,6 +323,7 @@ export const GetNotifiedCard = ({
                               width:
                                  isDesktop && isExpanded ? "100%" : undefined,
                            }}
+                           fullWidth
                         >
                            {isAppDownloaded || isDesktop
                               ? "Add to calendar"
@@ -330,7 +344,7 @@ export const GetNotifiedCard = ({
                   py: 1,
                }}
             >
-               <Typography variant="xsmall" color="text.disabled">
+               <Typography variant="xsmall" color="neutral.500">
                   You&apos;ll also receive reminders on
                   hubertus.groneweegen@myemailprovider.com before the start of
                   the live stream
