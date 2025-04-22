@@ -11,6 +11,7 @@ import {
 } from "@careerfairy/shared-lib/users"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
+import { UserRecord } from "firebase-admin/auth"
 import { onCall } from "firebase-functions/v2/https"
 import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import {
@@ -504,7 +505,7 @@ export const sendPasswordResetEmail = onCall<{
    }
 })
 
-export const backfillUserData = functions.https.onCall(async (request) => {
+export const backfillUserData = onCall(async (request) => {
    const email = request.auth?.token?.email
    functions.logger.debug(email, request.auth)
 
@@ -518,32 +519,70 @@ export const backfillUserData = functions.https.onCall(async (request) => {
       )
    }
 
-   const userData = await userRepo.getUserDataById(email)
-   const userRecord = await auth.getUserByEmail(email)
-   const dataToUpdate: Partial<UserData> = {}
+   try {
+      // First check if the user exists in Auth
+      let userRecord: UserRecord
+      try {
+         userRecord = await auth.getUserByEmail(email)
+      } catch (error) {
+         if (error.code === "auth/user-not-found") {
+            functions.logger.warn(
+               `User with email ${email} not found in Firebase Auth`
+            )
+            return { success: false, message: "User not found" }
+         }
+         // For other errors, throw them
+         throw error
+      }
 
-   if (!userData.referralCode) {
-      dataToUpdate.referralCode = generateReferralCode()
-      functions.logger.info("Adding referralCode to user")
-   }
+      // Then check if user data exists
+      let userData: UserData
+      try {
+         userData = await userRepo.getUserDataById(email)
+         if (!userData) {
+            functions.logger.warn(
+               `User data for ${email} not found in Firestore`
+            )
+            return { success: false, message: "User data not found" }
+         }
+      } catch (error) {
+         functions.logger.error(`Error getting user data for ${email}:`, error)
+         return { success: false, message: "Error getting user data" }
+      }
 
-   // if there's no timezone it will save the current timezone provided by the browser
-   if (!userData.timezone) {
-      dataToUpdate.timezone = request.data.timezone
-      functions.logger.info("Adding time zone to user")
-   }
+      const dataToUpdate: Partial<UserData> = {}
 
-   if (userData.emailVerified === undefined) {
-      dataToUpdate.emailVerified = userRecord.emailVerified
-      functions.logger.info("Adding emailVerifiedAt to user")
-   }
+      if (!userData.referralCode) {
+         dataToUpdate.referralCode = generateReferralCode()
+         functions.logger.info("Adding referralCode to user")
+      }
 
-   if (Object.keys(dataToUpdate).length > 0) {
-      await userUpdateFields(email, dataToUpdate)
-      functions.logger.info(
-         "User updated with the following fields",
-         dataToUpdate
+      // if there's no timezone it will save the current timezone provided by the browser
+      if (!userData.timezone) {
+         dataToUpdate.timezone = request.data.timezone
+         functions.logger.info("Adding time zone to user")
+      }
+
+      if (!userData.emailVerified) {
+         dataToUpdate.emailVerified = userRecord.emailVerified
+         functions.logger.info("Adding emailVerifiedAt to user")
+      }
+
+      if (Object.keys(dataToUpdate).length > 0) {
+         await userUpdateFields(email, dataToUpdate)
+         functions.logger.info(
+            "User updated with the following fields",
+            dataToUpdate
+         )
+      }
+
+      return { success: true }
+   } catch (error) {
+      functions.logger.error(
+         `Unexpected error in backfillUserData for ${email}:`,
+         error
       )
+      throw new functions.https.HttpsError("internal", error.message)
    }
 })
 
