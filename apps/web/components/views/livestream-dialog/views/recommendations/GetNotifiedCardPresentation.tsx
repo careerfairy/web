@@ -1,5 +1,4 @@
 import {
-   Avatar,
    Box,
    Button,
    Card,
@@ -8,6 +7,7 @@ import {
    Typography,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
 import {
    Calendar as CalendarIcon,
@@ -82,14 +82,12 @@ const QRCodeContainer = styled(Box)({
    alignSelf: "stretch",
 })
 
-// QR Code image
-const QRCodeImage = styled(Box)(({ theme }) => ({
+// QR Code image using styled(Image)
+const StyledQRCodeImage = styled(Image)(({ theme }) => ({
    width: 120,
    height: 120,
    backgroundColor: theme.palette.common.white,
    borderRadius: 12,
-   backgroundSize: "contain",
-   backgroundPosition: "center",
    boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
 }))
 
@@ -193,7 +191,11 @@ export const GetNotifiedCardPresentation = ({
                         isDesktop && isExpanded ? "center" : "flex-start",
                   }}
                >
-                  <Avatar src={companyLogoUrl} sx={{ width: 40, height: 40 }} />
+                  <CircularLogo
+                     src={companyLogoUrl}
+                     alt={`${companyName} logo`}
+                     size={40}
+                  />
                   <Typography
                      variant="small"
                      color="text.secondary"
@@ -281,10 +283,12 @@ export const GetNotifiedCardPresentation = ({
                               isDesktop && isExpanded ? "center" : "flex-start",
                         }}
                      >
-                        <QRCodeImage
-                           sx={{
-                              backgroundImage: `url('${qrCodeUrl}')`,
-                           }}
+                        <StyledQRCodeImage
+                           src={qrCodeUrl}
+                           alt="QR Code to download CareerFairy App"
+                           width={120}
+                           height={120}
+                           style={{ objectFit: "contain" }}
                         />
                         <Typography
                            variant="desktopBrandedH5"
@@ -340,11 +344,6 @@ export const GetNotifiedCardPresentation = ({
                            startIcon={<CalendarIcon size={16} />}
                            onClick={onAddToCalendar}
                            size={buttonsSize}
-                           sx={{
-                              alignSelf: isDesktop ? "center" : undefined,
-                              width:
-                                 isDesktop && isExpanded ? "100%" : undefined,
-                           }}
                            fullWidth
                         >
                            {isAppDownloaded || isDesktop
