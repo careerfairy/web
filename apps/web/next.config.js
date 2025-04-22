@@ -368,7 +368,9 @@ const moduleExports = {
          "icon.horse", // for fetching favicons
          "placehold.co",
       ],
+      // Allow SVGs to be used in the app
       dangerouslyAllowSVG: true,
+      // Restrictive CSP for SVG content to mitigate potential security risks
       contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
    },
    webpack: (config) => {
