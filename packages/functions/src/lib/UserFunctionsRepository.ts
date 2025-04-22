@@ -511,7 +511,7 @@ export class UserFunctionsRepository
             pinCode: user.validationPin.toString(),
          },
          identifiers: {
-            email: user.userEmail,
+            id: user.authId,
          },
          to: user.userEmail,
       })
