@@ -83,7 +83,7 @@ const styles = sxStyles({
    },
 })
 
-const NEXT_VIEW = "recommendations" satisfies ViewKey
+const NEXT_VIEW = "register-success" satisfies ViewKey
 
 const RegisterAskQuestionsView = () => {
    const { livestream, goToView } = useLiveStreamDialog()

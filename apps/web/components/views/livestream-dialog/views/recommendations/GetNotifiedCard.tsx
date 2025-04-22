@@ -2,6 +2,7 @@ import { useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCallback } from "react"
+import DateUtil from "util/DateUtil"
 import { LivestreamEvent } from "../../../../../../../packages/shared-lib/src/livestreams/livestreams"
 import { GetNotifiedCardPresentation } from "./GetNotifiedCardPresentation"
 
@@ -51,9 +52,7 @@ export const GetNotifiedCard = ({
       livestream?.backgroundImageUrl || "https://placehold.co/600x400"
 
    // Format date string from livestream start time
-   const eventDateString = livestream?.start
-      ? formatDate(livestream.start)
-      : "23 March at 3:00 PM"
+   const eventDateString = formatLivestreamDate(livestream?.start || new Date())
 
    // QR code URL - in a real implementation, you might generate this dynamically
    const qrCodeUrl = "https://placehold.co/120x120"
@@ -67,7 +66,6 @@ export const GetNotifiedCard = ({
    const handleAddToCalendar = useCallback(() => {
       console.log("Add to calendar clicked for livestream:", livestream?.id)
       // Implement actual calendar logic here
-      // - would likely need to create an iCal file with livestream data
    }, [livestream?.id])
 
    return (
@@ -90,21 +88,13 @@ export const GetNotifiedCard = ({
 }
 
 // Helper function to format date from firebase timestamp
-const formatDate = (timestamp: any): string => {
+const formatLivestreamDate = (timestamp: any): string => {
    if (!timestamp) return ""
 
    try {
       // Convert Firebase timestamp to JS Date
       const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
-
-      // Format the date - can be customized as needed
-      return new Intl.DateTimeFormat("en-US", {
-         day: "numeric",
-         month: "long",
-         hour: "numeric",
-         minute: "numeric",
-         hour12: true,
-      }).format(date)
+      return DateUtil.formatDateTime(date)
    } catch (error) {
       console.error("Error formatting date:", error)
       return ""

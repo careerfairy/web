@@ -422,7 +422,10 @@ const Content: FC<ContentProps> = ({
    // Using useEffect to update the view based on 'page'.
    // This allows conditional navigation not covered by useMemo.
    useEffect(() => {
+      // TODO: Remove if statement after reviewing the recommendations view PR
+      if (activeView === "recommendations") return
       setValue(getPageIndex(page))
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [page, setValue])
 
    const [registrationState, registrationDispatch] = useReducer(
@@ -590,9 +593,6 @@ type DialogContextType = {
 }
 
 const getPageIndex = (page: Props["page"]): number => {
-   // To fast track development, we return the recommendations view index
-   return views.findIndex((view) => view.key === "recommendations")
-
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")
