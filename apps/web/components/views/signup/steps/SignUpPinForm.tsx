@@ -18,6 +18,7 @@ import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { useDeleteCurrentUser } from "components/custom-hook/user/useDeleteCurrentUser"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { Formik } from "formik"
+import { updateUserActivity } from "HOCs/user/trackActivity"
 import { Fragment, useContext, useState } from "react"
 import { useDispatch } from "react-redux"
 import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
@@ -50,7 +51,7 @@ const SignUpPinForm = () => {
    const [errorMessageShown] = useState(false)
    const [incorrectPin, setIncorrectPin] = useState(false)
    const [generalLoading, setGeneralLoading] = useState(false)
-   const { authenticatedUser: user } = useAuth()
+   const { authenticatedUser: user, userData } = useAuth()
    const { nextStep, previousStep } =
       useContext<IMultiStepContext>(MultiStepContext)
    const dispatch = useDispatch()
@@ -104,10 +105,16 @@ const SignUpPinForm = () => {
       try {
          await firebase.validateUserEmailWithPin(userInfo)
 
+         analyticsSetUser(user.uid)
+
          // reload user auth on both redux state and firebase instance
          await firebase.auth.currentUser.reload()
          await reloadAuth(dispatch, firebase.app) // redux action
-         analyticsSetUser(user.uid)
+
+         // update user activity after the user is validated
+         setTimeout(() => {
+            updateUserActivity(userData).catch(errorLogAndNotify)
+         }, 250)
 
          updateActiveStep()
          dataLayerEvent(AnalyticsEvents.SignupPinComplete)
