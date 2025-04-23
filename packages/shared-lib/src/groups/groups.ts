@@ -3,6 +3,7 @@ import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { MergeExtraRequiredData } from "../ats/merge/MergeResponseTypes"
 import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
 import { FieldOfStudyCategory } from "../fieldOfStudy"
+import { Timestamp } from "../firebaseTypes"
 import { UserData } from "../users"
 import { dynamicSort } from "../utils"
 
@@ -128,9 +129,9 @@ export type GroupPlan = {
    // The type of the group plan.
    type: GroupPlanType
    // The timestamp when the group plan started, or null if the group plan has not started yet.
-   startedAt: firebase.firestore.Timestamp | null
+   startedAt: Timestamp | null
    // The timestamp when the group plan expires, or null if the group plan does not expire. Can be overwritten by CF admin.
-   expiresAt: firebase.firestore.Timestamp | null
+   expiresAt: Timestamp | null
 }
 
 export type GroupTargetUniversity = GroupOption & {

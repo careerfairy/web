@@ -11,7 +11,6 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import { customJobRepo } from "../../../data/RepositoryInstances"
 import { customJobServiceInstance } from "../../../data/firebase/CustomJobService"
 import { dataLayerCustomJobEvent } from "../../../util/analyticsUtils"
-import useGroupFields from "../group/useGroupFields"
 import { useAppDispatch } from "../store"
 import useFingerPrint from "../useFingerPrint"
 import useSnackbarNotifications from "../useSnackbarNotifications"
@@ -35,9 +34,6 @@ const useCustomJobApply = (
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
    const customJob = useCustomJob(job.id)
-   const { data: groupFields } = useGroupFields(customJob.groupId, [
-      "universityName",
-   ])
 
    const { trigger: handleConfirmApply, isMutating: isApplying } =
       useSWRMutation(
@@ -71,7 +67,7 @@ const useCustomJobApply = (
                dataLayerCustomJobEvent(
                   AnalyticsEvents.CustomJobApplicationComplete,
                   job,
-                  groupFields?.universityName
+                  customJob?.group?.universityName
                )
 
                if (isInTalentGuide) {
@@ -116,7 +112,7 @@ const useCustomJobApply = (
                dataLayerCustomJobEvent(
                   AnalyticsEvents.CustomJobApplicationInitiated,
                   job,
-                  groupFields?.universityName
+                  customJob?.group?.universityName
                )
             })
          }

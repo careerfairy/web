@@ -278,7 +278,8 @@ export const onWriteGroup = onDocumentWritten(
 
       // Run side effects for all creator changes
       sideEffectPromises.push(
-         sparkRepo.syncGroupDataToSpark(event.data, groupId)
+         sparkRepo.syncGroupDataToSpark(event.data, groupId),
+         customJobRepo.syncGroupDataToCustomJob(event.data, groupId)
       )
 
       const newValue = event.data.after?.data() as Group
