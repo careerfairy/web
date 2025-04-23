@@ -516,6 +516,7 @@ export interface UserActivity extends Identifiable {
       | "livestreamRegistration"
       | "livestreamParticipation"
       | "livestreamRecordingView"
+      | "signupPinComplete"
 }
 
 /**
