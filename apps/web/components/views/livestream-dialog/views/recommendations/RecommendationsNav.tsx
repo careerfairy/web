@@ -8,6 +8,7 @@ const styles = sxStyles({
       bottom: 0,
       left: 0,
       right: 0,
+      zIndex: "auto",
    },
 })
 

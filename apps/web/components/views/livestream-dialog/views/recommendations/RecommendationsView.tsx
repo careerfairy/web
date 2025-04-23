@@ -1,9 +1,11 @@
-import { Box, Button, styled } from "@mui/material"
+import { Box, styled } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { AnimatePresence } from "framer-motion"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLiveStreamDialog } from "../.."
 import BaseDialogView from "../../BaseDialogView"
+import { BlurredBackground } from "./BlurredBackground"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
 
@@ -12,7 +14,7 @@ const styles = sxStyles({
       padding: [0, "!important"],
       height: "100%",
       width: "100%",
-      overflow: "auto",
+      overflow: "hidden",
    },
    container: {
       display: "flex",
@@ -54,24 +56,28 @@ const RecommendationsView = () => {
    const isMobile = useIsMobile()
    const { livestream } = useLiveStreamDialog()
 
-   const [isExpanded, setIsExpanded] = useState(false)
+   const [showRecommendations, setShowRecommendations] = useState(false)
 
    return (
       <BaseDialogView
          sx={styles.root}
          mainContent={
             <Layout>
-               <Box sx={styles.container}>
-                  <GetNotifiedCard
-                     livestream={livestream}
-                     onClose={() => console.log("Card closed")}
-                     isExpanded={isExpanded}
-                  />
-                  <Button onClick={() => setIsExpanded(!isExpanded)}>
-                     {isExpanded ? "Collapse" : "Expand"}
-                  </Button>
-               </Box>
-               {Boolean(isMobile) && <RecommendationsNav />}
+               <AnimatePresence>
+                  <Box sx={styles.container}>
+                     {Boolean(isMobile && !showRecommendations) && (
+                        <GetNotifiedCard
+                           key="get-notified-card"
+                           livestream={livestream}
+                           onClose={() => setShowRecommendations(true)}
+                        />
+                     )}
+                  </Box>
+                  {Boolean(isMobile) && <RecommendationsNav />}
+                  {Boolean(isMobile && !showRecommendations) && (
+                     <BlurredBackground key="blurred-background" />
+                  )}
+               </AnimatePresence>
             </Layout>
          }
       />

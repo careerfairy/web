@@ -42,13 +42,21 @@ const StyledCard = styled(motion(Card))(({ theme }) => ({
 const EventBanner = styled(Box)(({ theme }) => ({
    backgroundColor: theme.palette.background.paper,
    borderRadius: 14,
-   borderColor: theme.palette.divider,
-   borderWidth: 1,
-   borderStyle: "solid",
-   padding: "0 0 8px 0",
+   display: "flex",
+   flexDirection: "column",
+}))
+
+const EventBannerLowerContentContainer = styled(motion(Box))(({ theme }) => ({
    display: "flex",
    flexDirection: "column",
    gap: 8,
+   padding: "8px 16px",
+   borderBottomRightRadius: "14px",
+   borderBottomLeftRadius: "14px",
+   borderWidth: 1,
+   borderColor: theme.brand.white[500],
+   backgroundColor: theme.brand.white[200],
+   borderStyle: "solid",
 }))
 
 // Banner image container
@@ -183,16 +191,9 @@ export const GetNotifiedCardPresentation = ({
             </BannerImageContainer>
 
             {/* Event content */}
-            <Box
-               sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: isDesktop && isExpanded ? "center" : "flex-start",
-                  px: 2,
-                  gap: 1,
-               }}
-               component={motion.div}
+            <EventBannerLowerContentContainer
                layoutId="event-content-container"
+               alignItems={isDesktop && isExpanded ? "center" : "flex-start"}
             >
                {/* Company info */}
                <Box
@@ -263,7 +264,7 @@ export const GetNotifiedCardPresentation = ({
                      {eventDateString}
                   </AnimatedTypography>
                </Box>
-            </Box>
+            </EventBannerLowerContentContainer>
          </EventBanner>
 
          {/* Call to action section */}
