@@ -1,3 +1,4 @@
+import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users/users"
 import { LoadingButton } from "@mui/lab"
 import {
    Box,
@@ -17,8 +18,8 @@ import { useAppSelector } from "components/custom-hook/store"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { useDeleteCurrentUser } from "components/custom-hook/user/useDeleteCurrentUser"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { userRepo } from "data/RepositoryInstances"
 import { Formik } from "formik"
-import { updateUserActivity } from "HOCs/user/trackActivity"
 import { Fragment, useContext, useState } from "react"
 import { useDispatch } from "react-redux"
 import { reloadAuth } from "react-redux-firebase/lib/actions/auth"
@@ -112,9 +113,12 @@ const SignUpPinForm = () => {
          await reloadAuth(dispatch, firebase.app) // redux action
 
          // update user activity after the user is validated
-         setTimeout(() => {
-            updateUserActivity(userData).catch(errorLogAndNotify)
-         }, 250)
+         await userRepo
+            .createActivity(
+               pickPublicDataFromUser(userData),
+               "signupPinComplete"
+            )
+            .catch(errorLogAndNotify)
 
          updateActiveStep()
          dataLayerEvent(AnalyticsEvents.SignupPinComplete)
