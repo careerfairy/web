@@ -27,6 +27,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
    maxWidth: 343,
    display: "flex",
    flexDirection: "column",
+   transition: theme.transitions.create(["width", "height"]),
    [theme.breakpoints.up("md")]: {
       maxWidth: "none",
       width: "auto",

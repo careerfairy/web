@@ -1,5 +1,6 @@
-import { Box, Grid, Typography, styled } from "@mui/material"
+import { Box, Button, styled } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLiveStreamDialog } from "../.."
 import BaseDialogView from "../../BaseDialogView"
@@ -53,151 +54,23 @@ const RecommendationsView = () => {
    const isMobile = useIsMobile()
    const { livestream } = useLiveStreamDialog()
 
+   const [isExpanded, setIsExpanded] = useState(false)
+
    return (
       <BaseDialogView
          sx={styles.root}
          mainContent={
             <Layout>
                <Box sx={styles.container}>
-                  <Typography variant="h4" sx={styles.title}>
-                     GetNotifiedCard - All Variants
-                  </Typography>
-
-                  <Grid
-                     container
-                     spacing={4}
-                     sx={styles.gridContainer}
-                     justifyContent="center"
-                  >
-                     {/* Mobile Variants */}
-                     <Grid
-                        item
-                        xs={12}
-                        md={6}
-                        lg={6}
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                     >
-                        <Typography variant="h6" sx={styles.variantLabel}>
-                           Mobile - App Download Variant
-                        </Typography>
-                        <GetNotifiedCard
-                           livestream={livestream}
-                           responsiveMode="mobile"
-                           shouldDownloadApp
-                           onClose={() => console.log("Card closed")}
-                        />
-                     </Grid>
-
-                     <Grid
-                        item
-                        xs={12}
-                        md={6}
-                        lg={6}
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                     >
-                        <Typography variant="h6" sx={styles.variantLabel}>
-                           Mobile - Calendar Only Variant
-                        </Typography>
-                        <GetNotifiedCard
-                           livestream={livestream}
-                           shouldDownloadApp={false}
-                           responsiveMode="mobile"
-                           onClose={() => console.log("Card closed")}
-                        />
-                     </Grid>
-
-                     {/* Desktop Variants */}
-                     <Grid
-                        item
-                        xs={12}
-                        md={6}
-                        lg={6}
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                     >
-                        <Typography variant="h6" sx={styles.variantLabel}>
-                           Desktop - App Download Variant
-                        </Typography>
-                        <GetNotifiedCard
-                           livestream={livestream}
-                           responsiveMode="desktop"
-                           isExpanded={false}
-                           shouldDownloadApp
-                           onClose={() => console.log("Card closed")}
-                        />
-                     </Grid>
-
-                     <Grid
-                        item
-                        xs={12}
-                        md={6}
-                        lg={6}
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                     >
-                        <Typography variant="h6" sx={styles.variantLabel}>
-                           Desktop - Calendar Only Variant
-                        </Typography>
-                        <GetNotifiedCard
-                           livestream={livestream}
-                           responsiveMode="desktop"
-                           isExpanded={false}
-                           shouldDownloadApp={false}
-                           onClose={() => console.log("Card closed")}
-                        />
-                     </Grid>
-
-                     {/* Desktop Expanded Variants */}
-                     <Grid
-                        item
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                     >
-                        <Typography variant="h6" sx={styles.variantLabel}>
-                           Desktop Expanded - App Download Variant
-                        </Typography>
-                        <GetNotifiedCard
-                           livestream={livestream}
-                           responsiveMode="desktop"
-                           isExpanded={true}
-                           shouldDownloadApp
-                           onClose={() => console.log("Card closed")}
-                        />
-                     </Grid>
-
-                     <Grid
-                        item
-                        xs={12}
-                        md={12}
-                        lg={12}
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="center"
-                     >
-                        <Typography variant="h6" sx={styles.variantLabel}>
-                           Desktop Expanded - Calendar Only Variant
-                        </Typography>
-                        <GetNotifiedCard
-                           livestream={livestream}
-                           responsiveMode="desktop"
-                           isExpanded={true}
-                           shouldDownloadApp={false}
-                           onClose={() => console.log("Card closed")}
-                        />
-                     </Grid>
-                  </Grid>
+                  <GetNotifiedCard
+                     livestream={livestream}
+                     onClose={() => console.log("Card closed")}
+                     isExpanded={isExpanded}
+                  />
+                  <Button onClick={() => setIsExpanded(!isExpanded)}>
+                     {isExpanded ? "Collapse" : "Expand"}
+                  </Button>
                </Box>
-
                {Boolean(isMobile) && <RecommendationsNav />}
             </Layout>
          }
