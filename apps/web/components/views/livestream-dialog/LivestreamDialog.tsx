@@ -29,6 +29,7 @@ import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
+import { RegistrationSuccessAnimation } from "./animations/register-success/RegistrationSuccessAnimation"
 import {
    RegistrationAction,
    RegistrationState,
@@ -211,6 +212,12 @@ const LivestreamDialog: FC<Props> = ({
    const [value, setValue] = useState<number>(getPageIndex(page))
    const activeView = views[value].key
 
+   // Using useEffect to update the view based on 'page'.
+   // This allows conditional navigation not covered by useMemo.
+   useEffect(() => {
+      setValue(getPageIndex(page))
+   }, [page, setValue])
+
    return (
       <Dialog
          open={open}
@@ -240,7 +247,6 @@ const LivestreamDialog: FC<Props> = ({
                   value={value}
                   activeView={activeView}
                   setValue={setValue}
-                  page={page}
                   {...rest}
                />
             ) : (
@@ -251,7 +257,7 @@ const LivestreamDialog: FC<Props> = ({
    )
 }
 
-type ContentProps = Omit<Props, "open"> & {
+type ContentProps = Omit<Props, "open" | "page"> & {
    value: number
    activeView: ViewKey
    setValue: Dispatch<SetStateAction<number>>
@@ -272,7 +278,6 @@ const Content: FC<ContentProps> = ({
    value,
    activeView,
    setValue,
-   page,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -419,15 +424,6 @@ const Content: FC<ContentProps> = ({
       }
    }, [value, onClose, goToView])
 
-   // Using useEffect to update the view based on 'page'.
-   // This allows conditional navigation not covered by useMemo.
-   useEffect(() => {
-      // TODO: Remove if statement after reviewing the recommendations view PR
-      if (activeView === "recommendations") return
-      setValue(getPageIndex(page))
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [page, setValue])
-
    const [registrationState, registrationDispatch] = useReducer(
       registrationReducer,
       registrationInitialState
@@ -519,7 +515,7 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
-         {/* {activeView === "recommendations" && <RegistrationSuccessAnimation />} */}
+         {activeView === "recommendations" && <RegistrationSuccessAnimation />}
       </DialogContext.Provider>
    )
 }
