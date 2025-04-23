@@ -277,8 +277,6 @@ export const GetNotifiedCardPresentation = ({
                flexDirection: "column",
                width: "100%",
             }}
-            component={motion.div}
-            layoutId="text-content-container"
          >
             <Stack
                spacing={2}
@@ -286,29 +284,25 @@ export const GetNotifiedCardPresentation = ({
                m="auto"
                display="flex"
                maxWidth={!shouldDownloadApp ? 434 : undefined}
-               component={motion.div}
-               layoutId="text-content-container"
             >
                {/* Text content */}
                <Stack
                   px={isDesktop ? 3 : 2}
                   textAlign={isDesktop && isExpanded ? "center" : "left"}
-                  component={motion.div}
-                  layoutId="text-content-container"
                   spacing={0.5}
                >
                   <AnimatedTypography
+                     layoutId="text-content"
                      variant={isDesktop ? "brandedH3" : "brandedH4"}
                      color="text.primary"
                      fontWeight={700}
-                     layoutId="text-content"
                   >
                      {!shouldDownloadApp ? "Get Notified! 🎉" : "Get Notified!"}
                   </AnimatedTypography>
                   <AnimatedTypography
+                     layoutId="text-content-description"
                      variant="medium"
                      color="text.secondary"
-                     layoutId="text-content-description"
                   >
                      {!shouldDownloadApp
                         ? "Stay updated on this live stream and future job opportunities by adding this event to your calendar."
@@ -335,8 +329,6 @@ export const GetNotifiedCardPresentation = ({
                            style={{ objectFit: "contain" }}
                         />
                         <Stack
-                           component={motion.div}
-                           layoutId="qr-stack"
                            alignItems={
                               isDesktop && isExpanded ? "center" : "flex-start"
                            }
