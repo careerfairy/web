@@ -1,5 +1,5 @@
-import { useMediaQuery } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { appQrCodeLSRegistration } from "constants/images"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCallback } from "react"
 import DateUtil from "util/DateUtil"
@@ -9,9 +9,9 @@ import { GetNotifiedCardPresentation } from "./GetNotifiedCardPresentation"
 /** Props for the container component that handles business logic */
 type Props = {
    /** The livestream event data */
-   livestream?: LivestreamEvent
+   livestream: LivestreamEvent
    /** If true, shows only calendar button. If false, shows download app and calendar buttons */
-   isAppDownloaded?: boolean
+   shouldDownloadApp: boolean
    /** Controls the responsive layout. "desktop" forces desktop layout, "mobile" forces mobile layout, "auto" uses media queries */
    responsiveMode?: "desktop" | "mobile" | "auto"
    /** If true and isDesktop is true, shows the expanded version with centered content */
@@ -26,42 +26,23 @@ type Props = {
  */
 export const GetNotifiedCard = ({
    livestream,
-   isAppDownloaded = false,
+   shouldDownloadApp,
    responsiveMode = "auto",
    isExpanded = false,
    onClose,
 }: Props) => {
    const { authenticatedUser } = useAuth()
-   const theme = useTheme()
-   const mdUp = useMediaQuery(theme.breakpoints.up("md"))
+   const isDesktopDefault = !useIsMobile()
 
    // Determine if using desktop layout based on responsiveMode and media query
    const isDesktop =
       responsiveMode === "auto"
-         ? mdUp
+         ? isDesktopDefault
          : responsiveMode === "desktop"
          ? true
          : false
 
-   // Format livestream data for UI, with fallbacks
-   const companyName = livestream?.company || "EY (Ernst & Young)"
-   const companyLogoUrl =
-      livestream?.companyLogoUrl || "https://placehold.co/80x80"
-   const jobTitle = livestream?.title || "Technology Consulting @EY"
-   const bannerImageUrl =
-      livestream?.backgroundImageUrl || "https://placehold.co/600x400"
-
-   // Format date string from livestream start time
-   const eventDateString = formatLivestreamDate(livestream?.start || new Date())
-
-   // QR code URL - in a real implementation, you might generate this dynamically
-   const qrCodeUrl = "https://placehold.co/120x120"
-
    // Handler functions
-   const handleDownloadApp = useCallback(() => {
-      console.log("Download app clicked for livestream:", livestream?.id)
-      // Implement actual download app logic here
-   }, [livestream?.id])
 
    const handleAddToCalendar = useCallback(() => {
       console.log("Add to calendar clicked for livestream:", livestream?.id)
@@ -70,19 +51,21 @@ export const GetNotifiedCard = ({
 
    return (
       <GetNotifiedCardPresentation
-         companyName={companyName}
-         companyLogoUrl={companyLogoUrl}
-         jobTitle={jobTitle}
-         bannerImageUrl={bannerImageUrl}
-         eventDateString={eventDateString}
-         qrCodeUrl={qrCodeUrl}
-         isAppDownloaded={isAppDownloaded}
+         companyName={livestream.company}
+         companyLogoUrl={livestream.companyLogoUrl}
+         title={livestream.title}
+         bannerImageUrl={livestream.backgroundImageUrl}
+         eventDateString={formatLivestreamDate(livestream?.start || new Date())}
+         qrCodeUrl={appQrCodeLSRegistration}
+         shouldDownloadApp={shouldDownloadApp}
          isDesktop={isDesktop}
          isExpanded={isExpanded}
          userEmail={authenticatedUser?.email || "example@example.com"}
-         onDownloadApp={handleDownloadApp}
          onAddToCalendar={handleAddToCalendar}
          onClose={onClose}
+         downloadAppHref={
+            "/install-mobile-application?utm_source=careerfairy&utm_campaign=AppDownloadQ12025&utm_medium=lsregistrationbutton&utm_content=appdownload"
+         }
       />
    )
 }

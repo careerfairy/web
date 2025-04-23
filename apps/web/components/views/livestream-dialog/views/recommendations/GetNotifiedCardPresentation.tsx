@@ -7,6 +7,7 @@ import {
    Typography,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
 import {
@@ -89,6 +90,7 @@ const StyledQRCodeImage = styled(Image)(({ theme }) => ({
    backgroundColor: theme.palette.common.white,
    borderRadius: 12,
    boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
+   padding: 6,
 }))
 
 /** Props for the presentation component that handles UI */
@@ -98,27 +100,27 @@ type Props = {
    /** Company logo URL */
    companyLogoUrl: string
    /** Job title or event title */
-   jobTitle: string
+   title: string
    /** Banner image URL */
    bannerImageUrl: string
    /** Formatted event date string */
    eventDateString: string
    /** QR code image URL */
    qrCodeUrl: string
-   /** If true, shows only calendar button. If false, shows download app and calendar buttons */
-   isAppDownloaded: boolean
+   /** If true, shows download app button. If false, shows only calendar button */
+   shouldDownloadApp: boolean
    /** If true, shows desktop layout. If false, shows mobile layout */
    isDesktop: boolean
    /** If true and isDesktop is true, shows the expanded version with centered content */
    isExpanded: boolean
    /** User's email for notification details */
    userEmail: string
-   /** Handler for download app button click */
-   onDownloadApp: () => void
    /** Handler for add to calendar button click */
    onAddToCalendar: () => void
    /** Optional callback when close button is clicked */
    onClose?: () => void
+   /** Href for the download app button */
+   downloadAppHref?: string
 }
 
 /**
@@ -128,17 +130,17 @@ type Props = {
 export const GetNotifiedCardPresentation = ({
    companyName,
    companyLogoUrl,
-   jobTitle,
+   title,
    bannerImageUrl,
    eventDateString,
    qrCodeUrl,
-   isAppDownloaded,
+   shouldDownloadApp,
    isDesktop,
    isExpanded,
    userEmail,
-   onDownloadApp,
    onAddToCalendar,
    onClose,
+   downloadAppHref,
 }: Props) => {
    const buttonsSize = isDesktop ? "large" : "medium"
 
@@ -146,7 +148,7 @@ export const GetNotifiedCardPresentation = ({
       <StyledCard
          sx={{
             width: `${isDesktop ? (isExpanded ? 570 : 402) : 343}px !important`,
-            height: isDesktop ? 755 : isAppDownloaded ? 534 : 572,
+            height: isDesktop ? 755 : shouldDownloadApp ? 572 : 534,
          }}
       >
          {/* Close button */}
@@ -194,12 +196,13 @@ export const GetNotifiedCardPresentation = ({
                   <CircularLogo
                      src={companyLogoUrl}
                      alt={`${companyName} logo`}
-                     size={40}
+                     size={28}
                   />
                   <Typography
                      variant="small"
                      color="text.secondary"
                      fontWeight={600}
+                     sx={getMaxLineStyles(1)}
                   >
                      {companyName}
                   </Typography>
@@ -212,8 +215,9 @@ export const GetNotifiedCardPresentation = ({
                   fontWeight={600}
                   width="100%"
                   align={isDesktop && isExpanded ? "center" : "left"}
+                  sx={getMaxLineStyles(1)}
                >
-                  {jobTitle}
+                  {title}
                </Typography>
 
                {/* Event date */}
@@ -228,7 +232,11 @@ export const GetNotifiedCardPresentation = ({
                   }}
                >
                   <CalendarIcon size={16} color="#5C5C6A" />
-                  <Typography variant="small" color="text.secondary">
+                  <Typography
+                     sx={getMaxLineStyles(1)}
+                     variant="small"
+                     color="text.secondary"
+                  >
                      {eventDateString}
                   </Typography>
                </Box>
@@ -251,7 +259,7 @@ export const GetNotifiedCardPresentation = ({
                spacing={2}
                m="auto"
                display="flex"
-               maxWidth={isAppDownloaded ? 434 : undefined}
+               maxWidth={!shouldDownloadApp ? 434 : undefined}
             >
                {/* Text content */}
                <Box
@@ -264,18 +272,18 @@ export const GetNotifiedCardPresentation = ({
                      gutterBottom
                      fontWeight={700}
                   >
-                     {isAppDownloaded ? "Get Notified! 🎉" : "Get Notified!"}
+                     {!shouldDownloadApp ? "Get Notified! 🎉" : "Get Notified!"}
                   </Typography>
                   <br />
                   <Typography variant="medium" color="text.secondary">
-                     {isAppDownloaded
+                     {!shouldDownloadApp
                         ? "Stay updated on this live stream and future job opportunities by adding this event to your calendar."
                         : "Download our mobile app to get notified when this live stream starts and stay updated on future job opportunities!"}
                   </Typography>
                </Box>
 
                {/* Desktop QR Code and Buttons */}
-               {isDesktop && !isAppDownloaded ? (
+               {isDesktop && shouldDownloadApp ? (
                   <Box sx={{ px: 2 }}>
                      <QRCodeContainer
                         sx={{
@@ -288,45 +296,53 @@ export const GetNotifiedCardPresentation = ({
                            alt="QR Code to download CareerFairy App"
                            width={120}
                            height={120}
+                           quality={100}
                            style={{ objectFit: "contain" }}
                         />
-                        <Typography
-                           variant="desktopBrandedH5"
-                           color="text.primary"
-                           fontWeight={600}
+                        <Stack
+                           alignItems={
+                              isDesktop && isExpanded ? "center" : "flex-start"
+                           }
+                           spacing={0.5}
                         >
-                           Scan to download CareerFairy App!
-                        </Typography>
-                        <Typography
-                           variant="small"
-                           color="neutral.600"
-                           align="center"
-                        >
-                           or
-                        </Typography>
-                        <Button
-                           variant="outlined"
-                           color="primary"
-                           fullWidth
-                           startIcon={<CalendarIcon size={16} />}
-                           onClick={onAddToCalendar}
-                           size={buttonsSize}
-                        >
-                           Add to calendar
-                        </Button>
+                           <Typography
+                              variant="desktopBrandedH5"
+                              color="text.primary"
+                              fontWeight={600}
+                           >
+                              Scan to download CareerFairy App!
+                           </Typography>
+                           <Typography
+                              variant="small"
+                              color="neutral.600"
+                              align="center"
+                           >
+                              or
+                           </Typography>
+                           <Button
+                              variant="outlined"
+                              color="primary"
+                              startIcon={<CalendarIcon size={16} />}
+                              onClick={onAddToCalendar}
+                              size="small"
+                           >
+                              Add to calendar
+                           </Button>
+                        </Stack>
                      </QRCodeContainer>
                   </Box>
                ) : (
                   /* Mobile Buttons or App Downloaded Buttons */
                   <Box sx={{ px: 2 }}>
                      <Stack spacing={1.5} sx={{ width: "100%" }}>
-                        {!isAppDownloaded && !isDesktop && (
+                        {Boolean(shouldDownloadApp && !isDesktop) && (
                            <Button
                               fullWidth
                               variant="contained"
                               color="primary"
                               startIcon={<DownloadIcon size={16} />}
-                              onClick={onDownloadApp}
+                              href={downloadAppHref}
+                              target="_blank"
                               size={buttonsSize}
                            >
                               Download app
@@ -334,7 +350,7 @@ export const GetNotifiedCardPresentation = ({
                         )}
                         <Button
                            variant={
-                              isAppDownloaded
+                              !shouldDownloadApp
                                  ? "contained"
                                  : isDesktop
                                  ? "contained"
@@ -346,7 +362,7 @@ export const GetNotifiedCardPresentation = ({
                            size={buttonsSize}
                            fullWidth
                         >
-                           {isAppDownloaded || isDesktop
+                           {!shouldDownloadApp || isDesktop
                               ? "Add to calendar"
                               : "Add live stream to calendar"}
                         </Button>

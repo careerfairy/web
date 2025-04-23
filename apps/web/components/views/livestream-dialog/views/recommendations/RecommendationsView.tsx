@@ -1,6 +1,7 @@
 import { Box, Grid, Typography, styled } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
+import { useLiveStreamDialog } from "../.."
 import BaseDialogView from "../../BaseDialogView"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
@@ -50,6 +51,7 @@ const Layout = styled(Box)({
 
 const RecommendationsView = () => {
    const isMobile = useIsMobile()
+   const { livestream } = useLiveStreamDialog()
 
    return (
       <BaseDialogView
@@ -81,8 +83,9 @@ const RecommendationsView = () => {
                            Mobile - App Download Variant
                         </Typography>
                         <GetNotifiedCard
+                           livestream={livestream}
                            responsiveMode="mobile"
-                           isAppDownloaded={false}
+                           shouldDownloadApp
                            onClose={() => console.log("Card closed")}
                         />
                      </Grid>
@@ -100,7 +103,8 @@ const RecommendationsView = () => {
                            Mobile - Calendar Only Variant
                         </Typography>
                         <GetNotifiedCard
-                           isAppDownloaded={true}
+                           livestream={livestream}
+                           shouldDownloadApp={false}
                            responsiveMode="mobile"
                            onClose={() => console.log("Card closed")}
                         />
@@ -120,9 +124,10 @@ const RecommendationsView = () => {
                            Desktop - App Download Variant
                         </Typography>
                         <GetNotifiedCard
+                           livestream={livestream}
                            responsiveMode="desktop"
                            isExpanded={false}
-                           isAppDownloaded={false}
+                           shouldDownloadApp
                            onClose={() => console.log("Card closed")}
                         />
                      </Grid>
@@ -140,9 +145,10 @@ const RecommendationsView = () => {
                            Desktop - Calendar Only Variant
                         </Typography>
                         <GetNotifiedCard
+                           livestream={livestream}
                            responsiveMode="desktop"
                            isExpanded={false}
-                           isAppDownloaded={true}
+                           shouldDownloadApp={false}
                            onClose={() => console.log("Card closed")}
                         />
                      </Grid>
@@ -161,9 +167,10 @@ const RecommendationsView = () => {
                            Desktop Expanded - App Download Variant
                         </Typography>
                         <GetNotifiedCard
+                           livestream={livestream}
                            responsiveMode="desktop"
                            isExpanded={true}
-                           isAppDownloaded={false}
+                           shouldDownloadApp
                            onClose={() => console.log("Card closed")}
                         />
                      </Grid>
@@ -181,9 +188,10 @@ const RecommendationsView = () => {
                            Desktop Expanded - Calendar Only Variant
                         </Typography>
                         <GetNotifiedCard
+                           livestream={livestream}
                            responsiveMode="desktop"
                            isExpanded={true}
-                           isAppDownloaded={true}
+                           shouldDownloadApp={false}
                            onClose={() => console.log("Card closed")}
                         />
                      </Grid>
