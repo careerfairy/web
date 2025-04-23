@@ -382,10 +382,12 @@ export const GetNotifiedCardPresentation = ({
                   py: 1,
                }}
             >
-               <Typography variant="xsmall" color="neutral.500">
-                  You&apos;ll also receive reminders on {userEmail} before the
-                  start of the live stream
-               </Typography>
+               {Boolean(userEmail) && (
+                  <Typography variant="xsmall" color="neutral.500">
+                     You&apos;ll also receive reminders on {userEmail} before
+                     the start of the live stream
+                  </Typography>
+               )}
             </Box>
          </CardContent>
       </StyledCard>
