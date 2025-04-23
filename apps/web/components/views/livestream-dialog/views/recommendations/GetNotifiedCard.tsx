@@ -1,9 +1,9 @@
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { appQrCodeLSRegistration } from "constants/images"
 import { useAuth } from "HOCs/AuthProvider"
-import { useCallback } from "react"
 import DateUtil from "util/DateUtil"
 import { LivestreamEvent } from "../../../../../../../packages/shared-lib/src/livestreams/livestreams"
+import { AddToCalendar } from "../../../common/AddToCalendar"
 import { GetNotifiedCardPresentation } from "./GetNotifiedCardPresentation"
 
 /** Props for the container component that handles business logic */
@@ -42,31 +42,33 @@ export const GetNotifiedCard = ({
          ? true
          : false
 
-   // Handler functions
-
-   const handleAddToCalendar = useCallback(() => {
-      console.log("Add to calendar clicked for livestream:", livestream?.id)
-      // Implement actual calendar logic here
-   }, [livestream?.id])
-
    return (
-      <GetNotifiedCardPresentation
-         companyName={livestream.company}
-         companyLogoUrl={livestream.companyLogoUrl}
-         title={livestream.title}
-         bannerImageUrl={livestream.backgroundImageUrl}
-         eventDateString={formatLivestreamDate(livestream?.start || new Date())}
-         qrCodeUrl={appQrCodeLSRegistration}
-         shouldDownloadApp={shouldDownloadApp}
-         isDesktop={isDesktop}
-         isExpanded={isExpanded}
-         userEmail={authenticatedUser?.email || "example@example.com"}
-         onAddToCalendar={handleAddToCalendar}
-         onClose={onClose}
-         downloadAppHref={
-            "/install-mobile-application?utm_source=careerfairy&utm_campaign=AppDownloadQ12025&utm_medium=lsregistrationbutton&utm_content=appdownload"
-         }
-      />
+      <AddToCalendar
+         event={livestream}
+         filename={`${livestream.company}-event`}
+      >
+         {(handleAddToCalendar) => (
+            <GetNotifiedCardPresentation
+               companyName={livestream.company}
+               companyLogoUrl={livestream.companyLogoUrl}
+               title={livestream.title}
+               bannerImageUrl={livestream.backgroundImageUrl}
+               eventDateString={formatLivestreamDate(
+                  livestream?.start || new Date()
+               )}
+               qrCodeUrl={appQrCodeLSRegistration}
+               shouldDownloadApp={shouldDownloadApp}
+               isDesktop={isDesktop}
+               isExpanded={isExpanded}
+               userEmail={authenticatedUser?.email || "example@example.com"}
+               onAddToCalendar={handleAddToCalendar}
+               onClose={onClose}
+               downloadAppHref={
+                  "/install-mobile-application?utm_source=careerfairy&utm_campaign=AppDownloadQ12025&utm_medium=lsregistrationbutton&utm_content=appdownload"
+               }
+            />
+         )}
+      </AddToCalendar>
    )
 }
 

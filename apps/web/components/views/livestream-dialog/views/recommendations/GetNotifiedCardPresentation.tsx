@@ -10,6 +10,7 @@ import { styled } from "@mui/material/styles"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
+import { SyntheticEvent } from "react"
 import {
    Calendar as CalendarIcon,
    X as CloseIcon,
@@ -116,7 +117,7 @@ type Props = {
    /** User's email for notification details */
    userEmail: string
    /** Handler for add to calendar button click */
-   onAddToCalendar: () => void
+   onAddToCalendar: (event: SyntheticEvent) => void
    /** Optional callback when close button is clicked */
    onClose?: () => void
    /** Href for the download app button */
