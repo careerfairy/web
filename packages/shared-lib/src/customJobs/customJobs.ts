@@ -1,5 +1,6 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
+import { PublicGroup } from "../groups"
 import { UserData } from "../users"
 import { CUSTOM_JOB_CONSTANTS } from "./constants"
 /**
@@ -35,6 +36,8 @@ export interface CustomJob extends Identifiable {
 
    // for jobs that have expired more than 30 days ago
    isPermanentlyExpired: boolean
+
+   group: PublicGroup
 }
 
 export type PublicCustomJob = Pick<

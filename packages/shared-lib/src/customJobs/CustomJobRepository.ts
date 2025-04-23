@@ -213,6 +213,7 @@ export class FirebaseCustomJobRepository
          id: ref.id,
          published: isPublished,
          isPermanentlyExpired: false,
+         group: null,
       }
 
       await ref.set(newJob, { merge: true })

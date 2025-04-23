@@ -6,14 +6,15 @@ import {
    CustomJob,
    CustomJobStats,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
+import { Change } from "firebase-functions"
 import { chunk } from "lodash"
-import { Timestamp } from "../api/firestoreAdmin"
+import { DocumentSnapshot, Timestamp } from "../api/firestoreAdmin"
 import {
    groupRepo,
    livestreamsRepo,
@@ -76,6 +77,18 @@ export interface ICustomJobFunctionsRepository extends ICustomJobRepository {
     * @param group Group object
     */
    syncCustomJobDataGroupMetaData(groupId: string, group: Group): Promise<void>
+
+   /**
+    * This method syncs the group data to the custom job, fetching all the custom jobs that are associated with the group
+    * and updating the group field for each one of them.
+    *
+    * @param groupChange Change event from the group document
+    * @param groupId ID of the group
+    */
+   syncGroupDataToCustomJob(
+      groupChange: Change<DocumentSnapshot>,
+      groupId: string
+   ): Promise<void>
 
    /**
     * This method syncs the deleted job on all the linked live streams
@@ -313,6 +326,71 @@ export class CustomJobFunctionsRepository
       })
 
       await Promise.allSettled(promises)
+   }
+
+   async syncGroupDataToCustomJob(
+      groupChange: Change<DocumentSnapshot>,
+      groupId: string
+   ): Promise<void> {
+      if (!groupChange.after.exists) {
+         functions.logger.log(`Group ${groupId} was deleted, skipping sync`)
+         return
+      }
+
+      functions.logger.log(
+         `Sync group data to custom jobs for group ${groupId}`
+      )
+
+      const newGroup = {
+         ...groupChange.after.data(),
+         id: groupChange.after.id,
+      } as Group
+
+      const customJobsSnap = await this.firestore
+         .collection("customJobs")
+         .where("groupId", "==", groupId)
+         .get()
+
+      functions.logger.log(
+         `Found ${customJobsSnap.size} custom jobs for group ${groupId}`
+      )
+
+      const batch = this.firestore.batch()
+
+      const publicGroup = pickPublicDataFromGroup(newGroup)
+
+      const toUpdate: Pick<CustomJob, "group"> = {
+         group: {
+            ...publicGroup,
+            ...(publicGroup?.plan
+               ? {
+                    plan: {
+                       ...publicGroup.plan,
+                       startedAt: publicGroup.plan.startedAt
+                          ? Timestamp.fromMillis(
+                               publicGroup.plan.startedAt.toMillis()
+                            )
+                          : null,
+                       expiresAt: publicGroup.plan.expiresAt
+                          ? Timestamp.fromMillis(
+                               publicGroup.plan.expiresAt.toMillis()
+                            )
+                          : null,
+                    },
+                 }
+               : {}),
+         },
+      }
+
+      customJobsSnap.forEach((doc) => {
+         batch.update(doc.ref, toUpdate)
+      })
+
+      await batch.commit()
+
+      functions.logger.log(
+         `Synced group data to ${customJobsSnap.size} custom jobs for group ${groupId}`
+      )
    }
 
    async syncDeletedCustomJobToLinkedLivestreams(
