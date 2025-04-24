@@ -11,12 +11,13 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { SyntheticEvent } from "react"
+import { ComponentProps, SyntheticEvent } from "react"
 import {
    Calendar as CalendarIcon,
    X as CloseIcon,
    Download as DownloadIcon,
 } from "react-feather"
+import { combineStyles } from "types/commonTypes"
 
 // Card container
 const StyledCard = styled(motion(Card))(({ theme }) => ({
@@ -37,6 +38,8 @@ const StyledCard = styled(motion(Card))(({ theme }) => ({
       width: "auto",
    },
 }))
+
+export type CardProps = ComponentProps<typeof StyledCard>
 
 // Event details section
 const EventBanner = styled(Box)(({ theme }) => ({
@@ -139,7 +142,7 @@ type Props = {
    onClose?: () => void
    /** Href for the download app button */
    downloadAppHref?: string
-}
+} & CardProps
 
 /**
  * Presentation component for the GetNotifiedCard.
@@ -159,15 +162,23 @@ export const GetNotifiedCardPresentation = ({
    onAddToCalendar,
    onClose,
    downloadAppHref,
+   sx,
+   ...cardProps
 }: Props) => {
    const buttonsSize = isDesktop ? "large" : "medium"
 
    return (
       <StyledCard
          layout
-         sx={{
-            width: `${isDesktop ? (isExpanded ? 570 : 402) : 343}px !important`,
-         }}
+         sx={combineStyles(
+            {
+               width: `${
+                  isDesktop ? (isExpanded ? 570 : 402) : 343
+               }px !important`,
+            },
+            sx
+         )}
+         {...cardProps}
       >
          {/* Close button */}
          {Boolean(onClose) && !isDesktop && (

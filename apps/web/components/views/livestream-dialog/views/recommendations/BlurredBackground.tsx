@@ -9,4 +9,7 @@ export const BlurredBackground = styled(Box)({
    bottom: 0,
    background: "rgba(0, 0, 0, 0.25)",
    backdropFilter: "blur(7.5px)",
+   display: "flex",
+   justifyContent: "center",
+   alignItems: "center",
 })

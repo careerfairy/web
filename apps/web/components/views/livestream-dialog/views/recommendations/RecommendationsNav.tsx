@@ -9,6 +9,7 @@ const styles = sxStyles({
       left: 0,
       right: 0,
       zIndex: "auto",
+      marginTop: "auto",
    },
 })
 

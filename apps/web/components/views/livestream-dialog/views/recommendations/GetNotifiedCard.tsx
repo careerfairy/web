@@ -7,7 +7,10 @@ import DateUtil from "util/DateUtil"
 import { MobileUtils } from "util/mobile.utils"
 import { LivestreamEvent } from "../../../../../../../packages/shared-lib/src/livestreams/livestreams"
 import { AddToCalendar } from "../../../common/AddToCalendar"
-import { GetNotifiedCardPresentation } from "./GetNotifiedCardPresentation"
+import {
+   CardProps,
+   GetNotifiedCardPresentation,
+} from "./GetNotifiedCardPresentation"
 
 /** Props for the container component that handles business logic */
 type Props = {
@@ -19,7 +22,7 @@ type Props = {
    isExpanded?: boolean
    /** Optional callback when close button is clicked */
    onClose?: () => void
-}
+} & CardProps
 
 /**
  * Container component that handles business logic for the GetNotifiedCard.
@@ -30,6 +33,7 @@ export const GetNotifiedCard = ({
    responsiveMode = "auto",
    isExpanded = false,
    onClose,
+   ...cardProps
 }: Props) => {
    const { authenticatedUser, userData } = useAuth()
    const isDesktopDefault = !useIsMobile()
@@ -53,6 +57,7 @@ export const GetNotifiedCard = ({
       >
          {(handleAddToCalendar) => (
             <GetNotifiedCardPresentation
+               {...cardProps}
                companyName={livestream.company}
                companyLogoUrl={livestream.companyLogoUrl}
                title={livestream.title}

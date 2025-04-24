@@ -1,6 +1,6 @@
 import { Box, styled } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { AnimatePresence } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useLiveStreamDialog } from "../.."
@@ -50,7 +50,19 @@ const styles = sxStyles({
 const Layout = styled(Box)({
    minHeight: "100%",
    position: "relative",
+   display: "flex",
+   flexDirection: "column",
 })
+
+// Wrap components with motion for animations
+const AnimatedBlurredBackground = motion(BlurredBackground)
+
+// Animation variants
+const fadeAnimation = {
+   initial: { opacity: 0 },
+   animate: { opacity: 1, transition: { duration: 0.3 } },
+   exit: { opacity: 0, transition: { duration: 0.3 } },
+}
 
 const RecommendationsView = () => {
    const isMobile = useIsMobile()
@@ -64,18 +76,22 @@ const RecommendationsView = () => {
          mainContent={
             <Layout>
                <AnimatePresence>
-                  <Box sx={styles.container}>
-                     {Boolean(isMobile && !showRecommendations) && (
+                  {Boolean(isMobile) && (
+                     <RecommendationsNav key="recommendations-nav" />
+                  )}
+                  {Boolean(isMobile && !showRecommendations) && (
+                     <AnimatedBlurredBackground
+                        key="blurred-background"
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        variants={fadeAnimation}
+                     >
                         <GetNotifiedCard
-                           key="get-notified-card"
                            livestream={livestream}
                            onClose={() => setShowRecommendations(true)}
                         />
-                     )}
-                  </Box>
-                  {Boolean(isMobile) && <RecommendationsNav />}
-                  {Boolean(isMobile && !showRecommendations) && (
-                     <BlurredBackground key="blurred-background" />
+                     </AnimatedBlurredBackground>
                   )}
                </AnimatePresence>
             </Layout>
