@@ -1,6 +1,7 @@
 import { CustomJob } from "@careerfairy/shared-lib/src/customJobs/customJobs"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
+import counterConstants from "../../lib/Counter/constants"
 import { firestore } from "../../lib/firebase"
 import {
    handleBulkWriterError,
@@ -21,8 +22,7 @@ import { logAction } from "../../util/logger"
  * onWriteTriggers to run with the latest data.
  * @param batchSize - The batch size to use for the update, defaults to 1000.
  * @param waitTimeBetweenBatches - The wait time between batches, defaults to 5000ms.
- * @param dummyRun - By default the update is a dummy run, allowing test runs before updating
- * documents.
+ * @param dryRun - Allows test runs before updating documents.
  * @param customDataFilter - A custom filter to apply to the documents, when not possible via
  * query. Defaults to undefined.
  */
@@ -31,11 +31,10 @@ interface UpdateDocumentsConfig<T = unknown> {
    updateData: Partial<{ [K in keyof T]: T[K] }>
    batchSize?: number
    waitTimeBetweenBatches?: number
-   dummyRun?: boolean
+   dryRun?: boolean
    customDataFilter?: (data: T) => boolean
 }
 
-const DUMMY_RUN = false
 const COLLECTION_NAME = "customJobs"
 const FIELD_TO_ORDER_BY = "id"
 
@@ -53,7 +52,7 @@ const config: UpdateDocumentsConfig<CustomJob> = {
    },
    batchSize: 25,
    waitTimeBetweenBatches: 20_000,
-   dummyRun: DUMMY_RUN,
+   dryRun: false, // Set to false to run the migration
    customDataFilter: (customJob) => {
       return typeof customJob?.deleted !== "boolean"
    },
@@ -76,6 +75,18 @@ export async function run() {
    console.log(
       `Total documents to process: ${totalDocumentsCounts} - ${COLLECTION_NAME}`
    )
+
+   // Set up counter for progress tracking
+   counter.setCustomCount(counterConstants.totalNumDocs, totalDocumentsCounts)
+   counter.setCustomCount(counterConstants.currentDocIndex, 0)
+   counter.setCustomCount(counterConstants.numSuccessfulWrites, 0)
+   counter.setCustomCount(counterConstants.numFailedWrites, 0)
+
+   if (config.dryRun) {
+      console.log("DRY RUN MODE: No documents will be updated")
+   } else {
+      writeProgressBar.start(totalDocumentsCounts, 0)
+   }
 
    try {
       let lastDoc = null
@@ -111,17 +122,19 @@ export async function run() {
                continue
             }
 
-            console.log(
-               `Processing document ${doc.id} - ${doc.data()?.title} ${
-                  config.dummyRun ? " - DUMMY RUN" : ""
-               }`
-            )
+            // Update current document index for progress tracking
+            counter.customCountIncrement(counterConstants.currentDocIndex)
 
-            if (!config.dummyRun) {
+            if (!config.dryRun) {
                bulkWriter
                   .update(doc.ref, config.updateData)
                   .then(() => handleBulkWriterSuccess(counter))
                   .catch((err) => handleBulkWriterError(err, counter))
+            } else {
+               // In dry run mode, just increment success counter without actual updates
+               counter.customCountIncrement(
+                  counterConstants.numSuccessfulWrites
+               )
             }
          }
 
@@ -135,13 +148,18 @@ export async function run() {
             )}%) - Skips: ${skips}`
          )
 
-         await bulkWriter.flush()
+         if (!config.dryRun) {
+            await bulkWriter.flush()
+         }
          await wait(config.waitTimeBetweenBatches ?? 5000)
       }
 
-      await bulkWriter.close()
-      writeProgressBar.stop()
-      Counter.log("Finished processing")
+      if (!config.dryRun) {
+         await bulkWriter.close()
+         writeProgressBar.stop()
+      }
+
+      Counter.log(config.dryRun ? "Finished dry run" : "Finished processing")
    } catch (error) {
       console.error("Error:", error)
    } finally {
