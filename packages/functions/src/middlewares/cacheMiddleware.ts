@@ -28,13 +28,22 @@ export type CacheKeyOnCallFn = (request: CallableRequest) => any[]
  * @param cacheNameSpace
  * @param cacheKeyFn
  * @param ttlSeconds
+ * @param bypassFn Optional function that determines whether to bypass the cache
  */
-export const cacheOnCallValues = (
+export const cacheOnCallValues = <T extends Record<string, unknown>>(
    cacheNameSpace: string,
    cacheKeyFn: CacheKeyOnCallFn,
-   ttlSeconds: number
-): OnCallMiddleware => {
+   ttlSeconds: number,
+   bypassFn: (request: CallableRequest<T>) => boolean = () => false
+): OnCallMiddleware<T> => {
    return async (request, next) => {
+      // Skip cache entirely if the bypass function returns true
+      if (bypassFn(request)) {
+         // Add a header to indicate cache was bypassed
+         request.rawRequest.res?.header("X-Cache-Bypassed", "true")
+         return await next()
+      }
+
       const cacheKey = await generateCacheKey(cacheKeyFn(request), sha1)
 
       // Try to fetch from cache

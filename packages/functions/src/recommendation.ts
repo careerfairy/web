@@ -1,6 +1,6 @@
 import functions = require("firebase-functions")
 import { onCall } from "firebase-functions/https"
-import { number } from "yup"
+import { boolean, number } from "yup"
 import {
    groupRepo,
    livestreamsRepo,
@@ -16,20 +16,22 @@ import { dataValidation, userAuthExists } from "./middlewares/validations"
 
 /**
  * Get Recommended Events
- * @param data - { limit: number } - limit of events to return
+ * @param data - { limit: number, bypassCache?: boolean } - limit of events to return and optional cache bypass flag
  * @param context - CallableContext
  * @returns {Promise<string[]>} - A list of recommended event Ids in order of relevance
  * */
 export const getRecommendedEvents = onCall(
-   middlewares<{ limit: number }>(
+   middlewares<{ limit: number; bypassCache?: boolean }>(
       dataValidation({
          limit: number().default(10).max(30),
+         bypassCache: boolean().default(false),
       }),
       userAuthExists(),
       cacheOnCallValues(
          "recommendedEvents",
          (request) => [request.auth.token.email, request.data.limit],
-         60 // 1m
+         60, // 1m
+         (request) => request.data.bypassCache === true
       ),
       async (request) => {
          try {

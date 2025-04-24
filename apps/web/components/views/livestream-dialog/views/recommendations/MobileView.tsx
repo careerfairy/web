@@ -1,5 +1,5 @@
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams/livestreams"
-import { Button, Container, IconButton, Stack, Typography } from "@mui/material"
+import { Container, IconButton, Stack, Typography } from "@mui/material"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { AnimatePresence, motion } from "framer-motion"
@@ -65,7 +65,7 @@ export const MobileView = () => {
    return (
       <AnimatePresence>
          {showRecommendations ? (
-            <Recommendations />
+            <Recommendations key="recommendations" />
          ) : (
             <AnimatedBlurredBackground
                key="get-notified-card"
@@ -86,38 +86,22 @@ export const MobileView = () => {
 }
 
 const Recommendations = () => {
-   const { events, loading } = useRecommendedEvents()
+   const { events, loading } = useRecommendedEvents({ bypassCache: true })
    const { livestream, closeDialog } = useLiveStreamDialog()
 
-   console.log("🚀 ~ Recommendations ~ events:", events)
-
-   // Create a separate simulated loading state
-   const [simulatedLoading, setSimulatedLoading] = useState(true)
-
    useEffect(() => {
-      setTimeout(() => {
-         setSimulatedLoading(false)
-      }, 3000)
-   }, [])
-
-   // Combine actual loading from hook with simulated loading
-   const isLoading = loading || simulatedLoading
-
-   // When reset button is clicked, set simulated loading for 2 seconds
-   const handleReset = () => {
-      setSimulatedLoading(true)
-      setTimeout(() => {
-         setSimulatedLoading(false)
-      }, 3000)
-   }
+      if (!loading && !events?.length) {
+         closeDialog()
+      }
+   }, [closeDialog, events?.length, loading])
 
    return (
       <Container
          sx={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: isLoading ? "center" : "flex-start",
-            gap: isLoading ? 1.5 : 1,
+            justifyContent: loading ? "center" : "flex-start",
+            gap: loading ? 1.5 : 1,
             border: "1px solid red",
             pt: 6,
             flex: 1,
@@ -133,15 +117,15 @@ const Recommendations = () => {
          <AnimatePresence mode="sync">
             <motion.div key="recommendations-title" layout>
                <Typography
-                  component={isLoading ? "h2" : "h5"}
-                  variant={isLoading ? "desktopBrandedH2" : "desktopBrandedH5"}
+                  component={loading ? "h2" : "h5"}
+                  variant={loading ? "desktopBrandedH2" : "desktopBrandedH5"}
                   sx={styles.title}
                >
                   Keep your pace going!&nbsp;🔥
                </Typography>
             </motion.div>
             <motion.div key="recommendations-subtitle" layout>
-               {isLoading ? (
+               {loading ? (
                   <Typography
                      component={"p"}
                      variant="medium"
@@ -160,7 +144,7 @@ const Recommendations = () => {
                   </Typography>
                )}
             </motion.div>
-            {isLoading ? null : (
+            {loading ? null : (
                <motion.div
                   key="recommendations-list"
                   layout
@@ -170,31 +154,22 @@ const Recommendations = () => {
                   variants={slideUpAnimation}
                >
                   <Stack spacing={1.5}>
-                     {Array.from({ length: 10 }).map((_, index) => (
+                     {events.map((event, index) => (
                         <motion.div key={index} variants={cardAnimation}>
                            <EventPreviewCard
                               totalElements={events.length}
                               index={index}
                               isRecommended
+                              event={event}
                               location={
                                  ImpressionLocation.livestreamDialogPostRegistrationRecommendations
                               }
-                              loading
                            />
                         </motion.div>
                      ))}
                   </Stack>
                </motion.div>
             )}
-            <motion.div key="recommendations-reset-button" layout>
-               <Button
-                  component={motion.button}
-                  variant="contained"
-                  onClick={handleReset}
-               >
-                  {isLoading ? "Loading..." : "Simulate Loading"}
-               </Button>
-            </motion.div>
          </AnimatePresence>
       </Container>
    )
