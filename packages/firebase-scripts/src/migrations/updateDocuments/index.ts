@@ -72,15 +72,15 @@ export async function run() {
    let processedDocuments = 0
    const totalDocumentsCounts = await getTotalDocumentCount(config.query)
 
-   console.log(
-      `Total documents to process: ${totalDocumentsCounts} - ${COLLECTION_NAME}`
-   )
-
    // Set up counter for progress tracking
    counter.setCustomCount(counterConstants.totalNumDocs, totalDocumentsCounts)
    counter.setCustomCount(counterConstants.currentDocIndex, 0)
    counter.setCustomCount(counterConstants.numSuccessfulWrites, 0)
    counter.setCustomCount(counterConstants.numFailedWrites, 0)
+
+   console.log(
+      `Total documents to process: ${totalDocumentsCounts} - ${COLLECTION_NAME}`
+   )
 
    if (config.dryRun) {
       console.log("DRY RUN MODE: No documents will be updated")
