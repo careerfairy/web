@@ -10,6 +10,8 @@ const styles = sxStyles({
       right: 0,
       zIndex: 0,
       marginTop: "auto",
+      // pt: 2,
+      minHeight: 72,
    },
 })
 

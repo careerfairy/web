@@ -100,6 +100,7 @@ const BottomNavBar = ({
 
    return (
       <Tabs
+         id="bottom-nav-bar"
          sx={combineStyles(
             styles.wrapper,
             isDark && styles.wrapperDark,

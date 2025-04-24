@@ -1,29 +1,58 @@
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams/livestreams"
-import { Container, IconButton, Stack, Typography } from "@mui/material"
+import {
+   Container,
+   Grid,
+   IconButton,
+   IconButtonProps,
+   styled,
+   Typography,
+   TypographyProps,
+} from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import { X as CloseIcon } from "react-feather"
-import { sxStyles } from "types/commonTypes"
 import { useLiveStreamDialog } from "../.."
 import { BlurredBackground } from "./BlurredBackground"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
 
-const styles = sxStyles({
-   title: {
-      transition: (theme) => theme.transitions.create(["all"]),
-      textAlign: "center",
-   },
-   subtitle: {
-      transition: (theme) => theme.transitions.create(["all"]),
-      textAlign: "center",
-   },
+const RecommendationsContainer = styled(Container)({
+   display: "flex",
+   flexDirection: "column",
+   paddingTop: 40,
+   paddingBottom: 16,
+   flex: 1,
+   position: "relative",
 })
 
-// Wrap components with motion for animations
-const AnimatedBlurredBackground = motion(BlurredBackground)
+const Title = styled((props: TypographyProps) => (
+   <Typography component="h5" {...props} />
+))(({ theme }) => ({
+   transition: theme.transitions.create(["all"]),
+   textAlign: "center",
+   marginBottom: 8,
+}))
+
+const Subtitle = styled((props: TypographyProps) => (
+   <Typography component="p" variant="medium" {...props} />
+))({
+   textAlign: "center",
+   marginBottom: 10,
+})
+
+const CloseButton = styled((props: IconButtonProps) => (
+   <IconButton {...props}>
+      <CloseIcon />
+   </IconButton>
+))({
+   position: "absolute",
+   top: 12,
+   right: 12,
+   padding: 4,
+})
 
 // Animation variants
 const fadeAnimation = {
@@ -64,23 +93,26 @@ export const MobileView = () => {
 
    return (
       <AnimatePresence>
-         {showRecommendations ? (
+         {Boolean(showRecommendations) && (
             <Recommendations key="recommendations" />
-         ) : (
-            <AnimatedBlurredBackground
+         )}
+         <RecommendationsNav key="recommendations-nav" />
+         {!showRecommendations && (
+            <motion.div
                key="get-notified-card"
                initial="initial"
                animate="animate"
                exit="exit"
                variants={fadeAnimation}
             >
-               <GetNotifiedCard
-                  livestream={livestream}
-                  onClose={() => setShowRecommendations(true)}
-               />
-            </AnimatedBlurredBackground>
+               <BlurredBackground>
+                  <GetNotifiedCard
+                     livestream={livestream}
+                     onClose={() => setShowRecommendations(true)}
+                  />
+               </BlurredBackground>
+            </motion.div>
          )}
-         <RecommendationsNav key="recommendations-nav" />
       </AnimatePresence>
    )
 }
@@ -88,7 +120,11 @@ export const MobileView = () => {
 const Recommendations = () => {
    const { events, loading } = useRecommendedEvents({ bypassCache: true })
    const { livestream, closeDialog } = useLiveStreamDialog()
+   const isSmall = useIsMobile(640)
 
+   /**
+    * Automatically close the dialog if there are no events to recommend
+    */
    useEffect(() => {
       if (!loading && !events?.length) {
          closeDialog()
@@ -96,53 +132,47 @@ const Recommendations = () => {
    }, [closeDialog, events?.length, loading])
 
    return (
-      <Container
+      <RecommendationsContainer
          sx={{
-            display: "flex",
-            flexDirection: "column",
             justifyContent: loading ? "center" : "flex-start",
-            gap: loading ? 1.5 : 1,
-            border: "1px solid red",
-            pt: 6,
-            flex: 1,
-            position: "relative",
          }}
       >
-         <IconButton
-            onClick={closeDialog}
-            sx={{ position: "absolute", top: 12, right: 12, padding: 0.5 }}
-         >
-            <CloseIcon />
-         </IconButton>
+         <CloseButton onClick={closeDialog} />
          <AnimatePresence mode="sync">
             <motion.div key="recommendations-title" layout>
-               <Typography
-                  component={loading ? "h2" : "h5"}
+               <Title
                   variant={loading ? "desktopBrandedH2" : "desktopBrandedH5"}
-                  sx={styles.title}
                >
                   Keep your pace going!&nbsp;🔥
-               </Typography>
+               </Title>
             </motion.div>
             <motion.div key="recommendations-subtitle" layout>
-               {loading ? (
-                  <Typography
-                     component={"p"}
-                     variant="medium"
-                     sx={styles.subtitle}
-                  >
-                     Finding your next favorite streams.
-                  </Typography>
-               ) : (
-                  <Typography
-                     component={"p"}
-                     variant="medium"
-                     sx={styles.subtitle}
-                  >
-                     Because you registered to <b>{livestream.company}</b>{" "}
-                     livestream:
-                  </Typography>
-               )}
+               <AnimatePresence mode="sync">
+                  {loading ? (
+                     <motion.div
+                        variants={fadeAnimation}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                     >
+                        <Subtitle key="recommendations-subtitle-loading">
+                           Finding your next favorite streams.
+                        </Subtitle>
+                     </motion.div>
+                  ) : (
+                     <motion.div
+                        variants={fadeAnimation}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                     >
+                        <Subtitle key="recommendations-subtitle">
+                           Because you registered to <b>{livestream.company}</b>{" "}
+                           livestream:
+                        </Subtitle>
+                     </motion.div>
+                  )}
+               </AnimatePresence>
             </motion.div>
             {loading ? null : (
                <motion.div
@@ -153,24 +183,30 @@ const Recommendations = () => {
                   exit="exit"
                   variants={slideUpAnimation}
                >
-                  <Stack spacing={1.5}>
+                  <Grid container spacing={1.5}>
                      {events.map((event, index) => (
-                        <motion.div key={index} variants={cardAnimation}>
-                           <EventPreviewCard
-                              totalElements={events.length}
-                              index={index}
-                              isRecommended
-                              event={event}
-                              location={
-                                 ImpressionLocation.livestreamDialogPostRegistrationRecommendations
-                              }
-                           />
-                        </motion.div>
+                        <Grid item xs={isSmall ? 12 : 6} key={event.id}>
+                           <motion.div
+                              variants={cardAnimation}
+                              initial="initial"
+                              animate="animate"
+                           >
+                              <EventPreviewCard
+                                 totalElements={events.length}
+                                 index={index}
+                                 isRecommended
+                                 event={event}
+                                 location={
+                                    ImpressionLocation.livestreamDialogPostRegistrationRecommendations
+                                 }
+                              />
+                           </motion.div>
+                        </Grid>
                      ))}
-                  </Stack>
+                  </Grid>
                </motion.div>
             )}
          </AnimatePresence>
-      </Container>
+      </RecommendationsContainer>
    )
 }
