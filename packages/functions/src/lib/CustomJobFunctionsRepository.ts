@@ -6,7 +6,7 @@ import {
    CustomJob,
    CustomJobStats,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { CustomJobMetaData } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
@@ -357,23 +357,21 @@ export class CustomJobFunctionsRepository
 
       const batch = this.firestore.batch()
 
-      const publicGroup = pickPublicDataFromGroup(newGroup)
-
       const toUpdate: Pick<CustomJob, "group"> = {
          group: {
-            ...publicGroup,
-            ...(publicGroup?.plan
+            ...newGroup,
+            ...(newGroup?.plan
                ? {
                     plan: {
-                       ...publicGroup.plan,
-                       startedAt: publicGroup.plan.startedAt
+                       ...newGroup.plan,
+                       startedAt: newGroup.plan.startedAt
                           ? Timestamp.fromMillis(
-                               publicGroup.plan.startedAt.toMillis()
+                               newGroup.plan.startedAt.toMillis()
                             )
                           : null,
-                       expiresAt: publicGroup.plan.expiresAt
+                       expiresAt: newGroup.plan.expiresAt
                           ? Timestamp.fromMillis(
-                               publicGroup.plan.expiresAt.toMillis()
+                               newGroup.plan.expiresAt.toMillis()
                             )
                           : null,
                     },
