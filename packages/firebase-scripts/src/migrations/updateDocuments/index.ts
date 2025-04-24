@@ -29,8 +29,8 @@ const config: UpdateDocumentsConfig = {
       // .where(FIELD_TO_ORDER_BY, "!=", true)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
    updateData: { migrationTrigger: Date.now() },
-   batchSize: 25,
-   waitTimeBetweenBatches: 3_000,
+   batchSize: 100,
+   waitTimeBetweenBatches: 20_000,
    dryRun: false, // Set to false to run the migration
 }
 
