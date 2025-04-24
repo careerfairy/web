@@ -228,6 +228,8 @@ if (notProduction) {
    csp["connect-src"].push(...allowedPorts, "ws:*") // For WebSocket connections
    csp["img-src"].push(...allowedPorts)
    csp["media-src"].push(...allowedPorts)
+   // Add Firebase Auth emulator to frame-src for development
+   csp["frame-src"].push(...allowedPorts)
 }
 
 if (isVercelPreview) {
