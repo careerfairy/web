@@ -118,10 +118,13 @@ export const MobileView = () => {
                   exit="exit"
                   variants={fadeAnimation}
                >
-                  <BlurredBackground>
+                  <BlurredBackground
+                     onClick={() => setShowRecommendations(true)}
+                  >
                      <GetNotifiedCard
                         livestream={livestream}
                         onClose={() => setShowRecommendations(true)}
+                        onClick={(e) => e.stopPropagation()} // Prevent the card from closing when clicked
                      />
                   </BlurredBackground>
                </Box>
