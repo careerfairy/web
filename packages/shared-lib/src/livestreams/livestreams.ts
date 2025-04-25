@@ -305,6 +305,7 @@ export const FALLBACK_DATE = "March 17, 2020 03:24:00"
 
 /*
  * Sub-collection found on the livestream doc called userLivestreamData
+ * Collection Path: livestreams/{livestreamId}/userLivestreamData/{userEmail}
  * */
 export interface UserLivestreamData extends Identifiable {
    userId: string

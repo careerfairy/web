@@ -35,7 +35,7 @@ export const FUNCTION_NAMES = {
       "sendPhysicalEventRegistrationConfirmationEmail",
 
    // Sparks functions
-   removeAndSyncUserSparkNotification: "removeAndSyncUserSparkNotification_v3",
+   removeAndSyncUserSparkNotification: "removeAndSyncUserSparkNotification_v4",
    createUserSparksFeedEventNotifications:
       "createUserSparksFeedEventNotifications_v3",
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
