@@ -1,6 +1,7 @@
 import { Fab } from "@mui/material"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
+import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import PlayIcon from "components/views/common/icons/PlayIcon"
@@ -125,6 +126,7 @@ export const RegistrationSuccessAnimation = ({
    const [animationResetKey, setAnimationResetKey] = useState(0)
 
    const isMobile = useIsMobile()
+   const isLandscape = useStreamIsLandscape()
 
    const triggerAnimation = () => {
       setAnimationPhase(AnimationPhase.FIRST_PHASE)
@@ -209,7 +211,7 @@ export const RegistrationSuccessAnimation = ({
                   >
                      <Box
                         sx={styles.mainStarContainer}
-                        top={isMobile ? -150 : -320}
+                        top={isLandscape ? -350 : isMobile ? -150 : -320}
                      >
                         <MainStar sx={styles.mainStar} />
                      </Box>
