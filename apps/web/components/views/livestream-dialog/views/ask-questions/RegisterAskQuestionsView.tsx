@@ -23,7 +23,7 @@ import BaseDialogView, {
    HeroTitle,
    MainContent,
 } from "../../BaseDialogView"
-import { useLiveStreamDialog, ViewKey } from "../../LivestreamDialog"
+import { useLiveStreamDialog } from "../../LivestreamDialog"
 import { QuestionsComponent } from "../livestream-details/main-content/Questions"
 import RegisterAskQuestionsViewSkeleton from "./RegisterAskQuestionsViewSkeleton"
 
@@ -83,10 +83,9 @@ const styles = sxStyles({
    },
 })
 
-const NEXT_VIEW = "recommendations" satisfies ViewKey
-
 const RegisterAskQuestionsView = () => {
-   const { livestream, goToView } = useLiveStreamDialog()
+   const { livestream, goToView, handleShowSuccessAnimation } =
+      useLiveStreamDialog()
    const { userPresenter, authenticatedUser } = useAuth()
 
    const [newlyCreatedQuestions, setNewlyCreatedQuestions] = useState<
@@ -97,9 +96,9 @@ const RegisterAskQuestionsView = () => {
 
    useEffect(() => {
       if (livestream.questionsDisabled) {
-         goToView(NEXT_VIEW)
+         handleShowSuccessAnimation()
       }
-   }, [livestream.questionsDisabled, goToView])
+   }, [livestream.questionsDisabled, handleShowSuccessAnimation])
 
    if (livestream.questionsDisabled) {
       return <RegisterAskQuestionsViewSkeleton />
@@ -219,7 +218,7 @@ const RegisterAskQuestionsView = () => {
                disableElevation
                size="medium"
                fullWidth={isMobile}
-               onClick={() => goToView(NEXT_VIEW)}
+               onClick={handleShowSuccessAnimation}
                color="secondary"
             >
                Finish registration

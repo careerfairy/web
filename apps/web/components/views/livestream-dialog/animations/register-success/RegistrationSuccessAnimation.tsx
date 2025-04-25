@@ -87,6 +87,7 @@ type Props = {
     * Callback fired when animation completes
     */
    onAnimationComplete?: () => void
+   onAnimationFullScreen?: () => void
    /**
     * When true, enables debugging control
     */
@@ -115,6 +116,7 @@ type Props = {
  */
 export const RegistrationSuccessAnimation = ({
    onAnimationComplete,
+   onAnimationFullScreen,
    debug = false,
 }: Props) => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
@@ -144,6 +146,7 @@ export const RegistrationSuccessAnimation = ({
                   setAnimationPhase(AnimationPhase.SECOND_PHASE)
                }, ANIMATION_CONFIG.container.delayBeforeExit)
             }
+            onAnimationFullScreen?.()
             break
          case AnimationPhase.SECOND_PHASE:
             resetAnimation()

@@ -1,4 +1,7 @@
-import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams/livestreams"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams/livestreams"
 import {
    Box,
    Container,
@@ -19,6 +22,7 @@ import { useLiveStreamDialog } from "../.."
 import { BlurredBackground } from "./BlurredBackground"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
+import { useArtificialLoading } from "./useArtificialLoading"
 
 const MobileLayout = styled(Box)({
    minHeight: "100%",
@@ -96,6 +100,9 @@ const cardAnimation = {
 
 export const MobileView = () => {
    const [showRecommendations, setShowRecommendations] = useState(false)
+   const { events, loading: loadingEvents } = useRecommendedEvents({
+      bypassCache: true,
+   })
 
    const { livestream } = useLiveStreamDialog()
 
@@ -103,7 +110,11 @@ export const MobileView = () => {
       <MobileLayout>
          <AnimatePresence>
             {Boolean(showRecommendations) && (
-               <Recommendations key="recommendations" />
+               <Recommendations
+                  key="recommendations"
+                  events={events}
+                  loadingEvents={loadingEvents}
+               />
             )}
             <RecommendationsNav key="recommendations-nav" />
             {!showRecommendations && (
@@ -134,24 +145,37 @@ export const MobileView = () => {
    )
 }
 
-const Recommendations = () => {
-   const { events, loading } = useRecommendedEvents({ bypassCache: true })
+const MIN_LOADING_TIME = 1500
+
+const Recommendations = ({
+   events,
+   loadingEvents,
+}: {
+   events: LivestreamEvent[]
+   loadingEvents: boolean
+}) => {
    const { livestream, closeDialog } = useLiveStreamDialog()
    const isSmall = useIsMobile(640)
+
+   // Use our custom hook to manage loading state
+   const isLoading = useArtificialLoading(loadingEvents, {
+      minLoadingTime: MIN_LOADING_TIME,
+      sessionKey: "cf-recommendations-loading-shown",
+   })
 
    /**
     * Automatically close the dialog if there are no events to recommend
     */
    useEffect(() => {
-      if (!loading && !events?.length) {
+      if (!loadingEvents && !events?.length) {
          closeDialog()
       }
-   }, [closeDialog, events?.length, loading])
+   }, [closeDialog, events?.length, loadingEvents])
 
    return (
       <RecommendationsContainer
          sx={{
-            justifyContent: loading ? "center" : "flex-start",
+            justifyContent: isLoading ? "center" : "flex-start",
          }}
       >
          <CloseButton onClick={closeDialog} />
@@ -165,7 +189,7 @@ const Recommendations = () => {
                layout
             >
                <Title
-                  variant={loading ? "desktopBrandedH2" : "desktopBrandedH5"}
+                  variant={isLoading ? "desktopBrandedH2" : "desktopBrandedH5"}
                >
                   Keep your pace going!&nbsp;🔥
                </Title>
@@ -179,7 +203,7 @@ const Recommendations = () => {
                layout
             >
                <AnimatePresence mode="sync">
-                  {loading ? (
+                  {isLoading ? (
                      <motion.div
                         variants={fadeAnimation}
                         initial="initial"
@@ -205,7 +229,7 @@ const Recommendations = () => {
                   )}
                </AnimatePresence>
             </motion.div>
-            {loading ? null : (
+            {isLoading ? null : (
                <motion.div
                   key="recommendations-list"
                   layout
