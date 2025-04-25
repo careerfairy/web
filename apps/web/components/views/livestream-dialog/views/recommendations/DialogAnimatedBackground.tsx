@@ -36,45 +36,37 @@ const BlurContainer = styled(Box)({
    filter: "blur(225.8px)",
 })
 
-// Styled elements for each colored circle
-const PurpleCircle = styled(Box)(({ theme }) => ({
+// Create a base Circle component with perfect aspect ratio
+const Circle = styled(Box)({
    position: "absolute",
-   width: "40%",
-   height: "40%",
+   aspectRatio: "1/1",
    borderRadius: "50%",
+   width: 525,
+})
+
+// Styled elements for each colored circle
+const PurpleCircle = styled(Circle)(({ theme }) => ({
    backgroundColor: theme.brand.purple[500],
    top: "30%",
-   left: "20%",
+   left: "33%",
 }))
 
-const TealCircle = styled(Box)(({ theme }) => ({
-   position: "absolute",
-   width: "30%",
-   height: "30%",
-   borderRadius: "50%",
+const TealCircle = styled(Circle)(({ theme }) => ({
    backgroundColor: theme.brand.tq[100],
-   top: "20%",
-   right: "30%",
+   top: "15%",
+   right: "27%",
 }))
 
-const BlueCircle = styled(Box)(({ theme }) => ({
-   position: "absolute",
-   width: "35%",
-   height: "35%",
-   borderRadius: "50%",
+const BlueCircle = styled(Circle)(({ theme }) => ({
    backgroundColor: theme.brand.info[200],
-   bottom: "20%",
-   left: "30%",
+   bottom: "8%",
+   left: "39%",
 }))
 
-const PinkCircle = styled(Box)(({ theme }) => ({
-   position: "absolute",
-   width: "25%",
-   height: "25%",
-   borderRadius: "50%",
+const PinkCircle = styled(Circle)(({ theme }) => ({
    backgroundColor: theme.brand.error[50],
-   bottom: "30%",
-   right: "20%",
+   bottom: "25%",
+   right: "45%",
 }))
 
 export const DialogAnimatedBackground = ({ children, ...props }: BoxProps) => {
@@ -83,10 +75,10 @@ export const DialogAnimatedBackground = ({ children, ...props }: BoxProps) => {
          <Root>
             <AnimatedContainer>
                <BlurContainer>
-                  <PurpleCircle />
-                  <TealCircle />
                   <BlueCircle />
+                  <PurpleCircle />
                   <PinkCircle />
+                  <TealCircle />
                </BlurContainer>
             </AnimatedContainer>
          </Root>

@@ -149,7 +149,6 @@ export const GetNotifiedCardPresentation = ({
       <StyledCard
          sx={{
             width: `${isDesktop ? (isExpanded ? 570 : 402) : 343}px !important`,
-            height: isDesktop ? 755 : shouldDownloadApp ? 572 : 534,
          }}
       >
          {/* Close button */}
@@ -258,6 +257,7 @@ export const GetNotifiedCardPresentation = ({
          >
             <Stack
                spacing={2}
+               py={2}
                m="auto"
                display="flex"
                maxWidth={!shouldDownloadApp ? 434 : undefined}
