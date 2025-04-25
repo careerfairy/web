@@ -68,7 +68,7 @@ export const removeAndSyncUserSparkNotification = onCall<{
    groupId: string
 }>(
    {
-      memory: "1GiB",
+      memory: "4GiB",
       timeoutSeconds: 60 * 9,
    },
    withMiddlewares(
