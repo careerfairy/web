@@ -29,7 +29,6 @@ import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
-import { RegistrationSuccessAnimation } from "./animations/register-success/RegistrationSuccessAnimation"
 import {
    RegistrationAction,
    RegistrationState,
@@ -515,7 +514,7 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
-         {activeView === "recommendations" && <RegistrationSuccessAnimation />}
+         {/* {activeView === "recommendations" && <RegistrationSuccessAnimation />} */}
       </DialogContext.Provider>
    )
 }
@@ -589,6 +588,7 @@ type DialogContextType = {
 }
 
 const getPageIndex = (page: Props["page"]): number => {
+   return views.findIndex((view) => view.key === "recommendations")
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")

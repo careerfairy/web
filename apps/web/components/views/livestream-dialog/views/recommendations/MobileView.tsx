@@ -1,5 +1,6 @@
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams/livestreams"
 import {
+   Box,
    Container,
    Grid,
    IconButton,
@@ -19,13 +20,20 @@ import { BlurredBackground } from "./BlurredBackground"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
 
+const MobileLayout = styled(Box)({
+   minHeight: "100%",
+   overflowY: "auto",
+   display: "flex",
+   flexDirection: "column",
+})
+
 const RecommendationsContainer = styled(Container)({
    display: "flex",
    flexDirection: "column",
    paddingTop: 40,
-   paddingBottom: 16,
-   flex: 1,
    position: "relative",
+   height: "-webkit-fill-available",
+   minHeight: "inherit",
 })
 
 const Title = styled((props: TypographyProps) => (
@@ -92,28 +100,34 @@ export const MobileView = () => {
    const { livestream } = useLiveStreamDialog()
 
    return (
-      <AnimatePresence>
-         {Boolean(showRecommendations) && (
-            <Recommendations key="recommendations" />
-         )}
-         <RecommendationsNav key="recommendations-nav" />
-         {!showRecommendations && (
-            <motion.div
-               key="get-notified-card"
-               initial="initial"
-               animate="animate"
-               exit="exit"
-               variants={fadeAnimation}
-            >
-               <BlurredBackground>
-                  <GetNotifiedCard
-                     livestream={livestream}
-                     onClose={() => setShowRecommendations(true)}
-                  />
-               </BlurredBackground>
-            </motion.div>
-         )}
-      </AnimatePresence>
+      <MobileLayout>
+         <AnimatePresence>
+            {Boolean(showRecommendations) && (
+               <Recommendations key="recommendations" />
+            )}
+            <RecommendationsNav key="recommendations-nav" />
+            {!showRecommendations && (
+               <Box
+                  component={motion.div}
+                  display="flex"
+                  flex={1}
+                  flexDirection="column"
+                  key="get-notified-card"
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  variants={fadeAnimation}
+               >
+                  <BlurredBackground>
+                     <GetNotifiedCard
+                        livestream={livestream}
+                        onClose={() => setShowRecommendations(true)}
+                     />
+                  </BlurredBackground>
+               </Box>
+            )}
+         </AnimatePresence>
+      </MobileLayout>
    )
 }
 
@@ -139,14 +153,28 @@ const Recommendations = () => {
       >
          <CloseButton onClick={closeDialog} />
          <AnimatePresence mode="sync">
-            <motion.div key="recommendations-title" layout>
+            <motion.div
+               key="recommendations-title"
+               initial="initial"
+               animate="animate"
+               exit="exit"
+               variants={slideUpAnimation}
+               layout
+            >
                <Title
                   variant={loading ? "desktopBrandedH2" : "desktopBrandedH5"}
                >
                   Keep your pace going!&nbsp;🔥
                </Title>
             </motion.div>
-            <motion.div key="recommendations-subtitle" layout>
+            <motion.div
+               key="recommendations-subtitle"
+               initial="initial"
+               animate="animate"
+               exit="exit"
+               variants={slideUpAnimation}
+               layout
+            >
                <AnimatePresence mode="sync">
                   {loading ? (
                      <motion.div
@@ -183,7 +211,7 @@ const Recommendations = () => {
                   exit="exit"
                   variants={slideUpAnimation}
                >
-                  <Grid container spacing={1.5}>
+                  <Grid container sx={{ pb: 11 }} spacing={1.5}>
                      {events.map((event, index) => (
                         <Grid item xs={isSmall ? 12 : 6} key={event.id}>
                            <motion.div
