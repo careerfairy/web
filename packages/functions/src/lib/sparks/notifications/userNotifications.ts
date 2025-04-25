@@ -76,15 +76,13 @@ export const handleCreateUsersSparksNotifications = async (
 
    const bulkWriter = firestore.bulkWriter()
 
-   const [upcomingEventsWithRegisteredStudents, userSparksFeedMetrics] =
-      await Promise.all([
-         // to get all the upcoming events that will start on the next X days
-         getStreamsByDateWithRegisteredStudents(startDate, endDate, {
-            excludeHidden: true,
-            skimData,
-         }),
-         sparkRepo.getAllUserSparksFeedMetrics(),
-      ])
+   const [upcomingEventsWithRegisteredStudents] = await Promise.all([
+      // to get all the upcoming events that will start on the next X days
+      getStreamsByDateWithRegisteredStudents(startDate, endDate, {
+         excludeHidden: true,
+         skimData,
+      }),
+   ])
 
    logger(
       `In next ${SPARK_CONSTANTS.LIMIT_DAYS_TO_SHOW_SPARK_NOTIFICATIONS} days, ${upcomingEventsWithRegisteredStudents.length} events will take place`
@@ -101,6 +99,8 @@ export const handleCreateUsersSparksNotifications = async (
       })
       return bulkWriter.close()
    }
+
+   const userSparksFeedMetrics = await sparkRepo.getAllUserSparksFeedMetrics()
 
    userSparksFeedMetrics.forEach(({ userId }) => {
       createSparkNotificationForSingleUser({
@@ -139,5 +139,6 @@ export const removeUserNotificationsAndSyncSparksNotifications = async (
    await sparkRepo.removeUserSparkNotification(userId, groupId)
    return handleCreateUsersSparksNotifications(firestore, logger, {
       skimData: true,
+      userId,
    })
 }
