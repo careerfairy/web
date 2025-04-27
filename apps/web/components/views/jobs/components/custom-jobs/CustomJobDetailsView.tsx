@@ -10,6 +10,7 @@ import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApp
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
+import { customJobRepo } from "data/RepositoryInstances"
 import { props } from "lodash/fp"
 import { ReactNode, forwardRef } from "react"
 import { useSelector } from "react-redux"
@@ -114,7 +115,15 @@ export const CustomJobDetails = ({
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
    useEffectOnce(() => {
-      dataLayerCustomJobEvent(AnalyticsEvents.CustomJobView, job, companyName)
+      customJobRepo
+         .incrementCustomJobViews(job.id)
+         .then(() =>
+            dataLayerCustomJobEvent(
+               AnalyticsEvents.CustomJobView,
+               job,
+               companyName
+            )
+         )
    })
 
    return (

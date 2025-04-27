@@ -18,19 +18,19 @@ interface UpdateDocumentsConfig {
    dryRun?: boolean
 }
 
-const FIELD_TO_ORDER_BY = "universityName"
+const FIELD_TO_ORDER_BY = "jobId"
 
 // Configure your update here
 const config: UpdateDocumentsConfig = {
    // Example: collection query
    query: firestore
-      .collection("careerCenterData")
+      .collection("customJobStats")
       // Keep this commented out for now as an example
       // .where(FIELD_TO_ORDER_BY, "!=", true)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
-   updateData: { migrationTrigger: Date.now() },
-   batchSize: 100,
-   waitTimeBetweenBatches: 20_000,
+   updateData: { migrationTrigger: Date.now(), views: 0 },
+   batchSize: 25,
+   waitTimeBetweenBatches: 5_000,
    dryRun: false, // Set to false to run the migration
 }
 

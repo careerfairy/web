@@ -118,6 +118,12 @@ export interface ICustomJobRepository {
    incrementCustomJobClicks(jobId: string): Promise<void>
 
    /**
+    * To increment the 'views' field on a specific customJob
+    * @param jobId
+    */
+   incrementCustomJobViews(jobId: string): Promise<void>
+
+   /**
     * Get all the custom jobs linked by a specific live stream
     * @param livestreamId
     */
@@ -448,6 +454,14 @@ export class FirebaseCustomJobRepository
 
       return ref.update({
          clicks: this.fieldValue.increment(1),
+      })
+   }
+
+   async incrementCustomJobViews(jobId: string): Promise<void> {
+      const ref = this.firestore.collection("customJobStats").doc(jobId)
+
+      return ref.update({
+         views: this.fieldValue.increment(1),
       })
    }
 

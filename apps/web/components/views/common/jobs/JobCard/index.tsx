@@ -57,6 +57,7 @@ type Props = {
    job: Job | CustomJob
    clicks?: number
    applicants?: number
+   views?: number
    previewMode?: boolean
    handleClick?: (job: Job | CustomJob, event?: React.MouseEvent) => void
    smallCard?: boolean
@@ -71,6 +72,7 @@ const JobCard = ({
    job,
    clicks,
    applicants,
+   views,
    previewMode,
    handleClick,
    smallCard,
@@ -147,7 +149,11 @@ const JobCard = ({
 
                   {showAdditionalInfo && !previewMode ? (
                      <Grid item xs={12} md={7} lg={6} sx={styles.statsWrapper}>
-                        <JobCardStats clicks={clicks} applicants={applicants} />
+                        <JobCardStats
+                           clicks={clicks}
+                           applicants={applicants}
+                           views={views}
+                        />
                      </Grid>
                   ) : null}
 
