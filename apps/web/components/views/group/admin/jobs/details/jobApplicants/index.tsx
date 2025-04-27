@@ -1,7 +1,10 @@
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
-import { Box, Grid, Typography } from "@mui/material"
-import React, { FC, useCallback, useMemo } from "react"
+import InfoIcon from "@mui/icons-material/InfoOutlined"
+import { Box, Button, Grid, Stack, Tooltip, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
+import React, { FC, useCallback, useMemo, useState } from "react"
+import { useLocalStorage } from "react-use"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useCustomJobStats from "../../../../../../custom-hook/custom-job/useCustomJobStats"
 import usePaginatedJobApplicants from "../../../../../../custom-hook/custom-job/usePaginatedJobApplicants"
@@ -42,6 +45,21 @@ type Props = {
 const JobApplicants: FC<Props> = ({ jobId }) => {
    const jobStats = useCustomJobStats(jobId)
 
+   const { userData } = useAuth()
+   const [hasSeenTooltip, setHasSeenTooltip] = useLocalStorage(
+      `job-applicants-tooltip-${userData?.authId}`,
+      false
+   )
+   const [openTooltip, setOpenTooltip] = useState(!hasSeenTooltip)
+   console.log("🚀 ~ openTooltip:", openTooltip)
+
+   const acknowledgeTooltip = (e: React.MouseEvent) => {
+      e.stopPropagation()
+
+      setHasSeenTooltip(true)
+      setOpenTooltip(false)
+   }
+
    const totalViews = jobStats.views || jobStats.applicants + jobStats.clicks
    const paginatedResults = usePaginatedJobApplicants(jobId)
 
@@ -63,6 +81,12 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
       },
       [paginatedResults]
    )
+
+   // useEffect(() => {
+   //    const shouldShowTooltip = !hasSeenTooltip
+   //    setHasSeenTooltip(!shouldShowTooltip)
+   //    setOpenTooltip(shouldShowTooltip)
+   // }, [hasSeenTooltip, setHasSeenTooltip])
 
    return (
       <>
@@ -95,19 +119,60 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
                   </Typography>
                </Box>
             </Grid>
-
             <Grid item xs={4}>
                <Box sx={styles.statsSection}>
-                  <Typography
-                     variant={"subtitle1"}
-                     color={"neutral.700"}
-                     sx={styles.statsLabel}
-                  >
-                     Confirmed applicants
-                  </Typography>
-                  <Typography variant={"body1"} sx={styles.statsValue}>
-                     {jobStats.applicants}
-                  </Typography>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                     <Typography
+                        variant={"subtitle1"}
+                        color={"neutral.700"}
+                        sx={styles.statsLabel}
+                     >
+                        Confirmed applicants
+                     </Typography>
+                     {hasSeenTooltip ? (
+                        <Tooltip
+                           title={
+                              <RolledTooltipContent
+                                 hasSeenTooltip={hasSeenTooltip}
+                                 acknowledgeTooltip={acknowledgeTooltip}
+                              />
+                           }
+                           sx={{ color: (theme) => theme.brand.black[700] }}
+                        >
+                           <InfoIcon />
+                        </Tooltip>
+                     ) : null}
+                  </Stack>
+                  <Box width={"fit-content"}>
+                     <Tooltip
+                        open={openTooltip}
+                        title={
+                           <RolledTooltipContent
+                              hasSeenTooltip={hasSeenTooltip}
+                              acknowledgeTooltip={acknowledgeTooltip}
+                           />
+                        }
+                        disableFocusListener
+                        disableHoverListener
+                        disableTouchListener
+                        placement="bottom"
+                        slotProps={{
+                           popper: {
+                              disablePortal: true,
+                              keepMounted: true,
+                           },
+                        }}
+                        sx={{
+                           color: (theme) => theme.brand.black[700],
+                           width: "fit-content",
+                           alignSelf: "center",
+                        }}
+                     >
+                        <Typography variant={"body1"} sx={styles.statsValue}>
+                           {jobStats.applicants}
+                        </Typography>
+                     </Tooltip>
+                  </Box>
                </Box>
             </Grid>
          </Grid>
@@ -133,6 +198,42 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
       </>
    )
 }
+
+type RolledTooltipContentProps = {
+   hasSeenTooltip: boolean
+   acknowledgeTooltip: (e: React.MouseEvent) => void
+}
+
+const RolledTooltipContent = ({
+   hasSeenTooltip,
+   acknowledgeTooltip,
+}: RolledTooltipContentProps) => (
+   <Stack spacing={"10px"} p={1} alignItems={"flex-end"}>
+      <Typography variant="xsmall" color="neutral.700" fontWeight={400}>
+         You&apos;re seeing confirmed applicants only. Some candidates may have
+         applied after clicking the job link but haven&apos;t marked it as
+         confirmed yet.
+      </Typography>
+      {!hasSeenTooltip && (
+         <Button
+            variant="outlined"
+            sx={{
+               width: "fit-content",
+               padding: "8px 16px",
+               fontSize: "12px",
+               border: (theme) => `1px solid ${theme.brand.purple[600]}`,
+               backgroundColor: (theme) => theme.brand.white[300],
+            }}
+            color="secondary"
+            onClick={acknowledgeTooltip}
+         >
+            <Typography variant="small" color="purple.700" fontWeight={400}>
+               Got it!
+            </Typography>
+         </Button>
+      )}
+   </Stack>
+)
 
 const convertJobApplicantToUserData = (
    doc: Partial<CustomJobApplicant>

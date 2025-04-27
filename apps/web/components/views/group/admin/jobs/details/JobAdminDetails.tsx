@@ -1,7 +1,6 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import ChevronLeft from "@mui/icons-material/ChevronLeft"
-import InfoIcon from "@mui/icons-material/InfoOutlined"
-import { Box, Tab, Tabs, Tooltip, Typography } from "@mui/material"
+import { Box, Tab, Tabs, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
@@ -188,14 +187,6 @@ const JobAdminDetails: FC<Props> = ({ job }) => {
                      >
                         Applicants
                      </Typography>
-                     <Tooltip
-                        title={
-                           "You may not see all applicants, as it only includes those who have indicated they applied. Additional talent may have applied through our platform."
-                        }
-                        sx={styles.tooltip}
-                     >
-                        <InfoIcon />
-                     </Tooltip>
                   </Box>
                }
             />
