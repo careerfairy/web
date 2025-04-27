@@ -104,6 +104,7 @@ class JobsFirebaseSeed implements JobsSeed {
          deleted: false,
          businessFunctionsTagIds: [],
          isPermanentlyExpired: false,
+         group: null,
       }
 
       return {
