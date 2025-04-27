@@ -220,6 +220,7 @@ export class FirebaseCustomJobRepository
          published: isPublished,
          isPermanentlyExpired: false,
          group: null,
+         deleted: false,
       }
 
       await ref.set(newJob, { merge: true })
@@ -579,16 +580,10 @@ export class FirebaseCustomJobRepository
          .where("isPermanentlyExpired", "==", false)
          .where("deadline", ">=", new Date())
          .where("published", "==", true)
+         .where("deleted", "==", false)
          .get()
 
-      return (
-         !snapshot.empty &&
-         Boolean(
-            mapFirestoreDocuments<CustomJob>(snapshot).find(
-               (job) => !job.deleted
-            )
-         )
-      )
+      return !snapshot.empty
    }
 
    async getCustomJobsByLinkedContentIds(
