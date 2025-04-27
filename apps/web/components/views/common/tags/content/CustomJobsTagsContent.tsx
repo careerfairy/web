@@ -3,7 +3,6 @@ import { Button, Stack, Typography } from "@mui/material"
 import useCustomJobs from "components/custom-hook/custom-job/useCustomJobs"
 import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
 import { RecommendedCustomJobsSkeleton } from "components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
 import { useCallback, useMemo, useState } from "react"
@@ -53,13 +52,12 @@ type Props = {
 
 const CustomJobsTagsContent = ({ tags, title }: Props) => {
    const businessFunctionTagIds = Object.keys(tags.businessFunctions)
-   const featureFlags = useFeatureFlags()
 
    const { count } = useCustomJobsCount({
       businessFunctionTagIds: businessFunctionTagIds,
    })
 
-   if (!featureFlags.jobHubV1 || !count) return null
+   if (!count) return null
 
    return (
       <Stack spacing={0} sx={styles.wrapper}>

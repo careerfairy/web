@@ -1,14 +1,14 @@
 import { ParsedUrlQuery } from "querystring"
 
-export type FlagKeys =
+export type FeatureFlagKey =
    | "atsAdminPageFlag"
    | "sparksAdminPageFlag"
    | "sparksB2BOnboardingFlag"
    | "livestreamCreationFlowV2"
-   | "jobHubV1"
    | "mentorsV1"
    | "talentProfileV1"
    | "levelsV1"
+
 export type FeatureFlag = {
    /**
     * Initial state for the flag, usually disabled (false)
@@ -24,6 +24,6 @@ export type FeatureFlag = {
    conditionalEnable?: (path: string, params: ParsedUrlQuery) => boolean
 }
 
-export type FeatureFlagsDetails = Record<FlagKeys, FeatureFlag>
+export type FeatureFlagsDetails = Record<FeatureFlagKey, FeatureFlag>
 
-export type FeatureFlagsState = Record<FlagKeys, boolean>
+export type FeatureFlagsState = Record<FeatureFlagKey, boolean>
