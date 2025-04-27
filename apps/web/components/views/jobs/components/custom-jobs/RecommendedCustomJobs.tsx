@@ -2,7 +2,6 @@ import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCustomJobsByUser } from "components/custom-hook/custom-job/useCustomJobsByUser"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import { useCallback, useMemo, useState } from "react"
 import { ChevronDown } from "react-feather"
@@ -44,9 +43,8 @@ const styles = sxStyles({
 })
 
 export const RecommendedCustomJobs = () => {
-   const featureFlags = useFeatureFlags()
    const { isLoggedOut } = useAuth()
-   if (!featureFlags.jobHubV1) return null
+
    return (
       <Stack spacing={0} sx={styles.wrapper} id="highlighted-jobs">
          <Typography

@@ -131,13 +131,14 @@ const JobCardDetails = ({
    const { userData } = useAuth()
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
-   const { jobHubV1, talentProfileV1 } = useFeatureFlags()
+
+   const { talentProfileV1 } = useFeatureFlags()
 
    const jobApplication = useUserJobApplication(userData?.id, job.id)
 
-   const showTooltip = useMemo(
-      () => !isAtsJob && isJobValidButNoLinkedContent(job) && jobHubV1,
-      [isAtsJob, job, jobHubV1]
+   const showWarning = useMemo(
+      () => !isAtsJob && isJobValidButNoLinkedContent(job),
+      [isAtsJob, job]
    )
 
    let jobName: string
@@ -181,7 +182,7 @@ const JobCardDetails = ({
                >
                   {jobName}
                </Typography>
-               {showTooltip ? (
+               {showWarning ? (
                   <Box sx={styles.warningContainer}>
                      <Tooltip
                         title={
