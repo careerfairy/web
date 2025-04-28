@@ -2,7 +2,10 @@ import {
    CityOption,
    CountryOption,
    generateCityId,
+   generateCountryId,
+   generateStateId,
    getCityCodes,
+   getLocationIds,
 } from "@careerfairy/shared-lib/countries/types"
 
 import { City, Country, State } from "country-state-city"
@@ -36,6 +39,14 @@ const CountryDataOptionsSchema = {
    countryIsoCode: string().required(),
 }
 
+const SearchLocationOptionsSchema = {
+   searchValue: string().required().min(2),
+}
+
+const GetLocationOptionsSchema = {
+   location: string().min(2).required(),
+}
+
 const CountryCitiesSchema = object().shape(CountryCitiesOptionsSchema)
 
 const CountryCityDataSchema = object().shape(CountryCityDataOptionsSchema)
@@ -48,6 +59,10 @@ const SearchCountrySchema = object().shape(SearchCountryOptionsSchema)
 
 const SearchCitySchema = object().shape(SearchCityOptionsSchema)
 
+const SearchLocationSchema = object().shape(SearchLocationOptionsSchema)
+
+const GetLocationSchema = object().shape(GetLocationOptionsSchema)
+
 type CountryCitiesOptions = InferType<typeof CountryCitiesSchema>
 
 type CountryCityDataOptions = InferType<typeof CountryCityDataSchema>
@@ -59,6 +74,10 @@ type CountryDataOptions = InferType<typeof CountryDataSchema>
 type SearchCountryOptions = InferType<typeof SearchCountrySchema>
 
 type SearchCityOptions = InferType<typeof SearchCitySchema>
+
+type SearchLocationOptions = InferType<typeof SearchLocationSchema>
+
+type GetLocationOptions = InferType<typeof GetLocationSchema>
 
 const performFuzzySearch = <T>(items: T[], searchValue: string): T[] => {
    // Configure Fuse options
@@ -249,4 +268,64 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
    }
 
    return countryResult
+})
+
+export const searchLocations = onCall<SearchLocationOptions>((request) => {
+   const { searchValue } = request.data
+
+   if (searchValue.length < 2) {
+      return null
+   }
+
+   const countries = Country.getAllCountries()
+      .map((country) => ({
+         name: country.name,
+         id: generateCountryId(country),
+      }))
+      .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
+
+   const states = State.getAllStates()
+      .map((state) => ({
+         name: `${state.name}, ${
+            Country.getCountryByCode(state.countryCode)?.name
+         }`,
+         id: generateStateId(state),
+      }))
+      .sort((stateA, stateB) => stateA.name.localeCompare(stateB.name))
+
+   // const cities = City.getAllCities()
+   //    .map((city) => ({
+   //       name: `${city.name}, ${Country.getCountryByCode(city.countryCode)?.name}`,
+   //       id: generateCityId(city),
+   //    }))
+   //    .sort((cityA, cityB) => cityA.name.localeCompare(cityB.name))
+
+   const locations = [...countries, ...states]
+
+   return performFuzzySearch(locations, searchValue).slice(0, 20)
+})
+
+export const getLocation = onCall<GetLocationOptions>((request) => {
+   const { searchValue } = request.data
+
+   const { countryIsoCode, stateIsoCode } = getLocationIds(searchValue)
+   console.log("🚀 ~ countryIsoCode:", countryIsoCode)
+   console.log("🚀 ~ stateIsoCode:", stateIsoCode)
+
+   if (!countryIsoCode) return null
+
+   const country = Country.getCountryByCode(countryIsoCode)
+   if (stateIsoCode) {
+      const state = State.getStateByCodeAndCountry(stateIsoCode, countryIsoCode)
+      console.log("🚀 ~ state:", state)
+      return {
+         id: searchValue,
+         name: `${state.name}, ${country.name}`,
+      }
+   }
+
+   return {
+      id: searchValue,
+      name: country.name,
+   }
 })

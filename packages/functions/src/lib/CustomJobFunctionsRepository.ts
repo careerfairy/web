@@ -123,7 +123,7 @@ export class CustomJobFunctionsRepository
          .doc(newCustomJob.id)
 
       functions.logger.log(
-         `Create CustomJobStats for the job ${newCustomJob.id}.`
+         `Create CustomJobStats for the job ${newCustomJob.id}. Group: ${newCustomJob.groupId}`
       )
 
       const newJobStat: CustomJobStats = {
@@ -131,7 +131,34 @@ export class CustomJobFunctionsRepository
          jobId: newCustomJob.id,
          groupId: newCustomJob.groupId,
          clicks: 0,
-         job: newCustomJob,
+         job: {
+            ...newCustomJob,
+            deadline: newCustomJob.deadline
+               ? Timestamp.fromMillis(newCustomJob.deadline.toMillis())
+               : null,
+            group: {
+               ...newCustomJob.group,
+               plan: {
+                  ...newCustomJob.group.plan,
+                  startedAt: newCustomJob.group.plan.startedAt
+                     ? Timestamp.fromMillis(
+                          newCustomJob.group.plan.startedAt.toMillis()
+                       )
+                     : null,
+                  expiresAt: newCustomJob.group.plan.expiresAt
+                     ? Timestamp.fromMillis(
+                          newCustomJob.group.plan.expiresAt.toMillis()
+                       )
+                     : null,
+               },
+            },
+            createdAt: newCustomJob.createdAt
+               ? Timestamp.fromMillis(newCustomJob.createdAt.toMillis())
+               : null,
+            updatedAt: newCustomJob.updatedAt
+               ? Timestamp.fromMillis(newCustomJob.updatedAt.toMillis())
+               : null,
+         },
          id: newCustomJob.id,
          applicants: 0,
          deleted: false,

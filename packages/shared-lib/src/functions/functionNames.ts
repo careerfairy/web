@@ -40,6 +40,10 @@ export const FUNCTION_NAMES = {
       "createUserSparksFeedEventNotifications_v3",
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
 
+   // Location functions
+   searchLocations: "searchLocations",
+   getLocation: "getLocation",
+
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",
 

@@ -26,6 +26,8 @@ export interface CustomJob extends Identifiable {
 
    // optional fields
    jobType?: JobType
+   workplace?: CustomJobWorkplace
+   jobLocation?: string
    salary?: string
    deleted?: boolean
    /**
@@ -55,6 +57,9 @@ export type PublicCustomJob = Pick<
    | "livestreams"
    | "sparks"
    | "isPermanentlyExpired"
+   | "group"
+   | "workplace"
+   | "jobLocation"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -79,6 +84,29 @@ export const jobTypeOptions = [
    { value: "Internship", label: "Internship", id: "Internship" },
 ]
 
+export type CustomJobWorkplace = "on-site" | "hybrid" | "remote"
+
+export const workplaceOptions: {
+   value: CustomJobWorkplace
+   label: string
+   id: CustomJobWorkplace
+}[] = [
+   { value: "on-site", label: "On-site", id: "on-site" },
+   { value: "hybrid", label: "Hybrid", id: "hybrid" },
+   { value: "remote", label: "Remote", id: "remote" },
+]
+
+export type WorkplaceOptionsRecord = Record<
+   CustomJobWorkplace,
+   { value: CustomJobWorkplace; label: string; id: CustomJobWorkplace }
+>
+
+export const workplaceOptionsMap: WorkplaceOptionsRecord = {
+   "on-site": { value: "on-site", label: "On-site", id: "on-site" },
+   hybrid: { value: "hybrid", label: "Hybrid", id: "hybrid" },
+   remote: { value: "remote", label: "Remote", id: "remote" },
+} as const
+
 export const pickPublicDataFromCustomJob = (
    job: CustomJob
 ): PublicCustomJob => {
@@ -97,6 +125,9 @@ export const pickPublicDataFromCustomJob = (
       livestreams: job.livestreams ?? [],
       sparks: job.sparks ?? [],
       isPermanentlyExpired: job.isPermanentlyExpired ?? false,
+      group: job.group ?? null,
+      workplace: job.workplace ?? null,
+      jobLocation: job.jobLocation ?? null,
    }
 }
 

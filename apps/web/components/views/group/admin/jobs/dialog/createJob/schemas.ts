@@ -1,4 +1,5 @@
 import { CUSTOM_JOB_CONSTANTS } from "@careerfairy/shared-lib/customJobs/constants"
+import { workplaceOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import * as Yup from "yup"
 
 export const jobFormValidationSchema = (quillRef) =>
@@ -28,6 +29,10 @@ export const basicInfoSchema = Yup.object({
          `Must select at least ${CUSTOM_JOB_CONSTANTS.MIN_BUSINESS_TAGS} business option`
       )
       .required("Business option is required"),
+   workplace: Yup.string().oneOf(
+      workplaceOptions.map((option) => option.value)
+   ),
+   jobLocation: Yup.string(),
 })
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

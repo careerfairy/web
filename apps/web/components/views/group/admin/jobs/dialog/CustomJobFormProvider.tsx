@@ -1,9 +1,12 @@
 import { getBusinessTagsByIds } from "@careerfairy/shared-lib/constants/tags"
 import {
    CustomJob,
+   CustomJobWorkplace,
    JobType,
    PublicCustomJob,
+   workplaceOptionsMap,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/groups/groups"
 import { yupResolver } from "@hookform/resolvers/yup"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
@@ -50,7 +53,7 @@ const CustomJobFormContext = createContext<CustomJobFormContextType>({
 
 export const getInitialValues = (
    job: CustomJob,
-   groupId: string
+   group: Group
 ): JobFormValues => {
    // If the 'job' field is received, it indicates the intention to edit an existing job.
    if (job) {
@@ -74,11 +77,13 @@ export const getInitialValues = (
 
    return {
       id: uuidv4(),
-      groupId: groupId,
+      groupId: group.id,
       basicInfo: {
          title: "",
          jobType: null,
          businessTags: [],
+         workplace: workplaceOptionsMap["on-site"].id,
+         jobLocation: group.companyCountry?.id,
       },
       additionalInfo: {
          salary: "",
@@ -110,7 +115,12 @@ const CustomJobFormProvider = ({
             setIsSubmitting(true)
 
             const {
-               basicInfo: { jobType, businessTags, ...basicInfoRest },
+               basicInfo: {
+                  jobType,
+                  businessTags,
+                  workplace,
+                  ...basicInfoRest
+               },
                additionalInfo: { deadline, postingUrl, ...additionalInfoRest },
                id,
                groupId,
@@ -127,7 +137,9 @@ const CustomJobFormProvider = ({
                groupId,
                businessFunctionsTagIds,
                jobType: jobType ? (jobType.value as JobType) : null,
+               workplace: workplace ? (workplace as CustomJobWorkplace) : null,
                deadline: Timestamp.fromDate(deadline),
+               group: group,
                postingUrl:
                   postingUrl.indexOf("http") === 0
                      ? postingUrl
@@ -168,6 +180,7 @@ const CustomJobFormProvider = ({
          successNotification,
          afterCreateCustomJob,
          errorNotification,
+         group,
       ]
    )
 
@@ -178,7 +191,7 @@ const CustomJobFormProvider = ({
 
    const formMethods = useForm<JobFormValues>({
       resolver: yupResolver(schema(quillInputRef)),
-      defaultValues: getInitialValues(job, group.groupId),
+      defaultValues: getInitialValues(job, group),
       mode: "onChange",
    })
 
@@ -200,10 +213,14 @@ const mapBasicInfo = ({
    title,
    jobType,
    businessFunctionsTagIds,
+   workplace,
+   jobLocation,
 }: CustomJob): BasicInfoValues => ({
    title,
    jobType: jobType ? { value: jobType, label: jobType, id: jobType } : null,
    businessTags: getBusinessTagsByIds(businessFunctionsTagIds),
+   workplace,
+   jobLocation,
 })
 
 const mapAdditionalInfo = (
