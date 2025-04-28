@@ -5,13 +5,14 @@ import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { Box, Grid, SxProps, Tooltip, Typography } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { useAuth } from "HOCs/AuthProvider"
+import useLocation from "components/custom-hook/countries/useLocation"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { DateTime } from "luxon"
 import { useMemo } from "react"
-import { AlertCircle, Briefcase, Globe, Zap } from "react-feather"
+import { AlertCircle, Briefcase, Globe, MapPin, Zap } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { isJobValidButNoLinkedContent } from "../utils"
@@ -136,6 +137,9 @@ const JobCardDetails = ({
 
    const jobApplication = useUserJobApplication(userData?.id, job.id)
 
+   // const jobLocation = null
+   const { data: jobLocation } = useLocation((job as CustomJob).jobLocation)
+   console.log("🚀 ~ jobLocation:", jobLocation)
    const showWarning = useMemo(
       () => !isAtsJob && isJobValidButNoLinkedContent(job),
       [isAtsJob, job]
@@ -147,7 +151,6 @@ const JobCardDetails = ({
    let jobPostingUrl: string
    let jobPublished: boolean
    let jobBusinessTags: string
-
    let jobIsPermanentlyExpired: boolean
 
    if (isAtsJob) {
@@ -250,6 +253,12 @@ const JobCardDetails = ({
                   </Box>
                ) : null}
 
+               {jobLocation ? (
+                  <Box sx={styles.subtitleItem}>
+                     <MapPin width={smallCard ? 12 : 14} />
+                     {jobLocation.name}
+                  </Box>
+               ) : null}
                {!hideJobUrl ? (
                   <Box sx={styles.subtitleItem}>
                      <Globe width={smallCard ? 12 : 14} />

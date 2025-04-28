@@ -370,7 +370,8 @@ exports.fetchCountryStatesList = countries.fetchCountryStatesList
 exports.fetchCountryCityData = countries.fetchCountryCityData
 exports.fetchCityData = countries.fetchCityData
 exports.fetchCountryData = countries.fetchCountryData
-
+exports[FUNCTION_NAMES.searchLocations] = countries.searchLocations
+exports[FUNCTION_NAMES.getLocation] = countries.getLocation
 // Levels
 exports.getFollowedCreators = levels.getFollowedCreators
 
