@@ -39,6 +39,9 @@ type CustomerIORecommendedLivestreamWebhookData = {
  * This endpoint will be called by Customer.io during their onboarding journey.
  */
 export const customerIORecommendedLivestreamsWebhook = onRequest(
+   {
+      memory: "512MiB",
+   },
    withMiddlewares(
       [
          warmingMiddleware,
