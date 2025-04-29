@@ -5,11 +5,12 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
+import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { useRouter } from "next/router"
 import { FC } from "react"
-import { Briefcase, Edit, Zap } from "react-feather"
+import { Briefcase, Edit, MapPin, Zap } from "react-feather"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
@@ -97,6 +98,7 @@ const CustomJobHeader = ({
    const isMobile = useIsMobile()
    const { push } = useRouter()
 
+   const jobLocation = useCustomJobLocation(job as CustomJob)
    const businessFunctionTags = (job.businessFunctionsTagIds || [])
       .map((tagId) => TagValuesLookup[tagId])
       .join(", ")
@@ -175,6 +177,15 @@ const CustomJobHeader = ({
                               {businessFunctionTags}
                            </Typography>
                         ) : null}
+                        {jobLocation ? (
+                           <Typography
+                              variant={"subtitle1"}
+                              sx={styles.details}
+                           >
+                              <MapPin width={14} />
+                              {jobLocation}
+                           </Typography>
+                        ) : null}
                      </Box>
                   ) : (
                      <Box sx={styles.detailsWrapper}>
@@ -194,6 +205,12 @@ const CustomJobHeader = ({
                                  <>
                                     <Zap width={14} />
                                     {businessFunctionTags}
+                                 </>
+                              ) : null}
+                              {jobLocation ? (
+                                 <>
+                                    <MapPin width={14} />
+                                    {jobLocation}
                                  </>
                               ) : null}
                            </Stack>
