@@ -1,7 +1,10 @@
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobWorkplace,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import useUserCountryCode from "../useUserCountryCode"
 
-// const validWorkplaceOptions: CustomJobWorkplace[] = ["hybrid", "remote"]
+const validWorkplaceOptions: CustomJobWorkplace[] = ["hybrid", "remote"]
 
 export const useCustomJobLocation = (customJob: CustomJob) => {
    const { userCountryCode } = useUserCountryCode()
@@ -10,6 +13,10 @@ export const useCustomJobLocation = (customJob: CustomJob) => {
 
    if (locations.length === 0) return ""
 
+   const workplaceText =
+      customJob.workplace && validWorkplaceOptions.includes(customJob.workplace)
+         ? "(Remote)"
+         : ""
    // Find location matching user's country code
    const matchingLocation = userCountryCode
       ? locations.find(
@@ -25,6 +32,6 @@ export const useCustomJobLocation = (customJob: CustomJob) => {
    const otherLocationsCount = locations.length - 1
 
    return `${firstLocation}${
-      otherLocationsCount ? `, +${otherLocationsCount}` : ""
+      otherLocationsCount ? `, +${otherLocationsCount} ${workplaceText}` : ""
    }`
 }
