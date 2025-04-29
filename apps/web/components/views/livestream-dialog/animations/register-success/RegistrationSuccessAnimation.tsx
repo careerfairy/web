@@ -170,7 +170,10 @@ export const RegistrationSuccessAnimation = ({
             },
          ]}
       >
-         <AnimatePresence onExitComplete={onAnimationComplete} mode="sync">
+         <AnimatePresence
+            onExitComplete={debug ? () => {} : onAnimationComplete}
+            mode="sync"
+         >
             {animationPhase > AnimationPhase.NOT_STARTED && (
                <Fragment>
                   <FramerBox
@@ -206,7 +209,9 @@ export const RegistrationSuccessAnimation = ({
                            duration: ANIMATION_CONFIG.container.opacity,
                         }, // Added for smoother fade
                      }}
-                     onAnimationComplete={handleAnimationComplete}
+                     onAnimationComplete={
+                        debug ? () => {} : handleAnimationComplete
+                     }
                      sx={styles.successContainer}
                   >
                      <Box

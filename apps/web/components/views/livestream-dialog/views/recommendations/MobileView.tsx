@@ -104,7 +104,17 @@ export const MobileView = () => {
       bypassCache: true,
    })
 
-   const { livestream } = useLiveStreamDialog()
+   const { livestream, goToView } = useLiveStreamDialog()
+
+   const nothingToRecommend = !loadingEvents && !events?.length
+
+   const handleNext = () => {
+      if (nothingToRecommend) {
+         goToView("livestream-details")
+      } else {
+         setShowRecommendations(true)
+      }
+   }
 
    return (
       <MobileLayout>
@@ -113,6 +123,7 @@ export const MobileView = () => {
                <Recommendations
                   key="recommendations"
                   events={events}
+                  nothingToRecommend={nothingToRecommend}
                   loadingEvents={loadingEvents}
                />
             )}
@@ -129,12 +140,10 @@ export const MobileView = () => {
                   exit="exit"
                   variants={fadeAnimation}
                >
-                  <BlurredBackground
-                     onClick={() => setShowRecommendations(true)}
-                  >
+                  <BlurredBackground onClick={handleNext}>
                      <GetNotifiedCard
                         livestream={livestream}
-                        onClose={() => setShowRecommendations(true)}
+                        onClose={handleNext}
                         onClick={(e) => e.stopPropagation()} // Prevent the card from closing when clicked
                      />
                   </BlurredBackground>
@@ -149,12 +158,14 @@ const MIN_LOADING_TIME = 1500
 
 const Recommendations = ({
    events,
+   nothingToRecommend,
    loadingEvents,
 }: {
    events: LivestreamEvent[]
+   nothingToRecommend: boolean
    loadingEvents: boolean
 }) => {
-   const { livestream, closeDialog } = useLiveStreamDialog()
+   const { livestream, closeDialog, goToView } = useLiveStreamDialog()
    const isSmall = useIsMobile(640)
 
    // Use our custom hook to manage loading state
@@ -163,14 +174,11 @@ const Recommendations = ({
       sessionKey: "cf-recommendations-loading-shown",
    })
 
-   /**
-    * Automatically close the dialog if there are no events to recommend
-    */
    useEffect(() => {
-      if (!loadingEvents && !events?.length) {
-         closeDialog()
+      if (nothingToRecommend) {
+         goToView("livestream-details")
       }
-   }, [closeDialog, events?.length, loadingEvents])
+   }, [goToView, nothingToRecommend])
 
    return (
       <RecommendationsContainer
