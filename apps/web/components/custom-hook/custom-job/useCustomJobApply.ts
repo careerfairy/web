@@ -39,6 +39,7 @@ const useCustomJobApply = (
       useSWRMutation(
          `user-${userData?.id}-applyToCustomJob-${job.id}`,
          async () => {
+            console.log("🚀 ~ handleConfirmApply:", handleConfirmApply)
             if (userData) {
                return await customJobServiceInstance.confirmJobApplication(
                   job.id,

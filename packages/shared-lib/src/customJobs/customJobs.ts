@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
-import { Group } from "../groups"
+import { Group, GroupOption } from "../groups"
 import { UserData } from "../users"
 import { CUSTOM_JOB_CONSTANTS } from "./constants"
 /**
@@ -27,7 +27,7 @@ export interface CustomJob extends Identifiable {
    // optional fields
    jobType?: JobType
    workplace?: CustomJobWorkplace
-   jobLocation?: string
+   jobLocation?: GroupOption[]
    salary?: string
    deleted?: boolean
    /**
@@ -127,7 +127,7 @@ export const pickPublicDataFromCustomJob = (
       isPermanentlyExpired: job.isPermanentlyExpired ?? false,
       group: job.group ?? null,
       workplace: job.workplace ?? null,
-      jobLocation: job.jobLocation ?? null,
+      jobLocation: job.jobLocation ?? [],
    }
 }
 

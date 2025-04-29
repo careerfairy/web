@@ -5,7 +5,7 @@ import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { Box, Grid, SxProps, Tooltip, Typography } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { useAuth } from "HOCs/AuthProvider"
-import useLocation from "components/custom-hook/countries/useLocation"
+import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
@@ -138,8 +138,8 @@ const JobCardDetails = ({
    const jobApplication = useUserJobApplication(userData?.id, job.id)
 
    // const jobLocation = null
-   const { data: jobLocation } = useLocation((job as CustomJob).jobLocation)
-   console.log("🚀 ~ jobLocation:", jobLocation)
+   const jobLocation = useCustomJobLocation(job as CustomJob)
+
    const showWarning = useMemo(
       () => !isAtsJob && isJobValidButNoLinkedContent(job),
       [isAtsJob, job]
@@ -256,7 +256,7 @@ const JobCardDetails = ({
                {jobLocation ? (
                   <Box sx={styles.subtitleItem}>
                      <MapPin width={smallCard ? 12 : 14} />
-                     {jobLocation.name}
+                     {jobLocation}
                   </Box>
                ) : null}
                {!hideJobUrl ? (

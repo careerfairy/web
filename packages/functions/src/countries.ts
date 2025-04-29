@@ -7,6 +7,7 @@ import {
    getCityCodes,
    getLocationIds,
 } from "@careerfairy/shared-lib/countries/types"
+import { universityCountriesArray } from "@careerfairy/shared-lib/universities/universities"
 
 import { City, Country, State } from "country-state-city"
 import { onCall } from "firebase-functions/https"
@@ -270,28 +271,36 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
    return countryResult
 })
 
-export const searchLocations = onCall<SearchLocationOptions>((request) => {
-   const { searchValue } = request.data
-
-   if (searchValue.length < 2) {
-      return null
-   }
-
+export const searchLocations = onCall<SearchLocationOptions>(() => {
    const countries = Country.getAllCountries()
+      .filter((country) =>
+         universityCountriesArray
+            .slice(0, 30)
+            .find((c) => c.code === country.isoCode)
+      )
       .map((country) => ({
          name: country.name,
          id: generateCountryId(country),
       }))
       .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
 
-   const states = State.getAllStates()
-      .map((state) => ({
-         name: `${state.name}, ${
-            Country.getCountryByCode(state.countryCode)?.name
-         }`,
-         id: generateStateId(state),
-      }))
-      .sort((stateA, stateB) => stateA.name.localeCompare(stateB.name))
+   const states = countries
+      .map((country) => {
+         const states = State.getStatesOfCountry(country.id)
+         return states.map((state) => ({
+            name: `${state.name}, ${country.name}`,
+            id: generateStateId(state),
+         }))
+      })
+      .flat()
+   // const states = State.getAllStates()
+   //    .map((state) => ({
+   //       name: `${state.name}, ${
+   //          Country.getCountryByCode(state.countryCode)?.name
+   //       }`,
+   //       id: generateStateId(state),
+   //    }))
+   //    .sort((stateA, stateB) => stateA.name.localeCompare(stateB.name))
 
    // const cities = City.getAllCities()
    //    .map((city) => ({
@@ -302,7 +311,7 @@ export const searchLocations = onCall<SearchLocationOptions>((request) => {
 
    const locations = [...countries, ...states]
 
-   return performFuzzySearch(locations, searchValue).slice(0, 20)
+   return locations
 })
 
 export const getLocation = onCall<GetLocationOptions>((request) => {

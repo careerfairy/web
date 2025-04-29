@@ -15,6 +15,11 @@ const groupOptionShape = Yup.object({
    name: Yup.string().required(),
 })
 
+const jobLocationShape = Yup.object({
+   id: Yup.string().required(),
+   value: Yup.string().required(),
+})
+
 export const basicInfoSchema = Yup.object({
    title: Yup.string().required("Job title is required"),
    jobType: Yup.object({
@@ -32,7 +37,7 @@ export const basicInfoSchema = Yup.object({
    workplace: Yup.string().oneOf(
       workplaceOptions.map((option) => option.value)
    ),
-   jobLocation: Yup.string(),
+   jobLocation: Yup.array().of(jobLocationShape),
 })
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

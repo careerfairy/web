@@ -13,9 +13,9 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import { customJobRepo } from "data/RepositoryInstances"
 import { Timestamp } from "firebase/firestore"
 import {
-   createContext,
    MutableRefObject,
    ReactNode,
+   createContext,
    useCallback,
    useContext,
    useMemo,
@@ -83,7 +83,9 @@ export const getInitialValues = (
          jobType: null,
          businessTags: [],
          workplace: workplaceOptionsMap["on-site"].id,
-         jobLocation: group.companyCountry?.id,
+         jobLocation: [
+            { id: group.companyCountry?.id, value: group.companyCountry?.name },
+         ],
       },
       additionalInfo: {
          salary: "",
@@ -119,6 +121,7 @@ const CustomJobFormProvider = ({
                   jobType,
                   businessTags,
                   workplace,
+                  jobLocation,
                   ...basicInfoRest
                },
                additionalInfo: { deadline, postingUrl, ...additionalInfoRest },
@@ -135,6 +138,9 @@ const CustomJobFormProvider = ({
                ...additionalInfoRest,
                id,
                groupId,
+               jobLocation:
+                  jobLocation?.map((el) => ({ id: el.id, name: el.value })) ??
+                  [],
                businessFunctionsTagIds,
                jobType: jobType ? (jobType.value as JobType) : null,
                workplace: workplace ? (workplace as CustomJobWorkplace) : null,
@@ -220,7 +226,7 @@ const mapBasicInfo = ({
    jobType: jobType ? { value: jobType, label: jobType, id: jobType } : null,
    businessTags: getBusinessTagsByIds(businessFunctionsTagIds),
    workplace,
-   jobLocation,
+   jobLocation: jobLocation?.map((el) => ({ id: el.id, value: el.name })) ?? [],
 })
 
 const mapAdditionalInfo = (

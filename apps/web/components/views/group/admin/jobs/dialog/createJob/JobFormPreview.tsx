@@ -65,6 +65,8 @@ const JobFormPreview = () => {
       "additionalInfo.deadline",
       "livestreamIds",
       "sparkIds",
+      "basicInfo.jobLocation",
+      "basicInfo.workplace",
    ])
 
    const fieldNames = [
@@ -76,6 +78,8 @@ const JobFormPreview = () => {
       "deadline",
       "livestreamIds",
       "sparkIds",
+      "jobLocation",
+      "workplace",
    ]
 
    // Convert fieldsValues array to an object
@@ -95,8 +99,15 @@ const JobFormPreview = () => {
    }, [goToStep, group.publicSparks, groupHasUpcomingLivestreams])
 
    const previewJob = useMemo<CustomJob>(() => {
-      const { deadline, jobType, businessTags, livestreamIds, sparkIds } =
-         fieldValuesObject
+      const {
+         deadline,
+         jobType,
+         businessTags,
+         livestreamIds,
+         sparkIds,
+         jobLocation,
+         workplace,
+      } = fieldValuesObject
 
       const businessTagsValues: string[] = businessTags?.map(
          (el: OptionGroup) => el.id
@@ -110,6 +121,11 @@ const JobFormPreview = () => {
          livestreams: livestreamIds,
          sparks: sparkIds,
          groupId: group.groupId,
+         jobLocation: jobLocation?.map((location) => ({
+            id: location.id,
+            name: location.value,
+         })),
+         workplace: workplace,
       }
    }, [fieldValuesObject, group])
 

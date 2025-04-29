@@ -7,14 +7,12 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
 import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
-import { universityCountriesMap } from "components/util/constants/universityCountries"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { useEffect, useState } from "react"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
@@ -76,8 +74,6 @@ const JobBasicInfo = () => {
    const { moveToNext } = useStepper()
    const { watch, setValue } = useFormContext()
 
-   const { group } = useGroup()
-
    const { isSubmitting } = useCustomJobForm()
 
    const watchFields = watch([
@@ -85,20 +81,11 @@ const JobBasicInfo = () => {
       "basicInfo.jobType",
       "basicInfo.businessTags",
       "basicInfo.jobLocation",
+      "basicInfo.workplace",
    ])
 
-   const jobLocation = watchFields[3]
-   console.log("🚀 ~ JobBasicInfo ~ jobLocation:", jobLocation)
-
-   const [locationSearch, setLocationSearch] = useState(
-      group?.companyCountry?.id
-         ? universityCountriesMap[group?.companyCountry?.id]
-         : ""
-   )
-
    const { data: locationOptions = [], isLoading: isSearching } =
-      useLocationSearch(locationSearch)
-   console.log("🚀 ~ JobBasicInfo ~ locationOptions:", locationOptions)
+      useLocationSearch()
 
    const transformedLocationOptions = locationOptions.map((option) => ({
       id: option.id,
@@ -107,12 +94,14 @@ const JobBasicInfo = () => {
 
    // This effect validates the basic info fields and updates the step validity state
    useEffect(() => {
-      const [title, jobType, businessTags] = watchFields
+      const [title, jobType, businessTags, jobLocation, workplace] = watchFields
 
       const fieldsToValidate = {
          title,
          jobType,
          businessTags,
+         jobLocation,
+         workplace,
       }
 
       setStepIsValid(basicInfoSchema.isValidSync(fieldsToValidate))
@@ -146,6 +135,14 @@ const JobBasicInfo = () => {
                            fullWidth
                            requiredText="(required)"
                            disabled={isSubmitting}
+                           placeholder="E.g., Mechanical Engineer"
+                           // InputProps={
+                           //    {
+                           //       sx: {
+                           //          height: "72px"
+                           //       }
+                           //    }
+                           // }
                         />
                      </Grid>
                      <Grid xs={12} item>
@@ -167,6 +164,7 @@ const JobBasicInfo = () => {
                            }}
                            textFieldProps={{
                               requiredText: "(required)",
+                              placeholder: "Select an option",
                               sx: BaseStyles.chipInput,
                            }}
                         />
@@ -176,63 +174,27 @@ const JobBasicInfo = () => {
                            label={"Job location"}
                            name={"basicInfo.jobLocation"}
                            options={transformedLocationOptions}
+                           multiple
+                           showCheckbox
                            textFieldProps={{
                               requiredText: null,
                               placeholder: "Insert a location",
-                              sx: {
-                                 "& .MuiAutocomplete-inputRoot.Mui-focused": {
-                                    borderColor: (theme) =>
-                                       theme.brand.purple[300],
-                                 },
-                              },
-                              onChange: (e) =>
-                                 setLocationSearch(e.target.value),
+                              sx: BaseStyles.chipInput,
                            }}
                            loading={isSearching}
                            autocompleteProps={{
                               id: "locationSearch",
+                              autoHighlight: true,
+                              disableCloseOnSelect: true,
                               disabled: isSubmitting,
                               disableClearable: true,
                               loadingText: "Searching locations...",
-                              autoHighlight: true,
                               selectOnFocus: false,
                               PaperComponent: ({ children }) => (
                                  <Box>{children}</Box>
                               ),
                               ListboxProps: {
                                  sx: styles.listBox,
-                              },
-                              getOptionLabel: (option) => {
-                                 if (typeof option === "string")
-                                    return (
-                                       transformedLocationOptions.find(
-                                          (o) => o.id === option
-                                       )?.value || ""
-                                    )
-
-                                 return option?.value || ""
-                              },
-                              isOptionEqualToValue: (option, value) => {
-                                 if (
-                                    typeof option === "string" ||
-                                    typeof value === "string"
-                                 ) {
-                                    return option === value
-                                 }
-                                 return option?.id === value?.id
-                              },
-                              getOptionKey: (option) => {
-                                 if (typeof option === "string") return option
-                                 return option?.id
-                              },
-                              onChange: (
-                                 e,
-                                 value: { id: string; value: string }
-                              ) => {
-                                 e.preventDefault()
-                                 e.stopPropagation()
-
-                                 setValue("basicInfo.jobLocation", value?.id)
                               },
                            }}
                         />
@@ -261,10 +223,6 @@ const JobBasicInfo = () => {
                                        ]?.label || ""
                                     )
                                  return option?.label || ""
-                              },
-                              getOptionKey(option) {
-                                 if (typeof option === "string") return option
-                                 return option?.id
                               },
                               onChange: (
                                  e,
