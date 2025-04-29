@@ -173,7 +173,6 @@ export const Content = ({
       isAutoApply,
       handleConfirmationClose,
       handleRemoveJobClose,
-      handleConfirmApply,
    } = useCustomJobDetailsDialog()
 
    const {
@@ -200,7 +199,6 @@ export const Content = ({
                job={customJob as PublicCustomJob}
                applicationSource={source}
                autoApply={isAutoApply}
-               onApply={handleConfirmApply}
                sx={styles.jobApplyConfirmationDialog}
             />
          ) : null}
