@@ -84,6 +84,17 @@ const styles = sxStyles({
       },
       display: "grid",
    },
+   noOptions: {
+      py: 2,
+      px: 2,
+      backgroundColor: "white",
+      borderRadius: "8px",
+      mx: -2,
+      boxShadow: {
+         sm: "none",
+         md: "0px 4px 16px rgba(0, 0, 0, 0.08)",
+      },
+   },
 })
 
 const JobBasicInfo = () => {
@@ -178,6 +189,9 @@ const JobBasicInfo = () => {
                               getOptionLabel: (option: any) =>
                                  option.name || "",
                               ChipProps: { color: "secondary" },
+                              noOptionsText: (
+                                 <Box sx={styles.noOptions}>No options</Box>
+                              ),
                            }}
                            textFieldProps={{
                               requiredText: "(required)",
@@ -192,6 +206,7 @@ const JobBasicInfo = () => {
                            name={"basicInfo.jobLocation"}
                            options={transformedLocationOptions}
                            multiple
+                           limit={3}
                            showCheckbox
                            textFieldProps={{
                               requiredText: null,
@@ -213,6 +228,9 @@ const JobBasicInfo = () => {
                               ListboxProps: {
                                  sx: styles.listBox,
                               },
+                              noOptionsText: (
+                                 <Box sx={styles.noOptions}>No options</Box>
+                              ),
                            }}
                         />
                      </Grid>
@@ -254,6 +272,9 @@ const JobBasicInfo = () => {
 
                                  setValue("basicInfo.workplace", value?.id)
                               },
+                              noOptionsText: (
+                                 <Box sx={styles.noOptions}>No options</Box>
+                              ),
                            }}
                         />
                      </Grid>
@@ -273,6 +294,9 @@ const JobBasicInfo = () => {
                               ListboxProps: {
                                  sx: styles.listBox,
                               },
+                              noOptionsText: (
+                                 <Box sx={styles.noOptions}>No options</Box>
+                              ),
                            }}
                         />
                      </Grid>
