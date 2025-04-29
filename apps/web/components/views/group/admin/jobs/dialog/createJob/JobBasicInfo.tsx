@@ -206,7 +206,6 @@ const JobBasicInfo = () => {
                            name={"basicInfo.jobLocation"}
                            options={transformedLocationOptions}
                            multiple
-                           limit={3}
                            showCheckbox
                            textFieldProps={{
                               requiredText: null,
