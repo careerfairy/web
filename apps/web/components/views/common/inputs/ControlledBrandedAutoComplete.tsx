@@ -7,6 +7,7 @@ import {
 } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { forwardRef, ReactNode, Ref, RefAttributes } from "react"
+import { ChevronDown } from "react-feather"
 import {
    Control,
    FieldError,
@@ -153,6 +154,7 @@ export const ControlledBrandedAutoComplete = forwardRef(
             loading={loading}
             multiple={multiple}
             options={options}
+            popupIcon={<ChevronDown size={24} color="black" />}
             getOptionDisabled={(option) => {
                if (!props.multiple || !limit) return false
 
