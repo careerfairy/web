@@ -180,7 +180,35 @@ export class CustomJobFunctionsRepository
          .collection("customJobStats")
          .doc(updatedCustomJob.id)
 
-      return ref.update({ job: updatedCustomJob })
+      const jobToUpdate = {
+         ...updatedCustomJob,
+         deadline: updatedCustomJob.deadline
+            ? Timestamp.fromMillis(updatedCustomJob.deadline.toMillis())
+            : null,
+         group: {
+            ...updatedCustomJob?.group,
+            plan: {
+               ...updatedCustomJob?.group?.plan,
+               startedAt: updatedCustomJob?.group?.plan?.startedAt
+                  ? Timestamp.fromMillis(
+                       updatedCustomJob?.group?.plan?.startedAt?.toMillis()
+                    )
+                  : null,
+               expiresAt: updatedCustomJob?.group?.plan?.expiresAt
+                  ? Timestamp.fromMillis(
+                       updatedCustomJob?.group?.plan?.expiresAt?.toMillis()
+                    )
+                  : null,
+            },
+         },
+         createdAt: updatedCustomJob?.createdAt
+            ? Timestamp.fromMillis(updatedCustomJob?.createdAt?.toMillis())
+            : null,
+         updatedAt: updatedCustomJob?.updatedAt
+            ? Timestamp.fromMillis(updatedCustomJob?.updatedAt?.toMillis())
+            : null,
+      }
+      return ref.update({ job: jobToUpdate })
    }
 
    async syncDeletedCustomJobDataToCustomJobStats(
