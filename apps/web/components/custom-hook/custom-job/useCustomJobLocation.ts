@@ -1,25 +1,30 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import useUserCountryCode from "../useUserCountryCode"
 
 // const validWorkplaceOptions: CustomJobWorkplace[] = ["hybrid", "remote"]
 
 export const useCustomJobLocation = (customJob: CustomJob) => {
-   //    const { data: jobLocationData } = useLocation(customJob?.jobLocation)
+   const { userCountryCode } = useUserCountryCode()
 
-   //    const jobWorkplace = customJob?.workplace && validWorkplaceOptions.includes(customJob.workplace) ? workplaceOptionsMap[customJob.workplace] : null
+   const locations = customJob.jobLocation || []
 
-   //    const workplaceText = jobWorkplace ? `(${jobWorkplace.label})` : ""
+   if (locations.length === 0) return ""
 
-   //    if(!jobLocationData?.name)
-   //         return null
+   // Find location matching user's country code
+   const matchingLocation = userCountryCode
+      ? locations.find(
+           (location) => location.id.substring(0, 2) === userCountryCode
+        )
+      : null
 
-   //     return `${jobLocationData?.name} ${workplaceText}`
-   const firstLocation = customJob.jobLocation?.[0]?.name
+   // If we found a matching location, use it as first location
+   // Otherwise use the first location from the array
+   const firstLocation = matchingLocation?.name || locations[0]?.name
 
-   const otherLocationsCount = customJob.jobLocation?.length - 1
+   // Calculate remaining locations count (excluding the first location)
+   const otherLocationsCount = locations.length - 1
 
-   return firstLocation
-      ? `${firstLocation} ${
-           otherLocationsCount ? `+${otherLocationsCount}` : ""
-        }`
-      : ""
+   return `${firstLocation}${
+      otherLocationsCount ? `, +${otherLocationsCount}` : ""
+   }`
 }

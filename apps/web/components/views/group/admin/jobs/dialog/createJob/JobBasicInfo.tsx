@@ -7,7 +7,6 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
 import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
-import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import SteppedDialog, {
@@ -65,6 +64,25 @@ const styles = sxStyles({
       "& .MuiAutocomplete-option": {
          p: "16px",
       },
+   },
+   chipInput: {
+      "& .MuiFilledInput-root": {
+         pb: 1,
+         pt: 3,
+      },
+      "& .MuiChip-label": {
+         fontSize: "14px",
+         fontWeight: "400",
+      },
+      "& .MuiChip-root": {
+         backgroundColor: "secondary.main",
+         color: "white",
+         m: 0.625,
+         "& svg": {
+            color: "inherit",
+         },
+      },
+      display: "grid",
    },
 })
 
@@ -136,13 +154,6 @@ const JobBasicInfo = () => {
                            requiredText="(required)"
                            disabled={isSubmitting}
                            placeholder="E.g., Mechanical Engineer"
-                           // InputProps={
-                           //    {
-                           //       sx: {
-                           //          height: "72px"
-                           //       }
-                           //    }
-                           // }
                         />
                      </Grid>
                      <Grid xs={12} item>
@@ -158,6 +169,12 @@ const JobBasicInfo = () => {
                               disabled: isSubmitting,
                               autoHighlight: true,
                               disableCloseOnSelect: true,
+                              PaperComponent: ({ children }) => (
+                                 <Box>{children}</Box>
+                              ),
+                              ListboxProps: {
+                                 sx: styles.listBox,
+                              },
                               getOptionLabel: (option: any) =>
                                  option.name || "",
                               ChipProps: { color: "secondary" },
@@ -165,7 +182,7 @@ const JobBasicInfo = () => {
                            textFieldProps={{
                               requiredText: "(required)",
                               placeholder: "Select an option",
-                              sx: BaseStyles.chipInput,
+                              sx: styles.chipInput,
                            }}
                         />
                      </Grid>
@@ -179,7 +196,7 @@ const JobBasicInfo = () => {
                            textFieldProps={{
                               requiredText: null,
                               placeholder: "Insert a location",
-                              sx: BaseStyles.chipInput,
+                              sx: styles.chipInput,
                            }}
                            loading={isSearching}
                            autocompleteProps={{
@@ -250,6 +267,12 @@ const JobBasicInfo = () => {
                               disabled: isSubmitting,
                               autoHighlight: true,
                               disableClearable: true,
+                              PaperComponent: ({ children }) => (
+                                 <Box>{children}</Box>
+                              ),
+                              ListboxProps: {
+                                 sx: styles.listBox,
+                              },
                            }}
                         />
                      </Grid>

@@ -1,7 +1,7 @@
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { Box, ButtonBase, Checkbox, Stack, Typography } from "@mui/material"
 import { RadioProps } from "@mui/material/Radio"
-import { styled, SxProps } from "@mui/material/styles"
+import { SxProps, styled } from "@mui/material/styles"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -58,7 +58,14 @@ export const BrandedCheckbox = styled((props: BrandedCheckboxProps) => (
       color={"default"}
       icon={<Box sx={styles.checkboxIconWrapper} />}
       checkedIcon={
-         <Box sx={styles.checkboxIconWrapper}>
+         <Box
+            sx={[
+               styles.checkboxIconWrapper,
+               {
+                  bgcolor: (theme) => theme.brand.purple[50],
+               },
+            ]}
+         >
             <CheckRoundedIcon sx={styles.dotIcon} fontSize={"small"} />
          </Box>
       }
