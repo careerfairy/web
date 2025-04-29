@@ -1,11 +1,15 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
-import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   PublicCustomJob,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
+import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { FC } from "react"
-import { Briefcase, Edit, MapPin as LocationIcon, Zap } from "react-feather"
+import { Briefcase, Edit, MapPin, Zap } from "react-feather"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
@@ -92,14 +96,10 @@ const JobHeader = ({
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
 
-   let jobName: string,
-      jobLocation: string,
-      jobType: string,
-      jobBusinessFunctionsTagIds: string[]
+   let jobName: string, jobType: string, jobBusinessFunctionsTagIds: string[]
 
    if (isAtsJob) {
       jobName = job.name
-      jobLocation = job.getLocation()
       jobType = job.getDepartment()
    } else {
       jobName = job.title
@@ -108,6 +108,8 @@ const JobHeader = ({
          (tagId) => TagValuesLookup[tagId]
       )
    }
+
+   const jobLocation = useCustomJobLocation(job as CustomJob)
 
    return (
       <>
@@ -166,7 +168,7 @@ const JobHeader = ({
                               variant={"subtitle1"}
                               sx={styles.details}
                            >
-                              <LocationIcon width={14} />
+                              <MapPin width={14} />
                               {jobLocation}
                            </Typography>
                         ) : null}
@@ -189,6 +191,12 @@ const JobHeader = ({
                                  <>
                                     <Zap width={14} />
                                     {jobBusinessFunctionsTagIds.join(", ")}
+                                 </>
+                              ) : null}
+                              {jobLocation ? (
+                                 <>
+                                    <MapPin width={14} />
+                                    {jobLocation}
                                  </>
                               ) : null}
                            </Stack>
