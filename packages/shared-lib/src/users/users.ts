@@ -186,6 +186,7 @@ export type UserAccountCreationAdditionalData = {
       startedAt?: Date
       endedAt?: Date
    }
+   savedJobId?: string
 }
 
 export type AdditionalUserRecommendationInfo = {

@@ -178,6 +178,10 @@ export interface ICustomJobRepository {
     * Update all custom jobs that have expired
     */
    syncExpiredCustomJobs(): Promise<void>
+
+   saveCustomJob(userId: string, customJob: CustomJob): Promise<void>
+
+   removeSavedCustomJob(userId: string, customJobId: string): Promise<void>
 }
 
 export class FirebaseCustomJobRepository
@@ -250,6 +254,29 @@ export class FirebaseCustomJobRepository
          .doc(jobId)
 
       return customJobRef.delete()
+   }
+
+   async saveCustomJob(userId: string, customJob: CustomJob): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("savedJobs")
+         .doc(customJob.id)
+
+      return ref.set(customJob)
+   }
+
+   async removeSavedCustomJob(
+      userId: string,
+      customJobId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("savedJobs")
+         .doc(customJobId)
+
+      return ref.delete()
    }
 
    async getCustomJobById(jobId: string): Promise<CustomJob> {
