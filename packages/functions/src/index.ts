@@ -89,7 +89,7 @@ import levels = require("./levels")
 import remindersNew = require("./reminders-new")
 import followups = require("./followups")
 // Auth
-exports.createNewUserAccount_v4 = auth.createNewUserAccount
+exports[FUNCTION_NAMES.createNewUserAccount] = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount = auth.createNewGroupAdminUserAccount
 exports[FUNCTION_NAMES.backfillUserData] = auth.backfillUserData
 exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin

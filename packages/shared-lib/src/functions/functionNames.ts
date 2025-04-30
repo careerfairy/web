@@ -20,7 +20,7 @@ export const FUNCTION_NAMES = {
    manualEndOfSparksTrialEmails: "manualEndOfSparksTrialEmails",
 
    // Auth functions
-   // createNewUserAccount: "createNewUserAccount_v4",
+   createNewUserAccount: "createNewUserAccount_v5",
 
    // Streaming functions
    // fetchAgoraRtcToken: "fetchAgoraRtcToken_v2",
