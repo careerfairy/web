@@ -112,7 +112,8 @@ const initValues: IFormValues = {
 
 function SignUpUserForm() {
    const firebase = useFirebaseService()
-   const { push } = useRouter()
+   const { push, query } = useRouter()
+   console.log("🚀 ~ SignUpUserForm ~ query:", query.savedJobId)
    const { setCurrentStep } = useContext<IMultiStepContext>(MultiStepContext)
    const { talentProfileV1 } = useFeatureFlags()
    const [emailSent, setEmailSent] = useState(false)
@@ -157,6 +158,7 @@ function SignUpUserForm() {
             startedAt: values.startedAt ? new Date(values.startedAt) : null,
             endedAt: values.endedAt ? new Date(values.endedAt) : null,
          },
+         savedJobId: query.savedJobId as string,
       }
 
       firebase
