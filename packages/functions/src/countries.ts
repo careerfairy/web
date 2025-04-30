@@ -7,7 +7,6 @@ import {
    getCityCodes,
    getLocationIds,
 } from "@careerfairy/shared-lib/countries/types"
-import { universityCountriesArray } from "@careerfairy/shared-lib/universities/universities"
 
 import { City, Country, State } from "country-state-city"
 import { onCall } from "firebase-functions/https"
@@ -273,11 +272,11 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
 
 export const searchLocations = onCall<SearchLocationOptions>(() => {
    const countries = Country.getAllCountries()
-      .filter((country) =>
-         universityCountriesArray
-            .slice(0, 30)
-            .find((c) => c.code === country.isoCode)
-      )
+      // .filter((country) =>
+      //    universityCountriesArray
+      //       .slice(0, 30)
+      //       .find((c) => c.code === country.isoCode)
+      // )
       .map((country) => ({
          name: country.name,
          id: generateCountryId(country),
@@ -318,15 +317,13 @@ export const getLocation = onCall<GetLocationOptions>((request) => {
    const { searchValue } = request.data
 
    const { countryIsoCode, stateIsoCode } = getLocationIds(searchValue)
-   console.log("🚀 ~ countryIsoCode:", countryIsoCode)
-   console.log("🚀 ~ stateIsoCode:", stateIsoCode)
 
    if (!countryIsoCode) return null
 
    const country = Country.getCountryByCode(countryIsoCode)
    if (stateIsoCode) {
       const state = State.getStateByCodeAndCountry(stateIsoCode, countryIsoCode)
-      console.log("🚀 ~ state:", state)
+
       return {
          id: searchValue,
          name: `${state.name}, ${country.name}`,
