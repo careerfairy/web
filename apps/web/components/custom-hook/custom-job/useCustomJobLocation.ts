@@ -2,12 +2,15 @@ import {
    CustomJob,
    CustomJobWorkplace,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { useAuth } from "HOCs/AuthProvider"
 import useUserCountryCode from "../useUserCountryCode"
-
 const validWorkplaceOptions: CustomJobWorkplace[] = ["hybrid", "remote"]
 
 export const useCustomJobLocation = (customJob: CustomJob) => {
-   const { userCountryCode } = useUserCountryCode()
+   const { userData } = useAuth()
+   const { userCountryCode: ipBasedCountryCode } = useUserCountryCode()
+
+   const userCountryCode = userData?.countryIsoCode || ipBasedCountryCode
 
    const locations = customJob.jobLocation || []
 

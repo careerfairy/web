@@ -272,11 +272,6 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
 
 export const searchLocations = onCall<SearchLocationOptions>(() => {
    const countries = Country.getAllCountries()
-      // .filter((country) =>
-      //    universityCountriesArray
-      //       .slice(0, 30)
-      //       .find((c) => c.code === country.isoCode)
-      // )
       .map((country) => ({
          name: country.name,
          id: generateCountryId(country),
@@ -292,21 +287,6 @@ export const searchLocations = onCall<SearchLocationOptions>(() => {
          }))
       })
       .flat()
-   // const states = State.getAllStates()
-   //    .map((state) => ({
-   //       name: `${state.name}, ${
-   //          Country.getCountryByCode(state.countryCode)?.name
-   //       }`,
-   //       id: generateStateId(state),
-   //    }))
-   //    .sort((stateA, stateB) => stateA.name.localeCompare(stateB.name))
-
-   // const cities = City.getAllCities()
-   //    .map((city) => ({
-   //       name: `${city.name}, ${Country.getCountryByCode(city.countryCode)?.name}`,
-   //       id: generateCityId(city),
-   //    }))
-   //    .sort((cityA, cityB) => cityA.name.localeCompare(cityB.name))
 
    const locations = [...countries, ...states]
 
