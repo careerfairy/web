@@ -32,6 +32,6 @@ export const useCustomJobLocation = (customJob: CustomJob) => {
    const otherLocationsCount = locations.length - 1
 
    return `${firstLocation}${
-      otherLocationsCount ? `, +${otherLocationsCount} ${workplaceText}` : ""
-   }`
+      otherLocationsCount ? `, +${otherLocationsCount}` : ""
+   } ${workplaceText}`
 }
