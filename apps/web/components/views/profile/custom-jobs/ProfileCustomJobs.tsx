@@ -1,17 +1,23 @@
-import { Box, Button, Stack, Tab, Tabs, Typography } from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJobsGroupNames from "components/custom-hook/custom-job/useCustomJobsGroupNames"
 import { useUserAppliedJobs } from "components/custom-hook/custom-job/useUserAppliedJobs"
 import { useUserInitiatedJobs } from "components/custom-hook/custom-job/useUserInitiatedJobs"
+import { useUserSavedJobs } from "components/custom-hook/custom-job/useUserSavedJobs"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { EmptyItemsView } from "components/views/common/EmptyItemsView"
 import CustomJobsList from "components/views/jobs/components/custom-jobs/CustomJobsList"
 import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import { useState } from "react"
-import { Briefcase } from "react-feather"
+import { Bookmark, Briefcase } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const TAB_VALUES = {
+   saved: {
+      value: "saved",
+      label: "Saved",
+   },
    initiated: {
       value: "initiated",
       label: "Initiated",
@@ -112,12 +118,13 @@ const ProfileCustomJobs = () => {
       setTabValue(newValue)
    }
 
-   const { talentProfileV1 } = useFeatureFlags()
-
    const TalentProfileTabsButtons = () => {
       const isInitiatedSelected = tabValue === TAB_VALUES.initiated.value
       const isAppliedSelected = tabValue === TAB_VALUES.applied.value
+      const isSavedSelected = tabValue === TAB_VALUES.saved.value
 
+      const onClickSaved = (event) =>
+         handleTabChange(event, TAB_VALUES.saved.value)
       const onClickInitiated = (event) =>
          handleTabChange(event, TAB_VALUES.initiated.value)
       const onClickApplied = (event) =>
@@ -130,6 +137,25 @@ const ProfileCustomJobs = () => {
                sx={styles.talentProfileTabsBtnWrapper}
                spacing={"9px"}
             >
+               <Button
+                  variant={isSavedSelected ? "contained" : "text"}
+                  sx={[
+                     styles.stateButton,
+                     isSavedSelected ? styles.selectedButton : null,
+                  ]}
+                  onClick={onClickSaved}
+               >
+                  <Typography
+                     variant="brandedBody"
+                     sx={
+                        isSavedSelected
+                           ? styles.selectedTabButtonText
+                           : styles.tabButtonText
+                     }
+                  >
+                     Saved
+                  </Typography>
+               </Button>
                <Button
                   variant={isInitiatedSelected ? "contained" : "text"}
                   sx={[
@@ -175,35 +201,18 @@ const ProfileCustomJobs = () => {
 
    return (
       <Box>
-         {talentProfileV1 ? (
-            <TalentProfileTabsButtons />
-         ) : (
-            <Tabs
-               value={tabValue}
-               onChange={handleTabChange}
-               aria-label="Job tabs"
-               sx={styles.tabs}
-            >
-               <Tab
-                  label={TAB_VALUES.initiated.label}
-                  value={TAB_VALUES.initiated.value}
-               />
-               <Tab
-                  label={TAB_VALUES.applied.label}
-                  value={TAB_VALUES.applied.value}
-               />
-            </Tabs>
-         )}
+         <TalentProfileTabsButtons />
          <Box
             sx={[
                styles.tabsContentWrapper,
-               talentProfileV1 ? styles.talentProfileTabsContentWrapper : null,
+               styles.talentProfileTabsContentWrapper,
             ]}
          >
             {tabValue === TAB_VALUES.initiated.value && (
                <UserInitiatedCustomJobs />
             )}
             {tabValue === TAB_VALUES.applied.value && <UserAppliedCustomJobs />}
+            {tabValue === TAB_VALUES.saved.value && <UserSavedCustomJobs />}
          </Box>
       </Box>
    )
@@ -288,6 +297,40 @@ const UserAppliedCustomJobsView = () => {
          jobsGroupNamesMap={jobsGroupNamesMap}
          applied
       />
+   )
+}
+
+const UserSavedCustomJobs = () => {
+   return (
+      <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
+         <UserSavedCustomJobsView />
+      </SuspenseWithBoundary>
+   )
+}
+
+const UserSavedCustomJobsView = () => {
+   const { data: savedJobs } = useUserSavedJobs()
+   const { data: jobsGroupNamesMap } = useCustomJobsGroupNames(savedJobs)
+
+   if (!savedJobs?.length)
+      return (
+         <EmptyItemsView
+            title="Save some jobs!"
+            description="Start saving jobs to easily find and apply to them later."
+            icon={<Bookmark width={"44px"} height={"44px"} />}
+         />
+      )
+
+   return (
+      <Box>
+         <CustomJobsList
+            customJobs={savedJobs}
+            hrefLink={TALENT_PROFILE_JOBS_DIALOG_LINK}
+            jobWrapperSx={styles.jobWrapper}
+            jobsGroupNamesMap={jobsGroupNamesMap}
+            applied
+         />
+      </Box>
    )
 }
 
