@@ -391,7 +391,7 @@ const ProfileJobCTA = ({
                alreadyApplied={alreadyApplied}
             />
             <ApplicationAlreadySentButton alreadyApplied={alreadyApplied} />
-            {!jobApplication.removedFromUserProfile ? (
+            {!jobApplication?.removedFromUserProfile ? (
                <UserProfileJobOptionsButtons
                   applicationInitiatedOnly={applicationInitiatedOnly}
                   handleRemoveClick={handleRemoveClick}
