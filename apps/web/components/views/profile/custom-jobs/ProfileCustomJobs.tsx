@@ -212,7 +212,7 @@ const ProfileCustomJobs = () => {
                <UserInitiatedCustomJobs />
             )}
             {tabValue === TAB_VALUES.applied.value && <UserAppliedCustomJobs />}
-            {tabValue === TAB_VALUES.saved.value && <UserSavedCustomJobs />}
+            {tabValue === TAB_VALUES.saved.value && <UserSavedCustomJobsView />}
          </Box>
       </Box>
    )
@@ -297,14 +297,6 @@ const UserAppliedCustomJobsView = () => {
          jobsGroupNamesMap={jobsGroupNamesMap}
          applied
       />
-   )
-}
-
-const UserSavedCustomJobs = () => {
-   return (
-      <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
-         <UserSavedCustomJobsView />
-      </SuspenseWithBoundary>
    )
 }
 
