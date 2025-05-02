@@ -105,20 +105,26 @@ export const removeAndSyncUserSparkNotification = onCall<{
  */
 export const createUserSparksFeedEventNotifications = onCall<{
    userId: string
-}>(async (request) => {
-   const { userId } = request.data as { userId: string }
+}>(
+   {
+      memory: "4GiB",
+      timeoutSeconds: 60 * 9,
+   },
+   async (request) => {
+      const { userId } = request.data as { userId: string }
 
-   try {
-      return handleCreateUsersSparksNotifications(
-         firestore,
-         functions.logger.log,
-         { userId, skimData: true }
-      )
-   } catch (error) {
-      logAndThrow(
-         "Error during the creation of a single User Sparks Feed event notifications",
-         error,
-         userId
-      )
+      try {
+         return handleCreateUsersSparksNotifications(
+            firestore,
+            functions.logger.log,
+            { userId, skimData: true }
+         )
+      } catch (error) {
+         logAndThrow(
+            "Error during the creation of a single User Sparks Feed event notifications",
+            error,
+            userId
+         )
+      }
    }
-})
+)
