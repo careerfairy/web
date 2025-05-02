@@ -137,17 +137,17 @@ export class CustomJobFunctionsRepository
                ? Timestamp.fromMillis(newCustomJob.deadline.toMillis())
                : null,
             group: {
-               ...newCustomJob.group,
+               ...newCustomJob?.group,
                plan: {
-                  ...newCustomJob.group.plan,
-                  startedAt: newCustomJob.group.plan.startedAt
+                  ...newCustomJob?.group?.plan,
+                  startedAt: newCustomJob?.group?.plan?.startedAt
                      ? Timestamp.fromMillis(
-                          newCustomJob.group.plan.startedAt.toMillis()
+                          newCustomJob?.group?.plan?.startedAt?.toMillis()
                        )
                      : null,
-                  expiresAt: newCustomJob.group.plan.expiresAt
+                  expiresAt: newCustomJob?.group?.plan?.expiresAt
                      ? Timestamp.fromMillis(
-                          newCustomJob.group.plan.expiresAt.toMillis()
+                          newCustomJob?.group?.plan?.expiresAt?.toMillis()
                        )
                      : null,
                },
