@@ -173,7 +173,6 @@ export const Content = ({
       isAutoApply,
       handleConfirmationClose,
       handleRemoveJobClose,
-      handleConfirmApply,
    } = useCustomJobDetailsDialog()
 
    const {
@@ -200,7 +199,6 @@ export const Content = ({
                job={customJob as PublicCustomJob}
                applicationSource={source}
                autoApply={isAutoApply}
-               onApply={handleConfirmApply}
                sx={styles.jobApplyConfirmationDialog}
             />
          ) : null}
@@ -219,13 +217,8 @@ export const Content = ({
 }
 
 export const Actions = () => {
-   const {
-      source,
-      customJob,
-      handleConfirmationOpen,
-      handleClickApplyBtn,
-      handleRemoveJobOpen,
-   } = useCustomJobDetailsDialog()
+   const { source, customJob, handleConfirmationOpen, handleRemoveJobOpen } =
+      useCustomJobDetailsDialog()
 
    return (
       <CustomJobCTAButtons
@@ -233,7 +226,6 @@ export const Actions = () => {
          job={customJob as PublicCustomJob}
          handleApplyClick={() => {
             handleConfirmationOpen()
-            handleClickApplyBtn()
          }}
          handleRemoveClick={handleRemoveJobOpen}
       />
