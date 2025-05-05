@@ -138,7 +138,13 @@ const JobCardDetails = ({
    const jobApplication = useUserJobApplication(userData?.id, job.id)
 
    // const jobLocation = null
-   const jobLocation = useCustomJobLocation(job as CustomJob)
+   const {
+      locationText: jobLocation,
+      othersCount,
+      otherLocations,
+   } = useCustomJobLocation(job as CustomJob, {
+      maxLocationsToShow: isMobile ? 1 : 4,
+   })
 
    const showWarning = useMemo(
       () => !isAtsJob && isJobValidButNoLinkedContent(job),
@@ -257,6 +263,18 @@ const JobCardDetails = ({
                   <Box sx={styles.subtitleItem}>
                      <MapPin width={smallCard ? 12 : 14} />
                      {jobLocation}
+                     {othersCount ? (
+                        <Tooltip
+                           title={otherLocations
+                              .map((location) => location.name)
+                              .join(", ")}
+                        >
+                           <Typography
+                              variant={"subtitle1"}
+                              sx={{ display: "inline", ml: "0px !important" }}
+                           >{`, +${othersCount}`}</Typography>
+                        </Tooltip>
+                     ) : null}
                   </Box>
                ) : null}
                {!hideJobUrl ? (

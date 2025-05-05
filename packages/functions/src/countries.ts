@@ -282,7 +282,7 @@ export const searchLocations = onCall<SearchLocationOptions>(() => {
       .map((country) => {
          const states = State.getStatesOfCountry(country.id)
          return states.map((state) => ({
-            name: `${state.name}, ${country.name}`,
+            name: `${state.name} (${country.name})`,
             id: generateStateId(state),
          }))
       })
@@ -306,7 +306,7 @@ export const getLocation = onCall<GetLocationOptions>((request) => {
 
       return {
          id: searchValue,
-         name: `${state.name}, ${country.name}`,
+         name: `${state.name} (${country.name})`,
       }
    }
 
