@@ -1,4 +1,3 @@
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    CompetitorAudienceBigQueryResult,
    CompetitorAudienceData,
@@ -20,6 +19,7 @@ import {
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { BigQuery } from "@google-cloud/bigquery"
 import { Firestore } from "firebase-admin/firestore"
+import { createAdminConverter } from "../../../util/firestore-admin"
 import IBigQueryService from "../../bigQuery/IBigQueryService"
 import { ISparkFunctionsRepository } from "../SparkFunctionsRepository"
 import {
@@ -238,11 +238,11 @@ class GroupSparksAnalyticsRepository
    async getAnalyticsFromFirestore(): Promise<SparksAnalyticsDTO> {
       const doc = await this.firestore
          .collection("sparksAnalytics")
-         .withConverter(createGenericConverter<SparksAnalyticsDTO>())
+         .withConverter(createAdminConverter<SparksAnalyticsDTO>())
          .doc(this.groupId)
          .get()
 
-      return doc.data() as SparksAnalyticsDTO
+      return doc.data()
    }
 
    async updateAnalyticsInFirestore(
