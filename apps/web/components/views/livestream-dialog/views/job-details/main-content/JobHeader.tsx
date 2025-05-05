@@ -1,15 +1,11 @@
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
-import {
-   CustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
-import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { FC } from "react"
-import { Briefcase, Edit, MapPin, Zap } from "react-feather"
+import { Briefcase, Edit, Zap } from "react-feather"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
@@ -109,8 +105,6 @@ const JobHeader = ({
       )
    }
 
-   const jobLocation = useCustomJobLocation(job as CustomJob)
-
    return (
       <>
          {isMobile && editMode ? (
@@ -162,16 +156,6 @@ const JobHeader = ({
                               {jobBusinessFunctionsTagIds.join(", ")}
                            </Typography>
                         ) : null}
-
-                        {jobLocation ? (
-                           <Typography
-                              variant={"subtitle1"}
-                              sx={styles.details}
-                           >
-                              <MapPin width={14} />
-                              {jobLocation}
-                           </Typography>
-                        ) : null}
                      </Box>
                   ) : (
                      <Box sx={styles.detailsWrapper}>
@@ -191,12 +175,6 @@ const JobHeader = ({
                                  <>
                                     <Zap width={14} />
                                     {jobBusinessFunctionsTagIds.join(", ")}
-                                 </>
-                              ) : null}
-                              {jobLocation ? (
-                                 <>
-                                    <MapPin width={14} />
-                                    {jobLocation}
                                  </>
                               ) : null}
                            </Stack>

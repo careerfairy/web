@@ -4,12 +4,19 @@ import {
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   Skeleton,
+   Stack,
+   Tooltip,
+   Typography,
+} from "@mui/material"
 import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { useRouter } from "next/router"
-import { FC } from "react"
+import { FC, useRef, useState } from "react"
 import { Briefcase, Edit, MapPin, Zap } from "react-feather"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { sxStyles } from "../../../../../types/commonTypes"
@@ -32,6 +39,7 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "flex-start",
       gap: "4px",
+      width: "100%",
    },
    headerCompanyLink: {
       cursor: "pointer",
@@ -86,6 +94,7 @@ type Props = {
    companyLogoUrl: string
    editMode?: boolean
    handleClick?: () => void
+   maxLocationsToShow?: number
 }
 
 const CustomJobHeader = ({
@@ -94,11 +103,26 @@ const CustomJobHeader = ({
    companyLogoUrl,
    editMode,
    handleClick,
+   maxLocationsToShow,
 }: Props) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
 
-   const jobLocation = useCustomJobLocation(job as CustomJob)
+   const [tooltipOpen, setTooltipOpen] = useState(false)
+   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+   const {
+      locationText: jobLocation,
+      othersCount,
+      otherLocations,
+      workplaceText,
+   } = useCustomJobLocation(
+      job as CustomJob,
+      maxLocationsToShow && {
+         maxLocationsToShow: maxLocationsToShow,
+      }
+   )
+
    const businessFunctionTags = (job.businessFunctionsTagIds || [])
       .map((tagId) => TagValuesLookup[tagId])
       .join(", ")
@@ -184,6 +208,55 @@ const CustomJobHeader = ({
                            >
                               <MapPin width={14} />
                               {jobLocation}
+                              {othersCount ? (
+                                 <Tooltip
+                                    title={otherLocations
+                                       .map((location) => location.name)
+                                       .join(", ")}
+                                    open={tooltipOpen}
+                                    onClose={undefined}
+                                    placement="top"
+                                 >
+                                    <Typography
+                                       variant={"subtitle1"}
+                                       sx={{
+                                          ...styles.details,
+                                          display: "inline",
+                                          ml: "0px !important",
+                                          cursor: "pointer",
+                                       }}
+                                       onClick={() => {
+                                          setTooltipOpen(true)
+                                          if (tooltipTimeoutRef.current)
+                                             clearTimeout(
+                                                tooltipTimeoutRef.current
+                                             )
+                                          tooltipTimeoutRef.current =
+                                             setTimeout(() => {
+                                                setTooltipOpen(false)
+                                             }, 4000)
+                                       }}
+                                    >
+                                       {`, +${othersCount}`}
+                                    </Typography>
+                                 </Tooltip>
+                              ) : (
+                                 ""
+                              )}
+                              {workplaceText ? (
+                                 <Typography
+                                    variant={"subtitle1"}
+                                    sx={{
+                                       ...styles.details,
+                                       display: "inline",
+                                       ml: "0px !important",
+                                    }}
+                                 >
+                                    {workplaceText}
+                                 </Typography>
+                              ) : (
+                                 ""
+                              )}
                            </Typography>
                         ) : null}
                      </Box>
@@ -211,6 +284,39 @@ const CustomJobHeader = ({
                                  <>
                                     <MapPin width={14} />
                                     {jobLocation}
+                                    {othersCount ? (
+                                       <Tooltip
+                                          title={otherLocations
+                                             .map((location) => location.name)
+                                             .join(", ")}
+                                          placement="top"
+                                       >
+                                          <Typography
+                                             variant={"subtitle1"}
+                                             sx={{
+                                                ...styles.details,
+                                                display: "inline",
+                                                ml: "0px !important",
+                                             }}
+                                          >{`, +${othersCount}`}</Typography>
+                                       </Tooltip>
+                                    ) : (
+                                       ""
+                                    )}
+                                    {workplaceText ? (
+                                       <Typography
+                                          variant={"subtitle1"}
+                                          sx={{
+                                             ...styles.details,
+                                             display: "inline",
+                                             ml: "0px !important",
+                                          }}
+                                       >
+                                          {workplaceText}
+                                       </Typography>
+                                    ) : (
+                                       ""
+                                    )}
                                  </>
                               ) : null}
                            </Stack>

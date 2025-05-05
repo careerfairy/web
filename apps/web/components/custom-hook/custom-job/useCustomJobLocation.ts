@@ -3,10 +3,20 @@ import {
    CustomJobWorkplace,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useAuth } from "HOCs/AuthProvider"
+import useIsMobile from "../useIsMobile"
 import useUserCountryCode from "../useUserCountryCode"
+
 const validWorkplaceOptions: CustomJobWorkplace[] = ["hybrid", "remote"]
 
-export const useCustomJobLocation = (customJob: CustomJob) => {
+type Options = {
+   maxLocationsToShow?: number
+}
+
+export const useCustomJobLocation = (
+   customJob: CustomJob,
+   options?: Options
+) => {
+   const isMobile = useIsMobile()
    const { userData } = useAuth()
    const { userCountryCode: ipBasedCountryCode } = useUserCountryCode()
 
@@ -14,11 +24,11 @@ export const useCustomJobLocation = (customJob: CustomJob) => {
 
    const locations = customJob.jobLocation || []
 
-   if (locations.length === 0) return ""
+   if (locations.length === 0) return { locationText: "", otherLocations: [] }
 
    const workplaceText =
       customJob.workplace && validWorkplaceOptions.includes(customJob.workplace)
-         ? "(Remote)"
+         ? " - Remote"
          : ""
    // Find location matching user's country code
    const matchingLocation = userCountryCode
@@ -27,14 +37,33 @@ export const useCustomJobLocation = (customJob: CustomJob) => {
         )
       : null
 
-   // If we found a matching location, use it as first location
-   // Otherwise use the first location from the array
-   const firstLocation = matchingLocation?.name || locations[0]?.name
+   const { maxLocationsToShow = isMobile ? 1 : 3 } = options || {}
 
-   // Calculate remaining locations count (excluding the first location)
-   const otherLocationsCount = locations.length - 1
+   // Always show matching location first, then fill with others
+   let shownLocations: string[] = []
+   let otherLocations = []
+   if (matchingLocation) {
+      shownLocations = [matchingLocation.name]
+      const remaining = locations.filter(
+         (loc) => loc.name !== matchingLocation.name
+      )
+      shownLocations = shownLocations.concat(
+         remaining.slice(0, maxLocationsToShow - 1).map((loc) => loc.name)
+      )
+      otherLocations = remaining.slice(maxLocationsToShow - 1)
+   } else {
+      shownLocations = locations
+         .slice(0, maxLocationsToShow)
+         .map((loc) => loc.name)
+      otherLocations = locations.slice(maxLocationsToShow)
+   }
 
-   return `${firstLocation}${
-      otherLocationsCount ? `, +${otherLocationsCount}` : ""
-   } ${workplaceText}`
+   const locationText = `${shownLocations.join(", ")}`
+
+   return {
+      locationText,
+      othersCount: otherLocations.length,
+      otherLocations,
+      workplaceText,
+   }
 }
