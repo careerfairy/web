@@ -55,7 +55,9 @@ export const useSavedJob = (customJob: CustomJob) => {
          },
          onSuccess: () => {
             successNotification(
-               `You have successfully ${data ? "removed" : "saved"} the job!`,
+               `You have ${data ? "" : "successfully"} ${
+                  data ? "removed" : "saved"
+               } the job!`,
                "Congrats"
             )
          },
