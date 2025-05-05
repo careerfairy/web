@@ -608,6 +608,7 @@ type DialogContextType = {
 }
 
 const getPageIndex = (page: Props["page"]): number => {
+   return views.findIndex((view) => view.key === "recommendations")
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")
