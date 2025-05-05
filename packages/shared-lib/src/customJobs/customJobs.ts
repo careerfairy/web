@@ -86,26 +86,26 @@ export const jobTypeOptions = [
 
 export type CustomJobWorkplace = "on-site" | "hybrid" | "remote"
 
+export const workplaceOptionsMap: WorkplaceOptionsRecord = {
+   "on-site": { value: "on-site", label: "On-site", id: "on-site" },
+   hybrid: { value: "hybrid", label: "Hybrid", id: "hybrid" },
+   remote: { value: "remote", label: "Remote", id: "remote" },
+} as const
+
 export const workplaceOptions: {
    value: CustomJobWorkplace
    label: string
    id: CustomJobWorkplace
 }[] = [
-   { value: "on-site", label: "On-site", id: "on-site" },
-   { value: "hybrid", label: "Hybrid", id: "hybrid" },
-   { value: "remote", label: "Remote", id: "remote" },
+   workplaceOptionsMap["on-site"],
+   workplaceOptionsMap["hybrid"],
+   workplaceOptionsMap["remote"],
 ]
 
 export type WorkplaceOptionsRecord = Record<
    CustomJobWorkplace,
    { value: CustomJobWorkplace; label: string; id: CustomJobWorkplace }
 >
-
-export const workplaceOptionsMap: WorkplaceOptionsRecord = {
-   "on-site": { value: "on-site", label: "On-site", id: "on-site" },
-   hybrid: { value: "hybrid", label: "Hybrid", id: "hybrid" },
-   remote: { value: "remote", label: "Remote", id: "remote" },
-} as const
 
 export const pickPublicDataFromCustomJob = (
    job: CustomJob

@@ -1,12 +1,10 @@
 import {
    CustomJob,
-   CustomJobWorkplace,
+   workplaceOptionsMap,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "../useIsMobile"
 import useUserCountryCode from "../useUserCountryCode"
-
-const validWorkplaceOptions: CustomJobWorkplace[] = ["hybrid", "remote"]
 
 type Options = {
    maxLocationsToShow?: number
@@ -27,8 +25,8 @@ export const useCustomJobLocation = (
    if (locations.length === 0) return { locationText: "", otherLocations: [] }
 
    const workplaceText =
-      customJob.workplace && validWorkplaceOptions.includes(customJob.workplace)
-         ? " - Remote"
+      customJob.workplace && customJob.workplace !== "on-site"
+         ? workplaceOptionsMap[customJob.workplace].label
          : ""
    // Find location matching user's country code
    const matchingLocation = userCountryCode
@@ -58,7 +56,7 @@ export const useCustomJobLocation = (
       otherLocations = locations.slice(maxLocationsToShow)
    }
 
-   const locationText = `${shownLocations.join(", ")}`
+   const locationText = `${shownLocations.join("; ")}`
 
    return {
       locationText,
