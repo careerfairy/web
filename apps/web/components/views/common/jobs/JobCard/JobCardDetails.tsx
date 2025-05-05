@@ -137,13 +137,13 @@ const JobCardDetails = ({
 
    const jobApplication = useUserJobApplication(userData?.id, job.id)
 
-   // const jobLocation = null
    const {
       locationText: jobLocation,
       othersCount,
       otherLocations,
+      workplaceText,
    } = useCustomJobLocation(job as CustomJob, {
-      maxLocationsToShow: isMobile ? 1 : 4,
+      maxLocationsToShow: isMobile ? 1 : 3,
    })
 
    const showWarning = useMemo(
@@ -274,6 +274,12 @@ const JobCardDetails = ({
                               sx={{ display: "inline", ml: "0px !important" }}
                            >{`, +${othersCount}`}</Typography>
                         </Tooltip>
+                     ) : null}
+                     {workplaceText ? (
+                        <Typography
+                           variant={"subtitle1"}
+                           sx={{ display: "inline", ml: "0px !important" }}
+                        >{`${workplaceText}`}</Typography>
                      ) : null}
                   </Box>
                ) : null}
