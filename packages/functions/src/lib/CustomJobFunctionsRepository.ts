@@ -131,34 +131,7 @@ export class CustomJobFunctionsRepository
          jobId: newCustomJob.id,
          groupId: newCustomJob.groupId,
          clicks: 0,
-         job: {
-            ...newCustomJob,
-            deadline: newCustomJob.deadline
-               ? Timestamp.fromMillis(newCustomJob.deadline.toMillis())
-               : null,
-            group: {
-               ...newCustomJob?.group,
-               plan: {
-                  ...newCustomJob?.group?.plan,
-                  startedAt: newCustomJob?.group?.plan?.startedAt
-                     ? Timestamp.fromMillis(
-                          newCustomJob?.group?.plan?.startedAt?.toMillis()
-                       )
-                     : null,
-                  expiresAt: newCustomJob?.group?.plan?.expiresAt
-                     ? Timestamp.fromMillis(
-                          newCustomJob?.group?.plan?.expiresAt?.toMillis()
-                       )
-                     : null,
-               },
-            },
-            createdAt: newCustomJob.createdAt
-               ? Timestamp.fromMillis(newCustomJob.createdAt.toMillis())
-               : null,
-            updatedAt: newCustomJob.updatedAt
-               ? Timestamp.fromMillis(newCustomJob.updatedAt.toMillis())
-               : null,
-         },
+         job: newCustomJob,
          id: newCustomJob.id,
          applicants: 0,
          deleted: false,
@@ -180,35 +153,7 @@ export class CustomJobFunctionsRepository
          .collection("customJobStats")
          .doc(updatedCustomJob.id)
 
-      const jobToUpdate = {
-         ...updatedCustomJob,
-         deadline: updatedCustomJob.deadline
-            ? Timestamp.fromMillis(updatedCustomJob.deadline.toMillis())
-            : null,
-         group: {
-            ...updatedCustomJob?.group,
-            plan: {
-               ...updatedCustomJob?.group?.plan,
-               startedAt: updatedCustomJob?.group?.plan?.startedAt
-                  ? Timestamp.fromMillis(
-                       updatedCustomJob?.group?.plan?.startedAt?.toMillis()
-                    )
-                  : null,
-               expiresAt: updatedCustomJob?.group?.plan?.expiresAt
-                  ? Timestamp.fromMillis(
-                       updatedCustomJob?.group?.plan?.expiresAt?.toMillis()
-                    )
-                  : null,
-            },
-         },
-         createdAt: updatedCustomJob?.createdAt
-            ? Timestamp.fromMillis(updatedCustomJob?.createdAt?.toMillis())
-            : null,
-         updatedAt: updatedCustomJob?.updatedAt
-            ? Timestamp.fromMillis(updatedCustomJob?.updatedAt?.toMillis())
-            : null,
-      }
-      return ref.update({ job: jobToUpdate })
+      return ref.update({ job: updatedCustomJob })
    }
 
    async syncDeletedCustomJobDataToCustomJobStats(
@@ -414,26 +359,7 @@ export class CustomJobFunctionsRepository
       const batch = this.firestore.batch()
 
       const toUpdate: Pick<CustomJob, "group"> = {
-         group: {
-            ...newGroup,
-            ...(newGroup?.plan
-               ? {
-                    plan: {
-                       ...newGroup.plan,
-                       startedAt: newGroup.plan.startedAt
-                          ? Timestamp.fromMillis(
-                               newGroup.plan.startedAt.toMillis()
-                            )
-                          : null,
-                       expiresAt: newGroup.plan.expiresAt
-                          ? Timestamp.fromMillis(
-                               newGroup.plan.expiresAt.toMillis()
-                            )
-                          : null,
-                    },
-                 }
-               : {}),
-         },
+         group: newGroup,
       }
 
       customJobsSnap.forEach((doc) => {
