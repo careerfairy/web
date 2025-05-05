@@ -112,7 +112,7 @@ const styles = sxStyles({
 })
 
 const ProfileCustomJobs = () => {
-   const [tabValue, setTabValue] = useState(TAB_VALUES.initiated.value)
+   const [tabValue, setTabValue] = useState(TAB_VALUES.saved.value)
 
    const handleTabChange = (_, newValue) => {
       setTabValue(newValue)
@@ -308,7 +308,7 @@ const UserSavedCustomJobsView = () => {
       return (
          <EmptyItemsView
             title="Save some jobs!"
-            description="Start saving jobs to easily find and apply to them later."
+            description="Start saving jobs to easily find them and apply later."
             icon={<Bookmark width={"44px"} height={"44px"} />}
          />
       )
