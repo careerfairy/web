@@ -49,6 +49,9 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[800],
       fontWeight: 400,
    },
+   checkedIconWrapper: {
+      bgcolor: (theme) => theme.brand.purple[50],
+   },
 })
 
 export type BrandedCheckboxProps = Omit<RadioProps, "variant">
@@ -58,14 +61,7 @@ export const BrandedCheckbox = styled((props: BrandedCheckboxProps) => (
       color={"default"}
       icon={<Box sx={styles.checkboxIconWrapper} />}
       checkedIcon={
-         <Box
-            sx={[
-               styles.checkboxIconWrapper,
-               {
-                  bgcolor: (theme) => theme.brand.purple[50],
-               },
-            ]}
-         >
+         <Box sx={[styles.checkboxIconWrapper, styles.checkedIconWrapper]}>
             <CheckRoundedIcon sx={styles.dotIcon} fontSize={"small"} />
          </Box>
       }
