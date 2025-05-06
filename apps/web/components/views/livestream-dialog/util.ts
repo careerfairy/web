@@ -75,7 +75,7 @@ type ValidLink =
    | ["livestream", string, "speaker-details", string]
    | ["livestream", string]
    | ["livestream", string, "register"]
-
+   | ["livestream", string, "recommendations"]
 type LinkType =
    | {
         type: "livestreamDetails"
@@ -96,6 +96,11 @@ type LinkType =
      }
    | {
         type: "registerToLivestream"
+        livestreamId: string
+        targetPage?: DialogPage
+     }
+   | {
+        type: "recommendations"
         livestreamId: string
         targetPage?: DialogPage
      }
@@ -128,6 +133,9 @@ export const buildDialogLink = ({
          break
       case "registerToLivestream":
          query = ["livestream", link.livestreamId, "register"]
+         break
+      case "recommendations":
+         query = ["livestream", link.livestreamId, "recommendations"]
          break
    }
 

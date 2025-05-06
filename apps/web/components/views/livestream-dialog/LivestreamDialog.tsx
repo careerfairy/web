@@ -21,6 +21,7 @@ import {
    useState,
 } from "react"
 import SwipeableViews from "react-swipeable-views"
+import { usePreviousDistinct } from "react-use"
 import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { sxStyles } from "../../../types/commonTypes"
@@ -99,7 +100,12 @@ type Props = {
    livestreamId: string
    handleClose: () => void
    open: boolean
-   page: "details" | "register" | "job-details" | "speaker-details"
+   page:
+      | "details"
+      | "register"
+      | "job-details"
+      | "speaker-details"
+      | "recommendations"
    updatedStats?: UserStats
    serverUserEmail: string
    /**
@@ -222,6 +228,8 @@ const LivestreamDialog: FC<Props> = ({
 
    const [value, setValue] = useState<number>(getPageIndex(page))
    const activeView = views[value].key
+   const previousValue = usePreviousDistinct(value)
+   const previousView = views[previousValue]?.key
 
    // Using useEffect to update the view based on 'page'.
    // This allows conditional navigation not covered by useMemo.
@@ -259,6 +267,7 @@ const LivestreamDialog: FC<Props> = ({
                      value={value}
                      activeView={activeView}
                      setValue={setValue}
+                     previousView={previousView}
                      isRecommendationsListVisible={isRecommendationsListVisible}
                      setIsRecommendationsListVisible={
                         setIsRecommendationsListVisible
@@ -278,6 +287,7 @@ type ContentProps = Omit<Props, "open" | "page"> & {
    value: number
    activeView: ViewKey
    setValue: Dispatch<SetStateAction<number>>
+   previousView: ViewKey
    isRecommendationsListVisible: boolean
    setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
 }
@@ -297,11 +307,12 @@ const Content: FC<ContentProps> = ({
    value,
    activeView,
    setValue,
+   previousView,
    isRecommendationsListVisible,
    setIsRecommendationsListVisible,
 }) => {
    const router = useRouter()
-   const { push, query } = router
+   const { push, replace, query } = router
 
    /**
     * Mark this event registration as recommended if the user came from the
@@ -340,7 +351,7 @@ const Content: FC<ContentProps> = ({
          switch (view) {
             case "livestream-details":
                if (isPageMode) {
-                  return void push(
+                  void push(
                      buildDialogLink({
                         router,
                         link: {
@@ -352,11 +363,12 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
+               setValue(views.findIndex((v) => v.key === view))
                break
 
             case "register-data-consent":
                if (isPageMode) {
-                  return void push(
+                  void push(
                      buildDialogLink({
                         router,
                         link: {
@@ -368,12 +380,14 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
+               setValue(views.findIndex((v) => v.key === view))
                break
 
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
                   view = "recommendations"
                }
+               setValue(views.findIndex((v) => v.key === view))
                break
          }
 
@@ -435,17 +449,48 @@ const Content: FC<ContentProps> = ({
       [livestreamId, mode, push, router, setValue]
    )
 
+   const goToRecommendations = useCallback(() => {
+      if (mode === "page") {
+         void replace(
+            buildDialogLink({
+               router,
+               link: { type: "recommendations", livestreamId },
+            }),
+            undefined,
+            routerOptions
+         )
+      } else {
+         setValue(views.findIndex((v) => v.key === "recommendations"))
+      }
+
+      setIsRecommendationsListVisible(false)
+   }, [
+      livestreamId,
+      mode,
+      replace,
+      router,
+      setValue,
+      setIsRecommendationsListVisible,
+   ])
+
    const onClose = useCallback(() => {
-      handleClose()
-   }, [handleClose])
+      if (
+         activeView === "livestream-details" &&
+         previousView === "recommendations"
+      ) {
+         goToRecommendations()
+      } else {
+         handleClose()
+      }
+   }, [activeView, previousView, handleClose, goToRecommendations])
 
    const handleBack = useCallback(() => {
-      if (views[value].key === "livestream-details") {
+      if (activeView === "livestream-details") {
          onClose()
       } else {
          goToView("livestream-details")
       }
-   }, [value, onClose, goToView])
+   }, [activeView, onClose, goToView])
 
    const [registrationState, registrationDispatch] = useReducer(
       registrationReducer,
@@ -547,7 +592,7 @@ const Content: FC<ContentProps> = ({
          )}
          {Boolean(showingSuccessAnimation) && (
             <RegistrationSuccessAnimation
-               onAnimationFullScreen={() => goToView("recommendations")}
+               onAnimationFullScreen={() => goToRecommendations()}
                onAnimationComplete={() => setShowingSuccessAnimation(false)}
             />
          )}
@@ -639,6 +684,8 @@ const getPageIndex = (page: Props["page"]): number => {
          return views.findIndex((view) => view.key === "job-details")
       case "speaker-details":
          return views.findIndex((view) => view.key === "speaker-details")
+      case "recommendations":
+         return views.findIndex((view) => view.key === "recommendations")
    }
 }
 

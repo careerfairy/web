@@ -4,13 +4,15 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
 import { motion } from "framer-motion"
-import { useEffect } from "react"
+import { useState } from "react"
 import { useLiveStreamDialog } from "../.."
 import { EventsGrid } from "./EventsGrid"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { LoadingIndicator } from "./LoadingIndicator"
 
-const Layout = styled(Box)<{ expanded?: boolean }>(({ theme, expanded }) => ({
+const Layout = styled(Box, {
+   shouldForwardProp: (prop) => prop !== "expanded",
+})<{ expanded?: boolean }>(({ theme, expanded }) => ({
    display: "flex",
    position: "relative",
    paddingTop: expanded ? 60 : 40,
@@ -28,7 +30,9 @@ const Layout = styled(Box)<{ expanded?: boolean }>(({ theme, expanded }) => ({
    },
 }))
 
-const CardContainer = styled(Box)<{ fullWidth: boolean }>(({ fullWidth }) => ({
+const CardContainer = styled(Box, {
+   shouldForwardProp: (prop) => prop !== "fullWidth",
+})<{ fullWidth: boolean }>(({ fullWidth }) => ({
    position: "sticky",
    height: "fit-content",
    display: "flex",
@@ -64,11 +68,11 @@ export const DesktopView = () => {
       bypassCache: true,
    })
 
-   useEffect(() => {
-      return () => {
-         setIsRecommendationsListVisible(false)
-      }
-   }, [setIsRecommendationsListVisible])
+   // Skip 7 seconds loader animation when returning to this view (when hitting back button or going back in browser history)
+   // eslint-disable-next-line react/hook-use-state
+   const [shouldHideLoaderOnInitialMount] = useState(
+      isRecommendationsListVisible
+   )
 
    return (
       <Layout
@@ -84,11 +88,15 @@ export const DesktopView = () => {
          {Boolean(isRecommendationsListVisible) && (
             <Recommendations events={events} loading={loadingEvents} />
          )}
-         <LoadingContainer>
-            <LoadingIndicator
-               onProgressComplete={() => setIsRecommendationsListVisible(true)}
-            />
-         </LoadingContainer>
+         {!shouldHideLoaderOnInitialMount && (
+            <LoadingContainer>
+               <LoadingIndicator
+                  onProgressComplete={() =>
+                     setIsRecommendationsListVisible(true)
+                  }
+               />
+            </LoadingContainer>
+         )}
       </Layout>
    )
 }

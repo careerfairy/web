@@ -12,7 +12,6 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
 import { AnimatePresence, motion } from "framer-motion"
-import { useEffect } from "react"
 import { X as CloseIcon } from "react-feather"
 import { useLiveStreamDialog } from "../.."
 import { BlurredBackground } from "./BlurredBackground"
@@ -77,26 +76,13 @@ export const MobileView = () => {
 
    const {
       livestream,
-      goToView,
       isRecommendationsListVisible,
       setIsRecommendationsListVisible,
    } = useLiveStreamDialog()
 
-   const nothingToRecommend = !loadingEvents && !events?.length
-
    const handleNext = () => {
-      if (nothingToRecommend) {
-         goToView("livestream-details")
-      } else {
-         setIsRecommendationsListVisible(true)
-      }
+      setIsRecommendationsListVisible(true)
    }
-
-   useEffect(() => {
-      return () => {
-         setIsRecommendationsListVisible(false)
-      }
-   }, [setIsRecommendationsListVisible])
 
    return (
       <MobileLayout>
@@ -105,7 +91,6 @@ export const MobileView = () => {
                <Recommendations
                   key="recommendations"
                   events={events}
-                  nothingToRecommend={nothingToRecommend}
                   loadingEvents={loadingEvents}
                />
             )}
@@ -140,14 +125,12 @@ const MIN_LOADING_TIME = 1500
 
 const Recommendations = ({
    events,
-   nothingToRecommend,
    loadingEvents,
 }: {
    events: LivestreamEvent[]
-   nothingToRecommend: boolean
    loadingEvents: boolean
 }) => {
-   const { livestream, closeDialog, goToView } = useLiveStreamDialog()
+   const { livestream, closeDialog } = useLiveStreamDialog()
    const isSmall = useIsMobile(640)
 
    // Use our custom hook to manage loading state
@@ -155,12 +138,6 @@ const Recommendations = ({
       minLoadingTime: MIN_LOADING_TIME,
       sessionKey: "cf-recommendations-loading-shown",
    })
-
-   useEffect(() => {
-      if (nothingToRecommend) {
-         goToView("livestream-details")
-      }
-   }, [goToView, nothingToRecommend])
 
    return (
       <RecommendationsContainer
@@ -219,12 +196,14 @@ const Recommendations = ({
                   )}
                </AnimatePresence>
             </motion.div>
-            <EventsGrid
-               key="recommendations-list"
-               singleColumn={isSmall}
-               events={events}
-               loading={loadingEvents}
-            />
+            {isLoading ? null : (
+               <EventsGrid
+                  key="recommendations-list"
+                  singleColumn={isSmall}
+                  events={events}
+                  loading={loadingEvents}
+               />
+            )}
          </AnimatePresence>
       </RecommendationsContainer>
    )

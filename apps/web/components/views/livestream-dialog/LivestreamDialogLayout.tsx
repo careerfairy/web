@@ -27,6 +27,7 @@ const validDialogPages = [
    "register",
    "job-details",
    "speaker-details",
+   "recommendations",
 ] as const
 type DialogPage = (typeof validDialogPages)[number]
 
