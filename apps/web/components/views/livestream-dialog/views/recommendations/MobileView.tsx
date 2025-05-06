@@ -16,7 +16,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { AnimatePresence, motion } from "framer-motion"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { X as CloseIcon } from "react-feather"
 import { useLiveStreamDialog } from "../.."
 import { BlurredBackground } from "./BlurredBackground"
@@ -99,12 +99,12 @@ const cardAnimation = {
 }
 
 export const MobileView = () => {
-   const [showRecommendations, setShowRecommendations] = useState(false)
    const { events, loading: loadingEvents } = useRecommendedEvents({
       bypassCache: true,
    })
 
-   const { livestream, goToView } = useLiveStreamDialog()
+   const { livestream, goToView, showRecommendations, setShowRecommendations } =
+      useLiveStreamDialog()
 
    const nothingToRecommend = !loadingEvents && !events?.length
 
@@ -115,6 +115,12 @@ export const MobileView = () => {
          setShowRecommendations(true)
       }
    }
+
+   useEffect(() => {
+      return () => {
+         setShowRecommendations(false)
+      }
+   }, [setShowRecommendations])
 
    return (
       <MobileLayout>

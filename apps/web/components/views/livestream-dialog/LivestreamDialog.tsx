@@ -217,6 +217,8 @@ const LivestreamDialog: FC<Props> = ({
       handleClose()
    }, [handleClose])
 
+   const [showRecommendations, setShowRecommendations] = useState(false)
+
    const [value, setValue] = useState<number>(getPageIndex(page))
    const activeView = views[value].key
 
@@ -229,6 +231,7 @@ const LivestreamDialog: FC<Props> = ({
    return (
       <AnimatedBackgroundProvider
          showAnimatedBackground={activeView === "recommendations"}
+         expanded={activeView === "recommendations" && showRecommendations}
       >
          <Dialog
             open={open}
@@ -253,6 +256,8 @@ const LivestreamDialog: FC<Props> = ({
                      value={value}
                      activeView={activeView}
                      setValue={setValue}
+                     showRecommendations={showRecommendations}
+                     setShowRecommendations={setShowRecommendations}
                      {...rest}
                   />
                ) : (
@@ -268,6 +273,8 @@ type ContentProps = Omit<Props, "open" | "page"> & {
    value: number
    activeView: ViewKey
    setValue: Dispatch<SetStateAction<number>>
+   showRecommendations: boolean
+   setShowRecommendations: Dispatch<SetStateAction<boolean>>
 }
 
 const Content: FC<ContentProps> = ({
@@ -285,6 +292,8 @@ const Content: FC<ContentProps> = ({
    value,
    activeView,
    setValue,
+   showRecommendations,
+   setShowRecommendations,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -473,6 +482,8 @@ const Content: FC<ContentProps> = ({
          handleDiscoverCompanySparks,
          setting,
          handleShowSuccessAnimation: () => setShowSuccessAnimation(true),
+         showRecommendations,
+         setShowRecommendations,
       }),
       [
          goToView,
@@ -495,6 +506,8 @@ const Content: FC<ContentProps> = ({
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
          setting,
+         showRecommendations,
+         setShowRecommendations,
       ]
    )
 
@@ -605,6 +618,8 @@ type DialogContextType = {
     * Method to show the success animation.
     */
    handleShowSuccessAnimation: () => void
+   showRecommendations: boolean
+   setShowRecommendations: Dispatch<SetStateAction<boolean>>
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -643,6 +658,8 @@ const DialogContext = createContext<DialogContextType>({
    handleDiscoverCompanySparks: () => {},
    setting: null,
    handleShowSuccessAnimation: () => {},
+   showRecommendations: false,
+   setShowRecommendations: () => {},
 })
 
 export const useLiveStreamDialog = () => {
