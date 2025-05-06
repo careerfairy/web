@@ -314,7 +314,7 @@ const Content: FC<ContentProps> = ({
    const [isDiscoverCompanySparksOpen, setIsDiscoverCompanySparksOpen] =
       useState(false)
 
-   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
+   const [showingSuccessAnimation, setShowingSuccessAnimation] = useState(false)
 
    const handleDiscoverCompanySparks = useCallback(() => {
       setIsDiscoverCompanySparksOpen(true)
@@ -481,7 +481,8 @@ const Content: FC<ContentProps> = ({
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
          setting,
-         handleShowSuccessAnimation: () => setShowSuccessAnimation(true),
+         handleStartSuccessAnimation: () => setShowingSuccessAnimation(true),
+         showingSuccessAnimation,
          showRecommendations,
          setShowRecommendations,
       }),
@@ -508,6 +509,7 @@ const Content: FC<ContentProps> = ({
          setting,
          showRecommendations,
          setShowRecommendations,
+         showingSuccessAnimation,
       ]
    )
 
@@ -538,10 +540,10 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
-         {Boolean(showSuccessAnimation) && (
+         {Boolean(showingSuccessAnimation) && (
             <RegistrationSuccessAnimation
                onAnimationFullScreen={() => goToView("recommendations")}
-               onAnimationComplete={() => setShowSuccessAnimation(false)}
+               onAnimationComplete={() => setShowingSuccessAnimation(false)}
             />
          )}
       </DialogContext.Provider>
@@ -617,13 +619,12 @@ type DialogContextType = {
    /**
     * Method to show the success animation.
     */
-   handleShowSuccessAnimation: () => void
+   handleStartSuccessAnimation: () => void
    showRecommendations: boolean
    setShowRecommendations: Dispatch<SetStateAction<boolean>>
 }
 
 const getPageIndex = (page: Props["page"]): number => {
-   return views.findIndex((view) => view.key === "recommendations")
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")
@@ -657,7 +658,7 @@ const DialogContext = createContext<DialogContextType>({
    isDiscoverCompanySparksOpen: false,
    handleDiscoverCompanySparks: () => {},
    setting: null,
-   handleShowSuccessAnimation: () => {},
+   handleStartSuccessAnimation: () => {},
    showRecommendations: false,
    setShowRecommendations: () => {},
 })

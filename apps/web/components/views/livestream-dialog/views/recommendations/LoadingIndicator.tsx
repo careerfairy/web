@@ -7,6 +7,7 @@ import {
 } from "@mui/material"
 import { motion } from "framer-motion"
 import { useEffect, useRef, useState } from "react"
+import { ANIMATION_CONFIG } from "../../animations/register-success/animationConfig"
 
 const Container = styled(motion.div)({
    display: "flex",
@@ -50,6 +51,7 @@ const StyledLinearProgress = styled(LinearProgress)({
 const LOADING_DURATION_MS = 6000 // 6 seconds in milliseconds
 const UPDATE_INTERVAL_MS = 60 // Update every 60ms for smooth animation
 const PROGRESS_STEP = (UPDATE_INTERVAL_MS / LOADING_DURATION_MS) * 100
+const DELAY_START_MS = ANIMATION_CONFIG.container.delayBeforeExit
 
 const variants = {
    visible: { opacity: 1, y: 0 },
@@ -63,6 +65,7 @@ type Props = {
 export const LoadingIndicator = ({ onProgressComplete }: Props) => {
    const [progress, setProgress] = useState(0)
    const [isComplete, setIsComplete] = useState(false)
+   const [isStarted, setIsStarted] = useState(false)
    const onProgressCompleteRef = useRef(onProgressComplete)
 
    useEffect(() => {
@@ -72,24 +75,34 @@ export const LoadingIndicator = ({ onProgressComplete }: Props) => {
    }, [onProgressComplete])
 
    useEffect(() => {
-      const timer = setInterval(() => {
-         setProgress((prevProgress) => {
-            const newProgress = prevProgress + PROGRESS_STEP
-            if (newProgress >= 100) {
-               clearInterval(timer)
-               if (onProgressCompleteRef.current) {
-                  onProgressCompleteRef.current()
+      // Add a timeout to delay the start of the progress
+      const startDelay = setTimeout(() => {
+         setIsStarted(true)
+      }, DELAY_START_MS)
+
+      let progressTimer: NodeJS.Timeout | null = null
+
+      if (isStarted) {
+         progressTimer = setInterval(() => {
+            setProgress((prevProgress) => {
+               const newProgress = prevProgress + PROGRESS_STEP
+               if (newProgress >= 100) {
+                  if (progressTimer) clearInterval(progressTimer)
+                  if (onProgressCompleteRef.current) {
+                     onProgressCompleteRef.current()
+                  }
+                  return 100
                }
-               return 100
-            }
-            return newProgress
-         })
-      }, UPDATE_INTERVAL_MS)
+               return newProgress
+            })
+         }, UPDATE_INTERVAL_MS)
+      }
 
       return () => {
-         clearInterval(timer)
+         clearTimeout(startDelay)
+         if (progressTimer) clearInterval(progressTimer)
       }
-   }, [])
+   }, [isStarted])
 
    if (isComplete) {
       return null

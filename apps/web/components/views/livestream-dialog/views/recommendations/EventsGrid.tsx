@@ -2,13 +2,12 @@ import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams/livestreams"
-import { Grid } from "@mui/material"
+import { Box, Grid, Typography, styled } from "@mui/material"
 import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { motion } from "framer-motion"
 import { ReactNode } from "react"
 
-// Animation for individual cards
 const cardAnimation = {
    initial: { opacity: 0, y: 20 },
    animate: {
@@ -17,6 +16,25 @@ const cardAnimation = {
       transition: { duration: 0.3 },
    },
 }
+
+const EmptyStateContainer = styled(Box)({
+   display: "flex",
+   justifyContent: "center",
+   alignItems: "center",
+   minHeight: "150px",
+   width: "100%",
+   padding: "40px 24px",
+})
+
+const EmptyStateText = styled(Typography)({
+   opacity: 0.8,
+   textAlign: "center",
+   color: "text.secondary",
+})
+
+const EventsContainer = styled(Grid)(({ theme }) => ({
+   paddingBottom: theme.spacing(11),
+}))
 
 type Props = {
    events: LivestreamEvent[]
@@ -28,7 +46,7 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
    if (loading) {
       return (
          <AnimateSlideUp>
-            <Grid container sx={{ pb: 11 }} spacing={1.5}>
+            <EventsContainer container spacing={1.5}>
                {Array(6)
                   .fill(null)
                   .map((_, index) => (
@@ -46,14 +64,26 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
                         </motion.div>
                      </Grid>
                   ))}
-            </Grid>
+            </EventsContainer>
+         </AnimateSlideUp>
+      )
+   }
+
+   if (events.length === 0) {
+      return (
+         <AnimateSlideUp>
+            <EmptyStateContainer>
+               <EmptyStateText>
+                  No events available at the moment.
+               </EmptyStateText>
+            </EmptyStateContainer>
          </AnimateSlideUp>
       )
    }
 
    return (
       <AnimateSlideUp>
-         <Grid container sx={{ pb: 11 }} spacing={1.5}>
+         <EventsContainer container spacing={1.5}>
             {events.map((event, index) => (
                <Grid item xs={singleColumn ? 12 : 6} key={event.id}>
                   <motion.div
@@ -73,7 +103,7 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
                   </motion.div>
                </Grid>
             ))}
-         </Grid>
+         </EventsContainer>
       </AnimateSlideUp>
    )
 }
