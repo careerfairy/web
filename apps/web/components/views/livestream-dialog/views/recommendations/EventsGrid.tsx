@@ -3,6 +3,7 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { Grid } from "@mui/material"
+import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { motion } from "framer-motion"
 import { ReactNode } from "react"
@@ -15,20 +16,6 @@ const cardAnimation = {
       y: 0,
       transition: { duration: 0.3 },
    },
-}
-// Slide up animation for card list
-const slideUpAnimation = {
-   initial: { opacity: 0, y: 50 },
-   animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-         duration: 0.5,
-         staggerChildren: 0.1,
-         when: "beforeChildren",
-      },
-   },
-   exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
 }
 
 type Props = {
@@ -99,7 +86,7 @@ const AnimateSlideUp = ({ children }: { children: ReactNode }) => {
          initial="initial"
          animate="animate"
          exit="exit"
-         variants={slideUpAnimation}
+         variants={SlideUpWithStaggeredChildrenAnimation}
       >
          {children}
       </motion.div>

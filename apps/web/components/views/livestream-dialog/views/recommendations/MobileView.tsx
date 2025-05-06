@@ -10,6 +10,7 @@ import {
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
+import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect } from "react"
 import { X as CloseIcon } from "react-feather"
@@ -67,21 +68,6 @@ const fadeAnimation = {
    initial: { opacity: 0 },
    animate: { opacity: 1, transition: { duration: 0.3 } },
    exit: { opacity: 0, transition: { duration: 0.3 } },
-}
-
-// Slide up animation for card list
-const slideUpAnimation = {
-   initial: { opacity: 0, y: 50 },
-   animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-         duration: 0.5,
-         staggerChildren: 0.1,
-         when: "beforeChildren",
-      },
-   },
-   exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
 }
 
 export const MobileView = () => {
@@ -185,7 +171,7 @@ const Recommendations = ({
                initial="initial"
                animate="animate"
                exit="exit"
-               variants={slideUpAnimation}
+               variants={SlideUpWithStaggeredChildrenAnimation}
                layout
             >
                <Title
@@ -199,7 +185,7 @@ const Recommendations = ({
                initial="initial"
                animate="animate"
                exit="exit"
-               variants={slideUpAnimation}
+               variants={SlideUpWithStaggeredChildrenAnimation}
                layout
             >
                <AnimatePresence mode="sync">
