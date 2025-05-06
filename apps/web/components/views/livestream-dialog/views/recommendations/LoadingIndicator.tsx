@@ -19,8 +19,7 @@ const Container = styled(motion.div)({
    backdropFilter: "blur(15px)",
    boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
    border: "1px solid #FFFFFF",
-   width: "100%",
-   maxWidth: "340px",
+   width: 264,
    overflow: "hidden",
 })
 
@@ -62,6 +61,7 @@ type Props = {
 
 export const LoadingIndicator = ({ onProgressComplete }: Props) => {
    const [progress, setProgress] = useState(0)
+   const [isComplete, setIsComplete] = useState(false)
    const onProgressCompleteRef = useRef(onProgressComplete)
 
    useEffect(() => {
@@ -90,6 +90,10 @@ export const LoadingIndicator = ({ onProgressComplete }: Props) => {
       }
    }, [])
 
+   if (isComplete) {
+      return null
+   }
+
    return (
       <Container
          data-testid="loading-indicator"
@@ -97,6 +101,11 @@ export const LoadingIndicator = ({ onProgressComplete }: Props) => {
          animate={progress === 100 ? "hidden" : "visible"}
          variants={variants}
          transition={{ duration: 0.5, ease: "easeOut" }}
+         onAnimationComplete={() => {
+            if (progress === 100) {
+               setIsComplete(true)
+            }
+         }}
       >
          <TextContainer>
             <Typography color="neutral.500" variant="xsmall">

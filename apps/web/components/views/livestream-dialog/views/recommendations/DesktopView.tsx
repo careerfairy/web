@@ -1,4 +1,4 @@
-import { Box, Stack, styled, Typography } from "@mui/material"
+import { Box, styled, Typography } from "@mui/material"
 import { motion } from "framer-motion"
 import { useEffect } from "react"
 import { useLiveStreamDialog } from "../.."
@@ -8,6 +8,11 @@ import { LoadingIndicator } from "./LoadingIndicator"
 const Layout = styled(Box)({
    display: "flex",
    minHeight: "100%",
+   maxHeight: "100vh",
+   overflow: "auto", // Enable scrolling within the layout
+   paddingTop: 60,
+   paddingLeft: 60,
+   paddingRight: 60,
 })
 
 // Slide up animation for card list
@@ -41,26 +46,38 @@ export const DesktopView = () => {
             flexDirection: showRecommendations ? "row" : "column",
             justifyContent: showRecommendations ? "flex-start" : "center",
             alignItems: showRecommendations ? "flex-start" : "center",
+            paddingTop: showRecommendations ? undefined : "40px",
          }}
+         paddingBottom={showRecommendations ? 0 : "60px"}
       >
-         <Stack
-            justifyContent="center"
-            alignItems="center"
-            spacing={4.75}
+         <Box
             position="sticky"
             height="fit-content"
-            paddingTop={showRecommendations ? "5%" : 0}
+            display="flex"
+            justifyContent="center"
             top={0}
+            sx={{
+               width: showRecommendations ? "auto" : "100%",
+            }}
          >
             <GetNotifiedCard
                isExpanded={!showRecommendations}
                livestream={livestream}
             />
+         </Box>
+         {Boolean(showRecommendations) && <Recommendations />}
+         <Box
+            position="absolute"
+            bottom={0}
+            left="50%"
+            sx={{
+               transform: "translateX(-50%)",
+            }}
+         >
             <LoadingIndicator
                onProgressComplete={() => setShowRecommendations(true)}
             />
-         </Stack>
-         {Boolean(showRecommendations) && <Recommendations />}
+         </Box>
       </Layout>
    )
 }
@@ -81,7 +98,7 @@ const Recommendations = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            padding: 4,
+            pl: 4,
          }}
       >
          <Typography fontWeight={700} variant="desktopBrandedH3">
