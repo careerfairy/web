@@ -97,6 +97,8 @@ const styles = sxStyles({
    },
 })
 
+const NO_OPTIONS_TEXT = "No options"
+
 const JobBasicInfo = () => {
    const [stepIsValid, setStepIsValid] = useState(false)
 
@@ -190,7 +192,9 @@ const JobBasicInfo = () => {
                                  option.name || "",
                               ChipProps: { color: "secondary" },
                               noOptionsText: (
-                                 <Box sx={styles.noOptions}>No options</Box>
+                                 <Box sx={styles.noOptions}>
+                                    {NO_OPTIONS_TEXT}
+                                 </Box>
                               ),
                            }}
                            textFieldProps={{
@@ -228,7 +232,9 @@ const JobBasicInfo = () => {
                                  sx: styles.listBox,
                               },
                               noOptionsText: (
-                                 <Box sx={styles.noOptions}>No options</Box>
+                                 <Box sx={styles.noOptions}>
+                                    {NO_OPTIONS_TEXT}
+                                 </Box>
                               ),
                            }}
                         />
@@ -272,7 +278,9 @@ const JobBasicInfo = () => {
                                  setValue("basicInfo.workplace", value?.id)
                               },
                               noOptionsText: (
-                                 <Box sx={styles.noOptions}>No options</Box>
+                                 <Box sx={styles.noOptions}>
+                                    {NO_OPTIONS_TEXT}
+                                 </Box>
                               ),
                            }}
                         />
@@ -294,7 +302,9 @@ const JobBasicInfo = () => {
                                  sx: styles.listBox,
                               },
                               noOptionsText: (
-                                 <Box sx={styles.noOptions}>No options</Box>
+                                 <Box sx={styles.noOptions}>
+                                    {NO_OPTIONS_TEXT}
+                                 </Box>
                               ),
                            }}
                         />
