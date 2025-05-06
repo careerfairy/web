@@ -56,7 +56,7 @@ export const useCustomJobLocation = (
       otherLocations = locations.slice(maxLocationsToShow)
    }
 
-   const locationText = `${shownLocations.join("; ")}`
+   const locationText = `${shownLocations.join(", ")}`
 
    return {
       locationText,
