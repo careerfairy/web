@@ -217,7 +217,8 @@ const LivestreamDialog: FC<Props> = ({
       handleClose()
    }, [handleClose])
 
-   const [showRecommendations, setShowRecommendations] = useState(false)
+   const [isRecommendationsListVisible, setIsRecommendationsListVisible] =
+      useState(false)
 
    const [value, setValue] = useState<number>(getPageIndex(page))
    const activeView = views[value].key
@@ -231,7 +232,9 @@ const LivestreamDialog: FC<Props> = ({
    return (
       <AnimatedBackgroundProvider
          showAnimatedBackground={activeView === "recommendations"}
-         expanded={activeView === "recommendations" && showRecommendations}
+         expanded={
+            activeView === "recommendations" && isRecommendationsListVisible
+         }
       >
          <Dialog
             open={open}
@@ -256,8 +259,10 @@ const LivestreamDialog: FC<Props> = ({
                      value={value}
                      activeView={activeView}
                      setValue={setValue}
-                     showRecommendations={showRecommendations}
-                     setShowRecommendations={setShowRecommendations}
+                     isRecommendationsListVisible={isRecommendationsListVisible}
+                     setIsRecommendationsListVisible={
+                        setIsRecommendationsListVisible
+                     }
                      {...rest}
                   />
                ) : (
@@ -273,8 +278,8 @@ type ContentProps = Omit<Props, "open" | "page"> & {
    value: number
    activeView: ViewKey
    setValue: Dispatch<SetStateAction<number>>
-   showRecommendations: boolean
-   setShowRecommendations: Dispatch<SetStateAction<boolean>>
+   isRecommendationsListVisible: boolean
+   setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
 }
 
 const Content: FC<ContentProps> = ({
@@ -292,8 +297,8 @@ const Content: FC<ContentProps> = ({
    value,
    activeView,
    setValue,
-   showRecommendations,
-   setShowRecommendations,
+   isRecommendationsListVisible,
+   setIsRecommendationsListVisible,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -483,8 +488,8 @@ const Content: FC<ContentProps> = ({
          setting,
          handleStartSuccessAnimation: () => setShowingSuccessAnimation(true),
          showingSuccessAnimation,
-         showRecommendations,
-         setShowRecommendations,
+         isRecommendationsListVisible,
+         setIsRecommendationsListVisible,
       }),
       [
          goToView,
@@ -507,8 +512,8 @@ const Content: FC<ContentProps> = ({
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
          setting,
-         showRecommendations,
-         setShowRecommendations,
+         isRecommendationsListVisible,
+         setIsRecommendationsListVisible,
          showingSuccessAnimation,
       ]
    )
@@ -620,8 +625,8 @@ type DialogContextType = {
     * Method to show the success animation.
     */
    handleStartSuccessAnimation: () => void
-   showRecommendations: boolean
-   setShowRecommendations: Dispatch<SetStateAction<boolean>>
+   isRecommendationsListVisible: boolean
+   setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -659,8 +664,8 @@ const DialogContext = createContext<DialogContextType>({
    handleDiscoverCompanySparks: () => {},
    setting: null,
    handleStartSuccessAnimation: () => {},
-   showRecommendations: false,
-   setShowRecommendations: () => {},
+   isRecommendationsListVisible: false,
+   setIsRecommendationsListVisible: () => {},
 })
 
 export const useLiveStreamDialog = () => {

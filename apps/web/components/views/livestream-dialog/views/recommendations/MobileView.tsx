@@ -75,8 +75,12 @@ export const MobileView = () => {
       bypassCache: true,
    })
 
-   const { livestream, goToView, showRecommendations, setShowRecommendations } =
-      useLiveStreamDialog()
+   const {
+      livestream,
+      goToView,
+      isRecommendationsListVisible,
+      setIsRecommendationsListVisible,
+   } = useLiveStreamDialog()
 
    const nothingToRecommend = !loadingEvents && !events?.length
 
@@ -84,20 +88,20 @@ export const MobileView = () => {
       if (nothingToRecommend) {
          goToView("livestream-details")
       } else {
-         setShowRecommendations(true)
+         setIsRecommendationsListVisible(true)
       }
    }
 
    useEffect(() => {
       return () => {
-         setShowRecommendations(false)
+         setIsRecommendationsListVisible(false)
       }
-   }, [setShowRecommendations])
+   }, [setIsRecommendationsListVisible])
 
    return (
       <MobileLayout>
          <AnimatePresence>
-            {Boolean(showRecommendations) && (
+            {Boolean(isRecommendationsListVisible) && (
                <Recommendations
                   key="recommendations"
                   events={events}
@@ -106,7 +110,7 @@ export const MobileView = () => {
                />
             )}
             <RecommendationsNav key="recommendations-nav" />
-            {!showRecommendations && (
+            {!isRecommendationsListVisible && (
                <Box
                   component={motion.div}
                   display="flex"

@@ -53,8 +53,11 @@ const RecommendationsContainer = styled(motion.div)(({ theme }) => ({
 }))
 
 export const DesktopView = () => {
-   const { livestream, setShowRecommendations, showRecommendations } =
-      useLiveStreamDialog()
+   const {
+      livestream,
+      setIsRecommendationsListVisible,
+      isRecommendationsListVisible,
+   } = useLiveStreamDialog()
 
    const { events, loading: loadingEvents } = useRecommendedEvents({
       bypassCache: true,
@@ -62,27 +65,27 @@ export const DesktopView = () => {
 
    useEffect(() => {
       return () => {
-         setShowRecommendations(false)
+         setIsRecommendationsListVisible(false)
       }
-   }, [setShowRecommendations])
+   }, [setIsRecommendationsListVisible])
 
    return (
       <Layout
-         expanded={showRecommendations}
-         paddingBottom={showRecommendations ? 0 : "90px"}
+         expanded={isRecommendationsListVisible}
+         paddingBottom={isRecommendationsListVisible ? 0 : "90px"}
       >
-         <CardContainer fullWidth={!showRecommendations}>
+         <CardContainer fullWidth={!isRecommendationsListVisible}>
             <GetNotifiedCard
-               isExpanded={!showRecommendations}
+               isExpanded={!isRecommendationsListVisible}
                livestream={livestream}
             />
          </CardContainer>
-         {Boolean(showRecommendations) && (
+         {Boolean(isRecommendationsListVisible) && (
             <Recommendations events={events} loading={loadingEvents} />
          )}
          <LoadingContainer>
             <LoadingIndicator
-               onProgressComplete={() => setShowRecommendations(true)}
+               onProgressComplete={() => setIsRecommendationsListVisible(true)}
             />
          </LoadingContainer>
       </Layout>
