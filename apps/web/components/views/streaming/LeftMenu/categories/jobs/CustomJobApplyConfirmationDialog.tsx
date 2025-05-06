@@ -126,9 +126,7 @@ const CustomJobApplyConfirmationDialog = ({
                      {`Did you apply to ${job.title}?`}
                   </Typography>
                   <Typography variant={"body2"}>
-                     {
-                        "You'll soon be able to manage your jobs directly in your profile."
-                     }
+                     {"Check your profile to manage your applications."}
                   </Typography>
                </Box>
 
