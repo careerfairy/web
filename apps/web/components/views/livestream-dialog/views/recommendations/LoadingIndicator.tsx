@@ -63,6 +63,41 @@ type Props = {
 }
 
 export const LoadingIndicator = ({ onProgressComplete }: Props) => {
+   const { progress, isComplete, handleAnimationComplete } =
+      useProgressIndicator(onProgressComplete)
+
+   if (isComplete) {
+      return null
+   }
+
+   return (
+      <Container
+         data-testid="loading-indicator"
+         initial="visible"
+         animate={progress === 100 ? "hidden" : "visible"}
+         variants={variants}
+         transition={{ duration: 0.5, ease: "easeOut" }}
+         onAnimationComplete={handleAnimationComplete}
+      >
+         <TextContainer>
+            <Typography color="neutral.500" variant="xsmall">
+               Hold on
+            </Typography>
+            <Typography color="neutral.800" variant="small">
+               Finding your next favorite streams
+            </Typography>
+         </TextContainer>
+         <ProgressContainer>
+            <StyledLinearProgress variant="determinate" value={progress} />
+         </ProgressContainer>
+      </Container>
+   )
+}
+
+/**
+ * Custom hook to manage progress indicator lifecycle
+ */
+const useProgressIndicator = (onProgressComplete?: () => void) => {
    const [progress, setProgress] = useState(0)
    const [isComplete, setIsComplete] = useState(false)
    const [isStarted, setIsStarted] = useState(false)
@@ -104,34 +139,15 @@ export const LoadingIndicator = ({ onProgressComplete }: Props) => {
       }
    }, [isStarted])
 
-   if (isComplete) {
-      return null
+   const handleAnimationComplete = () => {
+      if (progress === 100) {
+         setIsComplete(true)
+      }
    }
 
-   return (
-      <Container
-         data-testid="loading-indicator"
-         initial="visible"
-         animate={progress === 100 ? "hidden" : "visible"}
-         variants={variants}
-         transition={{ duration: 0.5, ease: "easeOut" }}
-         onAnimationComplete={() => {
-            if (progress === 100) {
-               setIsComplete(true)
-            }
-         }}
-      >
-         <TextContainer>
-            <Typography color="neutral.500" variant="xsmall">
-               Hold on
-            </Typography>
-            <Typography color="neutral.800" variant="small">
-               Finding your next favorite streams
-            </Typography>
-         </TextContainer>
-         <ProgressContainer>
-            <StyledLinearProgress variant="determinate" value={progress} />
-         </ProgressContainer>
-      </Container>
-   )
+   return {
+      progress,
+      isComplete,
+      handleAnimationComplete,
+   }
 }
