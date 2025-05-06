@@ -35,6 +35,7 @@ import {
    StyleSheet,
 } from "react-native"
 import { WebView } from "react-native-webview"
+import { branchTracking } from "../utils/branch-tracking"
 import { customerIO } from "../utils/customerio-tracking"
 import { SECURE_STORE_KEYS } from "../utils/secure-store-constants"
 import { sendToWebView } from "../utils/webview.utils"
@@ -135,7 +136,11 @@ const WebViewComponent = ({
    useEffect(() => {
       const handleDeepLink = (event: { url: string }) => {
          const deepLinkUrl = event.url
-         if (deepLinkUrl.includes("careerfairy")) {
+         if (deepLinkUrl.startsWith("careerfairy://")) {
+            const path = deepLinkUrl.replace("careerfairy://", "")
+            const webUrl = `${BASE_URL}/${path}`
+            setBaseUrl(webUrl)
+         } else if (deepLinkUrl.includes("careerfairy")) {
             setBaseUrl(deepLinkUrl)
          }
       }
@@ -145,8 +150,14 @@ const WebViewComponent = ({
 
       // Check if the app was opened via a deep link
       Linking.getInitialURL().then((initialUrl) => {
-         if (initialUrl && initialUrl.includes("careerfairy")) {
-            setBaseUrl(initialUrl)
+         if (initialUrl) {
+            if (initialUrl.startsWith("careerfairy://")) {
+               const path = initialUrl.replace("careerfairy://", "")
+               const webUrl = `${BASE_URL}/${path}`
+               setBaseUrl(webUrl)
+            } else if (initialUrl.includes("careerfairy")) {
+               setBaseUrl(initialUrl)
+            }
          }
       })
 
@@ -315,6 +326,7 @@ const WebViewComponent = ({
    const handleIdentifyCustomer = async (data: IDENTIFY_CUSTOMER) => {
       try {
          await customerIO.identifyCustomer(data.userAuthId)
+         await branchTracking.identifyUser(data.userAuthId).catch(console.error)
       } catch (error) {
          console.error(`Failed to identify customer: ${error}`)
       }
