@@ -86,6 +86,17 @@ const styles = sxStyles({
    logoSkeleton: {
       borderRadius: 4,
    },
+   tooltipTextWrapper: {
+      p: "8px",
+      maxWidth: "302px",
+      justifyContent: "center",
+      alignItems: "center",
+      textAlign: "center",
+   },
+   tooltipText: {
+      color: (t) => t.palette.neutral[700],
+      fontWeight: 400,
+   },
 })
 
 type Props = {
@@ -126,6 +137,10 @@ const CustomJobHeader = ({
    const businessFunctionTags = (job.businessFunctionsTagIds || [])
       .map((tagId) => TagValuesLookup[tagId])
       .join(", ")
+
+   const tooltipText = otherLocations
+      ?.map((location) => location.name)
+      ?.join(", ")
 
    return (
       <>
@@ -210,9 +225,11 @@ const CustomJobHeader = ({
                               {jobLocation}
                               {othersCount ? (
                                  <Tooltip
-                                    title={otherLocations
-                                       .map((location) => location.name)
-                                       .join(", ")}
+                                    title={
+                                       <LocationTooltip
+                                          tooltipText={tooltipText}
+                                       />
+                                    }
                                     open={tooltipOpen}
                                     onClose={undefined}
                                     placement="top"
@@ -286,9 +303,11 @@ const CustomJobHeader = ({
                                     {jobLocation}
                                     {othersCount ? (
                                        <Tooltip
-                                          title={otherLocations
-                                             .map((location) => location.name)
-                                             .join(", ")}
+                                          title={
+                                             <LocationTooltip
+                                                tooltipText={tooltipText}
+                                             />
+                                          }
                                           placement="top"
                                        >
                                           <Typography
@@ -342,6 +361,16 @@ const CustomJobHeader = ({
             )}
          </Box>
       </>
+   )
+}
+
+const LocationTooltip = ({ tooltipText }: { tooltipText: string }) => {
+   return (
+      <Box sx={styles.tooltipTextWrapper}>
+         <Typography sx={styles.tooltipText} variant={"xsmall"}>
+            {tooltipText}
+         </Typography>
+      </Box>
    )
 }
 
