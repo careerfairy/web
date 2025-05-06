@@ -46,7 +46,8 @@ export const VALID_SOURCES: RegistrationSource[] = [
       color: "#1ED0D0",
       match: (utms) => {
          const matchSource = /^careerfairy$/i.test(utms?.utm_source)
-         const matchMedium = /^email$/i.test(utms?.utm_medium)
+         // Updated to include push notifications, as Marketing team added a new medium
+         const matchMedium = /^pushnotification|email$/i.test(utms?.utm_medium)
 
          return matchSource && matchMedium
       },
