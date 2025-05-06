@@ -23,6 +23,7 @@
       "preset": "jest-expo"
    },
    "dependencies": {
+      "@config-plugins/react-native-branch": "8.0.0",
       "@expo-google-fonts/poppins": "^0.2.3",
       "@expo/config-plugins": "8.0.0",
       "@expo/vector-icons": "^14.0.2",
@@ -52,6 +53,7 @@
       "react": "18.2.0",
       "react-dom": "18.2.0",
       "react-native": "0.74.5",
+      "react-native-branch": "^6.6.0",
       "react-native-dotenv": "^3.4.11",
       "react-native-fbsdk-next": "^13.4.1",
       "react-native-gesture-handler": "~2.16.1",

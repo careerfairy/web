@@ -68,24 +68,7 @@ After running the app, a QR code will be displayed in your terminal.
 -  Open **Expo Go** on your phone.
 -  Use the app to scan the QR code displayed in the terminal, and the app will launch on your device.
 
-## Running on Simulators
-
-If you'd like to run the app on a simulator instead of a physical device, follow the instructions below.
-Also, before scanning the code or triggering the simulator, you can toggle development and local build by pressing key 's'
-
-### For Android Simulator
-
-1. Install and configure [Android Studio](https://developer.android.com/studio).
-2. Run the initial command (\`npm run native\` or \`npm run start\`).
-3. Press \`a\` in the terminal to launch the Android simulator.
-
-### For iPhone Simulator
-
-1. Install [Xcode](https://apps.apple.com/us/app/xcode/id497799835) and set up the Xcode simulator.
-2. Run the initial command (\`npm run native\` or \`npm run start\`).
-3. Press \`i\` in the terminal to launch the iPhone simulator.
-
----
+Note: New versions of the app won't run with Expo Go. You will need to follow the steps below to run and install a development/preview app build.
 
 ## Application build
 
@@ -141,6 +124,18 @@ or from the root
 
 ```bash
 npm run native-build:develop
+```
+
+If you want to run the build in an iOS simulator, you will need a preview build instead:
+
+```bash
+eas build --profile preview
+```
+
+or from the root
+
+```bash
+npm run native-build:preview
 ```
 
 2. Staging (for PR testing): After running the command, choose which platforms, Android, iOS or both
@@ -249,14 +244,5 @@ Sometimes, iOS simulator will have black screen
 
 Currently, android and expo go cannot work, as for android emulator, it only works with http://10.0.2.2:3000 accessing localhost, and it will load the app, but will not be able to contact backend services.
 Same thing for Expo GO, which needs exposed local ip address and it will have the same effect
-
----
-
-NOTE for iOS for deep linking to work:
-
-in file apple-app-site-association
-
-1. Replace <TEAM_ID> with your Apple Developer Team ID (found in your Apple Developer account).
-2. Replace <BUNDLE_ID> with your app's bundle identifier.
 
 Happy coding! 🎉
