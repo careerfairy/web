@@ -231,7 +231,7 @@ const Recommendations = ({
                      >
                         <Subtitle key="recommendations-subtitle">
                            Because you registered to <b>{livestream.company}</b>{" "}
-                           livestream:
+                           live stream:
                         </Subtitle>
                      </motion.div>
                   )}
