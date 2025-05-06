@@ -13,13 +13,13 @@ import { LoadingIndicator } from "./LoadingIndicator"
 const Layout = styled(Box)<{ expanded?: boolean }>(({ theme, expanded }) => ({
    display: "flex",
    position: "relative",
-   paddingTop: expanded ? 60 : "40px",
+   paddingTop: expanded ? 60 : 40,
    paddingLeft: 60,
    paddingRight: 60,
+   minHeight: "100%",
    flexDirection: expanded ? "row" : "column",
    justifyContent: expanded ? "flex-start" : "center",
    alignItems: expanded ? "flex-start" : "center",
-   minHeight: expanded ? "100%" : undefined,
    maxHeight: expanded ? "100vh" : undefined,
    overflow: expanded ? "auto" : undefined,
    [theme.breakpoints.down(990)]: {
@@ -35,11 +35,12 @@ const CardContainer = styled(Box)<{ fullWidth: boolean }>(({ fullWidth }) => ({
    justifyContent: "center",
    top: 0,
    width: fullWidth ? "100%" : "auto",
+   minHeight: 550,
 }))
 
 const LoadingContainer = styled(Box)({
    position: "absolute",
-   bottom: 0,
+   bottom: 30,
    left: "50%",
    transform: "translateX(-50%)",
 })
