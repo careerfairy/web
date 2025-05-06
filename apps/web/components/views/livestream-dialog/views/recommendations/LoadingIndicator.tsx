@@ -28,6 +28,7 @@ const TextContainer = styled(Box)({
    flexDirection: "column",
    alignItems: "center",
    paddingBottom: "6px",
+   textAlign: "center",
 })
 
 const ProgressContainer = styled(Box)({

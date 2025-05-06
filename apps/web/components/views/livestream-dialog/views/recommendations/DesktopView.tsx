@@ -1,19 +1,25 @@
-import { Box, styled, Typography } from "@mui/material"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
+import { Box, Stack, styled, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import { motion } from "framer-motion"
 import { useEffect } from "react"
 import { useLiveStreamDialog } from "../.."
+import { EventsGrid } from "./EventsGrid"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { LoadingIndicator } from "./LoadingIndicator"
 
-const Layout = styled(Box)({
+const Layout = styled(Box)(({ theme }) => ({
    display: "flex",
-   minHeight: "100%",
-   maxHeight: "100vh",
-   overflow: "auto", // Enable scrolling within the layout
    paddingTop: 60,
    paddingLeft: 60,
    paddingRight: 60,
-})
+   position: "relative",
+   [theme.breakpoints.down(990)]: {
+      paddingLeft: 40,
+      paddingRight: 40,
+   },
+}))
 
 // Slide up animation for card list
 const slideUpAnimation = {
@@ -34,6 +40,10 @@ export const DesktopView = () => {
    const { livestream, setShowRecommendations, showRecommendations } =
       useLiveStreamDialog()
 
+   const { events, loading: loadingEvents } = useRecommendedEvents({
+      bypassCache: true,
+   })
+
    useEffect(() => {
       return () => {
          setShowRecommendations(false)
@@ -47,8 +57,11 @@ export const DesktopView = () => {
             justifyContent: showRecommendations ? "flex-start" : "center",
             alignItems: showRecommendations ? "flex-start" : "center",
             paddingTop: showRecommendations ? undefined : "40px",
+            minHeight: showRecommendations ? "100%" : undefined,
+            maxHeight: showRecommendations ? "100vh" : undefined,
+            overflow: showRecommendations ? "auto" : undefined,
          }}
-         paddingBottom={showRecommendations ? 0 : "60px"}
+         paddingBottom={showRecommendations ? 0 : "90px"}
       >
          <Box
             position="sticky"
@@ -65,7 +78,9 @@ export const DesktopView = () => {
                livestream={livestream}
             />
          </Box>
-         {Boolean(showRecommendations) && <Recommendations />}
+         {Boolean(showRecommendations) && (
+            <Recommendations events={events} loading={loadingEvents} />
+         )}
          <Box
             position="absolute"
             bottom={0}
@@ -82,7 +97,15 @@ export const DesktopView = () => {
    )
 }
 
-const Recommendations = () => {
+const Recommendations = ({
+   events,
+   loading,
+}: {
+   events: LivestreamEvent[]
+   loading: boolean
+}) => {
+   const singleColumn = useIsMobile(1250)
+
    return (
       <Box
          component={motion.div}
@@ -92,7 +115,7 @@ const Recommendations = () => {
          animate="animate"
          exit="exit"
          variants={slideUpAnimation}
-         width={800}
+         width="100%"
          height={2020}
          sx={{
             display: "flex",
@@ -101,13 +124,19 @@ const Recommendations = () => {
             pl: 4,
          }}
       >
-         <Typography fontWeight={700} variant="desktopBrandedH3">
-            Keep your pace going! 🔥
-         </Typography>
-         <Typography variant="medium">
-            Here are more interesting live streams
-         </Typography>
-         Recommendations
+         <Stack textAlign="center" pb="23px">
+            <Typography fontWeight={700} variant="desktopBrandedH3">
+               Keep your pace going!&nbsp;🔥
+            </Typography>
+            <Typography variant="medium">
+               Here are more interesting live streams
+            </Typography>
+         </Stack>
+         <EventsGrid
+            singleColumn={singleColumn}
+            events={events}
+            loading={loading}
+         />
       </Box>
    )
 }

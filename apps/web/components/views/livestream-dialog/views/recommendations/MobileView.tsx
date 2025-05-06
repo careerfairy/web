@@ -1,11 +1,7 @@
-import {
-   ImpressionLocation,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/livestreams/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
 import {
    Box,
    Container,
-   Grid,
    IconButton,
    IconButtonProps,
    styled,
@@ -14,12 +10,12 @@ import {
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
-import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { AnimatePresence, motion } from "framer-motion"
 import { useEffect } from "react"
 import { X as CloseIcon } from "react-feather"
 import { useLiveStreamDialog } from "../.."
 import { BlurredBackground } from "./BlurredBackground"
+import { EventsGrid } from "./EventsGrid"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
 import { useArtificialLoading } from "./useArtificialLoading"
@@ -86,16 +82,6 @@ const slideUpAnimation = {
       },
    },
    exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
-}
-
-// Animation for individual cards
-const cardAnimation = {
-   initial: { opacity: 0, y: 20 },
-   animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.3 },
-   },
 }
 
 export const MobileView = () => {
@@ -243,38 +229,12 @@ const Recommendations = ({
                   )}
                </AnimatePresence>
             </motion.div>
-            {isLoading ? null : (
-               <motion.div
-                  key="recommendations-list"
-                  layout
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  variants={slideUpAnimation}
-               >
-                  <Grid container sx={{ pb: 11 }} spacing={1.5}>
-                     {events.map((event, index) => (
-                        <Grid item xs={isSmall ? 12 : 6} key={event.id}>
-                           <motion.div
-                              variants={cardAnimation}
-                              initial="initial"
-                              animate="animate"
-                           >
-                              <EventPreviewCard
-                                 totalElements={events.length}
-                                 index={index}
-                                 isRecommended
-                                 event={event}
-                                 location={
-                                    ImpressionLocation.livestreamDialogPostRegistrationRecommendations
-                                 }
-                              />
-                           </motion.div>
-                        </Grid>
-                     ))}
-                  </Grid>
-               </motion.div>
-            )}
+            <EventsGrid
+               key="recommendations-list"
+               singleColumn={isSmall}
+               events={events}
+               loading={loadingEvents}
+            />
          </AnimatePresence>
       </RecommendationsContainer>
    )
