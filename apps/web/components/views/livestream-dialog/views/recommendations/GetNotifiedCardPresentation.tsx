@@ -384,7 +384,7 @@ export const GetNotifiedCardPresentation = ({
             >
                {Boolean(userEmail) && (
                   <Typography variant="xsmall" color="neutral.500">
-                     You&apos;ll also receive reminders on {userEmail} before
+                     You&apos;ll also receive reminders at {userEmail} before
                      the start of the live stream
                   </Typography>
                )}
