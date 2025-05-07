@@ -4,14 +4,16 @@ import { UserSaveJob } from "./header-actions/SaveJob"
 
 export type CustomJobHeaderActionsProps = {
    customJob: CustomJob
+   isAdmin?: boolean
 }
 
 export const CustomJobHeaderActions = ({
    customJob,
+   isAdmin,
 }: CustomJobHeaderActionsProps) => {
    return (
       <Stack direction={"row"} spacing={1}>
-         <UserSaveJob customJob={customJob} />
+         {!isAdmin ? <UserSaveJob customJob={customJob} /> : null}
       </Stack>
    )
 }
