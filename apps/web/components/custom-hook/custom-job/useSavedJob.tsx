@@ -12,15 +12,14 @@ export const useSavedJob = (customJob: CustomJob) => {
    const { userData, isLoggedOut } = useAuth()
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
-   const { data } = useFirestoreDocument<CustomJob>(
+   const { data, status } = useFirestoreDocument<CustomJob>(
       "userData",
       [userData?.id, "savedJobs", customJob.id],
       {
          idField: "id",
       }
    )
-
-   const isSaved = !!data
+   const isSaved = !!data && status === "success"
 
    const redirectToSignUp = useCallback(() => {
       return push({
