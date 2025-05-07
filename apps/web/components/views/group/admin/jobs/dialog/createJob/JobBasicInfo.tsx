@@ -12,8 +12,8 @@ import { ControlledBrandedTextField } from "components/views/common/inputs/Contr
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
-import { useEffect, useState } from "react"
-import { useFormContext } from "react-hook-form"
+import { useEffect, useMemo, useState } from "react"
+import { useFormContext, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { useCustomJobForm } from "../CustomJobFormProvider"
 import { basicInfoSchema } from "./schemas"
@@ -101,7 +101,7 @@ const NO_OPTIONS_TEXT = "No options"
 
 const JobBasicInfo = () => {
    const [stepIsValid, setStepIsValid] = useState(false)
-
+   const [searchValue, setSearchValue] = useState("")
    const { moveToNext } = useStepper()
    const { watch, setValue } = useFormContext()
 
@@ -115,13 +115,33 @@ const JobBasicInfo = () => {
       "basicInfo.workplace",
    ])
 
-   const { data: locationOptions = [], isLoading: isSearching } =
-      useLocationSearch()
+   const jobLocations: { id: string; value: string }[] = useWatch({
+      name: "basicInfo.jobLocation",
+   })
 
-   const transformedLocationOptions = locationOptions.map((option) => ({
-      id: option.id,
-      value: option.name,
-   }))
+   const { data: locationOptions = [], isLoading: isSearching } =
+      useLocationSearch(searchValue)
+
+   const transformedLocationOptions = useMemo(() => {
+      const locations = locationOptions.map((option) => ({
+         id: option.id,
+         value: option.name,
+      }))
+
+      jobLocations?.forEach((location) => {
+         const locationOption = locations.find(
+            (option) => option.id === location.id
+         )
+         if (!locationOption) {
+            locations.push({
+               id: location.id,
+               value: location.value,
+            })
+         }
+      })
+
+      return locations
+   }, [locationOptions, jobLocations])
 
    // This effect validates the basic info fields and updates the step validity state
    useEffect(() => {
@@ -236,6 +256,9 @@ const JobBasicInfo = () => {
                                     {NO_OPTIONS_TEXT}
                                  </Box>
                               ),
+                              onInputChange: (_, value) => {
+                                 setSearchValue(value)
+                              },
                            }}
                         />
                      </Grid>
