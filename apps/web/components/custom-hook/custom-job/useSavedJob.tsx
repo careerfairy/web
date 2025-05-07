@@ -32,7 +32,6 @@ export const useSavedJob = (customJob: CustomJob) => {
    const { trigger: toggleSaved, isMutating: isToggling } = useSWRMutation(
       `user-${userData?.id}-saveCustomJob-${customJob.id}`,
       async () => {
-         console.log("🚀 ~ handleSaveJob toggleSaved:")
          if (isLoggedOut) {
             redirectToSignUp()
             return
@@ -54,12 +53,11 @@ export const useSavedJob = (customJob: CustomJob) => {
             )
          },
          onSuccess: () => {
-            successNotification(
-               `You have ${data ? "" : "successfully"} ${
-                  data ? "removed" : "saved"
-               } the job!`,
-               "Congrats"
-            )
+            const message = data
+               ? "❌ Job removed from your saved list."
+               : "✅ Job saved successfully!"
+
+            successNotification(message, "Congrats")
          },
       }
    )
