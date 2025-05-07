@@ -312,7 +312,7 @@ const Content: FC<ContentProps> = ({
    setIsRecommendationsListVisible,
 }) => {
    const router = useRouter()
-   const { push, replace, query } = router
+   const { push, query } = router
 
    /**
     * Mark this event registration as recommended if the user came from the
@@ -451,7 +451,7 @@ const Content: FC<ContentProps> = ({
 
    const goToRecommendations = useCallback(() => {
       if (mode === "page") {
-         void replace(
+         void push(
             buildDialogLink({
                router,
                link: { type: "recommendations", livestreamId },
@@ -462,27 +462,25 @@ const Content: FC<ContentProps> = ({
       } else {
          setValue(views.findIndex((v) => v.key === "recommendations"))
       }
-
-      setIsRecommendationsListVisible(false)
-   }, [
-      livestreamId,
-      mode,
-      replace,
-      router,
-      setValue,
-      setIsRecommendationsListVisible,
-   ])
+   }, [livestreamId, mode, push, router, setValue])
 
    const onClose = useCallback(() => {
       if (
          activeView === "livestream-details" &&
          previousView === "recommendations"
       ) {
+         setIsRecommendationsListVisible(true)
          goToRecommendations()
       } else {
          handleClose()
       }
-   }, [activeView, previousView, handleClose, goToRecommendations])
+   }, [
+      activeView,
+      previousView,
+      setIsRecommendationsListVisible,
+      goToRecommendations,
+      handleClose,
+   ])
 
    const handleBack = useCallback(() => {
       if (activeView === "livestream-details") {
@@ -531,7 +529,10 @@ const Content: FC<ContentProps> = ({
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
          setting,
-         handleStartSuccessAnimation: () => setShowingSuccessAnimation(true),
+         handleStartSuccessAnimation: () => {
+            setIsRecommendationsListVisible(false)
+            return setShowingSuccessAnimation(true)
+         },
          showingSuccessAnimation,
          isRecommendationsListVisible,
          setIsRecommendationsListVisible,

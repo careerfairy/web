@@ -34,8 +34,11 @@ const styles = sxStyles({
 const AskPhoneNumberView = () => {
    const firebase = useFirebaseService()
    const { userData } = useAuth()
-   const { goToView, livestream, handleDiscoverCompanySparks } =
-      useLiveStreamDialog()
+   const {
+      livestream,
+      handleDiscoverCompanySparks,
+      handleStartSuccessAnimation,
+   } = useLiveStreamDialog()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
    const onSubmit = async (data: { phoneNumber: string }) => {
@@ -52,7 +55,7 @@ const AskPhoneNumberView = () => {
          ])
          successNotification("We will remind you about this livestream!")
          handleDiscoverCompanySparks()
-         goToView("recommendations")
+         handleStartSuccessAnimation()
       } catch (error) {
          errorNotification(
             error,
@@ -73,7 +76,7 @@ const AskPhoneNumberView = () => {
          sx={styles.fullHeight}
          mainContent={
             <MainContent
-               onBackClick={() => goToView("recommendations")}
+               onBackClick={handleStartSuccessAnimation}
                onBackPosition="top-left"
                sx={styles.fullHeight}
             >
