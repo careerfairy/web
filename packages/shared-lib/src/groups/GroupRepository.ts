@@ -1325,11 +1325,7 @@ export class FirebaseGroupRepository
       const livestreams =
          mapFirestoreDocuments<LivestreamEvent>(livestreamsSnaps)
 
-      // covers co-hosted live stream edge case
-      const groupLivestreams = livestreams.filter(
-         (livestream) => livestream.groupIds[0] === group.id
-      )
-      const creatorsWithLivestreams = groupLivestreams
+      const creatorsWithLivestreams = livestreams
          .flatMap((livestream) => {
             return livestream.speakers
                ?.map((speaker) => creatorsMapByEmail.get(speaker.email))
