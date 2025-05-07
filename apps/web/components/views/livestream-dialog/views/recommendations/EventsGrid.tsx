@@ -90,6 +90,7 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
                      variants={cardAnimation}
                      initial="initial"
                      animate="animate"
+                     layout
                   >
                      <EventPreviewCard
                         totalElements={events.length}

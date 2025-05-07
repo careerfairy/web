@@ -72,7 +72,7 @@ export const DesktopView = () => {
       bypassCache: true,
    })
 
-   // Skip 7 seconds loader animation when returning to this view (when hitting back button or going back in browser history)
+   // Skip 6 seconds loader animation when returning to this view (when hitting back button or going back in browser history)
    // eslint-disable-next-line react/hook-use-state
    const [shouldHideLoaderOnInitialMount] = useState(
       isRecommendationsListVisible
@@ -127,7 +127,7 @@ const Recommendations = ({
          exit="exit"
          variants={SlideUpWithStaggeredChildrenAnimation}
       >
-         <Stack textAlign="center" pb="23px">
+         <Stack component={motion.div} layout textAlign="center" pb="23px">
             <Typography fontWeight={700} variant="desktopBrandedH3">
                Keep your pace going!&nbsp;🔥
             </Typography>

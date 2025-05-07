@@ -47,7 +47,7 @@ import {
    AnimatedBackgroundProvider,
    DialogAnimatedBackground,
 } from "./views/recommendations/DialogAnimatedBackground"
-import { RecommendationsViewSkeleton } from "./views/recommendations/RecommendationsViewSkeleton"
+import RecommendationsView from "./views/recommendations/RecommendationsView"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
 import SpeakerDetailsViewSkeleton from "./views/speaker-details/SpeakerDetailsViewSkeleton"
@@ -199,7 +199,7 @@ const views = [
    createView({
       key: "recommendations",
       viewPath: "recommendations/RecommendationsView",
-      loadingComponent: () => <RecommendationsViewSkeleton />,
+      loadingComponent: () => <RecommendationsView />, // load actual component
    }),
 ] as const
 
@@ -312,7 +312,7 @@ const Content: FC<ContentProps> = ({
    setIsRecommendationsListVisible,
 }) => {
    const router = useRouter()
-   const { push, query } = router
+   const { push, query, replace } = router
 
    /**
     * Mark this event registration as recommended if the user came from the
@@ -449,46 +449,53 @@ const Content: FC<ContentProps> = ({
       [livestreamId, mode, push, router, setValue]
    )
 
-   const goToRecommendations = useCallback(() => {
-      if (mode === "page") {
-         void push(
-            buildDialogLink({
-               router,
-               link: { type: "recommendations", livestreamId },
-            }),
-            undefined,
-            routerOptions
-         )
-      } else {
-         setValue(views.findIndex((v) => v.key === "recommendations"))
-      }
-   }, [livestreamId, mode, push, router, setValue])
+   const goToRecommendations = useCallback(
+      ({ replacePage }: { replacePage?: boolean } = {}) => {
+         if (mode === "page") {
+            const routerMethod = replacePage ? replace : push
+            void routerMethod(
+               buildDialogLink({
+                  router,
+                  link: { type: "recommendations", livestreamId },
+               }),
+               undefined,
+               routerOptions
+            )
+         } else {
+            setValue(views.findIndex((v) => v.key === "recommendations"))
+         }
+      },
+      [livestreamId, mode, push, router, setValue, replace]
+   )
 
    const onClose = useCallback(() => {
+      handleClose()
+   }, [handleClose])
+
+   const handleBack = useCallback(() => {
       if (
          activeView === "livestream-details" &&
          previousView === "recommendations"
       ) {
          setIsRecommendationsListVisible(true)
          goToRecommendations()
-      } else {
-         handleClose()
+         return
       }
+
+      if (activeView === "livestream-details") {
+         onClose()
+         return
+      }
+
+      goToView("livestream-details")
    }, [
       activeView,
       previousView,
+      goToView,
+      onClose,
       setIsRecommendationsListVisible,
       goToRecommendations,
-      handleClose,
    ])
-
-   const handleBack = useCallback(() => {
-      if (activeView === "livestream-details") {
-         onClose()
-      } else {
-         goToView("livestream-details")
-      }
-   }, [activeView, onClose, goToView])
 
    const [registrationState, registrationDispatch] = useReducer(
       registrationReducer,
@@ -512,6 +519,7 @@ const Content: FC<ContentProps> = ({
          closeDialog: onClose,
          livestream,
          activeView,
+         previousView,
          handleBack,
          livestreamPresenter,
          updatedStats,
@@ -542,6 +550,7 @@ const Content: FC<ContentProps> = ({
          onClose,
          livestream,
          activeView,
+         previousView,
          handleBack,
          livestreamPresenter,
          updatedStats,
@@ -593,7 +602,9 @@ const Content: FC<ContentProps> = ({
          )}
          {Boolean(showingSuccessAnimation) && (
             <RegistrationSuccessAnimation
-               onAnimationFullScreen={() => goToRecommendations()}
+               onAnimationFullScreen={() =>
+                  goToRecommendations({ replacePage: true })
+               }
                onAnimationComplete={() => setShowingSuccessAnimation(false)}
             />
          )}
@@ -636,6 +647,7 @@ type DialogContextType = {
    livestream: LivestreamEvent | undefined | null
    livestreamPresenter: LivestreamPresenter
    activeView: ViewKey
+   previousView: ViewKey | undefined
    /*
     * The user's stats, no stats we fallback to the server side stats
     * */
@@ -701,6 +713,7 @@ const DialogContext = createContext<DialogContextType>({
    livestream: undefined,
    livestreamPresenter: null,
    activeView: "livestream-details",
+   previousView: undefined,
    updatedStats: null,
    serverUserEmail: null,
    isRecommended: false,

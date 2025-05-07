@@ -35,8 +35,14 @@ const styles = sxStyles({
 })
 
 const LivestreamDetailsView = () => {
-   const { livestream, livestreamPresenter, serverUserEmail, closeDialog } =
-      useLiveStreamDialog()
+   const {
+      livestream,
+      livestreamPresenter,
+      serverUserEmail,
+      closeDialog,
+      previousView,
+      handleBack,
+   } = useLiveStreamDialog()
 
    const { handleRegisterClick } = useRegistrationHandler()
 
@@ -61,6 +67,14 @@ const LivestreamDetailsView = () => {
 
    const hasJobs = livestreamPresenter.hasJobs && jobsCount > 0
 
+   const handleBackClick = () => {
+      if (previousView === "recommendations") {
+         handleBack()
+      } else {
+         closeDialog()
+      }
+   }
+
    return (
       <BaseDialogView
          heroContent={
@@ -71,8 +85,12 @@ const LivestreamDetailsView = () => {
                   livestream.backgroundImageUrl,
                   "lg"
                )}
-               onBackPosition={isMobile ? "top-left" : "top-right"}
-               onBackClick={closeDialog}
+               onBackPosition={
+                  isMobile || previousView === "recommendations"
+                     ? "top-left"
+                     : "top-right"
+               }
+               onBackClick={handleBackClick}
             >
                <HeroTags />
                <ShareButton livestream={livestream} />

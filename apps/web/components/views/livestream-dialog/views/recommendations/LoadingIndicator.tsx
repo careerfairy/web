@@ -14,13 +14,12 @@ const Container = styled(motion.div)({
    flexDirection: "column",
    alignItems: "center",
    justifyContent: "center",
-   padding: "6px 0 0",
+   padding: "6px 13px 0",
    borderRadius: "200px",
    background: "rgba(255, 255, 255, 0.82)",
    backdropFilter: "blur(15px)",
    boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
    border: "1px solid #FFFFFF",
-   width: 264,
    overflow: "hidden",
 })
 
@@ -80,11 +79,11 @@ export const LoadingIndicator = ({ onProgressComplete }: Props) => {
          onAnimationComplete={handleAnimationComplete}
       >
          <TextContainer>
-            <Typography color="neutral.500" variant="xsmall">
+            <Typography component="p" color="neutral.500" variant="xsmall">
                Hold on
             </Typography>
-            <Typography color="neutral.800" variant="small">
-               Finding your next favorite streams
+            <Typography component="p" color="neutral.800" variant="small">
+               Finding your next favourite streams
             </Typography>
          </TextContainer>
          <ProgressContainer>
