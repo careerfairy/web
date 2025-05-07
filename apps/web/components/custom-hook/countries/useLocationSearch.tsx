@@ -34,7 +34,6 @@ type Options = {
  * @description Calls function, searching for locations, according to the search value (debounced).
  * @param searchValue - The search value to search for.
  * @param suspense - Whether to suspend the component.
- * @returns @type {Omit<OptionGroup, "groupId">[]} Locations as {id, name}
  */
 export const useLocationSearch = (
    searchValue: string,
