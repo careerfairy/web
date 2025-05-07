@@ -142,6 +142,8 @@ type Props = {
    onClose?: () => void
    /** Href for the download app button */
    downloadAppHref?: string
+   /** If true, animate layout */
+   animateLayout?: boolean
 } & CardProps
 
 /**
@@ -163,6 +165,7 @@ export const GetNotifiedCardPresentation = ({
    onClose,
    downloadAppHref,
    sx,
+   animateLayout,
    ...cardProps
 }: Props) => {
    const buttonsSize = isDesktop ? "large" : "medium"
@@ -177,7 +180,6 @@ export const GetNotifiedCardPresentation = ({
 
    return (
       <StyledCard
-         layout
          sx={combineStyles(
             {
                width: `${
@@ -214,7 +216,7 @@ export const GetNotifiedCardPresentation = ({
 
             {/* Event content */}
             <EventBannerLowerContentContainer
-               layoutId="event-content-container"
+               layout={animateLayout}
                alignItems={isDesktop && isExpanded ? "center" : "flex-start"}
             >
                {/* Company info */}
@@ -229,14 +231,14 @@ export const GetNotifiedCardPresentation = ({
                   }}
                >
                   <AnimatedCircularLogo
-                     layoutId="company-logo"
+                     layout={animateLayout}
                      src={companyLogoUrl}
                      alt={`${companyName} logo`}
                      size={28}
                   />
                   <Typography
                      component={motion.div}
-                     layoutId="company-name"
+                     layout={animateLayout}
                      variant="small"
                      color="text.secondary"
                      fontWeight={600}
@@ -248,7 +250,7 @@ export const GetNotifiedCardPresentation = ({
 
                {/* Job title */}
                <AnimatedTypography
-                  layoutId="event-title"
+                  layout={animateLayout}
                   variant="medium"
                   color="text.primary"
                   fontWeight={600}
@@ -262,7 +264,7 @@ export const GetNotifiedCardPresentation = ({
                {/* Event date */}
                <Box
                   component={motion.div}
-                  layoutId="event-date"
+                  layout={animateLayout}
                   sx={{
                      display: "flex",
                      alignItems: "center",
@@ -272,13 +274,9 @@ export const GetNotifiedCardPresentation = ({
                         isDesktop && isExpanded ? "center" : "flex-start",
                   }}
                >
-                  <AnimatedCalendarIcon
-                     layoutId="event-date-icon"
-                     size={16}
-                     color="#5C5C6A"
-                  />
+                  <AnimatedCalendarIcon layout size={16} color="#5C5C6A" />
                   <AnimatedTypography
-                     layoutId="event-date-text"
+                     layout={animateLayout}
                      sx={getMaxLineStyles(1)}
                      variant="small"
                      color="text.secondary"
@@ -315,7 +313,7 @@ export const GetNotifiedCardPresentation = ({
                   spacing={0.5}
                >
                   <AnimatedTypography
-                     layoutId="text-content"
+                     layout={animateLayout}
                      variant={isDesktop ? "brandedH3" : "brandedH4"}
                      color="text.primary"
                      fontWeight={700}
@@ -323,7 +321,7 @@ export const GetNotifiedCardPresentation = ({
                      {!shouldDownloadApp ? "Get Notified! 🎉" : "Get Notified!"}
                   </AnimatedTypography>
                   <AnimatedTypography
-                     layoutId="text-content-description"
+                     layout={animateLayout}
                      variant="medium"
                      color="text.secondary"
                   >
@@ -343,7 +341,7 @@ export const GetNotifiedCardPresentation = ({
                         }}
                      >
                         <StyledQRCodeImage
-                           layoutId="qr-code-image"
+                           layout={animateLayout}
                            src={qrCodeUrl}
                            alt="QR Code to download CareerFairy App"
                            width={120}
@@ -358,7 +356,7 @@ export const GetNotifiedCardPresentation = ({
                            spacing={0.5}
                         >
                            <AnimatedTypography
-                              layoutId="qr-title"
+                              layout={animateLayout}
                               variant="desktopBrandedH5"
                               color="text.primary"
                               fontWeight={600}
@@ -366,7 +364,7 @@ export const GetNotifiedCardPresentation = ({
                               Scan to download CareerFairy App!
                            </AnimatedTypography>
                            <AnimatedTypography
-                              layoutId="qr-or-text"
+                              layout={animateLayout}
                               variant="small"
                               color="neutral.600"
                               align="center"
@@ -375,7 +373,7 @@ export const GetNotifiedCardPresentation = ({
                            </AnimatedTypography>
                            <Button
                               component={motion.div}
-                              layoutId="calendar-btn"
+                              layout={animateLayout}
                               variant="outlined"
                               color="primary"
                               startIcon={<CalendarIcon size={16} />}

@@ -22,6 +22,8 @@ type Props = {
    isExpanded?: boolean
    /** Optional callback when close button is clicked */
    onClose?: () => void
+   /** If true, animate layout */
+   animateLayout?: boolean
 } & CardProps
 
 /**
@@ -33,6 +35,7 @@ export const GetNotifiedCard = ({
    responsiveMode = "auto",
    isExpanded = false,
    onClose,
+   animateLayout,
    ...cardProps
 }: Props) => {
    const { authenticatedUser, userData } = useAuth()
@@ -75,6 +78,7 @@ export const GetNotifiedCard = ({
                downloadAppHref={
                   "/install-mobile-application?utm_source=careerfairy&utm_campaign=AppDownloadQ12025&utm_medium=lsregistrationbutton&utm_content=appdownload"
                }
+               animateLayout={animateLayout}
             />
          )}
       </AddToCalendar>

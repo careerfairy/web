@@ -58,7 +58,6 @@ const RecommendationsContainer = styled(motion.div)(({ theme }) => ({
    alignItems: "center",
    paddingLeft: theme.spacing(4),
    width: "100%",
-   height: 3000,
    paddingTop: PADDING,
 }))
 
@@ -91,6 +90,7 @@ export const DesktopView = () => {
             <GetNotifiedCard
                isExpanded={!isRecommendationsListVisible}
                livestream={livestream}
+               animateLayout={isRecommendationsListVisible}
             />
          </CardContainer>
          {Boolean(isRecommendationsListVisible) && (

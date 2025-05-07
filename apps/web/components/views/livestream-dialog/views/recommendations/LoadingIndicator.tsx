@@ -109,6 +109,13 @@ const useProgressIndicator = (onProgressComplete?: () => void) => {
       }
    }, [onProgressComplete])
 
+   // Effect to handle progress completion and callback
+   useEffect(() => {
+      if (progress === 100 && onProgressCompleteRef.current) {
+         onProgressCompleteRef.current()
+      }
+   }, [progress])
+
    useEffect(() => {
       // Add a timeout to delay the start of the progress
       const startDelay = setTimeout(() => {
@@ -123,9 +130,6 @@ const useProgressIndicator = (onProgressComplete?: () => void) => {
                const newProgress = prevProgress + PROGRESS_STEP
                if (newProgress >= 100) {
                   if (progressTimer) clearInterval(progressTimer)
-                  if (onProgressCompleteRef.current) {
-                     onProgressCompleteRef.current()
-                  }
                   return 100
                }
                return newProgress
