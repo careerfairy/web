@@ -1,6 +1,7 @@
 import { Box, CircularProgress, Tooltip } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useSavedJob } from "components/custom-hook/custom-job/useSavedJob"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { Bookmark } from "react-feather"
@@ -42,7 +43,7 @@ export const SaveJob = ({ customJob }: CustomJobHeaderActionsProps) => {
    const { isSaved, toggleSaved, isToggling } = useSavedJob(customJob)
 
    return (
-      <Tooltip title={isSaved ? "Remove" : "Save"}>
+      <BrandedTooltip title={isSaved ? "Unsave" : "Save"}>
          <Box
             sx={[styles.bookmarkBox, isSaved && styles.bookmarkBoxSaved]}
             onClick={toggleSaved}
@@ -58,7 +59,7 @@ export const SaveJob = ({ customJob }: CustomJobHeaderActionsProps) => {
                />
             )}
          </Box>
-      </Tooltip>
+      </BrandedTooltip>
    )
 }
 
