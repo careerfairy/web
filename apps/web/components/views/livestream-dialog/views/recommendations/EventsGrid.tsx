@@ -95,6 +95,7 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
                         totalElements={events.length}
                         index={index}
                         isRecommended
+                        loading={!event}
                         event={event}
                         location={
                            ImpressionLocation.livestreamDialogPostRegistrationRecommendations
