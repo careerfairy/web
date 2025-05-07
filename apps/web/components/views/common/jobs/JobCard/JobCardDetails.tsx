@@ -10,6 +10,7 @@ import useUserJobApplication from "components/custom-hook/custom-job/useUserJobA
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { DateTime } from "luxon"
 import { useMemo } from "react"
 import { AlertCircle, Briefcase, Globe, MapPin, Zap } from "react-feather"
@@ -264,16 +265,19 @@ const JobCardDetails = ({
                      <MapPin width={smallCard ? 12 : 14} />
                      {jobLocation}
                      {othersCount ? (
-                        <Tooltip
+                        <BrandedTooltip
                            title={otherLocations
                               .map((location) => location.name)
                               .join(", ")}
+                           wrapperStyles={{
+                              display: "inline",
+                           }}
                         >
                            <Typography
                               variant={"subtitle1"}
                               sx={{ display: "inline", ml: "0px !important" }}
                            >{`, +${othersCount}`}</Typography>
-                        </Tooltip>
+                        </BrandedTooltip>
                      ) : null}
                      {workplaceText ? (
                         <Typography

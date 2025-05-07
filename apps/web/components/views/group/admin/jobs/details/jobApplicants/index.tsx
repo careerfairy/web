@@ -1,8 +1,9 @@
 import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
-import { Box, Button, Grid, Stack, Tooltip, Typography } from "@mui/material"
+import { Box, Button, Grid, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { useLocalStorage } from "react-use"
 import { sxStyles } from "../../../../../../../types/commonTypes"
@@ -36,6 +37,14 @@ const styles = sxStyles({
       width: "100%",
       justifyContent: "center",
    },
+   applicantsSection: {
+      mt: "12px",
+      p: "12px",
+      backgroundColor: (theme) => theme.brand.white[100],
+      borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.brand.purple[50]}`,
+   },
+   infoIcon: { color: (theme) => theme.brand.black[700] },
 })
 
 type Props = {
@@ -51,7 +60,6 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
       false
    )
    const [openTooltip, setOpenTooltip] = useState(!hasSeenTooltip)
-   console.log("🚀 ~ openTooltip:", openTooltip)
 
    const acknowledgeTooltip = (e: React.MouseEvent) => {
       e.stopPropagation()
@@ -81,12 +89,6 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
       },
       [paginatedResults]
    )
-
-   // useEffect(() => {
-   //    const shouldShowTooltip = !hasSeenTooltip
-   //    setHasSeenTooltip(!shouldShowTooltip)
-   //    setOpenTooltip(shouldShowTooltip)
-   // }, [hasSeenTooltip, setHasSeenTooltip])
 
    return (
       <>
@@ -130,21 +132,24 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
                         Confirmed applicants
                      </Typography>
                      {hasSeenTooltip ? (
-                        <Tooltip
+                        <BrandedTooltip
                            title={
                               <RolledTooltipContent
                                  hasSeenTooltip={hasSeenTooltip}
                                  acknowledgeTooltip={acknowledgeTooltip}
                               />
                            }
-                           sx={{ color: (theme) => theme.brand.black[700] }}
+                           sx={{
+                              color: (theme) => theme.brand.black[700],
+                              maxWidth: "302px",
+                           }}
                         >
-                           <InfoIcon />
-                        </Tooltip>
+                           <Box component={InfoIcon} sx={styles.infoIcon} />
+                        </BrandedTooltip>
                      ) : null}
                   </Stack>
                   <Box width={"fit-content"}>
-                     <Tooltip
+                     <BrandedTooltip
                         open={openTooltip}
                         title={
                            <RolledTooltipContent
@@ -171,30 +176,53 @@ const JobApplicants: FC<Props> = ({ jobId }) => {
                         <Typography variant={"body1"} sx={styles.statsValue}>
                            {jobStats.applicants}
                         </Typography>
-                     </Tooltip>
+                     </BrandedTooltip>
                   </Box>
                </Box>
             </Grid>
          </Grid>
 
-         <JobApplicantsList applicants={applicants} />
-
-         {applicants.length ? (
-            <StyledPagination
-               count={
-                  paginatedResults.nextDisabled
-                     ? paginatedResults.page
-                     : paginatedResults.page + 1
-               }
-               page={paginatedResults.page}
-               color="secondary"
-               disabled={paginatedResults.loading}
-               onChange={onPageChange}
-               siblingCount={0}
-               boundaryCount={0}
-               size="small"
-            />
-         ) : null}
+         <Stack spacing={"12px"} sx={styles.applicantsSection}>
+            <Stack direction="row" spacing={1}>
+               <Typography variant="small" color="neutral.700" fontWeight={400}>
+                  Logged-In users with confirmed applications
+               </Typography>
+               <BrandedTooltip
+                  title={
+                     <Typography
+                        variant="xsmall"
+                        color="neutral.700"
+                        fontWeight={400}
+                     >
+                        This list includes only accounts of users who confirmed
+                        their applications while logged in at CareerFairy.
+                     </Typography>
+                  }
+                  sx={{ maxWidth: "302px" }}
+               >
+                  <Box component={InfoIcon} sx={styles.infoIcon} />
+               </BrandedTooltip>
+            </Stack>
+            <Stack>
+               <JobApplicantsList applicants={applicants} />
+               {applicants.length ? (
+                  <StyledPagination
+                     count={
+                        paginatedResults.nextDisabled
+                           ? paginatedResults.page
+                           : paginatedResults.page + 1
+                     }
+                     page={paginatedResults.page}
+                     color="secondary"
+                     disabled={paginatedResults.loading}
+                     onChange={onPageChange}
+                     siblingCount={0}
+                     boundaryCount={0}
+                     size="small"
+                  />
+               ) : null}
+            </Stack>
+         </Stack>
       </>
    )
 }

@@ -4,17 +4,11 @@ import {
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import {
-   Box,
-   Button,
-   Skeleton,
-   Stack,
-   Tooltip,
-   Typography,
-} from "@mui/material"
+import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { useRouter } from "next/router"
 import { FC, useRef, useState } from "react"
 import { Briefcase, Edit, MapPin, Zap } from "react-feather"
@@ -224,7 +218,7 @@ const CustomJobHeader = ({
                               <MapPin width={14} />
                               {jobLocation}
                               {othersCount ? (
-                                 <Tooltip
+                                 <BrandedTooltip
                                     title={
                                        <LocationTooltip
                                           tooltipText={tooltipText}
@@ -233,13 +227,13 @@ const CustomJobHeader = ({
                                     open={tooltipOpen}
                                     onClose={undefined}
                                     placement="top"
+                                    wrapperStyles={{
+                                       display: "inline",
+                                    }}
                                  >
                                     <Typography
-                                       variant={"subtitle1"}
+                                       variant={"xsmall"}
                                        sx={{
-                                          ...styles.details,
-                                          display: "inline",
-                                          ml: "0px !important",
                                           cursor: "pointer",
                                        }}
                                        onClick={() => {
@@ -256,7 +250,7 @@ const CustomJobHeader = ({
                                     >
                                        {`, +${othersCount}`}
                                     </Typography>
-                                 </Tooltip>
+                                 </BrandedTooltip>
                               ) : (
                                  ""
                               )}
@@ -298,10 +292,10 @@ const CustomJobHeader = ({
                                  </>
                               ) : null}
                               {jobLocation ? (
-                                 <>
+                                 <Typography variant={"xsmall"}>
                                     <MapPin width={14} />
                                     {jobLocation}
-                                    {othersCount ? (
+                                    {/* {othersCount ? (
                                        <Tooltip
                                           title={
                                              <LocationTooltip
@@ -319,9 +313,24 @@ const CustomJobHeader = ({
                                              }}
                                           >{`, +${othersCount}`}</Typography>
                                        </Tooltip>
-                                    ) : (
-                                       ""
-                                    )}
+                                    ) : null} */}
+                                    {othersCount ? (
+                                       <BrandedTooltip
+                                          title={
+                                             <LocationTooltip
+                                                tooltipText={tooltipText}
+                                             />
+                                          }
+                                          placement="top"
+                                          wrapperStyles={{
+                                             display: "inline",
+                                          }}
+                                       >
+                                          <Typography
+                                             variant={"xsmall"}
+                                          >{`, +${othersCount}`}</Typography>
+                                       </BrandedTooltip>
+                                    ) : null}
                                     {workplaceText ? (
                                        <Typography
                                           variant={"subtitle1"}
@@ -333,10 +342,8 @@ const CustomJobHeader = ({
                                        >
                                           {workplaceText}
                                        </Typography>
-                                    ) : (
-                                       ""
-                                    )}
-                                 </>
+                                    ) : null}
+                                 </Typography>
                               ) : null}
                            </Stack>
                         </Typography>
