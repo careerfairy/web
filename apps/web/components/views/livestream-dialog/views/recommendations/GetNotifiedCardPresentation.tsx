@@ -341,6 +341,7 @@ export const GetNotifiedCardPresentation = ({
                         }}
                      >
                         <StyledQRCodeImage
+                           // @ts-ignore
                            layout={animateLayout}
                            src={qrCodeUrl}
                            alt="QR Code to download CareerFairy App"

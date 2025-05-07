@@ -90,7 +90,7 @@ export const DesktopView = () => {
             <GetNotifiedCard
                isExpanded={!isRecommendationsListVisible}
                livestream={livestream}
-               animateLayout={isRecommendationsListVisible}
+               animateLayout
             />
          </CardContainer>
          {Boolean(isRecommendationsListVisible) && (
