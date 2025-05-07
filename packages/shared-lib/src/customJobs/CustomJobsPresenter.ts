@@ -4,7 +4,16 @@ import {
    fromDateFirestoreFn,
    toDate,
 } from "../firebaseTypes"
+import { Group, serializePublicGroup } from "../groups"
+import { SerializedPublicGroup } from "../groups/groups"
 import { CustomJob, JobType } from "./customJobs"
+export interface SerializedCustomJob
+   extends Omit<CustomJob, "createdAt" | "updatedAt" | "deadline" | "group"> {
+   createdAt: number
+   updatedAt: number
+   deadline: number
+   group: SerializedPublicGroup
+}
 
 export class CustomJobsPresenter extends BaseModel {
    constructor(
@@ -25,7 +34,8 @@ export class CustomJobsPresenter extends BaseModel {
       public readonly deleted?: boolean,
       public readonly businessFunctionsTagIds?: string[],
       public readonly isPermanentlyExpired?: boolean,
-      public readonly disableUrlTracking?: boolean
+      public readonly disableUrlTracking?: boolean,
+      public readonly group?: Group
    ) {
       super()
    }
@@ -48,7 +58,8 @@ export class CustomJobsPresenter extends BaseModel {
          customJob.deleted,
          customJob.businessFunctionsTagIds,
          customJob.isPermanentlyExpired,
-         customJob.disableUrlTracking
+         customJob.disableUrlTracking,
+         customJob.group
       )
    }
    static parseDocument(
@@ -78,13 +89,18 @@ export class CustomJobsPresenter extends BaseModel {
          doc.deleted,
          doc.businessFunctionsTagIds,
          doc.isPermanentlyExpired,
-         doc.disableUrlTracking
+         doc.disableUrlTracking,
+         doc.group
       )
    }
    static serializeDocument(doc: CustomJob) {
-      return CustomJobsPresenter.createFromDocument(
-         doc
-      ).serializeToPlainObject()
+      const serialized =
+         CustomJobsPresenter.createFromDocument(doc).serializeToPlainObject()
+
+      return {
+         ...serialized,
+         group: serializePublicGroup(serialized.group),
+      }
    }
 
    convertToDocument(fromDate: fromDateFirestoreFn): CustomJob {
@@ -106,8 +122,8 @@ export class CustomJobsPresenter extends BaseModel {
          deleted: this.deleted,
          businessFunctionsTagIds: this.businessFunctionsTagIds,
          isPermanentlyExpired: this.isPermanentlyExpired,
-         group: null,
          disableUrlTracking: this.disableUrlTracking,
+         group: this.group,
       }
    }
 }
