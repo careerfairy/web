@@ -10,12 +10,13 @@ import { EventsGrid } from "./EventsGrid"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { LoadingIndicator } from "./LoadingIndicator"
 
+const PADDING = 76
+
 const Layout = styled(Box, {
    shouldForwardProp: (prop) => prop !== "expanded",
 })<{ expanded?: boolean }>(({ theme, expanded }) => ({
    display: "flex",
    position: "relative",
-   paddingTop: expanded ? 60 : 40,
    paddingLeft: 60,
    paddingRight: 60,
    minHeight: "100%",
@@ -31,15 +32,17 @@ const Layout = styled(Box, {
 }))
 
 const CardContainer = styled(Box, {
-   shouldForwardProp: (prop) => prop !== "fullWidth",
-})<{ fullWidth: boolean }>(({ fullWidth }) => ({
+   shouldForwardProp: (prop) => prop !== "fullWidth" && prop !== "expanded",
+})<{ fullWidth: boolean; expanded: boolean }>(({ fullWidth, expanded }) => ({
    position: "sticky",
-   height: "fit-content",
    display: "flex",
    justifyContent: "center",
+   alignItems: "center",
    top: 0,
    width: fullWidth ? "100%" : "auto",
-   minHeight: 550,
+   height: "100%",
+   paddingBottom: expanded ? PADDING : 20,
+   paddingTop: expanded ? PADDING : 20,
 }))
 
 const LoadingContainer = styled(Box)({
@@ -55,6 +58,8 @@ const RecommendationsContainer = styled(motion.div)(({ theme }) => ({
    alignItems: "center",
    paddingLeft: theme.spacing(4),
    width: "100%",
+   height: 3000,
+   paddingTop: PADDING,
 }))
 
 export const DesktopView = () => {
@@ -79,7 +84,10 @@ export const DesktopView = () => {
          expanded={isRecommendationsListVisible}
          paddingBottom={isRecommendationsListVisible ? 0 : "90px"}
       >
-         <CardContainer fullWidth={!isRecommendationsListVisible}>
+         <CardContainer
+            fullWidth={!isRecommendationsListVisible}
+            expanded={isRecommendationsListVisible}
+         >
             <GetNotifiedCard
                isExpanded={!isRecommendationsListVisible}
                livestream={livestream}

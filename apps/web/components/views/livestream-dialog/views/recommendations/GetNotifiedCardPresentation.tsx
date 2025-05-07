@@ -167,6 +167,14 @@ export const GetNotifiedCardPresentation = ({
 }: Props) => {
    const buttonsSize = isDesktop ? "large" : "medium"
 
+   const getCardMaxHeight = () => {
+      if (isDesktop) {
+         return shouldDownloadApp ? 755 : 706
+      } else {
+         return shouldDownloadApp ? 572 : 534
+      }
+   }
+
    return (
       <StyledCard
          layout
@@ -175,6 +183,9 @@ export const GetNotifiedCardPresentation = ({
                width: `${
                   isDesktop ? (isExpanded ? 570 : 402) : 343
                }px !important`,
+               maxHeight: getCardMaxHeight(),
+               height: "100%",
+               minHeight: 400,
             },
             sx
          )}
