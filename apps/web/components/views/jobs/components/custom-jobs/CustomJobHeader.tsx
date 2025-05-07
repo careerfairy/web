@@ -101,6 +101,7 @@ type Props = {
    editMode?: boolean
    handleClick?: () => void
    maxLocationsToShow?: number
+   isAdmin?: boolean
 }
 
 const CustomJobHeader = ({
@@ -110,6 +111,7 @@ const CustomJobHeader = ({
    editMode,
    handleClick,
    maxLocationsToShow,
+   isAdmin,
 }: Props) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
@@ -190,7 +192,10 @@ const CustomJobHeader = ({
                               {companyName}
                            </Typography>
                         </Stack>
-                        <CustomJobHeaderActions customJob={job as CustomJob} />
+                        <CustomJobHeaderActions
+                           customJob={job as CustomJob}
+                           isAdmin={isAdmin}
+                        />
                      </Stack>
                   ) : null}
                   <Typography variant={"brandedH3"} sx={styles.jobTitle}>
