@@ -11,7 +11,9 @@ import {
 import { City, Country, State } from "country-state-city"
 import { onCall } from "firebase-functions/https"
 import Fuse from "fuse.js"
-import { InferType, object, string } from "yup"
+import { InferType, number, object, string } from "yup"
+
+const SEARCH_LOCATION_LIMIT = 10
 
 const CountryCitiesOptionsSchema = {
    countryCode: string().required(),
@@ -41,6 +43,7 @@ const CountryDataOptionsSchema = {
 
 const SearchLocationOptionsSchema = {
    searchValue: string().required().min(2),
+   limit: number().optional().default(SEARCH_LOCATION_LIMIT),
 }
 
 const GetLocationOptionsSchema = {
@@ -79,7 +82,11 @@ type SearchLocationOptions = InferType<typeof SearchLocationSchema>
 
 type GetLocationOptions = InferType<typeof GetLocationSchema>
 
-const performFuzzySearch = <T>(items: T[], searchValue: string): T[] => {
+const performFuzzySearch = <T>(
+   items: T[],
+   searchValue: string,
+   limit?: number
+): T[] => {
    // Configure Fuse options
    const fuseOptions = {
       keys: ["name"],
@@ -89,7 +96,7 @@ const performFuzzySearch = <T>(items: T[], searchValue: string): T[] => {
    const fuse = new Fuse(items, fuseOptions)
    const searchResults = fuse.search(searchValue)
 
-   return searchResults.map((result) => result.item)
+   return searchResults.map((result) => result.item).slice(0, limit)
 }
 
 export const searchCountries = onCall<SearchCountryOptions>((request) => {
@@ -270,7 +277,9 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
    return countryResult
 })
 
-export const searchLocations = onCall<SearchLocationOptions>(() => {
+export const searchLocations = onCall<SearchLocationOptions>((request) => {
+   const { searchValue, limit } = request.data
+
    const countries = Country.getAllCountries()
       .map((country) => ({
          name: country.name,
@@ -288,7 +297,11 @@ export const searchLocations = onCall<SearchLocationOptions>(() => {
       })
       .flat()
 
-   const locations = [...countries, ...states]
+   const locations = performFuzzySearch(
+      [...countries, ...states],
+      searchValue,
+      limit
+   )
 
    return locations
 })
