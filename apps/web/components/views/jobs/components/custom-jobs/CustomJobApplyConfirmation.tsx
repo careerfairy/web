@@ -160,7 +160,7 @@ const Component = ({
                </Typography>
                <Typography variant={"body2"} sx={styles.messageText}>
                   {isLoggedIn
-                     ? "You'll soon be able to manage your jobs directly in your profile."
+                     ? "Check your profile to manage your applications."
                      : "Create an account to manage your jobs directly on CareerFairy."}
                </Typography>
             </Box>
