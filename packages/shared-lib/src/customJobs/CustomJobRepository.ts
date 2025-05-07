@@ -183,7 +183,7 @@ export interface ICustomJobRepository {
 
    removeSavedCustomJob(userId: string, customJobId: string): Promise<void>
 
-   getPublishedCustomJobs(limit?: number): Promise<CustomJob[]>
+   getPublishedCustomJobs(): Promise<CustomJob[]>
 }
 
 export class FirebaseCustomJobRepository
@@ -292,14 +292,13 @@ export class FirebaseCustomJobRepository
       return null
    }
 
-   async getPublishedCustomJobs(limit = 10): Promise<CustomJob[]> {
+   async getPublishedCustomJobs(): Promise<CustomJob[]> {
       const snapshot = await this.firestore
          .collection(this.COLLECTION_NAME)
          .where("published", "==", true)
          .where("deleted", "==", false)
          .where("isPermanentlyExpired", "==", false)
          .where("deadline", ">=", new Date())
-         .limit(limit)
          .get()
 
       return this.addIdToDocs<CustomJob>(snapshot.docs)

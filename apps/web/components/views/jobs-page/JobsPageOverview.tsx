@@ -1,4 +1,5 @@
 import { Container, Stack } from "@mui/material"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { sxStyles } from "types/commonTypes"
 import { CustomJobDetails } from "./overview/CustomJobDetails"
 import { CustomJobsOverviewList } from "./overview/CustomJobsOverviewList"
@@ -13,13 +14,15 @@ const styles = sxStyles({
 const JobsPageOverview = () => {
    return (
       <Container maxWidth="xl" sx={styles.container}>
-         <Stack spacing={2}>
-            <OverviewSearch />
-            <Stack direction="row" spacing={1}>
-               <CustomJobsOverviewList />
-               <CustomJobDetails />
+         <SuspenseWithBoundary>
+            <Stack spacing={2}>
+               <OverviewSearch />
+               <Stack direction="row" spacing={1}>
+                  <CustomJobsOverviewList />
+                  <CustomJobDetails />
+               </Stack>
             </Stack>
-         </Stack>
+         </SuspenseWithBoundary>
       </Container>
    )
 }
