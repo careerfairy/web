@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Tooltip } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useSavedJob } from "components/custom-hook/custom-job/useSavedJob"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
@@ -73,10 +73,10 @@ const UnAuthedSaveJob = ({ customJob }: CustomJobHeaderActionsProps) => {
    }, [asPath, customJob.id, push])
 
    return (
-      <Tooltip title={"Save"}>
+      <BrandedTooltip title={"Save"}>
          <Box sx={[styles.bookmarkBox]} onClick={redirectToSignUp}>
             <Box component={Bookmark} size={20} sx={styles.bookmarkIcon} />
          </Box>
-      </Tooltip>
+      </BrandedTooltip>
    )
 }
