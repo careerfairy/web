@@ -74,7 +74,7 @@ const UnAuthedSaveJob = ({ customJob }: CustomJobHeaderActionsProps) => {
 
    return (
       <BrandedTooltip title={"Save"}>
-         <Box sx={[styles.bookmarkBox]} onClick={redirectToSignUp}>
+         <Box sx={styles.bookmarkBox} onClick={redirectToSignUp}>
             <Box component={Bookmark} size={20} sx={styles.bookmarkIcon} />
          </Box>
       </BrandedTooltip>

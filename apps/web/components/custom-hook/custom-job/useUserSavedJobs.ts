@@ -12,13 +12,9 @@ export const useUserSavedJobs = () => {
       orderBy("deadline", "asc")
    )
 
-   const result = useFirestoreCollection<CustomJob>(collectionRef, {
+   return useFirestoreCollection<CustomJob>(collectionRef, {
       idField: "id", // this field will be added to the firestore object
       suspense: false,
+      initialData: [],
    })
-
-   return {
-      ...result,
-      data: result.data ?? [],
-   }
 }
