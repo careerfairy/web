@@ -56,7 +56,7 @@ export const useSavedJob = (customJob: CustomJob) => {
                ? "❌ Job removed from your saved list."
                : "✅ Job saved successfully!"
 
-            successNotification(message, "Congrats")
+            successNotification(message)
          },
       }
    )
