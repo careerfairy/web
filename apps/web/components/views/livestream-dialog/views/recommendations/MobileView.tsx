@@ -70,15 +70,16 @@ const fadeAnimation = {
 }
 
 export const MobileView = () => {
-   const { events, loading: loadingEvents } = useRecommendedEvents({
-      bypassCache: true,
-   })
-
    const {
       livestream,
       isRecommendationsListVisible,
       setIsRecommendationsListVisible,
    } = useLiveStreamDialog()
+
+   const { events, loading: loadingEvents } = useRecommendedEvents({
+      bypassCache: true,
+      referenceLivestreamId: livestream.id,
+   })
 
    const handleNext = () => {
       setIsRecommendationsListVisible(true)

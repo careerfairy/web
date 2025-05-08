@@ -69,7 +69,7 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
       )
    }
 
-   if (events.length === 0) {
+   if (!events?.length) {
       return (
          <AnimateSlideUp>
             <EmptyStateContainer>
