@@ -10,15 +10,15 @@ import { EventsGrid } from "./EventsGrid"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { LoadingIndicator } from "./LoadingIndicator"
 
-const PADDING = 76
+const PADDING = 60
 
 const Layout = styled(Box, {
    shouldForwardProp: (prop) => prop !== "expanded",
 })<{ expanded?: boolean }>(({ theme, expanded }) => ({
    display: "flex",
    position: "relative",
-   paddingLeft: 60,
-   paddingRight: 60,
+   paddingLeft: expanded ? 60 : 0,
+   paddingRight: expanded ? 60 : 0,
    minHeight: "100%",
    flexDirection: expanded ? "row" : "column",
    justifyContent: expanded ? "flex-start" : "center",
@@ -26,23 +26,33 @@ const Layout = styled(Box, {
    maxHeight: expanded ? "100vh" : undefined,
    overflow: expanded ? "auto" : undefined,
    [theme.breakpoints.down(990)]: {
-      paddingLeft: 40,
-      paddingRight: 40,
+      paddingLeft: expanded ? 40 : 0,
+      paddingRight: expanded ? 40 : 0,
    },
 }))
 
 const CardContainer = styled(Box, {
-   shouldForwardProp: (prop) => prop !== "fullWidth" && prop !== "expanded",
-})<{ fullWidth: boolean; expanded: boolean }>(({ fullWidth, expanded }) => ({
+   shouldForwardProp: (prop) => prop !== "expanded",
+})<{ expanded: boolean }>(({ expanded }) => ({
    position: "sticky",
    display: "flex",
+   flexDirection: "column",
    justifyContent: "center",
    alignItems: "center",
    top: 0,
-   width: fullWidth ? "100%" : "auto",
    height: "100%",
+   overflowY: "auto",
+   overflowX: "hidden",
+   width: expanded ? "auto" : "100%",
+   flexShrink: expanded ? 0 : 1,
+}))
+
+const CardContainerInner = styled(Box, {
+   shouldForwardProp: (prop) => prop !== "expanded",
+})<{ expanded: boolean }>(({ expanded }) => ({
    paddingBottom: expanded ? PADDING : 20,
    paddingTop: expanded ? PADDING : 20,
+   height: "100%",
 }))
 
 const LoadingContainer = styled(Box)({
@@ -81,17 +91,22 @@ export const DesktopView = () => {
    return (
       <Layout
          expanded={isRecommendationsListVisible}
-         paddingBottom={isRecommendationsListVisible ? 0 : "90px"}
+         paddingBottom={isRecommendationsListVisible ? 0 : 0}
       >
          <CardContainer
-            fullWidth={!isRecommendationsListVisible}
+            data-testid="get-notified-card-container"
             expanded={isRecommendationsListVisible}
          >
-            <GetNotifiedCard
-               isExpanded={!isRecommendationsListVisible}
-               livestream={livestream}
-               animateLayout
-            />
+            <CardContainerInner expanded={isRecommendationsListVisible}>
+               <GetNotifiedCard
+                  isExpanded={!isRecommendationsListVisible}
+                  livestream={livestream}
+                  animateLayout
+               />
+               {isRecommendationsListVisible ? null : (
+                  <Box data-testid="loading-indicator-offset" height={100} />
+               )}
+            </CardContainerInner>
          </CardContainer>
          {Boolean(isRecommendationsListVisible) && (
             <Recommendations events={events} loading={loadingEvents} />

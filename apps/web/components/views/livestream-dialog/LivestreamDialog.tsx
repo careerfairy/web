@@ -37,7 +37,7 @@ import {
    registrationInitialState,
    registrationReducer,
 } from "./registrationReducer"
-import { buildDialogLink } from "./util"
+import { DialogPageType, buildDialogLink } from "./util"
 import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
 import RedirectingView from "./views/common/RedirectingView"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
@@ -100,12 +100,7 @@ type Props = {
    livestreamId: string
    handleClose: () => void
    open: boolean
-   page:
-      | "details"
-      | "register"
-      | "job-details"
-      | "speaker-details"
-      | "recommendations"
+   initialPage: DialogPageType
    updatedStats?: UserStats
    serverUserEmail: string
    /**
@@ -215,7 +210,7 @@ const LivestreamDialog: FC<Props> = ({
    open,
    livestreamId,
    appear,
-   page = "details",
+   initialPage: page = "details",
    ...rest
 }) => {
    const isMobile = useIsMobile()
@@ -226,16 +221,23 @@ const LivestreamDialog: FC<Props> = ({
    const [isRecommendationsListVisible, setIsRecommendationsListVisible] =
       useState(false)
 
-   const [value, setValue] = useState<number>(getPageIndex(page))
-   const activeView = views[value].key
-   const previousValue = usePreviousDistinct(value)
+   /**
+    * Tracks the currently active view index in the dialog's SwipeableViews component.
+    * This index corresponds to the position in the 'views' array and determines which
+    * view is currently displayed to the user.
+    */
+   const [activeViewIndex, setActiveViewIndex] = useState<number>(
+      getActiveViewIndexFromPage(page)
+   )
+   const activeView = views[activeViewIndex].key
+   const previousValue = usePreviousDistinct(activeViewIndex)
    const previousView = views[previousValue]?.key
 
    // Using useEffect to update the view based on 'page'.
    // This allows conditional navigation not covered by useMemo.
    useEffect(() => {
-      setValue(getPageIndex(page))
-   }, [page, setValue])
+      setActiveViewIndex(getActiveViewIndexFromPage(page))
+   }, [page])
 
    return (
       <AnimatedBackgroundProvider
@@ -264,9 +266,9 @@ const LivestreamDialog: FC<Props> = ({
                   <Content
                      handleClose={onClose}
                      livestreamId={livestreamId}
-                     value={value}
+                     activeViewIndex={activeViewIndex}
                      activeView={activeView}
-                     setValue={setValue}
+                     setActiveViewIndex={setActiveViewIndex}
                      previousView={previousView}
                      isRecommendationsListVisible={isRecommendationsListVisible}
                      setIsRecommendationsListVisible={
@@ -284,9 +286,9 @@ const LivestreamDialog: FC<Props> = ({
 }
 
 type ContentProps = Omit<Props, "open" | "page"> & {
-   value: number
+   activeViewIndex: number
    activeView: ViewKey
-   setValue: Dispatch<SetStateAction<number>>
+   setActiveViewIndex: Dispatch<SetStateAction<number>>
    previousView: ViewKey
    isRecommendationsListVisible: boolean
    setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
@@ -304,9 +306,9 @@ const Content: FC<ContentProps> = ({
    jobId,
    speakerId,
    setting,
-   value,
+   activeViewIndex,
    activeView,
-   setValue,
+   setActiveViewIndex,
    previousView,
    isRecommendationsListVisible,
    setIsRecommendationsListVisible,
@@ -363,7 +365,7 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
-               setValue(views.findIndex((v) => v.key === view))
+               setActiveViewIndex(views.findIndex((v) => v.key === view))
                break
 
             case "register-data-consent":
@@ -380,21 +382,21 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
-               setValue(views.findIndex((v) => v.key === view))
+               setActiveViewIndex(views.findIndex((v) => v.key === view))
                break
 
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
                   view = "recommendations"
                }
-               setValue(views.findIndex((v) => v.key === view))
+               setActiveViewIndex(views.findIndex((v) => v.key === view))
                break
          }
 
-         setValue(views.findIndex((v) => v.key === view))
+         setActiveViewIndex(views.findIndex((v) => v.key === view))
       },
       [
-         setValue,
+         setActiveViewIndex,
          isPageMode,
          livestream?.questionsDisabled,
          push,
@@ -420,10 +422,10 @@ const Content: FC<ContentProps> = ({
             )
          } else {
             setCurrentJobId(jobId)
-            setValue(views.findIndex((v) => v.key === "job-details"))
+            setActiveViewIndex(views.findIndex((v) => v.key === "job-details"))
          }
       },
-      [livestreamId, mode, push, router, setValue]
+      [livestreamId, mode, push, router, setActiveViewIndex]
    )
 
    const goToSpeakerDetails = useCallback(
@@ -443,10 +445,12 @@ const Content: FC<ContentProps> = ({
             )
          } else {
             setCurrentSpeakerId(speakerId)
-            setValue(views.findIndex((v) => v.key === "speaker-details"))
+            setActiveViewIndex(
+               views.findIndex((v) => v.key === "speaker-details")
+            )
          }
       },
-      [livestreamId, mode, push, router, setValue]
+      [livestreamId, mode, push, router, setActiveViewIndex]
    )
 
    const goToRecommendations = useCallback(
@@ -462,10 +466,12 @@ const Content: FC<ContentProps> = ({
                routerOptions
             )
          } else {
-            setValue(views.findIndex((v) => v.key === "recommendations"))
+            setActiveViewIndex(
+               views.findIndex((v) => v.key === "recommendations")
+            )
          }
       },
-      [livestreamId, mode, push, router, setValue, replace]
+      [livestreamId, mode, push, router, setActiveViewIndex, replace]
    )
 
    const onClose = useCallback(() => {
@@ -584,7 +590,7 @@ const Content: FC<ContentProps> = ({
                slideStyle={styles.slide}
                disabled
                axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-               index={value}
+               index={activeViewIndex}
             >
                {views.map(
                   ({ key, component: View, skeleton: Skeleton }, index) => (
@@ -592,7 +598,7 @@ const Content: FC<ContentProps> = ({
                         sx={styles.fullHeight}
                         key={key}
                         value={index}
-                        activeValue={value}
+                        activeValue={activeViewIndex}
                      >
                         {livestream ? <View /> : <Skeleton />}
                      </AnimatedTabPanel>
@@ -687,7 +693,12 @@ type DialogContextType = {
    setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
 }
 
-const getPageIndex = (page: Props["page"]): number => {
+/**
+ * Converts a page type to its corresponding view index in the views array.
+ * This is used to determine which view should be displayed when a specific page
+ * is requested (either via URL or direct navigation).
+ */
+const getActiveViewIndexFromPage = (page: DialogPageType): number => {
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")

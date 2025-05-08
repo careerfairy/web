@@ -185,9 +185,9 @@ export const GetNotifiedCardPresentation = ({
                width: `${
                   isDesktop ? (isExpanded ? 570 : 402) : 343
                }px !important`,
-               maxHeight: getCardMaxHeight(),
-               height: "100%",
-               minHeight: 400,
+               height: getCardMaxHeight(),
+               // height: "100%",
+               // minHeight: 400,
             },
             sx
          )}

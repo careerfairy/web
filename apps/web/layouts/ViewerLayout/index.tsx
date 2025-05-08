@@ -410,7 +410,7 @@ const ViewerLayout = (props) => {
             serverSideLivestream={currentLivestream}
             livestreamId={currentLivestream.id}
             handleClose={() => {}}
-            page={"register"}
+            initialPage={"register"}
             mode="stand-alone"
             onRegisterSuccess={onRegistrationQuestionsAnswered}
          />

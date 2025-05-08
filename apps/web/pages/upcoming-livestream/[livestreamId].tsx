@@ -399,7 +399,7 @@ const UpcomingLivestreamPage = ({
                serverSideLivestream={stream}
                livestreamId={stream.id}
                handleClose={handleCloseDialog}
-               page={"register"}
+               initialPage={"register"}
                mode="stand-alone"
             />
          </UpcomingLayout>
