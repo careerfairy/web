@@ -12,7 +12,7 @@ const BrandedSwipeableDrawer = styled((props: SwipeableDrawerProps) => (
          marginTop: "10px",
          marginBottom: "10px",
          width: "92px",
-         height: "7px",
+         height: "7.322px",
          backgroundColor: "rgb(149, 149, 149)",
          borderRadius: "10px",
       },
