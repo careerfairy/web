@@ -219,7 +219,7 @@ const RegisterAskQuestionsView = () => {
                size="medium"
                fullWidth={isMobile}
                onClick={handleStartSuccessAnimation}
-               color="secondary"
+               color="primary"
             >
                Finish registration
             </Button>

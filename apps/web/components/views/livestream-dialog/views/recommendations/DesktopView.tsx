@@ -1,10 +1,18 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
-import { Box, Stack, styled, Typography } from "@mui/material"
+import {
+   Box,
+   IconButton,
+   IconButtonProps,
+   Stack,
+   styled,
+   Typography,
+} from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { Fragment, useState } from "react"
+import { X as CloseIcon } from "react-feather"
 import { useLiveStreamDialog } from "../.."
 import { EventsGrid } from "./EventsGrid"
 import { GetNotifiedCard } from "./GetNotifiedCard"
@@ -45,30 +53,44 @@ const CardContainer = styled(Box, {
    overflowX: "hidden",
    width: expanded ? "auto" : "100%",
    flexShrink: expanded ? 0 : 1,
-   paddingRight: expanded ? theme.spacing(4) : 0,
+   paddingRight: expanded ? theme.spacing(2) : 0,
 }))
 
 const CardContainerInner = styled(Box, {
-   shouldForwardProp: (prop) => prop !== "expanded",
-})<{ expanded: boolean }>(({ expanded }) => ({
-   paddingBottom: expanded ? PADDING : 20,
-   paddingTop: expanded ? PADDING : 20,
-   height: "100%",
-}))
+   shouldForwardProp: (prop) => prop !== "isRecommendationsListVisible",
+})<{ isRecommendationsListVisible: boolean }>(
+   ({ isRecommendationsListVisible }) => ({
+      paddingBottom: isRecommendationsListVisible ? PADDING : 0,
+      paddingTop: isRecommendationsListVisible ? PADDING : 50,
+      height: "100%",
+   })
+)
 
 const LoadingContainer = styled(Box)({
    position: "absolute",
-   bottom: 30,
+   bottom: 20,
    left: "50%",
    transform: "translateX(-50%)",
 })
 
-const RecommendationsContainer = styled(motion.div)({
+const RecommendationsContainer = styled(motion.div)(({ theme }) => ({
    display: "flex",
    flexDirection: "column",
    alignItems: "center",
    width: "100%",
    paddingTop: PADDING,
+   paddingLeft: theme.spacing(2),
+}))
+
+const CloseButton = styled((props: IconButtonProps) => (
+   <IconButton {...props}>
+      <CloseIcon />
+   </IconButton>
+))({
+   position: "absolute",
+   top: 24,
+   right: 24,
+   padding: 4,
 })
 
 export const DesktopView = () => {
@@ -76,6 +98,7 @@ export const DesktopView = () => {
       livestream,
       setIsRecommendationsListVisible,
       isRecommendationsListVisible,
+      closeDialog,
    } = useLiveStreamDialog()
 
    const { events, loading: loadingEvents } = useRecommendedEvents({
@@ -89,38 +112,43 @@ export const DesktopView = () => {
    )
 
    return (
-      <Layout
-         expanded={isRecommendationsListVisible}
-         paddingBottom={isRecommendationsListVisible ? 0 : 0}
-      >
-         <CardContainer
-            data-testid="get-notified-card-container"
+      <Fragment>
+         <CloseButton onClick={closeDialog} />
+         <Layout
             expanded={isRecommendationsListVisible}
+            paddingBottom={isRecommendationsListVisible ? 0 : 0}
          >
-            <CardContainerInner expanded={isRecommendationsListVisible}>
-               <GetNotifiedCard
-                  isExpanded={!isRecommendationsListVisible}
-                  livestream={livestream}
-                  animateLayout
-               />
-               {isRecommendationsListVisible ? null : (
-                  <Box data-testid="loading-indicator-offset" height={100} />
-               )}
-            </CardContainerInner>
-         </CardContainer>
-         {Boolean(isRecommendationsListVisible) && (
-            <Recommendations events={events} loading={loadingEvents} />
-         )}
-         {!shouldHideLoaderOnInitialMount && (
-            <LoadingContainer>
-               <LoadingIndicator
-                  onProgressComplete={() =>
-                     setIsRecommendationsListVisible(true)
-                  }
-               />
-            </LoadingContainer>
-         )}
-      </Layout>
+            <CardContainer
+               data-testid="get-notified-card-container"
+               expanded={isRecommendationsListVisible}
+            >
+               <CardContainerInner
+                  isRecommendationsListVisible={isRecommendationsListVisible}
+               >
+                  <GetNotifiedCard
+                     isExpanded={!isRecommendationsListVisible}
+                     livestream={livestream}
+                     animateLayout
+                  />
+                  {isRecommendationsListVisible ? null : (
+                     <Box data-testid="loading-indicator-offset" height={85} />
+                  )}
+               </CardContainerInner>
+            </CardContainer>
+            {Boolean(isRecommendationsListVisible) && (
+               <Recommendations events={events} loading={loadingEvents} />
+            )}
+            {!shouldHideLoaderOnInitialMount && (
+               <LoadingContainer>
+                  <LoadingIndicator
+                     onProgressComplete={() =>
+                        setIsRecommendationsListVisible(true)
+                     }
+                  />
+               </LoadingContainer>
+            )}
+         </Layout>
+      </Fragment>
    )
 }
 
