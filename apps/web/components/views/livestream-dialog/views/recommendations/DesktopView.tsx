@@ -33,7 +33,7 @@ const Layout = styled(Box, {
 
 const CardContainer = styled(Box, {
    shouldForwardProp: (prop) => prop !== "expanded",
-})<{ expanded: boolean }>(({ expanded }) => ({
+})<{ expanded: boolean }>(({ expanded, theme }) => ({
    position: "sticky",
    display: "flex",
    flexDirection: "column",
@@ -45,6 +45,7 @@ const CardContainer = styled(Box, {
    overflowX: "hidden",
    width: expanded ? "auto" : "100%",
    flexShrink: expanded ? 0 : 1,
+   paddingRight: expanded ? theme.spacing(4) : 0,
 }))
 
 const CardContainerInner = styled(Box, {
@@ -62,14 +63,13 @@ const LoadingContainer = styled(Box)({
    transform: "translateX(-50%)",
 })
 
-const RecommendationsContainer = styled(motion.div)(({ theme }) => ({
+const RecommendationsContainer = styled(motion.div)({
    display: "flex",
    flexDirection: "column",
    alignItems: "center",
-   paddingLeft: theme.spacing(4),
    width: "100%",
    paddingTop: PADDING,
-}))
+})
 
 export const DesktopView = () => {
    const {
