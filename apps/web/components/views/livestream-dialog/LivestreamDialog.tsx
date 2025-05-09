@@ -210,7 +210,7 @@ const LivestreamDialog: FC<Props> = ({
    open,
    livestreamId,
    appear,
-   initialPage: page = "details",
+   initialPage = "details",
    ...rest
 }) => {
    const isMobile = useIsMobile()
@@ -227,7 +227,7 @@ const LivestreamDialog: FC<Props> = ({
     * view is currently displayed to the user.
     */
    const [activeViewIndex, setActiveViewIndex] = useState<number>(
-      getActiveViewIndexFromPage(page)
+      getActiveViewIndexFromPage(initialPage)
    )
    const activeView = views[activeViewIndex].key
    const previousValue = usePreviousDistinct(activeViewIndex)
@@ -236,8 +236,8 @@ const LivestreamDialog: FC<Props> = ({
    // Using useEffect to update the view based on 'page'.
    // This allows conditional navigation not covered by useMemo.
    useEffect(() => {
-      setActiveViewIndex(getActiveViewIndexFromPage(page))
-   }, [page])
+      setActiveViewIndex(getActiveViewIndexFromPage(initialPage))
+   }, [initialPage])
 
    return (
       <AnimatedBackgroundProvider
@@ -285,7 +285,7 @@ const LivestreamDialog: FC<Props> = ({
    )
 }
 
-type ContentProps = Omit<Props, "open" | "page"> & {
+type ContentProps = Omit<Props, "open" | "initialPage"> & {
    activeViewIndex: number
    activeView: ViewKey
    setActiveViewIndex: Dispatch<SetStateAction<number>>
