@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
-import { Group } from "../groups"
+import { Group, GroupOption } from "../groups"
 import { UserData } from "../users"
 import { CUSTOM_JOB_CONSTANTS } from "./constants"
 /**
@@ -26,6 +26,8 @@ export interface CustomJob extends Identifiable {
 
    // optional fields
    jobType?: JobType
+   workplace?: CustomJobWorkplace
+   jobLocation?: GroupOption[]
    salary?: string
    deleted?: boolean
    /**
@@ -55,6 +57,9 @@ export type PublicCustomJob = Pick<
    | "livestreams"
    | "sparks"
    | "isPermanentlyExpired"
+   | "group"
+   | "workplace"
+   | "jobLocation"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -79,6 +84,29 @@ export const jobTypeOptions = [
    { value: "Internship", label: "Internship", id: "Internship" },
 ]
 
+export type CustomJobWorkplace = "on-site" | "hybrid" | "remote"
+
+export const workplaceOptionsMap: WorkplaceOptionsRecord = {
+   "on-site": { value: "on-site", label: "On-site", id: "on-site" },
+   hybrid: { value: "hybrid", label: "Hybrid", id: "hybrid" },
+   remote: { value: "remote", label: "Remote", id: "remote" },
+} as const
+
+export const workplaceOptions: {
+   value: CustomJobWorkplace
+   label: string
+   id: CustomJobWorkplace
+}[] = [
+   workplaceOptionsMap["on-site"],
+   workplaceOptionsMap["hybrid"],
+   workplaceOptionsMap["remote"],
+]
+
+export type WorkplaceOptionsRecord = Record<
+   CustomJobWorkplace,
+   { value: CustomJobWorkplace; label: string; id: CustomJobWorkplace }
+>
+
 export const pickPublicDataFromCustomJob = (
    job: CustomJob
 ): PublicCustomJob => {
@@ -97,6 +125,9 @@ export const pickPublicDataFromCustomJob = (
       livestreams: job.livestreams ?? [],
       sparks: job.sparks ?? [],
       isPermanentlyExpired: job.isPermanentlyExpired ?? false,
+      group: job.group ?? null,
+      workplace: job.workplace ?? null,
+      jobLocation: job.jobLocation ?? [],
    }
 }
 

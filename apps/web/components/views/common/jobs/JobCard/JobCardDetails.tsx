@@ -5,13 +5,15 @@ import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import { Box, Grid, SxProps, Tooltip, Typography } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { useAuth } from "HOCs/AuthProvider"
+import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { DateTime } from "luxon"
 import { useMemo } from "react"
-import { AlertCircle, Briefcase, Globe, Zap } from "react-feather"
+import { AlertCircle, Briefcase, Globe, MapPin, Zap } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { isJobValidButNoLinkedContent } from "../utils"
@@ -136,6 +138,15 @@ const JobCardDetails = ({
 
    const jobApplication = useUserJobApplication(userData?.id, job.id)
 
+   const {
+      locationText: jobLocation,
+      othersCount,
+      otherLocations,
+      workplaceText,
+   } = useCustomJobLocation(job as CustomJob, {
+      maxLocationsToShow: isMobile ? 1 : 3,
+   })
+
    const showWarning = useMemo(
       () => !isAtsJob && isJobValidButNoLinkedContent(job),
       [isAtsJob, job]
@@ -147,7 +158,6 @@ const JobCardDetails = ({
    let jobPostingUrl: string
    let jobPublished: boolean
    let jobBusinessTags: string
-
    let jobIsPermanentlyExpired: boolean
 
    if (isAtsJob) {
@@ -250,6 +260,33 @@ const JobCardDetails = ({
                   </Box>
                ) : null}
 
+               {jobLocation ? (
+                  <Box sx={styles.subtitleItem}>
+                     <MapPin width={smallCard ? 12 : 14} />
+                     {jobLocation}
+                     {othersCount ? (
+                        <BrandedTooltip
+                           title={otherLocations
+                              .map((location) => location.name)
+                              .join(", ")}
+                           wrapperStyles={{
+                              display: "inline",
+                           }}
+                        >
+                           <Typography
+                              variant={"subtitle1"}
+                              sx={{ display: "inline", ml: "0px !important" }}
+                           >{`, +${othersCount}`}</Typography>
+                        </BrandedTooltip>
+                     ) : null}
+                     {workplaceText ? (
+                        <Typography
+                           variant={"subtitle1"}
+                           sx={{ display: "inline", ml: "0px !important" }}
+                        >{`${workplaceText}`}</Typography>
+                     ) : null}
+                  </Box>
+               ) : null}
                {!hideJobUrl ? (
                   <Box sx={styles.subtitleItem}>
                      <Globe width={smallCard ? 12 : 14} />

@@ -2,10 +2,10 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Stack } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import JobHeader from "components/views/livestream-dialog/views/job-details/main-content/JobHeader"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
 import SanitizedHTML from "../../../../util/SanitizedHTML"
+import CustomJobHeader from "../custom-jobs/CustomJobHeader"
 import LinkedContentDetails from "./LinkedContentDetails"
 
 const styles = sxStyles({
@@ -47,15 +47,15 @@ const CustomJobAdminDetails = ({
       ? DateUtil.formatDateToString(deadline.toDate())
       : ""
 
-
    return (
       <Box sx={styles.wrapper}>
-         <JobHeader
+         <CustomJobHeader
             job={job}
             companyName={companyName}
             companyLogoUrl={companyLogoUrl}
             editMode={!!handleEdit}
             handleClick={handleEdit}
+            maxLocationsToShow={1}
          />
 
          <Box sx={styles.content}>
