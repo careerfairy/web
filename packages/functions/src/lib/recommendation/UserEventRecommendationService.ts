@@ -86,6 +86,14 @@ export default class UserEventRecommendationService
             return false
          }
 
+         // Filter out the reference livestream if it exists
+         if (
+            this.referenceLivestream &&
+            livestream.id === this.referenceLivestream.id
+         ) {
+            return false
+         }
+
          return true
       })
 
@@ -145,7 +153,6 @@ export default class UserEventRecommendationService
       if (refIndustry.length === 0) return []
 
       return this.filteredLivestreams
-         .filter((livestream) => livestream.id !== this.referenceLivestream.id)
          .map((livestream) =>
             RankedLivestreamEvent.createWithReferencePoints(
                livestream,

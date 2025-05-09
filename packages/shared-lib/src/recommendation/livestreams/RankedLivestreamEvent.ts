@@ -183,7 +183,7 @@ export class RankedLivestreamEvent {
     * Helper method to check if two arrays have any matching elements
     */
    private hasMatchingTag(tags1: string[], tags2: string[]): boolean {
-      if (!tags1 || !tags2 || tags1.length === 0 || tags2.length === 0) {
+      if (!tags1?.length || !tags2?.length) {
          return false
       }
       return tags1.some((tag) => tags2.includes(tag))
