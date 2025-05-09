@@ -15,6 +15,7 @@ import { UserRecord } from "firebase-admin/auth"
 import { onCall } from "firebase-functions/v2/https"
 import { FieldValue, Timestamp, auth, firestore } from "./api/firestoreAdmin"
 import {
+   customJobRepo,
    groupRepo,
    marketingUsersRepo,
    notificationService,
@@ -127,6 +128,19 @@ export const createNewUserAccount = onCall(async (request) => {
             await studyBackgroundRef.set(studyBackground)
          }
 
+         if (additionalData?.savedJobId) {
+            const customJob = await customJobRepo.getCustomJobById(
+               additionalData.savedJobId
+            )
+
+            const savedJobRef = firestore
+               .collection("userData")
+               .doc(recipientEmail)
+               .collection("savedJobs")
+               .doc(additionalData.savedJobId)
+
+            await savedJobRef.set(customJob)
+         }
          try {
             await marketingUsersRepo.delete(recipientEmail)
          } catch (e) {

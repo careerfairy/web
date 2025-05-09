@@ -56,6 +56,7 @@ const CustomJobAdminDetails = ({
             editMode={!!handleEdit}
             handleClick={handleEdit}
             maxLocationsToShow={1}
+            isAdmin
          />
 
          <Box sx={styles.content}>
