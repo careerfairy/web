@@ -3,6 +3,8 @@ import {
    CustomJobApplicationSource,
    CustomJobApplicationSourceTypes,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { CloseOutlined } from "@mui/icons-material"
+import { Box, IconButton } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobDetailsDialog from "components/views/common/jobs/CustomJobDetailsDialog"
 import { fromDate } from "data/firebase/FirebaseInstance"
@@ -103,6 +105,20 @@ export const CustomJobDialogLayout: FC<Props> = ({
             isOpen={dialogOpen}
             onClose={handleClose}
             source={source}
+            heroContent={
+               !isMobile ? (
+                  <Box
+                     display={"flex"}
+                     flexDirection={"row-reverse"}
+                     p={0}
+                     m={0}
+                  >
+                     <IconButton onClick={handleClose}>
+                        <CloseOutlined />
+                     </IconButton>
+                  </Box>
+               ) : null
+            }
             heroSx={{ m: 0, py: "0px !important", px: "10px !important" }}
             paperPropsSx={hasPaperProps ? styles.profilePaperProps : null}
             hideApplicationConfirmation={hideApplicationConfirmation}
