@@ -55,7 +55,7 @@ const config: UpdateDocumentsConfig<CustomJob> = {
    dryRun: false, // Set to false to run the migration
    customDataFilter: (customJob) => {
       return typeof customJob?.deleted !== "boolean"
-   },
+   }
 }
 
 const getTotalDocumentCount = async (query: Query) => {
@@ -151,6 +151,7 @@ export async function run() {
          if (!config.dryRun) {
             await bulkWriter.flush()
          }
+
          await wait(config.waitTimeBetweenBatches ?? 5000)
       }
 
