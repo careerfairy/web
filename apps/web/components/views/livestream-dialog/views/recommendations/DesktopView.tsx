@@ -107,6 +107,7 @@ export const DesktopView = () => {
 
    const { events, loading: loadingEvents } = useRecommendedEvents({
       bypassCache: true,
+      referenceLivestreamId: livestream.id,
    })
 
    // Skip 6 seconds loader animation when returning to this view (when hitting back button or going back in browser history)

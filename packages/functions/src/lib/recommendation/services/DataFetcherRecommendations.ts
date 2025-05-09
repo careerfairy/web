@@ -48,6 +48,11 @@ export interface IRecommendationDataFetcher {
    getUserLanguages(): Promise<ProfileLanguage[]>
 
    getUserFeaturedGroups(user: UserData): Promise<Group[]>
+   /**
+    * Get the reference livestream if one was specified
+    * @returns Promise containing the reference livestream or null if none was specified
+    */
+   getReferenceLivestream(): Promise<LivestreamEvent | null>
 }
 
 /**
@@ -131,6 +136,10 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
 
       return new NewsletterDataFetcher(loader)
    }
+
+   async getReferenceLivestream(): Promise<LivestreamEvent | null> {
+      throw new Error("Not implemented")
+   }
 }
 
 /**
@@ -140,14 +149,34 @@ export class NewsletterDataFetcher implements IRecommendationDataFetcher {
  */
 export class UserDataFetcher implements IRecommendationDataFetcher {
    private loader: BundleLoader
+
    constructor(
       private readonly userId: string,
       private readonly livestreamRepo: ILivestreamRepository,
       private readonly userRepo: IUserRepository,
       private readonly sparksRepo: ISparkFunctionsRepository,
-      private readonly groupRepo: IGroupRepository
+      private readonly groupRepo: IGroupRepository,
+      private readonly options: {
+         /**
+          * Reference livestream ID for similarity-based recommendations.
+          * When provided, recommendations will prioritize livestreams matching
+          * this one's industry and location.
+          */
+         referenceLivestreamId?: string
+      } = {}
    ) {
       this.loader = new BundleLoader()
+   }
+
+   /**
+    * Fetches the reference livestream if an ID was provided.
+    * Used by the recommendation engine to prioritize similar events.
+    *
+    * @returns The reference livestream or null if none was specified
+    */
+   async getReferenceLivestream(): Promise<LivestreamEvent | null> {
+      if (!this.options.referenceLivestreamId) return null
+      return this.livestreamRepo.getById(this.options.referenceLivestreamId)
    }
 
    async getUser(): Promise<UserData> {
