@@ -98,7 +98,6 @@ export type DialogSetting = keyof typeof AllDialogSettings
 type Props = {
    serverSideLivestream?: LivestreamEvent
    livestreamId: string
-   setLocalLivestreamId: Dispatch<SetStateAction<string>>
    handleClose: () => void
    open: boolean
    initialPage: DialogPageType
@@ -308,6 +307,7 @@ type ContentProps = Omit<Props, "open" | "initialPage"> & {
    previousView: ViewKey
    isRecommendationsListVisible: boolean
    setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
+   setLocalLivestreamId: Dispatch<SetStateAction<string>>
 }
 
 const Content: FC<ContentProps> = ({
