@@ -21,7 +21,7 @@ import {
    useState,
 } from "react"
 import SwipeableViews from "react-swipeable-views"
-import { usePrevious } from "react-use"
+import { usePrevious, usePreviousDistinct } from "react-use"
 import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { sxStyles } from "../../../types/commonTypes"
@@ -98,6 +98,7 @@ export type DialogSetting = keyof typeof AllDialogSettings
 type Props = {
    serverSideLivestream?: LivestreamEvent
    livestreamId: string
+   setLocalLivestreamId: Dispatch<SetStateAction<string>>
    handleClose: () => void
    open: boolean
    initialPage: DialogPageType
@@ -213,6 +214,20 @@ const LivestreamDialog: FC<Props> = ({
    initialPage = "details",
    ...rest
 }) => {
+   /**
+    * Maintains an internal state of the current livestream being displayed.
+    * This allows the dialog to manage its own livestream state independently of props,
+    * which is critical for handling navigation between different livestreams,
+    * especially in "stand-alone" mode where URL doesn't change.
+    */
+   const [localLivestreamId, setLocalLivestreamId] = useState<string | null>(
+      livestreamId
+   )
+
+   useEffect(() => {
+      setLocalLivestreamId(livestreamId)
+   }, [livestreamId])
+
    const isMobile = useIsMobile()
    const onClose = useCallback(() => {
       handleClose()
@@ -262,10 +277,11 @@ const LivestreamDialog: FC<Props> = ({
             PaperProps={PaperProps}
          >
             <DialogContent sx={styles.content}>
-               {livestreamId ? (
+               {localLivestreamId ? (
                   <Content
                      handleClose={onClose}
-                     livestreamId={livestreamId}
+                     livestreamId={localLivestreamId}
+                     setLocalLivestreamId={setLocalLivestreamId}
                      activeViewIndex={activeViewIndex}
                      activeView={activeView}
                      setActiveViewIndex={setActiveViewIndex}
@@ -301,6 +317,7 @@ const Content: FC<ContentProps> = ({
    serverUserEmail,
    onRegisterSuccess,
    livestreamId,
+   setLocalLivestreamId,
    mode = "page",
    currentSparkId,
    jobId,
@@ -314,6 +331,12 @@ const Content: FC<ContentProps> = ({
    setIsRecommendationsListVisible,
 }) => {
    const router = useRouter()
+   /**
+    * Tracks the previous livestream ID before it changes.
+    * Essential for the back navigation in "stand-alone" mode to restore
+    * the previous livestream when navigating between recommendations.
+    */
+   const previousLivestreamId = usePreviousDistinct(livestreamId)
    const { push, query, replace } = router
 
    /**
@@ -483,6 +506,16 @@ const Content: FC<ContentProps> = ({
          activeView === "livestream-details" &&
          previousView === "recommendations"
       ) {
+         /**
+          * In "stand-alone" mode, we need to manually restore the previous livestream
+          * when navigating back from recommendations to details view.
+          * This allows users to return to their original livestream after browsing
+          * recommendations, without relying on URL/router state which isn't updated
+          * in standalone mode.
+          */
+         if (mode === "stand-alone") {
+            setLocalLivestreamId(previousLivestreamId)
+         }
          setIsRecommendationsListVisible(true)
          goToRecommendations()
          return
@@ -501,6 +534,9 @@ const Content: FC<ContentProps> = ({
       onClose,
       setIsRecommendationsListVisible,
       goToRecommendations,
+      mode,
+      setLocalLivestreamId,
+      previousLivestreamId,
    ])
 
    const [registrationState, registrationDispatch] = useReducer(
