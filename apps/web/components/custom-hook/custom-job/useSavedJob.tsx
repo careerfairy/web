@@ -4,6 +4,8 @@ import useSWRMutation from "swr/mutation"
 
 import { useRouter } from "next/router"
 import { useCallback } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerCustomJobEvent } from "util/analyticsUtils"
 import { customJobRepo } from "../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../useSnackbarNotifications"
 import { useFirestoreDocument } from "../utils/useFirestoreDocument"
@@ -36,7 +38,19 @@ export const useSavedJob = (customJob: CustomJob) => {
             return
          }
          if (!isSaved) {
-            return await customJobRepo.saveCustomJob(userData.id, customJob)
+            return await customJobRepo
+               .saveCustomJob(userData.id, customJob)
+               .then(() => {
+                  dataLayerCustomJobEvent(
+                     AnalyticsEvents.CustomJobSave,
+                     customJob,
+                     customJob?.group?.universityName,
+                     {
+                        userAuthId: userData.authId,
+                        savedAt: new Date().toISOString(),
+                     }
+                  )
+               })
          } else {
             return await customJobRepo.removeSavedCustomJob(
                userData.id,
