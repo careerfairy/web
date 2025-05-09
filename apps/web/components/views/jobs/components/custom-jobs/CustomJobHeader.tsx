@@ -15,6 +15,7 @@ import { Briefcase, Edit, MapPin, Zap } from "react-feather"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
+import { CustomJobHeaderActions } from "./CustomJobHeaderActions"
 
 const styles = sxStyles({
    header: {
@@ -100,6 +101,7 @@ type Props = {
    editMode?: boolean
    handleClick?: () => void
    maxLocationsToShow?: number
+   isAdmin?: boolean
 }
 
 const CustomJobHeader = ({
@@ -109,6 +111,7 @@ const CustomJobHeader = ({
    editMode,
    handleClick,
    maxLocationsToShow,
+   isAdmin,
 }: Props) => {
    const isMobile = useIsMobile()
    const { push } = useRouter()
@@ -159,30 +162,40 @@ const CustomJobHeader = ({
                   {companyLogoUrl && companyName ? (
                      <Stack
                         direction={"row"}
-                        alignItems={"center"}
-                        spacing={1}
-                        mb={"8px"}
-                        sx={styles.headerCompanyLink}
-                        onClick={() => {
-                           push(
-                              makeGroupCompanyPageUrl(companyName, {
-                                 interactionSource:
-                                    InteractionSources.Job_Header,
-                              })
-                           )
-                        }}
+                        justifyContent={"space-between"}
+                        width={"100%"}
                      >
-                        <CircularLogo
-                           src={getResizedUrl(companyLogoUrl, "lg")}
-                           alt={`company ${companyName} logo`}
-                           size={44}
-                        />
-                        <Typography
-                           variant={isMobile ? "small" : "medium"}
-                           sx={styles.groupName}
+                        <Stack
+                           direction={"row"}
+                           alignItems={"center"}
+                           spacing={1}
+                           mb={"8px"}
+                           sx={styles.headerCompanyLink}
+                           onClick={() => {
+                              push(
+                                 makeGroupCompanyPageUrl(companyName, {
+                                    interactionSource:
+                                       InteractionSources.Job_Header,
+                                 })
+                              )
+                           }}
                         >
-                           {companyName}
-                        </Typography>
+                           <CircularLogo
+                              src={getResizedUrl(companyLogoUrl, "lg")}
+                              alt={`company ${companyName} logo`}
+                              size={44}
+                           />
+                           <Typography
+                              variant={isMobile ? "small" : "medium"}
+                              sx={styles.groupName}
+                           >
+                              {companyName}
+                           </Typography>
+                        </Stack>
+                        <CustomJobHeaderActions
+                           customJob={job as CustomJob}
+                           isAdmin={isAdmin}
+                        />
                      </Stack>
                   ) : null}
                   <Typography variant={"brandedH3"} sx={styles.jobTitle}>
