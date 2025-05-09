@@ -506,18 +506,16 @@ const Content: FC<ContentProps> = ({
          activeView === "livestream-details" &&
          previousView === "recommendations"
       ) {
-         /**
-          * In "stand-alone" mode, we need to manually restore the previous livestream
-          * when navigating back from recommendations to details view.
-          * This allows users to return to their original livestream after browsing
-          * recommendations, without relying on URL/router state which isn't updated
-          * in standalone mode.
-          */
-         if (mode === "stand-alone") {
-            setLocalLivestreamId(previousLivestreamId)
-         }
          setIsRecommendationsListVisible(true)
          goToRecommendations()
+         /**
+          * Restore the previous livestream when manually navigating back(not using browser back button) from recommendations to details view.
+          * Using setTimeout to delay the ID change until after view transition animations complete.
+          * This prevents visual glitches and ensures a smooth transition between different livestreams.
+          */
+         setTimeout(() => {
+            setLocalLivestreamId(previousLivestreamId)
+         }, 250)
          return
       }
 
@@ -534,7 +532,6 @@ const Content: FC<ContentProps> = ({
       onClose,
       setIsRecommendationsListVisible,
       goToRecommendations,
-      mode,
       setLocalLivestreamId,
       previousLivestreamId,
    ])
