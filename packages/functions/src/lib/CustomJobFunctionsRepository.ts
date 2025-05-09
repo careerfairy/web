@@ -123,7 +123,7 @@ export class CustomJobFunctionsRepository
          .doc(newCustomJob.id)
 
       functions.logger.log(
-         `Create CustomJobStats for the job ${newCustomJob.id}.`
+         `Create CustomJobStats for the job ${newCustomJob.id}. Group: ${newCustomJob.groupId}`
       )
 
       const newJobStat: CustomJobStats = {
@@ -359,26 +359,7 @@ export class CustomJobFunctionsRepository
       const batch = this.firestore.batch()
 
       const toUpdate: Pick<CustomJob, "group"> = {
-         group: {
-            ...newGroup,
-            ...(newGroup?.plan
-               ? {
-                    plan: {
-                       ...newGroup.plan,
-                       startedAt: newGroup.plan.startedAt
-                          ? Timestamp.fromMillis(
-                               newGroup.plan.startedAt.toMillis()
-                            )
-                          : null,
-                       expiresAt: newGroup.plan.expiresAt
-                          ? Timestamp.fromMillis(
-                               newGroup.plan.expiresAt.toMillis()
-                            )
-                          : null,
-                    },
-                 }
-               : {}),
-         },
+         group: newGroup,
       }
 
       customJobsSnap.forEach((doc) => {

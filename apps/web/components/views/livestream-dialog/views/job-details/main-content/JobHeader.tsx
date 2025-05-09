@@ -5,7 +5,7 @@ import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { FC } from "react"
-import { Briefcase, Edit, MapPin as LocationIcon, Zap } from "react-feather"
+import { Briefcase, Edit, Zap } from "react-feather"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
@@ -92,14 +92,10 @@ const JobHeader = ({
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
 
-   let jobName: string,
-      jobLocation: string,
-      jobType: string,
-      jobBusinessFunctionsTagIds: string[]
+   let jobName: string, jobType: string, jobBusinessFunctionsTagIds: string[]
 
    if (isAtsJob) {
       jobName = job.name
-      jobLocation = job.getLocation()
       jobType = job.getDepartment()
    } else {
       jobName = job.title
@@ -158,16 +154,6 @@ const JobHeader = ({
                            >
                               <Zap width={14} />
                               {jobBusinessFunctionsTagIds.join(", ")}
-                           </Typography>
-                        ) : null}
-
-                        {jobLocation ? (
-                           <Typography
-                              variant={"subtitle1"}
-                              sx={styles.details}
-                           >
-                              <LocationIcon width={14} />
-                              {jobLocation}
                            </Typography>
                         ) : null}
                      </Box>

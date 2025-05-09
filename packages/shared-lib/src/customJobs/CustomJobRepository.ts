@@ -219,7 +219,6 @@ export class FirebaseCustomJobRepository
          id: ref.id,
          published: isPublished,
          isPermanentlyExpired: false,
-         group: null,
          deleted: false,
       }
 

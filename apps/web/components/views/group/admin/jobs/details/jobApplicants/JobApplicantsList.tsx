@@ -1,19 +1,20 @@
-import { Button, Grid, ListItem, Stack } from "@mui/material"
-import React, { FC } from "react"
-import { useDownloadCV } from "../../../common/table/hooks"
-import Link from "components/views/common/Link"
-import { LoadingButton } from "@mui/lab"
 import DownloadIcon from "@mui/icons-material/CloudDownloadOutlined"
+import { LoadingButton } from "@mui/lab"
+import { Button, Grid, ListItem, Stack } from "@mui/material"
+import Link from "components/views/common/Link"
+import { FC } from "react"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
-import DesktopApplicantItem from "./DesktopApplicantItem"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
+import { UserDataEntry } from "../../../common/table/UserLivestreamDataTable"
+import { useDownloadCV } from "../../../common/table/hooks"
+import DesktopApplicantItem from "./DesktopApplicantItem"
 import MobileApplicantItem from "./MobileApplicantItem"
 
 const styles = sxStyles({
    listItem: {
-      background: "white",
+      background: (theme) => theme.brand.white[200],
       borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
       padding: 2,
       height: { md: "80px" },
       alignItems: "center",
@@ -44,7 +45,7 @@ type Props = {
 
 const JobApplicantsList: FC<Props> = ({ applicants }) => {
    return (
-      <Stack spacing={2} my={3}>
+      <Stack spacing={2}>
          {applicants.map((user) => (
             <ApplicationItem key={user.email} applicant={user} />
          ))}

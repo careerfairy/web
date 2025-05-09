@@ -129,8 +129,8 @@ const JobCard = ({
                   <Grid
                      item
                      xs={12}
-                     md={smallCard ? 12 : previewMode ? 9 : 4.5}
-                     lg={smallCard ? 12 : previewMode ? 9.5 : 5.5}
+                     md={smallCard ? 12 : 9}
+                     lg={smallCard ? 12 : 9}
                      sx={styles.infoWrapper}
                   >
                      <JobCardDetails

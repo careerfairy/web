@@ -17,6 +17,7 @@ import {
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 import GBLocale from "date-fns/locale/en-GB"
 import { Formik } from "formik"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo, useRef } from "react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -107,6 +108,7 @@ const CustomJobCreateOrEditFrom = ({
    job,
 }: Props) => {
    const quillInputRef = useRef()
+   const { group } = useGroup()
    const initialValues: CustomJobObj = useMemo(() => {
       // If the 'job' field is received, it indicates the intention to edit an existing job.
       if (job) {
@@ -126,9 +128,10 @@ const CustomJobCreateOrEditFrom = ({
          postingUrl: "",
          jobType: "",
          livestreams: [],
+         group: group,
          sparks: [],
       }
-   }, [groupId, job])
+   }, [groupId, job, group])
 
    return (
       <Box sx={styles.wrapper}>

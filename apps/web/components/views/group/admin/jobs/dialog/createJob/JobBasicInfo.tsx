@@ -1,14 +1,19 @@
 import { BusinessFunctionsTagValues } from "@careerfairy/shared-lib/constants/tags"
-import { jobTypeOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJobWorkplace,
+   jobTypeOptions,
+   workplaceOptions,
+   workplaceOptionsMap,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Grid } from "@mui/material"
-import BaseStyles from "components/views/admin/company-information/BaseStyles"
+import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
 import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
 import SteppedDialog, {
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
-import { useEffect, useState } from "react"
-import { useFormContext } from "react-hook-form"
+import { useEffect, useMemo, useState } from "react"
+import { useFormContext, useWatch } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
 import { useCustomJobForm } from "../CustomJobFormProvider"
 import { basicInfoSchema } from "./schemas"
@@ -47,13 +52,58 @@ const styles = sxStyles({
       width: { md: "700px" },
       height: { xs: "auto", md: "auto !important" },
    },
+   listBox: {
+      py: 0,
+      backgroundColor: "white",
+      borderRadius: "8px",
+      my: 1.5,
+      boxShadow: {
+         sm: "none",
+         md: "0px 4px 16px rgba(0, 0, 0, 0.08)",
+      },
+      "& .MuiAutocomplete-option": {
+         p: "16px",
+      },
+   },
+   chipInput: {
+      "& .MuiFilledInput-root": {
+         pb: 1,
+         pt: 3,
+      },
+      "& .MuiChip-label": {
+         fontSize: "14px",
+         fontWeight: "400",
+      },
+      "& .MuiChip-root": {
+         backgroundColor: "secondary.main",
+         color: "white",
+         m: 0.625,
+         "& svg": {
+            color: "inherit",
+         },
+      },
+      display: "grid",
+   },
+   noOptions: {
+      py: 2,
+      px: 2,
+      backgroundColor: "white",
+      borderRadius: "8px",
+      mx: -2,
+      boxShadow: {
+         sm: "none",
+         md: "0px 4px 16px rgba(0, 0, 0, 0.08)",
+      },
+   },
 })
+
+const NO_OPTIONS_TEXT = "No options"
 
 const JobBasicInfo = () => {
    const [stepIsValid, setStepIsValid] = useState(false)
-
+   const [searchValue, setSearchValue] = useState("")
    const { moveToNext } = useStepper()
-   const { watch } = useFormContext()
+   const { watch, setValue } = useFormContext()
 
    const { isSubmitting } = useCustomJobForm()
 
@@ -61,16 +111,48 @@ const JobBasicInfo = () => {
       "basicInfo.title",
       "basicInfo.jobType",
       "basicInfo.businessTags",
+      "basicInfo.jobLocation",
+      "basicInfo.workplace",
    ])
+
+   const jobLocations: { id: string; value: string }[] = useWatch({
+      name: "basicInfo.jobLocation",
+   })
+
+   const { data: locationOptions = [], isLoading: isSearching } =
+      useLocationSearch(searchValue)
+
+   const transformedLocationOptions = useMemo(() => {
+      const locations = locationOptions.map((option) => ({
+         id: option.id,
+         value: option.name,
+      }))
+
+      jobLocations?.forEach((location) => {
+         const locationOption = locations.find(
+            (option) => option.id === location.id
+         )
+         if (!locationOption) {
+            locations.push({
+               id: location.id,
+               value: location.value,
+            })
+         }
+      })
+
+      return locations
+   }, [locationOptions, jobLocations])
 
    // This effect validates the basic info fields and updates the step validity state
    useEffect(() => {
-      const [title, jobType, businessTags] = watchFields
+      const [title, jobType, businessTags, jobLocation, workplace] = watchFields
 
       const fieldsToValidate = {
          title,
          jobType,
          businessTags,
+         jobLocation,
+         workplace,
       }
 
       setStepIsValid(basicInfoSchema.isValidSync(fieldsToValidate))
@@ -104,23 +186,9 @@ const JobBasicInfo = () => {
                            fullWidth
                            requiredText="(required)"
                            disabled={isSubmitting}
+                           placeholder="E.g., Mechanical Engineer"
                         />
                      </Grid>
-
-                     <Grid xs={12} item>
-                        <ControlledBrandedAutoComplete
-                           label="Job Type"
-                           name="basicInfo.jobType"
-                           options={jobTypeOptions}
-                           autocompleteProps={{
-                              id: "jobType",
-                              disabled: isSubmitting,
-                              autoHighlight: true,
-                              disableClearable: true,
-                           }}
-                        />
-                     </Grid>
-
                      <Grid xs={12} item>
                         <ControlledBrandedAutoComplete
                            label="Business function"
@@ -134,13 +202,133 @@ const JobBasicInfo = () => {
                               disabled: isSubmitting,
                               autoHighlight: true,
                               disableCloseOnSelect: true,
+                              PaperComponent: ({ children }) => (
+                                 <Box>{children}</Box>
+                              ),
+                              ListboxProps: {
+                                 sx: styles.listBox,
+                              },
                               getOptionLabel: (option: any) =>
                                  option.name || "",
                               ChipProps: { color: "secondary" },
+                              noOptionsText: (
+                                 <Box sx={styles.noOptions}>
+                                    {NO_OPTIONS_TEXT}
+                                 </Box>
+                              ),
                            }}
                            textFieldProps={{
                               requiredText: "(required)",
-                              sx: BaseStyles.chipInput,
+                              placeholder: "Select an option",
+                              sx: styles.chipInput,
+                           }}
+                        />
+                     </Grid>
+                     <Grid xs={12} item>
+                        <ControlledBrandedAutoComplete
+                           label={"Job location"}
+                           name={"basicInfo.jobLocation"}
+                           options={transformedLocationOptions}
+                           multiple
+                           showCheckbox
+                           textFieldProps={{
+                              requiredText: null,
+                              placeholder: "Insert a location",
+                              sx: styles.chipInput,
+                           }}
+                           loading={isSearching}
+                           autocompleteProps={{
+                              id: "locationSearch",
+                              autoHighlight: true,
+                              disableCloseOnSelect: true,
+                              disabled: isSubmitting,
+                              disableClearable: true,
+                              loadingText: "Searching locations...",
+                              selectOnFocus: false,
+                              PaperComponent: ({ children }) => (
+                                 <Box>{children}</Box>
+                              ),
+                              ListboxProps: {
+                                 sx: styles.listBox,
+                              },
+                              noOptionsText: (
+                                 <Box sx={styles.noOptions}>
+                                    {NO_OPTIONS_TEXT}
+                                 </Box>
+                              ),
+                              onInputChange: (_, value) => {
+                                 setSearchValue(value)
+                              },
+                           }}
+                        />
+                     </Grid>
+                     <Grid xs={12} item>
+                        <ControlledBrandedAutoComplete
+                           label="Workplace"
+                           name="basicInfo.workplace"
+                           options={workplaceOptions}
+                           autocompleteProps={{
+                              id: "workplace",
+                              disabled: isSubmitting,
+                              autoHighlight: true,
+                              disableClearable: true,
+                              PaperComponent: ({ children }) => (
+                                 <Box>{children}</Box>
+                              ),
+                              ListboxProps: {
+                                 sx: styles.listBox,
+                              },
+                              getOptionLabel(option) {
+                                 if (typeof option === "string")
+                                    return (
+                                       workplaceOptionsMap[
+                                          option as CustomJobWorkplace
+                                       ]?.label || ""
+                                    )
+                                 return option?.label || ""
+                              },
+                              onChange: (
+                                 e,
+                                 value: {
+                                    id: CustomJobWorkplace
+                                    value: CustomJobWorkplace
+                                    label: string
+                                 }
+                              ) => {
+                                 e.preventDefault()
+                                 e.stopPropagation()
+
+                                 setValue("basicInfo.workplace", value?.id)
+                              },
+                              noOptionsText: (
+                                 <Box sx={styles.noOptions}>
+                                    {NO_OPTIONS_TEXT}
+                                 </Box>
+                              ),
+                           }}
+                        />
+                     </Grid>
+                     <Grid xs={12} item>
+                        <ControlledBrandedAutoComplete
+                           label="Job Type"
+                           name="basicInfo.jobType"
+                           options={jobTypeOptions}
+                           autocompleteProps={{
+                              id: "jobType",
+                              disabled: isSubmitting,
+                              autoHighlight: true,
+                              disableClearable: true,
+                              PaperComponent: ({ children }) => (
+                                 <Box>{children}</Box>
+                              ),
+                              ListboxProps: {
+                                 sx: styles.listBox,
+                              },
+                              noOptionsText: (
+                                 <Box sx={styles.noOptions}>
+                                    {NO_OPTIONS_TEXT}
+                                 </Box>
+                              ),
                            }}
                         />
                      </Grid>

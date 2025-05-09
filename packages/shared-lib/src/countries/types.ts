@@ -1,4 +1,4 @@
-import { ICity } from "country-state-city"
+import { ICity, ICountry, IState } from "country-state-city"
 
 export type CountryOption = {
    name: string
@@ -13,6 +13,23 @@ export type CityOption = {
 
 export const generateCityId = (city: ICity) => {
    return `${city.countryCode}-${city.stateCode}-${city.name}`
+}
+
+export const generateStateId = (state: IState) => {
+   return `${state.countryCode}-${state.isoCode}`
+}
+
+export const generateCountryId = (country: ICountry) => {
+   return country.isoCode
+}
+
+export const getLocationIds = (location: string) => {
+   const segments = location.split("-")
+   return {
+      countryIsoCode: segments?.at(0),
+      stateIsoCode: segments?.at(1),
+      cityName: segments?.at(2),
+   }
 }
 
 export const getCityCodes = (generatedCityId: string) => {
