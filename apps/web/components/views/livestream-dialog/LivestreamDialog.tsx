@@ -21,7 +21,7 @@ import {
    useState,
 } from "react"
 import SwipeableViews from "react-swipeable-views"
-import { usePreviousDistinct } from "react-use"
+import { usePrevious } from "react-use"
 import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { sxStyles } from "../../../types/commonTypes"
@@ -230,7 +230,7 @@ const LivestreamDialog: FC<Props> = ({
       getActiveViewIndexFromPage(initialPage)
    )
    const activeView = views[activeViewIndex].key
-   const previousValue = usePreviousDistinct(activeViewIndex)
+   const previousValue = usePrevious(activeViewIndex)
    const previousView = views[previousValue]?.key
 
    // Using useEffect to update the view based on 'page'.

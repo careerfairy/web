@@ -63,6 +63,10 @@ const CardContainerInner = styled(Box, {
       paddingBottom: isRecommendationsListVisible ? PADDING : 0,
       paddingTop: isRecommendationsListVisible ? PADDING : 50,
       height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
    })
 )
 
@@ -113,7 +117,6 @@ export const DesktopView = () => {
 
    return (
       <Fragment>
-         <CloseButton onClick={closeDialog} />
          <Layout
             expanded={isRecommendationsListVisible}
             paddingBottom={isRecommendationsListVisible ? 0 : 0}
@@ -131,7 +134,10 @@ export const DesktopView = () => {
                      animateLayout
                   />
                   {isRecommendationsListVisible ? null : (
-                     <Box data-testid="loading-indicator-offset" height={85} />
+                     <Box
+                        data-testid="loading-indicator-offset"
+                        minHeight={95}
+                     />
                   )}
                </CardContainerInner>
             </CardContainer>
@@ -148,6 +154,7 @@ export const DesktopView = () => {
                </LoadingContainer>
             )}
          </Layout>
+         <CloseButton onClick={closeDialog} />
       </Fragment>
    )
 }

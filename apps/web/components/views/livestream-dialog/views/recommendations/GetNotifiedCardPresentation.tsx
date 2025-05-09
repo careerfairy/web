@@ -29,6 +29,8 @@ const StyledCard = styled(motion(Card))(({ theme }) => ({
    maxWidth: 343,
    display: "flex",
    flexDirection: "column",
+   flexGrow: 1,
+   minHeight: "fit-content",
    transition: theme.transitions.create(["width", "height"], {
       duration: 300,
       easing: "ease-in-out",
@@ -180,12 +182,13 @@ export const GetNotifiedCardPresentation = ({
 
    return (
       <StyledCard
+         data-testid="get-notified-card"
          sx={combineStyles(
             {
                width: `${
                   isDesktop ? (isExpanded ? 570 : 402) : 343
                }px !important`,
-               height: getCardMaxHeight(),
+               maxHeight: getCardMaxHeight(),
             },
             sx
          )}
