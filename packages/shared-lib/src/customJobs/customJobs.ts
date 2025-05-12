@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
-import { Group, GroupOption } from "../groups"
+import { GroupOption, PublicGroup } from "../groups"
 import { UserData } from "../users"
 import { CUSTOM_JOB_CONSTANTS } from "./constants"
 /**
@@ -40,7 +40,7 @@ export interface CustomJob extends Identifiable {
    isPermanentlyExpired: boolean
    disableUrlTracking?: boolean
 
-   group: Group
+   group: PublicGroup
 }
 
 export type PublicCustomJob = Pick<
