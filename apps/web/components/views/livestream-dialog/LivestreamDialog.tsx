@@ -203,6 +203,7 @@ export type ViewKey = (typeof views)[number]["key"]
 const PaperProps: DialogProps["PaperProps"] = {
    sx: styles.dialogPaper,
    component: DialogAnimatedBackground,
+   "data-testid": "livestream-dialog",
 }
 
 const LivestreamDialog: FC<Props> = ({
