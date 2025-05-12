@@ -1,3 +1,4 @@
+import { CustomJob } from "@careerfairy/shared-lib/src/customJobs/customJobs"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import counterConstants from "../../lib/Counter/constants"
@@ -9,29 +10,52 @@ import {
 } from "../../util/bulkWriter"
 import { logAction } from "../../util/logger"
 
-interface UpdateDocumentsConfig {
+/**
+ * @param T - The type of the documents to update, defaults to unknown and useful when
+ * applying a custom filter to the documents (when not possible via query).
+ *
+ * @param query - The query to use to get the documents to update.
+ * @param updateData - The data to update the documents with. When a @param T is provided,
+ * the updateData will be typed accordingly. Not providing @param T can be useful when applying
+ * only an update of a non-existing field, example migrationTrigger (Date.now()), which will
+ * update with the current timestamp, thus not affecting the existing documents and allowing
+ * onWriteTriggers to run with the latest data.
+ * @param batchSize - The batch size to use for the update, defaults to 1000.
+ * @param waitTimeBetweenBatches - The wait time between batches, defaults to 5000ms.
+ * @param dryRun - Allows test runs before updating documents.
+ * @param customDataFilter - A custom filter to apply to the documents, when not possible via
+ * query. Defaults to undefined.
+ */
+interface UpdateDocumentsConfig<T = unknown> {
    query: Query
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   updateData: Record<string, any>
+   updateData: Partial<{ [K in keyof T]: T[K] }>
    batchSize?: number
    waitTimeBetweenBatches?: number
    dryRun?: boolean
+   customDataFilter?: (data: T) => boolean
 }
 
-const FIELD_TO_ORDER_BY = "lastActivityAt"
+const COLLECTION_NAME = "customJobs"
+const FIELD_TO_ORDER_BY = "id"
 
 // Configure your update here
-const config: UpdateDocumentsConfig = {
+const config: UpdateDocumentsConfig<CustomJob> = {
    // Example: collection query
    query: firestore
-      .collection("userData")
+      .collection(COLLECTION_NAME)
       // Keep this commented out for now as an example
-      // .where(FIELD_TO_ORDER_BY, "!=", true)
+      // .where(FIELD_TO_FILTER_BY, "!=", null)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
-   updateData: { migrationTrigger: Date.now() },
-   batchSize: 1000,
-   waitTimeBetweenBatches: 1_000,
+   updateData: {
+      deleted: false,
+      // migrationTrigger: Date.now()
+   },
+   batchSize: 25,
+   waitTimeBetweenBatches: 20_000,
    dryRun: false, // Set to false to run the migration
+   customDataFilter: (customJob) => {
+      return typeof customJob?.deleted !== "boolean"
+   }
 }
 
 const getTotalDocumentCount = async (query: Query) => {
@@ -54,7 +78,10 @@ export async function run() {
    counter.setCustomCount(counterConstants.numSuccessfulWrites, 0)
    counter.setCustomCount(counterConstants.numFailedWrites, 0)
 
-   console.log(`Total documents to process: ${totalDocumentsCounts}`)
+   console.log(
+      `Total documents to process: ${totalDocumentsCounts} - ${COLLECTION_NAME}`
+   )
+
    if (config.dryRun) {
       console.log("DRY RUN MODE: No documents will be updated")
    } else {
@@ -85,7 +112,16 @@ export async function run() {
          const docs = snapshot.docs
          processedDocuments += docs.length
 
+         let skips = 0
          for (const doc of docs) {
+            if (
+               config.customDataFilter &&
+               !config.customDataFilter(doc.data() as CustomJob)
+            ) {
+               skips++
+               continue
+            }
+
             // Update current document index for progress tracking
             counter.customCountIncrement(counterConstants.currentDocIndex)
 
@@ -109,7 +145,7 @@ export async function run() {
          console.log(
             `Processed ${processedDocuments} out of ${totalDocumentsCounts} documents (${progress.toFixed(
                2
-            )}%)`
+            )}%) - Skips: ${skips}`
          )
 
          if (!config.dryRun) {

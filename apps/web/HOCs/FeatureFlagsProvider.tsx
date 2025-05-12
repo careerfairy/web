@@ -65,13 +65,6 @@ export const flagsInitialState = {
       enabled: true,
    },
    /**
-    * New Job hub implementation
-    * Hide or Show
-    */
-   jobHubV1: {
-      enabled: true,
-   },
-   /**
     * B2C and B2B mentors
     * Hide or Show
     */

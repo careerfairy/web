@@ -113,9 +113,9 @@ export default function useRegistrationHandler() {
       )
 
       // after de-register from a livestream we want to update the user sparks notifications for this user
-      await sparkService.createUserSparksFeedEventNotifications(
-         userData.userEmail
-      )
+      await sparkService
+         .createUserSparksFeedEventNotifications(userData.userEmail)
+         .catch(errorLogAndNotify)
    }, [
       deregisterFromLivestream,
       livestream,

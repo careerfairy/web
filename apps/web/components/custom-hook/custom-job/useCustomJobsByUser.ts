@@ -1,4 +1,8 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { UserData } from "@careerfairy/shared-lib/users/users"
 import { useAuth } from "HOCs/AuthProvider"
+import { useMemo } from "react"
+import useUserCountryCode from "../useUserCountryCode"
 import useCustomJobs from "./useCustomJobs"
 
 type Options = {
@@ -12,6 +16,8 @@ type Options = {
  **/
 export const useCustomJobsByUser = (options: Options = {}) => {
    const { userData } = useAuth()
+   const { userCountryCode, isLoading: isLoadingUserCountryCode } =
+      useUserCountryCode()
 
    const businessFunctions = userData?.businessFunctionsTagIds || []
 
@@ -37,10 +43,58 @@ export const useCustomJobsByUser = (options: Options = {}) => {
       otherCustomJobs || []
    )
 
+   const sortedCustomJobs = useMemo(() => {
+      return sortCustomJobs(userData, allCustomJobs, userCountryCode)
+   }, [userData, allCustomJobs, userCountryCode])
+
    return {
-      customJobs: allCustomJobs,
-      totalCount: allCustomJobs.length,
+      customJobs: sortedCustomJobs,
+      totalCount: sortedCustomJobs.length,
       isLoading:
-         isLoadingBusinessFunctionCustomJobs || isLoadingOtherCustomJobs,
+         isLoadingBusinessFunctionCustomJobs ||
+         isLoadingOtherCustomJobs ||
+         isLoadingUserCountryCode,
    }
+}
+
+const sortCustomJobs = (
+   userData: UserData,
+   customJobs: CustomJob[],
+   userCountryCode: string
+) => {
+   const userCountry = userData?.countryIsoCode || userCountryCode
+   const userState = userData?.stateIsoCode
+
+   return [...customJobs].sort((a, b) => {
+      // Helper function to get location priority
+      const getLocationPriority = (job: CustomJob) => {
+         // If no locations, lowest priority
+         if (!job.jobLocation?.length) return 3
+
+         // Check all locations for matches
+         for (const location of job.jobLocation) {
+            const [country, state] = location.id.split("-")
+
+            // Exact match (country + state)
+            if (country === userCountry && state === userState) return 1
+
+            // Country match only
+            if (country === userCountry) return 2
+         }
+
+         // No matches found
+         return 3
+      }
+
+      const aPriority = getLocationPriority(a)
+      const bPriority = getLocationPriority(b)
+
+      // First sort by location priority
+      if (aPriority !== bPriority) {
+         return aPriority - bPriority
+      }
+
+      // Then sort by deadline within each location group
+      return a.deadline.toMillis() - b.deadline.toMillis()
+   })
 }

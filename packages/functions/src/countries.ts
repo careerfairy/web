@@ -2,13 +2,18 @@ import {
    CityOption,
    CountryOption,
    generateCityId,
+   generateCountryId,
+   generateStateId,
    getCityCodes,
+   getLocationIds,
 } from "@careerfairy/shared-lib/countries/types"
 
 import { City, Country, State } from "country-state-city"
 import { onCall } from "firebase-functions/https"
 import Fuse from "fuse.js"
-import { InferType, object, string } from "yup"
+import { InferType, number, object, string } from "yup"
+
+const SEARCH_LOCATION_LIMIT = 10
 
 const CountryCitiesOptionsSchema = {
    countryCode: string().required(),
@@ -36,6 +41,15 @@ const CountryDataOptionsSchema = {
    countryIsoCode: string().required(),
 }
 
+const SearchLocationOptionsSchema = {
+   searchValue: string().required().min(2),
+   limit: number().optional().default(SEARCH_LOCATION_LIMIT),
+}
+
+const GetLocationOptionsSchema = {
+   location: string().min(2).required(),
+}
+
 const CountryCitiesSchema = object().shape(CountryCitiesOptionsSchema)
 
 const CountryCityDataSchema = object().shape(CountryCityDataOptionsSchema)
@@ -47,6 +61,10 @@ const CountryDataSchema = object().shape(CountryDataOptionsSchema)
 const SearchCountrySchema = object().shape(SearchCountryOptionsSchema)
 
 const SearchCitySchema = object().shape(SearchCityOptionsSchema)
+
+const SearchLocationSchema = object().shape(SearchLocationOptionsSchema)
+
+const GetLocationSchema = object().shape(GetLocationOptionsSchema)
 
 type CountryCitiesOptions = InferType<typeof CountryCitiesSchema>
 
@@ -60,7 +78,15 @@ type SearchCountryOptions = InferType<typeof SearchCountrySchema>
 
 type SearchCityOptions = InferType<typeof SearchCitySchema>
 
-const performFuzzySearch = <T>(items: T[], searchValue: string): T[] => {
+type SearchLocationOptions = InferType<typeof SearchLocationSchema>
+
+type GetLocationOptions = InferType<typeof GetLocationSchema>
+
+const performFuzzySearch = <T>(
+   items: T[],
+   searchValue: string,
+   limit?: number
+): T[] => {
    // Configure Fuse options
    const fuseOptions = {
       keys: ["name"],
@@ -70,7 +96,7 @@ const performFuzzySearch = <T>(items: T[], searchValue: string): T[] => {
    const fuse = new Fuse(items, fuseOptions)
    const searchResults = fuse.search(searchValue)
 
-   return searchResults.map((result) => result.item)
+   return searchResults.map((result) => result.item).slice(0, limit)
 }
 
 export const searchCountries = onCall<SearchCountryOptions>((request) => {
@@ -249,4 +275,56 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
    }
 
    return countryResult
+})
+
+export const searchLocations = onCall<SearchLocationOptions>((request) => {
+   const { searchValue, limit } = request.data
+
+   const countries = Country.getAllCountries()
+      .map((country) => ({
+         name: country.name,
+         id: generateCountryId(country),
+      }))
+      .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
+
+   const states = countries
+      .map((country) => {
+         const states = State.getStatesOfCountry(country.id)
+         return states.map((state) => ({
+            name: `${state.name} (${country.name})`,
+            id: generateStateId(state),
+         }))
+      })
+      .flat()
+
+   const locations = performFuzzySearch(
+      [...countries, ...states],
+      searchValue,
+      limit
+   )
+
+   return locations
+})
+
+export const getLocation = onCall<GetLocationOptions>((request) => {
+   const { searchValue } = request.data
+
+   const { countryIsoCode, stateIsoCode } = getLocationIds(searchValue)
+
+   if (!countryIsoCode) return null
+
+   const country = Country.getCountryByCode(countryIsoCode)
+   if (stateIsoCode) {
+      const state = State.getStateByCodeAndCountry(stateIsoCode, countryIsoCode)
+
+      return {
+         id: searchValue,
+         name: `${state.name} (${country.name})`,
+      }
+   }
+
+   return {
+      id: searchValue,
+      name: country.name,
+   }
 })

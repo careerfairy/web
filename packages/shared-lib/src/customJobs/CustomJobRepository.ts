@@ -118,6 +118,12 @@ export interface ICustomJobRepository {
    incrementCustomJobClicks(jobId: string): Promise<void>
 
    /**
+    * To increment the 'views' field on a specific customJob
+    * @param jobId
+    */
+   incrementCustomJobViews(jobId: string): Promise<void>
+
+   /**
     * Get all the custom jobs linked by a specific live stream
     * @param livestreamId
     */
@@ -172,6 +178,10 @@ export interface ICustomJobRepository {
     * Update all custom jobs that have expired
     */
    syncExpiredCustomJobs(): Promise<void>
+
+   saveCustomJob(userId: string, customJob: CustomJob): Promise<void>
+
+   removeSavedCustomJob(userId: string, customJobId: string): Promise<void>
 }
 
 export class FirebaseCustomJobRepository
@@ -213,6 +223,7 @@ export class FirebaseCustomJobRepository
          id: ref.id,
          published: isPublished,
          isPermanentlyExpired: false,
+         deleted: false,
       }
 
       await ref.set(newJob, { merge: true })
@@ -243,6 +254,29 @@ export class FirebaseCustomJobRepository
          .doc(jobId)
 
       return customJobRef.delete()
+   }
+
+   async saveCustomJob(userId: string, customJob: CustomJob): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("savedJobs")
+         .doc(customJob.id)
+
+      return ref.set(customJob)
+   }
+
+   async removeSavedCustomJob(
+      userId: string,
+      customJobId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("savedJobs")
+         .doc(customJobId)
+
+      return ref.delete()
    }
 
    async getCustomJobById(jobId: string): Promise<CustomJob> {
@@ -450,6 +484,14 @@ export class FirebaseCustomJobRepository
       })
    }
 
+   async incrementCustomJobViews(jobId: string): Promise<void> {
+      const ref = this.firestore.collection("customJobStats").doc(jobId)
+
+      return ref.update({
+         views: this.fieldValue.increment(1),
+      })
+   }
+
    async getCustomJobsByLivestreamId(
       livestreamId: string
    ): Promise<CustomJob[]> {
@@ -564,16 +606,10 @@ export class FirebaseCustomJobRepository
          .where("isPermanentlyExpired", "==", false)
          .where("deadline", ">=", new Date())
          .where("published", "==", true)
+         .where("deleted", "==", false)
          .get()
 
-      return (
-         !snapshot.empty &&
-         Boolean(
-            mapFirestoreDocuments<CustomJob>(snapshot).find(
-               (job) => !job.deleted
-            )
-         )
-      )
+      return !snapshot.empty
    }
 
    async getCustomJobsByLinkedContentIds(

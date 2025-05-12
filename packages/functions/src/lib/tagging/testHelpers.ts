@@ -54,6 +54,7 @@ export const createNewAndOldCustomJobData = (
       deleted: false,
       businessFunctionsTagIds: newCustomJobOptions.businessFunctionTagIds ?? [],
       isPermanentlyExpired: false,
+      group: null,
    }
 
    const oldJob: CustomJob = {
@@ -77,6 +78,7 @@ export const createNewAndOldCustomJobData = (
       businessFunctionsTagIds:
          oldCustomJobOUserOptions?.businessFunctionTagIds ?? [],
       isPermanentlyExpired: false,
+      group: null,
    }
 
    return {
@@ -157,5 +159,6 @@ const generateCustomJobsData = (
       sparks: options.sparks ?? [],
       businessFunctionsTagIds: options.businessFunctionTagIds ?? [],
       isPermanentlyExpired: false,
+      group: null,
    }
 }

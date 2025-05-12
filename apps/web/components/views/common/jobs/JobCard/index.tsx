@@ -6,7 +6,6 @@ import {
 import { Box, ButtonBase, Grid, SxProps, useTheme } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useCallback } from "react"
@@ -57,6 +56,7 @@ type Props = {
    job: Job | CustomJob
    clicks?: number
    applicants?: number
+   views?: number
    previewMode?: boolean
    handleClick?: (job: Job | CustomJob, event?: React.MouseEvent) => void
    smallCard?: boolean
@@ -71,6 +71,7 @@ const JobCard = ({
    job,
    clicks,
    applicants,
+   views,
    previewMode,
    handleClick,
    smallCard,
@@ -81,11 +82,9 @@ const JobCard = ({
    applied,
 }: Props) => {
    const isJobExpired = useIsJobExpired(job as PublicCustomJob)
-
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const theme = useTheme()
-   const { jobHubV1 } = useFeatureFlags()
    const showAdditionalInfo = clicks !== undefined && applicants !== undefined
 
    const getStateColor = useCallback(
@@ -121,7 +120,7 @@ const JobCard = ({
       >
          <Grid container>
             <Box sx={styles.listItemContainer}>
-               {isAtsJob || !jobHubV1 ? null : (
+               {isAtsJob ? null : (
                   <Box
                      sx={[styles.jobState, { background: getStateColor(job) }]}
                   />
@@ -130,8 +129,8 @@ const JobCard = ({
                   <Grid
                      item
                      xs={12}
-                     md={smallCard ? 12 : previewMode ? 9 : 4.5}
-                     lg={smallCard ? 12 : previewMode ? 9.5 : 5.5}
+                     md={smallCard ? 12 : 9}
+                     lg={smallCard ? 12 : 9}
                      sx={styles.infoWrapper}
                   >
                      <JobCardDetails
@@ -147,7 +146,11 @@ const JobCard = ({
 
                   {showAdditionalInfo && !previewMode ? (
                      <Grid item xs={12} md={7} lg={6} sx={styles.statsWrapper}>
-                        <JobCardStats clicks={clicks} applicants={applicants} />
+                        <JobCardStats
+                           clicks={clicks}
+                           applicants={applicants}
+                           views={views}
+                        />
                      </Grid>
                   ) : null}
 
