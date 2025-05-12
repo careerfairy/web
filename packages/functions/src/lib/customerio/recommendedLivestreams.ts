@@ -26,6 +26,7 @@ type RecommendedLivestreamsRequest = {
  * Type definition for the response format
  */
 type CustomerIORecommendedLivestreamWebhookData = {
+   id: string
    url: string
    title: string
    company: string
@@ -40,7 +41,8 @@ type CustomerIORecommendedLivestreamWebhookData = {
  */
 export const customerIORecommendedLivestreamsWebhook = onRequest(
    {
-      memory: "512MiB",
+      memory: "1GiB",
+      concurrency: 20,
    },
    withMiddlewares(
       [
@@ -107,6 +109,7 @@ export const customerIORecommendedLivestreamsWebhook = onRequest(
                      livestream.start.toDate(),
                      user.timezone || "Europe/Zurich"
                   ),
+                  id: livestream.id,
                }))
 
             response.status(200).json({
