@@ -36,12 +36,27 @@ export const deserializeGroup = (
 export const serializePublicGroup = (
    publicGroup: PublicGroup
 ): SerializedPublicGroup => {
-   const { plan, ...rest } = publicGroup
+   if (!publicGroup) {
+      return null
+   }
+
+   if (publicGroup?.plan) {
+      delete publicGroup.plan
+   }
+
    return {
-      ...rest,
-      planType: plan?.type ?? null,
-      planStartedAtString: plan?.startedAt?.toDate().toISOString() ?? null,
-      planExpiresAtString: plan?.expiresAt?.toDate().toISOString() ?? null,
+      ...publicGroup,
+      ...(publicGroup?.plan
+         ? {
+              planType: publicGroup?.plan?.type,
+              planStartedAtString: publicGroup?.plan?.startedAt
+                 ?.toDate()
+                 ?.toISOString(),
+              planExpiresAtString: publicGroup?.plan?.expiresAt
+                 ?.toDate()
+                 ?.toISOString(),
+           }
+         : {}),
    }
 }
 
