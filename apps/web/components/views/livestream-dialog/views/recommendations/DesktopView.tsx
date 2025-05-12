@@ -87,7 +87,7 @@ const RecommendationsContainer = styled(motion.div)(({ theme }) => ({
 }))
 
 const CloseButton = styled((props: IconButtonProps) => (
-   <IconButton {...props}>
+   <IconButton data-testid="livestream-dialog-close" {...props}>
       <CloseIcon />
    </IconButton>
 ))({
