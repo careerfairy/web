@@ -33,6 +33,11 @@ const LivestreamsTable = () => {
       return livestreams.map((l) => ({ ...l, utmData }))
    }, [livestreams, utmData])
 
+   // Material table only re-renders with key change
+   const tableKey = useMemo(() => {
+      return rows.map((row) => `${row.id}`).join("-")
+   }, [rows])
+
    const rowOnClick = useCallback((event, rowData) => {
       if (window) {
          window.open(makeLivestreamEventDetailsUrl(rowData.id), "_blank")
@@ -50,6 +55,7 @@ const LivestreamsTable = () => {
             columns={columns}
             onRowClick={rowOnClick}
             data={rows}
+            key={tableKey}
             title={<TableTitle title="Livestreams" />}
             options={{
                toolbar: false,
