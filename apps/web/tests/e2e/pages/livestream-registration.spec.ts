@@ -107,6 +107,127 @@ test.describe("Livestream Registration Signed In", () => {
       })
    })
 
+   test("should show recommendations after successful registration", async ({
+      page,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      user,
+   }) => {
+      // Create multiple livestreams to ensure we have recommendations
+      const multipleStreams = await Promise.all([
+         setupLivestreamData(),
+         setupLivestreamData(undefined, {
+            overrideLivestreamDetails: {
+               title: "Recommendation Stream 1",
+            },
+         }),
+         setupLivestreamData(undefined, {
+            overrideLivestreamDetails: {
+               title: "Recommendation Stream 2",
+            },
+         }),
+         setupLivestreamData(undefined, {
+            overrideLivestreamDetails: {
+               title: "Recommendation Stream 3",
+            },
+         }),
+      ])
+
+      // Use the first created livestream for registration
+      const { livestream } = multipleStreams[0]
+      const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
+
+      await livestreamDialogPage.openDialog()
+
+      // Complete the registration process
+      await livestreamDialogPage.completeSuccessfulRegistration()
+
+      // Wait for and verify recommendations section appears
+      await livestreamDialogPage.waitForRecommendationsToAppear()
+
+      // Verify recommendations grid is visible and contains events
+      await livestreamDialogPage.verifyRecommendationsGridVisible()
+
+      // Check that at least one of our created recommendation streams is visible
+      const recommendationTitles = [
+         "Recommendation Stream 1",
+         "Recommendation Stream 2",
+         "Recommendation Stream 3",
+      ]
+      const hasRecommendation =
+         (await livestreamDialogPage.recommendedEventsGrid
+            .getByText(recommendationTitles[0])
+            .isVisible()) ||
+         (await livestreamDialogPage.recommendedEventsGrid
+            .getByText(recommendationTitles[1])
+            .isVisible()) ||
+         (await livestreamDialogPage.recommendedEventsGrid
+            .getByText(recommendationTitles[2])
+            .isVisible())
+      expect(hasRecommendation).toBeTruthy()
+
+      // Verify we can close the dialog after seeing recommendations
+      await livestreamDialogPage.closeDialog()
+
+      // Confirm the livestream is now registered
+      const livestreamCard = page
+         .getByTestId(`livestream-card-${livestream.id}`)
+         .first()
+
+      await livestreamCard.scrollIntoViewIfNeeded()
+      await expect(livestreamCard.getByText("Registered")).toBeVisible()
+   })
+
+   test("should allow navigating to a recommended event after registration", async ({
+      page,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      user,
+   }) => {
+      // Create multiple livestreams to ensure we have recommendations
+      const multipleStreams = await Promise.all([
+         setupLivestreamData(),
+         setupLivestreamData(undefined, {
+            overrideLivestreamDetails: {
+               title: "Recommendation Stream 1",
+            },
+         }),
+         setupLivestreamData(undefined, {
+            overrideLivestreamDetails: {
+               title: "Recommendation Stream 2",
+            },
+         }),
+         setupLivestreamData(undefined, {
+            overrideLivestreamDetails: {
+               title: "Recommendation Stream 3",
+            },
+         }),
+      ])
+
+      // Use the first created livestream for registration
+      const { livestream } = multipleStreams[0]
+      const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
+
+      await livestreamDialogPage.openDialog()
+
+      // Complete the registration process
+      await livestreamDialogPage.completeSuccessfulRegistration()
+
+      // Wait for recommendations to appear
+      await livestreamDialogPage.waitForRecommendationsToAppear()
+
+      // Click on the first recommended event
+      const clickedEventTitle =
+         await livestreamDialogPage.clickOnFirstRecommendedEvent()
+
+      // Verify the dialog now shows details for the clicked event
+      expect(clickedEventTitle).toBeTruthy()
+
+      // Make sure we clicked on a recommendation (not the original event)
+      expect(clickedEventTitle).not.toEqual(livestream.title)
+
+      // Verify we can register for this event too
+      await expect(livestreamDialogPage.registrationButton).toBeVisible()
+   })
+
    // Talent pool has been removed from the registration process
    test.skip("register to an event and fill out a question and join talent pool", async ({
       page,

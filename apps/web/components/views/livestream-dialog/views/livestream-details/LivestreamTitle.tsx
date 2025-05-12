@@ -21,7 +21,12 @@ type Props = {
 
 const LivestreamTitle: FC<Props> = (props) => {
    return (
-      <Typography align="center" variant={"brandedH1"} sx={styles.eventTitle}>
+      <Typography
+         align="center"
+         variant={"brandedH1"}
+         sx={styles.eventTitle}
+         data-testid={`livestream-dialog-title-${props.text}`}
+      >
          {props.text}
       </Typography>
    )

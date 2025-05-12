@@ -13,6 +13,9 @@ export default class LivestreamDialogPage extends CommonPage {
    public notEnoughCreditsButton: Locator
    public buyRecordingButton: Locator
    public signUpToWatchButton: Locator
+   public getNotifiedCard: Locator
+   public livestreamDialog: Locator
+   public recommendedEventsGrid: Locator
    public backButton: Locator
 
    constructor(page: Page, public livestream: LivestreamEvent) {
@@ -39,6 +42,12 @@ export default class LivestreamDialogPage extends CommonPage {
       )
 
       this.backButton = page.getByTestId("livestream-dialog-back-button")
+
+      this.livestreamDialog = page.getByTestId("livestream-dialog")
+
+      this.recommendedEventsGrid = page.getByTestId("recommended-events-grid")
+
+      this.getNotifiedCard = page.getByTestId("get-notified-card")
    }
 
    async openDialog(waitForTitle: boolean = true) {
@@ -135,10 +144,6 @@ export default class LivestreamDialogPage extends CommonPage {
       await expect(
          this.page.getByRole("heading", { name: "Registration successful" })
       ).toBeVisible()
-
-      await expect(
-         this.page.getByText("Finding your next favourite streams")
-      ).toBeVisible()
    }
 
    async closeDialog() {
@@ -170,5 +175,63 @@ export default class LivestreamDialogPage extends CommonPage {
             await expect(this.page.getByText(job.name)).toBeVisible()
          })
       )
+   }
+
+   async waitForRecommendationsToAppear() {
+      await expect(
+         this.getNotifiedCard.getByText(this.livestream.title)
+      ).toBeVisible()
+
+      await expect(
+         this.getNotifiedCard.getByRole("button", { name: "Add to calendar" })
+      ).toBeVisible()
+
+      // Wait for recommendations heading to appear,
+      // we intentionally show a fake loading state for 6 seconds
+      await expect(this.page.getByText("Keep your pace going! 🔥")).toBeVisible(
+         {
+            timeout: 15000,
+         }
+      )
+
+      // Verify subheading is visible
+      await expect(
+         this.page.getByText("Here are more interesting live streams")
+      ).toBeVisible()
+   }
+
+   async verifyRecommendationsGridVisible() {
+      // Verify at least one recommended event card is visible
+      await expect(
+         this.recommendedEventsGrid
+            .locator("[data-testid^='livestream-card-']")
+            .first()
+      ).toBeVisible()
+   }
+
+   async clickOnFirstRecommendedEvent() {
+      // Get the title of the first recommended event
+      const firstEventTitle = await this.recommendedEventsGrid
+         .locator("[data-testid^='livestream-card-']")
+         .first()
+         .locator("[data-testid^='livestream-card-title-']")
+         .textContent()
+
+      // Click on the first recommended event card
+      await this.recommendedEventsGrid
+         .locator("[data-testid^='livestream-card-']")
+         .first()
+         .click()
+
+      // Verify the clicked event details are shown
+      if (firstEventTitle) {
+         await expect(
+            this.livestreamDialog.getByTestId(
+               `livestream-dialog-title-${firstEventTitle}`
+            )
+         ).toBeVisible()
+      }
+
+      return firstEventTitle
    }
 }
