@@ -1,4 +1,4 @@
-import { CustomJob } from "@careerfairy/shared-lib/src/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/src/groups"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import counterConstants from "../../lib/Counter/constants"
@@ -19,7 +19,7 @@ import { logAction } from "../../util/logger"
  * the updateData will be typed accordingly. Not providing @param T can be useful when applying
  * only an update of a non-existing field, example migrationTrigger (Date.now()), which will
  * update with the current timestamp, thus not affecting the existing documents and allowing
- * onWriteTriggers to run with the latest data.
+ * onWriteTriggers to run with the latest data. Can be a function receiving the document data as a parameter and returns a partial of the document data.
  * @param batchSize - The batch size to use for the update, defaults to 1000.
  * @param waitTimeBetweenBatches - The wait time between batches, defaults to 5000ms.
  * @param dryRun - Allows test runs before updating documents.
@@ -28,34 +28,38 @@ import { logAction } from "../../util/logger"
  */
 interface UpdateDocumentsConfig<T = unknown> {
    query: Query
-   updateData: Partial<{ [K in keyof T]: T[K] }>
+   updateData:
+      | Partial<{ [K in keyof T]: T[K] }>
+      | ((data: T) => Partial<{ [K in keyof T]: T[K] }>)
    batchSize?: number
    waitTimeBetweenBatches?: number
    dryRun?: boolean
    customDataFilter?: (data: T) => boolean
 }
 
-const COLLECTION_NAME = "customJobs"
-const FIELD_TO_ORDER_BY = "id"
+const COLLECTION_NAME = "careerCenterData"
+const FIELD_TO_ORDER_BY = "groupId"
 
 // Configure your update here
-const config: UpdateDocumentsConfig<CustomJob> = {
+const config: UpdateDocumentsConfig<Group> = {
    // Example: collection query
    query: firestore
       .collection(COLLECTION_NAME)
       // Keep this commented out for now as an example
       // .where(FIELD_TO_FILTER_BY, "!=", null)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
-   updateData: {
-      deleted: false,
-      // migrationTrigger: Date.now()
+   updateData: (group) => {
+      return {
+         ...group,
+         id: group.groupId,
+      }
    },
    batchSize: 25,
-   waitTimeBetweenBatches: 20_000,
+   waitTimeBetweenBatches: 2_000,
    dryRun: false, // Set to false to run the migration
-   customDataFilter: (customJob) => {
-      return typeof customJob?.deleted !== "boolean"
-   }
+   customDataFilter: (group) => {
+      return !group?.id?.length
+   },
 }
 
 const getTotalDocumentCount = async (query: Query) => {
@@ -116,7 +120,7 @@ export async function run() {
          for (const doc of docs) {
             if (
                config.customDataFilter &&
-               !config.customDataFilter(doc.data() as CustomJob)
+               !config.customDataFilter(doc.data() as Group)
             ) {
                skips++
                continue
@@ -126,8 +130,13 @@ export async function run() {
             counter.customCountIncrement(counterConstants.currentDocIndex)
 
             if (!config.dryRun) {
+               const updateData =
+                  typeof config.updateData === "function"
+                     ? config.updateData(doc.data() as Group)
+                     : config.updateData
+
                bulkWriter
-                  .update(doc.ref, config.updateData)
+                  .update(doc.ref, updateData)
                   .then(() => handleBulkWriterSuccess(counter))
                   .catch((err) => handleBulkWriterError(err, counter))
             } else {

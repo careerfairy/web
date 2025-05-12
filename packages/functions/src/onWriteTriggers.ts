@@ -459,7 +459,11 @@ export const onWriteSpark = onDocumentWritten(
 )
 
 export const onWriteCustomJobs = onDocumentWritten(
-   "customJobs/{jobId}",
+   {
+      ...defaultTriggerRunTimeConfig,
+      memory: "1GiB",
+      document: "customJobs/{jobId}",
+   },
    async (event) => {
       const changeTypes = getChangeTypes(event)
 
