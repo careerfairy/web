@@ -21,6 +21,7 @@ type RecommendedSparksRequest = {
  * Type definition for the response format
  */
 type CustomerIORecommendedSparkWebhookData = {
+   id: string
    question: string
    company: string
    category_id: string
@@ -33,6 +34,10 @@ type CustomerIORecommendedSparkWebhookData = {
  * This endpoint will be called by Customer.io during their onboarding journey.
  */
 export const customerIORecommendedSparksWebhook = onRequest(
+   {
+      memory: "1GiB",
+      concurrency: 20,
+   },
    withMiddlewares(
       [
          warmingMiddleware,
@@ -90,6 +95,7 @@ export const customerIORecommendedSparksWebhook = onRequest(
                   category_id: spark.category.id,
                   thumbnailUrl: spark.video.thumbnailUrl,
                   url: `${getWebBaseUrl()}/sparks/${spark.id}`,
+                  id: spark.id,
                }))
 
             response.status(200).json({
