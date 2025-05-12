@@ -97,13 +97,20 @@ export class CommonPage {
 
       try {
          if (check) {
-            await locator.check()
+            await locator.check({
+               force: true, // https://github.com/microsoft/playwright/issues/27016
+            })
          } else {
-            await locator.uncheck()
+            await locator.uncheck({
+               force: true, // https://github.com/microsoft/playwright/issues/27016
+            })
          }
       } catch {
-         // @ts-ignore
-         await locator.evaluate((node) => (node.checked = check))
+         await locator.evaluate(
+            (node, checkValue) =>
+               ((node as HTMLInputElement).checked = checkValue),
+            check
+         )
       }
    }
 

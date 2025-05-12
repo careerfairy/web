@@ -10,12 +10,15 @@ import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApp
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
+import { customJobRepo } from "data/RepositoryInstances"
 import { props } from "lodash/fp"
 import { ReactNode, forwardRef } from "react"
 import { useSelector } from "react-redux"
-import { useMeasure } from "react-use"
+import { useEffectOnce, useMeasure } from "react-use"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerCustomJobEvent } from "util/analyticsUtils"
 import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
 import CustomJobCTAButtons from "./CustomJobCTAButtons"
 import CustomJobDescription from "./CustomJobDescription"
@@ -110,6 +113,18 @@ export const CustomJobDetails = ({
    const autoActionType = useSelector(autoAction)
    const isMobile = useIsMobile()
    const isAutoApply = autoActionType === AutomaticActions.APPLY
+
+   useEffectOnce(() => {
+      customJobRepo
+         .incrementCustomJobViews(job.id)
+         .then(() =>
+            dataLayerCustomJobEvent(
+               AnalyticsEvents.CustomJobView,
+               job,
+               companyName
+            )
+         )
+   })
 
    return (
       <>

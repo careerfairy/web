@@ -134,7 +134,7 @@ class FirebaseService {
       additionalData?: UserAccountCreationAdditionalData
    ) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v4"
+         FUNCTION_NAMES.createNewUserAccount
       )
       return createUserInAuthAndFirebase({ userData, additionalData })
    }

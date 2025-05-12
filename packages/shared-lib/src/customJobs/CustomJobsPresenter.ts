@@ -103,6 +103,7 @@ export class CustomJobsPresenter extends BaseModel {
          deleted: this.deleted,
          businessFunctionsTagIds: this.businessFunctionsTagIds,
          isPermanentlyExpired: this.isPermanentlyExpired,
+         group: null,
       }
    }
 }

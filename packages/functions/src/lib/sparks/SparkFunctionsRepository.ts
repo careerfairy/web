@@ -433,8 +433,9 @@ export class SparkFunctionsRepository
          question: data.question,
          video: data.video,
          category: getCategoryById(data.categoryId),
-         contentTopicsTagIds:
-            [SparkCategoriesToTagValuesMapper[data.categoryId]] ?? [],
+         contentTopicsTagIds: SparkCategoriesToTagValuesMapper[data.categoryId]
+            ? [SparkCategoriesToTagValuesMapper[data.categoryId]]
+            : [],
          createdAt: Timestamp.now(),
          publishedAt: data.published ? Timestamp.now() : null,
          updatedAt: null,
@@ -462,8 +463,9 @@ export class SparkFunctionsRepository
       > = {
          question: data.question,
          category: getCategoryById(data.categoryId),
-         contentTopicsTagIds:
-            [SparkCategoriesToTagValuesMapper[data.categoryId]] ?? [],
+         contentTopicsTagIds: SparkCategoriesToTagValuesMapper[data.categoryId]
+            ? [SparkCategoriesToTagValuesMapper[data.categoryId]]
+            : [],
          updatedAt: Timestamp.now(),
          published: data.published,
          creator: pickPublicDataFromCreator(creator),
@@ -537,8 +539,29 @@ export class SparkFunctionsRepository
 
       const batch = this.firestore.batch()
 
+      const publicGroup = pickPublicDataFromGroup(newGroup)
+
       const toUpdate: Pick<Spark, "group"> = {
-         group: pickPublicDataFromGroup(newGroup),
+         group: {
+            ...publicGroup,
+            ...(publicGroup?.plan
+               ? {
+                    plan: {
+                       ...publicGroup.plan,
+                       startedAt: publicGroup.plan.startedAt
+                          ? Timestamp.fromMillis(
+                               publicGroup.plan.startedAt.toMillis()
+                            )
+                          : null,
+                       expiresAt: publicGroup.plan.expiresAt
+                          ? Timestamp.fromMillis(
+                               publicGroup.plan.expiresAt.toMillis()
+                            )
+                          : null,
+                    },
+                 }
+               : {}),
+         },
       }
 
       sparksSnap.forEach((doc) => {

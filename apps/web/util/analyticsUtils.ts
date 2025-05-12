@@ -3,6 +3,7 @@ import { UserData } from "@careerfairy/shared-lib/users"
 import CookiesUtil from "./CookiesUtil"
 
 // Only import types, will not be part of the bundle, real package is loaded by GTM
+import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { TRACK_EVENT } from "@careerfairy/shared-lib/messaging"
@@ -20,8 +21,8 @@ import {
    RichTextBlockType,
    TalentGuideModule,
 } from "data/hygraph/types"
-import { AnalyticsEvent } from "./analyticsConstants"
 import { errorLogAndNotify } from "./CommonUtil"
+import { AnalyticsEvent } from "./analyticsConstants"
 import { getProgressPercentage } from "./levels"
 import { MobileUtils } from "./mobile.utils"
 
@@ -145,6 +146,22 @@ export const dataLayerSparkEvent = (
       companyId: spark.group.id, // GTM Variable
       categoryId: spark.category.id, // GTM Variable
       mentorId: spark.creator?.id, // GTM Variable
+   })
+}
+
+export const dataLayerCustomJobEvent = (
+   eventName: AnalyticsEvent,
+   job: PublicCustomJob,
+   companyName: string,
+   optionalVariables = {}
+) => {
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      groupId: job.groupId, // GTM Variable
+      jobId: job.id, // GTM Variable
+      jobName: job.title, // GTM Variable
+      deadline: job.deadline?.toDate()?.toISOString(), // GTM Variable
+      companyName: companyName, // GTM Variable
    })
 }
 

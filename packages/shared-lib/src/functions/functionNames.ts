@@ -20,7 +20,7 @@ export const FUNCTION_NAMES = {
    manualEndOfSparksTrialEmails: "manualEndOfSparksTrialEmails",
 
    // Auth functions
-   // createNewUserAccount: "createNewUserAccount_v4",
+   createNewUserAccount: "createNewUserAccount_v5",
 
    // Streaming functions
    // fetchAgoraRtcToken: "fetchAgoraRtcToken_v2",
@@ -39,6 +39,10 @@ export const FUNCTION_NAMES = {
    createUserSparksFeedEventNotifications:
       "createUserSparksFeedEventNotifications_v3",
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
+
+   // Location functions
+   searchLocations: "searchLocations",
+   getLocation: "getLocation",
 
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",

@@ -1,0 +1,64 @@
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
+import { useState } from "react"
+import { useDebounce } from "react-use"
+import useSWR, { SWRConfiguration } from "swr"
+import { errorLogAndNotify } from "util/CommonUtil"
+import useFunctionsSWR, {
+   reducedRemoteCallsOptions,
+} from "../utils/useFunctionsSWRFetcher"
+
+const DEBOUNCE_MS = 200
+
+const swrOptions: SWRConfiguration = {
+   ...reducedRemoteCallsOptions,
+   keepPreviousData: true,
+   onError: (error) =>
+      errorLogAndNotify(error, {
+         message: `Error searching locations list`,
+      }),
+}
+
+const getKey = (searchValue: string, limit?: number) => {
+   return searchValue?.length
+      ? [FUNCTION_NAMES.searchLocations, { searchValue, limit }]
+      : null
+}
+
+type Options = {
+   suspense?: boolean
+   limit?: number
+}
+
+/**
+ * @description Calls function, searching for locations, according to the search value (debounced).
+ * @param searchValue - The search value to search for.
+ * @param suspense - Whether to suspend the component.
+ */
+export const useLocationSearch = (
+   searchValue: string,
+   options: Options = {}
+) => {
+   const { suspense = true, limit = 10 } = options
+
+   const fetcher = useFunctionsSWR<OptionGroup[]>()
+
+   const [debouncedSearchValue, setDebouncedSearchValue] = useState("")
+
+   useDebounce(
+      () => {
+         setDebouncedSearchValue(searchValue)
+      },
+      DEBOUNCE_MS,
+      [searchValue]
+   )
+
+   return useSWR<Omit<OptionGroup, "groupId">[]>(
+      getKey(debouncedSearchValue, limit),
+      fetcher,
+      {
+         ...swrOptions,
+         suspense,
+      }
+   )
+}

@@ -2,7 +2,6 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
 import EventsPreviewCarousel, {
    EventsTypes,
@@ -26,8 +25,6 @@ type Props = {
 }
 
 const LinkedContentDetails = ({ job }: Props) => {
-   const { jobHubV1 } = useFeatureFlags()
-
    const { livestreams, sparks, groupId } = job
 
    const upcomingLiveStreams = useListenToStreams({ filterByGroupId: groupId })
@@ -78,7 +75,7 @@ const LinkedContentDetails = ({ job }: Props) => {
             </Box>
          ) : null}
 
-         {jobSparks.length > 0 && jobHubV1 ? (
+         {jobSparks.length > 0 ? (
             <Box sx={styles.linkedContentWrapper}>
                <SparksCarousel
                   sparks={jobSparks}

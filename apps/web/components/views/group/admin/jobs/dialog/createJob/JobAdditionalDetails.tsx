@@ -1,7 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/useGroupHasUpcomingLivestreams"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 import { datePickerDefaultStyles } from "components/views/calendar/utils"
@@ -91,7 +90,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
    const groupHasUpcomingLivestreams = useGroupHasUpcomingLivestreams(
       group.groupId
    )
-   const { jobHubV1 } = useFeatureFlags()
+
    const { watch, setValue, getValues } = useFormContext()
    const { isSubmitting } = useCustomJobForm()
 
@@ -144,15 +143,6 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
          goToStep(JobDialogStep.NO_CONTENT_AVAILABLE.key)
       }
    }, [getValues, goToStep, group.publicSparks, groupHasUpcomingLivestreams])
-
-   const handleNext = useCallback(() => {
-      if (jobHubV1) {
-         handleNextV2()
-         return
-      }
-
-      goToStep(JobDialogStep.FORM_PREVIEW.key)
-   }, [goToStep, handleNextV2, jobHubV1])
 
    return (
       <SteppedDialog.Container containerSx={styles.content} withActions>
@@ -275,7 +265,7 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                </SteppedDialog.Button>
 
                <SteppedDialog.Button
-                  onClick={handleNext}
+                  onClick={handleNextV2}
                   variant="contained"
                   color="secondary"
                   disabled={!stepIsValid}

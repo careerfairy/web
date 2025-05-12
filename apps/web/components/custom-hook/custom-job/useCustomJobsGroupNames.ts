@@ -10,7 +10,7 @@ type Result = {
 }
 const useCustomJobsGroupNames = (customJobs: CustomJob[]) => {
    const options: Record<string, string> = useMemo(() => {
-      return customJobs.reduce((acc, job) => {
+      return customJobs?.reduce((acc, job) => {
          acc[job.id] = job.groupId
          return acc
       }, {} as Record<string, string>)

@@ -206,7 +206,7 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
    const { reset } = useFormContext()
 
    useEffect(() => {
-      const updatedDefaultValues = getInitialValues(job, group.groupId)
+      const updatedDefaultValues = getInitialValues(job, group)
       reset(updatedDefaultValues)
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isJobFormDialogOpen])
