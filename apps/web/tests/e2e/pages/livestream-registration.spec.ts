@@ -112,28 +112,22 @@ test.describe("Livestream Registration Signed In", () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
    }) => {
+      const { livestream } = await setupLivestreamData()
+
       // Create multiple livestreams to ensure we have recommendations
-      const multipleStreams = await Promise.all([
-         setupLivestreamData(),
-         setupLivestreamData(undefined, {
-            overrideLivestreamDetails: {
-               title: "Recommendation Stream 1",
-            },
+      const [livestream1, livestream2, livestream3] = await Promise.all([
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 1",
          }),
-         setupLivestreamData(undefined, {
-            overrideLivestreamDetails: {
-               title: "Recommendation Stream 2",
-            },
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 2",
          }),
-         setupLivestreamData(undefined, {
-            overrideLivestreamDetails: {
-               title: "Recommendation Stream 3",
-            },
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 3",
          }),
       ])
 
       // Use the first created livestream for registration
-      const { livestream } = multipleStreams[0]
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       await livestreamDialogPage.openDialog()
@@ -147,21 +141,15 @@ test.describe("Livestream Registration Signed In", () => {
       // Verify recommendations grid is visible and contains events
       await livestreamDialogPage.verifyRecommendationsGridVisible()
 
-      // Check that at least one of our created recommendation streams is visible
-      const recommendationTitles = [
-         "Recommendation Stream 1",
-         "Recommendation Stream 2",
-         "Recommendation Stream 3",
-      ]
       const hasRecommendation =
          (await livestreamDialogPage.recommendedEventsGrid
-            .getByText(recommendationTitles[0])
+            .getByText(livestream1.title)
             .isVisible()) ||
          (await livestreamDialogPage.recommendedEventsGrid
-            .getByText(recommendationTitles[1])
+            .getByText(livestream2.title)
             .isVisible()) ||
          (await livestreamDialogPage.recommendedEventsGrid
-            .getByText(recommendationTitles[2])
+            .getByText(livestream3.title)
             .isVisible())
       expect(hasRecommendation).toBeTruthy()
 
@@ -182,28 +170,22 @@ test.describe("Livestream Registration Signed In", () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
    }) => {
+      const { livestream } = await setupLivestreamData()
+
       // Create multiple livestreams to ensure we have recommendations
-      const multipleStreams = await Promise.all([
-         setupLivestreamData(),
-         setupLivestreamData(undefined, {
-            overrideLivestreamDetails: {
-               title: "Recommendation Stream 1",
-            },
+      await Promise.all([
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 1",
          }),
-         setupLivestreamData(undefined, {
-            overrideLivestreamDetails: {
-               title: "Recommendation Stream 2",
-            },
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 2",
          }),
-         setupLivestreamData(undefined, {
-            overrideLivestreamDetails: {
-               title: "Recommendation Stream 3",
-            },
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 3",
          }),
       ])
 
       // Use the first created livestream for registration
-      const { livestream } = multipleStreams[0]
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       await livestreamDialogPage.openDialog()
