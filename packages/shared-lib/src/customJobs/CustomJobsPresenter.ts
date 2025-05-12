@@ -4,7 +4,7 @@ import {
    fromDateFirestoreFn,
    toDate,
 } from "../firebaseTypes"
-import { Group, serializePublicGroup } from "../groups"
+import { PublicGroup, serializePublicGroup } from "../groups"
 import { SerializedPublicGroup } from "../groups/groups"
 import { CustomJob, JobType } from "./customJobs"
 export interface SerializedCustomJob
@@ -35,10 +35,11 @@ export class CustomJobsPresenter extends BaseModel {
       public readonly businessFunctionsTagIds?: string[],
       public readonly isPermanentlyExpired?: boolean,
       public readonly disableUrlTracking?: boolean,
-      public readonly group?: Group
+      public readonly group?: PublicGroup
    ) {
       super()
    }
+
    static createFromPlainObject(customJob: CustomJobsPresenter) {
       return new CustomJobsPresenter(
          customJob.id,
@@ -62,6 +63,7 @@ export class CustomJobsPresenter extends BaseModel {
          customJob.group
       )
    }
+
    static parseDocument(
       customJob: CustomJobsPresenter,
       fromDate: fromDateFirestoreFn
@@ -100,7 +102,7 @@ export class CustomJobsPresenter extends BaseModel {
       return {
          ...serialized,
          group: serializePublicGroup(serialized.group),
-      }
+      } as SerializedCustomJob
    }
 
    convertToDocument(fromDate: fromDateFirestoreFn): CustomJob {
