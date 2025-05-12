@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material"
 
-import { Typography } from "@mui/material"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
+import NotFoundView from "components/views/livestream-dialog/views/common/NotFoundView"
 import { sxStyles } from "types/commonTypes"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 
@@ -23,7 +23,11 @@ export const CustomJobDetails = () => {
          {selectedJob ? (
             <CustomJobDetailsView job={selectedJob} />
          ) : (
-            <Typography>Select a job from the list</Typography>
+            // TODO: Add no job view here, or inside the CustomJobDetailsView
+            <NotFoundView
+               title="Job not found"
+               description="The job you are trying to navigate to was not found"
+            />
          )}
       </Stack>
    )
