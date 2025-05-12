@@ -77,7 +77,7 @@ export const getInitialValues = (
 
    return {
       id: uuidv4(),
-      groupId: group.id,
+      groupId: group.groupId,
       basicInfo: {
          title: "",
          jobType: null,
