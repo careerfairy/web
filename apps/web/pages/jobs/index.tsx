@@ -117,10 +117,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const serializedCustomJobs =
       customJobs?.map((job) => CustomJobsPresenter.serializeDocument(job)) ?? []
 
-   const serializedCustomJob = customJob
-      ? CustomJobsPresenter.serializeDocument(customJob)
-      : undefined
-
    // Add redirect to include the jobId in the URL if it's not already there
    if (!redirected && ((jobId && !customJob) || !jobId)) {
       return {
@@ -140,7 +136,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    return {
       props: {
          serializedCustomJobs,
-         serializedCustomJob,
          searchParams: {
             location: locations,
             term: term as string,
