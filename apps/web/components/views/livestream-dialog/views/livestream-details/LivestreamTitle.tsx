@@ -25,7 +25,7 @@ const LivestreamTitle: FC<Props> = (props) => {
          align="center"
          variant={"brandedH1"}
          sx={styles.eventTitle}
-         data-testid={`livestream-dialog-title-${props.text}`}
+         data-testid={"livestream-dialog-title"}
       >
          {props.text}
       </Typography>

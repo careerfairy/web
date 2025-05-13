@@ -107,28 +107,76 @@ test.describe("Livestream Registration Signed In", () => {
       })
    })
 
-   test("should show recommendations after successful registration", async ({
+   test("should show recommendations ordered by similarity to reference livestream", async ({
       page,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
    }) => {
-      const { livestream } = await setupLivestreamData()
+      // Create a reference livestream with specific industry and country
+      const { livestream: referenceLivestream } = await setupLivestreamData(
+         undefined,
+         {
+            overrideLivestreamDetails: {
+               title: "Reference Livestream",
+               companyIndustries: ["Software", "IT"],
+               companyCountries: ["Germany", "France"],
+            },
+         }
+      )
 
-      // Create multiple livestreams to ensure we have recommendations
-      const [livestream1, livestream2, livestream3] = await Promise.all([
+      // Create livestreams with varying similarity to test recommendation ordering:
+      const [industryAndLocationMatch, industryMatchOnly] = await Promise.all([
+         // Priority 1: Matching both industry AND location
          LivestreamSeed.createUpcoming({
-            title: "Recommendation Stream 1",
+            title: "P1: Industry & Location Match",
+            companyIndustries: ["Software"],
+            companyCountries: ["Germany"],
          }),
+
+         // Priority 2: Matching industry BUT different location
          LivestreamSeed.createUpcoming({
-            title: "Recommendation Stream 2",
+            title: "P2: Industry Match Only",
+            companyIndustries: ["IT"],
+            companyCountries: ["USA"],
          }),
+
+         // Additional streams that should not match P1 or P2 criteria
          LivestreamSeed.createUpcoming({
-            title: "Recommendation Stream 3",
+            title: "Other Stream 1",
+            companyIndustries: ["Healthcare"],
+            companyCountries: ["France"],
+         }),
+
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 2",
+            companyIndustries: ["Finance"],
+            companyCountries: ["Canada"],
+         }),
+
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 3",
+            companyIndustries: ["Healthcare"],
+            companyCountries: ["Canada"],
+         }),
+
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 4",
+            companyIndustries: ["Education"],
+            companyCountries: ["Australia"],
+         }),
+
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 5",
+            companyIndustries: ["Retail"],
+            companyCountries: ["Japan"],
          }),
       ])
 
-      // Use the first created livestream for registration
-      const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
+      // Use the reference livestream for registration
+      const livestreamDialogPage = new LivestreamDialogPage(
+         page,
+         referenceLivestream
+      )
 
       await livestreamDialogPage.openDialog()
 
@@ -141,24 +189,31 @@ test.describe("Livestream Registration Signed In", () => {
       // Verify recommendations grid is visible and contains events
       await livestreamDialogPage.verifyRecommendationsGridVisible()
 
-      const hasRecommendation =
-         (await livestreamDialogPage.recommendedEventsGrid
-            .getByText(livestream1.title)
-            .isVisible()) ||
-         (await livestreamDialogPage.recommendedEventsGrid
-            .getByText(livestream2.title)
-            .isVisible()) ||
-         (await livestreamDialogPage.recommendedEventsGrid
-            .getByText(livestream3.title)
-            .isVisible())
-      expect(hasRecommendation).toBeTruthy()
+      // Get all recommendation cards
+      const recommendationCards =
+         await livestreamDialogPage.getRecommendationCards()
+
+      // Ensure we only see 6 cards (UX requirement)
+      expect(recommendationCards.length).toBeLessThanOrEqual(6)
+
+      // Verify the first card is P1 (Industry & Location Match)
+      const firstCardTitle = await recommendationCards[0]
+         .locator("[data-testid^='livestream-card-title-']")
+         .textContent()
+      expect(firstCardTitle).toBe(industryAndLocationMatch.title)
+
+      // Verify the second card is P2 (Industry Match Only)
+      const secondCardTitle = await recommendationCards[1]
+         .locator("[data-testid^='livestream-card-title-']")
+         .textContent()
+      expect(secondCardTitle).toBe(industryMatchOnly.title)
 
       // Verify we can close the dialog after seeing recommendations
       await livestreamDialogPage.closeDialog()
 
       // Confirm the livestream is now registered
       const livestreamCard = page
-         .getByTestId(`livestream-card-${livestream.id}`)
+         .getByTestId(`livestream-card-${referenceLivestream.id}`)
          .first()
 
       await livestreamCard.scrollIntoViewIfNeeded()
@@ -201,7 +256,9 @@ test.describe("Livestream Registration Signed In", () => {
          await livestreamDialogPage.clickOnFirstRecommendedEvent()
 
       // Verify the dialog now shows details for the clicked event
-      expect(clickedEventTitle).toBeTruthy()
+      await expect(livestreamDialogPage.livestreamDialogTitle).toHaveText(
+         clickedEventTitle
+      )
 
       // Make sure we clicked on a recommendation (not the original event)
       expect(clickedEventTitle).not.toEqual(livestream.title)
