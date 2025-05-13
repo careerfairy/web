@@ -1740,6 +1740,11 @@ export const getCountryOptionByCountryCode = (
       (option) => option.id.toLowerCase() === countryCode.toLowerCase()
    )
 
+   // Add null check to prevent TypeError
+   if (!countryOption) {
+      return null
+   }
+
    return {
       id: countryOption.id,
       name: countryOption.name,

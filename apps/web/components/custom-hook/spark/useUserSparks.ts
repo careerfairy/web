@@ -79,18 +79,24 @@ const fetchPublicSparks = async (countryCode?: string): Promise<Spark[]> => {
 
    if (countryCode) {
       const formattedCountryCode = getCountryOptionByCountryCode(countryCode)
-      const countryFilteredQuery = query(
-         baseQuery,
-         where(
-            "group.targetedCountries",
-            "array-contains",
-            formattedCountryCode
+      // Only apply country filtering if we have a valid country option
+      if (formattedCountryCode) {
+         const countryFilteredQuery = query(
+            baseQuery,
+            where(
+               "group.targetedCountries",
+               "array-contains",
+               formattedCountryCode
+            )
          )
-      )
 
-      snapshots = await getDocs(countryFilteredQuery)
+         snapshots = await getDocs(countryFilteredQuery)
 
-      if (snapshots.size < SPARKS_LIMIT) {
+         if (snapshots.size < SPARKS_LIMIT) {
+            snapshots = await getDocs(baseQuery)
+         }
+      } else {
+         // If country code doesn't match, fetch without filtering
          snapshots = await getDocs(baseQuery)
       }
    } else {
