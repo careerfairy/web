@@ -64,18 +64,16 @@ export const deserializePublicGroup = (
    publicGroup: SerializedPublicGroup,
    fromDate: fromDateFirestoreFn
 ): PublicGroup => {
-   const { planType, planStartedAtString, planExpiresAtString, ...rest } =
-      publicGroup
    return {
-      ...rest,
-      plan: planType
+      ...publicGroup,
+      plan: publicGroup?.planType
          ? {
-              type: planType,
-              startedAt: planStartedAtString
-                 ? fromDate(new Date(planStartedAtString))
+              type: publicGroup.planType,
+              startedAt: publicGroup?.planStartedAtString
+                 ? fromDate(new Date(publicGroup.planStartedAtString))
                  : null,
-              expiresAt: planExpiresAtString
-                 ? fromDate(new Date(planExpiresAtString))
+              expiresAt: publicGroup?.planExpiresAtString
+                 ? fromDate(new Date(publicGroup.planExpiresAtString))
                  : null,
            }
          : null,

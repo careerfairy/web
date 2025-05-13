@@ -1,10 +1,15 @@
+import { Timestamp } from "firebase/firestore"
 import { BaseModel, fromSerializedDate } from "../BaseModel"
 import {
    fromDateConverter,
    fromDateFirestoreFn,
    toDate,
 } from "../firebaseTypes"
-import { PublicGroup, serializePublicGroup } from "../groups"
+import {
+   PublicGroup,
+   deserializePublicGroup,
+   serializePublicGroup,
+} from "../groups"
 import { SerializedPublicGroup } from "../groups/groups"
 import { CustomJob, JobType } from "./customJobs"
 export interface SerializedCustomJob
@@ -103,6 +108,31 @@ export class CustomJobsPresenter extends BaseModel {
          ...serialized,
          group: serializePublicGroup(serialized.group),
       } as SerializedCustomJob
+   }
+
+   static deserialize(
+      serializedCustomJob: SerializedCustomJob
+   ): CustomJobsPresenter {
+      return new CustomJobsPresenter(
+         serializedCustomJob.id,
+         serializedCustomJob.groupId,
+         serializedCustomJob.documentType,
+         serializedCustomJob.title,
+         serializedCustomJob.description,
+         serializedCustomJob.postingUrl,
+         fromSerializedDate(serializedCustomJob.deadline),
+         fromSerializedDate(serializedCustomJob.createdAt),
+         fromSerializedDate(serializedCustomJob.updatedAt),
+         serializedCustomJob.livestreams,
+         serializedCustomJob.sparks,
+         serializedCustomJob.published,
+         serializedCustomJob.jobType,
+         serializedCustomJob.salary,
+         serializedCustomJob.deleted,
+         serializedCustomJob.businessFunctionsTagIds,
+         serializedCustomJob.isPermanentlyExpired,
+         deserializePublicGroup(serializedCustomJob.group, Timestamp.fromDate)
+      )
    }
 
    convertToDocument(fromDate: fromDateFirestoreFn): CustomJob {
