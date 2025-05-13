@@ -15,6 +15,7 @@ export default class LivestreamDialogPage extends CommonPage {
    public signUpToWatchButton: Locator
    public getNotifiedCard: Locator
    public livestreamDialog: Locator
+   public livestreamDialogTitle: Locator
    public recommendedEventsGrid: Locator
    public backButton: Locator
 
@@ -44,6 +45,8 @@ export default class LivestreamDialogPage extends CommonPage {
       this.backButton = page.getByTestId("livestream-dialog-back-button")
 
       this.livestreamDialog = page.getByTestId("livestream-dialog")
+
+      this.livestreamDialogTitle = page.getByTestId("livestream-dialog-title")
 
       this.recommendedEventsGrid = page.getByTestId("recommended-events-grid")
 
@@ -225,13 +228,17 @@ export default class LivestreamDialogPage extends CommonPage {
 
       // Verify the clicked event details are shown
       if (firstEventTitle) {
-         await expect(
-            this.livestreamDialog.getByTestId(
-               `livestream-dialog-title-${firstEventTitle}`
-            )
-         ).toBeVisible()
+         await expect(this.livestreamDialogTitle).toHaveText(firstEventTitle)
       }
 
       return firstEventTitle
+   }
+
+   async getRecommendationCards() {
+      return this.recommendedEventsGrid
+         .locator(
+            "[data-testid^='livestream-card-']:not([data-testid^='livestream-card-title-'])"
+         )
+         .all()
    }
 }

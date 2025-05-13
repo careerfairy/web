@@ -149,8 +149,7 @@ export default class UserEventRecommendationService
    private getReferenceLivestreamBasedRankedRecommendations(): RankedLivestreamEvent[] {
       if (!this.referenceLivestream) return []
 
-      const refIndustry = this.referenceLivestream.businessFunctionsTagIds || []
-      if (refIndustry.length === 0) return []
+      if (!this.referenceLivestream?.companyIndustries?.length) return []
 
       return this.filteredLivestreams
          .map((livestream) =>
