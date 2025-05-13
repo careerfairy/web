@@ -1,5 +1,5 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import useCustomJobs from "components/custom-hook/custom-job/useCustomJobs"
+import { usePublishedCustomJobs } from "components/custom-hook/custom-job/usePublishedCustomJobs"
 import { customJobRepo } from "data/RepositoryInstances"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
@@ -25,6 +25,8 @@ const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
 )
 
 type JobsOverviewContextProviderType = {
+   serverCustomJobs?: CustomJob[]
+   serverJob?: CustomJob
    children: ReactNode
 }
 
@@ -35,19 +37,19 @@ export type SearchParams = {
 
 export const JobsOverviewContextProvider = ({
    children,
+   serverCustomJobs,
+   serverJob,
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
    const [selectedJob, setSelectedJob] = useState<CustomJob | undefined>(
-      undefined
+      serverJob
    )
 
-   // TODO: Replace with Algolia search
-   const { customJobs } = useCustomJobs({
-      totalItems: 15,
-      businessFunctionTagIds: [],
-      jobTypesIds: [],
-      ignoreIds: [],
+   // TODO: Replace customJobswith Algolia search
+
+   const { data: searchCustomJobs } = usePublishedCustomJobs({
+      initialData: serverCustomJobs,
    })
 
    const handleJobIdChange = useCallback(
@@ -90,10 +92,10 @@ export const JobsOverviewContextProvider = ({
       return {
          selectedJob: selectedJob,
          setSelectedJob: handleSelectedJobChange,
-         customJobs,
+         customJobs: searchCustomJobs, // TODO: Replace with Algolia search, using the initial data from the server
          searchParams,
       }
-   }, [customJobs, searchParams, selectedJob, handleSelectedJobChange])
+   }, [searchCustomJobs, searchParams, selectedJob, handleSelectedJobChange])
 
    useEffect(() => {
       handleJobIdChange(router.query.jobId as string)
