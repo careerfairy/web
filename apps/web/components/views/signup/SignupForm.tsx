@@ -184,6 +184,11 @@ const SignupForm = () => {
             value,
             currency: "CHF",
          })
+
+         dataLayerEvent(AnalyticsEvents.Purchase, {
+            value,
+            currency: "CHF",
+         })
       } else {
          setCurrentStep((prev) => prev + 1)
       }
