@@ -107,7 +107,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const locations = (location as string[]) || []
 
    // TODO: Replace with Algolia search using the searchParams
-   const customJobs = await customJobRepo.getPublishedCustomJobs()
+   const customJobs = (await customJobRepo.getPublishedCustomJobs())?.slice(
+      0,
+      10
+   )
    const firstCustomJob = customJobs?.at(0)
 
    const customJob = jobId
