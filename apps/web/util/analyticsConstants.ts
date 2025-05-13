@@ -126,6 +126,9 @@ export const AnalyticsEvents = {
    LivestreamChatNewMessage: "livestream_chat_new_message",
    LivestreamChatOpen: "livestream_chat_open",
    ToggleTheme: "toggle_theme",
+
+   // Value Scoring
+   Purchase: "Purchase",
 } as const
 
 export type AnalyticsEvent =
