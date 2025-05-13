@@ -2,26 +2,34 @@ import {
    CustomJobsPresenter,
    SerializedCustomJob,
 } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
-import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import {
    JobsOverviewContextProvider,
    SearchParams,
 } from "components/views/jobs-page/JobsOverviewContext"
 import JobsPageOverview from "components/views/jobs-page/JobsPageOverview"
 import { customJobRepo } from "data/RepositoryInstances"
+import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ serializedCustomJobs, searchParams }) => {
-   const isMounted = useIsMounted()
+> = ({ serializedCustomJobs, serializedCustomJob, searchParams }) => {
    const seoTitle = getSeoTitle(serializedCustomJobs, searchParams)
 
-   if (!isMounted) {
-      return null
-   }
+   const serverCustomJobs =
+      serializedCustomJobs?.map((job) =>
+         CustomJobsPresenter.deserialize(job).convertToDocument(
+            Timestamp.fromDate
+         )
+      ) || []
+
+   const serverJob = serializedCustomJob
+      ? CustomJobsPresenter.deserialize(serializedCustomJob).convertToDocument(
+           Timestamp.fromDate
+        )
+      : undefined
 
    return (
       <>
@@ -31,7 +39,10 @@ const JobsPage: NextPage<
             title={seoTitle}
          />
          <GenericDashboardLayout>
-            <JobsOverviewContextProvider>
+            <JobsOverviewContextProvider
+               serverCustomJobs={serverCustomJobs}
+               serverJob={serverJob}
+            >
                <JobsPageOverview />
             </JobsOverviewContextProvider>
             <ScrollToTop hasBottomNavBar />
@@ -85,6 +96,7 @@ const getSeoTitle = (
 
 type JobsPageProps = {
    serializedCustomJobs: SerializedCustomJob[]
+   serializedCustomJob?: SerializedCustomJob
    searchParams: SearchParams
 }
 
@@ -105,6 +117,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const serializedCustomJobs =
       customJobs?.map((job) => CustomJobsPresenter.serializeDocument(job)) ?? []
 
+   const serializedCustomJob = customJob
+      ? CustomJobsPresenter.serializeDocument(customJob)
+      : undefined
+
    // Add redirect to include the jobId in the URL if it's not already there
    if (!redirected && ((jobId && !customJob) || !jobId)) {
       return {
@@ -124,6 +140,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    return {
       props: {
          serializedCustomJobs,
+         serializedCustomJob,
          searchParams: {
             location: locations,
             term: term as string,
