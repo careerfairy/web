@@ -31,6 +31,7 @@ const StyledCard = styled(motion(Card))(({ theme }) => ({
    flexDirection: "column",
    flexGrow: 1,
    minHeight: "fit-content",
+   flexShrink: 0,
    transition: theme.transitions.create(["width", "height"], {
       duration: 300,
       easing: "ease-in-out",
