@@ -2,7 +2,7 @@
    "expo": {
       "name": "CareerFairy",
       "slug": "careerfairy-mobile-app",
-      "version": "1.0.3",
+      "version": "1.0.4",
       "orientation": "portrait",
       "icon": "./assets/images/AppIcon.png",
       "scheme": "careerfairy",
@@ -122,6 +122,14 @@
                "organization": "careerfairy",
                "project": "careerfairy-app",
                "url": "https://sentry.io/"
+            }
+         ],
+         [
+            "@config-plugins/react-native-branch",
+            {
+               "apiKey": "key_live_gqsfoucfrfZBTVYh9ZQagkoaurhGRYf0",
+               "iosAppDomain": "careerfairy.app.link",
+               "androidAppDomain": "careerfairy.app.link"
             }
          ]
       ],
