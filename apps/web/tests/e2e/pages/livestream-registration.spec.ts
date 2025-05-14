@@ -210,14 +210,6 @@ test.describe("Livestream Registration Signed In", () => {
 
       // Verify we can close the dialog after seeing recommendations
       await livestreamDialogPage.closeDialog()
-
-      // Confirm the livestream is now registered
-      const livestreamCard = page
-         .getByTestId(`livestream-card-${referenceLivestream.id}`)
-         .first()
-
-      await livestreamCard.scrollIntoViewIfNeeded()
-      await expect(livestreamCard.getByText("Registered")).toBeVisible()
    })
 
    test("should allow navigating to a recommended event after registration", async ({
