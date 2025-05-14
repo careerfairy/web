@@ -268,8 +268,6 @@ exports.onWriteCustomJobsSendNotifications =
 exports.onWriteStudyBackground = onWriteTriggers.onWriteStudyBackground
 
 // On Create Triggers for all collections
-exports.onCreateLivestreamPopularityEvents =
-   onCreateTriggers.onCreateLivestreamPopularityEvents
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
 exports.onCreateUserData_v2 = onCreateTriggers.onCreateUserData
