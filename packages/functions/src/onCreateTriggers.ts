@@ -28,6 +28,13 @@ export const onCreateLivestreamPopularityEvents = onDocumentCreated(
          id: event.data.id,
       }
 
+      if (event.params.livestreamId === "6QaE8TNhzEFMoQISBRKT") {
+         functions.logger.info(
+            "Skipping updating popularity for World Bank Live stream"
+         )
+         return
+      }
+
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
