@@ -42,7 +42,6 @@ import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQ
 import RedirectingView from "./views/common/RedirectingView"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
-import LivestreamDetailsView from "./views/livestream-details/LivestreamDetailsView"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
 import {
    AnimatedBackgroundProvider,
@@ -160,7 +159,7 @@ const views = [
    createView({
       key: "livestream-details",
       viewPath: "livestream-details/LivestreamDetailsView",
-      loadingComponent: () => <LivestreamDetailsView />,
+      loadingComponent: () => <LivestreamDetailsViewSkeleton />,
    }),
    createView({
       key: "register-data-consent",
