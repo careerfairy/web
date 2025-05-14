@@ -1,4 +1,7 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { Dialog, DialogContent, DialogProps } from "@mui/material"
@@ -358,6 +361,18 @@ const Content: FC<ContentProps> = ({
 
    const [showingSuccessAnimation, setShowingSuccessAnimation] = useState(false)
 
+   /**
+    * The source of the livestream impression.
+    * On mount, we extract the originSource from the query params.
+    *
+    * we don't change it for the lifetime of the dialog as it can be used to track
+    * the source of what was used to open the dialog.
+    */
+   // eslint-disable-next-line react/hook-use-state
+   const [originSource] = useState<ImpressionLocation | null>(
+      router.query.originSource as ImpressionLocation | null
+   )
+
    const handleDiscoverCompanySparks = useCallback(() => {
       setIsDiscoverCompanySparksOpen(true)
    }, [])
@@ -591,6 +606,7 @@ const Content: FC<ContentProps> = ({
          showingSuccessAnimation,
          isRecommendationsListVisible,
          setIsRecommendationsListVisible,
+         originSource,
       }),
       [
          goToView,
@@ -617,6 +633,7 @@ const Content: FC<ContentProps> = ({
          isRecommendationsListVisible,
          setIsRecommendationsListVisible,
          showingSuccessAnimation,
+         originSource,
       ]
    )
 
@@ -732,6 +749,7 @@ type DialogContextType = {
    handleStartSuccessAnimation: () => void
    isRecommendationsListVisible: boolean
    setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
+   originSource: ImpressionLocation | null
 }
 
 /**
@@ -779,6 +797,7 @@ const DialogContext = createContext<DialogContextType>({
    handleStartSuccessAnimation: () => {},
    isRecommendationsListVisible: false,
    setIsRecommendationsListVisible: () => {},
+   originSource: null,
 })
 
 export const useLiveStreamDialog = () => {

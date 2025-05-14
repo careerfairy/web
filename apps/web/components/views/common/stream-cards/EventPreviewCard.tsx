@@ -34,7 +34,7 @@ export type EventPreviewCardProps = {
    index?: number
    // The total number of events in the list
    totalElements?: number
-   location?: ImpressionLocation | string
+   location?: ImpressionLocation
    ref?: React.Ref<HTMLDivElement>
    disableClick?: boolean
    /* Overrides the default Link click behavior of the card */
@@ -132,6 +132,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                type: "livestreamDetails",
                livestreamId: presenterEvent.id,
             },
+            originSource: props.location,
          })
 
          // Fall back to the default portal link and open the event in a new tab
@@ -139,7 +140,14 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             href: eventLink,
             target: isOnlivestreamDialogPage(pathname) ? undefined : "_blank",
          }
-      }, [presenterEvent, hasRegistered, router, pathname, getPartnerEventLink])
+      }, [
+         presenterEvent,
+         hasRegistered,
+         router,
+         pathname,
+         getPartnerEventLink,
+         props.location,
+      ])
 
       const isLink =
          !isInTalentGuidePage &&

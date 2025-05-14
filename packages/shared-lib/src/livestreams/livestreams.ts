@@ -323,6 +323,7 @@ export interface UserLivestreamData extends Identifiable {
       referrer?: string
       isRecommended?: boolean
       sparkId?: string
+      originSource?: ImpressionLocation
    }
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
@@ -780,6 +781,8 @@ export enum ImpressionLocation {
    endOfStreamLivestreams = "endOfStreamLivestreams",
    mentorPageCarousel = "mentorPageCarousel",
    livestreamDialogPostRegistrationRecommendations = "livestreamDialogPostRegistrationRecommendations",
+   nextLivestreamsSearchBar = "nextLivestreamsSearchBar",
+   portalHeroContentCarousel = "portalHeroContentCarousel",
    unknown = "unknown",
 }
 

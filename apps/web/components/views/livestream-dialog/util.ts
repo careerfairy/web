@@ -1,3 +1,4 @@
+import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GetServerSidePropsContext, GetStaticPropsContext } from "next"
 import { NextRouter } from "next/router"
@@ -8,7 +9,6 @@ import {
    getServerSideUserStats,
    getUserTokenFromCookie,
 } from "../../../util/serverUtil"
-import { getBaseUrl } from "../../helperFunctions/HelperFunctions"
 import { LiveStreamDialogData } from "./LivestreamDialogLayout"
 
 export const getLivestreamDialogData = async (
@@ -147,9 +147,15 @@ type LinkType =
 export const buildDialogLink = ({
    router,
    link,
+   originSource,
 }: {
    router: NextRouter
    link: LinkType
+   /**
+    * The source of the click event.
+    * This is used to track the source of the click event.
+    */
+   originSource?: ImpressionLocation
 }): UrlObject => {
    const isOnLivestreamDialogPage = isOnlivestreamDialogPage(router.pathname)
    let query: ValidLink
@@ -185,27 +191,7 @@ export const buildDialogLink = ({
       query: {
          ...router.query,
          livestreamDialog: query,
+         ...(originSource ? { originSource } : {}),
       },
    }
-}
-
-export const buildExternalDialogLink = (link: LinkType): string => {
-   let pathDetail: string
-
-   switch (link.type) {
-      case "livestreamDetails":
-         pathDetail = `livestream/${link.livestreamId}`
-         break
-      case "jobDetails":
-         pathDetail = `livestream/${link.livestreamId}/job-details/${link.jobId}`
-         break
-      case "registerToLivestream":
-         pathDetail = `livestream/${link.livestreamId}/register`
-         break
-      default:
-         throw new Error("Invalid link type")
-   }
-
-   const baseUrl = getBaseUrl()
-   return `${baseUrl}${link.targetPage}/${pathDetail}`
 }
