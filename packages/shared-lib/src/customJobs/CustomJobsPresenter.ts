@@ -12,6 +12,7 @@ import {
 } from "../groups"
 import { SerializedPublicGroup } from "../groups/groups"
 import { CustomJob, JobType } from "./customJobs"
+
 export interface SerializedCustomJob
    extends Omit<CustomJob, "createdAt" | "updatedAt" | "deadline" | "group"> {
    createdAt: number
