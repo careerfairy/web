@@ -43,10 +43,10 @@ export const JobsOverviewContextProvider = ({
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
    const [selectedJob, setSelectedJob] = useState<CustomJob | undefined>(
-      serverJob
+      undefined
    )
 
-   // TODO: Replace customJobswith Algolia search
+   // TODO: Replace customJobs with Algolia search
 
    const { data: searchCustomJobs } = usePublishedCustomJobs({
       initialData: serverCustomJobs,
@@ -61,8 +61,6 @@ export const JobsOverviewContextProvider = ({
                return
             }
          }
-
-         setSelectedJob(undefined)
       },
       [setSelectedJob]
    )
@@ -98,8 +96,12 @@ export const JobsOverviewContextProvider = ({
    }, [searchCustomJobs, searchParams, selectedJob, handleSelectedJobChange])
 
    useEffect(() => {
-      handleJobIdChange(router.query.jobId as string)
-   }, [router.query.jobId, handleJobIdChange])
+      if (serverJob?.id !== router.query.jobId) {
+         handleJobIdChange(router.query.jobId as string)
+      } else {
+         setSelectedJob(serverJob)
+      }
+   }, [router.query.jobId, handleJobIdChange, serverJob])
 
    return (
       <JobsOverviewContext.Provider value={value}>
