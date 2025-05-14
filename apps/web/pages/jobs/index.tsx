@@ -2,20 +2,32 @@ import {
    CustomJobsPresenter,
    SerializedCustomJob,
 } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
+import {
+   SerializedSpark,
+   SparkPresenter,
+} from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import {
    JobsOverviewContextProvider,
    SearchParams,
 } from "components/views/jobs-page/JobsOverviewContext"
 import JobsPageOverview from "components/views/jobs-page/JobsPageOverview"
-import { customJobRepo } from "data/RepositoryInstances"
+import {
+   customJobRepo,
+   livestreamRepo,
+   sparkRepo,
+} from "data/RepositoryInstances"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ serializedCustomJobs, serializedCustomJob, searchParams }) => {
+> = ({ serializedCustomJobs, customJobData, searchParams }) => {
    const seoTitle = getSeoTitle(serializedCustomJobs, searchParams)
 
    const serverCustomJobs =
@@ -25,10 +37,10 @@ const JobsPage: NextPage<
          )
       ) || []
 
-   const serverJob = serializedCustomJob
-      ? CustomJobsPresenter.deserialize(serializedCustomJob).convertToDocument(
-           Timestamp.fromDate
-        )
+   const serverJob = customJobData?.serializedCustomJob
+      ? CustomJobsPresenter.deserialize(
+           customJobData.serializedCustomJob
+        ).convertToDocument(Timestamp.fromDate)
       : undefined
 
    return (
@@ -96,7 +108,11 @@ const getSeoTitle = (
 
 type JobsPageProps = {
    serializedCustomJobs: SerializedCustomJob[]
-   serializedCustomJob?: SerializedCustomJob
+   customJobData?: {
+      serializedCustomJob: SerializedCustomJob
+      livestreamsData: { [p: string]: any }[]
+      sparksData: SerializedSpark[]
+   }
    searchParams: SearchParams
 }
 
@@ -106,16 +122,18 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const { location, term = "", jobId, redirected } = context.query
    const locations = (location as string[]) || []
 
-   // TODO: Replace with Algolia search using the searchParams
-   const customJobs = (await customJobRepo.getPublishedCustomJobs())?.slice(
-      0,
-      10
-   )
+   // TODO: Replace with Algolia search using the searchParams, also add default limit
+   // TODO: Check also size limit, as returning high number of jobs might cause performance issues
+   const customJobs = await customJobRepo.getPublishedCustomJobs()
    const firstCustomJob = customJobs?.at(0)
 
    const customJob = jobId
       ? await customJobRepo.getCustomJobById(jobId as string)
       : firstCustomJob
+
+   const serializedCustomJob = customJob
+      ? CustomJobsPresenter.serializeDocument(customJob)
+      : null
 
    const serializedCustomJobs =
       customJobs?.map((job) => CustomJobsPresenter.serializeDocument(job)) ?? []
@@ -136,9 +154,39 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       }
    }
 
+   const serializedSparks: SerializedSpark[] = []
+   const livestreamsData: { [p: string]: any }[] = []
+
+   // For SEO only
+   if (customJob) {
+      let jobEvents: LivestreamEvent[] = []
+      let jobSparks: Spark[] = []
+
+      if (customJob?.livestreams?.length) {
+         jobEvents = await livestreamRepo.getLivestreamsByIds(
+            customJob.livestreams
+         )
+      }
+      if (customJob?.sparks?.length) {
+         jobSparks = await sparkRepo.getSparksByIds(customJob.sparks)
+      }
+
+      jobSparks.forEach((spark) => {
+         serializedSparks.push(SparkPresenter.serialize(spark))
+      })
+      jobEvents.forEach((event) => {
+         livestreamsData.push(LivestreamPresenter.serializeDocument(event))
+      })
+   }
+
    return {
       props: {
-         serializedCustomJobs,
+         serializedCustomJobs: serializedCustomJobs,
+         customJobData: {
+            serializedCustomJob,
+            livestreamsData,
+            sparksData: serializedSparks,
+         },
          searchParams: {
             location: locations,
             term: term as string,
