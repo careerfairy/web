@@ -1,8 +1,12 @@
-import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
 import {
-   PopularityEventType,
+   LivestreamEvent,
+   pickPublicDataFromLivestream,
+} from "@careerfairy/shared-lib/livestreams"
+import {
    PopularityEventData,
+   PopularityEventType,
 } from "@careerfairy/shared-lib/livestreams/popularity"
+import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
 import {
    addDoc,
    collection,
@@ -12,12 +16,8 @@ import {
    serverTimestamp,
    setDoc,
 } from "firebase/firestore"
-import { FirestoreInstance } from "./FirebaseInstance"
-import {
-   LivestreamEvent,
-   pickPublicDataFromLivestream,
-} from "@careerfairy/shared-lib/livestreams"
 import { getReferralInformation } from "util/CommonUtil"
+import { FirestoreInstance } from "./FirebaseInstance"
 
 export class RecommendationService {
    constructor(private readonly firestore: Firestore) {}
@@ -104,6 +104,8 @@ export class RecommendationService {
       livestream: LivestreamEvent,
       options?: AddPopularityEventOptions
    ): void {
+      return // Disable adding popularity events for now
+
       const data: Omit<PopularityEventData, "id"> = {
          type,
          createdAt: serverTimestamp() as any,
