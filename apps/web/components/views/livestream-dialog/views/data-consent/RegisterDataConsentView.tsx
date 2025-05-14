@@ -364,7 +364,7 @@ export const PrimarySecondaryButtons = ({
             variant="contained"
             disableElevation
             size="medium"
-            color="secondary"
+            color="primary"
             startIcon={
                loading ? (
                   <CircularProgress size={10} color="inherit" />
