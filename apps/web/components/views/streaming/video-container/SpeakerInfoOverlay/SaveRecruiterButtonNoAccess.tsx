@@ -1,18 +1,17 @@
-import React from "react"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { Button, Tooltip, TooltipProps, Typography } from "@mui/material"
-import SaveIcon from "@mui/icons-material/Save"
-import IconButton from "@mui/material/IconButton"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import Link from "../../../common/Link"
+import SaveIcon from "@mui/icons-material/Save"
+import { Button, Tooltip, TooltipProps, Typography } from "@mui/material"
+import IconButton from "@mui/material/IconButton"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import {
    careerSkillsLinkWithContext,
    My_Recruiters_NoAccess,
 } from "../../../../../constants/contextInfoCareerSkills"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { sxStyles } from "../../../../../types/commonTypes"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
+import Link from "../../../common/Link"
 
 const styles = sxStyles({
    tooltip: {

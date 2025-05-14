@@ -1,27 +1,27 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import Typography from "@mui/material/Typography"
-import Tooltip from "@mui/material/Tooltip"
-import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
+import Tooltip from "@mui/material/Tooltip"
+import Typography from "@mui/material/Typography"
 
-import React, { memo, useCallback, useState } from "react"
-import { alpha } from "@mui/material/styles"
 import CircularProgress, {
    circularProgressClasses,
 } from "@mui/material/CircularProgress"
+import { alpha } from "@mui/material/styles"
+import { memo, useCallback, useState } from "react"
 
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
 import { sxStyles } from "../../../../types/commonTypes"
 import Link from "../../common/Link"
 
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
 import useBadgeStepProgress from "../../../custom-hook/useBadgeStepProgress"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 
+import { useTimeoutFn } from "react-use"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 import useAnimatedNumber from "../../../custom-hook/useAnimatedNumber"
 import useIsMobile from "../../../custom-hook/useIsMobile"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { useTimeoutFn } from "react-use"
 
 const styles = sxStyles({
    root: {

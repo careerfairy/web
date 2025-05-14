@@ -1,5 +1,5 @@
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
 import { timeoutDuration } from "../components/custom-hook/useCanWatchHighlights"
 import { convertMillisecondsToTime } from "../util/CommonUtil"
 
