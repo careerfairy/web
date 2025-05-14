@@ -478,13 +478,19 @@ const Content: FC<ContentProps> = ({
    )
 
    const goToRecommendations = useCallback(
-      ({ replacePage }: { replacePage?: boolean } = {}) => {
+      ({
+         replacePage,
+         targetLivestreamId,
+      }: { replacePage?: boolean; targetLivestreamId?: string } = {}) => {
          if (mode === "page") {
             const routerMethod = replacePage ? replace : push
             void routerMethod(
                buildDialogLink({
                   router,
-                  link: { type: "recommendations", livestreamId },
+                  link: {
+                     type: "recommendations",
+                     livestreamId: targetLivestreamId || livestreamId,
+                  },
                }),
                undefined,
                routerOptions
@@ -508,7 +514,8 @@ const Content: FC<ContentProps> = ({
          previousView === "recommendations"
       ) {
          setIsRecommendationsListVisible(true)
-         goToRecommendations()
+         goToRecommendations({ targetLivestreamId: previousLivestreamId })
+
          /**
           * Restore the previous livestream when manually navigating back(not using browser back button) from recommendations to details view.
           * Using setTimeout to delay the ID change until after view transition animations complete.
@@ -530,11 +537,11 @@ const Content: FC<ContentProps> = ({
       activeView,
       previousView,
       goToView,
-      onClose,
       setIsRecommendationsListVisible,
       goToRecommendations,
-      setLocalLivestreamId,
       previousLivestreamId,
+      setLocalLivestreamId,
+      onClose,
    ])
 
    const [registrationState, registrationDispatch] = useReducer(
