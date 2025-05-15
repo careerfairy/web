@@ -1,11 +1,7 @@
-import {
-   ImpressionLocation,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/livestreams/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
 import {
    Box,
    Container,
-   Grid,
    IconButton,
    IconButtonProps,
    styled,
@@ -14,12 +10,12 @@ import {
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
-import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
+import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
 import { AnimatePresence, motion } from "framer-motion"
-import { useEffect, useState } from "react"
 import { X as CloseIcon } from "react-feather"
 import { useLiveStreamDialog } from "../.."
 import { BlurredBackground } from "./BlurredBackground"
+import { EventsGrid } from "./EventsGrid"
 import { GetNotifiedCard } from "./GetNotifiedCard"
 import { RecommendationsNav } from "./RecommendationsNav"
 import { useArtificialLoading } from "./useArtificialLoading"
@@ -73,62 +69,34 @@ const fadeAnimation = {
    exit: { opacity: 0, transition: { duration: 0.3 } },
 }
 
-// Slide up animation for card list
-const slideUpAnimation = {
-   initial: { opacity: 0, y: 50 },
-   animate: {
-      opacity: 1,
-      y: 0,
-      transition: {
-         duration: 0.5,
-         staggerChildren: 0.1,
-         when: "beforeChildren",
-      },
-   },
-   exit: { opacity: 0, y: 20, transition: { duration: 0.3 } },
-}
-
-// Animation for individual cards
-const cardAnimation = {
-   initial: { opacity: 0, y: 20 },
-   animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.3 },
-   },
-}
-
 export const MobileView = () => {
-   const [showRecommendations, setShowRecommendations] = useState(false)
+   const {
+      livestream,
+      isRecommendationsListVisible,
+      setIsRecommendationsListVisible,
+   } = useLiveStreamDialog()
+
    const { events, loading: loadingEvents } = useRecommendedEvents({
       bypassCache: true,
+      referenceLivestreamId: livestream.id,
    })
 
-   const { livestream, goToView } = useLiveStreamDialog()
-
-   const nothingToRecommend = !loadingEvents && !events?.length
-
    const handleNext = () => {
-      if (nothingToRecommend) {
-         goToView("livestream-details")
-      } else {
-         setShowRecommendations(true)
-      }
+      setIsRecommendationsListVisible(true)
    }
 
    return (
       <MobileLayout>
          <AnimatePresence>
-            {Boolean(showRecommendations) && (
+            {Boolean(isRecommendationsListVisible) && (
                <Recommendations
                   key="recommendations"
                   events={events}
-                  nothingToRecommend={nothingToRecommend}
                   loadingEvents={loadingEvents}
                />
             )}
             <RecommendationsNav key="recommendations-nav" />
-            {!showRecommendations && (
+            {!isRecommendationsListVisible && (
                <Box
                   component={motion.div}
                   display="flex"
@@ -158,14 +126,12 @@ const MIN_LOADING_TIME = 1500
 
 const Recommendations = ({
    events,
-   nothingToRecommend,
    loadingEvents,
 }: {
    events: LivestreamEvent[]
-   nothingToRecommend: boolean
    loadingEvents: boolean
 }) => {
-   const { livestream, closeDialog, goToView } = useLiveStreamDialog()
+   const { livestream, closeDialog } = useLiveStreamDialog()
    const isSmall = useIsMobile(640)
 
    // Use our custom hook to manage loading state
@@ -173,12 +139,6 @@ const Recommendations = ({
       minLoadingTime: MIN_LOADING_TIME,
       sessionKey: "cf-recommendations-loading-shown",
    })
-
-   useEffect(() => {
-      if (nothingToRecommend) {
-         goToView("livestream-details")
-      }
-   }, [goToView, nothingToRecommend])
 
    return (
       <RecommendationsContainer
@@ -193,7 +153,7 @@ const Recommendations = ({
                initial="initial"
                animate="animate"
                exit="exit"
-               variants={slideUpAnimation}
+               variants={SlideUpWithStaggeredChildrenAnimation}
                layout
             >
                <Title
@@ -207,7 +167,7 @@ const Recommendations = ({
                initial="initial"
                animate="animate"
                exit="exit"
-               variants={slideUpAnimation}
+               variants={SlideUpWithStaggeredChildrenAnimation}
                layout
             >
                <AnimatePresence mode="sync">
@@ -238,36 +198,12 @@ const Recommendations = ({
                </AnimatePresence>
             </motion.div>
             {isLoading ? null : (
-               <motion.div
+               <EventsGrid
                   key="recommendations-list"
-                  layout
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  variants={slideUpAnimation}
-               >
-                  <Grid container sx={{ pb: 11 }} spacing={1.5}>
-                     {events.map((event, index) => (
-                        <Grid item xs={isSmall ? 12 : 6} key={event.id}>
-                           <motion.div
-                              variants={cardAnimation}
-                              initial="initial"
-                              animate="animate"
-                           >
-                              <EventPreviewCard
-                                 totalElements={events.length}
-                                 index={index}
-                                 isRecommended
-                                 event={event}
-                                 location={
-                                    ImpressionLocation.livestreamDialogPostRegistrationRecommendations
-                                 }
-                              />
-                           </motion.div>
-                        </Grid>
-                     ))}
-                  </Grid>
-               </motion.div>
+                  singleColumn={isSmall}
+                  events={events}
+                  loading={loadingEvents}
+               />
             )}
          </AnimatePresence>
       </RecommendationsContainer>

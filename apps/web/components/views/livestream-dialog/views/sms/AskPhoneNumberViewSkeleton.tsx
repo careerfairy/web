@@ -3,13 +3,13 @@ import BaseDialogView, { MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 
 export const AskPhoneNumberViewSkeleton = () => {
-   const { goToView } = useLiveStreamDialog()
+   const { handleStartSuccessAnimation } = useLiveStreamDialog()
 
    return (
       <BaseDialogView
          mainContent={
             <MainContent
-               onBackClick={() => goToView("recommendations")}
+               onBackClick={handleStartSuccessAnimation}
                onBackPosition="top-left"
             >
                <Typography>Loading...</Typography>

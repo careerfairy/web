@@ -108,7 +108,7 @@ const LivestreamValidationsComponent = ({
             serverSideLivestream={livestream}
             livestreamId={livestream.id}
             handleClose={() => {}}
-            page={"register"}
+            initialPage={"register"}
             mode="stand-alone"
             onRegisterSuccess={afterRegistrationMutations}
          />

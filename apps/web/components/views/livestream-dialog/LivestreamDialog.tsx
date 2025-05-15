@@ -21,6 +21,7 @@ import {
    useState,
 } from "react"
 import SwipeableViews from "react-swipeable-views"
+import { usePrevious, usePreviousDistinct } from "react-use"
 import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { sxStyles } from "../../../types/commonTypes"
@@ -36,7 +37,7 @@ import {
    registrationInitialState,
    registrationReducer,
 } from "./registrationReducer"
-import { buildDialogLink } from "./util"
+import { DialogPageType, buildDialogLink } from "./util"
 import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
 import RedirectingView from "./views/common/RedirectingView"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
@@ -46,7 +47,7 @@ import {
    AnimatedBackgroundProvider,
    DialogAnimatedBackground,
 } from "./views/recommendations/DialogAnimatedBackground"
-import { RecommendationsViewSkeleton } from "./views/recommendations/RecommendationsViewSkeleton"
+import RecommendationsView from "./views/recommendations/RecommendationsView"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
 import SpeakerDetailsViewSkeleton from "./views/speaker-details/SpeakerDetailsViewSkeleton"
@@ -99,7 +100,7 @@ type Props = {
    livestreamId: string
    handleClose: () => void
    open: boolean
-   page: "details" | "register" | "job-details" | "speaker-details"
+   initialPage: DialogPageType
    updatedStats?: UserStats
    serverUserEmail: string
    /**
@@ -193,7 +194,7 @@ const views = [
    createView({
       key: "recommendations",
       viewPath: "recommendations/RecommendationsView",
-      loadingComponent: () => <RecommendationsViewSkeleton />,
+      loadingComponent: () => <RecommendationsView />, // load actual component
    }),
 ] as const
 
@@ -209,26 +210,55 @@ const LivestreamDialog: FC<Props> = ({
    open,
    livestreamId,
    appear,
-   page = "details",
+   initialPage = "details",
    ...rest
 }) => {
+   /**
+    * Maintains an internal state of the current livestream being displayed.
+    * This allows the dialog to manage its own livestream state independently of props,
+    * which is critical for handling navigation between different livestreams,
+    * especially in "stand-alone" mode where URL doesn't change.
+    */
+   const [localLivestreamId, setLocalLivestreamId] = useState<string | null>(
+      livestreamId
+   )
+
+   useEffect(() => {
+      setLocalLivestreamId(livestreamId)
+   }, [livestreamId])
+
    const isMobile = useIsMobile()
    const onClose = useCallback(() => {
       handleClose()
    }, [handleClose])
 
-   const [value, setValue] = useState<number>(getPageIndex(page))
-   const activeView = views[value].key
+   const [isRecommendationsListVisible, setIsRecommendationsListVisible] =
+      useState(false)
+
+   /**
+    * Tracks the currently active view index in the dialog's SwipeableViews component.
+    * This index corresponds to the position in the 'views' array and determines which
+    * view is currently displayed to the user.
+    */
+   const [activeViewIndex, setActiveViewIndex] = useState<number>(
+      getActiveViewIndexFromPage(initialPage)
+   )
+   const activeView = views[activeViewIndex].key
+   const previousValue = usePrevious(activeViewIndex)
+   const previousView = views[previousValue]?.key
 
    // Using useEffect to update the view based on 'page'.
    // This allows conditional navigation not covered by useMemo.
    useEffect(() => {
-      setValue(getPageIndex(page))
-   }, [page, setValue])
+      setActiveViewIndex(getActiveViewIndexFromPage(initialPage))
+   }, [initialPage])
 
    return (
       <AnimatedBackgroundProvider
          showAnimatedBackground={activeView === "recommendations"}
+         expanded={
+            activeView === "recommendations" && isRecommendationsListVisible
+         }
       >
          <Dialog
             open={open}
@@ -246,13 +276,19 @@ const LivestreamDialog: FC<Props> = ({
             PaperProps={PaperProps}
          >
             <DialogContent sx={styles.content}>
-               {livestreamId ? (
+               {localLivestreamId ? (
                   <Content
                      handleClose={onClose}
-                     livestreamId={livestreamId}
-                     value={value}
+                     livestreamId={localLivestreamId}
+                     setLocalLivestreamId={setLocalLivestreamId}
+                     activeViewIndex={activeViewIndex}
                      activeView={activeView}
-                     setValue={setValue}
+                     setActiveViewIndex={setActiveViewIndex}
+                     previousView={previousView}
+                     isRecommendationsListVisible={isRecommendationsListVisible}
+                     setIsRecommendationsListVisible={
+                        setIsRecommendationsListVisible
+                     }
                      {...rest}
                   />
                ) : (
@@ -264,10 +300,14 @@ const LivestreamDialog: FC<Props> = ({
    )
 }
 
-type ContentProps = Omit<Props, "open" | "page"> & {
-   value: number
+type ContentProps = Omit<Props, "open" | "initialPage"> & {
+   activeViewIndex: number
    activeView: ViewKey
-   setValue: Dispatch<SetStateAction<number>>
+   setActiveViewIndex: Dispatch<SetStateAction<number>>
+   previousView: ViewKey
+   isRecommendationsListVisible: boolean
+   setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
+   setLocalLivestreamId: Dispatch<SetStateAction<string>>
 }
 
 const Content: FC<ContentProps> = ({
@@ -277,17 +317,27 @@ const Content: FC<ContentProps> = ({
    serverUserEmail,
    onRegisterSuccess,
    livestreamId,
+   setLocalLivestreamId,
    mode = "page",
    currentSparkId,
    jobId,
    speakerId,
    setting,
-   value,
+   activeViewIndex,
    activeView,
-   setValue,
+   setActiveViewIndex,
+   previousView,
+   isRecommendationsListVisible,
+   setIsRecommendationsListVisible,
 }) => {
    const router = useRouter()
-   const { push, query } = router
+   /**
+    * Tracks the previous livestream ID before it changes.
+    * Essential for the back navigation in "stand-alone" mode to restore
+    * the previous livestream when navigating between recommendations.
+    */
+   const previousLivestreamId = usePreviousDistinct(livestreamId)
+   const { push, query, replace } = router
 
    /**
     * Mark this event registration as recommended if the user came from the
@@ -305,7 +355,7 @@ const Content: FC<ContentProps> = ({
    const [isDiscoverCompanySparksOpen, setIsDiscoverCompanySparksOpen] =
       useState(false)
 
-   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
+   const [showingSuccessAnimation, setShowingSuccessAnimation] = useState(false)
 
    const handleDiscoverCompanySparks = useCallback(() => {
       setIsDiscoverCompanySparksOpen(true)
@@ -326,7 +376,7 @@ const Content: FC<ContentProps> = ({
          switch (view) {
             case "livestream-details":
                if (isPageMode) {
-                  return void push(
+                  void push(
                      buildDialogLink({
                         router,
                         link: {
@@ -338,11 +388,12 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
+               setActiveViewIndex(views.findIndex((v) => v.key === view))
                break
 
             case "register-data-consent":
                if (isPageMode) {
-                  return void push(
+                  void push(
                      buildDialogLink({
                         router,
                         link: {
@@ -354,19 +405,21 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
+               setActiveViewIndex(views.findIndex((v) => v.key === view))
                break
 
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
                   view = "recommendations"
                }
+               setActiveViewIndex(views.findIndex((v) => v.key === view))
                break
          }
 
-         setValue(views.findIndex((v) => v.key === view))
+         setActiveViewIndex(views.findIndex((v) => v.key === view))
       },
       [
-         setValue,
+         setActiveViewIndex,
          isPageMode,
          livestream?.questionsDisabled,
          push,
@@ -392,10 +445,10 @@ const Content: FC<ContentProps> = ({
             )
          } else {
             setCurrentJobId(jobId)
-            setValue(views.findIndex((v) => v.key === "job-details"))
+            setActiveViewIndex(views.findIndex((v) => v.key === "job-details"))
          }
       },
-      [livestreamId, mode, push, router, setValue]
+      [livestreamId, mode, push, router, setActiveViewIndex]
    )
 
    const goToSpeakerDetails = useCallback(
@@ -415,10 +468,33 @@ const Content: FC<ContentProps> = ({
             )
          } else {
             setCurrentSpeakerId(speakerId)
-            setValue(views.findIndex((v) => v.key === "speaker-details"))
+            setActiveViewIndex(
+               views.findIndex((v) => v.key === "speaker-details")
+            )
          }
       },
-      [livestreamId, mode, push, router, setValue]
+      [livestreamId, mode, push, router, setActiveViewIndex]
+   )
+
+   const goToRecommendations = useCallback(
+      ({ replacePage }: { replacePage?: boolean } = {}) => {
+         if (mode === "page") {
+            const routerMethod = replacePage ? replace : push
+            void routerMethod(
+               buildDialogLink({
+                  router,
+                  link: { type: "recommendations", livestreamId },
+               }),
+               undefined,
+               routerOptions
+            )
+         } else {
+            setActiveViewIndex(
+               views.findIndex((v) => v.key === "recommendations")
+            )
+         }
+      },
+      [livestreamId, mode, push, router, setActiveViewIndex, replace]
    )
 
    const onClose = useCallback(() => {
@@ -426,12 +502,39 @@ const Content: FC<ContentProps> = ({
    }, [handleClose])
 
    const handleBack = useCallback(() => {
-      if (views[value].key === "livestream-details") {
-         onClose()
-      } else {
-         goToView("livestream-details")
+      if (
+         activeView === "livestream-details" &&
+         previousView === "recommendations"
+      ) {
+         setIsRecommendationsListVisible(true)
+         goToRecommendations()
+         /**
+          * Restore the previous livestream when manually navigating back(not using browser back button) from recommendations to details view.
+          * Using setTimeout to delay the ID change until after view transition animations complete.
+          * This prevents visual glitches and ensures a smooth transition between different livestreams.
+          */
+         setTimeout(() => {
+            setLocalLivestreamId(previousLivestreamId)
+         }, 250)
+         return
       }
-   }, [value, onClose, goToView])
+
+      if (activeView === "livestream-details") {
+         onClose()
+         return
+      }
+
+      goToView("livestream-details")
+   }, [
+      activeView,
+      previousView,
+      goToView,
+      onClose,
+      setIsRecommendationsListVisible,
+      goToRecommendations,
+      setLocalLivestreamId,
+      previousLivestreamId,
+   ])
 
    const [registrationState, registrationDispatch] = useReducer(
       registrationReducer,
@@ -455,6 +558,7 @@ const Content: FC<ContentProps> = ({
          closeDialog: onClose,
          livestream,
          activeView,
+         previousView,
          handleBack,
          livestreamPresenter,
          updatedStats,
@@ -472,13 +576,20 @@ const Content: FC<ContentProps> = ({
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
          setting,
-         handleShowSuccessAnimation: () => setShowSuccessAnimation(true),
+         handleStartSuccessAnimation: () => {
+            setIsRecommendationsListVisible(false)
+            return setShowingSuccessAnimation(true)
+         },
+         showingSuccessAnimation,
+         isRecommendationsListVisible,
+         setIsRecommendationsListVisible,
       }),
       [
          goToView,
          onClose,
          livestream,
          activeView,
+         previousView,
          handleBack,
          livestreamPresenter,
          updatedStats,
@@ -495,6 +606,9 @@ const Content: FC<ContentProps> = ({
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
          setting,
+         isRecommendationsListVisible,
+         setIsRecommendationsListVisible,
+         showingSuccessAnimation,
       ]
    )
 
@@ -509,7 +623,7 @@ const Content: FC<ContentProps> = ({
                slideStyle={styles.slide}
                disabled
                axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-               index={value}
+               index={activeViewIndex}
             >
                {views.map(
                   ({ key, component: View, skeleton: Skeleton }, index) => (
@@ -517,7 +631,7 @@ const Content: FC<ContentProps> = ({
                         sx={styles.fullHeight}
                         key={key}
                         value={index}
-                        activeValue={value}
+                        activeValue={activeViewIndex}
                      >
                         {livestream ? <View /> : <Skeleton />}
                      </AnimatedTabPanel>
@@ -525,10 +639,12 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
-         {Boolean(showSuccessAnimation) && (
+         {Boolean(showingSuccessAnimation) && (
             <RegistrationSuccessAnimation
-               onAnimationFullScreen={() => goToView("recommendations")}
-               onAnimationComplete={() => setShowSuccessAnimation(false)}
+               onAnimationFullScreen={() =>
+                  goToRecommendations({ replacePage: true })
+               }
+               onAnimationComplete={() => setShowingSuccessAnimation(false)}
             />
          )}
       </DialogContext.Provider>
@@ -570,6 +686,7 @@ type DialogContextType = {
    livestream: LivestreamEvent | undefined | null
    livestreamPresenter: LivestreamPresenter
    activeView: ViewKey
+   previousView: ViewKey | undefined
    /*
     * The user's stats, no stats we fallback to the server side stats
     * */
@@ -604,10 +721,17 @@ type DialogContextType = {
    /**
     * Method to show the success animation.
     */
-   handleShowSuccessAnimation: () => void
+   handleStartSuccessAnimation: () => void
+   isRecommendationsListVisible: boolean
+   setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
 }
 
-const getPageIndex = (page: Props["page"]): number => {
+/**
+ * Converts a page type to its corresponding view index in the views array.
+ * This is used to determine which view should be displayed when a specific page
+ * is requested (either via URL or direct navigation).
+ */
+const getActiveViewIndexFromPage = (page: DialogPageType): number => {
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")
@@ -617,6 +741,8 @@ const getPageIndex = (page: Props["page"]): number => {
          return views.findIndex((view) => view.key === "job-details")
       case "speaker-details":
          return views.findIndex((view) => view.key === "speaker-details")
+      case "recommendations":
+         return views.findIndex((view) => view.key === "recommendations")
    }
 }
 
@@ -631,6 +757,7 @@ const DialogContext = createContext<DialogContextType>({
    livestream: undefined,
    livestreamPresenter: null,
    activeView: "livestream-details",
+   previousView: undefined,
    updatedStats: null,
    serverUserEmail: null,
    isRecommended: false,
@@ -641,7 +768,9 @@ const DialogContext = createContext<DialogContextType>({
    isDiscoverCompanySparksOpen: false,
    handleDiscoverCompanySparks: () => {},
    setting: null,
-   handleShowSuccessAnimation: () => {},
+   handleStartSuccessAnimation: () => {},
+   isRecommendationsListVisible: false,
+   setIsRecommendationsListVisible: () => {},
 })
 
 export const useLiveStreamDialog = () => {

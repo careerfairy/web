@@ -1,6 +1,7 @@
 import functions = require("firebase-functions")
+import { GetRecommendedEventsFnArgs } from "@careerfairy/shared-lib/functions/types"
 import { onCall } from "firebase-functions/https"
-import { boolean, number } from "yup"
+import { boolean, number, string } from "yup"
 import {
    groupRepo,
    livestreamsRepo,
@@ -21,15 +22,20 @@ import { dataValidation, userAuthExists } from "./middlewares/validations"
  * @returns {Promise<string[]>} - A list of recommended event Ids in order of relevance
  * */
 export const getRecommendedEvents = onCall(
-   middlewares<{ limit: number; bypassCache?: boolean }>(
+   middlewares<GetRecommendedEventsFnArgs>(
       dataValidation({
          limit: number().default(10).max(30),
          bypassCache: boolean().default(false),
+         referenceLivestreamId: string().optional().nullable(),
       }),
       userAuthExists(),
       cacheOnCallValues(
          "recommendedEvents",
-         (request) => [request.auth.token.email, request.data.limit],
+         (request) => [
+            request.auth.token.email,
+            request.data.limit,
+            request.data.referenceLivestreamId,
+         ],
          60, // 1m
          (request) => request.data.bypassCache === true
       ),
