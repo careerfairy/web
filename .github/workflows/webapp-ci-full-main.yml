@@ -185,7 +185,7 @@ jobs:
    # Deploy
    deploy:
       name: "Deploy"
-      needs: [e2e_tests, unit_tests]
+      needs: [unit_tests, e2e_tests]
       runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:

@@ -65,6 +65,8 @@ export default class RecommendationServiceCore {
             eventMetaData: deDupedEvents.map((e) => ({
                id: e.id,
                numPoints: e.points,
+               title: e.model.title,
+               companyName: e.model.company,
                targetCountries: e.getTargetCountries(),
                targetUniversities: e.getTargetUniversities(),
                targetFieldsOfStudy: e.getFieldOfStudyIds(),

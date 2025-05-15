@@ -34,6 +34,10 @@ const responsiveVariants = {
       fontSize: "1.42857rem", // 20px
       lineHeight: 1.5,
    },
+   desktopBrandedH5: {
+      fontSize: "1.28571rem", // 18px
+      lineHeight: 1.55556,
+   },
 } satisfies ThemeOptions["typography"]
 
 export const getTypography = (

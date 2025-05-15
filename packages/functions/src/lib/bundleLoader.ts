@@ -1,9 +1,14 @@
 import axios, { AxiosInstance } from "axios"
-import { logAxiosErrorAndThrow } from "../util"
+import {
+   getDocs,
+   getDocsFromCache,
+   loadBundle,
+   namedQuery,
+} from "firebase/firestore"
+import { firestoreClientSDK } from "../api/firestoreClient"
 import { BundleName } from "../bundles"
 import config from "../config"
-import { getDocsFromCache, loadBundle, namedQuery } from "firebase/firestore"
-import { firestoreClientSDK } from "../api/firestoreClient"
+import { isTestEnvironment, logAxiosErrorAndThrow } from "../util"
 
 type BundleLoaderOptions = {
    url?: string
@@ -44,7 +49,17 @@ export class BundleLoader {
    async getDocs<T>(queryName: string) {
       try {
          const query = await namedQuery(firestoreClientSDK, queryName)
-         return getDocsFromCache(query).then((docs) =>
+
+         /**
+          * In test environments, we use getDocs instead of getDocsFromCache because:
+          * 1. Test data changes rapidly as tests run in parallel
+          * 2. Tests frequently wipe/reset the database
+          * 3. The Firestore bundle cache cannot reliably stay in sync with these rapid changes
+          * 4. It's more reliable to fetch directly from the database in test contexts
+          */
+         const queryExecutor = isTestEnvironment() ? getDocs : getDocsFromCache
+
+         return queryExecutor(query).then((docs) =>
             docs.docs.map(
                (doc) =>
                   ({

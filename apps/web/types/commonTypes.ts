@@ -31,7 +31,7 @@ export function sxStyles<TObject extends SystemStyleObject<Theme>>(
  * The function returns a flattened array of styles.
  *
  * @param {...SxProps} styles - The styles provided by the component and the props.
- * @returns {Array} An array of styles.
+ * @returns An array of styles.
  */
 export function combineStyles(...styles: SxProps[]) {
    return styles.flat()

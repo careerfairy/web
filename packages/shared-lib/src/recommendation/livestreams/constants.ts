@@ -44,6 +44,14 @@ export const RECOMMENDATION_POINTS = {
       POINTS_PER_APPLIED_JOB_COMPANY_SIZE_MATCH: 1,
    },
 
+   // Reference livestream recommendation points
+   REFERENCE: {
+      // Priority 1: Matching industry AND matching location
+      INDUSTRY_AND_LOCATION_MATCH_POINTS: 10000,
+      // Priority 2: Matching industry BUT different location
+      INDUSTRY_MATCH_ONLY_POINTS: 7000,
+   },
+
    // Multiplies live stream points if the user is in the featured group target (implies live stream is from a featured group)
    FEATURED_GROUP_LIVESTREAM_POINTS_MULTIPLIER: 1.25,
-}
+} as const

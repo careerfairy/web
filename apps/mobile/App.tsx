@@ -19,6 +19,7 @@ import {
 import WebView from "react-native-webview"
 import WebViewComponent from "./components/WebView"
 import { app, auth, db } from "./firebase"
+import { branchTracking } from "./utils/branch-tracking"
 import { customerIO } from "./utils/customerio-tracking"
 import { initializeFacebookTracking } from "./utils/facebook-tracking"
 import { handleVerifyToken } from "./utils/firebase"
@@ -80,6 +81,10 @@ function Native() {
 
    useEffect(() => {
       customerIO.initialize().catch(console.error)
+   }, [])
+
+   useEffect(() => {
+      branchTracking.initialize().catch(console.error)
    }, [])
 
    useEffect(() => {
@@ -173,6 +178,7 @@ function Native() {
    ) => {
       try {
          await resetFireStoreData(idToken, customerioPushToken)
+         branchTracking.logout().catch(console.error)
          sentry.setUser(null)
       } catch (e) {
          console.log("Error with resetting firestore data", e)
@@ -204,6 +210,9 @@ function Native() {
             )
 
             await customerIO.identifyCustomer(credentials.uid)
+            await branchTracking
+               .identifyUser(credentials.uid)
+               .catch(console.error)
             sentry.setUser({
                id: credentials.uid,
                email: credentials.email,

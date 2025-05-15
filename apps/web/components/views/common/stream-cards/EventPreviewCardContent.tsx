@@ -104,6 +104,7 @@ export const Title = () => {
          variant={"brandedBody"}
          color="text.primary"
          sx={styles.title}
+         data-testid={`livestream-card-title-${livestream?.id}`}
       >
          {loading ? (
             <Skeleton

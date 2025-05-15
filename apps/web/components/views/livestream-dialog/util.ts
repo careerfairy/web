@@ -68,13 +68,52 @@ export const isOnlivestreamDialogPage = (routerPathname: string) => {
    return routerPathname.includes(LIVESTREAM_DIALOG_PATH)
 }
 
+/**
+ * Represents the different page types available in the livestream dialog.
+ * These values are used as router paths in URL construction for the livestream dialog navigation.
+ *
+ * Each type corresponds to a specific route segment in the dialog's URL structure:
+ * - details: Main livestream details view (/livestream/[id])
+ * - register: Registration flow view (/livestream/[id]/register)
+ * - job-details: Job information view (/livestream/[id]/job-details/[jobId])
+ * - speaker-details: Speaker information view (/livestream/[id]/speaker-details/[speakerId])
+ * - recommendations: Recommendations view after registration (/livestream/[id]/recommendations)
+ *
+ * These router paths determine which view component is rendered within the dialog.
+ */
+export type DialogPageType =
+   | "details"
+   | "register"
+   | "job-details"
+   | "speaker-details"
+   | "recommendations"
+
+/**
+ * Maps URL path segments to DialogPageType values.
+ *
+ * WARNING: Do not modify these existing values as they are used in existing links.
+ */
+export const DialogPageTypeMapping = {
+   details: "details",
+   register: "register",
+   "job-details": "job-details",
+   "speaker-details": "speaker-details",
+   recommendations: "recommendations",
+} as const satisfies Record<string, DialogPageType>
+
+type PageTypeToUrlPath = typeof DialogPageTypeMapping
+
 type DialogPage = "/portal" | "/next-livestreams"
 
-type ValidLink =
-   | ["livestream", string, "job-details", string]
-   | ["livestream", string, "speaker-details", string]
+/**
+ * Valid path segments for the livestream dialog.
+ */
+export type ValidLink =
+   | ["livestream", string, PageTypeToUrlPath["job-details"], string]
+   | ["livestream", string, PageTypeToUrlPath["speaker-details"], string]
    | ["livestream", string]
-   | ["livestream", string, "register"]
+   | ["livestream", string, PageTypeToUrlPath["register"]]
+   | ["livestream", string, PageTypeToUrlPath["recommendations"]]
 
 type LinkType =
    | {
@@ -96,6 +135,11 @@ type LinkType =
      }
    | {
         type: "registerToLivestream"
+        livestreamId: string
+        targetPage?: DialogPage
+     }
+   | {
+        type: "recommendations"
         livestreamId: string
         targetPage?: DialogPage
      }
@@ -128,6 +172,9 @@ export const buildDialogLink = ({
          break
       case "registerToLivestream":
          query = ["livestream", link.livestreamId, "register"]
+         break
+      case "recommendations":
+         query = ["livestream", link.livestreamId, "recommendations"]
          break
    }
 

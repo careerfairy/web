@@ -228,6 +228,8 @@ if (notProduction) {
    csp["connect-src"].push(...allowedPorts, "ws:*") // For WebSocket connections
    csp["img-src"].push(...allowedPorts)
    csp["media-src"].push(...allowedPorts)
+   // Add Firebase Auth emulator to frame-src for development
+   csp["frame-src"].push(...allowedPorts)
 }
 
 if (isVercelPreview) {
@@ -366,7 +368,12 @@ const moduleExports = {
          "127.0.0.1",
          "eu-west-2.graphassets.com",
          "icon.horse", // for fetching favicons
+         "placehold.co",
       ],
+      // Allow SVGs to be used in the app
+      dangerouslyAllowSVG: true,
+      // Restrictive CSP for SVG content to mitigate potential security risks
+      contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
    },
    webpack: (config) => {
       config.module.rules.push({
