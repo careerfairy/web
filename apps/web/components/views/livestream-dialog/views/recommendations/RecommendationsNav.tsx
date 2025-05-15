@@ -1,17 +1,19 @@
+import { styled } from "@mui/material/styles"
 import { useNavLinks } from "hooks/useNavLinks"
 import BottomNavBar from "layouts/GenericDashboardLayout/BottomNavBar"
-import { sxStyles } from "types/commonTypes"
 
-const styles = sxStyles({
-   wrapper: {
-      position: "sticky",
-      bottom: 0,
-      left: 0,
-      right: 0,
-   },
+const Nav = styled(BottomNavBar)({
+   position: "absolute",
+   bottom: 0,
+   left: 0,
+   right: 0,
+   zIndex: 0,
+   marginTop: "auto",
+   minHeight: 72,
 })
 
 export const RecommendationsNav = () => {
    const navLinks = useNavLinks(true)
-   return <BottomNavBar disableHighlight links={navLinks} sx={styles.wrapper} />
+
+   return <Nav disableHighlight links={navLinks} id="recommendations-nav" />
 }

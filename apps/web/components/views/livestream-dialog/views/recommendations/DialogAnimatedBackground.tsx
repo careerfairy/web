@@ -1,5 +1,19 @@
 import { Box, BoxProps, keyframes } from "@mui/material"
 import { styled } from "@mui/material/styles"
+import { createContext, ReactNode, useContext, useMemo } from "react"
+
+type AnimatedBackgroundContextType = {
+   showAnimatedBackground: boolean
+}
+
+type AnimatedBackgroundProviderProps = {
+   children: ReactNode
+   showAnimatedBackground: boolean
+}
+
+const AnimatedBackgroundContext = createContext<
+   AnimatedBackgroundContextType | undefined
+>(undefined)
 
 // Keyframes for the rotation animation
 const rotate = keyframes`
@@ -22,7 +36,7 @@ const AnimatedContainer = styled(Box)(({ theme }) => ({
    width: "100%",
    height: "100%",
    overflow: "hidden",
-   backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#f5f5f5",
+   backgroundColor: theme.palette.mode === "dark" ? "#121212" : "#FDFDFD",
 }))
 
 // Styled element for the blur effect container
@@ -69,17 +83,45 @@ const PinkCircle = styled(Circle)(({ theme }) => ({
    right: "45%",
 }))
 
+export const useAnimatedBackground = (): AnimatedBackgroundContextType => {
+   const context = useContext(AnimatedBackgroundContext)
+   if (context === undefined) {
+      throw new Error(
+         "useAnimatedBackground must be used within an AnimatedBackgroundProvider"
+      )
+   }
+   return context
+}
+
+export const AnimatedBackgroundProvider = ({
+   showAnimatedBackground,
+   children,
+}: AnimatedBackgroundProviderProps) => {
+   const value = useMemo(
+      () => ({ showAnimatedBackground }),
+      [showAnimatedBackground]
+   )
+   return (
+      <AnimatedBackgroundContext.Provider value={value}>
+         {children}
+      </AnimatedBackgroundContext.Provider>
+   )
+}
+
 export const DialogAnimatedBackground = ({ children, ...props }: BoxProps) => {
+   const { showAnimatedBackground } = useAnimatedBackground()
    return (
       <Box {...props}>
          <Root>
             <AnimatedContainer>
-               <BlurContainer>
-                  <BlueCircle />
-                  <PurpleCircle />
-                  <PinkCircle />
-                  <TealCircle />
-               </BlurContainer>
+               {Boolean(showAnimatedBackground) && (
+                  <BlurContainer>
+                     <BlueCircle />
+                     <PurpleCircle />
+                     <PinkCircle />
+                     <TealCircle />
+                  </BlurContainer>
+               )}
             </AnimatedContainer>
          </Root>
          {children}

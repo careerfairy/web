@@ -126,7 +126,6 @@ export const DiscoverContent: FC = () => {
       closeDialog,
       isDiscoverCompanySparksOpen,
       handleDiscoverCompanySparks,
-      goToView,
    } = useLiveStreamDialog()
    const isMobile = useIsMobile()
 
@@ -150,13 +149,6 @@ export const DiscoverContent: FC = () => {
                      handleDiscoverSparks={handleDiscoverCompanySparks}
                   />
                )}
-               {/* TODO: Remove this button after reviewing the recommendations view PR */}
-               <Button
-                  variant="contained"
-                  onClick={() => goToView("recommendations")}
-               >
-                  Go to new view
-               </Button>
             </MainContent>
          }
       />

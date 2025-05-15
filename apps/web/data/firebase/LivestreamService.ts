@@ -5,6 +5,7 @@ import {
    AgoraRTMTokenRequest,
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import {
    CreateLivestreamCTARequest,
    CreateLivestreamPollRequest,
@@ -1236,20 +1237,28 @@ export class LivestreamService {
     * Fetches recommended live stream events for a user.
     * @param {number} limit - Maximum number of events to fetch.
     * @param {string} userId - ID of the user to get recommendations for.
+    * @param {boolean} bypassCache - Optional flag to bypass cache for fresh recommendations.
     * @returns Array of recommended live stream events.
     *
     * Filters out:
     * 1. Events the user is already registered for.
     * 2. Events that have already ended.
     */
-   async getRecommendedEvents(limit: number, userId: string) {
+   async getRecommendedEvents(
+      limit: number,
+      userId: string,
+      bypassCache: boolean = false
+   ) {
       const { data: eventIds } = await httpsCallable<
-         { limit: number },
+         { limit: number; bypassCache: boolean },
          string[]
       >(
          this.functions,
-         "getRecommendedEvents_v6"
-      )({ limit })
+         FUNCTION_NAMES.getRecommendedEvents
+      )({
+         limit,
+         bypassCache,
+      })
 
       const recommendedLivestreams: LivestreamEvent[] = []
 

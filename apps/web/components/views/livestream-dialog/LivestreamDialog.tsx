@@ -1,7 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
-import { Dialog, DialogContent } from "@mui/material"
+import { Dialog, DialogContent, DialogProps } from "@mui/material"
 import CircularProgress from "@mui/material/CircularProgress"
 import { useTheme } from "@mui/material/styles"
 import { LoadableOptions } from "next/dist/shared/lib/dynamic"
@@ -29,6 +29,7 @@ import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
+import { RegistrationSuccessAnimation } from "./animations/register-success/RegistrationSuccessAnimation"
 import {
    RegistrationAction,
    RegistrationState,
@@ -41,7 +42,10 @@ import RedirectingView from "./views/common/RedirectingView"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
-import { DialogAnimatedBackground } from "./views/recommendations/DialogAnimatedBackground"
+import {
+   AnimatedBackgroundProvider,
+   DialogAnimatedBackground,
+} from "./views/recommendations/DialogAnimatedBackground"
 import { RecommendationsViewSkeleton } from "./views/recommendations/RecommendationsViewSkeleton"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
@@ -195,6 +199,11 @@ const views = [
 
 export type ViewKey = (typeof views)[number]["key"]
 
+const PaperProps: DialogProps["PaperProps"] = {
+   sx: styles.dialogPaper,
+   component: DialogAnimatedBackground,
+}
+
 const LivestreamDialog: FC<Props> = ({
    handleClose,
    open,
@@ -211,47 +220,51 @@ const LivestreamDialog: FC<Props> = ({
    const [value, setValue] = useState<number>(getPageIndex(page))
    const activeView = views[value].key
 
+   // Using useEffect to update the view based on 'page'.
+   // This allows conditional navigation not covered by useMemo.
+   useEffect(() => {
+      setValue(getPageIndex(page))
+   }, [page, setValue])
+
    return (
-      <Dialog
-         open={open}
-         onClose={onClose}
-         TransitionComponent={
-            isMobile ? SlideLeftTransition : SlideUpTransition
-         }
-         maxWidth="md"
-         fullWidth
-         fullScreen={isMobile}
-         closeAfterTransition={true}
-         TransitionProps={{
-            appear: appear ?? undefined,
-         }}
-         PaperProps={{
-            sx: styles.dialogPaper,
-            ...(activeView === "recommendations" && {
-               component: DialogAnimatedBackground,
-            }),
-         }}
+      <AnimatedBackgroundProvider
+         showAnimatedBackground={activeView === "recommendations"}
       >
-         <DialogContent sx={styles.content}>
-            {livestreamId ? (
-               <Content
-                  handleClose={onClose}
-                  livestreamId={livestreamId}
-                  value={value}
-                  activeView={activeView}
-                  setValue={setValue}
-                  page={page}
-                  {...rest}
-               />
-            ) : (
-               <LivestreamDetailsViewSkeleton />
-            )}
-         </DialogContent>
-      </Dialog>
+         <Dialog
+            open={open}
+            onClose={onClose}
+            TransitionComponent={
+               isMobile ? SlideLeftTransition : SlideUpTransition
+            }
+            maxWidth="md"
+            fullWidth
+            fullScreen={isMobile}
+            closeAfterTransition={true}
+            TransitionProps={{
+               appear: appear ?? undefined,
+            }}
+            PaperProps={PaperProps}
+         >
+            <DialogContent sx={styles.content}>
+               {livestreamId ? (
+                  <Content
+                     handleClose={onClose}
+                     livestreamId={livestreamId}
+                     value={value}
+                     activeView={activeView}
+                     setValue={setValue}
+                     {...rest}
+                  />
+               ) : (
+                  <LivestreamDetailsViewSkeleton />
+               )}
+            </DialogContent>
+         </Dialog>
+      </AnimatedBackgroundProvider>
    )
 }
 
-type ContentProps = Omit<Props, "open"> & {
+type ContentProps = Omit<Props, "open" | "page"> & {
    value: number
    activeView: ViewKey
    setValue: Dispatch<SetStateAction<number>>
@@ -272,7 +285,6 @@ const Content: FC<ContentProps> = ({
    value,
    activeView,
    setValue,
-   page,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -292,6 +304,8 @@ const Content: FC<ContentProps> = ({
 
    const [isDiscoverCompanySparksOpen, setIsDiscoverCompanySparksOpen] =
       useState(false)
+
+   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false)
 
    const handleDiscoverCompanySparks = useCallback(() => {
       setIsDiscoverCompanySparksOpen(true)
@@ -419,15 +433,6 @@ const Content: FC<ContentProps> = ({
       }
    }, [value, onClose, goToView])
 
-   // Using useEffect to update the view based on 'page'.
-   // This allows conditional navigation not covered by useMemo.
-   useEffect(() => {
-      // TODO: Remove if statement after reviewing the recommendations view PR
-      if (activeView === "recommendations") return
-      setValue(getPageIndex(page))
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [page, setValue])
-
    const [registrationState, registrationDispatch] = useReducer(
       registrationReducer,
       registrationInitialState
@@ -467,6 +472,7 @@ const Content: FC<ContentProps> = ({
          isDiscoverCompanySparksOpen,
          handleDiscoverCompanySparks,
          setting,
+         handleShowSuccessAnimation: () => setShowSuccessAnimation(true),
       }),
       [
          goToView,
@@ -519,7 +525,12 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
-         {/* {activeView === "recommendations" && <RegistrationSuccessAnimation />} */}
+         {Boolean(showSuccessAnimation) && (
+            <RegistrationSuccessAnimation
+               onAnimationFullScreen={() => goToView("recommendations")}
+               onAnimationComplete={() => setShowSuccessAnimation(false)}
+            />
+         )}
       </DialogContext.Provider>
    )
 }
@@ -590,6 +601,10 @@ type DialogContextType = {
     * different text based on the dialog being shown on the levels page or the sparks feed.
     * */
    setting?: DialogSetting
+   /**
+    * Method to show the success animation.
+    */
+   handleShowSuccessAnimation: () => void
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -626,6 +641,7 @@ const DialogContext = createContext<DialogContextType>({
    isDiscoverCompanySparksOpen: false,
    handleDiscoverCompanySparks: () => {},
    setting: null,
+   handleShowSuccessAnimation: () => {},
 })
 
 export const useLiveStreamDialog = () => {

@@ -1,6 +1,7 @@
 import { Fab } from "@mui/material"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
+import { useStreamIsLandscape } from "components/custom-hook/streaming"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import FramerBox from "components/views/common/FramerBox"
 import PlayIcon from "components/views/common/icons/PlayIcon"
@@ -87,6 +88,7 @@ type Props = {
     * Callback fired when animation completes
     */
    onAnimationComplete?: () => void
+   onAnimationFullScreen?: () => void
    /**
     * When true, enables debugging control
     */
@@ -115,6 +117,7 @@ type Props = {
  */
 export const RegistrationSuccessAnimation = ({
    onAnimationComplete,
+   onAnimationFullScreen,
    debug = false,
 }: Props) => {
    const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(
@@ -123,6 +126,7 @@ export const RegistrationSuccessAnimation = ({
    const [animationResetKey, setAnimationResetKey] = useState(0)
 
    const isMobile = useIsMobile()
+   const isLandscape = useStreamIsLandscape()
 
    const triggerAnimation = () => {
       setAnimationPhase(AnimationPhase.FIRST_PHASE)
@@ -144,6 +148,7 @@ export const RegistrationSuccessAnimation = ({
                   setAnimationPhase(AnimationPhase.SECOND_PHASE)
                }, ANIMATION_CONFIG.container.delayBeforeExit)
             }
+            onAnimationFullScreen?.()
             break
          case AnimationPhase.SECOND_PHASE:
             resetAnimation()
@@ -165,7 +170,10 @@ export const RegistrationSuccessAnimation = ({
             },
          ]}
       >
-         <AnimatePresence onExitComplete={onAnimationComplete} mode="sync">
+         <AnimatePresence
+            onExitComplete={debug ? () => {} : onAnimationComplete}
+            mode="sync"
+         >
             {animationPhase > AnimationPhase.NOT_STARTED && (
                <Fragment>
                   <FramerBox
@@ -201,12 +209,14 @@ export const RegistrationSuccessAnimation = ({
                            duration: ANIMATION_CONFIG.container.opacity,
                         }, // Added for smoother fade
                      }}
-                     onAnimationComplete={handleAnimationComplete}
+                     onAnimationComplete={
+                        debug ? () => {} : handleAnimationComplete
+                     }
                      sx={styles.successContainer}
                   >
                      <Box
                         sx={styles.mainStarContainer}
-                        top={isMobile ? -150 : -320}
+                        top={isLandscape ? -350 : isMobile ? -150 : -320}
                      >
                         <MainStar sx={styles.mainStar} />
                      </Box>

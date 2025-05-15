@@ -1,24 +1,28 @@
+import { userIsTargetedApp } from "@careerfairy/shared-lib/countries/filters"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { appQrCodeLSRegistration } from "constants/images"
 import { useAuth } from "HOCs/AuthProvider"
+import { useMemo } from "react"
 import DateUtil from "util/DateUtil"
+import { MobileUtils } from "util/mobile.utils"
 import { LivestreamEvent } from "../../../../../../../packages/shared-lib/src/livestreams/livestreams"
 import { AddToCalendar } from "../../../common/AddToCalendar"
-import { GetNotifiedCardPresentation } from "./GetNotifiedCardPresentation"
+import {
+   CardProps,
+   GetNotifiedCardPresentation,
+} from "./GetNotifiedCardPresentation"
 
 /** Props for the container component that handles business logic */
 type Props = {
    /** The livestream event data */
    livestream: LivestreamEvent
-   /** If true, shows only calendar button. If false, shows download app and calendar buttons */
-   shouldDownloadApp: boolean
    /** Controls the responsive layout. "desktop" forces desktop layout, "mobile" forces mobile layout, "auto" uses media queries */
    responsiveMode?: "desktop" | "mobile" | "auto"
    /** If true and isDesktop is true, shows the expanded version with centered content */
    isExpanded?: boolean
    /** Optional callback when close button is clicked */
    onClose?: () => void
-}
+} & CardProps
 
 /**
  * Container component that handles business logic for the GetNotifiedCard.
@@ -26,13 +30,17 @@ type Props = {
  */
 export const GetNotifiedCard = ({
    livestream,
-   shouldDownloadApp,
    responsiveMode = "auto",
    isExpanded = false,
    onClose,
+   ...cardProps
 }: Props) => {
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
    const isDesktopDefault = !useIsMobile()
+
+   const shouldDownloadApp = useMemo(() => {
+      return userIsTargetedApp(userData) && !MobileUtils.webViewPresence()
+   }, [userData])
 
    // Determine if using desktop layout based on responsiveMode and media query
    const isDesktop =
@@ -49,6 +57,7 @@ export const GetNotifiedCard = ({
       >
          {(handleAddToCalendar) => (
             <GetNotifiedCardPresentation
+               {...cardProps}
                companyName={livestream.company}
                companyLogoUrl={livestream.companyLogoUrl}
                title={livestream.title}
