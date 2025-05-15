@@ -1,0 +1,74 @@
+import { CustomJob } from "./customJobs"
+
+/**
+ * When adding new fields to this type, make sure to add them to the
+ * CUSTOM_JOB_FIELDS_TO_INDEX array.
+ */
+export type TransformedCustomJob = CustomJob
+
+export const CUSTOM_JOB_FIELDS_TO_INDEX = [
+   "id",
+   "title",
+   "description",
+   "businessFunctionsTagIds",
+   "deleted",
+   "documentType",
+   "group",
+   "groupId",
+   "isPermanentlyExpired",
+   "jobLocation",
+   "livestreams",
+   "postingUrl",
+   "published",
+   "salary",
+   "sparks",
+   "workplace",
+   "jobLocation",
+] satisfies (keyof TransformedCustomJob)[]
+
+export type CustomJobFieldToIndexType =
+   (typeof CUSTOM_JOB_FIELDS_TO_INDEX)[number]
+
+/**
+ * Searchable attributes for custom jobs to enhance search functionality:
+ * The position of attributes in the list determines their priority in the search.
+ * They must be a subset of the fields defined in CUSTOM_JOB_FIELDS_TO_INDEX.
+ */
+export const CUSTOM_JOB_SEARCHABLE_ATTRIBUTES = [
+   "title",
+   "description",
+   "jobLocation",
+   "workplace",
+] satisfies CustomJobFieldToIndexType[]
+
+/**
+ * The fields listed below are intended for filtering purposes.
+ * They must be a subset of the fields defined in CUSTOM_JOB_FIELDS_TO_INDEX.
+ */
+export const CUSTOM_JOB_FILTERING_FIELDS = [
+   "title",
+   "description",
+   "jobLocation",
+   "workplace",
+   "businessFunctionsTagIds",
+] satisfies CustomJobFieldToIndexType[]
+
+type FilterFieldType = (typeof CUSTOM_JOB_FILTERING_FIELDS)[number]
+
+export type ArrayFilterFieldType = Extract<
+   FilterFieldType,
+   "jobLocation" | "businessFunctionsTagIds"
+> &
+   "objectID"
+
+export type BooleanFilterFieldType = Extract<
+   FilterFieldType,
+   "deleted" | "isPermanentlyExpired" | "published"
+>
+
+export const CUSTOM_JOB_REPLICAS = {
+   TITLE_ASC: "customJobs_title_asc",
+} as const
+
+export type CustomJobReplicaType =
+   (typeof CUSTOM_JOB_REPLICAS)[keyof typeof CUSTOM_JOB_REPLICAS]
