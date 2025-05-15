@@ -1269,13 +1269,22 @@ export class LivestreamService {
       for (const eventId of eventIds) {
          const isUserRegistered = await this.hasUserRegistered(eventId, userId)
          // If the user is registered, we don't want to show them the event
-         if (isUserRegistered) continue
+         if (isUserRegistered) {
+            continue
+         }
 
          const eventSnap = await getDoc(this.getLivestreamRef(eventId))
+
+         if (!eventSnap.exists()) {
+            continue
+         }
+
          const livestream = eventSnap.data()
 
          // If the event has ended, we don't want to show it
-         if (livestream.hasEnded) continue
+         if (livestream?.hasEnded) {
+            continue
+         }
 
          recommendedLivestreams.push(livestream)
       }

@@ -43,10 +43,8 @@ const CardContainer = styled(Box, {
    shouldForwardProp: (prop) => prop !== "expanded",
 })<{ expanded: boolean }>(({ expanded, theme }) => ({
    position: "sticky",
-   display: "flex",
-   flexDirection: "column",
-   justifyContent: "center",
-   alignItems: "center",
+   display: "grid",
+   placeItems: "center",
    top: 0,
    height: "100%",
    overflowY: "auto",
@@ -60,8 +58,8 @@ const CardContainerInner = styled(Box, {
    shouldForwardProp: (prop) => prop !== "isRecommendationsListVisible",
 })<{ isRecommendationsListVisible: boolean }>(
    ({ isRecommendationsListVisible }) => ({
-      paddingBottom: isRecommendationsListVisible ? PADDING : 0,
-      paddingTop: isRecommendationsListVisible ? PADDING : 50,
+      paddingBottom: isRecommendationsListVisible ? 16 : 0,
+      paddingTop: isRecommendationsListVisible ? 30 : 50,
       height: "100%",
       display: "flex",
       flexDirection: "column",
@@ -87,7 +85,7 @@ const RecommendationsContainer = styled(motion.div)(({ theme }) => ({
 }))
 
 const CloseButton = styled((props: IconButtonProps) => (
-   <IconButton {...props}>
+   <IconButton data-testid="livestream-dialog-close" {...props}>
       <CloseIcon />
    </IconButton>
 ))({
@@ -138,6 +136,7 @@ export const DesktopView = () => {
                      <Box
                         data-testid="loading-indicator-offset"
                         minHeight={95}
+                        flexShrink={0}
                      />
                   )}
                </CardContainerInner>

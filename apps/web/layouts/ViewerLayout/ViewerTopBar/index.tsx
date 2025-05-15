@@ -1,5 +1,11 @@
-import React, { useCallback, useEffect, useState } from "react"
-import { useTheme } from "@mui/material/styles"
+import { Badge as BadgeType } from "@careerfairy/shared-lib/badges/badges"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
+import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos"
+import Brightness4Icon from "@mui/icons-material/Brightness4"
+import Brightness7Icon from "@mui/icons-material/Brightness7"
+import CallToActionIcon from "@mui/icons-material/Link"
+import PeopleIcon from "@mui/icons-material/People"
+import BreakoutRoomIcon from "@mui/icons-material/Widgets"
 import {
    AppBar,
    Badge,
@@ -10,36 +16,30 @@ import {
    Toolbar,
    Tooltip,
 } from "@mui/material"
-import { MainLogo } from "../../../components/logos"
-import Brightness4Icon from "@mui/icons-material/Brightness4"
-import Brightness7Icon from "@mui/icons-material/Brightness7"
-import CallToActionIcon from "@mui/icons-material/Link"
-import PropTypes from "prop-types"
-import Logo from "./Logo"
-import { useThemeToggle } from "../../../context/theme/ThemeContext"
-import { useCurrentStream } from "../../../context/stream/StreamContext"
-import PeopleIcon from "@mui/icons-material/People"
-import NewFeatureHint from "../../../components/util/NewFeatureHint"
-import ViewerBreakoutRoomModal from "./ViewerBreakoutRoomModal"
-import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos"
+import { useTheme } from "@mui/material/styles"
+import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
+import { useNumberOfViewers } from "context/stream/useNumberOfViewers"
 import { useRouter } from "next/router"
-import useStreamToken from "../../../components/custom-hook/useStreamToken"
-import BreakoutRoomIcon from "@mui/icons-material/Widgets"
+import PropTypes from "prop-types"
+import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSelector"
 import * as actions from "store/actions"
+import { useAuth } from "../../../HOCs/AuthProvider"
 import useStreamGroups from "../../../components/custom-hook/useStreamGroups"
+import useStreamToken from "../../../components/custom-hook/useStreamToken"
+import { MainLogo } from "../../../components/logos"
+import breakoutRoomsSelector from "../../../components/selectors/breakoutRoomsSelector"
+import NewFeatureHint from "../../../components/util/NewFeatureHint"
+import BadgeButton from "../../../components/views/common/BadgeButton"
+import { useCurrentStream } from "../../../context/stream/StreamContext"
+import { useThemeToggle } from "../../../context/theme/ThemeContext"
+import { focusModeEnabledSelector } from "../../../store/selectors/streamSelectors"
+import { StylesProps } from "../../../types/commonTypes"
+import Logo from "./Logo"
+import ViewerBreakoutRoomModal from "./ViewerBreakoutRoomModal"
 import ViewerCtaModal from "./ViewerCtaModal"
 import FocusModeButton from "./buttons/FocusModeButton"
 import JoinTalentPoolButton from "./buttons/JoinTalentPoolButton"
-import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import BadgeButton from "../../../components/views/common/BadgeButton"
-import { StylesProps } from "../../../types/commonTypes"
-import { Badge as BadgeType } from "@careerfairy/shared-lib/dist/badges/badges"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { focusModeEnabledSelector } from "../../../store/selectors/streamSelectors"
-import { useNumberOfViewers } from "context/stream/useNumberOfViewers"
 
 const styles: StylesProps = {
    appBar: {
@@ -142,7 +142,7 @@ const ViewerTopBar = ({
                   mobile={mobile}
                   primary
                />
-               {breakoutRoomId && (
+               {Boolean(breakoutRoomId) && (
                   <Tooltip title="Back to main room">
                      <Button
                         onClick={handleBackToMainRoom}
@@ -156,7 +156,7 @@ const ViewerTopBar = ({
                   </Tooltip>
                )}
 
-               {breakoutRoomOpen && (
+               {Boolean(breakoutRoomOpen) && (
                   <Tooltip title="Checkout breakout rooms">
                      <IconButton
                         onClick={handleOpenBreakoutRoomModal}
@@ -168,7 +168,7 @@ const ViewerTopBar = ({
                      </IconButton>
                   </Tooltip>
                )}
-               {ctaStatus.active && (
+               {Boolean(ctaStatus.active) && (
                   <Tooltip
                      title={`Checkout live messages${
                         currentLivestream?.company
@@ -179,7 +179,7 @@ const ViewerTopBar = ({
                      <IconButton onClick={handleOpenCtaModal} size="large">
                         <Badge
                            color="secondary"
-                           badgeContent={ctaStatus.numberActive && "!"}
+                           badgeContent={ctaStatus.numberActive ? "!" : ""}
                         >
                            <CallToActionIcon />
                         </Badge>
@@ -239,12 +239,12 @@ const ViewerTopBar = ({
                </Box>
 
                <Box flexGrow={1} />
-               {currentLivestream.companyLogoUrl && (
+               {Boolean(currentLivestream.companyLogoUrl) && (
                   <Logo src={currentLivestream.companyLogoUrl} />
                )}
 
                <Box display="flex" alignItems="center">
-                  {breakoutRoomId && (
+                  {Boolean(breakoutRoomId) && (
                      <Tooltip title="Back to main room">
                         <Button
                            onClick={handleBackToMainRoom}
@@ -256,7 +256,7 @@ const ViewerTopBar = ({
                         </Button>
                      </Tooltip>
                   )}
-                  {breakoutRoomOpen && (
+                  {Boolean(breakoutRoomOpen) && (
                      <Tooltip title="Checkout breakout rooms">
                         <IconButton
                            onClick={handleOpenBreakoutRoomModal}
@@ -268,7 +268,7 @@ const ViewerTopBar = ({
                         </IconButton>
                      </Tooltip>
                   )}
-                  {ctaStatus.active && (
+                  {Boolean(ctaStatus.active) && (
                      <Tooltip
                         title={`Checkout live messages${
                            currentLivestream?.company
@@ -279,7 +279,7 @@ const ViewerTopBar = ({
                         <IconButton onClick={handleOpenCtaModal} size="large">
                            <Badge
                               color="secondary"
-                              badgeContent={ctaStatus.numberActive && "!"}
+                              badgeContent={ctaStatus.numberActive ? "!" : ""}
                            >
                               <CallToActionIcon />
                            </Badge>
