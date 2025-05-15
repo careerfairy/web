@@ -1,7 +1,6 @@
-import { SxProps } from "@mui/material"
 import Box from "@mui/material/Box"
 import Tab, { tabClasses } from "@mui/material/Tab"
-import Tabs, { tabsClasses } from "@mui/material/Tabs"
+import Tabs, { tabsClasses, TabsProps } from "@mui/material/Tabs"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
@@ -74,15 +73,15 @@ const styles = sxStyles({
 type Props = {
    links: INavLink[]
    isDark?: boolean
-   sx?: SxProps
    disableHighlight?: boolean
-}
+} & TabsProps
 
 const BottomNavBar = ({
    links,
    isDark = false,
    sx,
    disableHighlight,
+   ...tabProps
 }: Props) => {
    const { pathname: routerPathname } = useRouter()
    const isMobile = useIsMobile()
@@ -100,13 +99,17 @@ const BottomNavBar = ({
 
    return (
       <Tabs
+         id="bottom-nav-bar"
          sx={combineStyles(
-            styles.wrapper,
-            isDark && styles.wrapperDark,
-            disableHighlight && styles.disableHighlight,
+            [
+               styles.wrapper,
+               isDark && styles.wrapperDark,
+               disableHighlight && styles.disableHighlight,
+            ],
             sx
          )}
          value={activeTab > -1 ? activeTab : false}
+         {...tabProps}
       >
          {links.map(({ id, href, Icon, title, mobileTitle }, index) => (
             <Tab

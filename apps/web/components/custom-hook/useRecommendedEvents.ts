@@ -1,7 +1,7 @@
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { livestreamService } from "data/firebase/LivestreamService"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import useSWR, { preload } from "swr"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { reducedRemoteCallsOptions } from "./utils/useFunctionsSWRFetcher"
@@ -9,20 +9,36 @@ import { reducedRemoteCallsOptions } from "./utils/useFunctionsSWRFetcher"
 type Config = {
    limit?: FirebaseInArrayLimit
    suspense?: boolean
+   bypassCache?: boolean
 }
 
 const useRecommendedEvents = (config?: Config) => {
    const { authenticatedUser } = useAuth()
+
+   const randomNumber = useRef(Date.now())
 
    const limit = config?.limit || 10
    const suspense = config?.suspense || false
 
    const { data: events, isLoading } = useSWR<LivestreamEvent[]>(
       authenticatedUser.email
-         ? ["getRecommendedEvents", limit, authenticatedUser.email]
+         ? [
+              "getRecommendedEvents",
+              limit,
+              authenticatedUser.email,
+              ...(config?.bypassCache
+                 ? [
+                      `bypassCache=${config?.bypassCache}-${randomNumber.current}`,
+                   ]
+                 : []),
+           ]
          : null,
       async () =>
-         livestreamService.getRecommendedEvents(limit, authenticatedUser.email),
+         livestreamService.getRecommendedEvents(
+            limit,
+            authenticatedUser.email,
+            config?.bypassCache
+         ),
       {
          ...reducedRemoteCallsOptions,
          suspense,
@@ -40,6 +56,7 @@ const useRecommendedEvents = (config?: Config) => {
 
 type PreFetchConfig = {
    limit?: FirebaseInArrayLimit
+   bypassCache?: boolean
 }
 /*
  * Hook to preload the recommended eventIds and store them in the SWR cache

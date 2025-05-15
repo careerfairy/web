@@ -33,7 +33,7 @@ export const FUNCTION_NAMES = {
    // Livestream functions
    sendPhysicalEventRegistrationConfirmationEmail:
       "sendPhysicalEventRegistrationConfirmationEmail",
-
+   getRecommendedEvents: "getRecommendedEvents_v7",
    // Sparks functions
    removeAndSyncUserSparkNotification: "removeAndSyncUserSparkNotification_v4",
    createUserSparksFeedEventNotifications:

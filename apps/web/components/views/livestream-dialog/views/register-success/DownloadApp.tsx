@@ -114,7 +114,7 @@ const styles = sxStyles({
 })
 
 export const DownloadApp: FC = () => {
-   const { closeDialog, goToView } = useLiveStreamDialog()
+   const { closeDialog } = useLiveStreamDialog()
    const isMobile = useIsMobile()
 
    return (
@@ -165,13 +165,6 @@ export const DownloadApp: FC = () => {
                      {isMobile ? <ActionsMobile /> : <ActionsDesktop />}
                   </Box>
                </Box>
-               {/* TODO: Remove this button after reviewing the recommendations view PR */}
-               <Button
-                  variant="contained"
-                  onClick={() => goToView("recommendations")}
-               >
-                  Go to new view
-               </Button>
             </MainContent>
          }
       />

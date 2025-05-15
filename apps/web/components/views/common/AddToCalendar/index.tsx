@@ -119,14 +119,19 @@ export const AddToCalendar = memo(function AddToCalendar({
       [event]
    )
 
-   const handleClose = useCallback(() => {
+   const handleClose = useCallback((e?: SyntheticEvent) => {
+      e?.stopPropagation()
       setAnchorEl(null)
    }, [])
 
-   const handleItemClick = useCallback(() => {
-      handleClose()
-      onCalendarClick && onCalendarClick()
-   }, [onCalendarClick, handleClose])
+   const handleItemClick = useCallback(
+      (e?: SyntheticEvent) => {
+         e?.stopPropagation()
+         handleClose()
+         onCalendarClick && onCalendarClick()
+      },
+      [onCalendarClick, handleClose]
+   )
 
    const handleMobileClick = useCallback(() => {
       window.open(getLivestreamICSDownloadUrl(event.id, shouldUseEmulators()))
