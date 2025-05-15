@@ -107,6 +107,158 @@ test.describe("Livestream Registration Signed In", () => {
       })
    })
 
+   test("should show recommendations ordered by similarity to reference livestream", async ({
+      page,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      user,
+   }) => {
+      // Create a reference livestream with specific industry and country
+      const { livestream: referenceLivestream } = await setupLivestreamData(
+         undefined,
+         {
+            overrideLivestreamDetails: {
+               title: "Reference Livestream",
+               companyIndustries: ["Software", "IT"],
+               companyCountries: ["Germany", "France"],
+            },
+         }
+      )
+
+      // Create livestreams with varying similarity to test recommendation ordering:
+      const [industryAndLocationMatch, industryMatchOnly] = await Promise.all([
+         // Priority 1: Matching both industry AND location
+         LivestreamSeed.createUpcoming({
+            title: "P1: Industry & Location Match",
+            companyIndustries: ["Software"],
+            companyCountries: ["Germany"],
+         }),
+
+         // Priority 2: Matching industry BUT different location
+         LivestreamSeed.createUpcoming({
+            title: "P2: Industry Match Only",
+            companyIndustries: ["IT"],
+            companyCountries: ["USA"],
+         }),
+
+         // Additional streams that should not match P1 or P2 criteria
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 1",
+            companyIndustries: ["Healthcare"],
+            companyCountries: ["France"],
+         }),
+
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 2",
+            companyIndustries: ["Finance"],
+            companyCountries: ["Canada"],
+         }),
+
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 3",
+            companyIndustries: ["Healthcare"],
+            companyCountries: ["Canada"],
+         }),
+
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 4",
+            companyIndustries: ["Education"],
+            companyCountries: ["Australia"],
+         }),
+
+         LivestreamSeed.createUpcoming({
+            title: "Other Stream 5",
+            companyIndustries: ["Retail"],
+            companyCountries: ["Japan"],
+         }),
+      ])
+
+      // Use the reference livestream for registration
+      const livestreamDialogPage = new LivestreamDialogPage(
+         page,
+         referenceLivestream
+      )
+
+      await livestreamDialogPage.openDialog()
+
+      // Complete the registration process
+      await livestreamDialogPage.completeSuccessfulRegistration()
+
+      // Wait for and verify recommendations section appears
+      await livestreamDialogPage.waitForRecommendationsToAppear()
+
+      // Verify recommendations grid is visible and contains events
+      await livestreamDialogPage.verifyRecommendationsGridVisible()
+
+      // Get all recommendation cards
+      const recommendationCards =
+         await livestreamDialogPage.getRecommendationCards()
+
+      // Ensure we only see 6 cards (UX requirement)
+      expect(recommendationCards.length).toBeLessThanOrEqual(6)
+
+      // Verify the first card is P1 (Industry & Location Match)
+      const firstCardTitle = await recommendationCards[0]
+         .locator("[data-testid^='livestream-card-title-']")
+         .textContent()
+      expect(firstCardTitle).toBe(industryAndLocationMatch.title)
+
+      // Verify the second card is P2 (Industry Match Only)
+      const secondCardTitle = await recommendationCards[1]
+         .locator("[data-testid^='livestream-card-title-']")
+         .textContent()
+      expect(secondCardTitle).toBe(industryMatchOnly.title)
+
+      // Verify we can close the dialog after seeing recommendations
+      await livestreamDialogPage.closeDialog()
+   })
+
+   test("should allow navigating to a recommended event after registration", async ({
+      page,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      user,
+   }) => {
+      const { livestream } = await setupLivestreamData()
+
+      // Create multiple livestreams to ensure we have recommendations
+      await Promise.all([
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 1",
+         }),
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 2",
+         }),
+         LivestreamSeed.createUpcoming({
+            title: "Recommendation Stream 3",
+         }),
+      ])
+
+      // Use the first created livestream for registration
+      const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
+
+      await livestreamDialogPage.openDialog()
+
+      // Complete the registration process
+      await livestreamDialogPage.completeSuccessfulRegistration()
+
+      // Wait for recommendations to appear
+      await livestreamDialogPage.waitForRecommendationsToAppear()
+
+      // Click on the first recommended event
+      const clickedEventTitle =
+         await livestreamDialogPage.clickOnFirstRecommendedEvent()
+
+      // Verify the dialog now shows details for the clicked event
+      await expect(livestreamDialogPage.livestreamDialogTitle).toHaveText(
+         clickedEventTitle
+      )
+
+      // Make sure we clicked on a recommendation (not the original event)
+      expect(clickedEventTitle).not.toEqual(livestream.title)
+
+      // Verify we can register for this event too
+      await expect(livestreamDialogPage.registrationButton).toBeVisible()
+   })
+
    // Talent pool has been removed from the registration process
    test.skip("register to an event and fill out a question and join talent pool", async ({
       page,

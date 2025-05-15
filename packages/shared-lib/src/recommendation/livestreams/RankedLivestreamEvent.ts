@@ -73,7 +73,7 @@ export class RankedLivestreamEvent {
    }
 
    getFieldOfStudyIds(): string[] {
-      return this.model.targetFieldsOfStudy.map((e) => e.id) || []
+      return this.model.targetFieldsOfStudy?.map((e) => e.id) || []
    }
 
    getInterestIds(): string[] {

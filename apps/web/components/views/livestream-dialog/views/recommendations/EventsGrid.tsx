@@ -114,7 +114,8 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
 const AnimateSlideUp = ({ children }: { children: ReactNode }) => {
    return (
       <motion.div
-         key="recommendations-list"
+         data-testid="recommended-events-grid"
+         key="recommended-events-grid"
          layout
          initial="initial"
          animate="animate"
