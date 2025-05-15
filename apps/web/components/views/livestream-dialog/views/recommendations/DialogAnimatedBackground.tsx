@@ -1,14 +1,17 @@
 import { Box, BoxProps, keyframes } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { createContext, ReactNode, useContext, useMemo } from "react"
+import { combineStyles } from "types/commonTypes"
 
 type AnimatedBackgroundContextType = {
    showAnimatedBackground: boolean
+   expanded: boolean
 }
 
 type AnimatedBackgroundProviderProps = {
    children: ReactNode
    showAnimatedBackground: boolean
+   expanded: boolean
 }
 
 const AnimatedBackgroundContext = createContext<
@@ -24,6 +27,10 @@ const rotate = keyframes`
     transform: rotate(360deg);
   }
 `
+
+const PaperRoot = styled(Box)(({ theme }) => ({
+   transition: theme.transitions.create("max-width"),
+}))
 
 const Root = styled(Box)({
    position: "absolute",
@@ -95,11 +102,12 @@ export const useAnimatedBackground = (): AnimatedBackgroundContextType => {
 
 export const AnimatedBackgroundProvider = ({
    showAnimatedBackground,
+   expanded,
    children,
 }: AnimatedBackgroundProviderProps) => {
    const value = useMemo(
-      () => ({ showAnimatedBackground }),
-      [showAnimatedBackground]
+      () => ({ showAnimatedBackground, expanded }),
+      [showAnimatedBackground, expanded]
    )
    return (
       <AnimatedBackgroundContext.Provider value={value}>
@@ -108,10 +116,22 @@ export const AnimatedBackgroundProvider = ({
    )
 }
 
-export const DialogAnimatedBackground = ({ children, ...props }: BoxProps) => {
-   const { showAnimatedBackground } = useAnimatedBackground()
+export const DialogAnimatedBackground = ({
+   children,
+   sx,
+   ...props
+}: BoxProps) => {
+   const { showAnimatedBackground, expanded } = useAnimatedBackground()
    return (
-      <Box {...props}>
+      <PaperRoot
+         id="dialog-animated-background"
+         {...props}
+         sx={combineStyles(sx, [
+            expanded && {
+               maxWidth: "1373px !important",
+            },
+         ])}
+      >
          <Root>
             <AnimatedContainer>
                {Boolean(showAnimatedBackground) && (
@@ -125,6 +145,6 @@ export const DialogAnimatedBackground = ({ children, ...props }: BoxProps) => {
             </AnimatedContainer>
          </Root>
          {children}
-      </Box>
+      </PaperRoot>
    )
 }

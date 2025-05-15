@@ -115,7 +115,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
          livestreamId={livestreamId}
          handleClose={handleCloseDialog}
          open={eventDetailsDialogVisibility}
-         page={jobToOpenId ? "job-details" : "details"}
+         initialPage={jobToOpenId ? "job-details" : "details"}
          serverUserEmail={userEmail}
          mode={"stand-alone"}
          currentSparkId={currentSpark?.id}

@@ -84,7 +84,7 @@ const styles = sxStyles({
 })
 
 const RegisterAskQuestionsView = () => {
-   const { livestream, goToView, handleShowSuccessAnimation } =
+   const { livestream, goToView, handleStartSuccessAnimation } =
       useLiveStreamDialog()
    const { userPresenter, authenticatedUser } = useAuth()
 
@@ -96,9 +96,9 @@ const RegisterAskQuestionsView = () => {
 
    useEffect(() => {
       if (livestream.questionsDisabled) {
-         handleShowSuccessAnimation()
+         handleStartSuccessAnimation()
       }
-   }, [livestream.questionsDisabled, handleShowSuccessAnimation])
+   }, [livestream.questionsDisabled, handleStartSuccessAnimation])
 
    if (livestream.questionsDisabled) {
       return <RegisterAskQuestionsViewSkeleton />
@@ -218,8 +218,8 @@ const RegisterAskQuestionsView = () => {
                disableElevation
                size="medium"
                fullWidth={isMobile}
-               onClick={handleShowSuccessAnimation}
-               color="secondary"
+               onClick={handleStartSuccessAnimation}
+               color="primary"
             >
                Finish registration
             </Button>

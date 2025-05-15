@@ -160,7 +160,7 @@ const Content = ({ streams }: ContentProps) => {
             livestreamId={selectedLivestreamId}
             handleClose={handleCloseLivestreamDialog}
             mode="stand-alone"
-            page={"details"}
+            initialPage={"details"}
             serverUserEmail={authenticatedUser?.email}
          />
       </EndOfStreamContainer>

@@ -3,13 +3,14 @@ import { UserStats } from "@careerfairy/shared-lib/users"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
-import React, { FC, useCallback, useMemo } from "react"
+import { FC, ReactNode, useCallback, useMemo } from "react"
 import { fromDate } from "../../../data/firebase/FirebaseInstance"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { getStreamMetaInfo } from "../../../util/SeoUtil"
 import SEO from "../../util/SEO"
 import EventSEOSchemaScriptTag from "../common/EventSEOSchemaScriptTag"
 import LivestreamDialog from "./LivestreamDialog"
+import { DialogPageType, DialogPageTypeMapping } from "./util"
 
 export type LiveStreamDialogData = {
    serverSideLivestream: { [p: string]: any } | null
@@ -19,16 +20,8 @@ export type LiveStreamDialogData = {
 
 type Props = {
    livestreamDialogData?: LiveStreamDialogData
-   children: React.ReactNode
+   children: ReactNode
 }
-
-const validDialogPages = [
-   "details",
-   "register",
-   "job-details",
-   "speaker-details",
-] as const
-type DialogPage = (typeof validDialogPages)[number]
 
 /**
  * Renders the layout for the dialog that shows livestream information.
@@ -65,11 +58,8 @@ export const LivestreamDialogLayout: FC<Props> = ({
 
    const dialogOpen = useMemo(() => isLivestreamDialogOpen(query), [query])
 
-   const page = useMemo<DialogPage>(() => {
-      if (validDialogPages.includes(dialogPage as DialogPage)) {
-         return dialogPage as DialogPage
-      }
-      return "details" // Fallback to details page.
+   const page = useMemo<DialogPageType>(() => {
+      return DialogPageTypeMapping[dialogPage] || "details"
    }, [dialogPage])
 
    const handleClose = useCallback(() => {
@@ -100,7 +90,7 @@ export const LivestreamDialogLayout: FC<Props> = ({
             serverSideLivestream={serverLivestream}
             livestreamId={livestreamId}
             handleClose={handleClose}
-            page={page}
+            initialPage={page}
             appear={isMounted}
          />
          {/* Set SEO tags for the page. */}
