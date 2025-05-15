@@ -1,6 +1,7 @@
 import functions = require("firebase-functions")
+import { GetRecommendedEventsFnArgs } from "@careerfairy/shared-lib/functions/types"
 import { onCall } from "firebase-functions/https"
-import { number } from "yup"
+import { boolean, number, string } from "yup"
 import {
    groupRepo,
    livestreamsRepo,
@@ -16,20 +17,27 @@ import { dataValidation, userAuthExists } from "./middlewares/validations"
 
 /**
  * Get Recommended Events
- * @param data - { limit: number } - limit of events to return
+ * @param data - { limit: number, bypassCache?: boolean, referenceLivestreamId?: string } - limit of events to return, optional cache bypass flag, and optional reference livestream ID
  * @param context - CallableContext
  * @returns {Promise<string[]>} - A list of recommended event Ids in order of relevance
  * */
 export const getRecommendedEvents = onCall(
-   middlewares<{ limit: number }>(
+   middlewares<GetRecommendedEventsFnArgs>(
       dataValidation({
          limit: number().default(10).max(30),
+         bypassCache: boolean().default(false),
+         referenceLivestreamId: string().optional().nullable(),
       }),
       userAuthExists(),
       cacheOnCallValues(
          "recommendedEvents",
-         (request) => [request.auth.token.email, request.data.limit],
-         60 // 1m
+         (request) => [
+            request.auth.token.email,
+            request.data.limit,
+            request.data.referenceLivestreamId,
+         ],
+         60, // 1m
+         (request) => request.data.bypassCache === true
       ),
       async (request) => {
          try {
@@ -38,7 +46,8 @@ export const getRecommendedEvents = onCall(
                livestreamsRepo,
                userRepo,
                sparkRepo,
-               groupRepo
+               groupRepo,
+               { referenceLivestreamId: request.data.referenceLivestreamId }
             )
 
             const recommendationService =

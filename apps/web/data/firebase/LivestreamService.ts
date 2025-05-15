@@ -5,6 +5,8 @@ import {
    AgoraRTMTokenRequest,
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
+import { GetRecommendedEventsFnArgs } from "@careerfairy/shared-lib/functions/types"
 import {
    CreateLivestreamCTARequest,
    CreateLivestreamPollRequest,
@@ -1236,33 +1238,53 @@ export class LivestreamService {
     * Fetches recommended live stream events for a user.
     * @param {number} limit - Maximum number of events to fetch.
     * @param {string} userId - ID of the user to get recommendations for.
+    * @param {boolean} bypassCache - Optional flag to bypass cache for fresh recommendations.
+    * @param {string} referenceLivestreamId - Optional ID of the livestream to reference.
     * @returns Array of recommended live stream events.
     *
     * Filters out:
     * 1. Events the user is already registered for.
     * 2. Events that have already ended.
     */
-   async getRecommendedEvents(limit: number, userId: string) {
+   async getRecommendedEvents(
+      limit: number,
+      userId: string,
+      bypassCache: boolean = false,
+      referenceLivestreamId?: string
+   ) {
       const { data: eventIds } = await httpsCallable<
-         { limit: number },
+         GetRecommendedEventsFnArgs,
          string[]
       >(
          this.functions,
-         "getRecommendedEvents_v6"
-      )({ limit })
+         FUNCTION_NAMES.getRecommendedEvents
+      )({
+         limit,
+         bypassCache,
+         referenceLivestreamId,
+      })
 
       const recommendedLivestreams: LivestreamEvent[] = []
 
       for (const eventId of eventIds) {
          const isUserRegistered = await this.hasUserRegistered(eventId, userId)
          // If the user is registered, we don't want to show them the event
-         if (isUserRegistered) continue
+         if (isUserRegistered) {
+            continue
+         }
 
          const eventSnap = await getDoc(this.getLivestreamRef(eventId))
+
+         if (!eventSnap.exists()) {
+            continue
+         }
+
          const livestream = eventSnap.data()
 
          // If the event has ended, we don't want to show it
-         if (livestream.hasEnded) continue
+         if (livestream?.hasEnded) {
+            continue
+         }
 
          recommendedLivestreams.push(livestream)
       }

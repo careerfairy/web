@@ -1,15 +1,14 @@
-import React, {
-   KeyboardEventHandler,
-   memo,
-   useCallback,
-   useContext,
-   useEffect,
-   useState,
-} from "react"
-import ThumbUpRoundedIcon from "@mui/icons-material/ThumbUpRounded"
+import {
+   checkIsQuestionAuthor,
+   hasUpvotedLivestreamQuestion,
+   LivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
+import { containsBadgeOrLevelsAbove } from "@careerfairy/shared-lib/users/UserBadges"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded"
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import ThumbUpRoundedIcon from "@mui/icons-material/ThumbUpRounded"
 import {
    Box,
    Button,
@@ -22,6 +21,11 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
+import Stack from "@mui/material/Stack"
+import { useStreamingRef } from "components/custom-hook/live-stream/useStreamRoomRef"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import TutorialContext from "context/tutorials/TutorialContext"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { PlayIconButton } from "materialUI/GlobalButtons/GlobalButtons"
 import {
    TooltipButtonComponent,
@@ -29,27 +33,23 @@ import {
    TooltipTitle,
    WhiteTooltip,
 } from "materialUI/GlobalTooltips"
-import TutorialContext from "context/tutorials/TutorialContext"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
-import useStreamRef from "../../../../custom-hook/useStreamRef"
+import React, {
+   KeyboardEventHandler,
+   memo,
+   useCallback,
+   useContext,
+   useEffect,
+   useState,
+} from "react"
 import {
    CurrentStreamContextInterface,
    useCurrentStream,
 } from "../../../../../context/stream/StreamContext"
-import BadgeButton from "../../../common/BadgeButton"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import LinkifyText from "../../../../util/LinkifyText"
-import { LivestreamQuestion } from "@careerfairy/shared-lib/dist/livestreams"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
-import Stack from "@mui/material/Stack"
-import { containsBadgeOrLevelsAbove } from "@careerfairy/shared-lib/dist/users/UserBadges"
-import { livestreamService } from "data/firebase/LivestreamService"
-import { useStreamingRef } from "components/custom-hook/live-stream/useStreamRoomRef"
-import {
-   checkIsQuestionAuthor,
-   hasUpvotedLivestreamQuestion,
-} from "@careerfairy/shared-lib/livestreams"
+import useStreamRef from "../../../../custom-hook/useStreamRef"
+import LinkifyText from "../../../../util/LinkifyText"
+import BadgeButton from "../../../common/BadgeButton"
 
 const styles = sxStyles({
    chatInput: {

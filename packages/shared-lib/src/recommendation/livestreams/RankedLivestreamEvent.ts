@@ -73,7 +73,7 @@ export class RankedLivestreamEvent {
    }
 
    getFieldOfStudyIds(): string[] {
-      return this.model.targetFieldsOfStudy.map((e) => e.id) || []
+      return this.model.targetFieldsOfStudy?.map((e) => e.id) || []
    }
 
    getInterestIds(): string[] {
@@ -133,6 +133,77 @@ export class RankedLivestreamEvent {
 
    getBusinessFunctionTagIds(): string[] {
       return this.model?.businessFunctionsTagIds || []
+   }
+
+   /**
+    * Boosts ranking score based on industry and location matches with a reference livestream.
+    * Highest points for matching both industry and location (Priority 1),
+    * fewer points for industry match only (Priority 2).
+    *
+    * @param referenceLivestream Livestream to compare similarities against
+    * @returns This instance for chaining
+    */
+   applyReferenceBasedPoints(
+      referenceLivestream: LivestreamEvent
+   ): RankedLivestreamEvent {
+      if (!referenceLivestream || referenceLivestream.id === this.id) {
+         return this
+      }
+
+      const hasIndustryMatch = this.hasMatchingTag(
+         this.getCompanyIndustries(),
+         referenceLivestream.companyIndustries || []
+      )
+
+      if (!hasIndustryMatch) {
+         return this // No industry match, don't add any points
+      }
+
+      const hasLocationMatch = this.hasMatchingTag(
+         this.getCompanyCountries(),
+         referenceLivestream.companyCountries || []
+      )
+
+      if (hasLocationMatch) {
+         // Priority 1: Industry + Location match
+         this.addPoints(
+            RECOMMENDATION_POINTS.REFERENCE.INDUSTRY_AND_LOCATION_MATCH_POINTS
+         )
+      } else {
+         // Priority 2: Industry match only
+         this.addPoints(
+            RECOMMENDATION_POINTS.REFERENCE.INDUSTRY_MATCH_ONLY_POINTS
+         )
+      }
+
+      return this
+   }
+
+   /**
+    * Helper method to check if two arrays have any matching elements
+    */
+   private hasMatchingTag(tags1: string[], tags2: string[]): boolean {
+      if (!tags1?.length || !tags2?.length) {
+         return false
+      }
+      return tags1.some((tag) => tags2.includes(tag))
+   }
+
+   /**
+    * Factory method that creates and ranks an event by similarity to a reference.
+    * Implements the business priority logic for livestream recommendations.
+    *
+    * @param livestream Livestream to rank
+    * @param referenceLivestream Reference for similarity comparison
+    * @returns New ranked event with appropriate priority points
+    */
+   static createWithReferencePoints(
+      livestream: LivestreamEvent,
+      referenceLivestream: LivestreamEvent
+   ): RankedLivestreamEvent {
+      return RankedLivestreamEvent.create(livestream).applyReferenceBasedPoints(
+         referenceLivestream
+      )
    }
 
    addPoints(points: number) {

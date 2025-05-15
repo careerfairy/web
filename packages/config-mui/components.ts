@@ -29,7 +29,7 @@ export const getComponents = (
             props: { size: "small" },
             style: {
                ...theme.typography.small,
-               padding: "4px 16px",
+               padding: "8px 16px",
                "& svg": {
                   width: 14,
                   height: 14,

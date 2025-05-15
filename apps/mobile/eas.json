@@ -13,6 +13,9 @@
       },
       "preview": {
          "distribution": "internal",
+         "ios": {
+            "simulator": true
+         },
          "env": {
             "EAS_BUILD_DISABLE_COCOAPODS_CACHE": "1"
          }
@@ -21,6 +24,9 @@
          "autoIncrement": true,
          "env": {
             "EAS_BUILD_DISABLE_COCOAPODS_CACHE": "1"
+         },
+         "ios": {
+            "image": "macos-sequoia-15.3-xcode-16.2"
          }
       },
       "staging": {

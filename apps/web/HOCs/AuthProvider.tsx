@@ -1,13 +1,13 @@
 import {
-   AuthUserCustomClaims,
-   UserData,
-   UserStats,
-} from "@careerfairy/shared-lib/dist/users"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import {
    MESSAGING_TYPE,
    ON_AUTH_MOUNTED,
 } from "@careerfairy/shared-lib/messaging"
+import {
+   AuthUserCustomClaims,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/users"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
 import * as Sentry from "@sentry/nextjs"
 import Loader from "components/views/loader/Loader"
 import { userRepo } from "data/RepositoryInstances"
