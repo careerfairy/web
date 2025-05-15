@@ -14,6 +14,7 @@ import {
    SearchParams,
 } from "components/views/jobs-page/JobsOverviewContext"
 import JobsPageOverview from "components/views/jobs-page/JobsPageOverview"
+import { serialize } from "cookie"
 import {
    customJobRepo,
    livestreamRepo,
@@ -117,7 +118,9 @@ type JobsPageProps = {
 export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    context
 ) => {
-   const { location, term = "", jobId, redirected } = context.query
+   const hasRedirected = context.req.cookies["redirected"]
+
+   const { location, term = "", jobId } = context.query
    const locations = (location as string[]) || []
 
    // TODO: Replace with Algolia search using the searchParams, also add default limit
@@ -137,7 +140,16 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       customJobs?.map((job) => CustomJobsPresenter.serializeDocument(job)) ?? []
 
    // Add redirect to include the jobId in the URL if it's not already there
-   if (!redirected && ((jobId && !customJob) || !jobId)) {
+   if (!hasRedirected && ((jobId && !customJob) || !jobId)) {
+      context.res.setHeader(
+         "Set-Cookie",
+         serialize("redirected", "true", {
+            path: "/",
+            maxAge: 10, // seconds
+            httpOnly: true,
+         })
+      )
+
       return {
          redirect: {
             destination: `/jobs?${new URLSearchParams({
@@ -145,7 +157,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
                ...(term && { term: term.toString() }),
                // If there is no jobId, we redirect to the first job
                jobId: firstCustomJob?.id || "",
-               redirected: "true",
             })}`,
             permanent: false,
          },
@@ -176,6 +187,15 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          livestreamsData.push(LivestreamPresenter.serializeDocument(event))
       })
    }
+
+   // Clear the cookie for future clean runs
+   context.res.setHeader(
+      "Set-Cookie",
+      serialize("redirected", "", {
+         path: "/",
+         maxAge: -1,
+      })
+   )
 
    return {
       props: {
