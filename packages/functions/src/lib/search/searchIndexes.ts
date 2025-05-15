@@ -20,6 +20,9 @@ import {
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    CUSTOM_JOB_FIELDS_TO_INDEX,
+   CUSTOM_JOB_FILTERING_FIELDS,
+   CUSTOM_JOB_REPLICAS,
+   CUSTOM_JOB_SEARCHABLE_ATTRIBUTES,
    TransformedCustomJob,
 } from "@careerfairy/shared-lib/customJobs/search"
 import {
@@ -116,11 +119,16 @@ const customJobsIndex = {
    indexName: "customJobs" as const, // To allow inferring the type of the index name
    fields: removeDuplicates(CUSTOM_JOB_FIELDS_TO_INDEX),
    // shouldIndex: (doc) => !doc.deleted && !doc.isPermanentlyExpired && doc.published, // We could index only valid custom jobs
-   fullIndexSyncQueryConstraints: (collectionRef) =>
-      collectionRef
-         .where("deleted", "==", false)
-         .where("isPermanentlyExpired", "==", false)
-         .where("published", "==", true),
+   // fullIndexSyncQueryConstraints: (collectionRef) =>
+   //    collectionRef
+   //       .where("deleted", "==", false)
+   //       .where("isPermanentlyExpired", "==", false)
+   //       .where("published", "==", true),
+   settings: {
+      attributesForFaceting: CUSTOM_JOB_FILTERING_FIELDS,
+      searchableAttributes: CUSTOM_JOB_SEARCHABLE_ATTRIBUTES,
+      replicas: [CUSTOM_JOB_REPLICAS.TITLE_ASC],
+   },
 } satisfies Index<CustomJob, TransformedCustomJob>
 
 export const knownIndexes = {
