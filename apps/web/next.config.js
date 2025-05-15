@@ -283,6 +283,11 @@ const moduleExports = {
    redirects: async () => {
       return [
          {
+            source: "/(.*)",
+            destination: "https://careerfairy.io/$1",
+            permanent: true,
+         },
+         {
             source: "/landing",
             destination: "/",
             permanent: false,
