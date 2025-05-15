@@ -110,6 +110,7 @@ const styles = sxStyles({
       zIndex: 2,
       textDecoration: "none !important",
       fontWeight: 400,
+      p: "4px 16px",
    },
    badge: {
       height: 24,
