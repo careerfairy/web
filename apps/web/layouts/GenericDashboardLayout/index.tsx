@@ -1,3 +1,4 @@
+import { swissGermanCountryFilters } from "@careerfairy/shared-lib/countries/filters"
 import { useUserLocationCode } from "components/custom-hook/useUserLocationCode"
 import { CompanyIcon } from "components/views/common/icons/CompanyIcon"
 import { HomeIcon } from "components/views/common/icons/HomeIcon"
@@ -162,7 +163,8 @@ const GenericDashboardLayout = ({
             pathname: `/levels`,
             Icon: LevelsIcon,
             title: "Levels",
-            disabled: !countryCode || !["CH", "DE"].includes(countryCode),
+            disabled:
+               !countryCode || !swissGermanCountryFilters.includes(countryCode),
          },
          {
             id: "company",
@@ -170,7 +172,8 @@ const GenericDashboardLayout = ({
             pathname: `/companies`,
             Icon: CompanyIcon,
             title: "Companies",
-            disabled: countryCode && ["CH", "DE"].includes(countryCode),
+            disabled:
+               countryCode && swissGermanCountryFilters.includes(countryCode),
          },
          {
             id: "jobs",
