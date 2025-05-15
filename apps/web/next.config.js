@@ -168,6 +168,7 @@ const csp = {
       "https://player.vimeo.com",
       "https://www.careerfairy.io",
       "https://library.careerfairy.io",
+      "https://meetings.hubspot.com", // For request demo page on Webflow
       "https://cdn.embedly.com",
       "https://js.stripe.com",
       "https://hooks.stripe.com",
