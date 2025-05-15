@@ -107,7 +107,8 @@ test.describe("Livestream Registration Signed In", () => {
       })
    })
 
-   test("register to an event and fill out a question and join talent pool", async ({
+   // Talent pool has been removed from the registration process
+   test.skip("register to an event and fill out a question and join talent pool", async ({
       page,
       user,
    }) => {
@@ -118,7 +119,6 @@ test.describe("Livestream Registration Signed In", () => {
 
       await livestreamDialogPage.openDialog()
       await livestreamDialogPage.completeSuccessfulRegistration({
-         joinTalentPool: true,
          questionsViewArgs: {
             questionToAsk: question,
          },

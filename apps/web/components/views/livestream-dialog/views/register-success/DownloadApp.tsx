@@ -2,7 +2,7 @@ import CalendarIcon from "@mui/icons-material/CalendarTodayOutlined"
 import { Box, Button, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import Image from "next/legacy/image"
-import { FC, useEffect } from "react"
+import { FC } from "react"
 import { Download } from "react-feather"
 import {
    appQrCodeLSRegistration,
@@ -10,7 +10,6 @@ import {
 } from "../../../../../constants/images"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
-import { responsiveConfetti } from "../../../../util/confetti"
 import { AddToCalendar } from "../../../common/AddToCalendar"
 import BaseDialogView, { MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
@@ -115,14 +114,8 @@ const styles = sxStyles({
 })
 
 export const DownloadApp: FC = () => {
-   const { closeDialog, activeView } = useLiveStreamDialog()
+   const { closeDialog } = useLiveStreamDialog()
    const isMobile = useIsMobile()
-
-   useEffect(() => {
-      if (activeView !== "register-success") return
-
-      responsiveConfetti(isMobile)
-   }, [isMobile, activeView])
 
    return (
       <BaseDialogView
