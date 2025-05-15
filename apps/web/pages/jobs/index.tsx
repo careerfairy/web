@@ -29,7 +29,6 @@ const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ serializedCustomJobs, customJobData, searchParams }) => {
    const seoTitle = getSeoTitle(serializedCustomJobs, searchParams)
-
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
          CustomJobsPresenter.deserialize(job).convertToDocument(
@@ -42,7 +41,6 @@ const JobsPage: NextPage<
            customJobData.serializedCustomJob
         ).convertToDocument(Timestamp.fromDate)
       : undefined
-
    return (
       <>
          <SEO
