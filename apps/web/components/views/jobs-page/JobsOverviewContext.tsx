@@ -42,12 +42,9 @@ export const JobsOverviewContextProvider = ({
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
-   const [selectedJob, setSelectedJob] = useState<CustomJob | undefined>(
-      undefined
-   )
+   const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
 
    // TODO: Replace customJobs with Algolia search
-
    const { data: searchCustomJobs } = usePublishedCustomJobs({
       initialData: serverCustomJobs,
    })
@@ -56,11 +53,14 @@ export const JobsOverviewContextProvider = ({
       async (jobId: string) => {
          if (jobId) {
             const customJob = await customJobRepo.getCustomJobById(jobId)
+
             if (customJob) {
                setSelectedJob(customJob)
                return
             }
          }
+
+         setSelectedJob(undefined)
       },
       [setSelectedJob]
    )
