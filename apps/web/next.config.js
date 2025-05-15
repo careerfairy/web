@@ -302,7 +302,7 @@ const moduleExports = {
             headers: securityHeaders,
          },
          /**
-          * Prevent crawlers from indexing on preview environments
+          * Prevent crawlers from indexing on non-production environments, eg preview, staging, etc.
           */
          ...(process.env.VERCEL_ENV !== "production"
             ? [
