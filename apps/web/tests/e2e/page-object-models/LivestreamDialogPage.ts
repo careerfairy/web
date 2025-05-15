@@ -63,11 +63,9 @@ export default class LivestreamDialogPage extends CommonPage {
     */
    async completeSuccessfulRegistration({
       groupConsentRequired,
-      joinTalentPool,
       questionsViewArgs,
    }: {
       groupConsentRequired?: boolean
-      joinTalentPool?: boolean
       questionsViewArgs?: CompleteLivestreamQuestionsViewOptions
    } = {}) {
       // Wait for dialog to open fully
@@ -79,7 +77,6 @@ export default class LivestreamDialogPage extends CommonPage {
       // dialog views
       await this.completeGroupConsentView(groupConsentRequired ?? false)
       await this.completeLivestreamQuestionsView(questionsViewArgs)
-      await this.completeJoinTalentPoolView(joinTalentPool ?? true)
       await this.completeRegistrationSuccessView()
    }
 
@@ -119,7 +116,9 @@ export default class LivestreamDialogPage extends CommonPage {
          await expect(this.page.getByText("a few seconds ago")).toBeVisible()
       }
 
-      await this.page.getByRole("button", { name: "Next" }).click()
+      await this.page
+         .getByRole("button", { name: "Finish registration" })
+         .click()
    }
 
    async completeJoinTalentPoolView(join: boolean = true) {

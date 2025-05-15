@@ -28,6 +28,7 @@ import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
+import { RegistrationSuccessAnimation } from "./animations/register-success/RegistrationSuccessAnimation"
 import {
    RegistrationAction,
    RegistrationState,
@@ -39,7 +40,6 @@ import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQ
 import RedirectingView from "./views/common/RedirectingView"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
-import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
@@ -123,29 +123,23 @@ type Props = {
    appear?: boolean
 }
 
-export type ViewKey =
-   | "livestream-details"
-   | "register-data-consent"
-   | "register-ask-questions"
-   | "register-join-talent-pool"
-   | "register-success"
-   | "ask-phone-number"
-   | "job-details"
-   | "speaker-details"
-
-type ViewProps = {
-   key: ViewKey
+type ViewProps<T extends string> = {
+   key: T
    viewPath: string
    loadingComponent?: LoadableOptions["loading"]
 }
 
-type View = {
-   key: ViewKey
+type View<T extends string = string> = {
+   key: T
    component: ComponentType
    skeleton: LoadableOptions["loading"]
 }
 
-const createView = ({ key, viewPath, loadingComponent }: ViewProps): View => ({
+const createView = <T extends string = string>({
+   key,
+   viewPath,
+   loadingComponent,
+}: ViewProps<T>): View<T> => ({
    key,
    component: dynamic(() => import(`./views/${viewPath}`), {
       loading: loadingComponent || (() => <CircularProgress />),
@@ -153,7 +147,7 @@ const createView = ({ key, viewPath, loadingComponent }: ViewProps): View => ({
    skeleton: loadingComponent || (() => <CircularProgress />), // new
 })
 
-const views: View[] = [
+const views = [
    createView({
       key: "livestream-details",
       viewPath: "livestream-details/LivestreamDetailsView",
@@ -168,11 +162,6 @@ const views: View[] = [
       key: "register-ask-questions",
       viewPath: "ask-questions/RegisterAskQuestionsView",
       loadingComponent: () => <RegisterAskQuestionsViewSkeleton />,
-   }),
-   createView({
-      key: "register-join-talent-pool",
-      viewPath: "join-talent-pool/RegisterJoinTalentPoolView",
-      loadingComponent: () => <RegisterJoinTalentPoolViewSkeleton />,
    }),
    createView({
       key: "register-success",
@@ -194,7 +183,9 @@ const views: View[] = [
       viewPath: "speaker-details/SpeakerDetailsView",
       loadingComponent: () => <SpeakerDetailsViewSkeleton />,
    }),
-]
+] as const
+
+export type ViewKey = (typeof views)[number]["key"]
 
 const LivestreamDialog: FC<Props> = ({
    handleClose,
@@ -269,6 +260,8 @@ const Content: FC<ContentProps> = ({
    const theme = useTheme()
 
    const [value, setValue] = useState<number>(getPageIndex(page))
+   const activeView = views[value].key
+
    const [currentJobId, setCurrentJobId] = useState<string | null>(jobId)
    const [currentSpeakerId, setCurrentSpeakerId] = useState<string | null>(
       speakerId
@@ -308,7 +301,8 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
-            // eslint-disable-next-line no-fallthrough
+               break
+
             case "register-data-consent":
                if (isPageMode) {
                   return void push(
@@ -323,17 +317,16 @@ const Content: FC<ContentProps> = ({
                      routerOptions
                   )
                }
+               break
 
-            // eslint-disable-next-line no-fallthrough
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
-                  view = "register-join-talent-pool"
+                  view = "register-success"
                }
-
-            // eslint-disable-next-line no-fallthrough
-            default:
-               setValue(views.findIndex((v) => v.key === view))
+               break
          }
+
+         setValue(views.findIndex((v) => v.key === view))
       },
       [livestreamId, push, router, livestream?.questionsDisabled, isPageMode]
    )
@@ -423,7 +416,7 @@ const Content: FC<ContentProps> = ({
          goToView,
          closeDialog: onClose,
          livestream,
-         activeView: views[value].key,
+         activeView,
          handleBack,
          livestreamPresenter,
          updatedStats,
@@ -446,7 +439,7 @@ const Content: FC<ContentProps> = ({
          goToView,
          onClose,
          livestream,
-         value,
+         activeView,
          handleBack,
          livestreamPresenter,
          updatedStats,
@@ -493,6 +486,7 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
+         {activeView === "register-success" && <RegistrationSuccessAnimation />}
       </DialogContext.Provider>
    )
 }

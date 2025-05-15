@@ -34,7 +34,7 @@ test.describe("Group Analytics", () => {
          livestream
       )
 
-      await completeRegistration(livestreamDialogPage, true)
+      await completeRegistration(livestreamDialogPage)
 
       await Promise.all([
          verifyAnalyticsCard(groupPage, "Total registrations", "1"),
@@ -42,7 +42,7 @@ test.describe("Group Analytics", () => {
       ])
    })
 
-   testWithPrivacyPolicyActive(
+   testWithPrivacyPolicyActive.skip(
       "Talent pool analytics are visible and update when user registers",
       async ({ groupPage, group, context, user }) => {
          const { livestream } = await setupLivestreamData(group)
@@ -62,7 +62,7 @@ test.describe("Group Analytics", () => {
             livestream
          )
 
-         await completeRegistration(livestreamDialogPage, true, true)
+         await completeRegistration(livestreamDialogPage, true)
 
          await groupPage.assertUserIsInAnalyticsTable(user)
       }
@@ -78,7 +78,7 @@ test.describe("Group Analytics", () => {
             livestream
          )
 
-         await completeRegistration(livestreamDialogPage, true, true)
+         await completeRegistration(livestreamDialogPage, true)
 
          await groupPage.goToAnalyticsPage()
          await groupPage.goToLivestreamAnalyticsPage()
@@ -162,11 +162,9 @@ async function verifyAnalyticsCard(
  * */
 async function completeRegistration(
    livestreamDialogPage: LivestreamDialogPage,
-   joinTalentPool: boolean,
    groupConsentRequired: boolean = false
 ) {
    await livestreamDialogPage.completeSuccessfulRegistration({
-      joinTalentPool,
       groupConsentRequired,
    })
 }
