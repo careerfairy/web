@@ -2,13 +2,14 @@ import {
    swissGermanCountryFilters,
    userIsTargetedLevels,
 } from "@careerfairy/shared-lib/countries/filters"
+import { useAuth } from "HOCs/AuthProvider"
 import { CompanyIcon } from "components/views/common/icons"
 import { HomeIcon } from "components/views/common/icons/HomeIcon"
+import { JobsIcon } from "components/views/common/icons/JobsIcon"
 import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
 import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
 import { RecordingIcon } from "components/views/common/icons/RecordingIcon"
 import { SparksIcon } from "components/views/common/icons/SparksIcon"
-import { useAuth } from "HOCs/AuthProvider"
 import { useMemo } from "react"
 import useUserCountryCode from "../components/custom-hook/useUserCountryCode"
 import { INavLink } from "../layouts/types"
@@ -37,8 +38,11 @@ export const PastLivestreamsPath: INavLink = {
  */
 export const useNavLinks = (isMobile: boolean) => {
    const { userData } = useAuth()
-   const { userCountryCode } = useUserCountryCode()
+   const { userCountryCode: ipBasedUserCountryCode } = useUserCountryCode()
 
+   const userCountryCode = ipBasedUserCountryCode || userData?.countryIsoCode
+
+   // TODO: Implement dynamic ranking of links based on user country code
    return useMemo(() => {
       // Define base navigation links
       const links: INavLink[] = [
@@ -70,6 +74,13 @@ export const useNavLinks = (isMobile: boolean) => {
             Icon: SparksIcon,
             title: "Sparks",
          },
+         {
+            id: "jobs",
+            href: `/jobs`,
+            pathname: `/jobs`,
+            Icon: JobsIcon,
+            title: "Jobs",
+         },
          ...(!isMobile
             ? [
                  {
@@ -89,6 +100,7 @@ export const useNavLinks = (isMobile: boolean) => {
             Icon: LevelsIcon,
             title: "Levels",
          },
+
          {
             id: "company",
             href: `/companies`,
@@ -104,6 +116,16 @@ export const useNavLinks = (isMobile: boolean) => {
             return userData
                ? userIsTargetedLevels(userData)
                : swissGermanCountryFilters.includes(userCountryCode)
+         }
+         if (link.id === "company") {
+            return (
+               !userCountryCode ||
+               !(
+                  isMobile &&
+                  userCountryCode &&
+                  swissGermanCountryFilters.includes(userCountryCode)
+               )
+            )
          }
          return true
       })
