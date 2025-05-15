@@ -1,9 +1,3 @@
-import { CompanyIcon } from "components/views/common/icons"
-import { HomeIcon } from "components/views/common/icons/HomeIcon"
-import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
-import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
-import { RecordingIcon } from "components/views/common/icons/RecordingIcon"
-import { SparksIcon } from "components/views/common/icons/SparksIcon"
 import { createContext, ReactNode, useContext, useMemo } from "react"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
@@ -11,7 +5,6 @@ import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
 import Footer from "../../components/views/footer/Footer"
 import AdminGenericLayout from "../AdminGenericLayout"
 import CreditsDialogLayout from "../CreditsDialogLayout"
-import { INavLink } from "../types"
 import TabsNavigator from "./DropdownNavigator"
 import { GenericNavList } from "./GenericNavList"
 import NavBar from "./NavBar"
@@ -24,8 +17,8 @@ type IGenericDashboardContext = {
    headerScrollThreshold: number
    headerFixed?: boolean
    headerType?: "sticky" | "fixed"
-   navLinks: INavLink[]
    drawerOpen: boolean
+   isMobile: boolean
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
@@ -33,25 +26,9 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
    handleOpenCreditsDialog: () => {},
    headerScrollThreshold: 10,
    headerFixed: false,
-   navLinks: [],
    drawerOpen: false,
+   isMobile: false,
 })
-
-const NextLivestreamsPath: INavLink = {
-   id: "next-live-streams",
-   href: `/next-livestreams`,
-   pathname: `/next-livestreams/[[...livestreamDialog]]`,
-   title: "Live streams",
-   Icon: LiveStreamsIcon,
-}
-
-const PastLivestreamsPath: INavLink = {
-   id: "all-past-live-streams",
-   href: `/past-livestreams`,
-   pathname: `/past-livestreams/[[...livestreamDialog]]`,
-   title: "Recordings",
-   Icon: RecordingIcon,
-}
 
 type Props = {
    children: ReactNode
@@ -111,67 +88,6 @@ const GenericDashboardLayout = ({
       handleCloseCreditsDialog,
    ] = useDialogStateHandler()
 
-   const navLinks = useMemo(() => {
-      const links: INavLink[] = [
-         {
-            id: "home-page",
-            href: `/portal`,
-            pathname: `/portal/[[...livestreamDialog]]`,
-            Icon: HomeIcon,
-            title: "Home page",
-            mobileTitle: "Home",
-         },
-         {
-            id: "live-streams",
-            title: "Live streams",
-            mobileTitle: "Live streams",
-            Icon: LiveStreamsIcon,
-            href: `/next-livestreams`,
-            pathname: `/next-livestreams/[[...livestreamDialog]]`,
-            ...(isMobile
-               ? {
-                    childLinks: [NextLivestreamsPath, PastLivestreamsPath],
-                 }
-               : []),
-         },
-         {
-            id: "sparks",
-            href: `/sparks`,
-            pathname: `/sparks/[sparkId]`,
-            Icon: SparksIcon,
-            title: "Sparks",
-         },
-         ...(!isMobile
-            ? [
-                 {
-                    id: "past-live-streams",
-                    title: "Recordings",
-                    mobileTitle: "Recordings",
-                    Icon: RecordingIcon,
-                    href: `/past-livestreams`,
-                    pathname: `/past-livestreams/[[...livestreamDialog]]`,
-                 },
-              ]
-            : []),
-         {
-            id: "levels",
-            href: `/levels`,
-            pathname: `/levels`,
-            Icon: LevelsIcon,
-            title: "Levels",
-         },
-         {
-            id: "company",
-            href: `/companies`,
-            pathname: `/companies`,
-            Icon: CompanyIcon,
-            title: "Companies",
-         },
-      ]
-
-      return links
-   }, [isMobile])
-
    const drawerOpen = !hideDrawer && !isMobile
 
    const value = useMemo<IGenericDashboardContext>(
@@ -181,17 +97,17 @@ const GenericDashboardLayout = ({
          headerScrollThreshold,
          headerFixed: Boolean(headerFixed),
          headerType: headerType,
-         navLinks,
          drawerOpen,
+         isMobile,
       }),
       [
          handleOpenCreditsDialog,
          headerScrollThreshold,
          isPortalPage,
-         navLinks,
          headerFixed,
          headerType,
          drawerOpen,
+         isMobile,
       ]
    )
 

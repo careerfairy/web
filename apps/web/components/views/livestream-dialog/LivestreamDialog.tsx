@@ -11,6 +11,7 @@ import {
    ComponentType,
    Dispatch,
    FC,
+   SetStateAction,
    createContext,
    useCallback,
    useContext,
@@ -28,7 +29,6 @@ import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
-import { RegistrationSuccessAnimation } from "./animations/register-success/RegistrationSuccessAnimation"
 import {
    RegistrationAction,
    RegistrationState,
@@ -41,6 +41,8 @@ import RedirectingView from "./views/common/RedirectingView"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
+import { DialogAnimatedBackground } from "./views/recommendations/DialogAnimatedBackground"
+import { RecommendationsViewSkeleton } from "./views/recommendations/RecommendationsViewSkeleton"
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { AskPhoneNumberViewSkeleton } from "./views/sms/AskPhoneNumberViewSkeleton"
 import SpeakerDetailsViewSkeleton from "./views/speaker-details/SpeakerDetailsViewSkeleton"
@@ -71,6 +73,7 @@ const styles = sxStyles({
       borderTopRightRadius: `${theme.spacing(2)} !important`,
    }),
    dialogPaper: {
+      transition: (theme) => theme.transitions.create("max-width"),
       ...NICE_SCROLLBAR_STYLES,
       borderRadius: {
          md: 5,
@@ -183,6 +186,11 @@ const views = [
       viewPath: "speaker-details/SpeakerDetailsView",
       loadingComponent: () => <SpeakerDetailsViewSkeleton />,
    }),
+   createView({
+      key: "recommendations",
+      viewPath: "recommendations/RecommendationsView",
+      loadingComponent: () => <RecommendationsViewSkeleton />,
+   }),
 ] as const
 
 export type ViewKey = (typeof views)[number]["key"]
@@ -192,12 +200,16 @@ const LivestreamDialog: FC<Props> = ({
    open,
    livestreamId,
    appear,
+   page = "details",
    ...rest
 }) => {
    const isMobile = useIsMobile()
    const onClose = useCallback(() => {
       handleClose()
    }, [handleClose])
+
+   const [value, setValue] = useState<number>(getPageIndex(page))
+   const activeView = views[value].key
 
    return (
       <Dialog
@@ -215,6 +227,9 @@ const LivestreamDialog: FC<Props> = ({
          }}
          PaperProps={{
             sx: styles.dialogPaper,
+            ...(activeView === "recommendations" && {
+               component: DialogAnimatedBackground,
+            }),
          }}
       >
          <DialogContent sx={styles.content}>
@@ -222,6 +237,10 @@ const LivestreamDialog: FC<Props> = ({
                <Content
                   handleClose={onClose}
                   livestreamId={livestreamId}
+                  value={value}
+                  activeView={activeView}
+                  setValue={setValue}
+                  page={page}
                   {...rest}
                />
             ) : (
@@ -232,7 +251,11 @@ const LivestreamDialog: FC<Props> = ({
    )
 }
 
-type ContentProps = Omit<Props, "open">
+type ContentProps = Omit<Props, "open"> & {
+   value: number
+   activeView: ViewKey
+   setValue: Dispatch<SetStateAction<number>>
+}
 
 const Content: FC<ContentProps> = ({
    handleClose,
@@ -240,13 +263,16 @@ const Content: FC<ContentProps> = ({
    updatedStats,
    serverUserEmail,
    onRegisterSuccess,
-   page = "details",
    livestreamId,
    mode = "page",
    currentSparkId,
    jobId,
    speakerId,
    setting,
+   value,
+   activeView,
+   setValue,
+   page,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -258,9 +284,6 @@ const Content: FC<ContentProps> = ({
    const isRecommended = isFromNewsletter(query)
 
    const theme = useTheme()
-
-   const [value, setValue] = useState<number>(getPageIndex(page))
-   const activeView = views[value].key
 
    const [currentJobId, setCurrentJobId] = useState<string | null>(jobId)
    const [currentSpeakerId, setCurrentSpeakerId] = useState<string | null>(
@@ -321,14 +344,21 @@ const Content: FC<ContentProps> = ({
 
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
-                  view = "register-success"
+                  view = "recommendations"
                }
                break
          }
 
          setValue(views.findIndex((v) => v.key === view))
       },
-      [livestreamId, push, router, livestream?.questionsDisabled, isPageMode]
+      [
+         setValue,
+         isPageMode,
+         livestream?.questionsDisabled,
+         push,
+         router,
+         livestreamId,
+      ]
    )
 
    const goToJobDetails = useCallback(
@@ -351,7 +381,7 @@ const Content: FC<ContentProps> = ({
             setValue(views.findIndex((v) => v.key === "job-details"))
          }
       },
-      [livestreamId, mode, push, router]
+      [livestreamId, mode, push, router, setValue]
    )
 
    const goToSpeakerDetails = useCallback(
@@ -374,7 +404,7 @@ const Content: FC<ContentProps> = ({
             setValue(views.findIndex((v) => v.key === "speaker-details"))
          }
       },
-      [livestreamId, mode, push, router]
+      [livestreamId, mode, push, router, setValue]
    )
 
    const onClose = useCallback(() => {
@@ -392,8 +422,11 @@ const Content: FC<ContentProps> = ({
    // Using useEffect to update the view based on 'page'.
    // This allows conditional navigation not covered by useMemo.
    useEffect(() => {
+      // TODO: Remove if statement after reviewing the recommendations view PR
+      if (activeView === "recommendations") return
       setValue(getPageIndex(page))
-   }, [page])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [page, setValue])
 
    const [registrationState, registrationDispatch] = useReducer(
       registrationReducer,
@@ -486,7 +519,7 @@ const Content: FC<ContentProps> = ({
                )}
             </SwipeableViews>
          )}
-         {activeView === "register-success" && <RegistrationSuccessAnimation />}
+         {/* {activeView === "recommendations" && <RegistrationSuccessAnimation />} */}
       </DialogContext.Provider>
    )
 }

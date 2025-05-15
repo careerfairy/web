@@ -9,7 +9,7 @@ export const AskPhoneNumberViewSkeleton = () => {
       <BaseDialogView
          mainContent={
             <MainContent
-               onBackClick={() => goToView("register-success")}
+               onBackClick={() => goToView("recommendations")}
                onBackPosition="top-left"
             >
                <Typography>Loading...</Typography>
