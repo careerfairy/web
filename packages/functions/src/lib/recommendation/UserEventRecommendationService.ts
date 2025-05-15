@@ -37,6 +37,7 @@ export default class UserEventRecommendationService
     * This is the futureLivestreams filtered out of ended livestreams and registered livestreams
     */
    private filteredLivestreams: LivestreamEvent[] = []
+   private referenceLivestream: LivestreamEvent | null = null
 
    constructor(
       private readonly user: UserData,
@@ -49,6 +50,18 @@ export default class UserEventRecommendationService
       debug = true
    ) {
       super(functions.logger, debug)
+   }
+
+   /**
+    * Sets a reference livestream to be used for recommendations
+    * @param livestream The reference livestream
+    * @returns This service instance for chaining
+    */
+   setReferenceLivestream(
+      livestream: LivestreamEvent | null
+   ): UserEventRecommendationService {
+      this.referenceLivestream = livestream
+      return this
    }
 
    /**
@@ -73,13 +86,30 @@ export default class UserEventRecommendationService
             return false
          }
 
+         // Filter out the reference livestream if it exists
+         if (
+            this.referenceLivestream &&
+            livestream.id === this.referenceLivestream.id
+         ) {
+            return false
+         }
+
          return true
       })
 
       const promises: Promise<RankedLivestreamEvent[]>[] = []
 
+      // 1. Reference livestream based recommendations (highest priority)
+      if (this.referenceLivestream) {
+         promises.push(
+            Promise.resolve(
+               this.getReferenceLivestreamBasedRankedRecommendations()
+            )
+         )
+      }
+
+      // 2. User metadata based recommendations
       if (this.user) {
-         // Fetch top {limit} recommended events based on the user's Metadata
          promises.push(
             Promise.resolve(
                this.getRecommendedEventsBasedOnUserData(
@@ -91,9 +121,10 @@ export default class UserEventRecommendationService
                   this.featuredGroups
                )
             )
-         ),
-            // Fetch top {limit} recommended events based on the user actions, e.g. the events they have attended
-            promises.push(this.getRecommendedEventsBasedOnUserActions(10))
+         )
+
+         // 3. User actions based recommendations
+         promises.push(this.getRecommendedEventsBasedOnUserActions(10))
       }
 
       // Await all promises
@@ -108,6 +139,27 @@ export default class UserEventRecommendationService
          this.filteredLivestreams,
          this.user
       )
+   }
+
+   /**
+    * Builds ranked recommendations based on a reference livestream using priority rules.
+    * Priority 1: Matching industry AND matching location (high score)
+    * Priority 2: Matching industry BUT different location (medium score)
+    */
+   private getReferenceLivestreamBasedRankedRecommendations(): RankedLivestreamEvent[] {
+      if (!this.referenceLivestream) return []
+
+      const refIndustry = this.referenceLivestream.businessFunctionsTagIds || []
+      if (refIndustry.length === 0) return []
+
+      return this.filteredLivestreams
+         .map((livestream) =>
+            RankedLivestreamEvent.createWithReferencePoints(
+               livestream,
+               this.referenceLivestream
+            )
+         )
+         .filter((rankedEvent) => rankedEvent.getPoints() > 100) // Filter out events that didn't get reference points
    }
 
    public setFeaturedGroups(featuredGroups: {
@@ -197,6 +249,7 @@ export default class UserEventRecommendationService
          registeredLivestreams,
          studyBackgrounds,
          languages,
+         referenceLivestream,
       ] = await Promise.all([
          dataFetcher.getUser(),
          dataFetcher.getFutureLivestreams(),
@@ -204,6 +257,7 @@ export default class UserEventRecommendationService
          dataFetcher.getUserRegisteredLivestreams(),
          dataFetcher.getUserStudyBackgrounds(),
          dataFetcher.getUserLanguages(),
+         dataFetcher.getReferenceLivestream(),
       ])
 
       const [
@@ -243,5 +297,6 @@ export default class UserEventRecommendationService
       return instance
          .setAdditionalData({ studyBackgrounds, languages })
          .setFeaturedGroups(userFeaturedGroups)
+         .setReferenceLivestream(referenceLivestream)
    }
 }

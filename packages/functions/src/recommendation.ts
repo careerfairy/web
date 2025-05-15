@@ -17,7 +17,7 @@ import { dataValidation, userAuthExists } from "./middlewares/validations"
 
 /**
  * Get Recommended Events
- * @param data - { limit: number, bypassCache?: boolean } - limit of events to return and optional cache bypass flag
+ * @param data - { limit: number, bypassCache?: boolean, referenceLivestreamId?: string } - limit of events to return, optional cache bypass flag, and optional reference livestream ID
  * @param context - CallableContext
  * @returns {Promise<string[]>} - A list of recommended event Ids in order of relevance
  * */
@@ -46,7 +46,8 @@ export const getRecommendedEvents = onCall(
                livestreamsRepo,
                userRepo,
                sparkRepo,
-               groupRepo
+               groupRepo,
+               { referenceLivestreamId: request.data.referenceLivestreamId }
             )
 
             const recommendationService =
