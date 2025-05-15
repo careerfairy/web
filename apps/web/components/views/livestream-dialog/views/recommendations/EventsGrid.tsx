@@ -84,7 +84,8 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
    return (
       <AnimateSlideUp>
          <EventsContainer container spacing={1.5}>
-            {events.map((event, index) => (
+            {/* Only show 6 events at a time */}
+            {events.slice(0, 6).map((event, index) => (
                <Grid item xs={singleColumn ? 12 : 6} key={event.id}>
                   <motion.div
                      variants={cardAnimation}
