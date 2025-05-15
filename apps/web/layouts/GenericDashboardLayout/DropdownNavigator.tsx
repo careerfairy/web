@@ -1,9 +1,10 @@
 import { Box, Tab, Tabs } from "@mui/material"
+import { useNavLinks } from "hooks/useNavLinks"
 import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
+import { useGenericDashboard } from "."
 import { sxStyles } from "../../types/commonTypes"
 import { INavLink } from "../types"
-import { useGenericDashboard } from "./index"
 
 const styles = sxStyles({
    tabsWrapper: {
@@ -42,8 +43,10 @@ const styles = sxStyles({
 })
 
 const TabsNavigator = () => {
+   const { isMobile } = useGenericDashboard()
    const { pathname, push } = useRouter()
-   const { navLinks } = useGenericDashboard()
+
+   const navLinks = useNavLinks(isMobile)
    const [tabValue, setTabValue] = useState(pathname)
    const paths = useMemo((): INavLink[] => {
       const actualLink = navLinks.find((link) =>

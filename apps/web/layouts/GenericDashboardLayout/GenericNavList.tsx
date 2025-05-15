@@ -1,19 +1,14 @@
-import {
-   swissGermanCountryFilters,
-   userIsTargetedLevels,
-} from "@careerfairy/shared-lib/countries/filters"
 import { Badge } from "@mui/material"
 import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
-import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { collection, limit, query, where } from "firebase/firestore"
 import { useAuth } from "HOCs/AuthProvider"
-import { useMemo } from "react"
 import { useFirestore } from "reactfire"
+import { useGenericDashboard } from "."
 import useIsMobile from "../../components/custom-hook/useIsMobile"
+import { useNavLinks } from "../../hooks/useNavLinks"
 import NavList from "../common/NavList"
 import BottomNavBar from "./BottomNavBar"
-import { useGenericDashboard } from "./index"
 
 const useUserHasLevelsProgress = (userAuthUid: string) => {
    const firestore = useFirestore()
@@ -34,30 +29,17 @@ type Props = {
 }
 
 export const GenericNavList = ({ isDark }: Props) => {
-   const { userData } = useAuth()
-   const { userCountryCode } = useUserCountryCode()
-
    const isMobile = useIsMobile()
    const isFullScreen = useSparksFeedIsFullScreen()
-   const { navLinks } = useGenericDashboard()
+   const { isMobile: isGenericDashboardMobile } = useGenericDashboard()
 
-   const filteredNavList = useMemo(
-      () =>
-         navLinks.filter((link) => {
-            if (link.id == "levels") {
-               return userData
-                  ? userIsTargetedLevels(userData)
-                  : swissGermanCountryFilters.includes(userCountryCode)
-            }
-            return true
-         }),
-      [userData, navLinks, userCountryCode]
-   )
+   // Use the hook with its internal filtering
+   const filteredNavLinks = useNavLinks(isGenericDashboardMobile)
 
    return isMobile || isFullScreen ? (
-      <BottomNavBar links={filteredNavList} isDark={isDark} />
+      <BottomNavBar links={filteredNavLinks} isDark={isDark} />
    ) : (
-      <NavList links={filteredNavList} />
+      <NavList links={filteredNavLinks} />
    )
 }
 
