@@ -16,6 +16,12 @@ import {
    COMPANY_SEARCHABLE_ATTRIBUTES,
    TransformedGroup,
 } from "@careerfairy/shared-lib/groups/search"
+
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CUSTOM_JOB_FIELDS_TO_INDEX,
+   TransformedCustomJob,
+} from "@careerfairy/shared-lib/customJobs/search"
 import {
    SPARK_FIELDS_TO_INDEX,
    SPARK_FILTERING_FIELDS,
@@ -105,10 +111,23 @@ const companyIndex = {
    },
 } satisfies Index<Group, TransformedGroup>
 
+const customJobsIndex = {
+   collectionPath: "customJobs",
+   indexName: "customJobs" as const, // To allow inferring the type of the index name
+   fields: removeDuplicates(CUSTOM_JOB_FIELDS_TO_INDEX),
+   // shouldIndex: (doc) => !doc.deleted && !doc.isPermanentlyExpired && doc.published, // We could index only valid custom jobs
+   fullIndexSyncQueryConstraints: (collectionRef) =>
+      collectionRef
+         .where("deleted", "==", false)
+         .where("isPermanentlyExpired", "==", false)
+         .where("published", "==", true),
+} satisfies Index<CustomJob, TransformedCustomJob>
+
 export const knownIndexes = {
    [livestreamIndex.indexName]: livestreamIndex,
    [sparkIndex.indexName]: sparkIndex,
    [companyIndex.indexName]: companyIndex,
+   [customJobsIndex.indexName]: customJobsIndex,
 } as const satisfies Record<string, Index>
 
 export type IndexName = keyof typeof knownIndexes
