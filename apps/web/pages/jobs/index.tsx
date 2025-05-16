@@ -2,6 +2,8 @@ import {
    CustomJobsPresenter,
    SerializedCustomJob,
 } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
 import {
@@ -20,8 +22,10 @@ import {
    livestreamRepo,
    sparkRepo,
 } from "data/RepositoryInstances"
+import algoliaRepo from "data/algolia/AlgoliaRepository"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
+import { deserializeAlgoliaSearchResponse } from "util/algolia"
 import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
@@ -130,10 +134,22 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const { location, term = "", jobId } = context.query
    const locations = (location as string[]) || []
 
+   const filters: string = ""
    // TODO: Replace with Algolia search using the searchParams, also add default limit
    // TODO: Check also size limit, as returning high number of jobs might cause performance issues
-   const customJobs = await customJobRepo.getPublishedCustomJobs()
-   const firstCustomJob = customJobs?.at(0)
+   // const customJobs = await customJobRepo.getPublishedCustomJobs()
+   const algoliaResponse = await algoliaRepo.searchCustomJobs(
+      term as string,
+      filters,
+      0,
+      CUSTOM_JOB_REPLICAS.TITLE_ASC,
+      10
+   )
+   const algoliaCustomJobs = algoliaResponse.hits
+      .map(deserializeAlgoliaSearchResponse)
+      .map((job) => job as CustomJob)
+
+   const firstCustomJob = algoliaCustomJobs?.at(0)
 
    const customJob = jobId
       ? await customJobRepo.getCustomJobById(jobId as string)
@@ -144,7 +160,9 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       : null
 
    const serializedCustomJobs =
-      customJobs?.map((job) => CustomJobsPresenter.serializeDocument(job)) ?? []
+      algoliaCustomJobs?.map((job) =>
+         CustomJobsPresenter.serializeDocument(job)
+      ) ?? []
 
    // Add redirect to include the jobId in the URL if it's not already there
    if (!hasRedirected && ((jobId && !customJob) || !jobId)) {
