@@ -13,9 +13,9 @@ import { errorLogAndNotify } from "util/CommonUtil"
  *   - isLoading: (boolean) Loading state of the request
  *
  */
-const useUserCountryCode = () => {
+const useUserCountryCode = (shouldFetch = true) => {
    const { data: userCountryCode, isLoading } = useSWRImmutable(
-      "fetchUserCountryCode",
+      shouldFetch ? "fetchUserCountryCode" : null,
       async () => {
          const result = await FunctionsInstance.httpsCallable(
             "fetchUserCountryCode"
