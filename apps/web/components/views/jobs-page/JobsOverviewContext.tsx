@@ -1,7 +1,12 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
+import {
+   FilterOptions,
+   useCustomJobSearchAlgolia,
+} from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
 import { usePublishedCustomJobs } from "components/custom-hook/custom-job/usePublishedCustomJobs"
 import { customJobRepo } from "data/RepositoryInstances"
-import { useRouter } from "next/router"
+import { NextRouter, useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import {
    ReactNode,
@@ -12,12 +17,16 @@ import {
    useMemo,
    useState,
 } from "react"
+import { useDebounce } from "react-use"
 
 type JobsOverviewContextType = {
    selectedJob: CustomJob | undefined
    setSelectedJob: (job: CustomJob) => void
    customJobs: CustomJob[]
    searchParams: SearchParams
+   searchTerm: string
+   setSearchTerm: (term: string) => void
+   setSearchLocations: (locations: string[]) => void
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -42,12 +51,38 @@ export const JobsOverviewContextProvider = ({
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
+
+   const [searchTerm, setSearchTerm] = useState(searchParams.term)
+   console.log("🚀 ~ searchTerm:", searchTerm)
+
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
 
    // TODO: Replace customJobs with Algolia search
    const { data: searchCustomJobs } = usePublishedCustomJobs({
       initialData: serverCustomJobs,
    })
+
+   const filterOptions = useMemo<FilterOptions>(
+      () => ({
+         arrayFilters: {
+            jobLocation: [],
+         },
+      }),
+      []
+   )
+
+   const { data } = useCustomJobSearchAlgolia(searchParams.term, {
+      filterOptions,
+      targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
+      itemsPerPage: 10,
+      initialData: searchCustomJobs,
+   })
+
+   const infiniteJobs = useMemo(() => {
+      return data?.flatMap((page) => page.deserializedHits)
+   }, [data])
+
+   console.log("🚀 ~ infiniteJobs ~ infiniteJobs:", infiniteJobs)
 
    const handleJobIdChange = useCallback(
       async (jobId: string) => {
@@ -66,34 +101,37 @@ export const JobsOverviewContextProvider = ({
    )
 
    const handleSelectedJobChange = useCallback(
-      (job: CustomJob) => {
-         router.push(
-            {
-               pathname: router.pathname,
-               query: {
-                  ...(searchParams.location && {
-                     location: searchParams.location,
-                  }),
-                  ...(searchParams.term && { term: searchParams.term }),
-                  jobId: job.id,
-               },
-            },
-            undefined,
-            { shallow: true }
-         )
-      },
-      [router, searchParams]
+      (job: CustomJob) => handleQueryChange(router, "jobId", job.id),
+      [router]
    )
 
-   // TODO: Add additional state to the context
+   const handleLocationChange = useCallback(
+      (locations: string[]) => handleQueryChange(router, "location", locations),
+      [router]
+   )
+
+   useDebounce(() => handleQueryChange(router, "term", searchTerm), 750, [
+      searchTerm,
+   ])
+
    const value: JobsOverviewContextType = useMemo(() => {
       return {
          selectedJob: selectedJob,
          setSelectedJob: handleSelectedJobChange,
-         customJobs: searchCustomJobs, // TODO: Replace with Algolia search, using the initial data from the server
+         searchTerm,
+         setSearchTerm,
+         setSearchLocations: handleLocationChange,
+         customJobs: infiniteJobs, // TODO: Replace with Algolia search, using the initial data from the server
          searchParams,
       }
-   }, [searchCustomJobs, searchParams, selectedJob, handleSelectedJobChange])
+   }, [
+      infiniteJobs,
+      searchParams,
+      selectedJob,
+      handleSelectedJobChange,
+      handleLocationChange,
+      searchTerm,
+   ])
 
    useEffect(() => {
       if (serverJob?.id !== router.query.jobId) {
@@ -110,9 +148,27 @@ export const JobsOverviewContextProvider = ({
    )
 }
 
+const handleQueryChange = (
+   router: NextRouter,
+   param: keyof SearchParams | "jobId",
+   value: string | string[]
+) => {
+   router.push(
+      {
+         pathname: router.pathname,
+         query: {
+            ...router.query,
+            [param]: value,
+         },
+      },
+      undefined,
+      { shallow: true }
+   )
+}
+
 const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
    const searchParamLocations: string[] = []
-   const term = query.term as string
+   const term = (query.term as string) || ""
 
    if (query.location) {
       if (Array.isArray(query.location)) {

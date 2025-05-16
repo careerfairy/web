@@ -1,7 +1,8 @@
-import { Typography } from "@mui/material"
+import { TextField, Typography } from "@mui/material"
 
 import { Stack } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
+import { useJobsOverviewContext } from "../../JobsOverviewContext"
 
 const styles = sxStyles({
    root: {
@@ -13,11 +14,21 @@ const styles = sxStyles({
 })
 
 export const OverviewSearch = () => {
+   const { searchTerm, setSearchTerm } = useJobsOverviewContext()
    return (
       <Stack sx={styles.root}>
          <Typography>Jobs search</Typography>
          <Stack direction="row" spacing={1}>
             <Typography>Filters here</Typography>
+            <TextField
+               placeholder="Search term"
+               size="small"
+               sx={{
+                  width: "100%",
+               }}
+               value={searchTerm}
+               onChange={(e) => setSearchTerm(e.target.value)}
+            />
          </Stack>
       </Stack>
    )
