@@ -28,7 +28,12 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ serializedCustomJobs, customJobData, searchParams }) => {
+> = ({
+   serializedCustomJobs,
+   customJobData,
+   searchParams,
+   userCountryCode,
+}) => {
    const seoTitle = getSeoTitle(serializedCustomJobs, searchParams)
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
@@ -49,7 +54,7 @@ const JobsPage: NextPage<
             description={"Find your dream job with CareerFairy."}
             title={seoTitle}
          />
-         <GenericDashboardLayout>
+         <GenericDashboardLayout userCountryCode={userCountryCode}>
             <JobsOverviewContextProvider
                serverCustomJobs={serverCustomJobs}
                serverJob={serverJob}
@@ -113,13 +118,15 @@ type JobsPageProps = {
       sparksData: SerializedSpark[]
    }
    searchParams: SearchParams
+   userCountryCode: string
 }
 
 export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    context
 ) => {
    const hasRedirected = context.req.cookies["redirected"]
-
+   const userCountryCode =
+      (context.req.headers["x-vercel-ip-country"] as string) || null
    const { location, term = "", jobId } = context.query
    const locations = (location as string[]) || []
 
@@ -205,6 +212,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
             livestreamsData,
             sparksData: serializedSparks,
          },
+         userCountryCode,
          searchParams: {
             location: locations,
             term: term as string,
