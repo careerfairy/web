@@ -1,8 +1,8 @@
 import { Badge } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { collection, limit, query, where } from "firebase/firestore"
-import { useAuth } from "HOCs/AuthProvider"
 import { useFirestore } from "reactfire"
 import { useGenericDashboard } from "."
 import useIsMobile from "../../components/custom-hook/useIsMobile"
@@ -31,10 +31,14 @@ type Props = {
 export const GenericNavList = ({ isDark }: Props) => {
    const isMobile = useIsMobile()
    const isFullScreen = useSparksFeedIsFullScreen()
-   const { isMobile: isGenericDashboardMobile } = useGenericDashboard()
+   const { isMobile: isGenericDashboardMobile, userCountryCode } =
+      useGenericDashboard()
 
    // Use the hook with its internal filtering
-   const filteredNavLinks = useNavLinks(isGenericDashboardMobile)
+   const filteredNavLinks = useNavLinks(
+      isGenericDashboardMobile,
+      userCountryCode
+   )
 
    return isMobile || isFullScreen ? (
       <BottomNavBar links={filteredNavLinks} isDark={isDark} />

@@ -43,10 +43,10 @@ const styles = sxStyles({
 })
 
 const TabsNavigator = () => {
-   const { isMobile } = useGenericDashboard()
+   const { isMobile, userCountryCode } = useGenericDashboard()
    const { pathname, push } = useRouter()
 
-   const navLinks = useNavLinks(isMobile)
+   const navLinks = useNavLinks(isMobile, userCountryCode)
    const [tabValue, setTabValue] = useState(pathname)
    const paths = useMemo((): INavLink[] => {
       const actualLink = navLinks.find((link) =>
