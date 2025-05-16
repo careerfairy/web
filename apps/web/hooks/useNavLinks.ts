@@ -41,7 +41,7 @@ export const PastLivestreamsPath: INavLink = {
 export const useNavLinks = (isMobile: boolean, countryCode?: string) => {
    const { userData } = useAuth()
    const { userCountryCode: ipBasedUserCountryCode } = useUserCountryCode(
-      !countryCode?.length
+      !countryCode?.length && !userData?.countryIsoCode?.length
    )
 
    const userCountryCode =
