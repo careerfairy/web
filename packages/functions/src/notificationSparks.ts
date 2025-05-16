@@ -109,6 +109,7 @@ export const createUserSparksFeedEventNotifications = onCall<{
    {
       memory: "4GiB",
       timeoutSeconds: 60 * 9,
+      concurrency: 15,
    },
    async (request) => {
       const { userId } = request.data as { userId: string }
