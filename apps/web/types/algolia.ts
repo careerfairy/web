@@ -9,6 +9,11 @@ import {
 } from "@careerfairy/shared-lib/livestreams/search"
 
 import {
+   CustomJobFieldToIndexType,
+   TransformedCustomJob,
+} from "@careerfairy/shared-lib/customJobs/search"
+
+import {
    FieldToIndexType as SparkFieldToIndexType,
    TransformedSpark,
 } from "@careerfairy/shared-lib/sparks/search"
@@ -70,6 +75,14 @@ export type CompanyAlgoliaHit = Hit<AlgoliaCompanyResponse>
 
 // The search result type with deserialized timestamps.
 export type CompanySearchResult = DeserializeTimestamps<CompanyAlgoliaHit>
+
+export type AlgoliaCustomJobResponse = SerializeTimestamps<
+   Pick<TransformedCustomJob, CustomJobFieldToIndexType>
+>
+
+export type CustomJobAlgoliaHit = Hit<AlgoliaCustomJobResponse>
+
+export type CustomJobSearchResult = DeserializeTimestamps<CustomJobAlgoliaHit>
 
 // Filters
 export type DateFilterFieldType<T> = {

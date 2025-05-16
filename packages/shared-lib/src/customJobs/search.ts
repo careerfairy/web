@@ -24,6 +24,9 @@ export const CUSTOM_JOB_FIELDS_TO_INDEX = [
    "sparks",
    "workplace",
    "jobLocation",
+   "deadline",
+   "createdAt",
+   "updatedAt",
 ] satisfies (keyof TransformedCustomJob)[]
 
 export type CustomJobFieldToIndexType =
