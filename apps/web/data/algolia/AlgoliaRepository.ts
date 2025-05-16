@@ -2,11 +2,13 @@ import { SearchResponse } from "@algolia/client-search"
 import { CompanyReplicaType } from "@careerfairy/shared-lib/groups/search"
 import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
 
+import { CustomJobReplicaType } from "@careerfairy/shared-lib/customJobs/search"
 import { SparkReplicaType } from "@careerfairy/shared-lib/sparks/search"
 import { Wish } from "@careerfairy/shared-lib/wishes"
 import { SearchClient, SearchIndex } from "algoliasearch"
 import {
    AlgoliaCompanyResponse,
+   AlgoliaCustomJobResponse,
    AlgoliaLivestreamResponse,
    AlgoliaSparkResponse,
 } from "types/algolia"
@@ -42,6 +44,14 @@ export interface IAlgoliaRepository {
       targetReplica?: CompanyReplicaType,
       itemsPerPage?: number
    ): Promise<SearchResponse<AlgoliaCompanyResponse>>
+
+   searchCustomJobs(
+      query: string,
+      filters: string,
+      page: number,
+      targetReplica?: CustomJobReplicaType,
+      itemsPerPage?: number
+   ): Promise<SearchResponse<AlgoliaCustomJobResponse>>
 }
 interface SearchWishesOptions {
    sortType?: SortType
@@ -145,6 +155,26 @@ class AlgoliaRepository implements IAlgoliaRepository {
          itemsPerPage
       )
    }
+
+   async searchCustomJobs(
+      query: string,
+      filters: string,
+      page: number,
+      targetReplica?: CustomJobReplicaType,
+      itemsPerPage?: number
+   ) {
+      const index = initAlgoliaIndex(
+         targetReplica ? targetReplica : "customJobs"
+      )
+
+      return handleSearch<AlgoliaCustomJobResponse>(
+         index,
+         query,
+         filters,
+         page,
+         itemsPerPage
+      )
+   }
 }
 
 /**
@@ -169,6 +199,7 @@ const handleSearch = <AlgoliaResponseType>(
    // This ensures each test run gets isolated data
    return index.search<AlgoliaResponseType>(query, {
       hitsPerPage: itemsPerPage,
+
       filters: (isTest ? `workflowId:${workflowId} AND ` : "") + filters,
       page,
       cacheable: !isTest, // Disable caching for test environments as time is limited
