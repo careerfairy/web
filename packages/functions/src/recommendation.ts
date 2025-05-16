@@ -22,6 +22,9 @@ import { dataValidation, userAuthExists } from "./middlewares/validations"
  * @returns {Promise<string[]>} - A list of recommended event Ids in order of relevance
  * */
 export const getRecommendedEvents = onCall(
+   {
+      concurrency: 10,
+   },
    middlewares<GetRecommendedEventsFnArgs>(
       dataValidation({
          limit: number().default(10).max(30),
