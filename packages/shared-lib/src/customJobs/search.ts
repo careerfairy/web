@@ -4,7 +4,11 @@ import { CustomJob } from "./customJobs"
  * When adding new fields to this type, make sure to add them to the
  * CUSTOM_JOB_FIELDS_TO_INDEX array.
  */
-export type TransformedCustomJob = CustomJob
+export type TransformedCustomJob = CustomJob & {
+   locationNameTags?: string[]
+   locationIdTags?: string[]
+   normalizedJobType?: string
+}
 
 export const CUSTOM_JOB_FIELDS_TO_INDEX = [
    "id",
@@ -27,6 +31,10 @@ export const CUSTOM_JOB_FIELDS_TO_INDEX = [
    "deadline",
    "createdAt",
    "updatedAt",
+   "jobType",
+   "locationNameTags",
+   "locationIdTags",
+   "normalizedJobType",
 ] satisfies (keyof TransformedCustomJob)[]
 
 export type CustomJobFieldToIndexType =
@@ -38,9 +46,15 @@ export type CustomJobFieldToIndexType =
  * They must be a subset of the fields defined in CUSTOM_JOB_FIELDS_TO_INDEX.
  */
 export const CUSTOM_JOB_SEARCHABLE_ATTRIBUTES = [
+   "id",
    "title",
+   "group",
    "description",
    "jobLocation",
+   "locationNameTags",
+   "businessFunctionsTagIds",
+   "jobType",
+   "normalizedJobType",
    "workplace",
 ] satisfies CustomJobFieldToIndexType[]
 
@@ -49,10 +63,14 @@ export const CUSTOM_JOB_SEARCHABLE_ATTRIBUTES = [
  * They must be a subset of the fields defined in CUSTOM_JOB_FIELDS_TO_INDEX.
  */
 export const CUSTOM_JOB_FILTERING_FIELDS = [
+   "id",
    "title",
    "description",
    "jobLocation",
    "workplace",
+   "jobType",
+   "normalizedJobType",
+   "locationIdTags",
    "businessFunctionsTagIds",
 ] satisfies CustomJobFieldToIndexType[]
 
@@ -60,7 +78,7 @@ type FilterFieldType = (typeof CUSTOM_JOB_FILTERING_FIELDS)[number]
 
 export type ArrayFilterFieldType = Extract<
    FilterFieldType,
-   "jobLocation" | "businessFunctionsTagIds"
+   "locationIdTags" | "businessFunctionsTagIds" | "normalizedJobType"
 > &
    "objectID"
 

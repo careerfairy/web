@@ -86,6 +86,11 @@ export const jobTypeOptions = [
    { value: "Internship", label: "Internship", id: "Internship" },
 ]
 
+export const jobTypeValueOptions = jobTypeOptions.map((jobType) => ({
+   value: jobType.value,
+   id: jobType.id,
+}))
+
 export type CustomJobWorkplace = "on-site" | "hybrid" | "remote"
 
 export const workplaceOptionsMap: WorkplaceOptionsRecord = {
