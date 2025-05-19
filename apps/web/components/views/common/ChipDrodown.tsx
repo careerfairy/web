@@ -6,11 +6,25 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import { AnimatePresence, motion } from "framer-motion"
 import { ReactNode, useCallback, useMemo, useRef, useState } from "react"
-import { ChevronDown, ChevronUp } from "react-feather"
+import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { BrandedCheckbox } from "./inputs/BrandedCheckbox"
 import BrandedSwipeableDrawer from "./inputs/BrandedSwipeableDrawer"
+
+const popperContentVariants = {
+   closed: {
+      opacity: 0,
+      scaleY: 0,
+      transition: { duration: 0.15, ease: "easeInOut" },
+   },
+   open: {
+      opacity: 1,
+      scaleY: 1,
+      transition: { duration: 0.15, ease: "easeInOut" },
+   },
+}
 
 const styles = sxStyles({
    chip: {
@@ -29,19 +43,16 @@ const styles = sxStyles({
       maxWidth: "170px",
    },
    popper: {
-      zIndex: 1,
-      width: "353px",
-      backgroundColor: "white",
+      // zIndex: 1,
       mt: "8px !important",
+   },
+   popperContentWrapper: {
+      backgroundColor: "white",
       boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.08)",
       borderRadius: "8px",
       overflow: "hidden",
-      "& .MuiAutocomplete-inputRoot": {
-         display: "none",
-      },
-      "& .MuiAutocomplete-endAdornment": {
-         display: "none",
-      },
+      width: "353px",
+      transformOrigin: "top",
    },
    chipContentItem: {
       p: "12px",
@@ -140,7 +151,7 @@ export const ChipDropdown = ({
    }
 
    return (
-      <ClickAwayListener onClickAway={handleClose}>
+      <ClickAwayListener onClickAway={handleClose} key={label}>
          <Box>
             <Box ref={anchorRef}>
                <Chip
@@ -150,12 +161,20 @@ export const ChipDropdown = ({
                   ]}
                   label={chipLabel}
                   deleteIcon={
-                     <Box
-                        size={16}
-                        component={isOpen ? ChevronUp : ChevronDown}
-                     />
+                     <motion.div
+                        initial={false}
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        style={{ display: "flex" }}
+                     >
+                        <Box size={16} component={ChevronDown} />
+                     </motion.div>
                   }
-                  onDelete={() => setIsOpen((prev) => !prev)}
+                  onDelete={() => {
+                     console.log("🚀 ~ onDelete:")
+
+                     setIsOpen((prev) => !prev)
+                  }}
                   onClick={() => setIsOpen((prev) => !prev)}
                />
             </Box>
@@ -174,17 +193,30 @@ export const ChipDropdown = ({
                </BrandedSwipeableDrawer>
             ) : (
                <Popper
-                  open={isOpen}
+                  open={Boolean(anchorRef.current)}
                   anchorEl={anchorRef.current}
                   placement="bottom-start"
                   sx={styles.popper}
                >
-                  <ChipContent
-                     options={options}
-                     search={search}
-                     handleOptionClick={handleOptionClick}
-                     isChecked={isChecked}
-                  />
+                  <AnimatePresence>
+                     {isOpen ? (
+                        <motion.div
+                           key="popper-content"
+                           initial="closed"
+                           animate="open"
+                           exit="closed"
+                           variants={popperContentVariants}
+                           style={styles.popperContentWrapper}
+                        >
+                           <ChipContent
+                              options={options}
+                              search={search}
+                              handleOptionClick={handleOptionClick}
+                              isChecked={isChecked}
+                           />
+                        </motion.div>
+                     ) : null}
+                  </AnimatePresence>
                </Popper>
             )}
          </Box>
@@ -208,7 +240,7 @@ const ChipContent = ({
 }: ChipContentProps) => {
    return (
       <Stack p={0} maxHeight={300} overflow="auto">
-         {search}
+         {search ? <Box p={"12px"}>{search}</Box> : null}
          <Box>
             {options?.map((option) => (
                <ChipContentItem

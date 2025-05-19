@@ -141,6 +141,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const jobId = queryJobId as string
 
    const queryLocations = getQueryStringArray(context.query.location)
+   console.log("🚀 ~ queryLocations:", queryLocations)
    const queryBusinessFunctionTags = getQueryStringArray(
       context.query.businessFunctionTags
    )
@@ -184,6 +185,19 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    // Add redirect to include the jobId in the URL if it's not already there
    if (!hasRedirected && ((jobId && !customJob) || !jobId)) {
+      const params = new URLSearchParams()
+      queryLocations.forEach((loc) => params.append("location", loc))
+      queryBusinessFunctionTags.forEach((tag) =>
+         params.append("businessFunctionTags", tag)
+      )
+      queryJobTypes.forEach((type) => params.append("jobTypes", type))
+
+      if (term) params.set("term", term.toString())
+
+      if (firstCustomJob?.id) params.set("jobId", firstCustomJob.id)
+
+      const destination = `/jobs?${params.toString()}`
+
       context.res.setHeader(
          "Set-Cookie",
          serialize("redirected", "true", {
@@ -195,20 +209,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
       return {
          redirect: {
-            destination: `/jobs?${new URLSearchParams({
-               ...(queryLocations.length && {
-                  location: queryLocations.join(","),
-               }),
-               ...(term && { term: term.toString() }),
-               ...(queryBusinessFunctionTags.length && {
-                  businessFunctionTags: queryBusinessFunctionTags.join(","),
-               }),
-               ...(queryJobTypes.length && {
-                  jobTypes: queryJobTypes.join(","),
-               }),
-               // If there is no jobId, we redirect to the first job
-               jobId: firstCustomJob?.id || "",
-            })}`,
+            destination: destination,
             permanent: false,
          },
       }
