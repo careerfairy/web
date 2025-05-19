@@ -1,11 +1,11 @@
 import algoliasearch from "algoliasearch"
 import { logger } from "firebase-functions/v2"
-import { isLocalEnvironment } from "../util"
+import { isLocalEnvironment, isTestEnvironment } from "../util"
 
 let algoliaAppId = process.env.ALGOLIA_APP_ID
 let algoliaApiKey = process.env.ALGOLIA_API_KEY
 
-if (isLocalEnvironment() && process.env.NODE_ENV !== "test") {
+if (isLocalEnvironment() && !isTestEnvironment()) {
    algoliaAppId = process.env.DEV_ALGOLIA_APP_ID
    algoliaApiKey = process.env.DEV_ALGOLIA_API_KEY
 
