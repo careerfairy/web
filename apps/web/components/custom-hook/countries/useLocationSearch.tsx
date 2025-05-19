@@ -39,7 +39,7 @@ export const useLocationSearch = (
    searchValue: string,
    options: Options = {}
 ) => {
-   const { suspense = true, limit = 10 } = options
+   const { suspense = true, limit = 30 } = options
 
    const fetcher = useFunctionsSWR<OptionGroup[]>()
 
@@ -61,4 +61,13 @@ export const useLocationSearch = (
          suspense,
       }
    )
+}
+
+export const dropdownValueMapper = (
+   option: OptionGroup
+): { id: string; value: string } => {
+   return {
+      id: option.id,
+      value: option.name,
+   }
 }

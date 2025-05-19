@@ -11,6 +11,7 @@ import {
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
 import {
    JobsOverviewContextProvider,
    SearchParams,
@@ -28,6 +29,8 @@ import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
 import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
+
+import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 const JobsPage: NextPage<
@@ -131,19 +134,34 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const hasRedirected = context.req.cookies["redirected"]
    const userCountryCode =
       (context.req.headers["x-vercel-ip-country"] as string) || null
-   const { location, term = "", jobId } = context.query
-   const locations = (location as string[]) || []
 
-   const filters: string = ""
-   // TODO: Replace with Algolia search using the searchParams, also add default limit
-   // TODO: Check also size limit, as returning high number of jobs might cause performance issues
+   const { queryTerm = "", queryJobId } = context.query
+
+   const term = queryTerm as string
+   const jobId = queryJobId as string
+
+   const queryLocations = getQueryStringArray(context.query.location)
+   const queryBusinessFunctionTags = getQueryStringArray(
+      context.query.businessFunctionTags
+   )
+   const queryJobTypes = getQueryStringArray(context.query.jobTypes)
+
+   const filterOptions = {
+      arrayFilters: {
+         locationIdTags: queryLocations,
+         businessFunctionsTagIds: queryBusinessFunctionTags,
+         normalizedJobType: queryJobTypes,
+      },
+   }
+   const filters: string = buildAlgoliaFilterString(filterOptions)
+
    // const customJobs = await customJobRepo.getPublishedCustomJobs()
    const algoliaResponse = await algoliaRepo.searchCustomJobs(
       term as string,
       filters,
       0,
       CUSTOM_JOB_REPLICAS.TITLE_ASC,
-      10
+      30
    )
    const algoliaCustomJobs = algoliaResponse.hits
       .map(deserializeAlgoliaSearchResponse)
@@ -152,7 +170,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const firstCustomJob = algoliaCustomJobs?.at(0)
 
    const customJob = jobId
-      ? await customJobRepo.getCustomJobById(jobId as string)
+      ? await customJobRepo.getCustomJobById(jobId)
       : firstCustomJob
 
    const serializedCustomJob = customJob
@@ -178,8 +196,16 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       return {
          redirect: {
             destination: `/jobs?${new URLSearchParams({
-               ...(locations.length && { location: locations.join(",") }),
+               ...(queryLocations.length && {
+                  location: queryLocations.join(","),
+               }),
                ...(term && { term: term.toString() }),
+               ...(queryBusinessFunctionTags.length && {
+                  businessFunctionTags: queryBusinessFunctionTags.join(","),
+               }),
+               ...(queryJobTypes.length && {
+                  jobTypes: queryJobTypes.join(","),
+               }),
                // If there is no jobId, we redirect to the first job
                jobId: firstCustomJob?.id || "",
             })}`,
@@ -232,8 +258,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          },
          userCountryCode,
          searchParams: {
-            location: locations,
+            location: queryLocations,
             term: term as string,
+            businessFunctionTags: queryBusinessFunctionTags,
+            jobTypes: queryJobTypes,
          },
       },
    }

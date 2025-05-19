@@ -1,34 +1,47 @@
-import { TextField, Typography } from "@mui/material"
-
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
-import { useJobsOverviewContext } from "../../JobsOverviewContext"
+import { SearchByLocation } from "./by/SearchByLocation"
+import { SearchByTags } from "./by/SearchByTags"
+import { SearchByTerm } from "./by/SearchByTerm"
+import { SearchByType } from "./by/SearchByType"
 
 const styles = sxStyles({
    root: {
       width: "100%",
-      borderRadius: 2,
-      border: "1px solid #E0E0E0",
-      padding: 2,
+   },
+   searchBy: {
+      overflowX: "auto",
+      boxSizing: "border-box",
+      overflowClipMargin: "106px",
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
+      px: {
+         xs: "16px !important",
+         sm: "16px !important",
+         md: "32px !important",
+      },
+   },
+   searchByTerm: {
+      px: {
+         xs: "16px !important",
+         sm: "16px !important",
+         md: "32px !important",
+      },
    },
 })
 
 export const OverviewSearch = () => {
-   const { searchTerm, setSearchTerm } = useJobsOverviewContext()
    return (
-      <Stack sx={styles.root}>
-         <Typography>Jobs search</Typography>
-         <Stack direction="row" spacing={1}>
-            <Typography>Filters here</Typography>
-            <TextField
-               placeholder="Search term"
-               size="small"
-               sx={{
-                  width: "100%",
-               }}
-               value={searchTerm}
-               onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <Stack sx={styles.root} spacing={2}>
+         <Box sx={styles.searchByTerm}>
+            <SearchByTerm />
+         </Box>
+         <Stack direction="row" spacing={2} sx={styles.searchBy}>
+            <SearchByLocation />
+            <SearchByTags />
+            <SearchByType />
          </Stack>
       </Stack>
    )

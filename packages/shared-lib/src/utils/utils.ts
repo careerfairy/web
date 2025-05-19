@@ -582,3 +582,19 @@ export const arraySortByIndex = <T>(
    })
    return sortedItems
 }
+
+export const getQueryStringArray = (
+   queryString: string | string[] | undefined
+): string[] => {
+   const keyValues: string[] = []
+
+   if (!queryString) return []
+
+   if (Array.isArray(queryString)) {
+      keyValues.push(...queryString)
+   } else {
+      keyValues.push(queryString as string)
+   }
+
+   return keyValues
+}

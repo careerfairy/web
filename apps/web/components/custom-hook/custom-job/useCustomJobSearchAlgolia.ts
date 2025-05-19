@@ -41,13 +41,16 @@ export type FilterOptions = {
  * @param {Object} options - The filters to apply.
  * @returns {string} The constructed filter string.
  */
-const buildAlgoliaFilterString = (options: FilterOptions): string => {
+export const buildAlgoliaFilterString = (options: FilterOptions): string => {
    const filters = []
 
    const { arrayFilters, booleanFilters, excludeArrayFilters } = options
 
+   const arrayFiltersString = generateArrayFilterString(arrayFilters, false, {
+      normalizeFilterValues: true,
+   })
    // Handle arrayFilters
-   filters.push(generateArrayFilterString(arrayFilters))
+   filters.push(arrayFiltersString)
 
    // Handle booleanFilters
    filters.push(generateBooleanFilterStrings(booleanFilters))
