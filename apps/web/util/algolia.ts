@@ -57,9 +57,16 @@ export const deserializeAlgoliaSearchResponse = <
  */
 export const generateArrayFilterString = (
    arrayFilters: Record<string, string[]>,
-   exclude: boolean = false
+   exclude: boolean = false,
+   options: {
+      normalizeFilterValues: boolean
+   } = {
+      normalizeFilterValues: false,
+   }
 ): string => {
    if (!arrayFilters) return ""
+
+   const { normalizeFilterValues } = options
    const filters = []
    // Go through each filter type (e.g., "tags", "categories").
    Object.entries(arrayFilters).forEach(([filterName, filterValues]) => {
@@ -68,7 +75,14 @@ export const generateArrayFilterString = (
             // For exclusion, create a single NOT condition for the OR group
             const filterValueString = filterValues
                .filter(Boolean)
-               .map((filterValue) => `NOT ${filterName}:${filterValue}`)
+               .map(
+                  (filterValue) =>
+                     `NOT ${filterName}:${
+                        normalizeFilterValues
+                           ? normalizeFilterValue(filterValue)
+                           : filterValue
+                     }`
+               )
                .join(" AND ")
 
             if (filterValueString) {
@@ -78,7 +92,14 @@ export const generateArrayFilterString = (
             // Original inclusion logic with OR
             const filterValueString = filterValues
                .filter(Boolean)
-               .map((filterValue) => `${filterName}:${filterValue}`)
+               .map(
+                  (filterValue) =>
+                     `${filterName}:${
+                        normalizeFilterValues
+                           ? normalizeFilterValue(filterValue)
+                           : filterValue
+                     }`
+               )
                .join(" OR ")
 
             if (filterValueString) {
@@ -90,6 +111,10 @@ export const generateArrayFilterString = (
 
    // Link different filter types with "AND"
    return filters.join(" AND ")
+}
+
+const normalizeFilterValue = (filterValue: string) => {
+   return filterValue.replace(" ", "-")
 }
 
 /**

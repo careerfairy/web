@@ -1,10 +1,10 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
+import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
 import {
    FilterOptions,
    useCustomJobSearchAlgolia,
 } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
-import { usePublishedCustomJobs } from "components/custom-hook/custom-job/usePublishedCustomJobs"
 import { customJobRepo } from "data/RepositoryInstances"
 import { NextRouter, useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
@@ -27,6 +27,11 @@ type JobsOverviewContextType = {
    searchTerm: string
    setSearchTerm: (term: string) => void
    setSearchLocations: (locations: string[]) => void
+   searchLocations: string[]
+   searchBusinessFunctionTags: string[]
+   setSearchBusinessFunctionTags: (businessFunctionTags: string[]) => void
+   searchJobTypes: string[]
+   setSearchJobTypes: (jobTypes: string[]) => void
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -42,6 +47,8 @@ type JobsOverviewContextProviderType = {
 export type SearchParams = {
    location?: string[]
    term?: string
+   businessFunctionTags?: string[]
+   jobTypes?: string[]
 }
 
 export const JobsOverviewContextProvider = ({
@@ -53,36 +60,34 @@ export const JobsOverviewContextProvider = ({
    const searchParams = getSearchParams(router.query)
 
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
-   console.log("🚀 ~ searchTerm:", searchTerm)
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
-
-   // TODO: Replace customJobs with Algolia search
-   const { data: searchCustomJobs } = usePublishedCustomJobs({
-      initialData: serverCustomJobs,
-   })
 
    const filterOptions = useMemo<FilterOptions>(
       () => ({
          arrayFilters: {
-            jobLocation: [],
+            locationIdTags: searchParams.location,
+            businessFunctionsTagIds: searchParams.businessFunctionTags,
+            normalizedJobType: searchParams.jobTypes,
          },
       }),
-      []
+      [
+         searchParams.businessFunctionTags,
+         searchParams.location,
+         searchParams.jobTypes,
+      ]
    )
 
    const { data } = useCustomJobSearchAlgolia(searchParams.term, {
       filterOptions,
       targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
       itemsPerPage: 10,
-      initialData: searchCustomJobs,
+      initialData: serverCustomJobs,
    })
 
    const infiniteJobs = useMemo(() => {
-      return data?.flatMap((page) => page.deserializedHits)
+      return data?.flatMap((page) => page.deserializedHits) ?? []
    }, [data])
-
-   console.log("🚀 ~ infiniteJobs ~ infiniteJobs:", infiniteJobs)
 
    const handleJobIdChange = useCallback(
       async (jobId: string) => {
@@ -110,6 +115,21 @@ export const JobsOverviewContextProvider = ({
       [router]
    )
 
+   const handleBusinessFunctionTagsChange = useCallback(
+      (businessFunctionTags: string[]) =>
+         handleQueryChange(
+            router,
+            "businessFunctionTags",
+            businessFunctionTags
+         ),
+      [router]
+   )
+
+   const handleJobTypesChange = useCallback(
+      (jobTypes: string[]) => handleQueryChange(router, "jobTypes", jobTypes),
+      [router]
+   )
+
    useDebounce(() => handleQueryChange(router, "term", searchTerm), 750, [
       searchTerm,
    ])
@@ -121,7 +141,12 @@ export const JobsOverviewContextProvider = ({
          searchTerm,
          setSearchTerm,
          setSearchLocations: handleLocationChange,
-         customJobs: infiniteJobs, // TODO: Replace with Algolia search, using the initial data from the server
+         searchLocations: searchParams.location,
+         searchBusinessFunctionTags: searchParams.businessFunctionTags,
+         setSearchBusinessFunctionTags: handleBusinessFunctionTagsChange,
+         searchJobTypes: searchParams.jobTypes,
+         setSearchJobTypes: handleJobTypesChange,
+         customJobs: infiniteJobs,
          searchParams,
       }
    }, [
@@ -129,7 +154,9 @@ export const JobsOverviewContextProvider = ({
       searchParams,
       selectedJob,
       handleSelectedJobChange,
+      handleBusinessFunctionTagsChange,
       handleLocationChange,
+      handleJobTypesChange,
       searchTerm,
    ])
 
@@ -167,20 +194,19 @@ const handleQueryChange = (
 }
 
 const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
-   const searchParamLocations: string[] = []
    const term = (query.term as string) || ""
 
-   if (query.location) {
-      if (Array.isArray(query.location)) {
-         searchParamLocations.push(...query.location)
-      } else {
-         searchParamLocations.push(query.location as string)
-      }
-   }
+   const searchParamLocations = getQueryStringArray(query.location)
+   const searchParamBusinessFunctionTags = getQueryStringArray(
+      query.businessFunctionTags
+   )
+   const searchParamJobTypes = getQueryStringArray(query.jobTypes)
 
    return {
       location: searchParamLocations,
       term: term,
+      businessFunctionTags: searchParamBusinessFunctionTags,
+      jobTypes: searchParamJobTypes,
    }
 }
 
