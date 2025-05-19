@@ -118,6 +118,13 @@ const customJobsIndex = {
    collectionPath: "customJobs",
    indexName: "customJobs" as const, // To allow inferring the type of the index name
    fields: removeDuplicates(CUSTOM_JOB_FIELDS_TO_INDEX),
+   transformData: (data) => ({
+      ...data,
+      locationNameTags:
+         data.jobLocation?.map((location) => location.name) ?? [],
+      locationIdTags: data.jobLocation?.map((location) => location.id) ?? [],
+      normalizedJobType: data.jobType?.replace(" ", "-") ?? "",
+   }),
    // shouldIndex: (doc) => !doc.deleted && !doc.isPermanentlyExpired && doc.published, // We could index only valid custom jobs
    // fullIndexSyncQueryConstraints: (collectionRef) =>
    //    collectionRef
