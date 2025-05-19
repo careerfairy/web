@@ -2,7 +2,7 @@ import { Box } from "@mui/material"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
-import { Search } from "react-feather"
+import { Search, XCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -16,6 +16,7 @@ const styles = sxStyles({
          background: (theme) => theme.brand.white[100],
       },
       "& .MuiInputBase-input": {
+         ml: "8px",
          p: "0px",
          "&::placeholder": {
             color: (theme) => theme.palette.neutral[600],
@@ -29,7 +30,7 @@ const styles = sxStyles({
          fontWeight: "400",
       },
       "& svg": {
-         mr: "8px",
+         // mr: "8px",
       },
    },
    searchIcon: {
@@ -37,7 +38,18 @@ const styles = sxStyles({
       width: "24px",
       height: "24px",
    },
+   clearIcon: {
+      width: "26px",
+      height: "26px",
+      color: (theme) => theme.brand.white[50],
+      fill: (theme) => theme.brand.black[700],
+      "&:hover": {
+         fill: (theme) => theme.brand.black[800],
+         cursor: "pointer",
+      },
+   },
 })
+
 export const SearchByTerm = () => {
    const { searchTerm, setSearchTerm } = useJobsOverviewContext()
 
@@ -48,6 +60,13 @@ export const SearchByTerm = () => {
          sx={styles.searchField}
          InputProps={{
             startAdornment: <Box component={Search} sx={styles.searchIcon} />,
+            endAdornment: (
+               <Box
+                  sx={styles.clearIcon}
+                  component={XCircle}
+                  onClick={() => setSearchTerm("")}
+               />
+            ),
          }}
          value={searchTerm}
          onChange={(e) => setSearchTerm(e.target.value)}

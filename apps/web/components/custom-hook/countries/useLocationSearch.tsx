@@ -19,15 +19,26 @@ const swrOptions: SWRConfiguration = {
       }),
 }
 
-const getKey = (searchValue: string, limit?: number) => {
-   return searchValue?.length
-      ? [FUNCTION_NAMES.searchLocations, { searchValue, limit }]
+type GetKeyOptions = {
+   searchValue: string
+   limit?: number
+   initialLocationIds?: string[]
+}
+const getKey = (options: GetKeyOptions) => {
+   const { searchValue, limit, initialLocationIds } = options
+
+   return searchValue?.length || initialLocationIds?.length
+      ? [
+           FUNCTION_NAMES.searchLocations,
+           { searchValue, limit, initialLocationIds },
+        ]
       : null
 }
 
 type Options = {
    suspense?: boolean
    limit?: number
+   initialLocationIds?: string[]
 }
 
 /**
@@ -39,7 +50,7 @@ export const useLocationSearch = (
    searchValue: string,
    options: Options = {}
 ) => {
-   const { suspense = true, limit = 30 } = options
+   const { suspense = true, limit = 10, initialLocationIds } = options
 
    const fetcher = useFunctionsSWR<OptionGroup[]>()
 
@@ -54,7 +65,7 @@ export const useLocationSearch = (
    )
 
    return useSWR<Omit<OptionGroup, "groupId">[]>(
-      getKey(debouncedSearchValue, limit),
+      getKey({ searchValue: debouncedSearchValue, limit, initialLocationIds }),
       fetcher,
       {
          ...swrOptions,
