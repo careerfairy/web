@@ -5,7 +5,7 @@ import { isLocalEnvironment } from "../util"
 let algoliaAppId = process.env.ALGOLIA_APP_ID
 let algoliaApiKey = process.env.ALGOLIA_API_KEY
 
-if (isLocalEnvironment()) {
+if (isLocalEnvironment() && process.env.NODE_ENV !== "test") {
    algoliaAppId = process.env.DEV_ALGOLIA_APP_ID
    algoliaApiKey = process.env.DEV_ALGOLIA_API_KEY
 
