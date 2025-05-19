@@ -5,6 +5,7 @@ import {
 import { useAuth } from "HOCs/AuthProvider"
 import { CompanyIcon } from "components/views/common/icons"
 import { HomeIcon } from "components/views/common/icons/HomeIcon"
+import { JobsIcon } from "components/views/common/icons/JobsIcon"
 import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
 import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
 import { RecordingIcon } from "components/views/common/icons/RecordingIcon"
@@ -35,22 +36,32 @@ export const PastLivestreamsPath: INavLink = {
  * @param isMobile - Whether the screen is mobile
  * @returns Array of filtered navigation links
  */
-export const useNavLinks = (isMobile: boolean) => {
+export const useNavLinks = (
+   isMobile: boolean,
+   serverUserCountryCode?: string
+) => {
    const { userData } = useAuth()
-   const { userCountryCode } = useUserCountryCode()
+   const { userCountryCode: ipBasedUserCountryCode } = useUserCountryCode(
+      !serverUserCountryCode?.length || !userData?.countryIsoCode
+   )
 
+   const userCountryCode =
+      serverUserCountryCode ||
+      userData?.countryIsoCode ||
+      ipBasedUserCountryCode
    return useMemo(() => {
       const disabledLevels = !(userData
          ? userIsTargetedLevels(userData)
          : swissGermanCountryFilters.includes(userCountryCode))
 
-      const disabledCompanies =
+      const disabledCompanies = !(
          !userCountryCode ||
          !(
             isMobile &&
             userCountryCode &&
             swissGermanCountryFilters.includes(userCountryCode)
          )
+      )
 
       // Define base navigation links
       const links: INavLink[] = [
@@ -81,6 +92,13 @@ export const useNavLinks = (isMobile: boolean) => {
             pathname: `/sparks/[sparkId]`,
             Icon: SparksIcon,
             title: "Sparks",
+         },
+         {
+            id: "jobs",
+            href: `/jobs`,
+            pathname: `/jobs`,
+            Icon: JobsIcon,
+            title: "Jobs",
          },
          ...(!isMobile
             ? [
