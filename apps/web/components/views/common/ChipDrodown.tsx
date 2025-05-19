@@ -7,7 +7,15 @@ import {
    Typography,
 } from "@mui/material"
 import { AnimatePresence, motion } from "framer-motion"
-import { ReactNode, useCallback, useMemo, useRef, useState } from "react"
+import {
+   ReactNode,
+   useCallback,
+   useEffect,
+   useId,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { BrandedCheckbox } from "./inputs/BrandedCheckbox"
@@ -99,6 +107,7 @@ export const ChipDropdown = ({
 }: ChipDropdownProps) => {
    const [isOpen, setIsOpen] = useState(false)
    const anchorRef = useRef<HTMLDivElement>(null)
+   const id = useId()
 
    const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>(
       () => {
@@ -124,6 +133,18 @@ export const ChipDropdown = ({
          : label
    }, [options, selectedMap, label, hasSelectedItems])
 
+   useEffect(() => {
+      const handler = (e: CustomEvent) => {
+         if (e.detail !== id) setIsOpen(false)
+      }
+      window.addEventListener("chipdropdown-open", handler as EventListener)
+      return () =>
+         window.removeEventListener(
+            "chipdropdown-open",
+            handler as EventListener
+         )
+   }, [id])
+
    const handleOptionClick = (option: string) => {
       const newSelectedMap = { ...selectedMap, [option]: !selectedMap[option] }
       const newSelectedValues = Object.keys(newSelectedMap).filter(
@@ -146,14 +167,21 @@ export const ChipDropdown = ({
       setIsOpen(false)
    }
 
-   const handleOpen = () => {
-      setIsOpen(true)
+   const handleToggle = () => {
+      if (isOpen) {
+         setIsOpen(false)
+      } else {
+         window.dispatchEvent(
+            new CustomEvent("chipdropdown-open", { detail: id })
+         )
+         setIsOpen(true)
+      }
    }
 
    return (
       <ClickAwayListener onClickAway={handleClose} key={label}>
-         <Box>
-            <Box ref={anchorRef}>
+         <Box ref={anchorRef}>
+            <Box>
                <Chip
                   sx={[
                      styles.chip,
@@ -170,19 +198,15 @@ export const ChipDropdown = ({
                         <Box size={16} component={ChevronDown} />
                      </motion.div>
                   }
-                  onDelete={() => {
-                     console.log("🚀 ~ onDelete:")
-
-                     setIsOpen((prev) => !prev)
-                  }}
-                  onClick={() => setIsOpen((prev) => !prev)}
+                  onDelete={handleToggle}
+                  onClick={handleToggle}
                />
             </Box>
             {isDialog ? (
                <BrandedSwipeableDrawer
                   open={isOpen}
                   onClose={handleClose}
-                  onOpen={handleOpen}
+                  onOpen={handleToggle}
                >
                   <ChipContent
                      options={options}
