@@ -125,12 +125,13 @@ const customJobsIndex = {
       locationIdTags: data.jobLocation?.map((location) => location.id) ?? [],
       normalizedJobType: data.jobType?.replace(" ", "-") ?? "",
    }),
-   // shouldIndex: (doc) => !doc.deleted && !doc.isPermanentlyExpired && doc.published, // We could index only valid custom jobs
-   // fullIndexSyncQueryConstraints: (collectionRef) =>
-   //    collectionRef
-   //       .where("deleted", "==", false)
-   //       .where("isPermanentlyExpired", "==", false)
-   //       .where("published", "==", true),
+   shouldIndex: (doc) =>
+      !doc.deleted && !doc.isPermanentlyExpired && doc.published, // We could index only valid custom jobs
+   fullIndexSyncQueryConstraints: (collectionRef) =>
+      collectionRef
+         .where("deleted", "==", false)
+         .where("isPermanentlyExpired", "==", false)
+         .where("published", "==", true),
    settings: {
       attributesForFaceting: CUSTOM_JOB_FILTERING_FIELDS,
       searchableAttributes: CUSTOM_JOB_SEARCHABLE_ATTRIBUTES,

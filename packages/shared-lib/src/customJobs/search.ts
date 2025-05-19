@@ -49,7 +49,7 @@ export const CUSTOM_JOB_SEARCHABLE_ATTRIBUTES = [
    "id",
    "title",
    "group",
-   "description",
+   "description", // We might not want to index this field, as it might bring noise to the search results
    "jobLocation",
    "locationNameTags",
    "businessFunctionsTagIds",

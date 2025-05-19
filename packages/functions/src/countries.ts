@@ -11,7 +11,7 @@ import {
 import { City, Country, State } from "country-state-city"
 import { onCall } from "firebase-functions/https"
 import Fuse from "fuse.js"
-import { InferType, number, object, string } from "yup"
+import { InferType, array, number, object, string } from "yup"
 
 const SEARCH_LOCATION_LIMIT = 10
 
@@ -42,8 +42,9 @@ const CountryDataOptionsSchema = {
 }
 
 const SearchLocationOptionsSchema = {
-   searchValue: string().required().min(2),
+   searchValue: string().optional(),
    limit: number().optional().default(SEARCH_LOCATION_LIMIT),
+   initialLocationIds: array().of(string()).optional(),
 }
 
 const GetLocationOptionsSchema = {
@@ -278,30 +279,70 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
 })
 
 export const searchLocations = onCall<SearchLocationOptions>((request) => {
-   const { searchValue, limit } = request.data
+   const { searchValue, limit, initialLocationIds } = request.data
 
-   const countries = Country.getAllCountries()
-      .map((country) => ({
-         name: country.name,
-         id: generateCountryId(country),
-      }))
-      .sort((countryA, countryB) => countryA.name.localeCompare(countryB.name))
+   let locations: { id: string; name: string }[] = []
 
-   const states = countries
-      .map((country) => {
-         const states = State.getStatesOfCountry(country.id)
-         return states.map((state) => ({
-            name: `${state.name} (${country.name})`,
-            id: generateStateId(state),
+   if (searchValue?.length > 2) {
+      const countries = Country.getAllCountries()
+         .map((country) => ({
+            name: country.name,
+            id: generateCountryId(country),
          }))
-      })
-      .flat()
+         .sort((countryA, countryB) =>
+            countryA.name.localeCompare(countryB.name)
+         )
 
-   const locations = performFuzzySearch(
-      [...countries, ...states],
-      searchValue,
-      limit
+      const states = countries
+         .map((country) => {
+            const states = State.getStatesOfCountry(country.id)
+            return states.map((state) => ({
+               name: `${state.name} (${country.name})`,
+               id: generateStateId(state),
+            }))
+         })
+         .flat()
+
+      locations = performFuzzySearch(
+         [...countries, ...states],
+         searchValue,
+         limit
+      )
+   }
+
+   const locationsMap: Record<string, boolean> = Object.fromEntries(
+      locations.map((location) => [location.id, true])
    )
+
+   initialLocationIds?.forEach((locationId) => {
+      const { countryIsoCode, stateIsoCode } = getLocationIds(locationId)
+
+      if (!countryIsoCode) return
+
+      const country = Country.getCountryByCode(countryIsoCode)
+
+      if (stateIsoCode) {
+         const state = State.getStateByCodeAndCountry(
+            stateIsoCode,
+            countryIsoCode
+         )
+
+         state &&
+            !locationsMap[locationId] &&
+            locations.push({
+               id: locationId,
+               name: `${state.name} (${country.name})`,
+            })
+         return
+      }
+
+      country &&
+         !locationsMap[locationId] &&
+         locations.push({
+            id: locationId,
+            name: country.name,
+         })
+   })
 
    return locations
 })
