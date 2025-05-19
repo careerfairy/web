@@ -130,7 +130,7 @@ export const JobsOverviewContextProvider = ({
       [router]
    )
 
-   useDebounce(() => handleQueryChange(router, "term", searchTerm), 750, [
+   useDebounce(() => handleQueryChange(router, "term", searchTerm), 300, [
       searchTerm,
    ])
 
