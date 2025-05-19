@@ -13,6 +13,7 @@ import { firestore } from "./api/firestoreAdmin"
 import { getData } from "./lib/search/searchIndexGenerator"
 import { configureSettings, initAlgoliaIndex } from "./lib/search/util"
 import { defaultTriggerRunTimeConfigV2 } from "./lib/triggers/util"
+import { isLocalEnvironment } from "./util"
 
 const DOCS_PER_INDEXING = 250
 
@@ -37,6 +38,12 @@ export const fullIndexSync = onRequest(
          return
       }
 
+      let secretKey = process.env.ALGOLIA_FULL_SYNC_SECRET_KEY
+
+      if (isLocalEnvironment()) {
+         secretKey = process.env.DEV_ALGOLIA_FULL_SYNC_SECRET_KEY
+      }
+
       const schema = yup.object().shape({
          indexName: yup
             .mixed<IndexName>()
@@ -48,10 +55,7 @@ export const fullIndexSync = onRequest(
          secretKey: yup
             .string()
             .required("Secret key is required as a query parameter")
-            .equals(
-               [process.env.ALGOLIA_FULL_SYNC_SECRET_KEY],
-               "Invalid secret key"
-            ),
+            .equals([secretKey], "Invalid secret key"),
       })
 
       // Validate the request query against the schema

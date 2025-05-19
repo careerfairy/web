@@ -1,6 +1,17 @@
 import algoliasearch from "algoliasearch"
+import { logger } from "firebase-functions/v2"
+import { isLocalEnvironment } from "../util"
 
-export const algoliaClient = algoliasearch(
-   process.env.ALGOLIA_APP_ID,
-   process.env.ALGOLIA_API_KEY
-)
+let algoliaAppId = process.env.ALGOLIA_APP_ID
+let algoliaApiKey = process.env.ALGOLIA_API_KEY
+
+if (isLocalEnvironment()) {
+   algoliaAppId = process.env.DEV_ALGOLIA_APP_ID
+   algoliaApiKey = process.env.DEV_ALGOLIA_API_KEY
+
+   logger.info(
+      `Using Algolia in DEV mode (${process.env.DEV_NAME}), please ensure you have the correct credentials for your OWN Algolia application`
+   )
+}
+
+export const algoliaClient = algoliasearch(algoliaAppId, algoliaApiKey)
