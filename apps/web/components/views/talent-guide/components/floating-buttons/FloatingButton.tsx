@@ -47,11 +47,12 @@ export const FloatingButton = ({ children, sx, ...props }: Props) => {
          <Box sx={styles.buttonOffset} />
          <ButtonWrapper {...ButtonWrapperProps}>
             <LoadingButton
+               translate="no"
                size="large"
                fullWidth={isMobile}
                sx={combineStyles(styles.button, sx)}
                {...props}
-               loading={isLoading || props.loading}
+               loading={Boolean(isLoading || props.loading)}
             >
                {children}
             </LoadingButton>
