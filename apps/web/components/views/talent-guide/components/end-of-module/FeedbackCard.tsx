@@ -194,6 +194,7 @@ export const FeedbackCard = ({
          </AnimatedCollapse>
 
          <LoadingButton
+            translate="no"
             loading={isSubmitting}
             type="submit"
             variant="contained"
