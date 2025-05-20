@@ -21,7 +21,6 @@ import {
    AuthorInfo,
    EventRating,
    EventRatingAnswer,
-   ImpressionLocation,
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
@@ -2140,7 +2139,7 @@ class FirebaseService {
       options: {
          isRecommended?: boolean
          sparkId?: string
-         originSource?: ImpressionLocation
+         originSource?: string
       } = {}
    ): Promise<void> => {
       const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(

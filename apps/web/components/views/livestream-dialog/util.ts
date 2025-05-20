@@ -1,4 +1,3 @@
-import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GetServerSidePropsContext, GetStaticPropsContext } from "next"
 import { NextRouter } from "next/router"
@@ -155,7 +154,7 @@ export const buildDialogLink = ({
     * The source of the click event.
     * This is used to track the source of the click event.
     */
-   originSource?: ImpressionLocation
+   originSource?: string
 }): UrlObject => {
    const isOnLivestreamDialogPage = isOnlivestreamDialogPage(router.pathname)
    let query: ValidLink

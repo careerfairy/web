@@ -160,6 +160,7 @@ const LinkedContent = ({ job }: Props) => {
             initialPage={"details"}
             serverUserEmail={group.adminEmail}
             mode="stand-alone"
+            providedOriginSource={`group-admin-job-${job.id}`}
          />
       </>
    )
