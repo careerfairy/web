@@ -24,7 +24,7 @@ type UseOriginSourceProps = {
  *
  * @returns The origin source or null if not available
  */
-const useOriginSource = ({
+export const useOriginSource = ({
    mode,
    providedOriginSource,
 }: UseOriginSourceProps): string | null => {
@@ -46,5 +46,3 @@ const useOriginSource = ({
 
    return originSource
 }
-
-export default useOriginSource
