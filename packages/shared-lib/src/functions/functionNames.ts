@@ -39,6 +39,7 @@ export const FUNCTION_NAMES = {
    createUserSparksFeedEventNotifications:
       "createUserSparksFeedEventNotifications_v3",
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
+   getSparksFeed: "getSparksFeed_v11",
 
    // Location functions
    searchLocations: "searchLocations",
