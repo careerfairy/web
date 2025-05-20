@@ -2,10 +2,9 @@ import { Typography } from "@mui/material"
 import { useLiveStreamsByIds } from "components/custom-hook/live-stream/useLiveStreamsByIds"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import CircularLoader from "components/views/loader/CircularLoader"
-import EventsPreviewCarousel, {
-   EventsTypes,
-} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { LivestreamsCarouselBlockType } from "data/hygraph/types"
+import { useModuleId } from "store/selectors/talentGuideSelectors"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -44,12 +43,14 @@ const LivestreamsCarousel = ({ title, subHeader, liveStreamIds }: Props) => {
       (livestream) => livestream.liveStreamId
    )
 
+   const moduleId = useModuleId()
+
    const { data: liveStreams } = useLiveStreamsByIds(liveStreamIdsArray)
 
    return (
       <EventsPreviewCarousel
          id={"job-events"}
-         type={EventsTypes.COMING_UP}
+         location={`talent-guide-livestreams-carousel-module-${moduleId}`}
          events={liveStreams}
          styling={{
             mainWrapperBoxSx: styles.carouselWrapper,

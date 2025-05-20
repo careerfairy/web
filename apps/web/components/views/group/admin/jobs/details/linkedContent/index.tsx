@@ -9,9 +9,7 @@ import useGroupHasUpcomingLivestreams from "components/custom-hook/live-stream/u
 import useIsMobile from "components/custom-hook/useIsMobile"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
-import EventsPreviewCarousel, {
-   EventsTypes,
-} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react"
@@ -224,7 +222,7 @@ const LiveStreamsContent = ({
             {linkedLivestreams.length > 0 ? (
                <EventsPreviewCarousel
                   id={"job-events"}
-                  type={EventsTypes.JOB_EVENTS}
+                  location={`company-dashboard-linked-livestreams-job-carousel-${job.id}`}
                   events={linkedLivestreams}
                   isEmbedded
                   onCardClick={handleCardClick}
