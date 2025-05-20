@@ -50,7 +50,7 @@ const styles = sxStyles({
 })
 export const SearchByLocation = () => {
    const { searchLocations, setSearchLocations } = useJobsOverviewContext()
-   console.log("🚀 ~ SearchByLocation ~ searchLocations:", searchLocations)
+
    const [locationSearchValue, setLocationSearchValue] = useState("")
 
    const isMobile = useIsMobile()
@@ -59,12 +59,22 @@ export const SearchByLocation = () => {
       locationSearchValue,
       {
          suspense: false,
-         initialLocationIds: searchLocations,
+         initialLocationIds: !locationSearchValue?.length
+            ? searchLocations
+            : [],
       }
    )
    console.log("🚀 ~ SearchByLocation ~ isLoading:", isLoading)
 
-   console.log("🚀 ~ SearchByLocation ~ locations:", locations)
+   const { data: selectedLocations } = useLocationSearch("", {
+      suspense: false,
+      initialLocationIds: searchLocations,
+   })
+
+   const label =
+      (searchLocations?.length &&
+         selectedLocations?.map((location) => location.name).join(", ")) ||
+      "Location"
 
    const locationOptions = useMemo(() => {
       return locations?.map(dropdownValueMapper) ?? []
@@ -73,19 +83,23 @@ export const SearchByLocation = () => {
    return (
       <ChipDropdown
          isDialog={isMobile}
-         label="Location"
+         label={label}
+         forceLabel
          options={locationOptions}
          handleValueChange={setSearchLocations}
          selectedOptions={searchLocations}
-         search={
-            <BrandedTextField
-               fullWidth
-               placeholder="Search city, state, canton or country"
-               sx={styles.searchField}
-               value={locationSearchValue}
-               onChange={(e) => setLocationSearchValue(e.target.value)}
-            />
-         }
+         onClose={() => setLocationSearchValue("")}
+         search={() => {
+            return (
+               <BrandedTextField
+                  fullWidth
+                  placeholder="Search city, state, canton or country"
+                  sx={styles.searchField}
+                  value={locationSearchValue}
+                  onChange={(e) => setLocationSearchValue(e.target.value)}
+               />
+            )
+         }}
          showApply={isMobile}
       />
    )
