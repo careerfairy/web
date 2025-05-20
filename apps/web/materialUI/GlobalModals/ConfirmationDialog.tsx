@@ -301,7 +301,7 @@ const ActionButton = ({
    ...props
 }: ConfirmationDialogAction) => {
    return (
-      <LoadingButton {...props} onClick={callback}>
+      <LoadingButton {...props} onClick={callback} translate="no">
          {text}
       </LoadingButton>
    )
