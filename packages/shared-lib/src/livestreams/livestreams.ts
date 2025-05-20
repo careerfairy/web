@@ -780,7 +780,6 @@ export enum ImpressionLocation {
    viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
    endOfStreamLivestreams = "endOfStreamLivestreams",
    mentorPageCarousel = "mentorPageCarousel",
-   livestreamDialogPostRegistrationRecommendations = "livestreamDialogPostRegistrationRecommendations",
    nextLivestreamsSearchBar = "nextLivestreamsSearchBar",
    portalHeroContentCarousel = "portalHeroContentCarousel",
    unknown = "unknown",

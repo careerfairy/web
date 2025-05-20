@@ -122,6 +122,7 @@ const SparkNotifications: FC<Props> = ({ userEmail }) => {
          onRegisterSuccess={handleSuccessfulEventRegistration}
          jobId={jobToOpenId}
          setting={AllDialogSettings.SparksFeed}
+         providedOriginSource={`sparks-feed-notification-${currentSpark?.id}`}
       />
    ) : null
 }

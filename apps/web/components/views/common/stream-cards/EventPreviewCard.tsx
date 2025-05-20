@@ -34,7 +34,7 @@ export type EventPreviewCardProps = {
    index?: number
    // The total number of events in the list
    totalElements?: number
-   location?: ImpressionLocation
+   location?: ImpressionLocation | string
    ref?: React.Ref<HTMLDivElement>
    disableClick?: boolean
    /* Overrides the default Link click behavior of the card */

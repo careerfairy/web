@@ -1,7 +1,4 @@
-import {
-   ImpressionLocation,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { Dialog, DialogContent, DialogProps } from "@mui/material"
@@ -30,6 +27,7 @@ import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { sxStyles } from "../../../types/commonTypes"
 import { isFromNewsletter } from "../../../util/PathUtils"
 import useLivestream from "../../custom-hook/live-stream/useLivestream"
+import useOriginSource from "../../custom-hook/live-stream/useOriginSource"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
@@ -106,14 +104,6 @@ type Props = {
    initialPage: DialogPageType
    updatedStats?: UserStats
    serverUserEmail: string
-   /**
-    * The mode of operation for the dialog. Can be either "page" or "stand-alone".
-    * In "page" mode, the entire page will navigate between views.
-    * In "stand-alone" mode, only the view state of the dialog is updated, and the page remains static.
-    *
-    * Defaults to "page".
-    */
-   mode?: DialogContextType["mode"]
    onRegisterSuccess?: () => void
    currentSparkId?: string
    /**
@@ -132,7 +122,23 @@ type Props = {
    handleDiscoverCompanySparks?: () => void
    setting?: DialogSetting
    appear?: boolean
-}
+} & (
+   | {
+        /**
+         * The mode of operation for the dialog.
+         * In "page" mode, the entire page will navigate between views.
+         */
+        mode: "page"
+     }
+   | {
+        /**
+         * The mode of operation for the dialog.
+         * In "stand-alone" mode, only the view state of the dialog is updated, and the page remains static.
+         */
+        mode: "stand-alone"
+        providedOriginSource: string
+     }
+)
 
 type ViewProps<T extends string> = {
    key: T
@@ -232,6 +238,7 @@ const LivestreamDialog: FC<Props> = ({
    }, [livestreamId])
 
    const isMobile = useIsMobile()
+
    const onClose = useCallback(() => {
       handleClose()
    }, [handleClose])
@@ -304,7 +311,10 @@ const LivestreamDialog: FC<Props> = ({
    )
 }
 
-type ContentProps = Omit<Props, "open" | "initialPage"> & {
+type ContentProps = Omit<
+   Props,
+   "open" | "initialPage" | "providedOriginSource"
+> & {
    activeViewIndex: number
    activeView: ViewKey
    setActiveViewIndex: Dispatch<SetStateAction<number>>
@@ -312,6 +322,7 @@ type ContentProps = Omit<Props, "open" | "initialPage"> & {
    isRecommendationsListVisible: boolean
    setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
    setLocalLivestreamId: Dispatch<SetStateAction<string>>
+   providedOriginSource?: string
 }
 
 const Content: FC<ContentProps> = ({
@@ -333,6 +344,7 @@ const Content: FC<ContentProps> = ({
    previousView,
    isRecommendationsListVisible,
    setIsRecommendationsListVisible,
+   providedOriginSource,
 }) => {
    const router = useRouter()
    /**
@@ -363,15 +375,12 @@ const Content: FC<ContentProps> = ({
 
    /**
     * The source of the livestream impression.
-    * On mount, we extract the originSource from the query params.
-    *
-    * we don't change it for the lifetime of the dialog as it can be used to track
-    * the source of what was used to open the dialog.
+    * Managed by the useOriginSource hook to handle both page and stand-alone modes.
     */
-   // eslint-disable-next-line react/hook-use-state
-   const [originSource] = useState<ImpressionLocation | null>(
-      router.query.originSource as ImpressionLocation | null
-   )
+   const originSource = useOriginSource({
+      mode,
+      providedOriginSource,
+   })
 
    const handleDiscoverCompanySparks = useCallback(() => {
       setIsDiscoverCompanySparksOpen(true)
@@ -749,7 +758,7 @@ type DialogContextType = {
    handleStartSuccessAnimation: () => void
    isRecommendationsListVisible: boolean
    setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
-   originSource: ImpressionLocation | null
+   originSource: string | null
 }
 
 /**
