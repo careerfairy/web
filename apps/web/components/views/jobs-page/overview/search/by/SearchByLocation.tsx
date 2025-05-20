@@ -86,6 +86,7 @@ export const SearchByLocation = () => {
                onChange={(e) => setLocationSearchValue(e.target.value)}
             />
          }
+         showApply={isMobile}
       />
    )
 }
