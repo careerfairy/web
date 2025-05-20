@@ -11,7 +11,6 @@ import {
    Paper,
    Slide,
 } from "@mui/material"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import PropTypes from "prop-types"
 import { useState } from "react"
 import { Film as StreamIcon } from "react-feather"
@@ -21,16 +20,13 @@ import { useLivestreamRouting } from "./useLivestreamRouting"
 
 type ToolbarActionsDialogContentProps = {
    handleClose: () => void
-   handleOpenNewStreamModal: () => void
    group: Group
 }
 
 const ToolbarActionsDialogContent = ({
    handleClose,
-   handleOpenNewStreamModal,
    group,
 }: ToolbarActionsDialogContentProps) => {
-   const featureFlags = useFeatureFlags()
    const { createDraftLivestream } = useLivestreamRouting()
 
    const handleNewStream_v2 = async () => {
@@ -39,20 +35,6 @@ const ToolbarActionsDialogContent = ({
 
    // eslint-disable-next-line react/hook-use-state
    const [actions] = useState([
-      ...(!featureFlags.livestreamCreationFlowV2
-         ? [
-              {
-                 name: "Create a draft live stream (Legacy)",
-                 onClick: () => {
-                    handleOpenNewStreamModal()
-                    handleClose()
-                 },
-                 icon: <StreamIcon />,
-                 description:
-                    "Create a draft live stream event. This event will be created as a draft and will not be visible to the public until you explicitly publish it.",
-              },
-           ]
-         : []),
       {
          name: "Create a draft live stream",
          onClick: async () => {
@@ -109,12 +91,7 @@ ToolbarActionsDialogContent.propTypes = {
    handleClose: PropTypes.func,
 }
 
-const ToolbarActionsDialog = ({
-   openDialog,
-   onClose,
-   group,
-   handleOpenNewStreamModal,
-}) => {
+const ToolbarActionsDialog = ({ openDialog, onClose, group }) => {
    const handleClose = () => {
       onClose?.()
    }
@@ -128,11 +105,7 @@ const ToolbarActionsDialog = ({
          fullWidth
          aria-labelledby="pdf-report-download-dialog"
       >
-         <ToolbarActionsDialogContent
-            group={group}
-            handleOpenNewStreamModal={handleOpenNewStreamModal}
-            handleClose={handleClose}
-         />
+         <ToolbarActionsDialogContent group={group} handleClose={handleClose} />
       </Dialog>
    )
 }

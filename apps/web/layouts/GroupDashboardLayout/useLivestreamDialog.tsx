@@ -1,8 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
-import { StreamCreationProvider } from "components/views/draftStreamForm/StreamForm/StreamCreationProvider"
-import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
@@ -107,34 +105,6 @@ export const useLivestreamDialog = (group: Group) => {
       ]
    )
 
-   const StreamCreationDialog = useMemo(() => {
-      return openNewStreamModal ? (
-         <StreamCreationProvider>
-            <NewStreamModal
-               group={group}
-               typeOfStream={
-                  // every new livestream creation should be a draft
-                  // unless its a livestream obj without the isDraft flag
-                  // which should be an actual livestream
-                  currentStream && !currentStream.isDraft ? "upcoming" : "draft"
-               }
-               open={openNewStreamModal}
-               handlePublishStream={handlePublishStream}
-               handleResetCurrentStream={handleResetCurrentStream}
-               currentStream={currentStream}
-               onClose={handleCloseNewStreamModal}
-            />
-         </StreamCreationProvider>
-      ) : undefined
-   }, [
-      currentStream,
-      group,
-      handleCloseNewStreamModal,
-      handlePublishStream,
-      handleResetCurrentStream,
-      openNewStreamModal,
-   ])
-
    return useMemo(
       () => ({
          openNewStreamModal,
@@ -147,10 +117,8 @@ export const useLivestreamDialog = (group: Group) => {
          handleEditStream,
          handlePublishStream,
          isPublishing,
-         StreamCreationDialog,
       }),
       [
-         StreamCreationDialog,
          currentStream,
          handleCloseNewStreamModal,
          handleEditStream,

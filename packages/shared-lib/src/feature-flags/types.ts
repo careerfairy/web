@@ -4,7 +4,6 @@ export type FeatureFlagKey =
    | "atsAdminPageFlag"
    | "sparksAdminPageFlag"
    | "sparksB2BOnboardingFlag"
-   | "livestreamCreationFlowV2"
    | "mentorsV1"
    | "talentProfileV1"
    | "levelsV1"
