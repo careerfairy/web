@@ -101,8 +101,15 @@ type ChipDropdownProps = {
    options?: { id: string; value: string }[]
    selectedOptions?: string[]
    isDialog?: boolean
-   search?: ReactNode
+   /**
+    * A render prop for the search UI, receives addedOptions and onDeleteOption
+    */
+   search?: (
+      addedOptions: { id: string; value: string }[],
+      onDeleteOption: (id: string) => void
+   ) => ReactNode
    handleValueChange: (value: string[]) => void
+   onClose?: () => void
    /**
     * Controls if the apply and reset buttons are shown, in this
     * mode the changes are only applied when the apply button is clicked.
@@ -111,6 +118,12 @@ type ChipDropdownProps = {
     * @default true
     */
    showApply?: boolean
+
+   /**
+    * If true, the label will be the same as the label prop.
+    * @default false
+    */
+   forceLabel?: boolean
 }
 
 export const ChipDropdown = ({
@@ -121,6 +134,8 @@ export const ChipDropdown = ({
    selectedOptions,
    isDialog,
    showApply = true,
+   forceLabel = false,
+   onClose,
 }: ChipDropdownProps) => {
    const [isOpen, setIsOpen] = useState(false)
    const [isDirty, setIsDirty] = useState(false)
@@ -138,11 +153,25 @@ export const ChipDropdown = ({
       }
    )
 
+   const [addedOptions, setAddedOptions] = useState<
+      { id: string; value: string }[]
+   >(() => {
+      return (
+         selectedOptions?.map((option) => ({
+            id: option,
+            value: options?.find((o) => o.id === option)?.value,
+         })) || []
+      )
+   })
+
    const [hasSelectedItems, setHasSelectedItems] = useState(
       selectedOptions?.length > 0
    )
 
    const chipLabel = useMemo(() => {
+      if (forceLabel) {
+         return label
+      }
       if (showApply) {
          if (selectedOptions?.length === 0) {
             return label
@@ -169,6 +198,7 @@ export const ChipDropdown = ({
       hasSelectedItems,
       selectedOptions,
       showApply,
+      forceLabel,
    ])
 
    useEffect(() => {
@@ -187,8 +217,14 @@ export const ChipDropdown = ({
       (newSelectedValues: string[]) => {
          handleValueChange(newSelectedValues)
          setHasSelectedItems(newSelectedValues?.length > 0)
+         setAddedOptions(
+            newSelectedValues?.map((option) => ({
+               id: option,
+               value: options?.find((o) => o.id === option)?.value,
+            })) || []
+         )
       },
-      [handleValueChange]
+      [handleValueChange, options]
    )
 
    const handleOptionClick = (option: string) => {
@@ -213,6 +249,7 @@ export const ChipDropdown = ({
 
    const handleClose = () => {
       setIsOpen(false)
+      onClose?.()
    }
 
    const handleToggle = () => {
@@ -241,8 +278,29 @@ export const ChipDropdown = ({
       handleChange([])
    }, [handleChange])
 
+   const handleDeleteOption = useCallback(
+      (id: string) => {
+         // Remove the option from selectedMap
+         setSelectedMap((prev) => {
+            setAddedOptions((prevAddedOptions) =>
+               prevAddedOptions.filter((option) => option.id !== id)
+            )
+            return { ...prev, [id]: false }
+         })
+         // If not showApply, update immediately
+         if (!showApply) {
+            const newSelectedValues = Object.keys(selectedMap).filter(
+               (key) => key !== id && selectedMap[key]
+            )
+            handleChange(newSelectedValues)
+         }
+         setIsDirty(true)
+      },
+      [handleChange, selectedMap, showApply]
+   )
+
    return (
-      <ClickAwayListener onClickAway={handleClose} key={label}>
+      <ClickAwayListener onClickAway={handleClose}>
          <Box ref={anchorRef}>
             <Box>
                <Chip
@@ -273,7 +331,9 @@ export const ChipDropdown = ({
                >
                   <ChipContent
                      options={options}
-                     search={search}
+                     search={
+                        search ? search(addedOptions, handleDeleteOption) : null
+                     }
                      handleOptionClick={handleOptionClick}
                      isChecked={isChecked}
                   />
@@ -327,7 +387,11 @@ export const ChipDropdown = ({
                         >
                            <ChipContent
                               options={options}
-                              search={search}
+                              search={
+                                 search
+                                    ? search(addedOptions, handleDeleteOption)
+                                    : null
+                              }
                               handleOptionClick={handleOptionClick}
                               isChecked={isChecked}
                            />
@@ -343,10 +407,11 @@ export const ChipDropdown = ({
 
 type ChipContentProps = Omit<
    ChipDropdownProps,
-   "label" | "openDialog" | "handleValueChange"
+   "label" | "openDialog" | "handleValueChange" | "search"
 > & {
    handleOptionClick?: (option: string) => void
    isChecked: (option: string) => boolean
+   search?: ReactNode
 }
 
 const ChipContent = ({
