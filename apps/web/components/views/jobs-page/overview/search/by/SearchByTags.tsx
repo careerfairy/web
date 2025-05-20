@@ -23,6 +23,7 @@ export const SearchByTags = () => {
          options={businessFunctionTagsOptions}
          handleValueChange={setSearchBusinessFunctionTags}
          selectedOptions={searchBusinessFunctionTags}
+         showApply={isMobile}
       />
    )
 }
