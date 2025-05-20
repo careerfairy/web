@@ -1,5 +1,6 @@
 import {
    Box,
+   Button,
    Chip,
    ClickAwayListener,
    Popper,
@@ -86,6 +87,10 @@ const styles = sxStyles({
          color: (theme) => `${theme.brand.white[50]} !important`,
       },
    },
+   applyText: {
+      fontWeight: 400,
+      color: (theme) => theme.brand.white[100],
+   },
 })
 
 type ChipDropdownProps = {
@@ -95,6 +100,14 @@ type ChipDropdownProps = {
    isDialog?: boolean
    search?: ReactNode
    handleValueChange: (value: string[]) => void
+   /**
+    * Controls if the apply and reset buttons are shown, in this
+    * mode the changes are only applied when the apply button is clicked.
+    *
+    * Passing `false` will not show the apply and reset buttons. Meaning changes are applied immediately.
+    * @default true
+    */
+   showApply?: boolean
 }
 
 export const ChipDropdown = ({
@@ -104,6 +117,7 @@ export const ChipDropdown = ({
    search,
    selectedOptions,
    isDialog,
+   showApply = true,
 }: ChipDropdownProps) => {
    const [isOpen, setIsOpen] = useState(false)
    const anchorRef = useRef<HTMLDivElement>(null)
@@ -127,11 +141,15 @@ export const ChipDropdown = ({
    const chipLabel = useMemo(() => {
       return hasSelectedItems
          ? options
-              ?.filter((option) => selectedMap[option.id])
+              ?.filter(
+                 (option) =>
+                    selectedMap[option.id] &&
+                    selectedOptions?.includes(option.id)
+              )
               ?.map((option) => option.value)
               ?.join(", ")
          : label
-   }, [options, selectedMap, label, hasSelectedItems])
+   }, [options, selectedMap, label, hasSelectedItems, selectedOptions])
 
    useEffect(() => {
       const handler = (e: CustomEvent) => {
@@ -145,6 +163,14 @@ export const ChipDropdown = ({
          )
    }, [id])
 
+   const handleChange = useCallback(
+      (newSelectedValues: string[]) => {
+         handleValueChange(newSelectedValues)
+         setHasSelectedItems(newSelectedValues?.length > 0)
+      },
+      [handleValueChange]
+   )
+
    const handleOptionClick = (option: string) => {
       const newSelectedMap = { ...selectedMap, [option]: !selectedMap[option] }
       const newSelectedValues = Object.keys(newSelectedMap).filter(
@@ -152,8 +178,9 @@ export const ChipDropdown = ({
       )
 
       setSelectedMap(newSelectedMap)
-      handleValueChange(newSelectedValues)
-      setHasSelectedItems(newSelectedValues?.length > 0)
+      if (!showApply) {
+         handleChange(newSelectedValues)
+      }
    }
 
    const isChecked = useCallback(
@@ -177,6 +204,19 @@ export const ChipDropdown = ({
          setIsOpen(true)
       }
    }
+
+   const handleApply = useCallback(() => {
+      const newSelectedValues = Object.keys(selectedMap).filter(
+         (key) => selectedMap[key]
+      )
+      console.log("🚀 ~ handleApply ~ newSelectedValues:", newSelectedValues)
+      handleChange(newSelectedValues)
+   }, [handleChange, selectedMap])
+
+   const handleReset = useCallback(() => {
+      setSelectedMap({})
+      handleChange([])
+   }, [handleChange])
 
    return (
       <ClickAwayListener onClickAway={handleClose} key={label}>
@@ -214,6 +254,31 @@ export const ChipDropdown = ({
                      handleOptionClick={handleOptionClick}
                      isChecked={isChecked}
                   />
+                  {showApply ? (
+                     <Stack spacing={1} p={"16px"}>
+                        <Button
+                           variant="contained"
+                           color={"primary"}
+                           onClick={handleApply}
+                        >
+                           <Typography
+                              variant="brandedBody"
+                              sx={styles.applyText}
+                           >
+                              Apply
+                           </Typography>
+                        </Button>
+                        <Button variant="text" onClick={handleReset}>
+                           <Typography
+                              variant="brandedBody"
+                              color="neutral.600"
+                              fontWeight={400}
+                           >
+                              Reset
+                           </Typography>
+                        </Button>
+                     </Stack>
+                  ) : null}
                </BrandedSwipeableDrawer>
             ) : (
                <Popper
