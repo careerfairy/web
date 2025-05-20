@@ -91,6 +91,9 @@ const styles = sxStyles({
       fontWeight: 400,
       color: (theme) => theme.brand.white[100],
    },
+   disabledApplyText: {
+      color: (theme) => `${theme.brand.black[700]} !important`,
+   },
 })
 
 type ChipDropdownProps = {
@@ -120,6 +123,7 @@ export const ChipDropdown = ({
    showApply = true,
 }: ChipDropdownProps) => {
    const [isOpen, setIsOpen] = useState(false)
+   const [isDirty, setIsDirty] = useState(false)
    const anchorRef = useRef<HTMLDivElement>(null)
    const id = useId()
 
@@ -139,6 +143,15 @@ export const ChipDropdown = ({
    )
 
    const chipLabel = useMemo(() => {
+      if (showApply) {
+         if (selectedOptions?.length === 0) {
+            return label
+         }
+         return options
+            ?.filter((option) => selectedOptions?.includes(option?.id))
+            ?.map((option) => option.value)
+            ?.join(", ")
+      }
       return hasSelectedItems
          ? options
               ?.filter(
@@ -149,7 +162,14 @@ export const ChipDropdown = ({
               ?.map((option) => option.value)
               ?.join(", ")
          : label
-   }, [options, selectedMap, label, hasSelectedItems, selectedOptions])
+   }, [
+      options,
+      selectedMap,
+      label,
+      hasSelectedItems,
+      selectedOptions,
+      showApply,
+   ])
 
    useEffect(() => {
       const handler = (e: CustomEvent) => {
@@ -172,6 +192,7 @@ export const ChipDropdown = ({
    )
 
    const handleOptionClick = (option: string) => {
+      setIsDirty(true)
       const newSelectedMap = { ...selectedMap, [option]: !selectedMap[option] }
       const newSelectedValues = Object.keys(newSelectedMap).filter(
          (key) => newSelectedMap[key]
@@ -211,10 +232,12 @@ export const ChipDropdown = ({
       )
       console.log("🚀 ~ handleApply ~ newSelectedValues:", newSelectedValues)
       handleChange(newSelectedValues)
+      setIsDirty(false)
    }, [handleChange, selectedMap])
 
    const handleReset = useCallback(() => {
       setSelectedMap({})
+      setIsDirty(false)
       handleChange([])
    }, [handleChange])
 
@@ -260,10 +283,15 @@ export const ChipDropdown = ({
                            variant="contained"
                            color={"primary"}
                            onClick={handleApply}
+                           // sx={ !isDirty ? styles.disabledApply: null}
+                           disabled={!isDirty}
                         >
                            <Typography
                               variant="brandedBody"
-                              sx={styles.applyText}
+                              sx={[
+                                 styles.applyText,
+                                 !isDirty && styles.disabledApplyText,
+                              ]}
                            >
                               Apply
                            </Typography>

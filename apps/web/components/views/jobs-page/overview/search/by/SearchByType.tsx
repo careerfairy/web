@@ -14,6 +14,7 @@ export const SearchByType = () => {
          options={jobTypeValueOptions}
          handleValueChange={setSearchJobTypes}
          selectedOptions={searchJobTypes}
+         showApply={isMobile}
       />
    )
 }
