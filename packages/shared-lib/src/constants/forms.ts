@@ -1740,6 +1740,11 @@ export const getCountryOptionByCountryCode = (
       (option) => option.id.toLowerCase() === countryCode.toLowerCase()
    )
 
+   if (!countryOption) {
+      console.error(`Country option not found for country code: ${countryCode}`)
+      return null
+   }
+
    return {
       id: countryOption.id,
       name: countryOption.name,
