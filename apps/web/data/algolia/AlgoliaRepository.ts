@@ -199,7 +199,6 @@ const handleSearch = <AlgoliaResponseType>(
    // This ensures each test run gets isolated data
    return index.search<AlgoliaResponseType>(query, {
       hitsPerPage: itemsPerPage,
-
       filters: (isTest ? `workflowId:${workflowId} AND ` : "") + filters,
       page,
       cacheable: !isTest, // Disable caching for test environments as time is limited
