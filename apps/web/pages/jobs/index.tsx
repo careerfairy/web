@@ -141,7 +141,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const jobId = queryJobId as string
 
    const queryLocations = getQueryStringArray(context.query.location)
-   console.log("🚀 ~ queryLocations:", queryLocations)
    const queryBusinessFunctionTags = getQueryStringArray(
       context.query.businessFunctionTags
    )
@@ -154,6 +153,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          normalizedJobType: queryJobTypes,
       },
    }
+
    const filters: string = buildAlgoliaFilterString(filterOptions)
 
    // const customJobs = await customJobRepo.getPublishedCustomJobs()
@@ -267,4 +267,5 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       },
    }
 }
+
 export default JobsPage
