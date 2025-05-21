@@ -19,6 +19,7 @@ import {
 } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { BrandedTooltip } from "../streaming-page/components/BrandedTooltip"
 import { BrandedCheckbox } from "./inputs/BrandedCheckbox"
 import BrandedSwipeableDrawer from "./inputs/BrandedSwipeableDrawer"
 
@@ -302,25 +303,27 @@ export const ChipDropdown = ({
       <ClickAwayListener onClickAway={handleClose}>
          <Box ref={anchorRef}>
             <Box>
-               <Chip
-                  sx={[
-                     styles.chip,
-                     hasSelectedItems && styles.chipWithSelectedItems,
-                  ]}
-                  label={chipLabel}
-                  deleteIcon={
-                     <motion.div
-                        initial={false}
-                        animate={{ rotate: isOpen ? 180 : 0 }}
-                        transition={{ duration: 0.2, ease: "easeInOut" }}
-                        style={{ display: "flex" }}
-                     >
-                        <Box size={16} component={ChevronDown} />
-                     </motion.div>
-                  }
-                  onDelete={handleToggle}
-                  onClick={handleToggle}
-               />
+               <BrandedTooltip title={hasSelectedItems ? chipLabel : ""}>
+                  <Chip
+                     sx={[
+                        styles.chip,
+                        hasSelectedItems && styles.chipWithSelectedItems,
+                     ]}
+                     label={chipLabel}
+                     deleteIcon={
+                        <motion.div
+                           initial={false}
+                           animate={{ rotate: isOpen ? 180 : 0 }}
+                           transition={{ duration: 0.2, ease: "easeInOut" }}
+                           style={{ display: "flex" }}
+                        >
+                           <Box size={16} component={ChevronDown} />
+                        </motion.div>
+                     }
+                     onDelete={handleToggle}
+                     onClick={handleToggle}
+                  />
+               </BrandedTooltip>
             </Box>
             {isDialog ? (
                <BrandedSwipeableDrawer
