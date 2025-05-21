@@ -422,7 +422,12 @@ const ChipContent = ({
    isChecked,
 }: ChipContentProps) => {
    return (
-      <Stack p={0} maxHeight={300} overflow="auto">
+      <Stack
+         p={0}
+         maxHeight={300}
+         overflow="auto"
+         sx={{ scrollbarWidth: "thin" }}
+      >
          {search ? <Box p={"12px"}>{search}</Box> : null}
          <Box>
             {options?.map((option) => (
