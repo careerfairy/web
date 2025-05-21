@@ -52,7 +52,6 @@ const styles = sxStyles({
       maxWidth: "170px",
    },
    popper: {
-      // zIndex: 1,
       mt: "8px !important",
    },
    popperContentWrapper: {
@@ -267,7 +266,7 @@ export const ChipDropdown = ({
       const newSelectedValues = Object.keys(selectedMap).filter(
          (key) => selectedMap[key]
       )
-      console.log("🚀 ~ handleApply ~ newSelectedValues:", newSelectedValues)
+
       handleChange(newSelectedValues)
       setIsDirty(false)
    }, [handleChange, selectedMap])
@@ -343,7 +342,6 @@ export const ChipDropdown = ({
                            variant="contained"
                            color={"primary"}
                            onClick={handleApply}
-                           // sx={ !isDirty ? styles.disabledApply: null}
                            disabled={!isDirty}
                         >
                            <Typography

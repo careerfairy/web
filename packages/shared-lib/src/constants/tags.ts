@@ -66,6 +66,13 @@ export const BusinessFunctionsTagValues = Object.entries(
    BusinessFunctionsTags
 ).map(([, entry]) => entry) satisfies OptionGroup[]
 
+export const BusinessFunctionTagsOptions = BusinessFunctionsTagValues.map(
+   (tag) => ({
+      id: tag.id,
+      value: tag.name,
+   })
+)
+
 export const ContentTopicsTags = {
    ApplicationProcess: {
       id: "ApplicationProcess",
