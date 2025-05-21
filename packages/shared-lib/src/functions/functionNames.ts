@@ -34,6 +34,10 @@ export const FUNCTION_NAMES = {
    sendPhysicalEventRegistrationConfirmationEmail:
       "sendPhysicalEventRegistrationConfirmationEmail",
    getRecommendedEvents: "getRecommendedEvents_v7",
+
+   // Recording functions
+   getRecordingViews: "getRecordingViews",
+
    // Sparks functions
    removeAndSyncUserSparkNotification: "removeAndSyncUserSparkNotification_v4",
    createUserSparksFeedEventNotifications:
