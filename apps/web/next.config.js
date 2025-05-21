@@ -302,6 +302,22 @@ const moduleExports = {
             source: "/(.*)",
             headers: securityHeaders,
          },
+         /**
+          * Prevent crawlers from indexing on non-production environments, eg preview, staging, etc.
+          */
+         ...(process.env.VERCEL_ENV !== "production"
+            ? [
+                 {
+                    source: "/(.*)",
+                    headers: [
+                       {
+                          key: "X-Robots-Tag",
+                          value: "noindex, nofollow, noarchive",
+                       },
+                    ],
+                 },
+              ]
+            : []),
          {
             source: "/next-livestreams/:groupId/embed",
             // allow embedding iframes on this path
