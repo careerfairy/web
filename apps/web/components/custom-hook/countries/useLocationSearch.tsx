@@ -38,6 +38,10 @@ const getKey = (options: GetKeyOptions) => {
 type Options = {
    suspense?: boolean
    limit?: number
+   /**
+    * When provided, the locations with the ids are always included in the results.
+    * Regardless of the search value.
+    */
    initialLocationIds?: string[]
 }
 

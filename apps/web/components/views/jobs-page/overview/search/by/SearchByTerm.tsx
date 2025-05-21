@@ -29,9 +29,6 @@ const styles = sxStyles({
          fontSize: "16px",
          fontWeight: "400",
       },
-      "& svg": {
-         // mr: "8px",
-      },
    },
    searchIcon: {
       color: (theme) => theme.palette.neutral[600],
