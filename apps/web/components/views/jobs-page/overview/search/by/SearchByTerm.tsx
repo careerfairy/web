@@ -55,13 +55,13 @@ export const SearchByTerm = () => {
          sx={styles.searchField}
          InputProps={{
             startAdornment: <Box component={Search} sx={styles.searchIcon} />,
-            endAdornment: (
+            endAdornment: searchTerm?.length ? (
                <Box
                   sx={styles.clearIcon}
                   component={XCircleIcon}
                   onClick={() => setSearchTerm("")}
                />
-            ),
+            ) : null,
          }}
          value={searchTerm}
          onChange={(e) => setSearchTerm(e.target.value)}
