@@ -146,7 +146,7 @@ export class SparksService {
          }
       >(
          this.functions,
-         "getSparksFeed_v10"
+         FUNCTION_NAMES.getSparksFeed
       )(data)
 
       return {
