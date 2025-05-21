@@ -3,6 +3,7 @@ import { Stack } from "@mui/material"
 import { Typography } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
+import { NoResultsFound } from "./search/SearchResultsCount"
 
 const styles = sxStyles({
    root: {
@@ -19,6 +20,7 @@ export const CustomJobsOverviewList = () => {
 
    return (
       <Stack sx={styles.root} spacing={2}>
+         <NoResultsFound />
          <Typography>Custom jobs overview list</Typography>
          <Stack spacing={1}>
             {/* TODO: Replace with new Job Card */}

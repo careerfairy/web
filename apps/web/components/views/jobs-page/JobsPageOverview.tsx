@@ -4,6 +4,7 @@ import { sxStyles } from "types/commonTypes"
 import { CustomJobDetails } from "./overview/CustomJobDetails"
 import { CustomJobsOverviewList } from "./overview/CustomJobsOverviewList"
 import { OverviewSearch } from "./overview/search/OverviewSearch"
+import { SearchResultsCount } from "./overview/search/SearchResultsCount"
 
 const styles = sxStyles({
    container: {
@@ -24,6 +25,7 @@ const JobsPageOverview = () => {
       <Container maxWidth="xl" sx={styles.container}>
          <Stack spacing={2}>
             <OverviewSearch />
+            <SearchResultsCount />
             <Stack
                direction={isMobile ? "column" : "row"}
                spacing={1}

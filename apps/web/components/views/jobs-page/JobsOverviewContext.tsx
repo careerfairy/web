@@ -32,6 +32,8 @@ type JobsOverviewContextType = {
    setSearchBusinessFunctionTags: (businessFunctionTags: string[]) => void
    searchJobTypes: string[]
    setSearchJobTypes: (jobTypes: string[]) => void
+   hasFilters: boolean
+   searchResultsCount: number
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -148,6 +150,13 @@ export const JobsOverviewContextProvider = ({
          setSearchJobTypes: handleJobTypesChange,
          customJobs: infiniteJobs,
          searchParams,
+         hasFilters: Boolean(
+            searchParams?.location?.length ||
+               searchParams?.businessFunctionTags?.length ||
+               searchParams?.jobTypes?.length ||
+               searchParams?.term?.length
+         ),
+         searchResultsCount: data?.at(0)?.nbHits ?? 0,
       }
    }, [
       infiniteJobs,
@@ -158,6 +167,7 @@ export const JobsOverviewContextProvider = ({
       handleLocationChange,
       handleJobTypesChange,
       searchTerm,
+      data,
    ])
 
    useEffect(() => {
