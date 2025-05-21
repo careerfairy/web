@@ -1,8 +1,9 @@
 import { Box } from "@mui/material"
+import { XCircleIcon } from "components/views/common/icons/XCircleIcon"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
-import { Search, XCircle } from "react-feather"
+import { Search } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -36,12 +37,9 @@ const styles = sxStyles({
       height: "24px",
    },
    clearIcon: {
-      width: "26px",
-      height: "26px",
-      color: (theme) => theme.brand.white[50],
-      fill: (theme) => theme.brand.black[700],
+      width: "24px",
+      height: "24px",
       "&:hover": {
-         fill: (theme) => theme.brand.black[800],
          cursor: "pointer",
       },
    },
@@ -60,7 +58,7 @@ export const SearchByTerm = () => {
             endAdornment: (
                <Box
                   sx={styles.clearIcon}
-                  component={XCircle}
+                  component={XCircleIcon}
                   onClick={() => setSearchTerm("")}
                />
             ),
