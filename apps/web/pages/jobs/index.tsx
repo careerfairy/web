@@ -135,7 +135,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const userCountryCode =
       (context.req.headers["x-vercel-ip-country"] as string) || null
 
-   const { queryTerm = "", queryJobId } = context.query
+   const { term: queryTerm = "", jobId: queryJobId } = context.query
 
    const term = queryTerm as string
    const jobId = queryJobId as string
