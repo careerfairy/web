@@ -1,13 +1,14 @@
 import { Stack, Switch, Typography } from "@mui/material"
+import { useLocalTracks } from "../../context/LocalTracks"
 
 export const NoiseSuppression = () => {
-   // const {
-   // noiseSuppressionEnabled,
-   // toggleNoiseSuppression,
-   // isNoiseSuppressionSupported,
-   // } = useLocalTracks()
+   const {
+      noiseSuppressionEnabled,
+      toggleNoiseSuppression,
+      isNoiseSuppressionSupported,
+   } = useLocalTracks()
 
-   // if (!isNoiseSuppressionSupported) return null
+   if (!isNoiseSuppressionSupported) return null
 
    return (
       <Stack
@@ -26,8 +27,8 @@ export const NoiseSuppression = () => {
             </Typography>
          </span>
          <Switch
-            // checked={noiseSuppressionEnabled}
-            // onChange={toggleNoiseSuppression}
+            checked={noiseSuppressionEnabled}
+            onChange={toggleNoiseSuppression}
             color="primary"
          />
       </Stack>
