@@ -156,7 +156,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const filters: string = buildAlgoliaFilterString(filterOptions)
 
-   // const customJobs = await customJobRepo.getPublishedCustomJobs()
    const algoliaResponse = await algoliaRepo.searchCustomJobs(
       term as string,
       filters,
@@ -164,6 +163,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       CUSTOM_JOB_REPLICAS.TITLE_ASC,
       30
    )
+
    const algoliaCustomJobs = algoliaResponse.hits
       .map(deserializeAlgoliaSearchResponse)
       .map((job) => job as CustomJob)
