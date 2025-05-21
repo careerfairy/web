@@ -7,6 +7,7 @@ import { KEEP_WARM_HEADER } from "../middlewares-gen2/onRequest/validations"
 const functionsToWarm = [
    FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook,
    FUNCTION_NAMES.customerIORecommendedSparksWebhook,
+   FUNCTION_NAMES.searchLocations,
    // Add more functions as needed
 ]
 
