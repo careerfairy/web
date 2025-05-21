@@ -37,17 +37,8 @@ const styles = sxStyles({
          fontWeight: "400",
       },
    },
-   clearIcon: {
-      width: "26px",
-      height: "26px",
-      color: (theme) => theme.brand.white[50],
-      fill: (theme) => theme.brand.black[700],
-      "&:hover": {
-         fill: (theme) => theme.brand.black[800],
-         cursor: "pointer",
-      },
-   },
 })
+
 export const SearchByLocation = () => {
    const { searchLocations, setSearchLocations } = useJobsOverviewContext()
 
@@ -55,16 +46,10 @@ export const SearchByLocation = () => {
 
    const isMobile = useIsMobile()
 
-   const { data: locations, isLoading } = useLocationSearch(
-      locationSearchValue,
-      {
-         suspense: false,
-         initialLocationIds: !locationSearchValue?.length
-            ? searchLocations
-            : [],
-      }
-   )
-   console.log("🚀 ~ SearchByLocation ~ isLoading:", isLoading)
+   const { data: locations } = useLocationSearch(locationSearchValue, {
+      suspense: false,
+      initialLocationIds: !locationSearchValue?.length ? searchLocations : [],
+   })
 
    const { data: selectedLocations } = useLocationSearch("", {
       suspense: false,
@@ -93,7 +78,7 @@ export const SearchByLocation = () => {
             return (
                <BrandedTextField
                   fullWidth
-                  placeholder="Search city, state, canton or country"
+                  placeholder="Where to?"
                   sx={styles.searchField}
                   value={locationSearchValue}
                   onChange={(e) => setLocationSearchValue(e.target.value)}

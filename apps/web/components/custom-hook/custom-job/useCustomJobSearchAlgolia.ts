@@ -124,7 +124,7 @@ export const useCustomJobSearchAlgolia = (
    return useSWRInfinite<Data>(disable ? null : getKey, fetcher, {
       onError: (error, key) =>
          errorLogAndNotify(error, {
-            message: "Error fetching companies",
+            message: "Error fetching custom jobs",
             key,
          }),
       keepPreviousData: true,

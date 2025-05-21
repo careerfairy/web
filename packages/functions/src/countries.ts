@@ -12,6 +12,7 @@ import { City, Country, State } from "country-state-city"
 import { onCall } from "firebase-functions/https"
 import Fuse from "fuse.js"
 import { InferType, array, number, object, string } from "yup"
+import { getLocationById } from "./lib/countries/utils"
 
 const SEARCH_LOCATION_LIMIT = 10
 
@@ -315,33 +316,11 @@ export const searchLocations = onCall<SearchLocationOptions>((request) => {
    )
 
    initialLocationIds?.forEach((locationId) => {
-      const { countryIsoCode, stateIsoCode } = getLocationIds(locationId)
+      const location = getLocationById(locationId)
 
-      if (!countryIsoCode) return
+      if (!location) return
 
-      const country = Country.getCountryByCode(countryIsoCode)
-
-      if (stateIsoCode) {
-         const state = State.getStateByCodeAndCountry(
-            stateIsoCode,
-            countryIsoCode
-         )
-
-         state &&
-            !locationsMap[locationId] &&
-            locations.push({
-               id: locationId,
-               name: `${state.name} (${country.name})`,
-            })
-         return
-      }
-
-      country &&
-         !locationsMap[locationId] &&
-         locations.push({
-            id: locationId,
-            name: country.name,
-         })
+      location && !locationsMap[locationId] && locations.push(location)
    })
 
    return locations
