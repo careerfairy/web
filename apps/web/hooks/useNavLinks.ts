@@ -42,7 +42,7 @@ export const useNavLinks = (
 ) => {
    const { userData } = useAuth()
    const { userCountryCode: ipBasedUserCountryCode } = useUserCountryCode(
-      !serverUserCountryCode?.length || !userData?.countryIsoCode
+      !serverUserCountryCode?.length && !userData?.countryIsoCode?.length
    )
 
    const userCountryCode =
