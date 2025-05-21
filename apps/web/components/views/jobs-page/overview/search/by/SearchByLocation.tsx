@@ -78,7 +78,7 @@ export const SearchByLocation = () => {
             return (
                <BrandedTextField
                   fullWidth
-                  placeholder="Where to?"
+                  placeholder="Search city, state, canton or country"
                   sx={styles.searchField}
                   value={locationSearchValue}
                   onChange={(e) => setLocationSearchValue(e.target.value)}
