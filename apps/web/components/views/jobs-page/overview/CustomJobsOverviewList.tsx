@@ -8,10 +8,14 @@ import { NoResultsFound } from "./search/SearchResultsCount"
 const styles = sxStyles({
    root: {
       width: "339px",
+      minWidth: {
+         xs: "100%",
+         md: "339px",
+      },
       minHeight: "80vh",
-      borderRadius: 2,
-      border: "1px solid #E0E0E0",
-      padding: 2,
+      // borderRadius: 2,
+      // border: "1px solid #E0E0E0",
+      // padding: 2,
    },
 })
 
