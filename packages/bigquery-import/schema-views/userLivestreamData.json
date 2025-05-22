@@ -37,6 +37,10 @@
             {
                "name": "sparkId",
                "type": "string"
+            },
+            {
+               "name": "originSource",
+               "type": "string"
             }
          ],
          "name": "registered",

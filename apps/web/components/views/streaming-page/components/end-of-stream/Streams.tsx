@@ -162,6 +162,7 @@ const Content = ({ streams }: ContentProps) => {
             mode="stand-alone"
             initialPage={"details"}
             serverUserEmail={authenticatedUser?.email}
+            providedOriginSource={`end-of-stream-${selectedLivestreamId}`}
          />
       </EndOfStreamContainer>
    )

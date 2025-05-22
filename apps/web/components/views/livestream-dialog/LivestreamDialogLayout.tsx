@@ -63,14 +63,18 @@ export const LivestreamDialogLayout: FC<Props> = ({
    }, [dialogPage])
 
    const handleClose = useCallback(() => {
+      const newQuery = {
+         ...query,
+      }
+
+      delete newQuery.originSource
+      // Remove the livestream query param that opened the dialog.
+      delete newQuery.livestreamDialog
+
       void push(
          {
             pathname,
-            query: {
-               ...query,
-               // Remove the livestream query param that opened the dialog.
-               livestreamDialog: undefined,
-            },
+            query: newQuery,
          },
          undefined,
          {
@@ -84,6 +88,7 @@ export const LivestreamDialogLayout: FC<Props> = ({
       <>
          {children}
          <LivestreamDialog
+            mode="page"
             open={dialogOpen}
             updatedStats={updatedStats}
             serverUserEmail={livestreamDialogData?.serverSideUserEmail}

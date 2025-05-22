@@ -8,7 +8,6 @@ import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
-   EventsTypes,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useCallback, useState } from "react"
 import { Plus, Radio } from "react-feather"
@@ -139,7 +138,7 @@ const EventSection = () => {
                      ) : null
                   }
                   events={upcomingLivestreams}
-                  type={EventsTypes.COMING_UP}
+                  location={`company-page-next-livestreams-carousel-${group.id}`}
                   seeMoreLink={upcomingEventsHref}
                   handleSeeMoreClick={
                      tabMode
@@ -182,7 +181,8 @@ const EventSection = () => {
                      ) : null
                   }
                   events={pastLivestreams ?? []}
-                  type={EventsTypes.PAST_EVENTS}
+                  location={`company-page-past-livestreams-carousel-${group.id}`}
+                  disableAutoPlay
                   seeMoreLink={pastEventsHref}
                   handleSeeMoreClick={
                      tabMode

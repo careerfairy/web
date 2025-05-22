@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useRef } from "react"
+import { ReactNode, useEffect, useRef, useState } from "react"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import {
    groupRepo,
@@ -35,6 +35,8 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
    const { data: groups } = useGroupsByIds(livestream.groupIds)
    const { completeRegistrationProcess, registrationStatus } =
       useRegistrationHandler()
+
+   const [isRegistering, setIsRegistering] = useState(false)
 
    const completeRegistrationProcessRef = useRef(completeRegistrationProcess)
 
@@ -81,6 +83,10 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
                switch (registrationStatus()) {
                   case "can_register":
                      // we have enough information to complete the registration
+                     if (isRegistering) {
+                        return
+                     }
+                     setIsRegistering(true)
                      completeRegistrationProcessRef
                         .current(
                            userData,
@@ -97,6 +103,9 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
                         })
                         .catch((e) => {
                            errorNotification(e)
+                        })
+                        .finally(() => {
+                           setIsRegistering(false)
                         })
 
                      break
@@ -131,6 +140,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
       registrationDispatch,
       userData,
       registrationStatus,
+      isRegistering,
    ])
 
    // mark user as registered to any livestream

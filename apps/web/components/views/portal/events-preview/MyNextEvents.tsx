@@ -5,7 +5,7 @@ import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import Heading from "../common/Heading"
-import EventsPreviewCarousel, { EventsTypes } from "./EventsPreviewCarousel"
+import EventsPreviewCarousel from "./EventsPreviewCarousel"
 
 const styles = sxStyles({
    contentWrapper: {
@@ -115,7 +115,7 @@ const MyNextEvents = () => {
          >
             <EventsPreviewCarousel
                id={"my-next-events"}
-               type={EventsTypes.MY_NEXT}
+               location={"portal-registered-livestreams-carousel"}
                events={registeredStreams}
                isEmpty={Boolean(!isLoading && !registeredStreams?.length)}
                title={MY_NEXT_EVENTS_TITLE}
