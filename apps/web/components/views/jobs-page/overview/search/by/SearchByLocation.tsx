@@ -51,16 +51,6 @@ export const SearchByLocation = () => {
       initialLocationIds: !locationSearchValue?.length ? searchLocations : [],
    })
 
-   const { data: selectedLocations } = useLocationSearch("", {
-      suspense: false,
-      initialLocationIds: searchLocations,
-   })
-
-   const label =
-      (searchLocations?.length &&
-         selectedLocations?.map((location) => location.name).join(", ")) ||
-      "Location"
-
    const locationOptions = useMemo(() => {
       return locations?.map(dropdownValueMapper) ?? []
    }, [locations])
@@ -68,12 +58,18 @@ export const SearchByLocation = () => {
    return (
       <ChipDropdown
          isDialog={isMobile}
-         label={label}
-         forceLabel
-         options={locationOptions}
+         label={"Location"}
+         options={
+            locationSearchValue?.length || searchLocations?.length
+               ? locationOptions
+               : []
+         }
          handleValueChange={setSearchLocations}
          selectedOptions={searchLocations}
          onClose={() => setLocationSearchValue("")}
+         onApply={() => {
+            setLocationSearchValue("")
+         }}
          search={() => {
             return (
                <BrandedTextField

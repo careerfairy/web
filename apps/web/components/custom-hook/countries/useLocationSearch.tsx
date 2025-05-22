@@ -54,7 +54,7 @@ export const useLocationSearch = (
    searchValue: string,
    options: Options = {}
 ) => {
-   const { suspense = true, limit = 10, initialLocationIds } = options
+   const { suspense = true, limit = 20, initialLocationIds } = options
 
    const fetcher = useFunctionsSWR<OptionGroup[]>()
 
