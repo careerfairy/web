@@ -1,0 +1,106 @@
+import { Box, CircularProgress, ListItem, Stack } from "@mui/material"
+
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import JobCard from "components/views/common/jobs/JobCard"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import { useEffect, useRef } from "react"
+import { useInView } from "react-intersection-observer"
+import { sxStyles } from "types/commonTypes"
+import { useJobsOverviewContext } from "../JobsOverviewContext"
+
+const styles = sxStyles({
+   title: {
+      maxWidth: "calc(100% - 50px)",
+   },
+   typography: {
+      maxWidth: "calc(100% - 50px)",
+   },
+   jobListItemWrapper: { m: 0, p: 0 },
+   loader: {
+      display: "flex",
+      justifyContent: "center",
+   },
+   listContainer: {
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
+   },
+})
+
+type Props = {
+   customJobs: CustomJob[]
+}
+export const CustomJobsList = ({ customJobs }: Props) => {
+   const isMobile = useIsMobile()
+   const router = useRouter()
+   const { isValidating, nextPage, searchParams } = useJobsOverviewContext()
+
+   const scrollContainerRef = useRef<HTMLDivElement>(null)
+   const { inView, ref } = useInView({
+      rootMargin: "0px 0px 200px 0px",
+      root: !isMobile ? scrollContainerRef.current : null,
+   })
+
+   useEffect(() => {
+      if (isValidating) {
+         return
+      }
+      if (inView) {
+         nextPage()
+      }
+   }, [inView, nextPage, isValidating])
+
+   return (
+      <Stack
+         ref={scrollContainerRef}
+         overflow={!isMobile ? "scroll" : "initial"}
+         maxHeight={!isMobile ? "80dvh" : "auto"}
+         sx={styles.listContainer}
+         spacing={1}
+      >
+         {customJobs.map((customJob, idx) => {
+            return (
+               <Link
+                  href={{
+                     pathname: router.pathname,
+                     query: {
+                        ...router.query,
+                        jobId: customJob.id,
+                     },
+                  }}
+                  shallow
+                  passHref
+                  // Prevents the page from scrolling to the top when the link is clicked
+                  scroll={false}
+                  legacyBehavior
+                  key={idx}
+               >
+                  <ListItem sx={styles.jobListItemWrapper}>
+                     <JobCard
+                        job={customJob}
+                        previewMode
+                        titleSx={isMobile ? null : styles.title}
+                        typographySx={isMobile ? null : styles.typography}
+                        hideJobUrl
+                        smallCard
+                        showCompanyLogo
+                        companyLogoUrl={customJob.group?.logoUrl}
+                        companyName={customJob.group?.universityName}
+                        selected={searchParams.jobId === customJob.id}
+                     />
+                  </ListItem>
+               </Link>
+            )
+         })}
+         {Boolean(isValidating) && (
+            <Box sx={styles.loader}>
+               <CircularProgress />
+            </Box>
+         )}
+         <Box ref={ref} />
+      </Stack>
+   )
+}
