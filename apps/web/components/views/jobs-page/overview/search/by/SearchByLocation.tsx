@@ -6,7 +6,7 @@ import { useLocationSearch } from "components/custom-hook/countries/useLocationS
 
 import useIsMobile from "components/custom-hook/useIsMobile"
 
-import { ChipDropdown } from "components/views/common/ChipDrodown"
+import { ChipDropdown } from "components/views/common/ChipDropdown"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
 import { useState } from "react"
