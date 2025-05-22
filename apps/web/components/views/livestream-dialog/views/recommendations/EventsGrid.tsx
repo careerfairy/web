@@ -1,7 +1,4 @@
-import {
-   ImpressionLocation,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/livestreams/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { Box, Grid, Typography, styled } from "@mui/material"
 import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
@@ -99,9 +96,7 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
                         isRecommended
                         loading={!event}
                         event={event}
-                        location={
-                           ImpressionLocation.livestreamDialogPostRegistrationRecommendations
-                        }
+                        location={`livestream-dialog-post-registration-recommendations-${event.id}`}
                      />
                   </motion.div>
                </Grid>

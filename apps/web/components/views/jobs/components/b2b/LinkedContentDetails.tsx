@@ -3,9 +3,7 @@ import { Box, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import useListenToStreams from "components/custom-hook/useListenToStreams"
-import EventsPreviewCarousel, {
-   EventsTypes,
-} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { SparksCarousel } from "components/views/sparks/components/SparksCarousel"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -65,7 +63,7 @@ const LinkedContentDetails = ({ job }: Props) => {
                <Box sx={styles.linkedContentWrapper}>
                   <EventsPreviewCarousel
                      id={"job-events"}
-                     type={EventsTypes.JOB_EVENTS}
+                     location={`company-dashboard-linked-livestreams-job-carousel-${job.id}`}
                      events={jobLivestreams}
                      isEmbedded
                      disableClick

@@ -1,4 +1,7 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import PlayIcon from "@mui/icons-material/PlayCircleOutline"
@@ -95,6 +98,7 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
                      type: "registerToLivestream",
                      livestreamId: livestream.id,
                   },
+                  originSource: ImpressionLocation.portalHeroContentCarousel,
                })}
                shallow
             >
@@ -136,6 +140,7 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
                   type: "livestreamDetails",
                   livestreamId: livestream.id,
                },
+               originSource: ImpressionLocation.portalHeroContentCarousel,
             })}
             shallow
             color={"primary"}

@@ -111,6 +111,7 @@ const LivestreamValidationsComponent = ({
             initialPage={"register"}
             mode="stand-alone"
             onRegisterSuccess={afterRegistrationMutations}
+            providedOriginSource={`event-room-${livestream.id}`}
          />
       )
    }
