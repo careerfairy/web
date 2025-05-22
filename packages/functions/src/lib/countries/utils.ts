@@ -8,6 +8,8 @@ export const getLocationById = (locationId: string) => {
 
    const country = Country.getCountryByCode(countryIsoCode)
 
+   if (!country) return null
+
    if (stateIsoCode) {
       const state = State.getStateByCodeAndCountry(stateIsoCode, countryIsoCode)
 
