@@ -1,7 +1,4 @@
-import {
-   ImpressionLocation,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    Button,
    Stack,
@@ -133,30 +130,6 @@ const defaultEmblaOptions: EmblaOptionsType = {
    inViewThreshold: 0,
 }
 
-export enum EventsTypes {
-   /**
-    * Top Picks for User based on the interests they selected at signup
-    */
-   RECOMMENDED = "recommended",
-   /**
-    * Non specific upcoming events on careerfairy ordered closest start date
-    */
-   COMING_UP = "comingUp",
-   /**
-    * upcoming events on that user has registered to ordered closest start date
-    */
-   MY_NEXT = "myNext",
-   /**
-    * Events that have already happened
-    */
-   PAST_EVENTS = "pastEvents",
-   /*
-    * coming up marketing events
-    * */
-   COMING_UP_MARKETING = "comingUpMarketing",
-   JOB_EVENTS = "jobLinkedEvents",
-}
-
 export type EventsCarouselStyling = {
    compact?: boolean
    seeMoreSx?: SxProps
@@ -186,7 +159,7 @@ export type EventsProps = {
    header?: ReactNode
    loading?: boolean
    hidePreview?: boolean
-   type: EventsTypes
+   location: string
    id?: string
    isEmpty?: boolean
    isRecommended?: boolean
@@ -203,6 +176,7 @@ export type EventsProps = {
    disableTracking?: boolean
    preventPaddingSlide?: boolean
    onClickSeeMore?: () => void
+   disableAutoPlay?: boolean
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -215,7 +189,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          loading = false,
          events,
          hidePreview,
-         type,
+         location: type,
          id,
          isEmpty,
          isRecommended,
@@ -232,6 +206,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          disableTracking,
          header,
          preventPaddingSlide = false,
+         disableAutoPlay,
       } = props
 
       const allStyles = { ...defaultStyling, ...styling }
@@ -326,7 +301,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                      <Box sx={allStyles.eventsHeader}>
                         <Box>
                            {seeMoreLink !== undefined &&
-                              (allStyles.headerAsLink || isMobile) ? (
+                           (allStyles.headerAsLink || isMobile) ? (
                               <Link
                                  href={seeMoreLink}
                                  style={styles.titleLink}
@@ -376,8 +351,8 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                   ) : null}
                   <Stack sx={styles.previewContent}>
                      {!isMobile &&
-                        eventDescription !== undefined &&
-                        eventDescription.length > 0 ? (
+                     eventDescription !== undefined &&
+                     eventDescription.length > 0 ? (
                         <Stack>
                            <Box sx={styles.description}>
                               <Typography
@@ -415,7 +390,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                              loading={loading}
                                              index={index}
                                              totalElements={arr.length}
-                                             location={getLocation(type)}
+                                             location={type}
                                              event={event}
                                              isRecommended={isRecommended}
                                              hideChipLabels={hideChipLabels}
@@ -424,7 +399,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                              onGoNext={moveToNextSlide}
                                              disableAutoPlay={
                                                 isLSDialogOpen ||
-                                                (type === EventsTypes.PAST_EVENTS &&
+                                                (disableAutoPlay &&
                                                    shouldDisableAutoPlay(index))
                                              }
                                              muted={muted}
@@ -522,23 +497,6 @@ const LoadingCards = ({
          ))}
       </>
    )
-}
-
-const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
-   switch (eventType) {
-      case EventsTypes.MY_NEXT:
-         return ImpressionLocation.myNextEventsCarousel
-      case EventsTypes.PAST_EVENTS:
-         return ImpressionLocation.pastEventsCarousel
-      case EventsTypes.RECOMMENDED:
-         return ImpressionLocation.recommendedEventsCarousel
-      case EventsTypes.COMING_UP:
-         return ImpressionLocation.comingUpCarousel
-      case EventsTypes.COMING_UP_MARKETING:
-         return ImpressionLocation.marketingPageCarousel
-      default:
-         return ImpressionLocation.unknown
-   }
 }
 
 EventsPreviewCarousel.displayName = "EventsPreviewCarousel"

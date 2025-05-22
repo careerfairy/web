@@ -1,5 +1,5 @@
-import { Locator, Page } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
+import { Locator, Page } from "@playwright/test"
 import { credentials } from "../../constants"
 
 export class LoginPage {

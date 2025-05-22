@@ -28,8 +28,14 @@ import { useLiveStreamDialog } from "./LivestreamDialog"
  * Logic for handling the register button click
  */
 export default function useRegistrationHandler() {
-   const { livestream, isRecommended, goToView, currentSparkId, mode } =
-      useLiveStreamDialog()
+   const {
+      livestream,
+      isRecommended,
+      goToView,
+      currentSparkId,
+      mode,
+      originSource,
+   } = useLiveStreamDialog()
    const { push, asPath, pathname } = useRouter()
    const { forceShowReminder } = useUserReminders()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
@@ -222,6 +228,7 @@ export default function useRegistrationHandler() {
                   {
                      isRecommended,
                      ...(currentSparkId && { sparkId: currentSparkId }),
+                     originSource,
                   }
                )
 

@@ -367,14 +367,14 @@ test.describe("Livestream Registration Signed Out", () => {
       await LoginPage.login(page, {
          openPage: false,
          email,
-         waitForURL: `**/portal/livestream/${livestream.id}/register`,
+         waitForURL: `**/portal/livestream/${livestream.id}/register**`,
       })
 
       // livestream dialog should be open after redirect
       await expect(page.getByText(livestream.title).first()).toBeVisible()
 
       // Wait for the URL to redirect to the livestream registration page
-      await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
+      await page.waitForURL(`**/portal/livestream/${livestream.id}/register**`)
    })
 
    test.skip("register to an event without login, create an account and proceed with registration", async ({
@@ -404,7 +404,7 @@ test.describe("Livestream Registration Signed Out", () => {
       await signup.signupUser(email)
 
       // Wait for the URL to redirect to the livestream registration page 1st step of the registration process
-      await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
+      await page.waitForURL(`**/portal/livestream/${livestream.id}/register**`)
    })
 })
 

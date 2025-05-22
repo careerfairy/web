@@ -1,3 +1,4 @@
+import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
 import { queryParamToArr } from "@careerfairy/shared-lib/utils"
 import {
@@ -254,6 +255,7 @@ const NextLiveStreamsWithFilter = ({
                   type: "livestreamDetails",
                   livestreamId: hit.id,
                },
+               originSource: ImpressionLocation.nextLivestreamsSearchBar,
             }),
             undefined,
             {

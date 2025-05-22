@@ -413,6 +413,7 @@ const ViewerLayout = (props) => {
             initialPage={"register"}
             mode="stand-alone"
             onRegisterSuccess={onRegistrationQuestionsAnswered}
+            providedOriginSource={`old-livestream-event-room-${livestreamId}`}
          />
       )
    }
