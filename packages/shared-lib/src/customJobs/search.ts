@@ -27,7 +27,6 @@ export const CUSTOM_JOB_FIELDS_TO_INDEX = [
    "salary",
    "sparks",
    "workplace",
-   "jobLocation",
    "deadline",
    "createdAt",
    "updatedAt",
