@@ -71,6 +71,9 @@ export const CUSTOM_JOB_FILTERING_FIELDS = [
    "normalizedJobType",
    "locationIdTags",
    "businessFunctionsTagIds",
+   "published",
+   "isPermanentlyExpired",
+   "deleted",
 ] satisfies CustomJobFieldToIndexType[]
 
 type FilterFieldType = (typeof CUSTOM_JOB_FILTERING_FIELDS)[number]

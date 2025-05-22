@@ -1,8 +1,10 @@
 import { Stack } from "@mui/material"
 
 import { Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { sxStyles } from "types/commonTypes"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
+import { CustomJobsList } from "./CustomJobsList"
 import { NoResultsFound } from "./search/SearchResultsCount"
 
 const styles = sxStyles({
@@ -13,32 +15,72 @@ const styles = sxStyles({
          md: "339px",
       },
       minHeight: "80vh",
-      // borderRadius: 2,
-      // border: "1px solid #E0E0E0",
-      // padding: 2,
    },
+   listTitle: {
+      fontWeight: 600,
+      color: (theme) => theme.palette.neutral[900],
+   },
+   title: {
+      maxWidth: "calc(100% - 50px)",
+   },
+   typography: {
+      maxWidth: "calc(100% - 50px)",
+   },
+   jobListItemWrapper: { m: 0, p: 0 },
 })
 
 export const CustomJobsOverviewList = () => {
-   const { customJobs, setSelectedJob } = useJobsOverviewContext()
+   const { showDefaultJobs, showResultJobs, showOtherJobs } =
+      useJobsOverviewContext()
 
    return (
       <Stack sx={styles.root} spacing={2}>
          <NoResultsFound />
-         <Typography>Custom jobs overview list</Typography>
-         <Stack spacing={1}>
-            {/* TODO: Replace with new Job Card */}
-            {customJobs.map((job) => (
-               <Typography
-                  key={job.id}
-                  onClick={() => {
-                     setSelectedJob(job)
-                  }}
-               >
-                  {job.title}
-               </Typography>
-            ))}
-         </Stack>
+         {showDefaultJobs ? <DefaultJobs /> : null}
+         {showResultJobs ? <ResultJobs /> : null}
+         {showOtherJobs ? <OtherJobs /> : null}
+      </Stack>
+   )
+}
+
+const DefaultJobs = () => {
+   const { isLoggedIn } = useAuth()
+   const { customJobs } = useJobsOverviewContext()
+   const title = isLoggedIn ? "Right for you" : "Trending jobs"
+
+   return (
+      <Stack spacing={1}>
+         <Typography variant="medium" sx={styles.listTitle}>
+            {title}
+            {" 🚀"}
+         </Typography>
+         {/* TODO: Replace with new Job Card */}
+         <CustomJobsList customJobs={customJobs} />
+      </Stack>
+   )
+}
+
+const ResultJobs = () => {
+   const { customJobs } = useJobsOverviewContext()
+
+   return (
+      <Stack spacing={1}>
+         {/* TODO: Replace with new Job Card */}
+         <CustomJobsList customJobs={customJobs} />
+      </Stack>
+   )
+}
+
+const OtherJobs = () => {
+   const { customJobs } = useJobsOverviewContext()
+
+   return (
+      <Stack spacing={1}>
+         <Typography variant="medium" sx={styles.listTitle}>
+            Other jobs you might like
+         </Typography>
+         {/* TODO: Replace with new Job Card */}
+         <CustomJobsList customJobs={customJobs} />
       </Stack>
    )
 }

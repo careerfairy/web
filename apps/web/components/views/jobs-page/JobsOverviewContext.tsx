@@ -34,6 +34,11 @@ type JobsOverviewContextType = {
    setSearchJobTypes: (jobTypes: string[]) => void
    hasFilters: boolean
    searchResultsCount: number
+   showDefaultJobs: boolean
+   showResultJobs: boolean
+   showOtherJobs: boolean
+   isValidating: boolean
+   nextPage: () => void
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -51,6 +56,7 @@ export type SearchParams = {
    term?: string
    businessFunctionTags?: string[]
    jobTypes?: string[]
+   jobId?: string
 }
 
 export const JobsOverviewContextProvider = ({
@@ -72,6 +78,11 @@ export const JobsOverviewContextProvider = ({
             businessFunctionsTagIds: searchParams.businessFunctionTags,
             normalizedJobType: searchParams.jobTypes,
          },
+         booleanFilters: {
+            // deleted: false,
+            // published: true,
+            // isPermanentlyExpired: false,
+         },
       }),
       [
          searchParams.businessFunctionTags,
@@ -80,12 +91,15 @@ export const JobsOverviewContextProvider = ({
       ]
    )
 
-   const { data } = useCustomJobSearchAlgolia(searchParams.term, {
-      filterOptions,
-      targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
-      itemsPerPage: 10,
-      initialData: serverCustomJobs,
-   })
+   const { data, isValidating, setSize } = useCustomJobSearchAlgolia(
+      searchParams.term,
+      {
+         filterOptions,
+         targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
+         itemsPerPage: 10,
+         initialData: serverCustomJobs,
+      }
+   )
 
    const infiniteJobs = useMemo(() => {
       return data?.flatMap((page) => page.deserializedHits) ?? []
@@ -137,6 +151,21 @@ export const JobsOverviewContextProvider = ({
    ])
 
    const value: JobsOverviewContextType = useMemo(() => {
+      const hasFilters = Boolean(
+         searchParams?.location?.length ||
+            searchParams?.businessFunctionTags?.length ||
+            searchParams?.jobTypes?.length ||
+            searchParams?.term?.length
+      )
+
+      const searchResultsCount = data?.at(0)?.nbHits ?? 0
+
+      const nextPage = () => {
+         if (searchResultsCount > infiniteJobs?.length) {
+            setSize((prevSize) => prevSize + 1)
+         }
+      }
+
       return {
          selectedJob: selectedJob,
          setSelectedJob: handleSelectedJobChange,
@@ -150,13 +179,13 @@ export const JobsOverviewContextProvider = ({
          setSearchJobTypes: handleJobTypesChange,
          customJobs: infiniteJobs,
          searchParams,
-         hasFilters: Boolean(
-            searchParams?.location?.length ||
-               searchParams?.businessFunctionTags?.length ||
-               searchParams?.jobTypes?.length ||
-               searchParams?.term?.length
-         ),
-         searchResultsCount: data?.at(0)?.nbHits ?? 0,
+         hasFilters,
+         searchResultsCount,
+         showDefaultJobs: !hasFilters,
+         showResultJobs: hasFilters && searchResultsCount > 0,
+         showOtherJobs: hasFilters && searchResultsCount === 0,
+         isValidating,
+         nextPage,
       }
    }, [
       infiniteJobs,
@@ -168,6 +197,8 @@ export const JobsOverviewContextProvider = ({
       handleJobTypesChange,
       searchTerm,
       data,
+      isValidating,
+      setSize,
    ])
 
    useEffect(() => {
@@ -187,7 +218,7 @@ export const JobsOverviewContextProvider = ({
 
 const handleQueryChange = (
    router: NextRouter,
-   param: keyof SearchParams | "jobId",
+   param: keyof SearchParams,
    value: string | string[]
 ) => {
    router.push(
@@ -205,6 +236,7 @@ const handleQueryChange = (
 
 const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
    const term = (query.term as string) || ""
+   const jobId = (query.jobId as string) || ""
 
    const searchParamLocations = getQueryStringArray(query.location)
    const searchParamBusinessFunctionTags = getQueryStringArray(
@@ -217,6 +249,7 @@ const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
       term: term,
       businessFunctionTags: searchParamBusinessFunctionTags,
       jobTypes: searchParamJobTypes,
+      jobId,
    }
 }
 
