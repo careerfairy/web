@@ -132,6 +132,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                type: "livestreamDetails",
                livestreamId: presenterEvent.id,
             },
+            originSource: props.location,
          })
 
          // Fall back to the default portal link and open the event in a new tab
@@ -139,7 +140,14 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             href: eventLink,
             target: isOnlivestreamDialogPage(pathname) ? undefined : "_blank",
          }
-      }, [presenterEvent, hasRegistered, router, pathname, getPartnerEventLink])
+      }, [
+         presenterEvent,
+         hasRegistered,
+         router,
+         pathname,
+         getPartnerEventLink,
+         props.location,
+      ])
 
       const isLink =
          !isInTalentGuidePage &&

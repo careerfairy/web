@@ -1,4 +1,7 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import ChevronRight from "@mui/icons-material/ChevronRight"
@@ -119,6 +122,7 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
                livestreamId: event?.id,
                type: "livestreamDetails",
             },
+            originSource: ImpressionLocation.unknown, // deprecated component
          }),
       [router, event?.id]
    )

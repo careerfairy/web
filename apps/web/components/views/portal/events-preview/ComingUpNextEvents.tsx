@@ -7,7 +7,6 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
-   EventsTypes,
 } from "./EventsPreviewCarousel"
 import { formatLivestreamsEvents } from "./utils"
 
@@ -89,7 +88,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       <EventsPreviewCarousel
          id={"upcoming-events"}
          title={COMING_UP_NEXT_EVENT_TITLE}
-         type={EventsTypes.COMING_UP}
+         location={"portal-next-livestreams-carousel"}
          events={formatLivestreamsEvents(localEvents)}
          seeMoreLink={"/next-livestreams"}
          isRecommended

@@ -323,6 +323,7 @@ export interface UserLivestreamData extends Identifiable {
       referrer?: string
       isRecommended?: boolean
       sparkId?: string
+      originSource?: ImpressionLocation
    }
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
@@ -761,26 +762,27 @@ export interface UserParticipatingStats extends DocumentData, Identifiable {
 }
 
 export enum ImpressionLocation {
-   recommendedEventsCarousel = "recommendedEventsCarousel",
-   businessFunctionsTagsCarousel = "businessFunctionsTagsCarousel",
-   contentTopicsTagsCarousel = "contentTopicsTagsCarousel",
-   otherTagsCarousel = "otherTagsCarousel",
-   comingUpCarousel = "comingUpCarousel",
-   myNextEventsCarousel = "myNextEventsCarousel",
-   pastEventsCarousel = "pastEventsCarousel",
-   nextLivestreams = "nextLivestreams",
-   pastLivestreams = "pastLivestreams",
-   nextLivestreamsGroup = "nextLivestreamsGroup",
-   pastLivestreamsGroup = "pastLivestreamsGroup",
-   marketingPageCarousel = "marketingPageCarousel",
-   embeddedNextLivestreams = "embeddedNextLivestreams",
-   embeddedPastLivestreams = "embeddedPastLivestreams",
-   landingPageCarousel = "landingPageCarousel",
-   viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
-   endOfStreamLivestreams = "endOfStreamLivestreams",
-   mentorPageCarousel = "mentorPageCarousel",
-   livestreamDialogPostRegistrationRecommendations = "livestreamDialogPostRegistrationRecommendations",
-   unknown = "unknown",
+   recommendedEventsCarousel = "recommended-events-carousel", // recommendedEventsCarousel
+   businessFunctionsTagsCarousel = "business-functions-tags-carousel", // businessFunctionsTagsCarousel
+   contentTopicsTagsCarousel = "content-topics-tags-carousel", // contentTopicsTagsCarousel
+   otherTagsCarousel = "other-tags-carousel", // otherTagsCarousel
+   comingUpCarousel = "coming-up-carousel", // comingUpCarousel
+   myNextEventsCarousel = "my-next-events-carousel", // myNextEventsCarousel
+   pastEventsCarousel = "past-events-carousel", // pastEventsCarousel
+   nextLivestreams = "next-livestreams", // nextLivestreams
+   pastLivestreams = "past-livestreams", // pastLivestreams
+   nextLivestreamsGroup = "next-livestreams-group", // nextLivestreamsGroup
+   pastLivestreamsGroup = "past-livestreams-group", // pastLivestreamsGroup
+   marketingPageCarousel = "marketing-page-carousel", // marketingPageCarousel
+   embeddedNextLivestreams = "embedded-next-livestreams", // embeddedNextLivestreams
+   embeddedPastLivestreams = "embedded-past-livestreams", // embeddedPastLivestreams
+   landingPageCarousel = "landing-page-carousel", // landingPageCarousel
+   viewerStreamingPageLivestreamsCarousel = "viewer-streaming-page-livestreams-carousel", // viewerStreamingPageLivestreamsCarousel
+   endOfStreamLivestreams = "end-of-stream-livestreams", // endOfStreamLivestreams
+   mentorPageCarousel = "mentor-page-carousel", // mentorPageCarousel
+   nextLivestreamsSearchBar = "next-livestreams-search-bar", // nextLivestreamsSearchBar
+   portalHeroContentCarousel = "portal-hero-content-carousel", // portalHeroContentCarousel
+   unknown = "unknown", // unknown
 }
 
 /**

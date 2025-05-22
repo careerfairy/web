@@ -2139,6 +2139,7 @@ class FirebaseService {
       options: {
          isRecommended?: boolean
          sparkId?: string
+         originSource?: string
       } = {}
    ): Promise<void> => {
       const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(
@@ -2180,6 +2181,9 @@ class FirebaseService {
             }),
             ...(options.sparkId?.length > 0 && {
                sparkId: options.sparkId,
+            }),
+            ...(options.originSource && {
+               originSource: options.originSource,
             }),
          },
          // to allow queries for users that didn't participate

@@ -35,9 +35,7 @@ import CategoryTagsContent from "components/views/common/tags/CategoryTagsConten
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import { FeaturedCompanies } from "components/views/portal/companies/featured/FeaturedCompanies"
-import EventsPreviewCarousel, {
-   EventsTypes,
-} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { UserSparksCarousel } from "components/views/portal/sparks/UserSparksCarousel"
 import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
 import { sxStyles } from "types/commonTypes"
@@ -160,7 +158,8 @@ const PortalPage = ({
                               <EventsPreviewCarousel
                                  id={"past-events"}
                                  title={"Recordings"}
-                                 type={EventsTypes.PAST_EVENTS}
+                                 location={"portal-past-livestreams-carousel"}
+                                 disableAutoPlay
                                  events={events}
                                  seeMoreLink={"/past-livestreams"}
                                  preventPaddingSlide

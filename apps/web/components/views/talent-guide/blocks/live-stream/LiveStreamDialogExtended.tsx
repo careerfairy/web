@@ -4,6 +4,7 @@ import LivestreamDialog, {
 } from "components/views/livestream-dialog/LivestreamDialog"
 import { useRouter } from "next/router"
 import { useEffect } from "react"
+import { useModuleId } from "store/selectors/talentGuideSelectors"
 
 type Props = {
    isLiveStreamDialogOpen: boolean
@@ -20,6 +21,7 @@ const Dialog = ({
 }: Props) => {
    const router = useRouter()
    const { data: livestream } = useLivestream(currentLiveStreamIdInDialog)
+   const moduleId = useModuleId()
 
    useEffect(() => {
       if (!router.query.dialogLiveStreamId && isLiveStreamDialogOpen) {
@@ -39,6 +41,7 @@ const Dialog = ({
          handleClose={handleLiveStreamDialogClose}
          initialPage={"details"}
          mode="stand-alone"
+         providedOriginSource={`talent-guide-module-${moduleId}-livestream-${livestream.id}`}
          serverUserEmail={""}
          setting={AllDialogSettings.Levels}
       />

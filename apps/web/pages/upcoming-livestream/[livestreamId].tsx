@@ -401,6 +401,7 @@ const UpcomingLivestreamPage = ({
                handleClose={handleCloseDialog}
                initialPage={"register"}
                mode="stand-alone"
+               providedOriginSource={`deprecated-upcoming-livestream-page-${stream.id}`}
             />
          </UpcomingLayout>
          {mobile && !isRegistrationDisabled && !registered ? (

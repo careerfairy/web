@@ -6,9 +6,7 @@ import { Box, Stack, Typography } from "@mui/material"
 import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/useCustomJobLinkedLivestreams"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
-import EventsPreviewCarousel, {
-   EventsTypes,
-} from "components/views/portal/events-preview/EventsPreviewCarousel"
+import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { EmblaOptionsType } from "embla-carousel-react"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
@@ -60,6 +58,7 @@ const CustomJobLinkedContents = ({
             <CustomJobLinkedLivestreams
                livestreams={jobLivestreams}
                disableEventClick={disableEventClick}
+               jobId={job.id}
             />
          )}
          {!hideLinkedSparks ? (
@@ -75,10 +74,12 @@ const CustomJobLinkedContents = ({
 type CustomJobLinkedLivestreamsProps = {
    livestreams: LivestreamEvent[]
    disableEventClick?: boolean
+   jobId: string
 }
 const CustomJobLinkedLivestreams = ({
    livestreams,
    disableEventClick: disableClick,
+   jobId,
 }: CustomJobLinkedLivestreamsProps) => {
    if (!livestreams.length) return null
    return (
@@ -89,7 +90,7 @@ const CustomJobLinkedLivestreams = ({
          <Box sx={styles.linkedContentWrapper}>
             <EventsPreviewCarousel
                id={"job-events"}
-               type={EventsTypes.JOB_EVENTS}
+               location={`linked-livestreams-job-carousel-${jobId}`}
                events={livestreams}
                isEmbedded
                disableClick={disableClick}

@@ -60,7 +60,7 @@ test.describe("Welcome Dialog", () => {
       await signup.signupUser(email)
 
       // redirection to livestream should work
-      await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
+      await page.waitForURL(`**/portal/livestream/${livestream.id}/register**`)
 
       await livestreamDialogPage.clickOnDialogBackButton()
       await livestreamDialogPage.closeDialog()
