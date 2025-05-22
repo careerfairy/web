@@ -1,4 +1,4 @@
-import { ChipDropdown } from "components/views/common/ChipDrodown"
+import { ChipDropdown } from "components/views/common/ChipDropdown"
 
 import { BusinessFunctionTagsOptions } from "@careerfairy/shared-lib/constants/tags"
 
