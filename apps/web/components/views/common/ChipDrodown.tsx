@@ -8,11 +8,12 @@ import {
    Typography,
 } from "@mui/material"
 import { AnimatePresence, motion } from "framer-motion"
-import {
+import React, {
    ReactNode,
    useCallback,
    useEffect,
    useId,
+   useLayoutEffect,
    useMemo,
    useRef,
    useState,
@@ -45,6 +46,10 @@ const styles = sxStyles({
          fontSize: "14px",
          fontWeight: "400",
          color: "neutral.700",
+         display: "flex",
+         alignItems: "center",
+         overflow: "hidden",
+         minWidth: 0,
       },
       "& svg": {
          m: "0px !important",
@@ -71,7 +76,15 @@ const styles = sxStyles({
       },
       cursor: "pointer",
    },
+   chipContentItemChecked: {
+      background: (theme) => theme.brand.white[300],
+   },
    chipContentItemLabel: {
+      fontSize: {
+         md: "14px",
+         sm: "16px",
+         xs: "16px",
+      },
       color: (theme) => theme.palette.neutral[700],
       fontWeight: 400,
    },
@@ -105,7 +118,7 @@ type ChipDropdownProps = {
     * A render prop for the search UI, receives addedOptions and onDeleteOption
     */
    search?: (
-      addedOptions: { id: string; value: string }[],
+      currentAddedOptions: { id: string; value: string }[],
       onDeleteOption: (id: string) => void
    ) => ReactNode
    handleValueChange: (value: string[]) => void
@@ -118,7 +131,7 @@ type ChipDropdownProps = {
     * @default true
     */
    showApply?: boolean
-
+   onApply?: () => void
    /**
     * If true, the label will be the same as the label prop.
     * @default false
@@ -136,6 +149,7 @@ export const ChipDropdown = ({
    showApply = true,
    forceLabel = false,
    onClose,
+   onApply,
 }: ChipDropdownProps) => {
    const [isOpen, setIsOpen] = useState(false)
    const [isDirty, setIsDirty] = useState(false)
@@ -143,62 +157,179 @@ export const ChipDropdown = ({
    const id = useId()
 
    const [selectedMap, setSelectedMap] = useState<Record<string, boolean>>(
-      () => {
-         return (
-            selectedOptions?.reduce((acc, option) => {
-               acc[option] = true
-               return acc
-            }, {} as Record<string, boolean>) || {}
-         )
-      }
+      () =>
+         selectedOptions?.reduce((acc, option) => {
+            acc[option] = true
+            return acc
+         }, {} as Record<string, boolean>) || {}
    )
 
-   const [addedOptions, setAddedOptions] = useState<
-      { id: string; value: string }[]
-   >(() => {
-      return (
-         selectedOptions?.map((option) => ({
-            id: option,
-            value: options?.find((o) => o.id === option)?.value,
-         })) || []
-      )
-   })
+   useEffect(() => {
+      const newSelectedMap =
+         selectedOptions?.reduce((acc, optionId) => {
+            acc[optionId] = true
+            return acc
+         }, {} as Record<string, boolean>) || {}
+      setSelectedMap(newSelectedMap)
+      setIsDirty(false)
+   }, [selectedOptions])
 
-   const [hasSelectedItems, setHasSelectedItems] = useState(
-      selectedOptions?.length > 0
-   )
+   const currentAddedOptions = useMemo(() => {
+      if (!options) return []
+      return Object.keys(selectedMap)
+         .filter((id) => selectedMap[id])
+         .map((id) => {
+            const option = options.find((opt) => opt.id === id)
+            return option ? { id, value: option.value } : null
+         })
+         .filter(Boolean) as { id: string; value: string }[]
+   }, [selectedMap, options])
 
-   const chipLabel = useMemo(() => {
-      if (forceLabel) {
-         return label
-      }
+   const chipShouldBeStyledAsSelected = useMemo(() => {
       if (showApply) {
-         if (selectedOptions?.length === 0) {
-            return label
-         }
-         return options
-            ?.filter((option) => selectedOptions?.includes(option?.id))
-            ?.map((option) => option.value)
-            ?.join(", ")
+         return (selectedOptions?.length || 0) > 0
       }
-      return hasSelectedItems
-         ? options
-              ?.filter(
-                 (option) =>
-                    selectedMap[option.id] &&
-                    selectedOptions?.includes(option.id)
-              )
-              ?.map((option) => option.value)
-              ?.join(", ")
-         : label
+      return Object.values(selectedMap).some(Boolean)
+   }, [selectedOptions, selectedMap, showApply])
+
+   const displayChipLabel = useMemo(() => {
+      if (forceLabel) return label
+
+      const idsToDisplayNamesFor = showApply
+         ? selectedOptions || []
+         : Object.keys(selectedMap).filter((key) => selectedMap[key])
+
+      if (idsToDisplayNamesFor.length === 0) return label
+
+      const names = idsToDisplayNamesFor
+         .map((id) => options?.find((opt) => opt.id === id)?.value)
+         .filter(Boolean)
+         .join(", ")
+      return names || label
+   }, [forceLabel, label, options, selectedMap, selectedOptions, showApply])
+
+   const chipLabelTextRef = useRef<HTMLSpanElement>(null)
+   const [truncatedLabelText, setTruncatedLabelText] = useState<string | null>(
+      null
+   )
+   const [plusNCount, setPlusNCount] = useState<number | null>(null)
+
+   const tooltipFullLabel = useMemo(() => {
+      const currentSelectedIds = showApply
+         ? selectedOptions || []
+         : Object.keys(selectedMap).filter((key) => selectedMap[key])
+
+      if (currentSelectedIds.length === 0 || !options) {
+         return ""
+      }
+
+      const selectedNames = currentSelectedIds
+         .map((id) => options.find((opt) => opt.id === id)?.value)
+         .filter(Boolean) // Filter out any undefined names
+
+      return selectedNames.join(", ")
+   }, [options, selectedMap, selectedOptions, showApply])
+
+   useLayoutEffect(() => {
+      const textElement = chipLabelTextRef.current
+      const labelContainer = textElement?.parentElement
+
+      if (!textElement || !labelContainer || forceLabel || !options) {
+         setTruncatedLabelText(null)
+         setPlusNCount(null)
+         return
+      }
+
+      const currentSelectedIds = showApply
+         ? selectedOptions || []
+         : Object.keys(selectedMap).filter((key) => selectedMap[key])
+
+      if (currentSelectedIds.length === 0) {
+         setTruncatedLabelText(null)
+         setPlusNCount(null)
+         return
+      }
+
+      const relevantOptionsValues = currentSelectedIds
+         .map((id) => options.find((opt) => opt.id === id)?.value)
+         .filter((value): value is string => typeof value === "string")
+
+      if (relevantOptionsValues.length === 0) {
+         setTruncatedLabelText(null)
+         setPlusNCount(null)
+         return
+      }
+
+      const fullText = relevantOptionsValues.join(", ")
+      const availableWidth = labelContainer.clientWidth
+
+      textElement.style.whiteSpace = "nowrap"
+      textElement.textContent = fullText
+
+      const doesFullTextFit = textElement.scrollWidth <= availableWidth
+      textElement.style.whiteSpace = ""
+
+      if (doesFullTextFit) {
+         setTruncatedLabelText(null)
+         setPlusNCount(null)
+         textElement.textContent = fullText
+      } else {
+         const tempMeasureSpan = document.createElement("span")
+         const computedStyles = window.getComputedStyle(textElement)
+         tempMeasureSpan.style.position = "absolute"
+         tempMeasureSpan.style.left = "-9999px"
+         tempMeasureSpan.style.top = "-9999px"
+         tempMeasureSpan.style.visibility = "hidden"
+         tempMeasureSpan.style.whiteSpace = "nowrap"
+         tempMeasureSpan.style.fontFamily = computedStyles.fontFamily
+         tempMeasureSpan.style.fontSize = computedStyles.fontSize
+         tempMeasureSpan.style.fontWeight = computedStyles.fontWeight
+         tempMeasureSpan.style.letterSpacing = computedStyles.letterSpacing
+         tempMeasureSpan.style.padding = computedStyles.padding
+         document.body.appendChild(tempMeasureSpan)
+
+         let bestFitText = ""
+         let bestFitCount: number | null = null
+         let foundOptimalFit = false
+
+         for (let k = relevantOptionsValues.length - 1; k >= 1; k--) {
+            const currentItemsText = relevantOptionsValues
+               .slice(0, k)
+               .join(", ")
+            const hiddenCount = relevantOptionsValues.length - k
+            const plusNString = `, +${hiddenCount}`
+
+            tempMeasureSpan.textContent = plusNString
+            const plusNWidth = tempMeasureSpan.offsetWidth
+
+            textElement.textContent = currentItemsText
+            if (textElement.scrollWidth + plusNWidth <= availableWidth) {
+               bestFitText = currentItemsText
+               bestFitCount = hiddenCount
+               foundOptimalFit = true
+               break
+            }
+         }
+
+         if (!foundOptimalFit && relevantOptionsValues.length > 0) {
+            bestFitText = relevantOptionsValues[0]
+            const hiddenCount = relevantOptionsValues.length - 1
+            bestFitCount = hiddenCount > 0 ? hiddenCount : null
+         }
+
+         setTruncatedLabelText(bestFitText)
+         setPlusNCount(bestFitCount)
+         document.body.removeChild(tempMeasureSpan)
+         textElement.textContent = bestFitText
+      }
    }, [
+      displayChipLabel,
+      forceLabel,
       options,
       selectedMap,
-      label,
-      hasSelectedItems,
       selectedOptions,
       showApply,
-      forceLabel,
+      label,
    ])
 
    useEffect(() => {
@@ -213,32 +344,24 @@ export const ChipDropdown = ({
          )
    }, [id])
 
-   const handleChange = useCallback(
-      (newSelectedValues: string[]) => {
-         handleValueChange(newSelectedValues)
-         setHasSelectedItems(newSelectedValues?.length > 0)
-         setAddedOptions(
-            newSelectedValues?.map((option) => ({
-               id: option,
-               value: options?.find((o) => o.id === option)?.value,
-            })) || []
-         )
+   const handleOptionClick = useCallback(
+      (optionId: string) => {
+         setIsDirty(true)
+         const newSelectedMap = {
+            ...selectedMap,
+            [optionId]: !selectedMap[optionId],
+         }
+         setSelectedMap(newSelectedMap)
+
+         if (!showApply) {
+            const newSelectedValues = Object.keys(newSelectedMap).filter(
+               (key) => newSelectedMap[key]
+            )
+            handleValueChange(newSelectedValues)
+         }
       },
-      [handleValueChange, options]
+      [selectedMap, showApply, handleValueChange]
    )
-
-   const handleOptionClick = (option: string) => {
-      setIsDirty(true)
-      const newSelectedMap = { ...selectedMap, [option]: !selectedMap[option] }
-      const newSelectedValues = Object.keys(newSelectedMap).filter(
-         (key) => newSelectedMap[key]
-      )
-
-      setSelectedMap(newSelectedMap)
-      if (!showApply) {
-         handleChange(newSelectedValues)
-      }
-   }
 
    const isChecked = useCallback(
       (option: string) => {
@@ -267,49 +390,73 @@ export const ChipDropdown = ({
       const newSelectedValues = Object.keys(selectedMap).filter(
          (key) => selectedMap[key]
       )
-
-      handleChange(newSelectedValues)
+      handleValueChange(newSelectedValues)
       setIsDirty(false)
-   }, [handleChange, selectedMap])
+      onApply?.()
+   }, [selectedMap, handleValueChange, onApply])
 
    const handleReset = useCallback(() => {
       setSelectedMap({})
       setIsDirty(false)
-      handleChange([])
-   }, [handleChange])
+      handleValueChange([])
+   }, [handleValueChange])
 
    const handleDeleteOption = useCallback(
-      (id: string) => {
-         // Remove the option from selectedMap
-         setSelectedMap((prev) => {
-            setAddedOptions((prevAddedOptions) =>
-               prevAddedOptions.filter((option) => option.id !== id)
-            )
-            return { ...prev, [id]: false }
-         })
-         // If not showApply, update immediately
-         if (!showApply) {
-            const newSelectedValues = Object.keys(selectedMap).filter(
-               (key) => key !== id && selectedMap[key]
-            )
-            handleChange(newSelectedValues)
-         }
+      (idToDelete: string) => {
+         const newSelectedMap = { ...selectedMap, [idToDelete]: false }
+         setSelectedMap(newSelectedMap)
          setIsDirty(true)
+
+         if (!showApply) {
+            const newSelectedValues = Object.keys(newSelectedMap).filter(
+               (key) => newSelectedMap[key]
+            )
+            handleValueChange(newSelectedValues)
+         }
       },
-      [handleChange, selectedMap, showApply]
+      [selectedMap, showApply, handleValueChange]
    )
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
          <Box ref={anchorRef}>
             <Box>
-               <BrandedTooltip title={hasSelectedItems ? chipLabel : ""}>
+               <BrandedTooltip
+                  title={chipShouldBeStyledAsSelected ? tooltipFullLabel : ""}
+               >
                   <Chip
                      sx={[
                         styles.chip,
-                        hasSelectedItems && styles.chipWithSelectedItems,
+                        chipShouldBeStyledAsSelected &&
+                           styles.chipWithSelectedItems,
                      ]}
-                     label={chipLabel}
+                     label={
+                        <>
+                           <Typography
+                              ref={chipLabelTextRef}
+                              component="span"
+                              sx={{
+                                 whiteSpace: "nowrap",
+                                 overflow: "hidden",
+                                 textOverflow: "ellipsis",
+                                 minWidth: 0,
+                              }}
+                           >
+                              {truncatedLabelText ?? displayChipLabel}
+                           </Typography>
+                           {plusNCount !== null && plusNCount > 0 && (
+                              <Typography
+                                 component="span"
+                                 sx={{
+                                    whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                 }}
+                              >
+                                 {`, +${plusNCount}`}
+                              </Typography>
+                           )}
+                        </>
+                     }
                      deleteIcon={
                         <motion.div
                            initial={false}
@@ -334,7 +481,9 @@ export const ChipDropdown = ({
                   <ChipContent
                      options={options}
                      search={
-                        search ? search(addedOptions, handleDeleteOption) : null
+                        search
+                           ? search(currentAddedOptions, handleDeleteOption)
+                           : null
                      }
                      handleOptionClick={handleOptionClick}
                      isChecked={isChecked}
@@ -390,7 +539,10 @@ export const ChipDropdown = ({
                               options={options}
                               search={
                                  search
-                                    ? search(addedOptions, handleDeleteOption)
+                                    ? search(
+                                         currentAddedOptions,
+                                         handleDeleteOption
+                                      )
                                     : null
                               }
                               handleOptionClick={handleOptionClick}
@@ -410,12 +562,12 @@ type ChipContentProps = Omit<
    ChipDropdownProps,
    "label" | "openDialog" | "handleValueChange" | "search"
 > & {
-   handleOptionClick?: (option: string) => void
-   isChecked: (option: string) => boolean
+   handleOptionClick: (optionId: string) => void
+   isChecked: (optionId: string) => boolean
    search?: ReactNode
 }
 
-const ChipContent = ({
+const ChipContentInternal = ({
    options,
    search,
    handleOptionClick,
@@ -424,7 +576,7 @@ const ChipContent = ({
    return (
       <Stack
          p={0}
-         maxHeight={300}
+         maxHeight={"452px"}
          overflow="auto"
          sx={{ scrollbarWidth: "thin" }}
       >
@@ -433,11 +585,10 @@ const ChipContent = ({
             {options?.map((option) => (
                <ChipContentItem
                   key={option.id}
+                  id={option.id}
                   label={option.value}
                   checked={isChecked(option.id)}
-                  onClick={() => {
-                     handleOptionClick?.(option.id)
-                  }}
+                  onItemClick={handleOptionClick}
                />
             ))}
          </Box>
@@ -445,24 +596,34 @@ const ChipContent = ({
    )
 }
 
+export const ChipContent = React.memo(ChipContentInternal)
+
 type ChipContentItemProps = {
-   onClick?: () => void
+   onItemClick: (id: string) => void
    checked?: boolean
    label: string
+   id: string
 }
 
-const ChipContentItem = ({ onClick, label, checked }: ChipContentItemProps) => {
+const ChipContentItemInternal = ({
+   onItemClick,
+   label,
+   checked,
+   id,
+}: ChipContentItemProps) => {
+   const handleClick = useCallback(() => {
+      onItemClick(id)
+   }, [onItemClick, id])
+
    return (
       <Stack
          direction="row"
          justifyContent="space-between"
          alignItems="center"
-         onClick={onClick}
-         sx={styles.chipContentItem}
+         onClick={handleClick}
+         sx={[styles.chipContentItem, checked && styles.chipContentItemChecked]}
       >
-         <Typography variant="brandedBody" sx={styles.chipContentItemLabel}>
-            {label}
-         </Typography>
+         <Typography sx={styles.chipContentItemLabel}>{label}</Typography>
          <BrandedCheckbox
             sx={{ p: 0, width: "24px", height: "24px" }}
             checked={checked}
@@ -470,3 +631,5 @@ const ChipContentItem = ({ onClick, label, checked }: ChipContentItemProps) => {
       </Stack>
    )
 }
+
+export const ChipContentItem = React.memo(ChipContentItemInternal)
