@@ -51,6 +51,7 @@ import reminders = require("./reminders")
 import remindersNoShow = require("./reminders-no-show")
 import livestreams = require("./livestreams")
 import analytics = require("./analytics")
+import recordingAnalytics = require("./recordingAnalytics")
 import breakoutRooms = require("./breakoutRooms")
 import recording = require("./recording")
 import slack = require("./slack")
@@ -195,6 +196,7 @@ exports.automaticallyRecordLivestreamBreakoutRoom =
    recording.automaticallyRecordLivestreamBreakoutRoom
 exports.checkForUnfinishedLivestreamsAndStopRecording =
    recording.checkForUnfinishedLivestreamsAndStopRecording
+exports[FUNCTION_NAMES.getRecordingViews] = recordingAnalytics.getRecordingViews
 
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite_eu =

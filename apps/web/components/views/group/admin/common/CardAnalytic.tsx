@@ -1,10 +1,10 @@
 import { CircularProgress, Skeleton, Typography } from "@mui/material"
-import CardCustom, { SubheaderLink } from "./CardCustom"
-import { sxStyles } from "../../../../../types/commonTypes"
+import Stack from "@mui/material/Stack"
 import React, { FC } from "react"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import { sxStyles } from "../../../../../types/commonTypes"
 import useCountQuery from "../../../../custom-hook/useCountQuery"
-import Stack from "@mui/material/Stack"
+import CardCustom, { SubheaderLink } from "./CardCustom"
 
 const styles = sxStyles({
    value: {
@@ -54,10 +54,13 @@ export const CardAnalytic = ({
    )
 }
 
-type SimpleCardAnalyticProps = Pick<Props, "title" | "value">
+type SimpleCardAnalyticProps = Pick<Props, "title" | "value"> & {
+   isLoading?: boolean
+}
 export const SimpleCardAnalytic: FC<SimpleCardAnalyticProps> = ({
    title,
    value,
+   isLoading,
 }) => {
    return (
       <CardCustom sx={styles.simpleAnalyticRoot}>
@@ -74,7 +77,11 @@ export const SimpleCardAnalytic: FC<SimpleCardAnalyticProps> = ({
                variant="h4"
                fontWeight={600}
             >
-               {value}
+               {isLoading ? (
+                  <CircularProgress color="secondary" size={20} />
+               ) : (
+                  value
+               )}
             </Typography>
          </Stack>
       </CardCustom>

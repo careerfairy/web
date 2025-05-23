@@ -386,6 +386,7 @@ export interface LivestreamJobApplicationDetails extends JobIdentifier {
 }
 
 // Collection Path: livestreams/{livestreamId}/recordingStats/stats
+/** @deprecated */
 export interface LivestreamRecordingDetails extends Identifiable {
    livestreamId: string
    livestreamStartDate: firebase.firestore.Timestamp
