@@ -469,7 +469,7 @@ export interface Speaker extends Identifiable {
    lastName?: string
    position?: string
    rank?: number
-   email?: string
+   email: never
    linkedInUrl?: string
    roles: CreatorRole[]
    groupId?: string
