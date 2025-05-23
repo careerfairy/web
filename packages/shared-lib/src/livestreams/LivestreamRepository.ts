@@ -1266,9 +1266,7 @@ export class FirebaseLivestreamRepository
          minutesWatched: this.fieldValue.increment(
             minutesWatched
          ) as unknown as number,
-         viewers: userId
-            ? (this.fieldValue.arrayUnion(userId) as unknown as string[])
-            : (this.fieldValue.arrayUnion() as unknown as string[]),
+         viewers: this.fieldValue.arrayUnion() as unknown as string[],
          views: this.fieldValue.increment(1) as unknown as number,
       }
 

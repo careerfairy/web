@@ -55,6 +55,7 @@ import {
    INotificationService,
    NotificationService,
 } from "../lib/notifications/NotificationService"
+import RecordingAnalyticsRepository from "../lib/recordings/analytics/RecordingAnalyticsRepository"
 import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
 import bigQueryClient from "./bigQueryClient"
@@ -133,6 +134,11 @@ export const getSparksAnalyticsRepoInstance = (
       sparksRepo
    )
 }
+
+export const getRecordingAnalyticsRepoInstance =
+   (): RecordingAnalyticsRepository => {
+      return new RecordingAnalyticsRepository(bigQueryClient)
+   }
 
 export const customJobRepo: ICustomJobFunctionsRepository =
    new CustomJobFunctionsRepository(firestore as any, FieldValue)

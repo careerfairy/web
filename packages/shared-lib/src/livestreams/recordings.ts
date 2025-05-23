@@ -58,3 +58,8 @@ export const downloadLinkWithDate = (
       return downloadLink(livestreamId, sid, breakoutRoomID)
    }
 }
+
+export type RecordingStatsFromBigQuery = {
+   totalViews: number
+   uniqueViewers: number
+}

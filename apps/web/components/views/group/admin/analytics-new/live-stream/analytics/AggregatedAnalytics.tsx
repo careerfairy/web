@@ -1,14 +1,12 @@
-import React from "react"
 import { Grid } from "@mui/material"
+import { useRecordingViewsSWR } from "components/custom-hook/recordings/useRecordingViewsSWR"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
+import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
 import {
    SimpleCardAnalytic,
    SimpleCardAnalyticSkeleton,
 } from "../../../common/CardAnalytic"
-import { useFirestoreDocument } from "../../../../../../custom-hook/utils/useFirestoreDocument"
-import { LivestreamRecordingDetails } from "@careerfairy/shared-lib/livestreams"
-import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
+import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
 
 const styles = sxStyles({
    gridItem: {
@@ -63,21 +61,20 @@ const LoadingAggregatedAnalytics = () => {
       </Grid>
    )
 }
+
 const RecordingViewsAnalytic = () => {
    const { currentStreamStats } = useLivestreamsAnalyticsPageContext()
-
-   const { data: recordingDetails } =
-      useFirestoreDocument<LivestreamRecordingDetails>("livestreams", [
-         currentStreamStats.livestream.id,
-         "recordingStats",
-         "stats",
-      ])
+   const { totalViews, loading } = useRecordingViewsSWR(
+      currentStreamStats.livestream.id
+   )
 
    return (
       <SimpleCardAnalytic
          title="Recording views"
-         value={recordingDetails?.views ?? 0}
+         value={totalViews ?? 0}
+         isLoading={loading}
       />
    )
 }
+
 export default AggregatedAnalytics
