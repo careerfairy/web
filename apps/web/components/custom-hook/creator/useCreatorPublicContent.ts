@@ -22,8 +22,9 @@ const swrOptions: SWRConfiguration = {
  * as well as if there's jobs available on the corresponding group.
  **/
 const useCreatorPublicContent = (creator: Creator) => {
+   console.log("🚀 ~ useCreatorPublicContent ~ creator:", creator)
    const swrFetcher = async () => {
-      return groupRepo.getCreatorPublicContent(creator)
+      return groupRepo.getCreatorPublicContent(creator.id, creator.groupId)
    }
 
    return useSWR(`creator-content-${creator.id}`, swrFetcher, swrOptions)

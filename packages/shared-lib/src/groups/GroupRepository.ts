@@ -302,7 +302,10 @@ export interface IGroupRepository {
     * @returns A Promise that resolves with an object containing the live streams and sparks
     * associated, as well as if the group the creator belongs to has any jobs.
     */
-   getCreatorPublicContent(creator: Creator): Promise<CreatorPublicContent>
+   getCreatorPublicContent(
+      creatorId: string,
+      groupId: string
+   ): Promise<CreatorPublicContent>
 
    /**
     * Updates the publicSparks flag in a group.
@@ -1294,13 +1297,6 @@ export class FirebaseGroupRepository
          }
       })
 
-      const creatorsMapByEmail = new Map<string, Creator>()
-      creators.forEach((creator) => {
-         if (creator.id) {
-            creatorsMapByEmail.set(creator.email, creator)
-         }
-      })
-
       const creatorsWithSparksSnaps = group.publicSparks
          ? await Promise.all(
               creators.map((creator) => {
@@ -1328,7 +1324,7 @@ export class FirebaseGroupRepository
       const creatorsWithLivestreams = livestreams
          .flatMap((livestream) => {
             return livestream.speakers
-               ?.map((speaker) => creatorsMapByEmail.get(speaker.email))
+               ?.map((speaker) => creatorsMapById.get(speaker.id))
                .filter(Boolean)
          })
          .filter(Boolean)
@@ -1349,28 +1345,28 @@ export class FirebaseGroupRepository
    }
 
    async getCreatorPublicContent(
-      creator: Creator
+      creatorId: string,
+      groupId: string
    ): Promise<CreatorPublicContent> {
-      if (!creator.groupId)
-         return { sparks: [], livestreams: [], hasJobs: false }
+      if (!groupId) return { sparks: [], livestreams: [], hasJobs: false }
 
-      const group = await this.getGroupById(creator.groupId)
+      const group = await this.getGroupById(groupId)
 
       const [groupLivestreamsSnaps, sparksSnaps, groupJobs] = await Promise.all(
          [
             this.firestore
                .collection("livestreams")
-               .where("groupIds", "array-contains", group.id)
                .where("test", "==", false)
                .where("hidden", "==", false)
                .where("denyRecordingAccess", "==", false)
+               .where("creatorsIds", "array-contains", creatorId)
                .orderBy("start", "desc")
                .get(),
             group.publicSparks
                ? this.firestore
                     .collection("sparks")
                     .where("published", "==", true)
-                    .where("creator.id", "==", creator.id)
+                    .where("creator.id", "==", creatorId)
                     .get()
                : null,
             this.firestore
@@ -1387,17 +1383,8 @@ export class FirebaseGroupRepository
       const creatorsSparks =
          sparksSnaps && mapFirestoreDocuments<Spark>(sparksSnaps)
 
-      const groupLivestreams = mapFirestoreDocuments<LivestreamEvent>(
-         groupLivestreamsSnaps
-      )
-
       const creatorLivestreams =
-         groupLivestreams?.filter((livestream) =>
-            // filter by email for backwards compatibility
-            livestream.speakers.find(
-               (speaker) => speaker.email == creator.email
-            )
-         ) ?? []
+         mapFirestoreDocuments<LivestreamEvent>(groupLivestreamsSnaps) ?? []
 
       const hasJobs = !groupJobs.empty
 

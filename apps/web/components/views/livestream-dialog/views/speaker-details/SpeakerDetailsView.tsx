@@ -216,6 +216,7 @@ const MentorDetails = ({ mentor }: { mentor: Creator }) => {
       data: { livestreams, sparks, hasJobs },
    } = useCreatorPublicContent(mentor)
 
+   console.log("🚀 ~ MentorDetails ~ livestreams:", livestreams)
    return (
       <Stack spacing={3} mb={3}>
          <MentorDetailLayout.Header mentor={mentor} group={group} fullWidth />

@@ -470,7 +470,7 @@ export interface Speaker extends Identifiable {
    position?: string
    rank?: number
    /** @deprecated */
-   email: string
+   email?: string
    linkedInUrl?: string
    roles: CreatorRole[]
    groupId?: string
