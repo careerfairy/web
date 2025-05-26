@@ -1,5 +1,4 @@
 import {
-   AddCreatorData,
    Creator,
    CreatorRoles,
 } from "@careerfairy/shared-lib/src/groups/creators"
@@ -15,6 +14,7 @@ import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
 import { logAction } from "../../../util/logger"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
+import { WithRef } from "../../../util/types"
 
 const RUNNING_VERSION = "1.0"
 const counter = new Counter()
@@ -38,7 +38,7 @@ export async function run() {
       const [allLivestreams, allCreators] = await logAction(
          () =>
             Promise.all([
-               livestreamRepo.getAllLivestreams(true, false),
+               livestreamRepo.getAllLivestreams<true>(false, true),
                groupRepo.getAllCreators(false),
             ]),
          "Fetching all livestreams and creators"
@@ -62,7 +62,7 @@ export async function run() {
 
       // Process draft livestreams
       const allDraftLivestreams = await logAction(
-         () => livestreamRepo.getAllDraftLivestreams(),
+         () => livestreamRepo.getAllDraftLivestreams(true),
          "Fetching all draft livestreams"
       )
 
@@ -82,7 +82,7 @@ export async function run() {
 }
 
 async function processLivestreams(
-   livestreams: LivestreamEvent[],
+   livestreams: WithRef<LivestreamEvent>[],
    creatorsByEmailAndGroup: Map<string, Creator>
 ) {
    const batchSize = 50 // Smaller batch size due to potential creator creation
@@ -94,11 +94,7 @@ async function processLivestreams(
       const livestreamsChunk = livestreams.slice(i, i + batchSize)
 
       for (const livestream of livestreamsChunk) {
-         await processLivestreamSpeakers(
-            livestream,
-            creatorsByEmailAndGroup,
-            "livestreams"
-         )
+         await processLivestreamSpeakers(livestream, creatorsByEmailAndGroup)
          progressBar.increment()
       }
    }
@@ -108,7 +104,7 @@ async function processLivestreams(
 }
 
 async function processDraftLivestreams(
-   draftLivestreams: LivestreamEvent[],
+   draftLivestreams: WithRef<LivestreamEvent>[],
    creatorsByEmailAndGroup: Map<string, Creator>
 ) {
    const batchSize = 50
@@ -120,11 +116,7 @@ async function processDraftLivestreams(
       const livestreamsChunk = draftLivestreams.slice(i, i + batchSize)
 
       for (const livestream of livestreamsChunk) {
-         await processLivestreamSpeakers(
-            livestream,
-            creatorsByEmailAndGroup,
-            "draftLivestreams"
-         )
+         await processLivestreamSpeakers(livestream, creatorsByEmailAndGroup)
          progressBar.increment()
       }
    }
@@ -134,9 +126,8 @@ async function processDraftLivestreams(
 }
 
 async function processLivestreamSpeakers(
-   livestream: LivestreamEvent,
-   creatorsByEmailAndGroup: Map<string, Creator>,
-   collection: "livestreams" | "draftLivestreams"
+   livestream: WithRef<LivestreamEvent>,
+   creatorsByEmailAndGroup: Map<string, Creator>
 ) {
    if (!livestream.speakers || livestream.speakers.length === 0) {
       return
@@ -147,8 +138,8 @@ async function processLivestreamSpeakers(
    let hasChanges = false
 
    for (const speaker of livestream.speakers) {
-      // Skip speakers that don't have an email or already have a creator ID
-      if (!speaker.email || speaker.id) {
+      // Skip speakers that don't have an email (nothing to migrate)
+      if (!speaker.email) {
          updatedSpeakers.push(speaker)
          continue
       }
@@ -186,7 +177,7 @@ async function processLivestreamSpeakers(
          counter.addToCustomCount("speakersLinkedToExistingCreators", 1)
       } else {
          // No matching creator found - create new creator
-         const primaryGroupId = livestream.groupIds?.[0]
+         const primaryGroupId = await selectPrimaryGroupId(livestream.groupIds)
          if (!primaryGroupId) {
             Counter.log(
                `Warning: Livestream ${livestream.id} has no groupIds, skipping speaker ${speaker.email}`
@@ -236,14 +227,12 @@ async function processLivestreamSpeakers(
 
    // Update livestream if there are changes
    if (hasChanges) {
-      const livestreamRef = firestore.collection(collection).doc(livestream.id)
-
       const updateData: Partial<LivestreamEvent> = {
          speakers: updatedSpeakers,
-         creatorsIds: Array.from(updatedCreatorIds),
+         creatorsIds: [...new Set(Array.from(updatedCreatorIds))],
       }
 
-      await livestreamRef.update(updateData)
+      await livestream._ref.update(updateData)
       counter.writeIncrement()
       counter.addToCustomCount("livestreamsUpdated", 1)
    }
@@ -259,7 +248,7 @@ async function createCreatorFromSpeaker(
       .collection("creators")
       .doc() // Generate new document ID
 
-   const creatorData: AddCreatorData = {
+   const newCreator: Creator = {
       firstName: speaker.firstName || "Unknown",
       lastName: speaker.lastName || "Speaker",
       position: speaker.position || "Speaker",
@@ -271,10 +260,6 @@ async function createCreatorFromSpeaker(
          speaker.roles && speaker.roles.length > 0
             ? speaker.roles
             : [CreatorRoles.Speaker],
-   }
-
-   const newCreator: Creator = {
-      ...creatorData,
       id: creatorRef.id,
       groupId,
       documentType: "groupCreator",
@@ -287,4 +272,40 @@ async function createCreatorFromSpeaker(
    await creatorRef.set(newCreator)
 
    return newCreator
+}
+
+async function selectPrimaryGroupId(
+   groupIds: string[] | undefined
+): Promise<string | null> {
+   if (!groupIds || groupIds.length === 0) {
+      return null
+   }
+
+   // If there's only one group, use it
+   if (groupIds.length === 1) {
+      return groupIds[0]
+   }
+
+   // If there are multiple groups, prioritize company groups (without universityCode) over university groups
+   try {
+      const groupPromises = groupIds.map((groupId) =>
+         groupRepo.getGroupById(groupId)
+      )
+      const groups = await Promise.all(groupPromises)
+
+      // Filter out null groups and find the first group without universityCode
+      const validGroups = groups.filter((group) => group !== null)
+      const companyGroup = validGroups.find((group) => !group.universityCode)
+
+      if (companyGroup) {
+         return companyGroup.id
+      }
+
+      // If all groups have universityCode, just return the first valid one
+      return validGroups[0]?.id || groupIds[0]
+   } catch (error) {
+      Counter.log(`Error fetching groups for selection: ${error.message}`)
+      // Fallback to first groupId if there's an error
+      return groupIds[0]
+   }
 }
