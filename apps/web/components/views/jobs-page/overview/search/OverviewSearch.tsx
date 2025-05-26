@@ -13,7 +13,7 @@ const styles = sxStyles({
    stickyRoot: {
       position: "sticky",
       top: 64,
-      backgroundColor: (theme) => theme.brand.white[300],
+      backgroundColor: "#F7F8FC",
       py: 2,
    },
    searchBy: {
