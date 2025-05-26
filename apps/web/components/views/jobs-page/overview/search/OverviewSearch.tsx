@@ -1,4 +1,5 @@
 import { Box, Stack } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 import { SearchByLocation } from "./by/SearchByLocation"
 import { SearchByTags } from "./by/SearchByTags"
@@ -8,6 +9,12 @@ import { SearchByType } from "./by/SearchByType"
 const styles = sxStyles({
    root: {
       width: "100%",
+   },
+   stickyRoot: {
+      position: "sticky",
+      top: 64,
+      backgroundColor: (theme) => theme.brand.white[300],
+      py: 2,
    },
    searchBy: {
       overflowX: "auto",
@@ -33,8 +40,10 @@ const styles = sxStyles({
 })
 
 export const OverviewSearch = () => {
+   const isMobile = useIsMobile()
+
    return (
-      <Stack sx={styles.root} spacing={2}>
+      <Stack sx={[styles.root, isMobile && styles.stickyRoot]} spacing={2}>
          <Box sx={styles.searchByTerm}>
             <SearchByTerm />
          </Box>
