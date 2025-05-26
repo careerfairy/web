@@ -72,12 +72,15 @@ const styles = sxStyles({
       p: "12px",
       background: (theme) => theme.brand.white[100],
       "&:hover": {
-         background: (theme) => theme.brand.white[300],
+         background: (theme) => theme.brand.black[100],
       },
       cursor: "pointer",
    },
    chipContentItemChecked: {
       background: (theme) => theme.brand.white[300],
+      "&:hover": {
+         background: (theme) => theme.brand.white[400],
+      },
    },
    chipContentItemLabel: {
       fontSize: {
@@ -137,6 +140,7 @@ type ChipDropdownProps = {
     * @default false
     */
    forceLabel?: boolean
+   closeOnApply?: boolean
 }
 
 export const ChipDropdown = ({
@@ -150,6 +154,7 @@ export const ChipDropdown = ({
    forceLabel = false,
    onClose,
    onApply,
+   closeOnApply = true,
 }: ChipDropdownProps) => {
    const [isOpen, setIsOpen] = useState(false)
    const [isDirty, setIsDirty] = useState(false)
@@ -370,10 +375,10 @@ export const ChipDropdown = ({
       [selectedMap]
    )
 
-   const handleClose = () => {
+   const handleClose = useCallback(() => {
       setIsOpen(false)
       onClose?.()
-   }
+   }, [onClose])
 
    const handleToggle = () => {
       if (isOpen) {
@@ -393,7 +398,10 @@ export const ChipDropdown = ({
       handleValueChange(newSelectedValues)
       setIsDirty(false)
       onApply?.()
-   }, [selectedMap, handleValueChange, onApply])
+      if (closeOnApply) {
+         handleClose()
+      }
+   }, [selectedMap, handleValueChange, onApply, closeOnApply, handleClose])
 
    const handleReset = useCallback(() => {
       setSelectedMap({})
@@ -489,7 +497,13 @@ export const ChipDropdown = ({
                      isChecked={isChecked}
                   />
                   {showApply ? (
-                     <Stack spacing={1} p={"16px"}>
+                     <Stack
+                        spacing={1}
+                        p={"16px"}
+                        borderTop={(theme) =>
+                           `1px solid ${theme.brand.white[500]}`
+                        }
+                     >
                         <Button
                            variant="contained"
                            color={"primary"}

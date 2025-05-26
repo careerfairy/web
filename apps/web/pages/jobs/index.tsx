@@ -61,7 +61,7 @@ const JobsPage: NextPage<
             description={"Find your dream job with CareerFairy."}
             title={seoTitle}
          />
-         <GenericDashboardLayout userCountryCode={userCountryCode}>
+         <GenericDashboardLayout userCountryCode={userCountryCode} headerFixed>
             <JobsOverviewContextProvider
                serverCustomJobs={serverCustomJobs}
                serverJob={serverJob}
