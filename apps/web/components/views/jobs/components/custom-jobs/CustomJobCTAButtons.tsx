@@ -585,6 +585,8 @@ const CustomJobApplyButton = ({
 }
 
 const getJobUrl = (job: PublicCustomJob) => {
+   if (job.disableUrlTracking) return job.postingUrl
+
    return addUtmTagsToLink({
       link: job.postingUrl,
       campaign: UTM_CAMPAIGN,
