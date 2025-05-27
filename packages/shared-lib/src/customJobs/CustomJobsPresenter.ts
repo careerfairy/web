@@ -24,7 +24,8 @@ export class CustomJobsPresenter extends BaseModel {
       public readonly salary?: string,
       public readonly deleted?: boolean,
       public readonly businessFunctionsTagIds?: string[],
-      public readonly isPermanentlyExpired?: boolean
+      public readonly isPermanentlyExpired?: boolean,
+      public readonly disableUrlTracking?: boolean
    ) {
       super()
    }
@@ -46,7 +47,8 @@ export class CustomJobsPresenter extends BaseModel {
          customJob.salary,
          customJob.deleted,
          customJob.businessFunctionsTagIds,
-         customJob.isPermanentlyExpired
+         customJob.isPermanentlyExpired,
+         customJob.disableUrlTracking
       )
    }
    static parseDocument(
@@ -75,7 +77,8 @@ export class CustomJobsPresenter extends BaseModel {
          doc.salary,
          doc.deleted,
          doc.businessFunctionsTagIds,
-         doc.isPermanentlyExpired
+         doc.isPermanentlyExpired,
+         doc.disableUrlTracking
       )
    }
    static serializeDocument(doc: CustomJob) {
@@ -104,6 +107,7 @@ export class CustomJobsPresenter extends BaseModel {
          businessFunctionsTagIds: this.businessFunctionsTagIds,
          isPermanentlyExpired: this.isPermanentlyExpired,
          group: null,
+         disableUrlTracking: this.disableUrlTracking,
       }
    }
 }

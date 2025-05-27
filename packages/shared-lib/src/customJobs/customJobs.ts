@@ -38,7 +38,7 @@ export interface CustomJob extends Identifiable {
 
    // for jobs that have expired more than 30 days ago
    isPermanentlyExpired: boolean
-   disableUrlTracking: boolean
+   disableUrlTracking?: boolean
 
    group: Group
 }
