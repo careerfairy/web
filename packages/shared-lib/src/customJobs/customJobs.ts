@@ -38,6 +38,7 @@ export interface CustomJob extends Identifiable {
 
    // for jobs that have expired more than 30 days ago
    isPermanentlyExpired: boolean
+   disableUrlTracking?: boolean
 
    group: Group
 }
@@ -60,6 +61,7 @@ export type PublicCustomJob = Pick<
    | "group"
    | "workplace"
    | "jobLocation"
+   | "disableUrlTracking"
 >
 
 export type PublicCustomJobApplicant = Pick<
@@ -128,6 +130,7 @@ export const pickPublicDataFromCustomJob = (
       group: job.group ?? null,
       workplace: job.workplace ?? null,
       jobLocation: job.jobLocation ?? [],
+      disableUrlTracking: job.disableUrlTracking ?? false,
    }
 }
 
