@@ -4,6 +4,7 @@ import CookiesUtil from "./CookiesUtil"
 
 // Only import types, will not be part of the bundle, real package is loaded by GTM
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { toUnixTimestamp } from "@careerfairy/shared-lib/customerio/util"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { TRACK_EVENT } from "@careerfairy/shared-lib/messaging"
@@ -86,6 +87,7 @@ export const dataLayerLivestreamEvent = (
             livestreamId: livestream?.id, // GTM Variable
             livestreamTitle: livestream?.title, // GTM Variable
             companyName: livestream?.company, // GTM Variable
+            livestreamStartDate: toUnixTimestamp(livestream.start),
          },
          optionalVariables
       )
