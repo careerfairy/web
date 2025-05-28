@@ -286,6 +286,16 @@ function findMatchingCreator(
             return creator
          }
       }
+
+      // Try backfilled email match
+      const backfilledEmail = generateBackfilledEmail(speaker, groupId)
+      const backfilledEmailKey = createEmailKey(backfilledEmail, groupId)
+      const creatorByBackfilledEmail =
+         creatorsByEmailAndGroup.get(backfilledEmailKey)
+      if (creatorByBackfilledEmail) {
+         counter.addToCustomCount("speakersMatchedByBackfilledEmail", 1)
+         return creatorByBackfilledEmail
+      }
    }
 
    return null
@@ -336,6 +346,17 @@ async function handleNewCreator(
       updateCreatorCache(newCreator, creatorsByEmailAndGroup)
 
       console.log("🚀 ~ newCreator:", JSON.stringify(newCreator, null, 2))
+      // Log why we're creating a new creator
+      Counter.log(
+         `Creating new creator for speaker ${speaker.firstName || ""} ${
+            speaker.lastName || ""
+         } (${speaker.email || "no email"}) in livestream ${
+            livestream._ref.id
+         }.` +
+            ` No matching creator found by email or name in groups: ${
+               livestream.groupIds?.join(", ") || "none"
+            }`
+      )
       counter.addToCustomCount("newCreatorsCreated", 1)
 
       const updatedSpeaker = createSpeakerWithoutEmail(speaker, newCreator.id)
@@ -381,7 +402,7 @@ function updateCreatorCache(
       )
    }
 
-   if (creator.firstName && creator.lastName) {
+   if (creator.firstName || creator.lastName) {
       creatorsByEmailAndGroup.set(
          createNameKey(creator.firstName, creator.lastName, creator.groupId),
          creator
@@ -478,8 +499,8 @@ const selectPrimaryGroupId = (
 
 // Helper functions
 function createNameKey(
-   firstName: string,
-   lastName: string,
+   firstName = "unknown",
+   lastName = "speaker",
    groupId: string
 ): string {
    return `${firstName.trim().toLowerCase()}:${lastName
