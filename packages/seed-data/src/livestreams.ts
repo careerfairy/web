@@ -246,11 +246,11 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
 
       const data = this.random({
          author: {
-            email: faker.internet.email(),
+            authUid: faker.datatype.uuid(),
             groupId: groupId,
          },
          lastUpdatedAuthorInfo: {
-            email: faker.internet.email(),
+            authUid: faker.datatype.uuid(),
             groupId: groupId,
          },
          groupIds: [groupId],
@@ -471,7 +471,6 @@ const generateSpeaker = (): Speaker => ({
    firstName: faker.name.firstName(),
    lastName: faker.name.lastName(),
    position: faker.name.jobTitle(),
-   email: faker.internet.email(),
    roles: [CreatorRoles.Speaker],
 })
 

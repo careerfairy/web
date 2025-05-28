@@ -266,8 +266,8 @@ export type LivestreamLanguage = {
 }
 
 export type AuthorInfo = {
-   email: string
    groupId?: string
+   authUid?: string
 }
 
 export interface LivestreamStatus {
