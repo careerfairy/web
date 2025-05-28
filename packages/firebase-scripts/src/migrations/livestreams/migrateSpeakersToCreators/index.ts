@@ -34,13 +34,11 @@ const counter = new Counter()
 
 // Reset counters
 counter.setCustomCount("newCreatorsCreated", 0)
-counter.setCustomCount("newCreatorsWouldBeCreated", 0)
 counter.setCustomCount("speakersMatchedByEmail", 0)
 counter.setCustomCount("speakersMatchedByName", 0)
 counter.setCustomCount("speakersMatchedByBackfilledEmail", 0)
 counter.setCustomCount("speakersAlreadyLinkedCorrectly", 0)
 counter.setCustomCount("speakersLinkedToExistingCreators", 0)
-counter.setCustomCount("livestreamsWouldBeUpdated", 0)
 counter.setCustomCount("livestreamsUpdated", 0)
 
 const progressBar = new cliProgress.SingleBar(
