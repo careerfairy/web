@@ -400,7 +400,7 @@ function updateCreatorCache(
       )
    }
 
-   if (creator.firstName || creator.lastName) {
+   if (creator.firstName && creator.lastName) {
       creatorsByEmailAndGroup.set(
          createNameKey(creator.firstName, creator.lastName, creator.groupId),
          creator
