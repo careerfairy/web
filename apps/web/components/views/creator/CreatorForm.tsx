@@ -24,7 +24,7 @@ const styles = sxStyles({
 
 type FormProviderProps = {
    creator?: Creator
-   isAdhocSpeaker?: boolean
+   hideEmailField?: boolean
    children:
       | ((methods: UseFormReturn<CreateCreatorSchemaType>) => ReactNode)
       | ReactNode
@@ -32,11 +32,11 @@ type FormProviderProps = {
 
 // Create a context to pass the isAdhocSpeaker value down
 type CreatorFormContextType = {
-   isAdhocSpeaker: boolean
+   hideEmailField: boolean
 }
 
 const CreatorFormContext = React.createContext<CreatorFormContextType>({
-   isAdhocSpeaker: false,
+   hideEmailField: false,
 })
 
 export const useCreatorForm = () => React.useContext(CreatorFormContext)
@@ -44,18 +44,18 @@ export const useCreatorForm = () => React.useContext(CreatorFormContext)
 export const CreatorFormProvider = ({
    children,
    creator,
-   isAdhocSpeaker = false,
+   hideEmailField = false,
 }: FormProviderProps) => {
    // For adhoc speakers, we modify the schema to make email optional
    const modifiedSchema = useMemo(() => {
-      if (isAdhocSpeaker) {
+      if (hideEmailField) {
          // Create a modified schema with email field optional
          return CreateCreatorSchema.clone().shape({
             email: yup.string().notRequired(),
          })
       }
       return CreateCreatorSchema
-   }, [isAdhocSpeaker])
+   }, [hideEmailField])
 
    const methods = useYupForm({
       schema: modifiedSchema,
@@ -66,9 +66,9 @@ export const CreatorFormProvider = ({
 
    const contextValue = useMemo(
       () => ({
-         isAdhocSpeaker,
+         hideEmailField,
       }),
-      [isAdhocSpeaker]
+      [hideEmailField]
    )
 
    return (
@@ -84,7 +84,7 @@ export const CreatorFormFields = () => {
    const {
       formState: { defaultValues },
    } = useFormContext<CreateCreatorSchemaType>()
-   const { isAdhocSpeaker } = useCreatorForm()
+   const { hideEmailField } = useCreatorForm()
 
    const isEditing = Boolean(defaultValues.id)
 
@@ -138,8 +138,7 @@ export const CreatorFormFields = () => {
                tooltipText="Add your LinkedIn profile to connect with more qualified candidates."
             />
          </Grid>
-         {/* Only show email field if not an adhoc speaker */}
-         {isAdhocSpeaker ? null : (
+         {hideEmailField ? null : (
             <Grid item xs={12}>
                <ControlledBrandedTextField
                   name="email"

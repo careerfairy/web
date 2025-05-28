@@ -27,7 +27,7 @@ const styles = sxStyles({
 
 export const CreateSpeakerView = () => {
    return (
-      <CreatorFormProvider isAdhocSpeaker={true}>
+      <CreatorFormProvider hideEmailField>
          <View component="form">
             <View.Content>
                <View.Title>

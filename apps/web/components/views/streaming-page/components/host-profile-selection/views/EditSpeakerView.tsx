@@ -4,8 +4,8 @@ import {
 } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
 import { LoadingButton } from "@mui/lab"
-import { Backdrop, Box, Button } from "@mui/material"
-import { useCreator } from "components/custom-hook/live-stream/useCreator"
+import { Box, Button, CircularProgress } from "@mui/material"
+import { useCreator } from "components/custom-hook/creator/useCreator"
 import { useSpeakerFormSubmit } from "components/custom-hook/live-stream/useSpeakerFormSubmit"
 import {
    CreatorFormFields,
@@ -36,7 +36,6 @@ export const EditSpeakerView = () => {
       selectedSpeaker?.groupId,
       selectedSpeaker?.id
    )
-   console.log("🚀 ~ EditSpeakerView ~ creator:", creator)
 
    const isRelatedToCreator = !!creator
 
@@ -47,40 +46,42 @@ export const EditSpeakerView = () => {
       ? mapSpeakerToCreator(selectedSpeaker)
       : undefined
 
+   if (isLoading) {
+      return <CircularProgress />
+   }
+
    return (
-      <Backdrop open={isLoading}>
-         <CreatorFormProvider
-            creator={creatorData}
-            isAdhocSpeaker={!isRelatedToCreator}
-         >
-            <View component="form">
-               <View.Content>
-                  <View.Title>
-                     Edit{" "}
-                     <Box component="span" color="primary.main">
-                        Speaker
-                     </Box>
-                  </View.Title>
-                  <View.Subtitle>
-                     Check and change your speaker details
-                  </View.Subtitle>
-               </View.Content>
-               <Box sx={styles.formFields}>
-                  <CreatorFormFields />
-               </Box>
-               <View.Actions>
-                  <Button
-                     color="grey"
-                     variant="outlined"
-                     onClick={goBackToSelectSpeaker}
-                  >
-                     Back
-                  </Button>
-                  <SaveChangesButton />
-               </View.Actions>
-            </View>
-         </CreatorFormProvider>
-      </Backdrop>
+      <CreatorFormProvider
+         creator={creatorData}
+         hideEmailField={!isRelatedToCreator}
+      >
+         <View component="form">
+            <View.Content>
+               <View.Title>
+                  Edit{" "}
+                  <Box component="span" color="primary.main">
+                     Speaker
+                  </Box>
+               </View.Title>
+               <View.Subtitle>
+                  Check and change your speaker details
+               </View.Subtitle>
+            </View.Content>
+            <Box sx={styles.formFields}>
+               <CreatorFormFields />
+            </Box>
+            <View.Actions>
+               <Button
+                  color="grey"
+                  variant="outlined"
+                  onClick={goBackToSelectSpeaker}
+               >
+                  Back
+               </Button>
+               <SaveChangesButton />
+            </View.Actions>
+         </View>
+      </CreatorFormProvider>
    )
 }
 

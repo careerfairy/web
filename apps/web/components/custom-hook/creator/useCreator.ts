@@ -1,42 +1,41 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import { collection, getDocs, limit, query, where } from "firebase/firestore"
+import { doc, getDoc } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 /**
  * Custom hook to fetch creator data for a given speaker ID
- * @param speakerId - The ID of the speaker to fetch creator data for
- * @param careerCenterId - Optional career center ID to specify which collection to query
+ * @param groupId - The ID of the group/career center to fetch creator data from
+ * @param creatorId - The ID of the creator to fetch data for
  * @returns SWR response containing creator data and loading state
  */
-export const useCreator = (groupId: string, speakerId: string) => {
+export const useCreator = (groupId: string, creatorId: string) => {
    const firestore = useFirestore()
-   const fetcherKey = speakerId ? `creator-${groupId}-${speakerId}` : null
+   const fetcherKey = creatorId ? `creator-${groupId}-${creatorId}` : null
 
    const fetcher = async () => {
       try {
-         if (!speakerId) return null
+         if (!creatorId) return null
 
-         const creatorsQuery = query(
-            collection(firestore, `careerCenterData/${groupId}/creators`),
-            where("id", "==", speakerId),
-            limit(1)
+         const creatorDoc = doc(
+            firestore,
+            `careerCenterData/${groupId}/creators/${creatorId}`
          ).withConverter(createGenericConverter<Creator>())
 
-         const querySnapshot = await getDocs(creatorsQuery)
+         const querySnapshot = await getDoc(creatorDoc)
 
-         if (querySnapshot.empty) {
+         if (!querySnapshot.exists()) {
             return null
          }
 
          // Return the actual creator data
-         return querySnapshot.docs[0].data()
+         return querySnapshot.data()
       } catch (error) {
          errorLogAndNotify(error, {
             message: "Error fetching creator data",
-            speakerId,
+            creatorId,
          })
          return null
       }
