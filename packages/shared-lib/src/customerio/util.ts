@@ -7,7 +7,7 @@ import { CustomerIOUserData } from "./types"
  * Uses Math.floor() as CustomerIO requires integer timestamps and does not accept decimal values.
  * @param timestamp Firebase timestamp
  */
-function toUnixTimestamp(timestamp: Timestamp): number | undefined {
+export function toUnixTimestamp(timestamp: Timestamp): number | undefined {
    if (!timestamp) return undefined
    return Math.floor(timestamp.toDate().getTime() / 1000)
 }
