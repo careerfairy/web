@@ -26,8 +26,8 @@ import { WithRef } from "../../../util/types"
 const RUNNING_VERSION = "1.1"
 const DRY_RUN = false // MODIFY THIS TO TOGGLE DRY RUN
 const BACKFILLED_EMAIL = "speaker@careerfairy.io"
-const LIVESTREAMS_PER_CHUNK = 100 // How many livestreams to process in one chunk
-const MAX_BATCH_OPERATIONS = 500 // Firestore's limit of operations per batch
+const LIVESTREAMS_PER_CHUNK = 300 // How many livestreams to process in one chunk
+const MAX_BATCH_OPERATIONS = 450 // Firestore's limit of operations per batch
 
 // Global state
 const counter = new Counter()
@@ -126,7 +126,6 @@ async function commitBatch(): Promise<void> {
    await currentBatch.commit()
    counter.addToWriteCount(batchOperationCount)
    counter.addToCustomCount("batchesCommitted", 1)
-   Counter.log(`Committed batch with ${batchOperationCount} operations`)
 
    // Reset batch
    currentBatch = firestore.batch()
@@ -336,6 +335,7 @@ async function handleNewCreator(
       const newCreator = await createCreatorFromSpeaker(speaker, primaryGroupId)
       updateCreatorCache(newCreator, creatorsByEmailAndGroup)
 
+      console.log("🚀 ~ newCreator:", JSON.stringify(newCreator, null, 2))
       counter.addToCustomCount("newCreatorsCreated", 1)
 
       const updatedSpeaker = createSpeakerWithoutEmail(speaker, newCreator.id)
