@@ -19,6 +19,7 @@ export const LogoBackButton = () => {
          href={"/portal"}
          direction="row"
          alignItems="center"
+         target="_blank"
       >
          <IconButton sx={styles.backIcon}>
             <ArrowBackIcon fontSize="inherit" />
