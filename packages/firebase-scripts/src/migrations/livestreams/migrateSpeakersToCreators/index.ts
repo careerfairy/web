@@ -323,7 +323,7 @@ function handleExistingCreator(
 
    // Link to existing creator
    counter.addToCustomCount("speakersLinkedToExistingCreators", 1)
-   const updatedSpeaker = createSpeakerWithoutEmail(speaker, matchingCreator.id)
+   const updatedSpeaker = createUpdatedSpeakerObject(speaker, matchingCreator)
    return {
       speaker: updatedSpeaker,
       creatorId: matchingCreator.id,
@@ -344,10 +344,10 @@ async function handleNewCreator(
 
    if (DRY_RUN) {
       counter.addToCustomCount("newCreatorsWouldBeCreated", 1)
-      const dryRunSpeaker = createSpeakerWithoutEmail(
-         speaker,
-         "DRY_RUN_NEW_CREATOR_ID"
-      )
+      const dryRunSpeaker = createUpdatedSpeakerObject(speaker, {
+         id: "DRY_RUN_NEW_CREATOR_ID",
+         email: "DRY_RUN_NEW_CREATOR_EMAIL",
+      })
       return { speaker: dryRunSpeaker }
    }
 
@@ -357,7 +357,7 @@ async function handleNewCreator(
 
       counter.addToCustomCount("newCreatorsCreated", 1)
 
-      const updatedSpeaker = createSpeakerWithoutEmail(speaker, newCreator.id)
+      const updatedSpeaker = createUpdatedSpeakerObject(speaker, newCreator)
       return {
          speaker: updatedSpeaker,
          creatorId: newCreator.id,
@@ -370,10 +370,10 @@ async function handleNewCreator(
    }
 }
 
-function createSpeakerWithoutEmail(
+function createUpdatedSpeakerObject(
    speaker: Speaker,
-   creatorId: string
-): Omit<Speaker, "email"> & { id: string } {
+   creator: Pick<Creator, "email" | "id">
+): Speaker {
    return {
       avatar: speaker.avatar || "",
       background: speaker.background || "",
@@ -384,7 +384,8 @@ function createSpeakerWithoutEmail(
       linkedInUrl: speaker.linkedInUrl || "",
       roles: speaker.roles || [],
       groupId: speaker.groupId,
-      id: creatorId,
+      email: creator.email,
+      id: creator.id,
    }
 }
 
@@ -419,8 +420,7 @@ async function updateLivestream(
    }
 
    const updateData: Partial<LivestreamEvent> = {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      speakers: updatedSpeakers.map(({ email, ...rest }) => rest),
+      speakers: updatedSpeakers,
       creatorsIds: Array.from(updatedCreatorIds),
    }
 
