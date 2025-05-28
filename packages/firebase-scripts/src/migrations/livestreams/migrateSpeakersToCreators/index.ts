@@ -7,17 +7,14 @@ import {
    Speaker,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import * as cliProgress from "cli-progress"
-import {
-   DocumentReference,
-   FieldValue,
-   WriteBatch,
-} from "firebase-admin/firestore"
+import { DocumentReference, FieldValue } from "firebase-admin/firestore"
 
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
+import { UltraBatch } from "../../../util/batchUtils"
 import { logAction } from "../../../util/logger"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 import { WithRef } from "../../../util/types"
@@ -27,7 +24,6 @@ const RUNNING_VERSION = "1.1"
 const DRY_RUN = false // MODIFY THIS TO TOGGLE DRY RUN
 const BACKFILLED_EMAIL_DOMAIN = "careerfairy.io" // Changed from constant to domain only
 const LIVESTREAMS_PER_CHUNK = 300 // How many livestreams to process in one chunk
-const MAX_BATCH_OPERATIONS = 450 // Firestore's limit of operations per batch
 
 // Global state
 const counter = new Counter()
@@ -54,15 +50,14 @@ let allLivestreams: WithRef<LivestreamEvent>[]
 let allCreators: Creator[]
 let allDraftLivestreams: WithRef<LivestreamEvent>[]
 let allGroupsDict: Record<string, Group>
-let currentBatch: WriteBatch
-let batchOperationCount = 0
+let batchManager: UltraBatch
 
 export async function run() {
    try {
       logMigrationStart()
 
-      // Initialize batch
-      currentBatch = firestore.batch()
+      // Initialize UltraBatch
+      batchManager = new UltraBatch(firestore, counter, DRY_RUN)
 
       // Fetch all data
       ;[allLivestreams, allDraftLivestreams, allGroupsDict, allCreators] =
@@ -101,45 +96,13 @@ export async function run() {
       )
 
       // Commit any remaining batch operations
-      if (batchOperationCount > 0 && !DRY_RUN) {
-         await commitBatch()
-         Counter.log(
-            `Final batch committed with ${batchOperationCount} operations`
-         )
-      }
+      await batchManager.commit()
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
    } finally {
       counter.print()
    }
-}
-
-// Helper function to manage batch operations
-async function addToBatch(operation: () => void): Promise<void> {
-   if (DRY_RUN) return
-
-   // Check if we need to commit current batch first
-   if (batchOperationCount >= MAX_BATCH_OPERATIONS) {
-      await commitBatch()
-   }
-
-   // Add operation to batch
-   operation()
-   batchOperationCount++
-}
-
-// Helper function to commit the current batch and start a new one
-async function commitBatch(): Promise<void> {
-   if (batchOperationCount === 0) return
-
-   await currentBatch.commit()
-   counter.addToWriteCount(batchOperationCount)
-   counter.addToCustomCount("batchesCommitted", 1)
-
-   // Reset batch
-   currentBatch = firestore.batch()
-   batchOperationCount = 0
 }
 
 function logMigrationStart() {
@@ -203,11 +166,6 @@ async function processLivestreamsInBatches(
       for (const livestream of livestreamsChunk) {
          await processLivestreamSpeakers(livestream, creatorsByEmailAndGroup)
          progressBar.increment()
-      }
-
-      // Commit batch after processing each chunk to avoid memory issues
-      if (batchOperationCount > 0 && !DRY_RUN) {
-         await commitBatch()
       }
    }
 
@@ -424,11 +382,8 @@ async function updateLivestream(
       creatorsIds: Array.from(updatedCreatorIds),
    }
 
-   await addToBatch(() => {
-      currentBatch.update(
-         livestream._ref as unknown as DocumentReference,
-         updateData
-      )
+   await batchManager.add((batch) => {
+      batch.update(livestream._ref as unknown as DocumentReference, updateData)
    })
 
    counter.addToCustomCount("livestreamsUpdated", 1)
@@ -468,8 +423,8 @@ async function createCreatorFromSpeaker(
       updatedAt: timestamp as any,
    }
 
-   await addToBatch(() => {
-      currentBatch.set(creatorRef, newCreator)
+   await batchManager.add((batch) => {
+      batch.set(creatorRef, newCreator)
    })
 
    return newCreator
