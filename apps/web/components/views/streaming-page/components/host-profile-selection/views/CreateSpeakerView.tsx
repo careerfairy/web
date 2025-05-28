@@ -27,7 +27,7 @@ const styles = sxStyles({
 
 export const CreateSpeakerView = () => {
    return (
-      <CreatorFormProvider>
+      <CreatorFormProvider isAdhocSpeaker={true}>
          <View component="form">
             <View.Content>
                <View.Title>
@@ -65,7 +65,9 @@ const Actions = () => {
    } = useFormContext<CreateCreatorSchemaType>()
 
    const handleJoin = async (values: CreateCreatorSchemaType) => {
+      console.log("🚀 ~ handleJoin ~ values:", values)
       const newSpeaker = await handleSubmitSpeakerForm(values)
+      console.log("🚀 ~ handleJoin ~ newSpeaker:", newSpeaker)
       joinLiveStreamWithSpeaker(newSpeaker.id)
    }
 

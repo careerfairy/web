@@ -4,7 +4,8 @@ import {
 } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
 import { LoadingButton } from "@mui/lab"
-import { Box, Button } from "@mui/material"
+import { Backdrop, Box, Button } from "@mui/material"
+import { useCreator } from "components/custom-hook/live-stream/useCreator"
 import { useSpeakerFormSubmit } from "components/custom-hook/live-stream/useSpeakerFormSubmit"
 import {
    CreatorFormFields,
@@ -31,40 +32,55 @@ const styles = sxStyles({
 
 export const EditSpeakerView = () => {
    const { goBackToSelectSpeaker, selectedSpeaker } = useHostProfileSelection()
+   const { data: creator, isLoading } = useCreator(
+      selectedSpeaker?.groupId,
+      selectedSpeaker?.id
+   )
+   console.log("🚀 ~ EditSpeakerView ~ creator:", creator)
+
+   const isRelatedToCreator = !!creator
+
+   // If we found a creator, use that data, otherwise use the speaker data
+   const creatorData = isRelatedToCreator
+      ? creator
+      : selectedSpeaker
+      ? mapSpeakerToCreator(selectedSpeaker)
+      : undefined
 
    return (
-      <CreatorFormProvider
-         creator={
-            selectedSpeaker ? mapSpeakerToCreator(selectedSpeaker) : undefined
-         }
-      >
-         <View component="form">
-            <View.Content>
-               <View.Title>
-                  Edit{" "}
-                  <Box component="span" color="primary.main">
-                     Speaker
-                  </Box>
-               </View.Title>
-               <View.Subtitle>
-                  Check and change your speaker details
-               </View.Subtitle>
-            </View.Content>
-            <Box sx={styles.formFields}>
-               <CreatorFormFields />
-            </Box>
-            <View.Actions>
-               <Button
-                  color="grey"
-                  variant="outlined"
-                  onClick={goBackToSelectSpeaker}
-               >
-                  Back
-               </Button>
-               <SaveChangesButton />
-            </View.Actions>
-         </View>
-      </CreatorFormProvider>
+      <Backdrop open={isLoading}>
+         <CreatorFormProvider
+            creator={creatorData}
+            isAdhocSpeaker={!isRelatedToCreator}
+         >
+            <View component="form">
+               <View.Content>
+                  <View.Title>
+                     Edit{" "}
+                     <Box component="span" color="primary.main">
+                        Speaker
+                     </Box>
+                  </View.Title>
+                  <View.Subtitle>
+                     Check and change your speaker details
+                  </View.Subtitle>
+               </View.Content>
+               <Box sx={styles.formFields}>
+                  <CreatorFormFields />
+               </Box>
+               <View.Actions>
+                  <Button
+                     color="grey"
+                     variant="outlined"
+                     onClick={goBackToSelectSpeaker}
+                  >
+                     Back
+                  </Button>
+                  <SaveChangesButton />
+               </View.Actions>
+            </View>
+         </CreatorFormProvider>
+      </Backdrop>
    )
 }
 
