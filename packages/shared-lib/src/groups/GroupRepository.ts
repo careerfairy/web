@@ -1,5 +1,6 @@
 import firebase from "firebase/compat/app"
 import { uniqBy } from "lodash"
+import { DateTime } from "luxon"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
    mapFirestoreDocuments,
@@ -1283,6 +1284,8 @@ export class FirebaseGroupRepository
             .where("test", "==", false)
             .where("hidden", "==", false)
             .where("denyRecordingAccess", "==", false)
+            // Too avoid showing too many potentially outdated mentors, we filter out old livestreams
+            .where("start", ">=", DateTime.now().minus({ years: 2 }).toJSDate())
             .get(),
       ])
 

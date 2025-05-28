@@ -31,6 +31,18 @@ const MAX_BATCH_OPERATIONS = 450 // Firestore's limit of operations per batch
 
 // Global state
 const counter = new Counter()
+
+// Reset counters
+counter.setCustomCount("newCreatorsCreated", 0)
+counter.setCustomCount("newCreatorsWouldBeCreated", 0)
+counter.setCustomCount("speakersMatchedByEmail", 0)
+counter.setCustomCount("speakersMatchedByName", 0)
+counter.setCustomCount("speakersMatchedByBackfilledEmail", 0)
+counter.setCustomCount("speakersAlreadyLinkedCorrectly", 0)
+counter.setCustomCount("speakersLinkedToExistingCreators", 0)
+counter.setCustomCount("livestreamsWouldBeUpdated", 0)
+counter.setCustomCount("livestreamsUpdated", 0)
+
 const progressBar = new cliProgress.SingleBar(
    {
       clearOnComplete: false,
@@ -345,18 +357,6 @@ async function handleNewCreator(
       const newCreator = await createCreatorFromSpeaker(speaker, primaryGroupId)
       updateCreatorCache(newCreator, creatorsByEmailAndGroup)
 
-      console.log("🚀 ~ newCreator:", JSON.stringify(newCreator, null, 2))
-      // Log why we're creating a new creator
-      Counter.log(
-         `Creating new creator for speaker ${speaker.firstName || ""} ${
-            speaker.lastName || ""
-         } (${speaker.email || "no email"}) in livestream ${
-            livestream._ref.id
-         }.` +
-            ` No matching creator found by email or name in groups: ${
-               livestream.groupIds?.join(", ") || "none"
-            }`
-      )
       counter.addToCustomCount("newCreatorsCreated", 1)
 
       const updatedSpeaker = createSpeakerWithoutEmail(speaker, newCreator.id)
