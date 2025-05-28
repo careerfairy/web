@@ -25,7 +25,7 @@ import { WithRef } from "../../../util/types"
 // Constants
 const RUNNING_VERSION = "1.1"
 const DRY_RUN = false // MODIFY THIS TO TOGGLE DRY RUN
-const BACKFILLED_EMAIL = "speaker@careerfairy.io"
+const BACKFILLED_EMAIL_DOMAIN = "careerfairy.io" // Changed from constant to domain only
 const LIVESTREAMS_PER_CHUNK = 300 // How many livestreams to process in one chunk
 const MAX_BATCH_OPERATIONS = 450 // Firestore's limit of operations per batch
 
@@ -161,7 +161,7 @@ function buildCreatorLookupMap(creators: Creator[]): Map<string, Creator> {
 
    creators.forEach((creator) => {
       // Add email-based key (excluding backfilled emails)
-      if (creator.email && !isBackfilledEmail(creator.email)) {
+      if (creator.email) {
          creatorsByEmailAndGroup.set(
             createEmailKey(creator.email, creator.groupId),
             creator
@@ -263,8 +263,8 @@ function findMatchingCreator(
    creatorsByEmailAndGroup: Map<string, Creator>
 ): Creator | null {
    for (const groupId of groupIds) {
-      // Try email match first (excluding backfilled emails)
-      if (speaker.email && !isBackfilledEmail(speaker.email)) {
+      // Try email match first
+      if (speaker.email) {
          const emailKey = createEmailKey(speaker.email, groupId)
          const creator = creatorsByEmailAndGroup.get(emailKey)
          if (creator) {
@@ -373,8 +373,8 @@ function updateCreatorCache(
    creator: Creator,
    creatorsByEmailAndGroup: Map<string, Creator>
 ) {
-   // Update cache for future lookups (excluding backfilled emails)
-   if (creator.email && !isBackfilledEmail(creator.email)) {
+   // Update cache for future lookups
+   if (creator.email) {
       creatorsByEmailAndGroup.set(
          createEmailKey(creator.email, creator.groupId),
          creator
@@ -425,7 +425,7 @@ async function createCreatorFromSpeaker(
       .collection("creators")
       .doc()
 
-   const email = speaker.email || BACKFILLED_EMAIL
+   const email = speaker.email || generateBackfilledEmail(speaker, groupId)
    if (!speaker.email) {
       counter.addToCustomCount("speakersWithBackfilledEmails", 1)
    }
@@ -484,13 +484,18 @@ function createNameKey(
 ): string {
    return `${firstName.trim().toLowerCase()}:${lastName
       .trim()
-      .toLowerCase()}:${groupId}`
+      .toLowerCase()}:${groupId}`.replace(/\s+/g, "-")
 }
 
 function createEmailKey(email: string, groupId: string): string {
    return `${email}:${groupId}`
 }
 
-function isBackfilledEmail(email: string): boolean {
-   return email === BACKFILLED_EMAIL
+// Add new function to generate unique backfilled emails
+function generateBackfilledEmail(speaker: Speaker, groupId: string): string {
+   const firstName = (speaker.firstName || "unknown").trim().toLowerCase()
+   const lastName = (speaker.lastName || "speaker").trim().toLowerCase()
+   const namePart = `${firstName}_${lastName}`.replace(/\s+/g, "-")
+
+   return `backfill+${namePart}_${groupId}@${BACKFILLED_EMAIL_DOMAIN}` // e.g. backfill+john_doe_groupId@careerfairy.io
 }
