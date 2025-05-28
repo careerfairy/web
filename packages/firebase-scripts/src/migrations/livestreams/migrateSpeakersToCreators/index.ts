@@ -9,6 +9,8 @@ import {
 import * as cliProgress from "cli-progress"
 import { FieldValue } from "firebase-admin/firestore"
 
+import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
@@ -16,16 +18,14 @@ import { logAction } from "../../../util/logger"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 import { WithRef } from "../../../util/types"
 
+// Constants
 const RUNNING_VERSION = "1.1"
-
-// --- CONFIGURATION ---
-// Set to true to run in dry-run mode (no actual writes to Firestore)
-// Set to false to run the full migration with writes
 const DRY_RUN = false // MODIFY THIS TO TOGGLE DRY RUN
-// --- END CONFIGURATION ---
+const BACKFILLED_EMAIL = "speaker@careerfairy.io"
+const BATCH_SIZE = 50
 
+// Global state
 const counter = new Counter()
-
 const progressBar = new cliProgress.SingleBar(
    {
       clearOnComplete: false,
@@ -35,142 +35,50 @@ const progressBar = new cliProgress.SingleBar(
    cliProgress.Presets.shades_grey
 )
 
-// Track inconsistent speakers for logging at the end
-interface InconsistentSpeaker {
-   livestreamId: string
-   speakerEmail: string
-   speakerId: string
-   matchingCreatorId: string
-   groupId: string
-}
-
-const inconsistentSpeakers: InconsistentSpeaker[] = []
+let allLivestreams: WithRef<LivestreamEvent>[]
+let allCreators: Creator[]
+let allDraftLivestreams: WithRef<LivestreamEvent>[]
+let allGroupsDict: Record<string, Group>
 
 export async function run() {
    try {
-      Counter.log(
-         `Starting migration: Deprecate speaker emails and backfill creators - v${RUNNING_VERSION} ${
-            DRY_RUN ? "(DRY RUN)" : ""
-         }`
-      )
+      logMigrationStart()
 
-      // Fetch all livestreams and creators
-      const [
-         allLivestreams,
-         // livestream,
-         allCreators,
-      ] = await logAction(
-         () =>
-            Promise.all([
-               // livestreamRepo.getById("QSOwuyePu24gjq6J3t0e"),
-               livestreamRepo.getAllLivestreams<true>(false, true),
-               groupRepo.getAllCreators(false),
-            ]),
-         "Fetching all livestreams and creators"
-      )
+      // Fetch all data
+      ;[allLivestreams, allDraftLivestreams, allGroupsDict, allCreators] =
+         await logAction(
+            () =>
+               Promise.all([
+                  livestreamRepo.getAllLivestreams<true>(false, true),
+                  livestreamRepo.getAllDraftLivestreams(true),
+                  groupRepo.getAllGroups(true).then(convertDocArrayToDict),
+                  groupRepo.getAllCreators(false),
+               ]),
+            "Fetching all livestreams, draft livestreams, creators, and groups"
+         )
 
-      // // @ts-ignore
-      // livestream._ref = firestore.collection("livestreams").doc(livestream.id)
-
-      // const allLivestreams: WithRef<LivestreamEvent>[] = [
-      //    livestream as WithRef<LivestreamEvent>,
-      // ]
-
-      Counter.log(
-         `Fetched ${allLivestreams.length} livestreams and ${allCreators.length} creators`
-      )
-
-      counter.addToReadCount(allLivestreams.length + allCreators.length)
-
-      // Create a map of creators by email and groupId for efficient lookup
-      const creatorsByEmailAndGroup = new Map<string, Creator>()
-      allCreators.forEach((creator) => {
-         // Create email-based key - only if not a backfilled email
-         if (creator.email && !isBackfilledEmail(creator.email)) {
-            creatorsByEmailAndGroup.set(
-               createEmailKey(creator.email, creator.groupId),
-               creator
-            )
-         }
-
-         // Create name-based key (lowercase for case-insensitive matching)
-         if (creator.firstName && creator.lastName) {
-            creatorsByEmailAndGroup.set(
-               createNameKey(
-                  creator.firstName,
-                  creator.lastName,
-                  creator.groupId
-               ),
-               creator
-            )
-         }
+      logDataFetched({
+         numLivestreams: allLivestreams.length,
+         numCreators: allCreators.length,
+         numDraftLivestreams: allDraftLivestreams.length,
+         numGroups: Object.keys(allGroupsDict).length,
       })
 
-      // Process livestreams in batches
-      await processLivestreams(allLivestreams, creatorsByEmailAndGroup)
-
-      // Process draft livestreams
-      const allDraftLivestreams = await logAction(
-         () => livestreamRepo.getAllDraftLivestreams(true),
-         "Fetching all draft livestreams"
+      counter.addToReadCount(
+         allLivestreams.length +
+            allCreators.length +
+            allDraftLivestreams.length +
+            Object.keys(allGroupsDict).length
       )
 
-      Counter.log(`Fetched ${allDraftLivestreams.length} draft livestreams`)
-      counter.addToReadCount(allDraftLivestreams.length)
+      // Build creator lookup maps
+      const creatorsByEmailAndGroup = buildCreatorLookupMap(allCreators)
 
-      await processDraftLivestreams(
-         allDraftLivestreams,
+      // Process all livestreams
+      await processLivestreamsInBatches(
+         [...allLivestreams, ...allDraftLivestreams],
          creatorsByEmailAndGroup
       )
-
-      // Log all inconsistent speakers at the end
-      if (inconsistentSpeakers.length > 0) {
-         Counter.log("\n=== INCONSISTENT SPEAKERS FOUND ===")
-         Counter.log(
-            `Found ${inconsistentSpeakers.length} speakers with email/ID mismatches:`
-         )
-
-         inconsistentSpeakers.forEach((speaker, index) => {
-            Counter.log(
-               `${index + 1}. Livestream: ${speaker.livestreamId} | Email: ${
-                  speaker.speakerEmail
-               } | Speaker ID: ${speaker.speakerId} | Matching Creator ID: ${
-                  speaker.matchingCreatorId
-               } | Group: ${speaker.groupId}`
-            )
-         })
-
-         Counter.log("=== END INCONSISTENT SPEAKERS ===\n")
-      } else {
-         Counter.log("✅ No inconsistent speakers found!")
-      }
-
-      // Log statistics about backfilled emails
-      const backfilledCount =
-         counter.getCustomCount("speakersWithBackfilledEmails") || 0
-      if (backfilledCount > 0) {
-         Counter.log(`\n=== BACKFILLED EMAILS STATISTICS ===`)
-         Counter.log(
-            `Created ${backfilledCount} backfilled emails for speakers without emails`
-         )
-         Counter.log(
-            `Format: backfilled.firstname.lastname.creatorId@speaker.careerfairy.io`
-         )
-         Counter.log(`=== END BACKFILLED EMAILS STATISTICS ===\n`)
-      }
-
-      // Log match statistics
-      const emailMatches = counter.getCustomCount("speakersMatchedByEmail") || 0
-      const nameMatches = counter.getCustomCount("speakersMatchedByName") || 0
-      const alreadyLinkedCorrectly =
-         counter.getCustomCount("speakersAlreadyLinkedCorrectly") || 0
-      Counter.log(`\n=== MATCHING STATISTICS ===`)
-      Counter.log(`Speakers matched by email: ${emailMatches}`)
-      Counter.log(`Speakers matched by name: ${nameMatches}`)
-      Counter.log(
-         `Speakers already correctly linked: ${alreadyLinkedCorrectly}`
-      )
-      Counter.log(`=== END MATCHING STATISTICS ===\n`)
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
@@ -179,17 +87,63 @@ export async function run() {
    }
 }
 
-async function processLivestreams(
+function logMigrationStart() {
+   Counter.log(
+      `Starting migration: Deprecate speaker emails and backfill creators - v${RUNNING_VERSION} ${
+         DRY_RUN ? "(DRY RUN)" : ""
+      }`
+   )
+}
+
+function logDataFetched({
+   numLivestreams,
+   numCreators,
+   numDraftLivestreams,
+   numGroups,
+}: {
+   numLivestreams: number
+   numCreators: number
+   numDraftLivestreams: number
+   numGroups: number
+}) {
+   Counter.log(
+      `Fetched ${numLivestreams} livestreams, ${numCreators} creators, ${numDraftLivestreams} draft livestreams, and ${numGroups} groups`
+   )
+}
+
+function buildCreatorLookupMap(creators: Creator[]): Map<string, Creator> {
+   const creatorsByEmailAndGroup = new Map<string, Creator>()
+
+   creators.forEach((creator) => {
+      // Add email-based key (excluding backfilled emails)
+      if (creator.email && !isBackfilledEmail(creator.email)) {
+         creatorsByEmailAndGroup.set(
+            createEmailKey(creator.email, creator.groupId),
+            creator
+         )
+      }
+
+      // Add name-based key for case-insensitive matching
+      if (creator.firstName && creator.lastName) {
+         creatorsByEmailAndGroup.set(
+            createNameKey(creator.firstName, creator.lastName, creator.groupId),
+            creator
+         )
+      }
+   })
+
+   return creatorsByEmailAndGroup
+}
+
+async function processLivestreamsInBatches(
    livestreams: WithRef<LivestreamEvent>[],
    creatorsByEmailAndGroup: Map<string, Creator>
 ) {
-   const batchSize = 50 // Smaller batch size due to potential creator creation
    const totalNumDocs = livestreams.length
-
    progressBar.start(totalNumDocs, 0)
 
-   for (let i = 0; i < totalNumDocs; i += batchSize) {
-      const livestreamsChunk = livestreams.slice(i, i + batchSize)
+   for (let i = 0; i < totalNumDocs; i += BATCH_SIZE) {
+      const livestreamsChunk = livestreams.slice(i, i + BATCH_SIZE)
 
       for (const livestream of livestreamsChunk) {
          await processLivestreamSpeakers(livestream, creatorsByEmailAndGroup)
@@ -201,210 +155,211 @@ async function processLivestreams(
    Counter.log("All livestreams processed! :)")
 }
 
-async function processDraftLivestreams(
-   draftLivestreams: WithRef<LivestreamEvent>[],
-   creatorsByEmailAndGroup: Map<string, Creator>
-) {
-   const batchSize = 50
-   const totalNumDocs = draftLivestreams.length
-
-   progressBar.start(totalNumDocs, 0)
-
-   for (let i = 0; i < totalNumDocs; i += batchSize) {
-      const livestreamsChunk = draftLivestreams.slice(i, i + batchSize)
-
-      for (const livestream of livestreamsChunk) {
-         await processLivestreamSpeakers(livestream, creatorsByEmailAndGroup)
-         progressBar.increment()
-      }
-   }
-
-   progressBar.stop()
-   Counter.log("All draft livestreams processed! :)")
-}
-
 async function processLivestreamSpeakers(
    livestream: WithRef<LivestreamEvent>,
    creatorsByEmailAndGroup: Map<string, Creator>
 ) {
-   if (!livestream.speakers || livestream.speakers.length === 0) {
-      return
-   }
+   if (!livestream.speakers?.length) return
 
    const updatedSpeakers: Speaker[] = []
    const updatedCreatorIds = new Set(livestream.creatorsIds || [])
-   let hasChanges = false
 
    for (const speaker of livestream.speakers) {
-      // Try to find matching creator in any of the livestream's groups
-      let matchingCreator: Creator | null = null
+      const result = await processSingleSpeaker(
+         speaker,
+         livestream,
+         creatorsByEmailAndGroup
+      )
 
-      for (const groupId of livestream.groupIds || []) {
-         // Try matching by email first (if it's not a backfilled email)
-         if (speaker.email && !isBackfilledEmail(speaker.email)) {
-            const emailKey = createEmailKey(speaker.email, groupId)
-            if (creatorsByEmailAndGroup.has(emailKey)) {
-               matchingCreator = creatorsByEmailAndGroup.get(emailKey)
-               counter.addToCustomCount("speakersMatchedByEmail", 1)
-               break
-            }
-         }
+      updatedSpeakers.push(result.speaker)
+      if (result.creatorId) {
+         updatedCreatorIds.add(result.creatorId)
+      }
+   }
 
-         // If no match by email, try matching by first and last name
-         if (!matchingCreator && speaker.firstName && speaker.lastName) {
-            const nameKey = createNameKey(
-               speaker.firstName,
-               speaker.lastName,
-               groupId
-            )
-            if (creatorsByEmailAndGroup.has(nameKey)) {
-               matchingCreator = creatorsByEmailAndGroup.get(nameKey)
-               counter.addToCustomCount("speakersMatchedByName", 1)
-               break
-            }
+   await updateLivestream(livestream, updatedSpeakers, updatedCreatorIds)
+}
+
+interface SpeakerProcessResult {
+   speaker: Speaker
+   creatorId?: string
+}
+
+async function processSingleSpeaker(
+   speaker: Speaker,
+   livestream: WithRef<LivestreamEvent>,
+   creatorsByEmailAndGroup: Map<string, Creator>
+): Promise<SpeakerProcessResult> {
+   const matchingCreator = findMatchingCreator(
+      speaker,
+      livestream.groupIds || [],
+      creatorsByEmailAndGroup
+   )
+
+   if (matchingCreator) {
+      return handleExistingCreator(speaker, matchingCreator)
+   } else {
+      return await handleNewCreator(
+         speaker,
+         livestream,
+         creatorsByEmailAndGroup
+      )
+   }
+}
+
+function findMatchingCreator(
+   speaker: Speaker,
+   groupIds: string[],
+   creatorsByEmailAndGroup: Map<string, Creator>
+): Creator | null {
+   for (const groupId of groupIds) {
+      // Try email match first (excluding backfilled emails)
+      if (speaker.email && !isBackfilledEmail(speaker.email)) {
+         const emailKey = createEmailKey(speaker.email, groupId)
+         const creator = creatorsByEmailAndGroup.get(emailKey)
+         if (creator) {
+            counter.addToCustomCount("speakersMatchedByEmail", 1)
+            return creator
          }
       }
 
-      if (matchingCreator) {
-         // Check if speaker already has a different ID than the matching creator
-         if (speaker.id && speaker.id !== matchingCreator.id) {
-            counter.addToCustomCount("speakersWithMismatchedIds", 1)
-
-            // Collect inconsistent speaker for end-of-script logging
-            inconsistentSpeakers.push({
-               livestreamId: livestream.id,
-               speakerEmail: speaker.email,
-               speakerId: speaker.id,
-               matchingCreatorId: matchingCreator.id,
-               groupId: matchingCreator.groupId,
-            })
-         }
-
-         // Skip updating if speaker already has the correct creator ID
-         if (speaker.id === matchingCreator.id) {
-            counter.addToCustomCount("speakersAlreadyLinkedCorrectly", 1)
-            updatedSpeakers.push(speaker)
-            updatedCreatorIds.add(matchingCreator.id)
-            continue
-         }
-
-         // Found existing creator - update speaker to reference it
-         const updatedSpeaker: Omit<Speaker, "email"> & { id: string } = {
-            avatar: speaker.avatar || "",
-            background: speaker.background || "",
-            firstName: speaker.firstName || "",
-            lastName: speaker.lastName || "",
-            position: speaker.position || "",
-            rank: speaker.rank || 0,
-            linkedInUrl: speaker.linkedInUrl || "",
-            roles: speaker.roles || [],
-            groupId: speaker.groupId,
-            id: matchingCreator.id,
-         }
-
-         updatedSpeakers.push(updatedSpeaker)
-         updatedCreatorIds.add(matchingCreator.id)
-         hasChanges = true
-
-         counter.addToCustomCount("speakersLinkedToExistingCreators", 1)
-      } else {
-         // No matching creator found - create new creator
-         const primaryGroupId = await selectPrimaryGroupId(livestream.groupIds)
-         if (!primaryGroupId) {
-            Counter.log(
-               `Warning: Livestream ${livestream.id} has no groupIds, skipping speaker ${speaker.firstName} ${speaker.lastName}`
-            )
-            updatedSpeakers.push(speaker)
-            continue
-         }
-         if (!DRY_RUN) {
-            try {
-               const newCreator = await createCreatorFromSpeaker(
-                  speaker,
-                  primaryGroupId
-               )
-
-               // Update the cache for future lookups - only for non-backfilled emails
-               if (newCreator.email && !isBackfilledEmail(newCreator.email)) {
-                  creatorsByEmailAndGroup.set(
-                     createEmailKey(newCreator.email, primaryGroupId),
-                     newCreator
-                  )
-               }
-
-               if (newCreator.firstName && newCreator.lastName) {
-                  creatorsByEmailAndGroup.set(
-                     createNameKey(
-                        newCreator.firstName,
-                        newCreator.lastName,
-                        primaryGroupId
-                     ),
-                     newCreator
-                  )
-               }
-
-               // Update speaker to reference new creator
-               const updatedSpeaker: Omit<Speaker, "email"> & { id: string } = {
-                  avatar: speaker.avatar || "",
-                  background: speaker.background || "",
-                  firstName: speaker.firstName || "",
-                  lastName: speaker.lastName || "",
-                  position: speaker.position || "",
-                  rank: speaker.rank || 0,
-                  linkedInUrl: speaker.linkedInUrl || "",
-                  roles: speaker.roles || [],
-                  groupId: speaker.groupId,
-                  id: newCreator.id,
-               }
-
-               updatedSpeakers.push(updatedSpeaker)
-               updatedCreatorIds.add(newCreator.id)
-               hasChanges = true
-
-               counter.addToCustomCount("newCreatorsCreated", 1)
-               counter.writeIncrement() // For creator creation
-            } catch (error) {
-               Counter.log(
-                  `Error creating creator for speaker ${speaker.email}: ${error.message}`
-               )
-               updatedSpeakers.push(speaker) // Keep original speaker if creator creation fails
-            }
-         } else {
-            // Dry run: just count what would be created
-            counter.addToCustomCount("newCreatorsWouldBeCreated", 1)
-            // In dry run, if we would create a creator, we still need to represent the speaker as "changed" for the update count
-            // but keep the original speaker data for the array as no actual change is made to the object structure itself.
-            const wouldBeUpdatedSpeaker: Speaker = {
-               avatar: speaker.avatar || "",
-               background: speaker.background || "",
-               firstName: speaker.firstName || "",
-               lastName: speaker.lastName || "",
-               position: speaker.position || "",
-               rank: speaker.rank || 0,
-               linkedInUrl: speaker.linkedInUrl || "",
-               roles: speaker.roles || [],
-               groupId: speaker.groupId,
-               id: "DRY_RUN_NEW_CREATOR_ID", // Placeholder ID for dry run
-            }
-            updatedSpeakers.push(wouldBeUpdatedSpeaker)
-            hasChanges = true // Mark as changed to count for "livestreamsWouldBeUpdated"
+      // Try name match
+      if (speaker.firstName && speaker.lastName) {
+         const nameKey = createNameKey(
+            speaker.firstName,
+            speaker.lastName,
+            groupId
+         )
+         const creator = creatorsByEmailAndGroup.get(nameKey)
+         if (creator) {
+            counter.addToCustomCount("speakersMatchedByName", 1)
+            return creator
          }
       }
    }
 
-   // Update livestream if there are changes
-   if (hasChanges && !DRY_RUN) {
-      const updateData: Partial<LivestreamEvent> = {
-         speakers: updatedSpeakers,
-         creatorsIds: [...new Set(Array.from(updatedCreatorIds))],
-      }
+   return null
+}
 
-      await livestream._ref.update(updateData)
+function handleExistingCreator(
+   speaker: Speaker,
+   matchingCreator: Creator
+): SpeakerProcessResult {
+   // Already correctly linked
+   if (speaker.id === matchingCreator.id) {
+      counter.addToCustomCount("speakersAlreadyLinkedCorrectly", 1)
+      return { speaker, creatorId: matchingCreator.id }
+   }
+
+   // Link to existing creator
+   counter.addToCustomCount("speakersLinkedToExistingCreators", 1)
+   const updatedSpeaker = createSpeakerWithoutEmail(speaker, matchingCreator.id)
+   return {
+      speaker: updatedSpeaker,
+      creatorId: matchingCreator.id,
+   }
+}
+
+async function handleNewCreator(
+   speaker: Speaker,
+   livestream: WithRef<LivestreamEvent>,
+   creatorsByEmailAndGroup: Map<string, Creator>
+): Promise<SpeakerProcessResult> {
+   const primaryGroupId = selectPrimaryGroupId(livestream.groupIds)
+
+   if (!primaryGroupId) {
+      Counter.log(
+         `Warning: Livestream ${livestream.id} has no groupIds, skipping speaker ${speaker.firstName} ${speaker.lastName}`
+      )
+      return { speaker }
+   }
+
+   if (DRY_RUN) {
+      counter.addToCustomCount("newCreatorsWouldBeCreated", 1)
+      const dryRunSpeaker = createSpeakerWithoutEmail(
+         speaker,
+         "DRY_RUN_NEW_CREATOR_ID"
+      )
+      return { speaker: dryRunSpeaker }
+   }
+
+   try {
+      const newCreator = await createCreatorFromSpeaker(speaker, primaryGroupId)
+      updateCreatorCache(newCreator, creatorsByEmailAndGroup)
+
+      counter.addToCustomCount("newCreatorsCreated", 1)
       counter.writeIncrement()
-      counter.addToCustomCount("livestreamsUpdated", 1)
-   } else if (hasChanges && DRY_RUN) {
-      counter.addToCustomCount("livestreamsWouldBeUpdated", 1)
+
+      const updatedSpeaker = createSpeakerWithoutEmail(speaker, newCreator.id)
+      return {
+         speaker: updatedSpeaker,
+         creatorId: newCreator.id,
+      }
+   } catch (error) {
+      Counter.log(
+         `Error creating creator for speaker ${speaker.email}: ${error.message}`
+      )
+      return { speaker }
    }
+}
+
+function createSpeakerWithoutEmail(
+   speaker: Speaker,
+   creatorId: string
+): Omit<Speaker, "email"> & { id: string } {
+   return {
+      avatar: speaker.avatar || "",
+      background: speaker.background || "",
+      firstName: speaker.firstName || "",
+      lastName: speaker.lastName || "",
+      position: speaker.position || "",
+      rank: speaker.rank || 0,
+      linkedInUrl: speaker.linkedInUrl || "",
+      roles: speaker.roles || [],
+      groupId: speaker.groupId,
+      id: creatorId,
+   }
+}
+
+function updateCreatorCache(
+   creator: Creator,
+   creatorsByEmailAndGroup: Map<string, Creator>
+) {
+   // Update cache for future lookups (excluding backfilled emails)
+   if (creator.email && !isBackfilledEmail(creator.email)) {
+      creatorsByEmailAndGroup.set(
+         createEmailKey(creator.email, creator.groupId),
+         creator
+      )
+   }
+
+   if (creator.firstName && creator.lastName) {
+      creatorsByEmailAndGroup.set(
+         createNameKey(creator.firstName, creator.lastName, creator.groupId),
+         creator
+      )
+   }
+}
+
+async function updateLivestream(
+   livestream: WithRef<LivestreamEvent>,
+   updatedSpeakers: Speaker[],
+   updatedCreatorIds: Set<string>
+) {
+   if (DRY_RUN) {
+      counter.addToCustomCount("livestreamsWouldBeUpdated", 1)
+      return
+   }
+
+   const updateData: Partial<LivestreamEvent> = {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      speakers: updatedSpeakers.map(({ email, ...rest }) => rest),
+      creatorsIds: Array.from(updatedCreatorIds),
+   }
+
+   await livestream._ref.update(updateData)
+   counter.writeIncrement()
+   counter.addToCustomCount("livestreamsUpdated", 1)
 }
 
 async function createCreatorFromSpeaker(
@@ -415,38 +370,23 @@ async function createCreatorFromSpeaker(
       .collection("careerCenterData")
       .doc(groupId)
       .collection("creators")
-      .doc() // Generate new document ID
+      .doc()
 
-   // Create a backfilled email if speaker has no email
-   const hasNoEmail = !speaker.email
-   const email =
-      speaker.email ||
-      createBackfilledEmail(
-         speaker.firstName || "Unknown",
-         speaker.lastName || "Speaker",
-         creatorRef.id
-      )
-
-   if (hasNoEmail) {
+   const email = speaker.email || BACKFILLED_EMAIL
+   if (!speaker.email) {
       counter.addToCustomCount("speakersWithBackfilledEmails", 1)
    }
 
-   // Create the Creator object with server timestamps
-   // Use FieldValue.serverTimestamp() for setting in Firestore, but cast for the return type
    const timestamp = FieldValue.serverTimestamp()
-
    const newCreator: Creator = {
       firstName: speaker.firstName || "Unknown",
       lastName: speaker.lastName || "Speaker",
       position: speaker.position || "Speaker",
-      email: email,
+      email,
       avatarUrl: speaker.avatar || "",
       linkedInUrl: speaker.linkedInUrl || "",
       story: speaker.background || "",
-      roles:
-         speaker.roles && speaker.roles.length > 0
-            ? speaker.roles
-            : [CreatorRoles.Speaker],
+      roles: speaker.roles?.length ? speaker.roles : [CreatorRoles.Speaker],
       id: creatorRef.id,
       groupId,
       documentType: "groupCreator",
@@ -457,47 +397,30 @@ async function createCreatorFromSpeaker(
    }
 
    await creatorRef.set(newCreator)
-
    return newCreator
 }
 
-async function selectPrimaryGroupId(
+const selectPrimaryGroupId = (
    groupIds: string[] | undefined
-): Promise<string | null> {
-   if (!groupIds || groupIds.length === 0) {
-      return null
-   }
+): string | null => {
+   if (!groupIds?.length) return null
+   if (groupIds.length === 1) return groupIds[0]
 
-   // If there's only one group, use it
-   if (groupIds.length === 1) {
-      return groupIds[0]
-   }
-
-   // If there are multiple groups, prioritize company groups (without universityCode) over university groups
    try {
-      const groupPromises = groupIds.map((groupId) =>
-         groupRepo.getGroupById(groupId)
-      )
-      const groups = await Promise.all(groupPromises)
+      const validGroups = groupIds
+         .map((groupId) => allGroupsDict[groupId])
+         .filter(Boolean)
 
-      // Filter out null groups and find the first group without universityCode
-      const validGroups = groups.filter(Boolean)
+      // Prioritize company groups (without universityCode)
       const companyGroup = validGroups.find((group) => !group.universityCode)
-
-      if (companyGroup) {
-         return companyGroup.id
-      }
-
-      // If all groups have universityCode, just return the first valid one
-      return validGroups[0]?.id || groupIds[0]
+      return companyGroup?.id || validGroups[0]?.id || groupIds[0]
    } catch (error) {
       Counter.log(`Error fetching groups for selection: ${error.message}`)
-      // Fallback to first groupId if there's an error
       return groupIds[0]
    }
 }
 
-// Helper function to create a name-based key
+// Helper functions
 function createNameKey(
    firstName: string,
    lastName: string,
@@ -508,27 +431,10 @@ function createNameKey(
       .toLowerCase()}:${groupId}`
 }
 
-// Helper function to create an email-based key
 function createEmailKey(email: string, groupId: string): string {
    return `${email}:${groupId}`
 }
 
-// Helper function to create a backfilled email
-function createBackfilledEmail(
-   firstName: string,
-   lastName: string,
-   creatorId: string
-): string {
-   // Use the same firstName/lastName normalization as in createNameKey
-   const normalizedFirstName = firstName.trim().toLowerCase()
-   const normalizedLastName = lastName.trim().toLowerCase()
-   return `backfilled.${normalizedFirstName}.${normalizedLastName}.${creatorId}@speaker.careerfairy.io`
-}
-
-// Helper function to check if an email is a backfilled email
 function isBackfilledEmail(email: string): boolean {
-   return (
-      email.startsWith("backfilled.") &&
-      email.endsWith("@speaker.careerfairy.io")
-   )
+   return email === BACKFILLED_EMAIL
 }
