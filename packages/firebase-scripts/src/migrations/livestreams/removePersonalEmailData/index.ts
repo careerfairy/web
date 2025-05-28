@@ -64,7 +64,7 @@ export async function run() {
          })
       }
 
-      await ultraBatch.commitFinal()
+      await ultraBatch.commit()
       progressBar.stop()
    } catch (error) {
       console.error(error)
