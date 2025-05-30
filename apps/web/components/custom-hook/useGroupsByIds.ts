@@ -11,7 +11,7 @@ const empty = ["empty"]
  * @returns Firestore collection containing interests.
  * @remarks If more than 10 IDs are passed, only the first 10 will be fetched.
  */
-const useGroupsByIds = (ids: string[] = empty) => {
+const useGroupsByIds = (ids: string[] = empty, suspense: boolean = true) => {
    const groupIds = ids?.length
       ? ids.slice(0, MAX_QUERY_ARRAY_IN_LENGTH)
       : empty
@@ -20,7 +20,10 @@ const useGroupsByIds = (ids: string[] = empty) => {
       query(
          collection(FirestoreInstance, "careerCenterData"),
          where(documentId(), "in", groupIds)
-      )
+      ),
+      {
+         suspense: suspense,
+      }
    )
 }
 

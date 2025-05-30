@@ -3,10 +3,12 @@ import {
    CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/groups/groups"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
+import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import { useAuth } from "HOCs/AuthProvider"
 import React, {
    createContext,
@@ -32,6 +34,12 @@ interface CustomJobDetailsContextType {
    handleRemoveJobClose: () => void
    handleClickApplyBtn: () => void
    handleConfirmApply: () => void
+   group?: Group
+   suspense?: boolean
+   hideApplicationConfirmation?: boolean
+   hideLinkedLivestreams?: boolean
+   hideLinkedSparks?: boolean
+   hideCTAButtons?: boolean
 }
 
 const CustomJobDetailsContext = createContext<
@@ -42,11 +50,26 @@ interface CustomJobDetailsProviderProps {
    children: ReactNode
    customJob: CustomJob
    source: CustomJobApplicationSource
+   suspense?: boolean
+   hideApplicationConfirmation?: boolean
+   hideLinkedLivestreams?: boolean
+   hideLinkedSparks?: boolean
+   hideCTAButtons?: boolean
 }
 
 export const CustomJobDetailsProvider: React.FC<
    CustomJobDetailsProviderProps
-> = ({ children, customJob, source }) => {
+> = (props: CustomJobDetailsProviderProps) => {
+   const {
+      customJob,
+      source,
+      children,
+      suspense,
+      hideApplicationConfirmation,
+      hideLinkedLivestreams,
+      hideLinkedSparks,
+      hideCTAButtons,
+   } = props
    const { data: fingerPrintId } = useFingerPrint()
 
    const { userData } = useAuth()
@@ -64,6 +87,10 @@ export const CustomJobDetailsProvider: React.FC<
 
    const { applicationInitiatedOnly, handleClickApplyBtn, handleConfirmApply } =
       useCustomJobApply(customJob as PublicCustomJob, source)
+
+   const { data: jobGroups } = useGroupsByIds([customJob.groupId], suspense)
+
+   const group = jobGroups?.at(0)
 
    useEffect(() => {
       if (shouldOpenApplyConfirmation) handleConfirmationOpen()
@@ -87,6 +114,12 @@ export const CustomJobDetailsProvider: React.FC<
          handleRemoveJobClose,
          handleClickApplyBtn,
          handleConfirmApply,
+         group,
+         suspense,
+         hideApplicationConfirmation,
+         hideLinkedLivestreams,
+         hideLinkedSparks,
+         hideCTAButtons,
       }),
       [
          customJob,
@@ -101,6 +134,12 @@ export const CustomJobDetailsProvider: React.FC<
          handleRemoveJobClose,
          handleClickApplyBtn,
          handleConfirmApply,
+         group,
+         suspense,
+         hideApplicationConfirmation,
+         hideLinkedLivestreams,
+         hideLinkedSparks,
+         hideCTAButtons,
       ]
    )
 
