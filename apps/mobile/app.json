@@ -2,7 +2,7 @@
    "expo": {
       "name": "CareerFairy",
       "slug": "careerfairy-mobile-app",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "orientation": "portrait",
       "icon": "./assets/images/AppIcon.png",
       "scheme": "careerfairy",
@@ -21,7 +21,8 @@
          "infoPlist": {
             "NSCameraUsageDescription": "CareerFairy only uses the camera if you decide to actively participate in a live stream.",
             "NSMicrophoneUsageDescription": "CareerFairy only uses the microphone if you decide to actively participate in a live stream.",
-            "NSUserNotificationUsageDescription": "CareerFairy uses notifications to keep you up-to-date with your live streams."
+            "NSUserNotificationUsageDescription": "CareerFairy uses notifications to keep you up-to-date with your live streams.",
+            "NSAdvertisingAttributionReportEndpoint": "https://branch-skan.com"
          },
          "associatedDomains": [
             "applinks:www.careerfairy.io",
