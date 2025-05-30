@@ -42,7 +42,7 @@ const responsiveBreakpoint = "md"
 const customStyles = sxStyles({
    root: {
       p: {
-         xs: 2,
+         xs: 0,
          [responsiveBreakpoint]: 3,
       },
    },
