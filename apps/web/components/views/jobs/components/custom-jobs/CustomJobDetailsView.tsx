@@ -68,16 +68,12 @@ const customStyles = sxStyles({
       backgroundColor: (theme) => theme.brand.white[50],
       borderTopLeftRadius: "8px",
       borderTopRightRadius: "8px",
-      // borderBottom: theme => `1px solid ${theme.brand.black[300]}`
    },
    tabsHeader: {
       position: "sticky",
       top: 0,
-      // zIndex: (theme) => theme.zIndex.appBar,
+      zIndex: 1,
       backgroundColor: (theme) => theme.brand.white[50],
-      // backgroundColor: "red",
-      // borderTopLeftRadius: "8px",
-      // borderTopRightRadius: "8px",
    },
 })
 

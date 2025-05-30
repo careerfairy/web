@@ -63,6 +63,10 @@ export const CustomJobDetails = () => {
       jobDetailsDialogOpen,
       setJobDetailsDialogOpen,
    } = useJobsOverviewContext()
+   console.log(
+      "🚀 ~ CustomJobDetails ~ jobDetailsDialogOpen:",
+      jobDetailsDialogOpen
+   )
 
    const router = useRouter()
    // TODO: Remove, this is for easier testing
