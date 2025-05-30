@@ -51,11 +51,11 @@ export async function run() {
             adHocSpeakers:
                livestream.adHocSpeakers?.map(removeEmailCallback) || [],
             liveSpeakers: [],
-            author: {
-               ...livestream.author,
-               email: "",
-            },
+            author: livestream.author || {},
          }
+
+         // @ts-expect-error - email is no longer a valid field on AuthorInfo
+         delete toUpdate.author?.email
 
          await ultraBatch.add((batch) => {
             batch.update(
@@ -65,7 +65,7 @@ export async function run() {
          })
       }
 
-      await ultraBatch.commitFinal()
+      await ultraBatch.commit()
       progressBar.stop()
    } catch (error) {
       console.error(error)
