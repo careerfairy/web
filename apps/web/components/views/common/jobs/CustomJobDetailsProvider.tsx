@@ -97,6 +97,10 @@ export const CustomJobDetailsProvider: React.FC<
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [shouldOpenApplyConfirmation])
 
+   useEffect(() => {
+      handleConfirmationClose()
+   }, [customJob, handleConfirmationClose])
+
    const autoActionType = useSelector(autoAction)
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
