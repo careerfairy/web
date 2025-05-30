@@ -8,7 +8,7 @@ import { TabConfig } from "./TabsHeader"
 
 const styles = sxStyles({
    root: {
-      minHeight: "700px",
+      minHeight: "710px",
       background: (theme) => theme.brand.white[50],
       display: "flex",
       flexDirection: "column",

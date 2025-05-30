@@ -56,7 +56,19 @@ const styles = sxStyles({
       background: (theme) => theme.brand.white[200],
       borderTop: (theme) => `1px solid ${theme.brand.black[300]}`,
    },
+   dialogHeader: {
+      py: "0px !important",
+      px: {
+         xs: "16px !important",
+         sm: "16px !important",
+         md: "24px !important",
+      },
+   },
    header: {
+      py: "0px !important",
+      px: "16px !important",
+   },
+   inlineHeader: {
       p: "12px !important",
    },
    inlineContentWrapper: {
@@ -138,7 +150,14 @@ const DialogDetailsContent = ({
          suspense={suspense}
       >
          <DialogContent sx={styles.dialogContent}>
-            <Content heroContent={heroContent} heroSx={heroSx} />
+            <Content
+               heroContent={heroContent}
+               heroSx={heroSx}
+               headerSx={styles.dialogHeader}
+               sx={{
+                  p: "0px !important",
+               }}
+            />
          </DialogContent>
          <DialogActions sx={styles.fixedBottomContent}>
             <Actions />
@@ -214,7 +233,7 @@ export const Content = ({
             heroSx={heroSx}
             sx={combineStyles(styles.customJobDetailsView, sx)}
             companyLogoUrl={group?.logoUrl}
-            headerSx={headerSx}
+            headerSx={combineStyles(styles.header, headerSx)}
             companyName={group?.universityName}
             hideLinkedLivestreams={hideLinkedLivestreams}
             hideLinkedSparks={hideLinkedSparks}
@@ -246,7 +265,6 @@ export const Content = ({
 }
 
 type InlineDetailsContentProps = ContentProps & {
-   rootSx?: SxProps<DefaultTheme>
    customJob: CustomJob
    source: CustomJobApplicationSource
 }
@@ -261,17 +279,12 @@ export const InlineCustomJobDetailsContent = (
          hideCTAButtons
          suspense={false}
       >
-         <Stack
-            sx={props.rootSx}
-            spacing={0}
-            alignItems={"space-between"}
-            height={"100%"}
-         >
+         <Stack spacing={0} alignItems={"space-between"} height={"100%"}>
             <Box sx={styles.inlineContentWrapper}>
                <Content
                   {...props}
                   sx={styles.inlineCustomJobDetailsView}
-                  headerSx={styles.header}
+                  headerSx={styles.inlineHeader}
                />
             </Box>
             <Box sx={styles.inlineActions}>
