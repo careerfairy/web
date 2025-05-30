@@ -16,11 +16,14 @@ const styles = sxStyles({
          sm: "16px !important",
          md: "32px !important",
       },
+      maxHeight: "726px !important",
+      overflow: "hidden",
    },
 })
 
 const JobsPageOverview = () => {
    const isMobile = useIsMobile()
+
    return (
       <Container maxWidth="xl" sx={styles.container}>
          <Stack spacing={2}>

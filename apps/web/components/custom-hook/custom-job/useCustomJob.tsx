@@ -12,7 +12,6 @@ const useCustomJob = (jobId: string, initialData?: CustomJob) => {
    const options = useMemo(() => {
       const opts: ReactFireOptions = {
          idField: "id",
-         suspense: true,
       }
 
       /**

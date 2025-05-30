@@ -31,8 +31,9 @@ const styles = sxStyles({
 })
 
 export const UserSaveJob = ({ customJob }: CustomJobHeaderActionsProps) => {
-   const { isLoggedIn } = useAuth()
-   return isLoggedIn ? (
+   const { isLoggedIn, userData } = useAuth()
+
+   return isLoggedIn && userData?.id ? (
       <SaveJob customJob={customJob} />
    ) : (
       <UnAuthedSaveJob customJob={customJob} />
