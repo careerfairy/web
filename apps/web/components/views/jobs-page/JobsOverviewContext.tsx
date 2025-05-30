@@ -1,10 +1,15 @@
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobApplicationSource,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
 import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
 import {
    FilterOptions,
    useCustomJobSearchAlgolia,
 } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { customJobRepo } from "data/RepositoryInstances"
 import { NextRouter, useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
@@ -39,6 +44,10 @@ type JobsOverviewContextType = {
    showOtherJobs: boolean
    isValidating: boolean
    nextPage: () => void
+   hasMore: boolean
+   context: CustomJobApplicationSource
+   jobDetailsDialogOpen: boolean
+   setJobDetailsDialogOpen: (open: boolean) => void
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -66,7 +75,8 @@ export const JobsOverviewContextProvider = ({
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
-
+   const isMobile = useIsMobile()
+   const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] = useState(true)
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
@@ -77,11 +87,6 @@ export const JobsOverviewContextProvider = ({
             locationIdTags: searchParams.location,
             businessFunctionsTagIds: searchParams.businessFunctionTags,
             normalizedJobType: searchParams.jobTypes,
-         },
-         booleanFilters: {
-            // deleted: false,
-            // published: true,
-            // isPermanentlyExpired: false,
          },
       }),
       [
@@ -122,7 +127,9 @@ export const JobsOverviewContextProvider = ({
    )
 
    const handleSelectedJobChange = useCallback(
-      (job: CustomJob) => handleQueryChange(router, "jobId", job.id),
+      (job: CustomJob) => {
+         handleQueryChange(router, "jobId", job.id)
+      },
       [router]
    )
 
@@ -164,7 +171,11 @@ export const JobsOverviewContextProvider = ({
          if (searchResultsCount > infiniteJobs?.length) {
             setSize((prevSize) => prevSize + 1)
          }
+
+         return Promise.resolve()
       }
+
+      const hasMore = searchResultsCount > infiniteJobs?.length
 
       return {
          selectedJob: selectedJob,
@@ -186,6 +197,13 @@ export const JobsOverviewContextProvider = ({
          showOtherJobs: hasFilters && searchResultsCount === 0,
          isValidating,
          nextPage,
+         hasMore,
+         context: {
+            source: CustomJobApplicationSourceTypes.Group,
+            id: selectedJob?.groupId,
+         },
+         jobDetailsDialogOpen: isJobDetailsDialogOpen,
+         setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
       }
    }, [
       infiniteJobs,
@@ -199,6 +217,8 @@ export const JobsOverviewContextProvider = ({
       data,
       isValidating,
       setSize,
+      isJobDetailsDialogOpen,
+      setIsJobDetailsDialogOpen,
    ])
 
    useEffect(() => {
@@ -207,7 +227,8 @@ export const JobsOverviewContextProvider = ({
       } else {
          setSelectedJob(serverJob)
       }
-   }, [router.query.jobId, handleJobIdChange, serverJob])
+      setIsJobDetailsDialogOpen(isMobile)
+   }, [router.query.jobId, handleJobIdChange, serverJob, isMobile])
 
    return (
       <JobsOverviewContext.Provider value={value}>

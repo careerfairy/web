@@ -16,6 +16,7 @@ const styles = sxStyles({
       top: 64,
       backgroundColor: "#F7F8FC",
       py: 2,
+      zIndex: 1,
    },
    searchBy: {
       overflowX: "auto",

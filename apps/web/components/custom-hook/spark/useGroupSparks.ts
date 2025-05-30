@@ -22,6 +22,8 @@ const useGroupSparks = (groupId: string, options?: Options) => {
 
    return useFirestoreCollection<Spark>(groupSparksQuery, {
       idField: "id",
+      suspense: false,
+      initialData: [],
    })
 }
 
