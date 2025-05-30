@@ -9,7 +9,6 @@ import {
    FilterOptions,
    useCustomJobSearchAlgolia,
 } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import { customJobRepo } from "data/RepositoryInstances"
 import { NextRouter, useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
@@ -75,8 +74,8 @@ export const JobsOverviewContextProvider = ({
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
-   const isMobile = useIsMobile()
-   const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] = useState(true)
+
+   const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] = useState(false)
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
@@ -116,6 +115,7 @@ export const JobsOverviewContextProvider = ({
             const customJob = await customJobRepo.getCustomJobById(jobId)
 
             if (customJob) {
+               setIsJobDetailsDialogOpen(true)
                setSelectedJob(customJob)
                return
             }
@@ -123,7 +123,7 @@ export const JobsOverviewContextProvider = ({
 
          setSelectedJob(undefined)
       },
-      [setSelectedJob]
+      [setSelectedJob, setIsJobDetailsDialogOpen]
    )
 
    const handleSelectedJobChange = useCallback(
@@ -226,9 +226,14 @@ export const JobsOverviewContextProvider = ({
          handleJobIdChange(router.query.jobId as string)
       } else {
          setSelectedJob(serverJob)
+         setIsJobDetailsDialogOpen(true)
       }
-      setIsJobDetailsDialogOpen(isMobile)
-   }, [router.query.jobId, handleJobIdChange, serverJob, isMobile])
+   }, [
+      router.query.jobId,
+      handleJobIdChange,
+      serverJob,
+      setIsJobDetailsDialogOpen,
+   ])
 
    return (
       <JobsOverviewContext.Provider value={value}>
