@@ -14,7 +14,7 @@ import { Group } from "@careerfairy/shared-lib/dist/groups"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
-import { UltraBatch } from "../../../util/batchUtils"
+import { BatchManager } from "../../../util/batchUtils"
 import { logAction } from "../../../util/logger"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 import { WithRef } from "../../../util/types"
@@ -50,14 +50,14 @@ let allLivestreams: WithRef<LivestreamEvent>[]
 let allCreators: Creator[]
 let allDraftLivestreams: WithRef<LivestreamEvent>[]
 let allGroupsDict: Record<string, Group>
-let batchManager: UltraBatch
+let batchManager: BatchManager
 
 export async function run() {
    try {
       logMigrationStart()
 
-      // Initialize UltraBatch
-      batchManager = new UltraBatch(firestore, counter, DRY_RUN)
+      // Initialize BatchManager
+      batchManager = new BatchManager(firestore, counter, DRY_RUN)
 
       // Fetch all data
       ;[allLivestreams, allDraftLivestreams, allGroupsDict, allCreators] =

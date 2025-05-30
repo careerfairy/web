@@ -9,7 +9,7 @@ const MAX_BATCH_OPERATIONS = 450
  * It also integrates with a Counter instance to track write operations and batches committed,
  * and supports a dry run mode.
  */
-export class UltraBatch {
+export class BatchManager {
    private currentBatch: WriteBatch
    private batchOperationCount: number
    private firestore: Firestore
@@ -17,7 +17,7 @@ export class UltraBatch {
    private dryRun: boolean
 
    /**
-    * Creates an instance of UltraBatch.
+    * Creates an instance of BatchManager.
     * @param firestoreInstance - The Firestore instance to use for batch operations.
     * @param counterInstance - The Counter instance for tracking operations.
     * @param [dryRun=false] - If true, operations will not be committed to Firestore.
@@ -80,13 +80,5 @@ export class UltraBatch {
       // Reset batch
       this.currentBatch = this.firestore.batch()
       this.batchOperationCount = 0
-   }
-
-   /**
-    * Gets the current number of operations in the uncommitted batch.
-    * @returns {number} The current number of operations in the batch.
-    */
-   getCurrentOperationCount(): number {
-      return this.batchOperationCount
    }
 }
