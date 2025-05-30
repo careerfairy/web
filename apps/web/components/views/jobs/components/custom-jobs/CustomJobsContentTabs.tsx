@@ -9,7 +9,6 @@ import { TabConfig } from "./TabsHeader"
 const styles = sxStyles({
    root: {
       minHeight: "580px",
-      maxHeight: "680px",
       background: (theme) => theme.brand.white[50],
       display: "flex",
       flexDirection: "column",
