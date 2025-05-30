@@ -2,17 +2,16 @@ import {
    CustomJob,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Typography } from "@mui/material"
+import { SxProps, Theme, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import { FC } from "react"
-import { sxStyles } from "../../../../../types/commonTypes"
+import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
 import SanitizedHTML from "../../../../util/SanitizedHTML"
 
 const styles = sxStyles({
-   root: {},
    jobTitle: {
       fontWeight: 600,
    },
@@ -39,25 +38,14 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
    },
-   confirmationWrapper: {
-      display: "flex",
-      padding: "24px",
-      justifyContent: "space-between",
-      alignItems: "center",
-      position: "absolute",
-      borderRadius: "12px",
-      border: "1.5px solid var(--turquoise-turquoise-400, #6ACFC0)",
-      background: "var(--white-white-200, #FCFCFE)",
-      boxShadow: "0px 4px 10px 0px rgba(0, 0, 0, 0.05)",
-   },
 })
 
 type Props = {
    job: CustomJob | PublicCustomJob
+   jobDeadlineWrapperSx?: SxProps<Theme>
 }
 
-const CustomJobDescription: FC<Props> = ({ job }) => {
-   const jobSalary = job.salary
+const CustomJobDescription: FC<Props> = ({ job, jobDeadlineWrapperSx }) => {
    const jobDeadline = job.deadline
       ? DateUtil.formatDateToString(job.deadline.toDate())
       : ""
@@ -65,25 +53,14 @@ const CustomJobDescription: FC<Props> = ({ job }) => {
    return (
       <Stack spacing={"24px"}>
          <Box sx={styles.wrapper} mt={0}>
-            <Typography sx={styles.jobTitle} variant="h6">
-               Job Description
-            </Typography>
             <SanitizedHTML sx={styles.html} htmlString={job.description} />
          </Box>
 
-         {jobSalary ? (
-            <Box sx={styles.wrapper} gap={2}>
-               <Typography variant={"h6"} sx={styles.subTitle}>
-                  Salary
-               </Typography>
-               <Typography variant={"body1"} sx={styles.jobValues}>
-                  {jobSalary}
-               </Typography>
-            </Box>
-         ) : null}
-
          {jobDeadline ? (
-            <Box sx={styles.wrapper} gap={2}>
+            <Box
+               sx={combineStyles(styles.wrapper, jobDeadlineWrapperSx)}
+               gap={2}
+            >
                <Typography variant={"h6"} sx={styles.subTitle}>
                   Application deadline
                </Typography>

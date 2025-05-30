@@ -14,19 +14,12 @@ const styles = sxStyles({
          xs: "100%",
          md: "339px",
       },
-      minHeight: "80vh",
+      overflowY: "scroll",
    },
    listTitle: {
       fontWeight: 600,
       color: (theme) => theme.palette.neutral[900],
    },
-   title: {
-      maxWidth: "calc(100% - 50px)",
-   },
-   typography: {
-      maxWidth: "calc(100% - 50px)",
-   },
-   jobListItemWrapper: { m: 0, p: 0 },
 })
 
 export const CustomJobsOverviewList = () => {

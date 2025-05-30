@@ -18,7 +18,7 @@ const styles = sxStyles({
       fontWeight: 600,
    },
    linkedContentWrapper: {
-      my: 2,
+      mb: 2,
    },
 })
 
@@ -83,9 +83,9 @@ const CustomJobLinkedLivestreams = ({
 }: CustomJobLinkedLivestreamsProps) => {
    if (!livestreams.length) return null
    return (
-      <Box>
+      <Stack spacing={0}>
          <Typography variant={"subtitle1"} sx={styles.subTitle}>
-            Live streams related to this job
+            Recordings related to this job
          </Typography>
          <Box sx={styles.linkedContentWrapper}>
             <EventsPreviewCarousel
@@ -94,10 +94,10 @@ const CustomJobLinkedLivestreams = ({
                events={livestreams}
                isEmbedded
                disableClick={disableClick}
-               styling={{ padding: false }}
+               styling={{ padding: false, viewportSx: { py: "12px" } }}
             />
          </Box>
-      </Box>
+      </Stack>
    )
 }
 
