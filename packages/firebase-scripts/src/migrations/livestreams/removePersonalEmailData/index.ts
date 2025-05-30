@@ -5,7 +5,7 @@ import { DocumentReference } from "firebase-admin/firestore"
 import Counter from "../../../lib/Counter"
 import { firestore } from "../../../lib/firebase"
 import { livestreamRepo } from "../../../repositories"
-import { UltraBatch } from "../../../util/batchUtils"
+import { BatchManager } from "../../../util/batchUtils"
 import { logAction } from "../../../util/logger"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 
@@ -24,7 +24,7 @@ const progressBar = new cliProgress.SingleBar(
 )
 
 export async function run() {
-   const ultraBatch = new UltraBatch(firestore, counter, DRY_RUN)
+   const batchManager = new BatchManager(firestore, counter, DRY_RUN)
 
    try {
       const [allLivestreams, allDraftLivestreams] = await logAction(
@@ -56,7 +56,7 @@ export async function run() {
          // @ts-expect-error - email is no longer a valid field on AuthorInfo
          delete toUpdate.lastUpdatedAuthorInfo?.email
 
-         await ultraBatch.add((batch) => {
+         await batchManager.add((batch) => {
             batch.update(
                livestream._ref as unknown as DocumentReference<LivestreamEvent>,
                toUpdate
@@ -64,7 +64,7 @@ export async function run() {
          })
       }
 
-      await ultraBatch.commit()
+      await batchManager.commit()
       progressBar.stop()
    } catch (error) {
       console.error(error)
