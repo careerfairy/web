@@ -76,11 +76,12 @@ export const CustomJobDetailsProvider: React.FC<
 
    const { applicationInitiatedOnly: shouldOpenApplyConfirmation } =
       useUserJobApplication(userData?.id || fingerPrintId, customJob.id)
+
    const [
       isApplyConfirmationOpen,
       handleConfirmationOpen,
       handleConfirmationClose,
-   ] = useDialogStateHandler(false)
+   ] = useDialogStateHandler(shouldOpenApplyConfirmation)
 
    const [isRemoveConfirmationOpen, handleRemoveJobOpen, handleRemoveJobClose] =
       useDialogStateHandler(false)
@@ -93,13 +94,17 @@ export const CustomJobDetailsProvider: React.FC<
    const group = jobGroups?.at(0)
 
    useEffect(() => {
-      if (shouldOpenApplyConfirmation) handleConfirmationOpen()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [shouldOpenApplyConfirmation])
-
-   useEffect(() => {
-      handleConfirmationClose()
-   }, [customJob, handleConfirmationClose])
+      if (shouldOpenApplyConfirmation) {
+         handleConfirmationOpen()
+      } else {
+         handleConfirmationClose()
+      }
+   }, [
+      shouldOpenApplyConfirmation,
+      customJob,
+      handleConfirmationOpen,
+      handleConfirmationClose,
+   ])
 
    const autoActionType = useSelector(autoAction)
    const isAutoApply = autoActionType === AutomaticActions.APPLY
