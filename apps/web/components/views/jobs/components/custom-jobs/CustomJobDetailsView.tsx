@@ -71,7 +71,7 @@ const customStyles = sxStyles({
    },
    tabsHeader: {
       position: "sticky",
-      top: 0,
+      top: -1,
       zIndex: 1,
       backgroundColor: (theme) => theme.brand.white[50],
    },
@@ -181,7 +181,7 @@ export const CustomJobDetails = ({
    const [currentActiveTab, handleTabClickInternal] =
       useControlledTabNavigationOnScroll(sectionRefs.current, {
          initialValue: activeTabState,
-         threshold: 0.2,
+         threshold: 0.1,
       })
 
    useEffect(() => {
