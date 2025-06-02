@@ -6,7 +6,7 @@ import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 /**
- * Custom hook to fetch creator data for a given speaker ID
+ * Custom hook to fetch creator data for a given creator
  * @param groupId - The ID of the group/career center to fetch creator data from
  * @param creatorId - The ID of the creator to fetch data for
  * @returns SWR response containing creator data and loading state
