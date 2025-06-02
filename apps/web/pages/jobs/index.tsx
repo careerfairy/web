@@ -131,9 +131,8 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const term = queryTerm as string
    const jobId = queryJobId as string
 
-   const dialogOpen =
-      (!hasRedirected && Boolean(jobId)) ||
-      (hasRedirected && dialogOpenHeader === "true")
+   const fromSpecificJob = !hasRedirected && Boolean(jobId)
+   const dialogOpen = fromSpecificJob || dialogOpenHeader === "true"
 
    const queryLocations = getQueryStringArray(context.query.location)
    const queryBusinessFunctionTags = getQueryStringArray(
@@ -202,14 +201,16 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          })
       )
 
-      context.res.setHeader(
-         "Set-Cookie",
-         serialize("dialogOpen", dialogOpen ? "true" : "false", {
-            path: "/",
-            maxAge: 10, // seconds
-            httpOnly: true,
-         })
-      )
+      if (dialogOpen) {
+         context.res.setHeader(
+            "Set-Cookie",
+            serialize("dialogOpen", "true", {
+               path: "/",
+               maxAge: 10, // seconds
+               httpOnly: true,
+            })
+         )
+      }
 
       return {
          redirect: {
