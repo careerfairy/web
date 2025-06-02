@@ -11,7 +11,6 @@ import { alpha } from "@mui/material"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
 import { ReactNode } from "react"
-import { useGroup } from ".."
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../types/commonTypes"
@@ -75,11 +74,9 @@ type Props = {
 }
 
 const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
-   const { livestreamDialog } = useGroup()
    const isMobile = useIsMobile()
    const { layout } = useGroupDashboard()
-   const { createDraftLivestream, isCreating, livestreamCreationFlowV2 } =
-      useLivestreamRouting()
+   const { createDraftLivestream, isCreating } = useLivestreamRouting()
 
    const drawerPresent = !isMobile && layout.leftDrawerOpen
 
@@ -111,11 +108,7 @@ const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
                        variant={"outlined"}
                        color={"secondary"}
                        loading={isCreating}
-                       onClick={() =>
-                          livestreamCreationFlowV2
-                             ? createDraftLivestream()
-                             : livestreamDialog.handleOpenNewStreamModal()
-                       }
+                       onClick={() => createDraftLivestream()}
                     >
                        Create New Live Stream
                     </LoadingButton>

@@ -1,17 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-handler-names */
-import PropTypes from "prop-types"
-import React, { Fragment, useEffect, useState } from "react"
+import { AppBar, Box, CircularProgress, Tabs } from "@mui/material"
+import Tab from "@mui/material/Tab"
 import { alpha } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
-import { AppBar, Box, CircularProgress, Tabs } from "@mui/material"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
+import PropTypes from "prop-types"
+import { Fragment, useEffect, useState } from "react"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions"
-import Tab from "@mui/material/Tab"
 import Header from "./Header"
 import EventsTable from "./events-table/EventsTable"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import { useLivestreamRouting } from "./useLivestreamRouting"
 
 const useStyles = makeStyles((theme) => ({
    containerRoot: {},
@@ -34,6 +35,9 @@ const useStyles = makeStyles((theme) => ({
 
 const EventsOverview = () => {
    const { group, livestreamDialog } = useGroup()
+
+   const { createDraftLivestream } = useLivestreamRouting()
+
    const classes = useStyles()
    const {
       listenToDraftLiveStreamsByGroupId,
@@ -126,9 +130,7 @@ const EventsOverview = () => {
             <Box>
                <Header
                   group={group}
-                  handleOpenNewStreamModal={
-                     livestreamDialog.handleOpenNewStreamModal
-                  }
+                  handleOpenNewStreamModal={createDraftLivestream}
                   isDraft={tabValue === "draft"}
                />
             </Box>
@@ -158,13 +160,9 @@ const EventsOverview = () => {
                </Box>
             ) : (
                <EventsTable
-                  handleEditStream={livestreamDialog.handleEditStream}
                   isDraft={tabValue === "draft"}
                   isPast={tabValue === "past"}
                   streams={streams}
-                  handleOpenNewStreamModal={
-                     livestreamDialog.handleOpenNewStreamModal
-                  }
                   groupsDictionary={groupsDictionary}
                   group={group}
                   eventId={eventId}

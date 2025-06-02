@@ -242,7 +242,6 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
                backgroundColor={backgroundColor}
             >
                {children}
-               {livestreamDialog.StreamCreationDialog}
             </GroupDashboardLayoutProvider>
          </GroupContext.Provider>
       </Outlet>
