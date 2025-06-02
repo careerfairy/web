@@ -247,9 +247,7 @@ const FeedbackCardContent = ({
 }
 
 const NoLivestreams = () => {
-   const { livestreamDialog } = useGroup()
-   const { createDraftLivestream, isCreating, livestreamCreationFlowV2 } =
-      useLivestreamRouting()
+   const { createDraftLivestream, isCreating } = useLivestreamRouting()
    return (
       <Box>
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
@@ -262,11 +260,7 @@ const NoLivestreams = () => {
             <LoadingButton
                color="secondary"
                variant="contained"
-               onClick={() =>
-                  livestreamCreationFlowV2
-                     ? createDraftLivestream()
-                     : livestreamDialog.handleOpenNewStreamModal()
-               }
+               onClick={createDraftLivestream}
                loading={isCreating}
             >
                Create New Live Stream
