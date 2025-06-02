@@ -54,8 +54,8 @@ export const Footer = () => {
             <Box component="span" fontWeight={600} color="primary.main">
                Pro tip:
             </Box>{" "}
-            Use the raise hand functionality to ask your questions directly to
-            the live stream speakers.
+            Leave this tab open so you don&apos;t miss a moment! The stream will
+            start here automatically.
          </Typography>
       </Box>
    )
