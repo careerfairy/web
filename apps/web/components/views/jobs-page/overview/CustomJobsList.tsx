@@ -17,6 +17,13 @@ const styles = sxStyles({
       maxWidth: "calc(100% - 50px)",
    },
    jobListItemWrapper: { m: 0, p: 0 },
+   lastJobListItemWrapper: {
+      mb: {
+         xs: "100px",
+         sm: "100px",
+         md: 0,
+      },
+   },
    loader: {
       display: "flex",
       justifyContent: "center",
@@ -76,7 +83,13 @@ export const CustomJobsList = ({ customJobs }: Props) => {
                      scroll={false}
                      key={idx}
                   >
-                     <ListItem sx={styles.jobListItemWrapper}>
+                     <ListItem
+                        sx={[
+                           styles.jobListItemWrapper,
+                           idx === customJobs.length - 1 &&
+                              styles.lastJobListItemWrapper,
+                        ]}
+                     >
                         <JobCard
                            job={customJob}
                            previewMode
