@@ -60,6 +60,7 @@ const styles = sxStyles({
    },
    popper: {
       mt: "8px !important",
+      zIndex: 2,
    },
    popperContentWrapper: {
       backgroundColor: "white",

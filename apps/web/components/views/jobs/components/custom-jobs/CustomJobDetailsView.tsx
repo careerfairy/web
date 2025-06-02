@@ -72,6 +72,7 @@ const customStyles = sxStyles({
    tabsHeader: {
       position: "sticky",
       top: -1,
+      zIndex: 1,
       backgroundColor: (theme) => theme.brand.white[50],
    },
 })
