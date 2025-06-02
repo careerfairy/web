@@ -57,6 +57,7 @@ type JobsOverviewContextProviderType = {
    serverCustomJobs?: CustomJob[]
    serverJob?: CustomJob
    children: ReactNode
+   dialogOpen?: boolean
 }
 
 export type SearchParams = {
@@ -71,11 +72,14 @@ export const JobsOverviewContextProvider = ({
    children,
    serverCustomJobs,
    serverJob,
+   dialogOpen,
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
 
-   const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] = useState(false)
+   const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
+      useState(dialogOpen)
+
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
@@ -115,8 +119,8 @@ export const JobsOverviewContextProvider = ({
             const customJob = await customJobRepo.getCustomJobById(jobId)
 
             if (customJob) {
-               setIsJobDetailsDialogOpen(true)
                setSelectedJob(customJob)
+               setIsJobDetailsDialogOpen(true)
                return
             }
          }
@@ -226,14 +230,8 @@ export const JobsOverviewContextProvider = ({
          handleJobIdChange(router.query.jobId as string)
       } else {
          setSelectedJob(serverJob)
-         setIsJobDetailsDialogOpen(true)
       }
-   }, [
-      router.query.jobId,
-      handleJobIdChange,
-      serverJob,
-      setIsJobDetailsDialogOpen,
-   ])
+   }, [router.query.jobId, handleJobIdChange, serverJob])
 
    return (
       <JobsOverviewContext.Provider value={value}>
