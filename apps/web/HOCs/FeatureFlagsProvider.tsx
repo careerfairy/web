@@ -29,7 +29,6 @@ const createFeatureFlagEnableCondition = (groupIds: string[]) => {
  * - ?atsAdminPageFlag=true
  * - ?sparksAdminPageFlag=true
  * - ?sparksB2BOnboardingFlag=true
- * - ?livestreamCreationFlowV2=true
  * - ?levelsV1=true
  */
 export const flagsInitialState = {
@@ -56,13 +55,6 @@ export const flagsInitialState = {
    sparksB2BOnboardingFlag: {
       enabled: false,
       conditionalEnable: createFeatureFlagEnableCondition(testGoups),
-   },
-   /**
-    * B2B Live stream creation flow version 2
-    * Hide or Show
-    */
-   livestreamCreationFlowV2: {
-      enabled: true,
    },
    /**
     * B2C and B2B mentors

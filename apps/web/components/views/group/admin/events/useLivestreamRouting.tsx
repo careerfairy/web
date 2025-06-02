@@ -1,6 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { buildLivestreamObject } from "components/helperFunctions/streamFormFunctions"
 import { getLivestreamInitialValues } from "components/views/draftStreamForm/DraftStreamForm"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -18,7 +17,6 @@ export const useLivestreamRouting = () => {
    const router = useRouter()
    const firebase = useFirebaseService()
    const { authenticatedUser } = useAuth()
-   const featureFlags = useFeatureFlags()
 
    const [isCreating, setIsCreating] = useState(false)
 
@@ -78,6 +76,5 @@ export const useLivestreamRouting = () => {
       editLivestream,
       createDraftLivestream: handleCreateDraftLivestream,
       isCreating,
-      livestreamCreationFlowV2: featureFlags.livestreamCreationFlowV2,
    }
 }
