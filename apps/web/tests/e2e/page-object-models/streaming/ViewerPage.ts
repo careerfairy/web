@@ -13,7 +13,9 @@ export class ViewerPage extends StreamingPage {
    }
 
    public assertWaitingRoomText() {
-      return this.assertTextIsVisible("The live stream is about to start!")
+      return this.assertTextIsVisible(
+         "Get ready!\nThe live stream starts soon."
+      )
    }
 
    public async askQuestion(question: string) {

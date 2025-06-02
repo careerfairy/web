@@ -143,7 +143,7 @@ export class LivestreamPresenter extends BaseModel {
 
    /**
     * Checks if the user should enter the waiting room (for new UI only).
-    * User enters 5 minutes before the live stream starts.
+    * User enters 1 hour before the live stream starts.
     *
     * @returns {boolean} True if the user should enter the waiting room, false otherwise.
     */
@@ -152,11 +152,11 @@ export class LivestreamPresenter extends BaseModel {
          return false
       }
 
-      const FIVE_MINUTES_IN_MS = 5 * 60 * 1000
+      const ONE_HOUR_IN_MS = 60 * 60 * 1000
       const currentTime = Date.now()
       const startTime = this.start.getTime()
 
-      return startTime - currentTime <= FIVE_MINUTES_IN_MS
+      return startTime - currentTime <= ONE_HOUR_IN_MS
    }
 
    isTest(): boolean {
