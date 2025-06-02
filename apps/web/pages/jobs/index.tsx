@@ -146,6 +146,11 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          businessFunctionsTagIds: queryBusinessFunctionTags,
          normalizedJobType: queryJobTypes,
       },
+      booleanFilters: {
+         deleted: false,
+         published: true,
+         isPermanentlyExpired: false,
+      },
    }
 
    const filters: string = buildAlgoliaFilterString(filterOptions)
