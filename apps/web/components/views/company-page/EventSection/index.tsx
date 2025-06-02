@@ -1,20 +1,16 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Link, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { EmptyItemsView } from "components/views/common/EmptyItemsView"
 import FollowButton from "components/views/common/company/FollowButton"
-import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
 } from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { FC, useCallback, useState } from "react"
+import { FC } from "react"
 import { Plus, Radio } from "react-feather"
 import { TabValue, useCompanyPage } from "../"
 import { sxStyles } from "../../../../types/commonTypes"
-import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
 import { SeeAllLink } from "../Overview/SeeAllLink"
 import {
    EMPTY_UPCOMING_EVENTS_DESCRIPTION,
@@ -97,18 +93,6 @@ const EventSection = () => {
 
    const isMobile = useIsMobile()
 
-   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
-      useDialogStateHandler()
-
-   const [eventToEdit, setEventToEdit] = useState(null)
-   const handleOpenEvent = useCallback(
-      (event: LivestreamEvent) => {
-         setEventToEdit(event)
-         handleOpenDialog()
-      },
-      [handleOpenDialog]
-   )
-
    const upcomingEventsHref = getCompanyPageTabLink(TabValue.livesStreams)
    const pastEventsHref = getCompanyPageTabLink(TabValue.recordings)
 
@@ -148,7 +132,6 @@ const EventSection = () => {
                   styling={eventsCarouselStyling}
                   hideChipLabels={editMode}
                   showManageButton={editMode}
-                  handleOpenEvent={handleOpenEvent}
                />
             ) : editMode ? (
                <CreateStreamButton />
@@ -194,21 +177,6 @@ const EventSection = () => {
                />
             ) : null}
          </Stack>
-         {isDialogOpen ? (
-            <StreamCreationProvider>
-               <NewStreamModal
-                  group={group}
-                  typeOfStream={"upcoming"}
-                  open={isDialogOpen}
-                  handlePublishStream={null}
-                  handleResetCurrentStream={() => {
-                     /* default mpty function with comment to prevent linting */
-                  }}
-                  currentStream={eventToEdit}
-                  onClose={handleCloseDialog}
-               />
-            </StreamCreationProvider>
-         ) : null}
       </Box>
    )
 }

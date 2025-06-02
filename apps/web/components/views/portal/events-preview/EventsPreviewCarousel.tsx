@@ -170,7 +170,6 @@ export type EventsProps = {
    styling?: EventsCarouselStyling
    showManageButton?: boolean
    hideChipLabels?: boolean
-   handleOpenEvent?: (event: LivestreamEvent) => void
    disableClick?: boolean
    onCardClick?: (event) => void
    disableTracking?: boolean
@@ -200,7 +199,6 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          styling = defaultStyling,
          hideChipLabels,
          showManageButton = false,
-         handleOpenEvent,
          disableClick,
          onCardClick,
          disableTracking,
@@ -220,8 +218,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
       const isMobile = useIsMobile()
       const { query } = useRouter()
       const isLSDialogOpen = isLivestreamDialogOpen(query)
-      const { editLivestream, livestreamCreationFlowV2 } =
-         useLivestreamRouting()
+      const { editLivestream } = useLivestreamRouting()
 
       const {
          shouldDisableAutoPlay,
@@ -426,17 +423,9 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                                          color="primary"
                                                          onClick={(e) => {
                                                             e.stopPropagation()
-                                                            if (
-                                                               livestreamCreationFlowV2
-                                                            ) {
-                                                               return editLivestream(
-                                                                  event.id
-                                                               )
-                                                            } else {
-                                                               return handleOpenEvent(
-                                                                  event
-                                                               )
-                                                            }
+                                                            return editLivestream(
+                                                               event.id
+                                                            )
                                                          }}
                                                          fullWidth
                                                          size="small"

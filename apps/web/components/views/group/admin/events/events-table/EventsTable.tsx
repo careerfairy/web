@@ -14,7 +14,6 @@ import GetStreamerLinksIcon from "@mui/icons-material/Share"
 import { Box, CircularProgress } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useMetaDataActions } from "components/custom-hook/useMetaDataActions"
 import { defaultTableOptions, tableIcons } from "components/util/tableUtils"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -39,7 +38,6 @@ import ToolbarDialogAction from "./ToolbarDialogAction"
 interface Props {
    streams: LivestreamEvent[]
    isDraft: boolean
-   handleEditStream: (stream: LivestreamEvent) => void
    group: Group
    publishingDraft: boolean
    handlePublishStream: (stream: LivestreamEvent) => void
@@ -47,7 +45,6 @@ interface Props {
    setGroupsDictionary: React.Dispatch<
       React.SetStateAction<Record<string, Group>>
    >
-   handleOpenNewStreamModal: () => void
    groupsDictionary: Record<string, Group>
    eventId: string
 }
@@ -55,13 +52,11 @@ interface Props {
 const EventsTable = ({
    streams,
    isDraft,
-   handleEditStream,
    group,
    publishingDraft,
    handlePublishStream,
    isPast,
    setGroupsDictionary,
-   handleOpenNewStreamModal,
    groupsDictionary,
    eventId,
 }: Props) => {
@@ -91,7 +86,6 @@ const EventsTable = ({
       targetStream,
    })
 
-   const featureFlags = useFeatureFlags()
    const router = useRouter()
 
    const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
@@ -197,19 +191,6 @@ const EventsTable = ({
 
    const manageStreamActions = useCallback(
       (rowData) => {
-         const editLivestreamLegacyDialogOption = {
-            icon: <EditIcon color="action" />,
-            tooltip: isDraft
-               ? "Edit Draft Event (Legacy)"
-               : "Edit Event (Legacy)",
-            onClick: () => handleEditStream(rowData),
-            hintTitle: isDraft
-               ? "Edit Draft Event (Legacy)"
-               : "Edit Event (Legacy)",
-            hintDescription:
-               "Edit the details of the event like the start date and speakers.",
-         }
-
          const result = [
             {
                icon: <EditIcon color="action" />,
@@ -267,9 +248,6 @@ const EventsTable = ({
             },
          ]
 
-         if (!featureFlags.livestreamCreationFlowV2)
-            return [editLivestreamLegacyDialogOption, ...result]
-
          return result
       },
       [
@@ -281,9 +259,7 @@ const EventsTable = ({
          group.groupId,
          userData?.isAdmin,
          publishingDraft,
-         featureFlags.livestreamCreationFlowV2,
          handleEditStreamV2,
-         handleEditStream,
          handleOpenStreamerLinksModal,
          handleClickDeleteStream,
          handlePublishStream,
@@ -496,7 +472,6 @@ const EventsTable = ({
             group={group}
             onClose={handleCloseToolbarActionsDialog}
             openDialog={toolbarActionsDialogOpen}
-            handleOpenNewStreamModal={handleOpenNewStreamModal}
          />
       </>
    )
