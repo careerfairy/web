@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
 
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
@@ -64,6 +64,7 @@ export const CustomJobDetails = () => {
       setJobDetailsDialogOpen,
    } = useJobsOverviewContext()
    const router = useRouter()
+
    // TODO: Remove, this is for easier testing
    const notFound = !selectedJob || router.query.notFound === "true"
    const [isOpen, setIsOpen] = useState(notFound)
@@ -101,7 +102,21 @@ export const CustomJobDetails = () => {
          {isMobile ? (
             <CustomJobDetailsDialog
                isOpen={jobDetailsDialogOpen}
-               onClose={() => setJobDetailsDialogOpen(false)}
+               onClose={() => {
+                  setJobDetailsDialogOpen(false)
+
+                  const query = router.query
+                  delete query.jobId
+
+                  router.push(
+                     {
+                        pathname: router.pathname,
+                        query: query,
+                     },
+                     undefined,
+                     { shallow: true }
+                  )
+               }}
                customJobId={selectedJob.id}
                source={context}
                serverSideCustomJob={selectedJob}
@@ -134,9 +149,20 @@ const NotFoundWrapper = ({
             open={isOpen}
             handleClose={handleNotFoundClose}
          >
-            <Box sx={styles.mobileNotFoundWrapper}>
-               <CustomJobNotFound />
-            </Box>
+            <ResponsiveDialogLayout.Content>
+               <Box sx={styles.mobileNotFoundWrapper}>
+                  <CustomJobNotFound />
+               </Box>
+            </ResponsiveDialogLayout.Content>
+            <ResponsiveDialogLayout.Actions>
+               <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={handleNotFoundClose}
+               >
+                  Back to jobs
+               </Button>
+            </ResponsiveDialogLayout.Actions>
          </ResponsiveDialogLayout>
       )
    }
