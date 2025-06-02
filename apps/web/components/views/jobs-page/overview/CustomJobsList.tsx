@@ -35,8 +35,13 @@ type Props = {
 export const CustomJobsList = ({ customJobs }: Props) => {
    const isMobile = useIsMobile()
    const router = useRouter()
-   const { isValidating, nextPage, searchParams, hasMore } =
-      useJobsOverviewContext()
+   const {
+      isValidating,
+      nextPage,
+      searchParams,
+      hasMore,
+      setJobDetailsDialogOpen,
+   } = useJobsOverviewContext()
 
    return (
       <Stack
@@ -59,6 +64,11 @@ export const CustomJobsList = ({ customJobs }: Props) => {
                            ...router.query,
                            jobId: customJob.id,
                         },
+                     }}
+                     onClick={() => {
+                        if (isMobile) {
+                           setJobDetailsDialogOpen(true)
+                        }
                      }}
                      shallow
                      passHref
