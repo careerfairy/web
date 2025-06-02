@@ -41,6 +41,7 @@ const JobsPage: NextPage<
    searchParams,
    userCountryCode,
    numberOfJobs,
+   dialogOpen,
 }) => {
    const seoTitle = getSeoTitle(searchParams, numberOfJobs)
    const serverCustomJobs =
@@ -62,10 +63,15 @@ const JobsPage: NextPage<
             description={"Find your dream job with CareerFairy."}
             title={seoTitle}
          />
-         <GenericDashboardLayout userCountryCode={userCountryCode} hideFooter headerFixed>
+         <GenericDashboardLayout
+            userCountryCode={userCountryCode}
+            hideFooter
+            headerFixed
+         >
             <JobsOverviewContextProvider
                serverCustomJobs={serverCustomJobs}
                serverJob={serverJob}
+               dialogOpen={dialogOpen}
             >
                <JobsPageOverview />
             </JobsOverviewContextProvider>
@@ -109,12 +115,14 @@ type JobsPageProps = {
    searchParams: SearchParams
    userCountryCode: string
    numberOfJobs: number
+   dialogOpen: boolean
 }
 
 export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    context
 ) => {
    const hasRedirected = context.req.cookies["redirected"]
+   const dialogOpenHeader = context.req.cookies["dialogOpen"]
    const userCountryCode =
       (context.req.headers["x-vercel-ip-country"] as string) || null
 
@@ -122,6 +130,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const term = queryTerm as string
    const jobId = queryJobId as string
+
+   const dialogOpen =
+      (!hasRedirected && Boolean(jobId)) ||
+      (hasRedirected && dialogOpenHeader === "true")
 
    const queryLocations = getQueryStringArray(context.query.location)
    const queryBusinessFunctionTags = getQueryStringArray(
@@ -190,6 +202,15 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          })
       )
 
+      context.res.setHeader(
+         "Set-Cookie",
+         serialize("dialogOpen", dialogOpen ? "true" : "false", {
+            path: "/",
+            maxAge: 10, // seconds
+            httpOnly: true,
+         })
+      )
+
       return {
          redirect: {
             destination: destination,
@@ -241,6 +262,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
             livestreamsData,
             sparksData: serializedSparks,
          },
+         dialogOpen,
          userCountryCode,
          searchParams: {
             location: queryLocations,
