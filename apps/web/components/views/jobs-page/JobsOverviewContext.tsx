@@ -91,6 +91,11 @@ export const JobsOverviewContextProvider = ({
             businessFunctionsTagIds: searchParams.businessFunctionTags,
             normalizedJobType: searchParams.jobTypes,
          },
+         booleanFilters: {
+            deleted: false,
+            published: true,
+            isPermanentlyExpired: false,
+         },
       }),
       [
          searchParams.businessFunctionTags,
