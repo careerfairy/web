@@ -40,8 +40,9 @@ const JobsPage: NextPage<
    customJobData,
    searchParams,
    userCountryCode,
+   numberOfJobs,
 }) => {
-   const seoTitle = getSeoTitle(serializedCustomJobs, searchParams)
+   const seoTitle = getSeoTitle(searchParams, numberOfJobs)
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
          CustomJobsPresenter.deserialize(job).convertToDocument(
@@ -74,42 +75,23 @@ const JobsPage: NextPage<
    )
 }
 
-const getSeoTitle = (
-   serializedCustomJobs: SerializedCustomJob[],
-   searchParams: SearchParams
-) => {
-   if (
-      !searchParams.location.length &&
-      !searchParams.term &&
-      serializedCustomJobs?.length
-   ) {
-      return `${serializedCustomJobs?.length} Jobs on CareerFairy`
+const getSeoTitle = (searchParams: SearchParams, numberOfJobs: number) => {
+   if (!searchParams.location.length && !searchParams.term && numberOfJobs) {
+      return `${numberOfJobs} Jobs on CareerFairy`
    }
 
-   if (
-      searchParams.location.length &&
-      !searchParams.term &&
-      serializedCustomJobs?.length
-   ) {
-      return `${
-         serializedCustomJobs?.length
-      } Jobs in ${searchParams.location.join(", ")} on CareerFairy`
+   if (searchParams.location.length && !searchParams.term && numberOfJobs) {
+      return `${numberOfJobs} Jobs in ${searchParams.location.join(
+         ", "
+      )} on CareerFairy`
    }
 
-   if (
-      !searchParams.location.length &&
-      searchParams.term &&
-      serializedCustomJobs?.length
-   ) {
-      return `${serializedCustomJobs?.length} Jobs for ${searchParams.term} on CareerFairy`
+   if (!searchParams.location.length && searchParams.term && numberOfJobs) {
+      return `${numberOfJobs} Jobs for ${searchParams.term} on CareerFairy`
    }
 
-   if (
-      searchParams.location.length &&
-      searchParams.term &&
-      serializedCustomJobs?.length
-   ) {
-      return `${serializedCustomJobs?.length} Jobs for ${
+   if (searchParams.location.length && searchParams.term && numberOfJobs) {
+      return `${numberOfJobs} Jobs for ${
          searchParams.term
       } in ${searchParams.location.join(", ")} on CareerFairy`
    }
@@ -126,6 +108,7 @@ type JobsPageProps = {
    }
    searchParams: SearchParams
    userCountryCode: string
+   numberOfJobs: number
 }
 
 export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
@@ -252,6 +235,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    return {
       props: {
          serializedCustomJobs: serializedCustomJobs,
+         numberOfJobs: algoliaResponse.nbHits,
          customJobData: {
             serializedCustomJob,
             livestreamsData,
