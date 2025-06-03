@@ -6,6 +6,15 @@ import {
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useMeasure } from "react-use"
 
+/**
+ * @description
+ * A custom hook that truncates text to fit within a container, using the canvas context to measure the text width.
+ * The hook uses the useMeasure hook and calculateOptimalTruncation function to calculate the optimal truncation.
+ * Items which are truncated are counted, which can be used to display a "+" count or other scenarios.
+ * @param items - The items to truncate.
+ * @param separator - The separator to use between items.
+ * @returns A tuple containing the ref, the truncation result, and the font style.
+ */
 export const useTextTruncation = (
    items: string[],
    separator: string = ", "
