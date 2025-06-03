@@ -58,7 +58,7 @@ export const useLivestreamDialog = (group: Group) => {
                  ...(group?.id && { groupId: group.id }),
               }
       },
-      [authenticatedUser.uid, group.id]
+      [authenticatedUser.uid, group?.id]
    )
 
    const handlePublishStream = useCallback(
