@@ -2,26 +2,24 @@
 
 ## Purpose
 
-This migration deprecates the `email` field from `livestream.speakers[]` to prevent exposing sensitive email data on the client side. It backfills speaker data by associating them with existing creators or creating new creators.
+Deprecates `email` field from `livestream.speakers[]` and backfills speaker data by linking to existing creators or creating new ones using multiple matching strategies.
 
 ## What it does
 
-1. **Fetches all livestreams and creators** from both regular and draft collections
-2. **For each speaker in each livestream:**
-   -  Checks if the speaker already has a creator ID (skips if already processed)
-   -  Looks for an existing creator with matching email in any of the livestream's associated groups
-   -  If found: Links the speaker to the existing creator by setting `speaker.id` and adding to `livestream.creatorsIds`
-   -  If not found: Creates a new creator document with the speaker's data
-3. **Removes the email field** from speakers after successful linking
-4. **Updates livestream documents** with the new speaker and creator associations
+1. **Fetches** all livestreams, creators, and groups
+2. **For each speaker:**
+   -  Skips if already correctly linked
+   -  Matches using: email, name (case-insensitive), or backfilled email
+   -  Links to existing creator OR creates new creator
+   -  Generates backfilled emails for speakers without emails: `backfill+firstname_lastname_groupId@careerfairy.io`
+3. **Updates** livestream documents with new speaker/creator associations
 
 ## Key Features
 
--  **Safe processing**: Only processes speakers that have emails but no creator ID
--  **Group validation**: Ensures creators are only matched within the correct groups
--  **Error handling**: Continues processing even if individual creator creation fails
--  **Batch processing**: Processes livestreams in manageable batches
--  **Progress tracking**: Shows progress and provides detailed counters
+-  **Multiple matching strategies** (email, name, backfilled email)
+-  **Backfilled email generation** for speakers without emails
+-  **Smart group selection** (prioritizes company over university groups)
+-  **Batch processing** with progress tracking and error handling
 
 ## Run
 
@@ -29,48 +27,43 @@ This migration deprecates the `email` field from `livestream.speakers[]` to prev
 npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/migrateSpeakersToCreators
 ```
 
-## Dry Run Mode
+## Configuration
 
-When `DRY_RUN` is set to `true` in the `index.ts` file:
+Set `DRY_RUN = true` in `index.ts` to simulate without making changes.
 
--  No creators are created
--  No livestream documents are updated
--  All inconsistencies are detected and logged at the end
--  Provides counts of what _would_ be changed
+## Tracking Counters
 
-## Results Tracking
+**Normal Mode:**
 
-The migration tracks:
+-  `speakersMatchedByEmail/Name/BackfilledEmail` - Matching statistics
+-  `speakersAlreadyLinkedCorrectly` - Already processed speakers
+-  `newCreatorsCreated` - New creator documents
+-  `speakersWithBackfilledEmails` - Generated emails
+-  `livestreamsUpdated` - Updated documents
 
-**Normal Mode (DRY_RUN = false):**
+**Dry Run:** Same counters with `WouldBe` suffixes
 
--  `speakersLinkedToExistingCreators`: Number of speakers successfully linked to existing creators
--  `newCreatorsCreated`: Number of new creator documents created
--  `livestreamsUpdated`: Number of livestream documents that were updated
--  `speakersWithMismatchedIds`: Number of speakers that had matching emails to creators but different IDs (data inconsistency detection)
+## Group Selection
 
-**Dry Run Mode (DRY_RUN = true):**
+When multiple groups exist:
 
--  `speakersLinkedToExistingCreators`: Number of speakers that _would be_ linked to existing creators (if email matches and ID is different or missing)
--  `newCreatorsWouldBeCreated`: Number of new creator documents that _would be_ created
--  `livestreamsWouldBeUpdated`: Number of livestream documents that _would be_ updated
--  `speakersWithMismatchedIds`: Number of speakers with email/ID mismatches (same as normal mode, inconsistencies are just logged)
+1. Prioritizes company groups (no `universityCode`)
+2. Falls back to first valid group
+3. Uses first group ID if data unavailable
 
 ## Safety Notes
 
--  Speakers without emails are left unchanged.
--  Original speaker data is preserved if creator creation fails (in normal mode).
--  The migration processes both regular livestreams and draft livestreams.
--  Uses smaller batch sizes (50) due to potential creator document creation.
+-  Preserves original data on creator creation failure
+-  Processes both regular and draft livestreams
+-  Uses batch size of 300 for efficient processing
+-  Updates (not removes) email fields for consistency
 
 ## After Migration
 
-Once this migration is complete:
-
--  All livestream speakers should have creator IDs instead of emails.
--  Email-based matching (like in `getCreatorsWithPublicContent`) can be replaced with ID-based lookups.
--  Client-side code will no longer have access to speaker email addresses.
--  The `Speaker.email` field can be fully removed from the interface (it is already typed as `never` which should be causing type errors if used).
+-  All speakers have creator IDs and emails (original or backfilled)
+-  Email-based matching can be replaced with ID-based lookups
+-  Client-side access to original emails is removed
+-  `Speaker.email` field can be fully deprecated
 
 ## Version
 

@@ -20,22 +20,23 @@ import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 import { WithRef } from "../../../util/types"
 
 // Constants
-const RUNNING_VERSION = "1.1"
+const RUNNING_VERSION = "1.0"
 const DRY_RUN = false // MODIFY THIS TO TOGGLE DRY RUN
 const BACKFILLED_EMAIL_DOMAIN = "careerfairy.io" // Changed from constant to domain only
 const LIVESTREAMS_PER_CHUNK = 300 // How many livestreams to process in one chunk
 
-// Global state
-const counter = new Counter()
-
-// Reset counters
-counter.setCustomCount("newCreatorsCreated", 0)
-counter.setCustomCount("speakersMatchedByEmail", 0)
-counter.setCustomCount("speakersMatchedByName", 0)
-counter.setCustomCount("speakersMatchedByBackfilledEmail", 0)
-counter.setCustomCount("speakersAlreadyLinkedCorrectly", 0)
-counter.setCustomCount("speakersLinkedToExistingCreators", 0)
-counter.setCustomCount("livestreamsUpdated", 0)
+const counter = new Counter({
+   newCreatorsCreated: 0,
+   speakersMatchedByEmail: 0,
+   speakersMatchedByName: 0,
+   speakersMatchedByBackfilledEmail: 0,
+   speakersAlreadyLinkedCorrectly: 0,
+   speakersLinkedToExistingCreators: 0,
+   livestreamsUpdated: 0,
+   newCreatorsWouldBeCreated: 0,
+   livestreamsWouldBeUpdated: 0,
+   speakersWithBackfilledEmails: 0,
+})
 
 const progressBar = new cliProgress.SingleBar(
    {

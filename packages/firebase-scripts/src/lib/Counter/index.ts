@@ -1,7 +1,13 @@
 export default class Counter {
-   private readCount: number = 0
-   private writeCount: number = 0
+   private readCount = 0
+   private writeCount = 0
    private customCounts: { [key: string]: number } = {}
+
+   constructor(initialCounts?: { [key: string]: number }) {
+      if (initialCounts) {
+         this.customCounts = { ...initialCounts }
+      }
+   }
 
    public read(): number {
       return this.readCount

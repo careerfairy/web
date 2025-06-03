@@ -39,12 +39,20 @@ export const EditSpeakerView = () => {
 
    const isRelatedToCreator = !!creator
 
-   // If we found a creator, use that data, otherwise use the speaker data
-   const creatorData = isRelatedToCreator
-      ? creator
-      : selectedSpeaker
-      ? mapSpeakerToCreator(selectedSpeaker)
-      : undefined
+   // Determine the creator data to use based on available information
+   const getCreatorData = () => {
+      if (isRelatedToCreator) {
+         return creator
+      }
+
+      if (selectedSpeaker) {
+         return mapSpeakerToCreator(selectedSpeaker)
+      }
+
+      return undefined
+   }
+
+   const creatorData = getCreatorData()
 
    if (isLoading) {
       return <CircularProgress />
@@ -53,6 +61,7 @@ export const EditSpeakerView = () => {
    return (
       <CreatorFormProvider
          creator={creatorData}
+         // Email is only required for creators, not adhoc speakers
          hideEmailField={!isRelatedToCreator}
       >
          <View component="form">
