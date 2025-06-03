@@ -11,7 +11,7 @@ export const useTextTruncation = (
    separator: string = ", "
 ): [(node: HTMLElement | null) => void, TruncationResult, string] => {
    const [element, setElement] = useState<HTMLElement | null>(null)
-   const [fontStyle, setFontStyle] = useState<string>("14px Poppins")
+   const [fontStyle, setFontStyle] = useState<string>("14px sans-serif")
    const [measureRef, { width }] = useMeasure<HTMLElement>()
 
    const ref = useCallback(
@@ -43,9 +43,9 @@ export const useTextTruncation = (
             setFontStyle(newFontDescription)
          } else if (
             (!newFontDescription || !newFontDescription.includes("px")) &&
-            fontStyle !== "14px Poppins"
+            fontStyle !== "14px sans-serif"
          ) {
-            setFontStyle("14px Poppins")
+            setFontStyle("14px sans-serif")
          }
       }
    }, [element, width, fontStyle])
