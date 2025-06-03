@@ -51,7 +51,7 @@ export const JobsFilter = () => {
                onClick={handleOpenJobAreas}
             >
                <Typography variant="small" lineHeight={"20px"}>
-                  Job Areas
+                  Job fields
                   {selectedJobAreasIds.length > 0 && (
                      <Typography
                         variant="small"
@@ -107,7 +107,7 @@ const JobAreasDialog = ({ isOpen, handleClose }: FilterDialogProps) => {
       <ResponsiveDialogLayout open={isOpen} handleClose={handleClose}>
          <ResponsiveDialogLayout.Header handleClose={handleClose}>
             <Typography sx={styles.dialogTitle} variant="medium">
-               Job Areas
+               Job fields
             </Typography>
          </ResponsiveDialogLayout.Header>
          <ResponsiveDialogLayout.Content>
