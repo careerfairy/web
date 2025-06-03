@@ -598,3 +598,123 @@ export const getQueryStringArray = (
 
    return keyValues
 }
+
+export type TruncationResult = {
+   truncatedText: string | null
+   plusCount: number | null
+   shouldShowTooltip: boolean
+}
+
+// The caller is responsible for setting the font on the context.
+let canvasContextSingleton: CanvasRenderingContext2D | null = null
+export const getCanvasContext = (): CanvasRenderingContext2D | null => {
+   if (!canvasContextSingleton) {
+      if (typeof document !== "undefined") {
+         const canvas = document.createElement("canvas")
+         canvasContextSingleton = canvas.getContext("2d")
+      } else {
+         return null
+      }
+   }
+   // Font is NOT set here. Caller must set it.
+   return canvasContextSingleton
+}
+
+/**
+ * @description
+ * Calculates the optimal truncation of a list of items to fit within a given container width.
+ * @param ctx - The canvas context to use for measuring text width.
+ * @param items - The list of items to truncate.
+ * @param containerWidth - The width of the container to fit the truncated text within.
+ * @param separator - The separator to use between items.
+ * @returns An object containing the truncated text, the number of items that were truncated, and a boolean indicating whether to show a tooltip.
+ */
+export const calculateOptimalTruncation = (
+   ctx: CanvasRenderingContext2D | null,
+   items: string[] | null | undefined,
+   containerWidth: number,
+   separator: string
+): TruncationResult => {
+   if (!ctx || !items || items.length === 0) {
+      const joinedItemsInitial = items?.join(separator) || ""
+      return {
+         truncatedText: joinedItemsInitial.trimEnd(),
+         plusCount: null,
+         shouldShowTooltip: false,
+      }
+   }
+
+   const fullTextOriginal = items.join(separator)
+   if (ctx.measureText(fullTextOriginal).width <= containerWidth) {
+      return {
+         truncatedText: fullTextOriginal.trimEnd(),
+         plusCount: null,
+         shouldShowTooltip: false,
+      }
+   }
+
+   for (let numTextItems = items.length; numTextItems >= 1; numTextItems--) {
+      const plusCount = items.length - numTextItems
+      const plusCountStringForMeasurement =
+         plusCount > 0 ? `, +${plusCount}` : ""
+
+      const currentTextItems = items.slice(0, numTextItems)
+      let textToRender = currentTextItems.join(separator)
+      if (
+         ctx.measureText(textToRender + plusCountStringForMeasurement).width <=
+         containerWidth
+      ) {
+         return {
+            truncatedText: textToRender.trimEnd(),
+            plusCount: plusCount > 0 ? plusCount : null,
+            shouldShowTooltip: true,
+         }
+      }
+
+      if (numTextItems >= 1) {
+         const prefixItems = items.slice(0, numTextItems - 1)
+         const itemToTruncate = items[numTextItems - 1]
+         const prefixText = prefixItems.join(separator)
+
+         if (itemToTruncate) {
+            for (let j = itemToTruncate.length; j >= 1; j--) {
+               const truncatedPart = itemToTruncate.substring(0, j) + "..."
+               textToRender =
+                  prefixItems.length > 0
+                     ? prefixText + separator + truncatedPart
+                     : truncatedPart
+
+               if (
+                  ctx.measureText(textToRender + plusCountStringForMeasurement)
+                     .width <= containerWidth
+               ) {
+                  return {
+                     truncatedText: textToRender.trimEnd(),
+                     plusCount: plusCount > 0 ? plusCount : null,
+                     shouldShowTooltip: true,
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   if (items.length > 0) {
+      const plusNOnlyText = `+${items.length}`
+      if (ctx.measureText(plusNOnlyText).width <= containerWidth) {
+         return {
+            truncatedText: plusNOnlyText,
+            plusCount: null,
+            shouldShowTooltip: true,
+         }
+      }
+   }
+   if (ctx.measureText("...").width <= containerWidth) {
+      return { truncatedText: "...", plusCount: null, shouldShowTooltip: true }
+   }
+   return {
+      truncatedText: "",
+      plusCount: null,
+      shouldShowTooltip: items.length > 0,
+   }
+}

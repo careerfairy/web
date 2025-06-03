@@ -1,4 +1,4 @@
-import { ChipDropdown } from "components/views/common/ChipDropdown"
+import { ChipDropdown } from "components/views/common/ChipDropdown/ChipDropdown"
 
 import { BusinessFunctionTagsOptions } from "@careerfairy/shared-lib/constants/tags"
 
@@ -12,12 +12,16 @@ export const SearchByTags = () => {
 
    return (
       <ChipDropdown
-         isDialog={isMobile}
          label="Job fields"
          options={BusinessFunctionTagsOptions}
-         handleValueChange={setSearchBusinessFunctionTags}
-         selectedOptions={searchBusinessFunctionTags}
-         showApply={isMobile}
+         selection={{
+            selectedOptions: searchBusinessFunctionTags,
+            onChange: setSearchBusinessFunctionTags,
+            showApply: isMobile,
+         }}
+         ui={{
+            isDialog: isMobile,
+         }}
       />
    )
 }
