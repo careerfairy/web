@@ -6,7 +6,7 @@ import { useLocationSearch } from "components/custom-hook/countries/useLocationS
 
 import useIsMobile from "components/custom-hook/useIsMobile"
 
-import { ChipDropdown } from "components/views/common/ChipDropdown"
+import { ChipDropdown } from "components/views/common/ChipDropdown/ChipDropdown"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
 import { useState } from "react"
@@ -57,31 +57,35 @@ export const SearchByLocation = () => {
 
    return (
       <ChipDropdown
-         isDialog={isMobile}
          label={"Location"}
          options={
             locationSearchValue?.length || searchLocations?.length
                ? locationOptions
                : []
          }
-         handleValueChange={setSearchLocations}
-         selectedOptions={searchLocations}
+         selection={{
+            selectedOptions: searchLocations,
+            onChange: setSearchLocations,
+            showApply: isMobile,
+            onApply: () => {
+               setLocationSearchValue("")
+            },
+         }}
+         ui={{
+            isDialog: isMobile,
+            search: () => {
+               return (
+                  <BrandedTextField
+                     fullWidth
+                     placeholder="Search city, state, canton or country"
+                     sx={styles.searchField}
+                     value={locationSearchValue}
+                     onChange={(e) => setLocationSearchValue(e.target.value)}
+                  />
+               )
+            },
+         }}
          onClose={() => setLocationSearchValue("")}
-         onApply={() => {
-            setLocationSearchValue("")
-         }}
-         search={() => {
-            return (
-               <BrandedTextField
-                  fullWidth
-                  placeholder="Search city, state, canton or country"
-                  sx={styles.searchField}
-                  value={locationSearchValue}
-                  onChange={(e) => setLocationSearchValue(e.target.value)}
-               />
-            )
-         }}
-         showApply={isMobile}
       />
    )
 }

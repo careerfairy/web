@@ -1,6 +1,6 @@
 import { jobTypeValueOptions } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { ChipDropdown } from "components/views/common/ChipDropdown"
+import { ChipDropdown } from "components/views/common/ChipDropdown/ChipDropdown"
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
 
 export const SearchByType = () => {
@@ -9,12 +9,16 @@ export const SearchByType = () => {
 
    return (
       <ChipDropdown
-         isDialog={isMobile}
          label="Job type"
          options={jobTypeValueOptions}
-         handleValueChange={setSearchJobTypes}
-         selectedOptions={searchJobTypes}
-         showApply={isMobile}
+         selection={{
+            selectedOptions: searchJobTypes,
+            onChange: setSearchJobTypes,
+            showApply: isMobile,
+         }}
+         ui={{
+            isDialog: isMobile,
+         }}
       />
    )
 }
