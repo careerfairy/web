@@ -1,5 +1,6 @@
 import { Box, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { ChipDropdownProvider } from "components/views/common/ChipDropdown/ChipDropdownContext"
 import { sxStyles } from "types/commonTypes"
 import { SearchByLocation } from "./by/SearchByLocation"
 import { SearchByTags } from "./by/SearchByTags"
@@ -48,9 +49,11 @@ export const OverviewSearch = () => {
             <SearchByTerm />
          </Box>
          <Stack direction="row" spacing={2} sx={styles.searchBy}>
-            <SearchByLocation />
-            <SearchByTags />
-            <SearchByType />
+            <ChipDropdownProvider>
+               <SearchByLocation />
+               <SearchByTags />
+               <SearchByType />
+            </ChipDropdownProvider>
          </Stack>
       </Stack>
    )
