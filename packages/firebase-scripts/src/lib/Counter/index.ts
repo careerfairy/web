@@ -1,9 +1,11 @@
-export default class Counter {
+type AnyString = string & {}
+
+export default class Counter<Key extends string> {
    private readCount = 0
    private writeCount = 0
-   private customCounts: { [key: string]: number } = {}
+   private customCounts: Record<string, number> = {}
 
-   constructor(initialCounts?: { [key: string]: number }) {
+   constructor(initialCounts?: { [key in Key]: number }) {
       if (initialCounts) {
          this.customCounts = { ...initialCounts }
       }
@@ -43,7 +45,7 @@ export default class Counter {
       this.readCount += count
    }
 
-   public customCountIncrement(key: string): void {
+   public customCountIncrement(key: Key | AnyString): void {
       if (this.customCounts[key]) {
          this.customCounts[key]++
       } else {
@@ -51,15 +53,15 @@ export default class Counter {
       }
    }
 
-   public getCustomCount(key: string): number {
-      return this.customCounts[key]
+   public getCustomCount(key: Key | AnyString): number {
+      return this.customCounts[key] || 0
    }
 
-   public setCustomCount(key: string, count: number): void {
+   public setCustomCount(key: Key | AnyString, count: number): void {
       this.customCounts[key] = count
    }
 
-   public addToCustomCount(key: string, count: number): void {
+   public addToCustomCount(key: Key | AnyString, count: number): void {
       if (this.customCounts[key]) {
          this.customCounts[key] += count
       } else {
@@ -67,9 +69,9 @@ export default class Counter {
       }
    }
 
-   public print(key?: string): void {
+   public print(key?: Key | AnyString): void {
       if (key) {
-         Counter.log(`${key}: ${this.customCounts[key]}`)
+         Counter.log(`${key}: ${this.customCounts[key] || 0}`)
       } else {
          Counter.log(`Read: ${this.readCount}`)
          Counter.log(`Write: ${this.writeCount}`)
