@@ -1,4 +1,4 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import {
    CreateCreatorSchema,
    CreateCreatorSchemaType,
@@ -23,7 +23,7 @@ const styles = sxStyles({
 })
 
 type FormProviderProps = {
-   creator?: Creator
+   creator?: Creator | PublicCreator
    hideEmailField?: boolean
    children:
       | ((methods: UseFormReturn<CreateCreatorSchemaType>) => ReactNode)

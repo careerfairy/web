@@ -14,6 +14,12 @@ import * as admin from "firebase-admin"
 import { v4 as uuidv4 } from "uuid"
 import { groupQuestions } from "./groups"
 import { firestore } from "./lib/firebase"
+import {
+   createCreatorDocument,
+   createGroupDocument,
+   creatorExists,
+   groupExists,
+} from "./utils/groupUtils"
 
 type SetupUserLivestreamDataOptions = {
    user: UserData
@@ -258,6 +264,12 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          ...overrideFields,
       })
 
+      // Ensure all required groups exist
+      await this.ensureGroupsExist(data.groupIds)
+
+      // Ensure group creators exist
+      await this.ensureCreatorsExist(data.speakers, data.groupIds[0])
+
       const livestreamRef = firestore.collection("livestreams").doc(data.id)
 
       const statsRef = livestreamRef.collection("stats").doc("livestreamStats")
@@ -420,6 +432,38 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          contentTopicsTagIds: [],
          summary: "",
       }
+   }
+
+   /**
+    * Ensures all required groups exist, creating them if necessary
+    */
+   private async ensureGroupsExist(groupIds: string[]): Promise<void> {
+      if (!groupIds?.length) return
+
+      await Promise.all(
+         groupIds.map(async (groupId) => {
+            const exists = await groupExists(groupId)
+            if (!exists) {
+               await createGroupDocument(groupId)
+            }
+         })
+      )
+   }
+
+   private async ensureCreatorsExist(
+      speakers: Speaker[],
+      groupId: string
+   ): Promise<void> {
+      if (!speakers?.length) return
+
+      await Promise.all(
+         speakers.map(async (speaker) => {
+            const exists = await creatorExists(speaker.id)
+            if (!exists) {
+               await createCreatorDocument(speaker, groupId)
+            }
+         })
+      )
    }
 }
 

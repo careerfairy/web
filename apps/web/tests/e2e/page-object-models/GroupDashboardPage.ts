@@ -358,7 +358,7 @@ export class GroupDashboardPage extends CommonPage {
 
             const existingSpeaker = await this.page
                .getByLabel("Speakers of this event")
-               .getByText(speaker.email)
+               .getByText(`${speaker.firstName} ${speaker.lastName}`)
 
             const speakerExists = await existingSpeaker.isVisible()
 
@@ -376,7 +376,8 @@ export class GroupDashboardPage extends CommonPage {
                Doe: () => speaker.lastName,
                "E.g.,: Marketing Manager": () => speaker.position,
                "LinkedIn link": () => speaker.linkedInUrl,
-               "E.g.,: John@careerfairy.io": () => speaker.email,
+               "E.g.,: John@careerfairy.io": () =>
+                  `${speaker.firstName}-${Date.now()}@example.com`,
                "Tell talent a little more about your story and professional background!":
                   () => speaker.background,
             }

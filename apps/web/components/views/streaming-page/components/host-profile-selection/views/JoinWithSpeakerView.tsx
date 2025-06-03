@@ -1,4 +1,4 @@
-import { mapSpeakerToCreator } from "@careerfairy/shared-lib/groups/creators"
+import { mapSpeakerToPublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, Button } from "@mui/material"
 import { useRemoteUsers } from "agora-rtc-react"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
@@ -82,7 +82,7 @@ export const JoinWithSpeakerView = () => {
                sx={styles.creatorPreview}
                creator={
                   selectedSpeaker
-                     ? mapSpeakerToCreator(selectedSpeaker)
+                     ? mapSpeakerToPublicCreator(selectedSpeaker)
                      : undefined
                }
             />
