@@ -1,6 +1,6 @@
 type AnyString = string & {}
 
-export default class Counter<Key extends string> {
+export default class Counter<Key extends string = string> {
    private readCount = 0
    private writeCount = 0
    private customCounts: Record<string, number> = {}
