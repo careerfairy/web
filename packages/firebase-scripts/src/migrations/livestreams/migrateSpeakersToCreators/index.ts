@@ -23,7 +23,6 @@ import { WithRef } from "../../../util/types"
 const RUNNING_VERSION = "1.0"
 const DRY_RUN = false // MODIFY THIS TO TOGGLE DRY RUN
 const BACKFILLED_EMAIL_DOMAIN = "careerfairy.io" // Changed from constant to domain only
-const LIVESTREAMS_PER_CHUNK = 300 // How many livestreams to process in one chunk
 
 const counter = new Counter({
    newCreatorsCreated: 0,
@@ -91,7 +90,7 @@ export async function run() {
       const creatorsByEmailAndGroup = buildCreatorLookupMap(allCreators)
 
       // Process all livestreams
-      await processLivestreamsInBatches(
+      await processLivestreams(
          [...allLivestreams, ...allDraftLivestreams],
          creatorsByEmailAndGroup
       )
@@ -154,20 +153,16 @@ function buildCreatorLookupMap(creators: Creator[]): Map<string, Creator> {
    return creatorsByEmailAndGroup
 }
 
-async function processLivestreamsInBatches(
+async function processLivestreams(
    livestreams: WithRef<LivestreamEvent>[],
    creatorsByEmailAndGroup: Map<string, Creator>
 ) {
    const totalNumDocs = livestreams.length
    progressBar.start(totalNumDocs, 0)
 
-   for (let i = 0; i < totalNumDocs; i += LIVESTREAMS_PER_CHUNK) {
-      const livestreamsChunk = livestreams.slice(i, i + LIVESTREAMS_PER_CHUNK)
-
-      for (const livestream of livestreamsChunk) {
-         await processLivestreamSpeakers(livestream, creatorsByEmailAndGroup)
-         progressBar.increment()
-      }
+   for (const livestream of livestreams) {
+      await processLivestreamSpeakers(livestream, creatorsByEmailAndGroup)
+      progressBar.increment()
    }
 
    progressBar.stop()
