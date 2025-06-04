@@ -320,7 +320,7 @@ async function handleNewCreator(
       }
    } catch (error) {
       Counter.log(
-         // @ts-ignore
+         // @ts-expect-error - email is no longer a valid field on Speaker
          `Error creating creator for speaker ${speaker.email}: ${error.message}`
       )
       return { speaker }
