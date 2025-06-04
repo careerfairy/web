@@ -161,7 +161,7 @@ export const getInitialValues = (
    linkedInUrl: creator?.linkedInUrl || "",
    story: creator?.story || "",
    id: creator?.id || "",
-   email: "email" in creator ? creator.email : "",
+   email: creator && "email" in creator ? creator.email : "",
    roles: getInitialRolesValues(creator),
 })
 
