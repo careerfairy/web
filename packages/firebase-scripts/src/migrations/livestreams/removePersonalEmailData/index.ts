@@ -43,8 +43,10 @@ export async function run() {
          progressBar.increment()
 
          const toUpdate: Partial<LivestreamEvent> = {
+            // @ts-expect-error - email is no longer a valid field on Speaker
             speakers: livestream.speakers?.map(removeEmailCallback) || [],
             adHocSpeakers:
+               // @ts-expect-error - email is no longer a valid field on Speaker
                livestream.adHocSpeakers?.map(removeEmailCallback) || [],
             liveSpeakers: [],
             author: livestream.author || {},
