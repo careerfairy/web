@@ -36,7 +36,7 @@ const useCustomJobApply = (
 
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
-   const customJob = useCustomJob(job.id, job as CustomJob)
+   const customJob = useCustomJob(job.id, { initialData: job as CustomJob })
 
    const { trigger: handleConfirmApply, isMutating: isApplying } =
       useSWRMutation(

@@ -135,7 +135,7 @@ const DialogDetailsContent = ({
 
    const customJob = useCustomJob(
       customJobId,
-      hasInitialData ? serverSideCustomJob : undefined
+      hasInitialData ? { initialData: serverSideCustomJob } : undefined
    )
 
    if (!customJob) return <CustomJobNotFound onClose={onClose} />

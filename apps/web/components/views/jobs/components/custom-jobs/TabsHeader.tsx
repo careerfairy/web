@@ -38,7 +38,6 @@ export const TabsHeader = ({
       <Tabs
          value={activeTab}
          onChange={onTabChange}
-         variant="fullWidth"
          sx={{
             borderBottom: (theme) => `1px solid ${theme.brand.white[500]}`,
          }}

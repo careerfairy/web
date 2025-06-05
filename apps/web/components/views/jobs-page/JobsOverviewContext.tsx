@@ -9,6 +9,7 @@ import {
    FilterOptions,
    useCustomJobSearchAlgolia,
 } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { customJobRepo } from "data/RepositoryInstances"
 import { NextRouter, useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
@@ -76,13 +77,14 @@ export const JobsOverviewContextProvider = ({
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
-
+   const isMobile = useIsMobile()
    const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
       useState(dialogOpen)
-
+   console.log("🚀 ~ dialogOpen:", dialogOpen)
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
+   console.log("🚀 ~ selectedJob:", selectedJob)
 
    const filterOptions = useMemo<FilterOptions>(
       () => ({
@@ -92,9 +94,9 @@ export const JobsOverviewContextProvider = ({
             normalizedJobType: searchParams.jobTypes,
          },
          booleanFilters: {
-            deleted: false,
-            published: true,
-            isPermanentlyExpired: false,
+            // deleted: false,
+            // published: true,
+            // isPermanentlyExpired: false,
          },
       }),
       [
@@ -130,14 +132,15 @@ export const JobsOverviewContextProvider = ({
             }
          }
 
+         setIsJobDetailsDialogOpen(false)
          setSelectedJob(undefined)
       },
       [setSelectedJob, setIsJobDetailsDialogOpen]
    )
 
    const handleSelectedJobChange = useCallback(
-      (job: CustomJob) => {
-         handleQueryChange(router, "jobId", job.id)
+      (job: CustomJob | undefined) => {
+         handleQueryChange(router, "jobId", job?.id)
       },
       [router]
    )
@@ -211,7 +214,8 @@ export const JobsOverviewContextProvider = ({
             source: CustomJobApplicationSourceTypes.Group,
             id: selectedJob?.groupId,
          },
-         jobDetailsDialogOpen: isJobDetailsDialogOpen,
+         jobDetailsDialogOpen:
+            isJobDetailsDialogOpen && isMobile && Boolean(selectedJob),
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
       }
    }, [
@@ -228,13 +232,19 @@ export const JobsOverviewContextProvider = ({
       setSize,
       isJobDetailsDialogOpen,
       setIsJobDetailsDialogOpen,
+      isMobile,
    ])
 
    useEffect(() => {
-      if (serverJob?.id !== router.query.jobId) {
+      if (!router.query.jobId) {
+         setSelectedJob(undefined)
+         setIsJobDetailsDialogOpen(false)
+      }
+      if (serverJob?.id !== router.query.jobId && router.query.jobId) {
          handleJobIdChange(router.query.jobId as string)
       } else {
          setSelectedJob(serverJob)
+         // setIsJobDetailsDialogOpen(true)
       }
    }, [router.query.jobId, handleJobIdChange, serverJob])
 
@@ -250,13 +260,18 @@ const handleQueryChange = (
    param: keyof SearchParams,
    value: string | string[]
 ) => {
+   const query = router.query
+
+   if (value) {
+      query[param] = value
+   } else {
+      delete query[param]
+   }
+
    router.push(
       {
          pathname: router.pathname,
-         query: {
-            ...router.query,
-            [param]: value,
-         },
+         query: query,
       },
       undefined,
       { shallow: true }
