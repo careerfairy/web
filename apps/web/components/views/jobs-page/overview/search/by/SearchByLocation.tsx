@@ -48,7 +48,7 @@ export const SearchByLocation = () => {
 
    const { data: locations } = useLocationSearch(locationSearchValue, {
       suspense: false,
-      initialLocationIds: !locationSearchValue?.length ? searchLocations : [],
+      initialLocationIds: searchLocations ?? [],
    })
 
    const locationOptions = useMemo(() => {

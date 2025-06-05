@@ -19,7 +19,8 @@ const styles = sxStyles({
       maxHeight: {
          xs: "100% !important",
          sm: "100% !important",
-         md: "726px !important",
+         // Seems to not be consistent
+         md: "76dvh !important",
       },
       overflow: "hidden",
    },
