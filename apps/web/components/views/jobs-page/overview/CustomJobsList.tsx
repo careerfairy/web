@@ -45,7 +45,7 @@ export const CustomJobsList = ({ customJobs }: Props) => {
    const {
       isValidating,
       nextPage,
-      searchParams,
+      selectedJob,
       hasMore,
       setJobDetailsDialogOpen,
    } = useJobsOverviewContext()
@@ -101,7 +101,7 @@ export const CustomJobsList = ({ customJobs }: Props) => {
                            companyLogoUrl={customJob.group?.logoUrl}
                            companyName={customJob.group?.universityName}
                            selected={
-                              searchParams.jobId === customJob.id && !isMobile
+                              selectedJob?.id === customJob.id && !isMobile
                            }
                         />
                      </ListItem>

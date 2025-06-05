@@ -65,7 +65,7 @@ const styles = sxStyles({
    },
    details: {
       color: (t) => t.palette.neutral[500],
-      fontSize: "12px",
+      fontSize: "14px",
    },
    detailsValue: {
       display: "inline",
@@ -190,7 +190,7 @@ const CustomJobHeader = ({
                         />
                      </Stack>
                   ) : null}
-                  <Typography variant={"brandedH3"} sx={styles.jobTitle}>
+                  <Typography variant={"brandedH5"} sx={styles.jobTitle}>
                      {job.title}
                   </Typography>
 
