@@ -112,6 +112,11 @@ const styles = sxStyles({
    disabledApplyText: {
       color: (theme) => `${theme.brand.black[700]} !important`,
    },
+   dialogContentRoot: {
+      minHeight: "90dvh",
+      maxHeight: "95dvh",
+      justifyContent: "space-between",
+   },
 })
 
 type ChipOptions = {
@@ -514,51 +519,53 @@ export const ChipDropdown = ({
                   onClose={handleClose}
                   onOpen={handleToggle}
                >
-                  <ChipContent
-                     options={options}
-                     search={
-                        search
-                           ? search(currentAddedOptions, handleDeleteOption)
-                           : null
-                     }
-                     handleOptionClick={handleActualOptionClick}
-                     isChecked={isChecked}
-                  />
-                  {showApply ? (
-                     <Stack
-                        spacing={1}
-                        p={"16px"}
-                        borderTop={(theme) =>
-                           `1px solid ${theme.brand.white[500]}`
+                  <Stack sx={styles.dialogContentRoot}>
+                     <ChipContent
+                        options={options}
+                        search={
+                           search
+                              ? search(currentAddedOptions, handleDeleteOption)
+                              : null
                         }
-                     >
-                        <Button
-                           variant="contained"
-                           color={"primary"}
-                           onClick={handleApply}
-                           disabled={!isDirty}
+                        handleOptionClick={handleActualOptionClick}
+                        isChecked={isChecked}
+                     />
+                     {showApply ? (
+                        <Stack
+                           spacing={1}
+                           p={"16px"}
+                           borderTop={(theme) =>
+                              `1px solid ${theme.brand.white[500]}`
+                           }
                         >
-                           <Typography
-                              variant="brandedBody"
-                              sx={[
-                                 styles.applyText,
-                                 !isDirty && styles.disabledApplyText,
-                              ]}
+                           <Button
+                              variant="contained"
+                              color={"primary"}
+                              onClick={handleApply}
+                              disabled={!isDirty}
                            >
-                              Apply
-                           </Typography>
-                        </Button>
-                        <Button variant="text" onClick={handleReset}>
-                           <Typography
-                              variant="brandedBody"
-                              color="neutral.600"
-                              fontWeight={400}
-                           >
-                              Reset
-                           </Typography>
-                        </Button>
-                     </Stack>
-                  ) : null}
+                              <Typography
+                                 variant="brandedBody"
+                                 sx={[
+                                    styles.applyText,
+                                    !isDirty && styles.disabledApplyText,
+                                 ]}
+                              >
+                                 Apply
+                              </Typography>
+                           </Button>
+                           <Button variant="text" onClick={handleReset}>
+                              <Typography
+                                 variant="brandedBody"
+                                 color="neutral.600"
+                                 fontWeight={400}
+                              >
+                                 Reset
+                              </Typography>
+                           </Button>
+                        </Stack>
+                     ) : null}
+                  </Stack>
                </BrandedSwipeableDrawer>
             ) : (
                <Popper

@@ -1,8 +1,6 @@
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box } from "@mui/material"
 
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
-import { EmptyPlaceholder } from "components/views/common/icons/EmptyPlaceholder"
 import CustomJobDetailsDialog, {
    InlineCustomJobDetailsContent,
 } from "components/views/common/jobs/CustomJobDetailsDialog"
@@ -62,12 +60,14 @@ export const CustomJobDetails = () => {
       context,
       jobDetailsDialogOpen,
       setJobDetailsDialogOpen,
+      setSelectedJob,
    } = useJobsOverviewContext()
    const router = useRouter()
 
    // TODO: Remove, this is for easier testing
    const notFound = !selectedJob || router.query.notFound === "true"
    const [isOpen, setIsOpen] = useState(notFound)
+   console.log("🚀 ~ CustomJobDetails ~ isOpen:", isOpen)
 
    const handleNotFoundClose = useCallback(() => {
       setIsOpen(false)
@@ -86,108 +86,97 @@ export const CustomJobDetails = () => {
       )
       setJobDetailsDialogOpen(false)
    }, [setIsOpen, router, setJobDetailsDialogOpen])
+   console.log(
+      "🚀 ~ handleNotFoundClose ~ handleNotFoundClose:",
+      handleNotFoundClose?.name
+   )
 
-   if (notFound) {
-      return (
-         <NotFoundWrapper
-            isMobile={isMobile}
-            isOpen={isOpen}
-            handleNotFoundClose={handleNotFoundClose}
-         />
-      )
-   }
+   // if (notFound) {
+   //    return (
+   //       <NotFoundWrapper
+   //          isMobile={isMobile}
+   //          isOpen={isOpen}
+   //          handleNotFoundClose={handleNotFoundClose}
+   //       />
+   //    )
+   // }
 
    return (
       <Box sx={styles.root}>
-         {isMobile ? (
-            <CustomJobDetailsDialog
-               isOpen={jobDetailsDialogOpen}
-               onClose={() => {
-                  setJobDetailsDialogOpen(false)
-
-                  const query = router.query
-                  delete query.jobId
-
-                  router.push(
-                     {
-                        pathname: router.pathname,
-                        query: query,
-                     },
-                     undefined,
-                     { shallow: true }
-                  )
-               }}
-               customJobId={selectedJob.id}
-               source={context}
-               serverSideCustomJob={selectedJob}
-               suspense={false}
-            />
-         ) : (
+         <CustomJobDetailsDialog
+            isOpen={jobDetailsDialogOpen}
+            onClose={() => setSelectedJob(undefined)}
+            customJobId={selectedJob?.id}
+            source={context}
+            serverSideCustomJob={selectedJob}
+            suspense={false}
+         />
+         {!isMobile ? (
             <InlineCustomJobDetailsContent
                customJob={selectedJob}
                source={context}
             />
-         )}
+         ) : null}
       </Box>
    )
 }
 
-type NotFoundWrapperProps = {
-   isMobile: boolean
-   isOpen: boolean
-   handleNotFoundClose: () => void
-}
+// type NotFoundWrapperProps = {
+//    isMobile: boolean
+//    isOpen: boolean
+//    handleNotFoundClose: () => void
+// }
 
-const NotFoundWrapper = ({
-   isMobile,
-   isOpen,
-   handleNotFoundClose,
-}: NotFoundWrapperProps) => {
-   if (isMobile) {
-      return (
-         <ResponsiveDialogLayout
-            open={isOpen}
-            handleClose={handleNotFoundClose}
-         >
-            <ResponsiveDialogLayout.Content>
-               <Box sx={styles.mobileNotFoundWrapper}>
-                  <CustomJobNotFound />
-               </Box>
-            </ResponsiveDialogLayout.Content>
-            <ResponsiveDialogLayout.Actions>
-               <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={handleNotFoundClose}
-               >
-                  Back to jobs
-               </Button>
-            </ResponsiveDialogLayout.Actions>
-         </ResponsiveDialogLayout>
-      )
-   }
+// const NotFoundWrapper = ({
+//    isMobile,
+//    isOpen,
+//    handleNotFoundClose,
+// }: NotFoundWrapperProps) => {
+//    if (isMobile) {
+//       return (
+//          <ResponsiveDialogLayout
+//             open={isOpen}
+//             handleClose={handleNotFoundClose}
+//          >
+//             <ResponsiveDialogLayout.Content>
+//                <Box sx={styles.mobileNotFoundWrapper}>
+//                   <CustomJobNotFound />
+//                </Box>
+//             </ResponsiveDialogLayout.Content>
+//             <ResponsiveDialogLayout.Actions>
+//                <Button
+//                   fullWidth
+//                   variant="contained"
+//                   onClick={handleNotFoundClose}
+//                >
+//                   Back to jobs
+//                </Button>
+//             </ResponsiveDialogLayout.Actions>
+//          </ResponsiveDialogLayout>
+//       )
+//    }
 
-   return (
-      <Stack sx={styles.notFoundRoot}>
-         <CustomJobNotFound />
-      </Stack>
-   )
-}
+//    return (
+//       <Stack sx={styles.notFoundRoot}>
+//          <CustomJobNotFound />
+//       </Stack>
+//    )
+// }
 
-const CustomJobNotFound = () => {
-   return (
-      <Stack spacing={"12px"} sx={styles.notFoundWrapper}>
-         <Box sx={styles.emptyPlaceholder}>
-            <EmptyPlaceholder />
-         </Box>
-         <Stack spacing={"4px"}>
-            <Typography variant="medium" color={"neutral.800"} fontWeight={600}>
-               Oops... This job is no longer available
-            </Typography>
-            <Typography variant="small" color={"neutral.700"} fontWeight={400}>
-               But don&apos;t worry, there are plenty of others to explore.
-            </Typography>
-         </Stack>
-      </Stack>
-   )
-}
+// const CustomJobNotFound = () => {
+//    return (
+//       <Stack spacing={"12px"} sx={styles.notFoundWrapper}>
+//          <Box sx={styles.emptyPlaceholder}>
+//             <EmptyPlaceholder />
+//          </Box>
+//          <Stack spacing={"4px"}>
+//             <Typography variant="medium" color={"neutral.800"} fontWeight={600}>
+//                Oops... This job is no longer available
+//             </Typography>
+//             <Typography variant="small" color={"neutral.700"} fontWeight={400}>
+//                But don&apos;t worry, there are plenty of others to explore.
+//             </Typography>
+//          </Stack>
+//       </Stack>
+//    )
+// }
