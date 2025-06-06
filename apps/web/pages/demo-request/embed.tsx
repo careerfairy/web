@@ -53,6 +53,11 @@ export default function DemoRequestEmbed() {
                name="viewport"
                content="width=device-width, initial-scale=1"
             />
+            <style>{`
+               body {
+                  background-color: transparent !important;
+               }
+            `}</style>
          </Head>
 
          <div id="hubspot-form">{/* HubSpot form will be injected here */}</div>
