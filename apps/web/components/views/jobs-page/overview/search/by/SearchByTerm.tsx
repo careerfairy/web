@@ -12,8 +12,12 @@ const styles = sxStyles({
          p: "4px 12px",
          height: "48px",
          borderRadius: "12px",
-         border: (theme) => `1px solid ${theme.palette.neutral[50]}`,
-
+         // border: (theme) => {
+         //    if (theme.breakpoints.down("sm")) {
+         //       return `1px solid ${theme.palette.neutral[100]}`
+         //    }
+         //    return `1px solid ${theme.palette.neutral[50]}`
+         // },
          background: (theme) => theme.brand.white[100],
       },
       "& .MuiInputBase-input": {
@@ -21,14 +25,31 @@ const styles = sxStyles({
          p: "0px",
          "&::placeholder": {
             color: (theme) => theme.palette.neutral[600],
-            fontSize: "16px",
+            fontSize: {
+               xs: "14px",
+               sm: "14px",
+               md: "16px",
+            },
             fontWeight: "400",
          },
       },
       "& .MuiFilledInput-input": {
          color: (theme) => theme.palette.neutral[800],
-         fontSize: "16px",
+         fontSize: {
+            xs: "14px",
+            sm: "14px",
+            md: "16px",
+         },
          fontWeight: "400",
+      },
+   },
+   input: {
+      border: (theme) => {
+         return {
+            xs: `1px solid ${theme.palette.neutral[100]}`,
+            sm: `1px solid ${theme.palette.neutral[100]}`,
+            md: `1px solid ${theme.palette.neutral[50]}`,
+         }
       },
    },
    searchIcon: {
@@ -62,6 +83,7 @@ export const SearchByTerm = () => {
                   onClick={() => setSearchTerm("")}
                />
             ) : null,
+            sx: styles.input,
          }}
          value={searchTerm}
          onChange={(e) => setSearchTerm(e.target.value)}
