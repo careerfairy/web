@@ -34,6 +34,8 @@ import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useC
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
+export const HEADER_TRANSITION_TIMEOUT = 200
+
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({
@@ -69,7 +71,9 @@ const JobsPage: NextPage<
          <GenericDashboardLayout
             userCountryCode={userCountryCode}
             hideFooter
-            headerFixed
+            headerScrollThreshold={1}
+            transitionTimeout={HEADER_TRANSITION_TIMEOUT}
+            // headerFixed
          >
             <LivestreamDialogLayout>
                <JobsOverviewContextProvider

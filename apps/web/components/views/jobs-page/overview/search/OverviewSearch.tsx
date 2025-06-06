@@ -13,10 +13,11 @@ const styles = sxStyles({
    },
    stickyRoot: {
       position: "sticky",
-      top: 64,
+      top: `calc(var(--app-bar-visible, 0) * 60px)`,
       backgroundColor: "#F7F8FC",
       py: 2,
       zIndex: 1,
+      transition: `top 200ms ease-in-out`,
    },
    searchBy: {
       overflowX: "auto",
@@ -49,7 +50,7 @@ export const OverviewSearch = () => {
          <Box sx={styles.searchByTerm}>
             <SearchByTerm />
          </Box>
-         <Stack direction="row" spacing={2} sx={styles.searchBy}>
+         <Stack direction="row" spacing={1} sx={styles.searchBy}>
             <ChipDropdownProvider>
                <SearchByLocation />
                <SearchByTags />
