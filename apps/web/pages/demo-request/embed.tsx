@@ -10,7 +10,7 @@ declare global {
 const HUBSPOT_CONFIG = {
    portalId: "9186494",
    formId: "e2d5408c-4c39-4133-8b49-22d74ad24134",
-   region: "eu1", //
+   region: "eu1",
 }
 
 export default function DemoRequestEmbed() {
