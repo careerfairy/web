@@ -9,6 +9,7 @@ import { SearchResultsCount } from "./overview/search/SearchResultsCount"
 const styles = sxStyles({
    container: {
       px: "0px !important",
+      maxHeight: "100%",
    },
    jobsContainer: {
       px: {
@@ -20,7 +21,7 @@ const styles = sxStyles({
          xs: "100% !important",
          sm: "100% !important",
          // Seems to not be consistent
-         md: "76dvh !important",
+         md: "80dvh !important",
       },
       overflow: "hidden",
    },

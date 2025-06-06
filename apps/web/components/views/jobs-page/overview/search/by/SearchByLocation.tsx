@@ -1,6 +1,6 @@
 import { dropdownValueMapper } from "components/custom-hook/countries/useLocationSearch"
 
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 
 import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
 
@@ -9,7 +9,6 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { ChipDropdown } from "components/views/common/ChipDropdown/ChipDropdown"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
-import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -73,7 +72,20 @@ export const SearchByLocation = () => {
          }}
          ui={{
             isDialog: isMobile,
-            search: () => {
+            dialog: {
+               rootSx: {
+                  // minHeight: isSearchFocused ? "550px" : "90dvh",
+                  // maxHeight: isSearchFocused ? "auto" : "90dvh",
+               },
+               paperSx: {
+                  // maxHeight: "55dvh",
+                  // minHeight: isSearchFocused ? "auto" : "90dvh",
+               },
+               contentSx: {
+                  minHeight: "100%",
+               },
+            },
+            search: (_, __, searchInputRef) => {
                return (
                   <BrandedTextField
                      fullWidth
@@ -81,11 +93,13 @@ export const SearchByLocation = () => {
                      sx={styles.searchField}
                      value={locationSearchValue}
                      onChange={(e) => setLocationSearchValue(e.target.value)}
+                     inputRef={searchInputRef}
                   />
                )
             },
          }}
          onClose={() => setLocationSearchValue("")}
+         focusSearchInputOnOpenDialog={isMobile}
       />
    )
 }
