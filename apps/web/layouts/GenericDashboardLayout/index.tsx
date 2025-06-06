@@ -70,6 +70,10 @@ type Props = {
     * 'x-vercel-ip-country' during SSR
     */
    userCountryCode?: string
+   /**
+    * The timeout for the header transition, defaults to undefined
+    */
+   transitionTimeout?: number
 }
 
 const GenericDashboardLayout = ({
@@ -87,6 +91,7 @@ const GenericDashboardLayout = ({
    isBottomNavDark = false,
    hideHeader,
    userCountryCode,
+   transitionTimeout = undefined,
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
 
@@ -140,6 +145,7 @@ const GenericDashboardLayout = ({
                drawerOpen={drawerOpen}
                dropdownNav={isMobile ? <TabsNavigator /> : null}
                headerWidth={headerWidth}
+               transitionTimeout={transitionTimeout}
             >
                {children}
                {hideFooter ? null : (
