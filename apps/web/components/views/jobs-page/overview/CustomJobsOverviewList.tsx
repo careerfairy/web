@@ -1,8 +1,11 @@
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
+import { useEffect, useMemo, useRef } from "react"
 
 import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
+import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 import { CustomJobsList } from "./CustomJobsList"
 import { NoResultsFound } from "./search/SearchResultsCount"
@@ -23,15 +26,32 @@ const styles = sxStyles({
 })
 
 export const CustomJobsOverviewList = () => {
-   const { showDefaultJobs, showResultJobs, showOtherJobs } =
+   const isMobile = useIsMobile()
+   const { showDefaultJobs, showResultJobs, showOtherJobs, searchParams } =
       useJobsOverviewContext()
+
+   const scrollableContainerRef = useRef<HTMLDivElement>(null)
+
+   const filterParams = useMemo(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { jobId, ...rest } = searchParams
+      return JSON.stringify(rest)
+   }, [searchParams])
+
+   useEffect(() => {
+      if (scrollableContainerRef.current && isMobile) {
+         scrollTop()
+      }
+   }, [filterParams, isMobile])
 
    return (
       <Stack sx={styles.root} spacing={2}>
          <NoResultsFound />
-         {showDefaultJobs ? <DefaultJobs /> : null}
-         {showResultJobs ? <ResultJobs /> : null}
-         {showOtherJobs ? <OtherJobs /> : null}
+         <Box ref={scrollableContainerRef}>
+            {showDefaultJobs ? <DefaultJobs /> : null}
+            {showResultJobs ? <ResultJobs /> : null}
+            {showOtherJobs ? <OtherJobs /> : null}
+         </Box>
       </Stack>
    )
 }

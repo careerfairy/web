@@ -557,84 +557,82 @@ export const ChipDropdown = ({
                </BrandedTooltip>
             </Box>
             {isDialog ? (
-               <Box sx={{ position: "relative", height: "100%" }}>
-                  <BrandedSwipeableDrawer
-                     anchor="bottom"
-                     open={isOpen}
-                     onClose={handleClose}
-                     onOpen={handleToggle}
-                     PaperProps={{
-                        sx: combineStyles(styles.paper, dialog?.paperSx),
-                     }}
+               <BrandedSwipeableDrawer
+                  anchor="bottom"
+                  open={isOpen}
+                  onClose={handleClose}
+                  onOpen={handleToggle}
+                  PaperProps={{
+                     sx: combineStyles(styles.paper, dialog?.paperSx),
+                  }}
+               >
+                  <Stack
+                     sx={combineStyles(
+                        styles.dialogContentRoot,
+                        dialog?.rootSx
+                     )}
+                     justifyContent="space-between"
                   >
-                     <Stack
-                        sx={combineStyles(
-                           styles.dialogContentRoot,
-                           dialog?.rootSx
-                        )}
-                        justifyContent="space-between"
-                     >
-                        <ChipContent
-                           options={options}
-                           search={
-                              search
-                                 ? search(
-                                      currentAddedOptions,
-                                      handleDeleteOption,
-                                      internalSearchInputRef
-                                   )
-                                 : null
+                     <ChipContent
+                        options={options}
+                        search={
+                           search
+                              ? search(
+                                   currentAddedOptions,
+                                   handleDeleteOption,
+                                   internalSearchInputRef
+                                )
+                              : null
+                        }
+                        handleOptionClick={handleActualOptionClick}
+                        isChecked={isChecked}
+                        rootSx={dialog?.contentSx}
+                     />
+                     {showApply ? (
+                        <Stack
+                           spacing={1}
+                           p={"16px"}
+                           borderTop={(theme) =>
+                              `1px solid ${theme.brand.white[500]}`
                            }
-                           handleOptionClick={handleActualOptionClick}
-                           isChecked={isChecked}
-                           rootSx={dialog?.contentSx}
-                        />
-                        {showApply ? (
-                           <Stack
-                              spacing={1}
-                              p={"16px"}
-                              borderTop={(theme) =>
-                                 `1px solid ${theme.brand.white[500]}`
-                              }
-                              sx={{
-                                 position: "sticky",
-                                 bottom: 0,
-                                 zIndex: 1,
-                                 backgroundColor: (theme) =>
-                                    theme.brand.white[100] ||
-                                    theme.palette.background.paper,
-                              }}
+                           sx={{
+                              position: "sticky",
+                              bottom: 0,
+                              zIndex: 1,
+                              backgroundColor: (theme) =>
+                                 theme.brand.white[100] ||
+                                 theme.palette.background.paper,
+                           }}
+                        >
+                           <Button
+                              variant="contained"
+                              color={"primary"}
+                              onClick={handleApply}
+                              disabled={!isDirty}
                            >
-                              <Button
-                                 variant="contained"
-                                 color={"primary"}
-                                 onClick={handleApply}
-                                 disabled={!isDirty}
+                              <Typography
+                                 variant="brandedBody"
+                                 sx={[
+                                    styles.applyText,
+                                    !isDirty && styles.disabledApplyText,
+                                 ]}
                               >
-                                 <Typography
-                                    variant="brandedBody"
-                                    sx={[
-                                       styles.applyText,
-                                       !isDirty && styles.disabledApplyText,
-                                    ]}
-                                 >
-                                    Apply
-                                 </Typography>
-                              </Button>
-                              <Button variant="text" onClick={handleReset}>
-                                 <Typography
-                                    variant="brandedBody"
-                                    color="neutral.600"
-                                    fontWeight={400}
-                                 >
-                                    Reset
-                                 </Typography>
-                              </Button>
-                           </Stack>
-                        ) : null}
-                     </Stack>
-                  </BrandedSwipeableDrawer>
-               </Box>
+                                 Apply
+                              </Typography>
+                           </Button>
+                           <Button variant="text" onClick={handleReset}>
+                              <Typography
+                                 variant="brandedBody"
+                                 color="neutral.600"
+                                 fontWeight={400}
+                              >
+                                 Reset
+                              </Typography>
+                           </Button>
+                        </Stack>
+                     ) : null}
+                  </Stack>
+               </BrandedSwipeableDrawer>
             ) : (
                <Popper
                   open={Boolean(anchorRef.current)}
