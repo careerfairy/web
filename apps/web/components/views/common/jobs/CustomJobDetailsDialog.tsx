@@ -7,7 +7,6 @@ import {
 import { CloseOutlined } from "@mui/icons-material"
 import {
    Box,
-   Button,
    DialogActions,
    DialogContent,
    IconButton,
@@ -22,14 +21,14 @@ import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/Cu
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { ProfileRemoveCustomJobConfirmation } from "components/views/jobs/components/custom-jobs/ProfileRemoveCustomJobConfirmation"
 import CustomJobDetailsSkeleton from "components/views/jobs/components/custom-jobs/skeletons/CustomJobDetailsSkeleton"
-import { Fragment, ReactNode } from "react"
+import { ReactNode } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { ResponsiveDialogLayout } from "../ResponsiveDialog"
 import {
    CustomJobDetailsProvider,
    useCustomJobDetailsDialog,
 } from "./CustomJobDetailsProvider"
-import { CustomJobNotFoundView } from "./CustomJobNotFoundView"
+import { CustomJobNotFoundView } from "./CustomJobNotFound"
 
 const styles = sxStyles({
    fixedBottomContent: {
@@ -127,7 +126,6 @@ const DialogDetailsContent = ({
    hideApplicationConfirmation,
    hideLinkedLivestreams,
    hideLinkedSparks,
-   onClose,
    suspense,
 }: Props) => {
    const hasInitialData =
@@ -137,8 +135,6 @@ const DialogDetailsContent = ({
       customJobId,
       hasInitialData ? { initialData: serverSideCustomJob } : undefined
    )
-
-   if (!customJob) return <CustomJobNotFound onClose={onClose} />
 
    return (
       <CustomJobDetailsProvider
@@ -163,34 +159,6 @@ const DialogDetailsContent = ({
             <Actions />
          </DialogActions>
       </CustomJobDetailsProvider>
-   )
-}
-
-type CustomJobNotFoundProps = {
-   onClose: () => void
-}
-
-const CustomJobNotFound = ({ onClose }: CustomJobNotFoundProps) => {
-   return (
-      <Fragment>
-         <DialogContent sx={styles.dialogContent}>
-            <CustomJobNotFoundView
-               title="No job found"
-               description="The job you are looking for does not exist. It may have been deleted or closed or the link you followed may be broken."
-            />
-         </DialogContent>
-         <DialogActions sx={styles.fixedBottomContent}>
-            <Button
-               variant="contained"
-               onClick={onClose}
-               color="primary"
-               disableElevation
-               size="small"
-            >
-               Back
-            </Button>
-         </DialogActions>
-      </Fragment>
    )
 }
 
@@ -272,6 +240,14 @@ type InlineDetailsContentProps = ContentProps & {
 export const InlineCustomJobDetailsContent = (
    props: InlineDetailsContentProps
 ) => {
+   if (!props.customJob) {
+      return (
+         <Box sx={{ p: 2 }}>
+            <CustomJobNotFoundView />
+         </Box>
+      )
+   }
+
    return (
       <CustomJobDetailsProvider
          customJob={props.customJob}
