@@ -39,44 +39,27 @@ const styles = sxStyles({
 })
 
 type NotFoundWrapperProps = {
-   isMobile: boolean
    isOpen: boolean
    handleNotFoundClose: () => void
 }
 
-export const CustomJobNotFound = ({
-   isMobile,
+export const CustomJobNotFoundDialog = ({
    isOpen,
    handleNotFoundClose,
 }: NotFoundWrapperProps) => {
-   if (isMobile) {
-      return (
-         <ResponsiveDialogLayout
-            open={isOpen}
-            handleClose={handleNotFoundClose}
-         >
-            <ResponsiveDialogLayout.Content>
-               <Box sx={styles.mobileNotFoundWrapper}>
-                  <CustomJobNotFoundView />
-               </Box>
-            </ResponsiveDialogLayout.Content>
-            <ResponsiveDialogLayout.Actions>
-               <Button
-                  fullWidth
-                  variant="contained"
-                  onClick={handleNotFoundClose}
-               >
-                  Back to jobs
-               </Button>
-            </ResponsiveDialogLayout.Actions>
-         </ResponsiveDialogLayout>
-      )
-   }
-
    return (
-      <Stack sx={styles.notFoundRoot}>
-         <CustomJobNotFoundView />
-      </Stack>
+      <ResponsiveDialogLayout open={isOpen} handleClose={handleNotFoundClose}>
+         <ResponsiveDialogLayout.Content>
+            <Box sx={styles.mobileNotFoundWrapper}>
+               <CustomJobNotFoundView />
+            </Box>
+         </ResponsiveDialogLayout.Content>
+         <ResponsiveDialogLayout.Actions>
+            <Button fullWidth variant="contained" onClick={handleNotFoundClose}>
+               Back to jobs
+            </Button>
+         </ResponsiveDialogLayout.Actions>
+      </ResponsiveDialogLayout>
    )
 }
 

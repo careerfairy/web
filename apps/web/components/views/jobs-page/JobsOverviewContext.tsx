@@ -47,6 +47,7 @@ type JobsOverviewContextType = {
    hasMore: boolean
    context: CustomJobApplicationSource
    jobDetailsDialogOpen: boolean
+   jobNotFound: boolean
    setJobDetailsDialogOpen: (open: boolean) => void
 }
 
@@ -82,6 +83,10 @@ export const JobsOverviewContextProvider = ({
       useState(dialogOpen)
    console.log("🚀 ~ dialogOpen:", dialogOpen)
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
+   const [jobNotFound, setJobNotFound] = useState(
+      searchParams.jobId && !serverJob
+   )
+   console.log("🚀 ~ jobNotFound:", jobNotFound)
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
    console.log("🚀 ~ selectedJob:", selectedJob)
@@ -128,12 +133,15 @@ export const JobsOverviewContextProvider = ({
             if (customJob) {
                setSelectedJob(customJob)
                setIsJobDetailsDialogOpen(true)
+               setJobNotFound(false)
                return
             }
+            setJobNotFound(true)
          }
 
          setIsJobDetailsDialogOpen(false)
          setSelectedJob(undefined)
+         setJobNotFound(Boolean(jobId?.length))
       },
       [setSelectedJob, setIsJobDetailsDialogOpen]
    )
@@ -216,6 +224,7 @@ export const JobsOverviewContextProvider = ({
          },
          jobDetailsDialogOpen:
             isJobDetailsDialogOpen && isMobile && Boolean(selectedJob),
+         jobNotFound,
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
       }
    }, [
@@ -233,6 +242,7 @@ export const JobsOverviewContextProvider = ({
       isJobDetailsDialogOpen,
       setIsJobDetailsDialogOpen,
       isMobile,
+      jobNotFound,
    ])
 
    useEffect(() => {
@@ -247,6 +257,12 @@ export const JobsOverviewContextProvider = ({
          // setIsJobDetailsDialogOpen(true)
       }
    }, [router.query.jobId, handleJobIdChange, serverJob])
+
+   // useEffect(() => {
+   //    if(!isMobile && infiniteJobs?.length && !selectedJob){
+   //       handleJobIdChange(infiniteJobs[0].id)
+   //    }
+   // }, [infiniteJobs, selectedJob, isMobile, handleJobIdChange])
 
    return (
       <JobsOverviewContext.Provider value={value}>
