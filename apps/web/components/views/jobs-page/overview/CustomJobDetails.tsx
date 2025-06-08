@@ -4,8 +4,8 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobDetailsDialog, {
    InlineCustomJobDetailsContent,
 } from "components/views/common/jobs/CustomJobDetailsDialog"
-import { useRouter } from "next/router"
-import { useCallback, useState } from "react"
+import { CustomJobNotFoundDialog } from "components/views/common/jobs/CustomJobNotFound"
+import { useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 
@@ -59,37 +59,37 @@ export const CustomJobDetails = () => {
       selectedJob,
       context,
       jobDetailsDialogOpen,
-      setJobDetailsDialogOpen,
+      jobNotFound,
       setSelectedJob,
    } = useJobsOverviewContext()
-   const router = useRouter()
 
+   const [isNotFoundDialogOpen, setIsNotFoundDialogOpen] = useState(jobNotFound)
    // TODO: Remove, this is for easier testing
-   const notFound = !selectedJob || router.query.notFound === "true"
-   const [isOpen, setIsOpen] = useState(notFound)
-   console.log("🚀 ~ CustomJobDetails ~ isOpen:", isOpen)
+   // const notFound = !selectedJob || router.query.notFound === "true"
+   // const [isOpen, setIsOpen] = useState(notFound)
+   // console.log("🚀 ~ CustomJobDetails ~ jobDetailsDialogOpen:", jobDetailsDialogOpen)
 
-   const handleNotFoundClose = useCallback(() => {
-      setIsOpen(false)
+   // const handleNotFoundClose = useCallback(() => {
+   //    setIsOpen(false)
 
-      const query = router.query
-      delete query.jobId
-      delete query.notFound
+   //    const query = router.query
+   //    delete query.jobId
+   //    delete query.notFound
 
-      router.push(
-         {
-            pathname: router.pathname,
-            query: query,
-         },
-         undefined,
-         { shallow: true }
-      )
-      setJobDetailsDialogOpen(false)
-   }, [setIsOpen, router, setJobDetailsDialogOpen])
-   console.log(
-      "🚀 ~ handleNotFoundClose ~ handleNotFoundClose:",
-      handleNotFoundClose?.name
-   )
+   //    router.push(
+   //       {
+   //          pathname: router.pathname,
+   //          query: query,
+   //       },
+   //       undefined,
+   //       { shallow: true }
+   //    )
+   //    setJobDetailsDialogOpen(false)
+   // }, [setIsOpen, router, setJobDetailsDialogOpen])
+   // console.log(
+   //    "🚀 ~ handleNotFoundClose ~ handleNotFoundClose:",
+   //    handleNotFoundClose?.name
+   // )
 
    // if (notFound) {
    //    return (
@@ -103,6 +103,10 @@ export const CustomJobDetails = () => {
 
    return (
       <Box sx={styles.root}>
+         <CustomJobNotFoundDialog
+            isOpen={Boolean(isNotFoundDialogOpen && isMobile)}
+            handleNotFoundClose={() => setIsNotFoundDialogOpen(false)}
+         />
          <CustomJobDetailsDialog
             isOpen={jobDetailsDialogOpen}
             onClose={() => setSelectedJob(undefined)}
@@ -120,63 +124,3 @@ export const CustomJobDetails = () => {
       </Box>
    )
 }
-
-// type NotFoundWrapperProps = {
-//    isMobile: boolean
-//    isOpen: boolean
-//    handleNotFoundClose: () => void
-// }
-
-// const NotFoundWrapper = ({
-//    isMobile,
-//    isOpen,
-//    handleNotFoundClose,
-// }: NotFoundWrapperProps) => {
-//    if (isMobile) {
-//       return (
-//          <ResponsiveDialogLayout
-//             open={isOpen}
-//             handleClose={handleNotFoundClose}
-//          >
-//             <ResponsiveDialogLayout.Content>
-//                <Box sx={styles.mobileNotFoundWrapper}>
-//                   <CustomJobNotFound />
-//                </Box>
-//             </ResponsiveDialogLayout.Content>
-//             <ResponsiveDialogLayout.Actions>
-//                <Button
-//                   fullWidth
-//                   variant="contained"
-//                   onClick={handleNotFoundClose}
-//                >
-//                   Back to jobs
-//                </Button>
-//             </ResponsiveDialogLayout.Actions>
-//          </ResponsiveDialogLayout>
-//       )
-//    }
-
-//    return (
-//       <Stack sx={styles.notFoundRoot}>
-//          <CustomJobNotFound />
-//       </Stack>
-//    )
-// }
-
-// const CustomJobNotFound = () => {
-//    return (
-//       <Stack spacing={"12px"} sx={styles.notFoundWrapper}>
-//          <Box sx={styles.emptyPlaceholder}>
-//             <EmptyPlaceholder />
-//          </Box>
-//          <Stack spacing={"4px"}>
-//             <Typography variant="medium" color={"neutral.800"} fontWeight={600}>
-//                Oops... This job is no longer available
-//             </Typography>
-//             <Typography variant="small" color={"neutral.700"} fontWeight={400}>
-//                But don&apos;t worry, there are plenty of others to explore.
-//             </Typography>
-//          </Stack>
-//       </Stack>
-//    )
-// }

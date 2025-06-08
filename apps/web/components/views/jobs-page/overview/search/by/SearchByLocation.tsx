@@ -42,12 +42,19 @@ export const SearchByLocation = () => {
    const { searchLocations, setSearchLocations } = useJobsOverviewContext()
 
    const [locationSearchValue, setLocationSearchValue] = useState("")
-
+   const [isSearchFocused, setIsSearchFocused] = useState(false)
+   const [focusCount, setFocusCount] = useState(0)
    const isMobile = useIsMobile()
+
+   // const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>(searchLocations ?? [])
+   // const initialLocationIds = useMemo(() => {
+   //    return (searchLocations ?? []).concat(selectedLocationIds)
+   // }, [searchLocations])
 
    const { data: locations } = useLocationSearch(locationSearchValue, {
       suspense: false,
       initialLocationIds: searchLocations ?? [],
+      limit: 5,
    })
 
    const locationOptions = useMemo(() => {
@@ -72,19 +79,21 @@ export const SearchByLocation = () => {
          }}
          ui={{
             isDialog: isMobile,
-            dialog: {
-               rootSx: {
-                  // minHeight: isSearchFocused ? "550px" : "90dvh",
-                  // maxHeight: isSearchFocused ? "auto" : "90dvh",
-               },
-               paperSx: {
-                  // maxHeight: "55dvh",
-                  // minHeight: isSearchFocused ? "auto" : "90dvh",
-               },
-               contentSx: {
-                  minHeight: "100%",
-               },
-            },
+            dialog: isMobile
+               ? {
+                    rootSx: {
+                       minHeight: isSearchFocused ? "90dvh" : "90dvh",
+                       maxHeight: isSearchFocused ? "90dvh" : "90dvh",
+                    },
+                    paperSx: {
+                       maxHeight: focusCount > 1 ? "55dvh" : "auto",
+                       // minHeight: isSearchFocused ? "90dvh" : "90dvh",
+                    },
+                    contentSx: {
+                       // minHeight: "100%",
+                    },
+                 }
+               : {},
             search: (_, __, searchInputRef) => {
                return (
                   <BrandedTextField
@@ -94,6 +103,11 @@ export const SearchByLocation = () => {
                      value={locationSearchValue}
                      onChange={(e) => setLocationSearchValue(e.target.value)}
                      inputRef={searchInputRef}
+                     onFocus={() => {
+                        setIsSearchFocused(true)
+                        setFocusCount((prev) => prev + 1)
+                     }}
+                     onBlur={() => setIsSearchFocused(false)}
                   />
                )
             },

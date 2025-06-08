@@ -114,7 +114,11 @@ const CustomJobDetailsView = (props: Props) => {
             <CustomJobDetailsSkeleton heroContent={!!props.heroContent} />
          }
       >
-         <CustomJobDetails {...props} />
+         <CustomJobDetails
+            {...props}
+            companyLogoUrl={props?.job?.group?.logoUrl}
+            companyName={props?.job?.group?.universityName}
+         />
       </SuspenseWithBoundary>
    )
 }

@@ -8,7 +8,6 @@ import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApp
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
-import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import { useAuth } from "HOCs/AuthProvider"
 import React, {
    createContext,
@@ -75,7 +74,7 @@ export const CustomJobDetailsProvider: React.FC<
    const { userData } = useAuth()
 
    const { applicationInitiatedOnly: shouldOpenApplyConfirmation } =
-      useUserJobApplication(userData?.id || fingerPrintId, customJob.id)
+      useUserJobApplication(userData?.id || fingerPrintId, customJob?.id)
 
    const [
       isApplyConfirmationOpen,
@@ -89,9 +88,9 @@ export const CustomJobDetailsProvider: React.FC<
    const { applicationInitiatedOnly, handleClickApplyBtn, handleConfirmApply } =
       useCustomJobApply(customJob as PublicCustomJob, source)
 
-   const { data: jobGroups } = useGroupsByIds([customJob.groupId], suspense)
+   // const { data: jobGroups } = useGroupsByIds([customJob.groupId], suspense)
 
-   const group = jobGroups?.at(0)
+   const group = customJob?.group as Group
 
    useEffect(() => {
       if (shouldOpenApplyConfirmation) {
