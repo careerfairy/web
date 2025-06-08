@@ -99,9 +99,9 @@ export const JobsOverviewContextProvider = ({
             normalizedJobType: searchParams.jobTypes,
          },
          booleanFilters: {
-            // deleted: false,
-            // published: true,
-            // isPermanentlyExpired: false,
+            deleted: false,
+            published: true,
+            isPermanentlyExpired: false,
          },
       }),
       [
