@@ -26,6 +26,7 @@ import { BrandedTooltip } from "../../streaming-page/components/BrandedTooltip"
 import { BrandedCheckbox } from "../inputs/BrandedCheckbox"
 import BrandedSwipeableDrawer from "../inputs/BrandedSwipeableDrawer"
 import { useChipDropdownContext } from "./ChipDropdownContext"
+import { SearchInputPlugin } from "./plugins/SearchInputPlugin"
 
 const popperContentVariants = {
    closed: {
@@ -156,11 +157,11 @@ type ChipDropdownUI = {
    /**
     * A render prop for the search UI, receives addedOptions, onDeleteOption, and an inputRef.
     */
-   search?: (
-      currentAddedOptions: ChipOptions[],
-      onDeleteOption: (id: ChipOptions["id"]) => void,
-      searchInputRef?: React.Ref<HTMLInputElement>
-   ) => ReactNode
+   search?: {
+      locationSearchValue: string
+      setLocationSearchValue: (value: string) => void
+      placeholder?: string
+   }
 
    /**
     * Custom styles for the dialog component, applies only to the dialog mode, rendered as a swipeable drawer.
@@ -187,6 +188,15 @@ type ChipDropdownUI = {
     * @default true
     */
    closeOnApply?: boolean
+}
+
+export type SearchInputPluginProps = {
+   searchValue: string
+   setSearchValue: (value: string) => void
+   searchInputRef?: React.MutableRefObject<HTMLInputElement>
+   currentAddedOptions: ChipOptions[]
+   onDeleteOption: (id: ChipOptions["id"]) => void
+   placeholder?: string
 }
 
 type ChipDropdownProps = {
@@ -298,6 +308,7 @@ export const ChipDropdown = ({
    ui,
    onClose,
    onOpen,
+   focusSearchInputOnOpenDialog = false,
 }: ChipDropdownProps) => {
    const {
       selectedOptions,
@@ -313,6 +324,7 @@ export const ChipDropdown = ({
       closeOnApply = true,
    } = ui || {}
    const anchorRef = useRef<HTMLDivElement>(null)
+   const searchInputRef = useRef<HTMLInputElement>(null)
    const id = useId()
    const { openDropdownId, setOpenDropdownId } = useChipDropdownContext()
 
@@ -423,7 +435,6 @@ export const ChipDropdown = ({
 
    const handleToggle = () => {
       dispatch({ type: "TOGGLE_OPEN" })
-      onOpen?.()
       if (!isOpen) {
          setOpenDropdownId(id)
       } else {
@@ -481,6 +492,22 @@ export const ChipDropdown = ({
       })
    }, [selection.selectedOptions, dispatch])
 
+   useEffect(() => {
+      if (isOpen && searchInputRef.current && focusSearchInputOnOpenDialog) {
+         // alert("focus")
+         setTimeout(() => {
+            searchInputRef.current?.focus()
+         }, 300)
+         // searchInputRef.current?.click()
+      }
+   }, [isOpen, focusSearchInputOnOpenDialog])
+   // useEffect(() => {
+   //    if (isOpen) {
+   //       setTimeout(() => {
+   //          onOpen?.()
+   //       }, 300)
+   //    }
+   // }, [isOpen])
    return (
       <ClickAwayListener onClickAway={handleClose}>
          <Box ref={anchorRef} sx={{ position: "relative" }}>
@@ -549,7 +576,10 @@ export const ChipDropdown = ({
                            <Box size={16} component={ChevronDown} />
                         </motion.div>
                      }
-                     onDelete={handleToggle}
+                     onDelete={(event) => {
+                        event.stopPropagation()
+                        handleToggle()
+                     }}
                      onClick={handleToggle}
                   />
                </BrandedTooltip>
@@ -563,7 +593,42 @@ export const ChipDropdown = ({
                   PaperProps={{
                      sx: combineStyles(styles.paper, dialog?.paperSx),
                   }}
-                  disableAutoFocus={false}
+                  // disableRestoreFocus={true}
+                  // onTransitionExited={( ) => {
+                  //    alert("exited")
+                  // }}
+                  // onTransitionEnter={( ) => {
+                  //    alert("enter")
+                  // }}
+                  // SlideProps={{
+                  //    onExited: () => {
+                  //       alert("exited - SlideProps")
+                  //    },
+                  //    onEnter: () => {
+                  //       alert("enter - SlideProps")
+                  //    }
+                  // }}
+                  onTransitionEnd={(event) => {
+                     // The transition might fire for multiple properties (e.g., opacity for backdrop, transform for paper).
+                     // We only want to react to one of them to prevent the logic from running twice.
+                     // The `transform` property is a good candidate as it relates to the drawer sliding in.
+                     if (event.propertyName !== "transform") {
+                        return
+                     }
+                     // alert("end: transition")
+                     if (isOpen) {
+                        onOpen?.()
+                     }
+                  }}
+                  // onAnimationStart={( ) => {
+                  //    alert("start")
+                  // }}
+                  onAnimationEnd={() => {
+                     // alert("end: animation")
+                     // if(isOpen && focusSearchInputOnOpenDialog && searchInputRef.current) {
+                     //    searchInputRef.current.focus()
+                     // }
+                  }}
                >
                   <Stack
                      sx={combineStyles(
@@ -575,7 +640,14 @@ export const ChipDropdown = ({
                      <Stack>
                         {search ? (
                            <Box p={"12px"} sx={styles.searchContainer}>
-                              {search(currentAddedOptions, handleDeleteOption)}
+                              <SearchInputPlugin
+                                 searchValue={search.locationSearchValue}
+                                 setSearchValue={search.setLocationSearchValue}
+                                 searchInputRef={searchInputRef}
+                                 currentAddedOptions={currentAddedOptions}
+                                 onDeleteOption={handleDeleteOption}
+                                 placeholder={search.placeholder ?? "Search"}
+                              />
                            </Box>
                         ) : null}
                         <ChipContent
@@ -647,19 +719,42 @@ export const ChipDropdown = ({
                            variants={popperContentVariants}
                            style={styles.popperContentWrapper}
                         >
-                           <ChipContent
+                           <Stack>
+                              {search ? (
+                                 <Box p={"12px"} sx={styles.searchContainer}>
+                                    <SearchInputPlugin
+                                       searchValue={search.locationSearchValue}
+                                       setSearchValue={
+                                          search.setLocationSearchValue
+                                       }
+                                       currentAddedOptions={currentAddedOptions}
+                                       onDeleteOption={handleDeleteOption}
+                                       placeholder={
+                                          search.placeholder ?? "Search"
+                                       }
+                                       searchInputRef={searchInputRef}
+                                    />
+                                 </Box>
+                              ) : null}
+                              <ChipContent
+                                 options={options}
+                                 handleOptionClick={handleActualOptionClick}
+                                 isChecked={isChecked}
+                              />
+                           </Stack>
+                           {/* <ChipContent
                               options={options}
                               search={
                                  search
                                     ? search(
-                                         currentAddedOptions,
-                                         handleDeleteOption
-                                      )
+                                       currentAddedOptions,
+                                       handleDeleteOption
+                                    )
                                     : null
                               }
                               handleOptionClick={handleActualOptionClick}
                               isChecked={isChecked}
-                           />
+                           /> */}
                         </motion.div>
                      ) : null}
                   </AnimatePresence>
