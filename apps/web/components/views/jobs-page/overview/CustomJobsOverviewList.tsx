@@ -40,7 +40,6 @@ export const CustomJobsOverviewList = () => {
 
    useEffect(() => {
       if (scrollableContainerRef.current) {
-         // scrollTop()
          if (isMobile) {
             scrollTop()
          } else {

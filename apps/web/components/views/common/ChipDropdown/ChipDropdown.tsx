@@ -69,9 +69,10 @@ const styles = sxStyles({
       backgroundColor: "white",
       boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.08)",
       borderRadius: "8px",
-      overflow: "hidden",
+      overflow: "scroll",
       width: "353px",
       transformOrigin: "top",
+      maxHeight: "500px",
    },
    chipContentItem: {
       p: "12px",
@@ -116,10 +117,6 @@ const styles = sxStyles({
       color: (theme) => `${theme.brand.black[700]} !important`,
    },
    dialogContentRoot: {
-      // minHeight: "55dvh",
-      // maxHeight: "90dvh",
-      // height: "100%",
-      // minHeight: "100vh",
       justifyContent: "space-between",
    },
    paper: {
@@ -131,6 +128,12 @@ const styles = sxStyles({
       zIndex: 1,
       backgroundColor: (theme) =>
          theme.brand.white[100] || theme.palette.background.paper,
+   },
+   chipContentRoot: {
+      scrollbarWidth: "thin",
+      flexGrow: 1,
+      overflowY: "auto",
+      p: 0,
    },
 })
 
@@ -155,7 +158,11 @@ type SelectionOptions = {
 
 type ChipDropdownUI = {
    /**
-    * A render prop for the search UI, receives addedOptions, onDeleteOption, and an inputRef.
+    * When required parameters are provided, the search input will be rendered.
+    *
+    * @param locationSearchValue - The value of the search input.
+    * @param setLocationSearchValue - The function to set the value of the search input.
+    * @param placeholder - The placeholder of the search input.
     */
    search?: {
       locationSearchValue: string
@@ -494,20 +501,12 @@ export const ChipDropdown = ({
 
    useEffect(() => {
       if (isOpen && searchInputRef.current && focusSearchInputOnOpenDialog) {
-         // alert("focus")
          setTimeout(() => {
             searchInputRef.current?.focus()
          }, 300)
-         // searchInputRef.current?.click()
       }
    }, [isOpen, focusSearchInputOnOpenDialog])
-   // useEffect(() => {
-   //    if (isOpen) {
-   //       setTimeout(() => {
-   //          onOpen?.()
-   //       }, 300)
-   //    }
-   // }, [isOpen])
+
    return (
       <ClickAwayListener onClickAway={handleClose}>
          <Box ref={anchorRef} sx={{ position: "relative" }}>
@@ -593,21 +592,6 @@ export const ChipDropdown = ({
                   PaperProps={{
                      sx: combineStyles(styles.paper, dialog?.paperSx),
                   }}
-                  // disableRestoreFocus={true}
-                  // onTransitionExited={( ) => {
-                  //    alert("exited")
-                  // }}
-                  // onTransitionEnter={( ) => {
-                  //    alert("enter")
-                  // }}
-                  // SlideProps={{
-                  //    onExited: () => {
-                  //       alert("exited - SlideProps")
-                  //    },
-                  //    onEnter: () => {
-                  //       alert("enter - SlideProps")
-                  //    }
-                  // }}
                   onTransitionEnd={(event) => {
                      // The transition might fire for multiple properties (e.g., opacity for backdrop, transform for paper).
                      // We only want to react to one of them to prevent the logic from running twice.
@@ -619,15 +603,6 @@ export const ChipDropdown = ({
                      if (isOpen) {
                         onOpen?.()
                      }
-                  }}
-                  // onAnimationStart={( ) => {
-                  //    alert("start")
-                  // }}
-                  onAnimationEnd={() => {
-                     // alert("end: animation")
-                     // if(isOpen && focusSearchInputOnOpenDialog && searchInputRef.current) {
-                     //    searchInputRef.current.focus()
-                     // }
                   }}
                >
                   <Stack
@@ -742,19 +717,6 @@ export const ChipDropdown = ({
                                  isChecked={isChecked}
                               />
                            </Stack>
-                           {/* <ChipContent
-                              options={options}
-                              search={
-                                 search
-                                    ? search(
-                                       currentAddedOptions,
-                                       handleDeleteOption
-                                    )
-                                    : null
-                              }
-                              handleOptionClick={handleActualOptionClick}
-                              isChecked={isChecked}
-                           /> */}
                         </motion.div>
                      ) : null}
                   </AnimatePresence>
@@ -780,15 +742,7 @@ const ChipContentInternal = ({
    rootSx,
 }: ChipContentInternalProps) => {
    return (
-      <Stack
-         p={0}
-         // maxHeight={"452px"}
-         // overflow="auto"
-         sx={combineStyles(
-            { scrollbarWidth: "thin", flexGrow: 1, overflowY: "auto" },
-            rootSx
-         )}
-      >
+      <Stack sx={combineStyles(styles.chipContentRoot, rootSx)}>
          <Box>
             {options?.map((option) => (
                <ChipContentItem
