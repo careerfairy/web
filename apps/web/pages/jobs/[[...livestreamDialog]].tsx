@@ -157,9 +157,9 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          normalizedJobType: queryJobTypes,
       },
       booleanFilters: {
-         deleted: false,
-         published: true,
-         isPermanentlyExpired: false,
+         // deleted: false,
+         // published: true,
+         // isPermanentlyExpired: false,
       },
    }
 

@@ -29,10 +29,10 @@ const styles = sxStyles({
       justifyContent: "center",
    },
    listContainer: {
-      scrollbarWidth: "none",
-      "&::-webkit-scrollbar": {
-         display: "none",
-      },
+      // scrollbarWidth: "none",
+      // "&::-webkit-scrollbar": {
+      //    display: "none",
+      // },
    },
 })
 
@@ -52,10 +52,11 @@ export const CustomJobsList = ({ customJobs }: Props) => {
 
    return (
       <Stack
-         overflow={!isMobile ? "scroll" : "initial"}
+         // overflow={!isMobile ? "scroll" : "initial"}
          sx={styles.listContainer}
          spacing={1}
       >
+         {/* <Box ref={scrollableContainerRef}></Box> */}
          <CustomInfiniteScroll
             hasMore={hasMore}
             loading={isValidating}
