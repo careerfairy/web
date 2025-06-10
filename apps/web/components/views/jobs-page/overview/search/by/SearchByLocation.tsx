@@ -18,7 +18,7 @@ export const SearchByLocation = () => {
    const { data: locations } = useLocationSearch(locationSearchValue, {
       suspense: false,
       initialLocationIds: searchLocations ?? [],
-      limit: 10,
+      limit: 15,
    })
 
    const locationOptions = useMemo(() => {
@@ -43,28 +43,14 @@ export const SearchByLocation = () => {
          }}
          ui={{
             isDialog: isMobile,
-            dialog: isMobile
-               ? {
-                    rootSx: {},
-                    paperSx: {
-                       // minHeight: "90dvh",
-                       //   maxHeight: "50vh",
-                       // minHeight: "80vh",
-                       height: "100dvh",
-                    },
-                    contentSx: {
-                       minHeight: "70dvh",
-                       // maxHeight: "45vh",
-                       // minHeight: "30dvh",
-                       // height: "fit-content"
-                       // maxHeight: "fit-content !important",
-                       // minHeight: "100%",
-                       //   minHeight: "30dvh",
-                       //   maxHeight: "30dvh",
-                       //   maxHeight:  isSearchFocused  && focusCount < 2 ? "30dvh" :"100dvh",
-                    },
-                 }
-               : {},
+            dialog: {
+               paperSx: {
+                  height: "100dvh",
+               },
+               contentSx: {
+                  minHeight: "70dvh",
+               },
+            },
             search: {
                locationSearchValue,
                setLocationSearchValue,
@@ -73,13 +59,6 @@ export const SearchByLocation = () => {
          }}
          onClose={() => setLocationSearchValue("")}
          focusSearchInputOnOpenDialog={isMobile}
-         onOpen={() => {
-            // inputRef.current?.click()
-            // inputRef.current?.focus()
-            // setTimeout(() => {
-            //    inputRef.current?.click()
-            // }, 100)
-         }}
       />
    )
 }

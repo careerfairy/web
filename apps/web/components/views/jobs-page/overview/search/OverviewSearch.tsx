@@ -17,27 +17,27 @@ const styles = sxStyles({
       backgroundColor: "#F7F8FC",
       py: 2,
       zIndex: 1,
-      transition: `top 200ms ease-in-out`,
+      transition: `top 100ms ease-out`,
    },
    searchBy: {
-      overflowX: "auto",
-      boxSizing: "border-box",
-      overflowClipMargin: "106px",
-      scrollbarWidth: "none",
-      "&::-webkit-scrollbar": {
-         display: "none",
-      },
+      // overflowX: "auto",
+      // boxSizing: "border-box",
+      // overflowClipMargin: "106px",
+      // scrollbarWidth: "none",
+      // "&::-webkit-scrollbar": {
+      //    display: "none",
+      // },
       px: {
-         xs: "16px !important",
-         sm: "16px !important",
-         md: "32px !important",
+         xs: "16px",
+         sm: "16px",
+         md: "32px",
       },
    },
    searchByTerm: {
       px: {
-         xs: "16px !important",
-         sm: "16px !important",
-         md: "32px !important",
+         xs: "16px",
+         sm: "16px",
+         md: "32px",
       },
    },
 })

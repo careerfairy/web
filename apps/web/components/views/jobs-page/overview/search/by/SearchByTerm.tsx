@@ -12,12 +12,6 @@ const styles = sxStyles({
          p: "4px 12px",
          height: "48px",
          borderRadius: "12px",
-         // border: (theme) => {
-         //    if (theme.breakpoints.down("sm")) {
-         //       return `1px solid ${theme.palette.neutral[100]}`
-         //    }
-         //    return `1px solid ${theme.palette.neutral[50]}`
-         // },
          background: (theme) => theme.brand.white[100],
       },
       "& .MuiInputBase-input": {

@@ -64,42 +64,6 @@ export const CustomJobDetails = () => {
    } = useJobsOverviewContext()
 
    const [isNotFoundDialogOpen, setIsNotFoundDialogOpen] = useState(jobNotFound)
-   // TODO: Remove, this is for easier testing
-   // const notFound = !selectedJob || router.query.notFound === "true"
-   // const [isOpen, setIsOpen] = useState(notFound)
-   // console.log("🚀 ~ CustomJobDetails ~ jobDetailsDialogOpen:", jobDetailsDialogOpen)
-
-   // const handleNotFoundClose = useCallback(() => {
-   //    setIsOpen(false)
-
-   //    const query = router.query
-   //    delete query.jobId
-   //    delete query.notFound
-
-   //    router.push(
-   //       {
-   //          pathname: router.pathname,
-   //          query: query,
-   //       },
-   //       undefined,
-   //       { shallow: true }
-   //    )
-   //    setJobDetailsDialogOpen(false)
-   // }, [setIsOpen, router, setJobDetailsDialogOpen])
-   // console.log(
-   //    "🚀 ~ handleNotFoundClose ~ handleNotFoundClose:",
-   //    handleNotFoundClose?.name
-   // )
-
-   // if (notFound) {
-   //    return (
-   //       <NotFoundWrapper
-   //          isMobile={isMobile}
-   //          isOpen={isOpen}
-   //          handleNotFoundClose={handleNotFoundClose}
-   //       />
-   //    )
-   // }
 
    return (
       <Box sx={styles.root}>
