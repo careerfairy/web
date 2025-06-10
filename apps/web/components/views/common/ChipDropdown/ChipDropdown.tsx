@@ -115,13 +115,21 @@ const styles = sxStyles({
       color: (theme) => `${theme.brand.black[700]} !important`,
    },
    dialogContentRoot: {
-      // minHeight: "80dvh",
+      // minHeight: "55dvh",
       // maxHeight: "90dvh",
-      height: "100%",
+      // height: "100%",
+      // minHeight: "100vh",
       justifyContent: "space-between",
    },
    paper: {
-      maxHeight: "95dvh",
+      maxHeight: "90dvh",
+   },
+   searchContainer: {
+      position: "sticky",
+      top: 0,
+      zIndex: 1,
+      backgroundColor: (theme) =>
+         theme.brand.white[100] || theme.palette.background.paper,
    },
 })
 
@@ -151,7 +159,7 @@ type ChipDropdownUI = {
    search?: (
       currentAddedOptions: ChipOptions[],
       onDeleteOption: (id: ChipOptions["id"]) => void,
-      searchInputRef: React.Ref<HTMLInputElement>
+      searchInputRef?: React.Ref<HTMLInputElement>
    ) => ReactNode
 
    /**
@@ -188,6 +196,7 @@ type ChipDropdownProps = {
    ui?: ChipDropdownUI
    onClose?: () => void
    focusSearchInputOnOpenDialog?: boolean
+   onOpen?: () => void
 }
 
 type ChipDropdownState = {
@@ -288,7 +297,7 @@ export const ChipDropdown = ({
    selection,
    ui,
    onClose,
-   focusSearchInputOnOpenDialog,
+   onOpen,
 }: ChipDropdownProps) => {
    const {
       selectedOptions,
@@ -304,7 +313,6 @@ export const ChipDropdown = ({
       closeOnApply = true,
    } = ui || {}
    const anchorRef = useRef<HTMLDivElement>(null)
-   const internalSearchInputRef = useRef<HTMLInputElement>(null)
    const id = useId()
    const { openDropdownId, setOpenDropdownId } = useChipDropdownContext()
 
@@ -415,6 +423,7 @@ export const ChipDropdown = ({
 
    const handleToggle = () => {
       dispatch({ type: "TOGGLE_OPEN" })
+      onOpen?.()
       if (!isOpen) {
          setOpenDropdownId(id)
       } else {
@@ -471,17 +480,6 @@ export const ChipDropdown = ({
          payload: { selectedOptions: selection.selectedOptions },
       })
    }, [selection.selectedOptions, dispatch])
-
-   useEffect(() => {
-      if (
-         state.isOpen &&
-         isDialog &&
-         focusSearchInputOnOpenDialog &&
-         internalSearchInputRef.current
-      ) {
-         internalSearchInputRef.current?.focus()
-      }
-   }, [state.isOpen, isDialog, focusSearchInputOnOpenDialog])
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
@@ -565,6 +563,7 @@ export const ChipDropdown = ({
                   PaperProps={{
                      sx: combineStyles(styles.paper, dialog?.paperSx),
                   }}
+                  disableAutoFocus={false}
                >
                   <Stack
                      sx={combineStyles(
@@ -573,21 +572,19 @@ export const ChipDropdown = ({
                      )}
                      justifyContent="space-between"
                   >
-                     <ChipContent
-                        options={options}
-                        search={
-                           search
-                              ? search(
-                                   currentAddedOptions,
-                                   handleDeleteOption,
-                                   internalSearchInputRef
-                                )
-                              : null
-                        }
-                        handleOptionClick={handleActualOptionClick}
-                        isChecked={isChecked}
-                        rootSx={dialog?.contentSx}
-                     />
+                     <Stack>
+                        {search ? (
+                           <Box p={"12px"} sx={styles.searchContainer}>
+                              {search(currentAddedOptions, handleDeleteOption)}
+                           </Box>
+                        ) : null}
+                        <ChipContent
+                           options={options}
+                           handleOptionClick={handleActualOptionClick}
+                           isChecked={isChecked}
+                           rootSx={dialog?.contentSx}
+                        />
+                     </Stack>
                      {showApply ? (
                         <Stack
                            spacing={1}
@@ -656,8 +653,7 @@ export const ChipDropdown = ({
                                  search
                                     ? search(
                                          currentAddedOptions,
-                                         handleDeleteOption,
-                                         internalSearchInputRef
+                                         handleDeleteOption
                                       )
                                     : null
                               }
@@ -684,7 +680,6 @@ type ChipContentInternalProps = {
 
 const ChipContentInternal = ({
    options,
-   search,
    handleOptionClick,
    isChecked,
    rootSx,
@@ -699,7 +694,6 @@ const ChipContentInternal = ({
             rootSx
          )}
       >
-         {search ? <Box p={"12px"}>{search}</Box> : null}
          <Box>
             {options?.map((option) => (
                <ChipContentItem

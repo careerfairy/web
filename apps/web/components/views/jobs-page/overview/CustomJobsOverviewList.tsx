@@ -39,8 +39,16 @@ export const CustomJobsOverviewList = () => {
    }, [searchParams])
 
    useEffect(() => {
-      if (scrollableContainerRef.current && isMobile) {
-         scrollTop()
+      if (scrollableContainerRef.current) {
+         // scrollTop()
+         if (isMobile) {
+            scrollTop()
+         } else {
+            scrollableContainerRef.current.scrollIntoView({
+               behavior: "smooth",
+               block: "start",
+            })
+         }
       }
    }, [filterParams, isMobile])
 

@@ -1,6 +1,6 @@
 import { dropdownValueMapper } from "components/custom-hook/countries/useLocationSearch"
 
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 
 import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
 
@@ -13,6 +13,9 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    searchField: {
+      position: "sticky",
+      top: "0px",
+
       "& .MuiInputBase-root": {
          p: "4px 12px",
          height: "48px",
@@ -42,24 +45,19 @@ export const SearchByLocation = () => {
    const { searchLocations, setSearchLocations } = useJobsOverviewContext()
 
    const [locationSearchValue, setLocationSearchValue] = useState("")
-   const [isSearchFocused, setIsSearchFocused] = useState(false)
-   const [focusCount, setFocusCount] = useState(0)
    const isMobile = useIsMobile()
-
-   // const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>(searchLocations ?? [])
-   // const initialLocationIds = useMemo(() => {
-   //    return (searchLocations ?? []).concat(selectedLocationIds)
-   // }, [searchLocations])
 
    const { data: locations } = useLocationSearch(locationSearchValue, {
       suspense: false,
       initialLocationIds: searchLocations ?? [],
-      limit: 5,
+      limit: 10,
    })
 
    const locationOptions = useMemo(() => {
       return locations?.map(dropdownValueMapper) ?? []
    }, [locations])
+
+   const inputRef = useRef<HTMLInputElement>(null)
 
    return (
       <ChipDropdown
@@ -81,20 +79,27 @@ export const SearchByLocation = () => {
             isDialog: isMobile,
             dialog: isMobile
                ? {
-                    rootSx: {
-                       minHeight: isSearchFocused ? "90dvh" : "90dvh",
-                       maxHeight: isSearchFocused ? "90dvh" : "90dvh",
-                    },
+                    rootSx: {},
                     paperSx: {
-                       maxHeight: focusCount > 1 ? "55dvh" : "auto",
-                       // minHeight: isSearchFocused ? "90dvh" : "90dvh",
+                       // minHeight: "90dvh",
+                       //   maxHeight: "50vh",
+                       // minHeight: "80vh",
+                       height: "100dvh",
                     },
                     contentSx: {
+                       minHeight: "350px",
+                       // maxHeight: "45vh",
+                       // minHeight: "30dvh",
+                       // height: "fit-content"
+                       // maxHeight: "fit-content !important",
                        // minHeight: "100%",
+                       //   minHeight: "30dvh",
+                       //   maxHeight: "30dvh",
+                       //   maxHeight:  isSearchFocused  && focusCount < 2 ? "30dvh" :"100dvh",
                     },
                  }
                : {},
-            search: (_, __, searchInputRef) => {
+            search: () => {
                return (
                   <BrandedTextField
                      fullWidth
@@ -102,18 +107,19 @@ export const SearchByLocation = () => {
                      sx={styles.searchField}
                      value={locationSearchValue}
                      onChange={(e) => setLocationSearchValue(e.target.value)}
-                     inputRef={searchInputRef}
-                     onFocus={() => {
-                        setIsSearchFocused(true)
-                        setFocusCount((prev) => prev + 1)
+                     autoFocus
+                     InputProps={{
+                        inputRef: inputRef,
+                        autoFocus: true,
                      }}
-                     onBlur={() => setIsSearchFocused(false)}
                   />
                )
             },
          }}
          onClose={() => setLocationSearchValue("")}
-         focusSearchInputOnOpenDialog={isMobile}
+         onOpen={() => {
+            inputRef.current?.focus()
+         }}
       />
    )
 }
