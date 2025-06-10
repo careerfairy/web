@@ -1,6 +1,11 @@
 import functions = require("firebase-functions")
 import { EUROPEAN_COUNTRY_CODES } from "@careerfairy/shared-lib/constants/forms"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   getJobEmailData,
+   getSparkEmailData,
+   getSpeakerEmailData,
+} from "@careerfairy/shared-lib/email/emailData"
 import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LiveStreamEventWithUsersLivestreamData,
@@ -25,11 +30,6 @@ import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailNotificationRequestData,
 } from "./lib/notifications/EmailTypes"
-import {
-   getJobEmailData,
-   getSparkEmailData,
-   getSpeakerEmailData,
-} from "./lib/notifications/util"
 import { isLocalEnvironment } from "./util"
 
 type FollowUpTemplateId =

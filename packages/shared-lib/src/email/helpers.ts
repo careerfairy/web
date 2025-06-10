@@ -1,9 +1,4 @@
 import { DateTime } from "luxon"
-import {
-   getJobEmailData,
-   getSparkEmailData,
-   getSpeakerEmailData,
-} from "../../../functions/src/lib/notifications/util"
 import { CustomJob } from "../customJobs/customJobs"
 import {
    LivestreamEvent,
@@ -11,18 +6,18 @@ import {
 } from "../livestreams"
 import { Spark } from "../sparks/sparks"
 import { SparkInteractionSources } from "../sparks/telemetry"
+import {
+   CalendarData,
+   getJobEmailData,
+   getSparkEmailData,
+   getSpeakerEmailData,
+} from "./emailData"
 
 import {
    createCalendarEvent,
    getLivestreamICSDownloadUrl,
    makeUrls,
-} from "../utils/utils"
-
-export interface CalendarData {
-   google: string
-   apple: string
-   outlook: string
-}
+} from "../utils"
 
 type GenerateCalendarOptions = {
    utmCampaign?: string
