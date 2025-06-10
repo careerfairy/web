@@ -28,17 +28,12 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
    },
-   listContainer: {
-      // scrollbarWidth: "none",
-      // "&::-webkit-scrollbar": {
-      //    display: "none",
-      // },
-   },
 })
 
 type Props = {
    customJobs: CustomJob[]
 }
+
 export const CustomJobsList = ({ customJobs }: Props) => {
    const isMobile = useIsMobile()
    const router = useRouter()
@@ -51,17 +46,12 @@ export const CustomJobsList = ({ customJobs }: Props) => {
    } = useJobsOverviewContext()
 
    return (
-      <Stack
-         // overflow={!isMobile ? "scroll" : "initial"}
-         sx={styles.listContainer}
-         spacing={1}
-      >
-         {/* <Box ref={scrollableContainerRef}></Box> */}
+      <Stack spacing={1}>
          <CustomInfiniteScroll
             hasMore={hasMore}
             loading={isValidating}
             next={() => Promise.resolve(nextPage())}
-            offset={0} // Trigger next page when 200px from the bottom
+            offset={200}
          >
             {customJobs.map((customJob, idx) => {
                return (

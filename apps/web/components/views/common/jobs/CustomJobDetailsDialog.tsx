@@ -7,6 +7,7 @@ import {
 import { CloseOutlined } from "@mui/icons-material"
 import {
    Box,
+   Button,
    DialogActions,
    DialogContent,
    IconButton,
@@ -16,6 +17,7 @@ import {
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJob from "components/custom-hook/custom-job/useCustomJob"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
@@ -80,6 +82,9 @@ const styles = sxStyles({
          display: "none",
       },
    },
+   notFoundWrapper: {
+      border: "none",
+   },
 })
 
 type Props = {
@@ -127,7 +132,9 @@ const DialogDetailsContent = ({
    hideLinkedLivestreams,
    hideLinkedSparks,
    suspense,
+   onClose,
 }: Props) => {
+   const isMobile = useIsMobile()
    const hasInitialData =
       serverSideCustomJob && customJobId === serverSideCustomJob?.id
 
@@ -135,6 +142,25 @@ const DialogDetailsContent = ({
       customJobId,
       hasInitialData ? { initialData: serverSideCustomJob } : undefined
    )
+
+   if (!customJob) {
+      return (
+         <>
+            <DialogContent sx={styles.dialogContent}>
+               <CustomJobNotFoundView rootSx={styles.notFoundWrapper} />
+            </DialogContent>
+            <DialogActions sx={styles.fixedBottomContent}>
+               <Button
+                  fullWidth={isMobile}
+                  variant="contained"
+                  onClick={onClose}
+               >
+                  Back
+               </Button>
+            </DialogActions>
+         </>
+      )
+   }
 
    return (
       <CustomJobDetailsProvider

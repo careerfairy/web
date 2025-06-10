@@ -88,8 +88,6 @@ export const CustomJobDetailsProvider: React.FC<
    const { applicationInitiatedOnly, handleClickApplyBtn, handleConfirmApply } =
       useCustomJobApply(customJob as PublicCustomJob, source)
 
-   // const { data: jobGroups } = useGroupsByIds([customJob.groupId], suspense)
-
    const group = customJob?.group as Group
 
    useEffect(() => {

@@ -81,15 +81,12 @@ export const JobsOverviewContextProvider = ({
    const isMobile = useIsMobile()
    const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
       useState(dialogOpen)
-   console.log("🚀 ~ dialogOpen:", dialogOpen)
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
    const [jobNotFound, setJobNotFound] = useState(
       searchParams.jobId && !serverJob
    )
-   console.log("🚀 ~ jobNotFound:", jobNotFound)
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
-   console.log("🚀 ~ selectedJob:", selectedJob)
 
    const filterOptions = useMemo<FilterOptions>(
       () => ({
@@ -219,8 +216,9 @@ export const JobsOverviewContextProvider = ({
          nextPage,
          hasMore,
          context: {
-            source: CustomJobApplicationSourceTypes.Group,
-            id: selectedJob?.groupId,
+            source: CustomJobApplicationSourceTypes.JobSection,
+            // Could be changed
+            id: searchParams.jobId || selectedJob?.id || "jobSection",
          },
          jobDetailsDialogOpen:
             isJobDetailsDialogOpen && isMobile && Boolean(selectedJob),
@@ -254,15 +252,8 @@ export const JobsOverviewContextProvider = ({
          handleJobIdChange(router.query.jobId as string)
       } else {
          setSelectedJob(serverJob)
-         // setIsJobDetailsDialogOpen(true)
       }
    }, [router.query.jobId, handleJobIdChange, serverJob])
-
-   // useEffect(() => {
-   //    if(!isMobile && infiniteJobs?.length && !selectedJob){
-   //       handleJobIdChange(infiniteJobs[0].id)
-   //    }
-   // }, [infiniteJobs, selectedJob, isMobile, handleJobIdChange])
 
    return (
       <JobsOverviewContext.Provider value={value}>
