@@ -67,6 +67,10 @@ const csp = {
       "js.hs-banner.com",
       "js.hs-scripts.com",
       "js.hsadspixel.net",
+      "js.hsforms.net", // For HubSpot forms embed script
+      "forms.hsforms.com", // For HubSpot forms embed
+      "forms-na1.hsforms.com", // For HubSpot forms embed (NA1 region)
+      "forms-eu1.hsforms.com", // For HubSpot forms embed (EU region)
       "snap.licdn.com",
       "https://cdn.dreamdata.cloud",
       "https://d3e54v103j8qbb.cloudfront.net",
@@ -118,6 +122,10 @@ const csp = {
       "*.hotjar.com",
       "*.hotjar.io",
       "*.hubapi.com",
+      "*.hsforms.net", // For HubSpot forms API calls
+      "forms.hsforms.com", // For HubSpot forms API calls
+      "forms-na1.hsforms.com", // For HubSpot forms API calls (NA1 region)
+      "forms-eu1.hsforms.com", // For HubSpot forms API calls (EU region)
       "*.linkedin.oribi.io",
       "*.sd-rtn.com:*",
       "*.sentry.io",
@@ -169,6 +177,9 @@ const csp = {
       "https://www.careerfairy.io",
       "https://library.careerfairy.io",
       "https://meetings.hubspot.com", // For request demo page on Webflow
+      "https://forms.hsforms.com", // For HubSpot form submission confirmations
+      "https://forms-na1.hsforms.com", // For HubSpot form submission confirmations (NA1)
+      "https://forms-eu1.hsforms.com", // For HubSpot form submission confirmations (EU1)
       "https://cdn.embedly.com",
       "https://js.stripe.com",
       "https://hooks.stripe.com",
@@ -351,6 +362,16 @@ const moduleExports = {
          },
          {
             source: "/next-livestreams/partnership/:partnerSource",
+            // allow embedding iframes on this path
+            headers: [
+               {
+                  key: "X-Frame-Options",
+                  value: "",
+               },
+            ],
+         },
+         {
+            source: "/demo-request/embed",
             // allow embedding iframes on this path
             headers: [
                {
