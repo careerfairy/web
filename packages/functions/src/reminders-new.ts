@@ -1,3 +1,4 @@
+import { generateCalendarData } from "@careerfairy/shared-lib/email/helpers"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import {
@@ -22,7 +23,6 @@ import ical from "ical-generator"
 import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
 import { groupRepo, notificationService } from "./api/repositories"
-import { generateCalendarData } from "./lib/calendar-helpers"
 import { getStreamsByDateWithRegisteredStudents } from "./lib/livestream"
 import {
    CUSTOMERIO_EMAIL_TEMPLATES,
@@ -30,7 +30,11 @@ import {
    EmailNotificationRequestData,
 } from "./lib/notifications/EmailTypes"
 import { OnBatchCompleteCallback } from "./lib/notifications/NotificationService"
-import { addMinutesDate, formatLivestreamDate } from "./util"
+import {
+   addMinutesDate,
+   formatLivestreamDate,
+   isLocalEnvironment,
+} from "./util"
 
 // delay to be sure that the reminder is sent at the time
 const reminderBufferMinutes = 20
@@ -366,10 +370,10 @@ const handleSendEmails = async (
       type EmailRequest = EmailNotificationRequestData<ReminderTemplateId>
 
       // Generate calendar data
-      const calendarData = generateCalendarData(
-         stream,
-         "fromcalendarevent-mail"
-      )
+      const calendarData = generateCalendarData(stream, {
+         utmCampaign: "fromcalendarevent-mail",
+         isLocalEnvironment: isLocalEnvironment(),
+      })
 
       // Create notification requests for all users
       const notificationRequests = registeredUsers.map<EmailRequest>(
