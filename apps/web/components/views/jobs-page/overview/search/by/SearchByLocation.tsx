@@ -1,45 +1,13 @@
 import { dropdownValueMapper } from "components/custom-hook/countries/useLocationSearch"
 
-import { useMemo, useRef, useState } from "react"
+import { useMemo, useState } from "react"
 
 import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
 
 import useIsMobile from "components/custom-hook/useIsMobile"
 
 import { ChipDropdown } from "components/views/common/ChipDropdown/ChipDropdown"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
-import { sxStyles } from "types/commonTypes"
-
-const styles = sxStyles({
-   searchField: {
-      position: "sticky",
-      top: "0px",
-
-      "& .MuiInputBase-root": {
-         p: "4px 12px",
-         height: "48px",
-         borderRadius: "12px",
-         border: (theme) => `1px solid ${theme.palette.neutral[50]}`,
-
-         background: (theme) => theme.brand.white[100],
-      },
-      "& .MuiInputBase-input": {
-         ml: "8px",
-         p: "0px",
-         "&::placeholder": {
-            color: (theme) => theme.palette.neutral[600],
-            fontSize: "14px",
-            fontWeight: "400",
-         },
-      },
-      "& .MuiFilledInput-input": {
-         color: (theme) => theme.palette.neutral[800],
-         fontSize: "14px",
-         fontWeight: "400",
-      },
-   },
-})
 
 export const SearchByLocation = () => {
    const { searchLocations, setSearchLocations } = useJobsOverviewContext()
@@ -56,8 +24,6 @@ export const SearchByLocation = () => {
    const locationOptions = useMemo(() => {
       return locations?.map(dropdownValueMapper) ?? []
    }, [locations])
-
-   const inputRef = useRef<HTMLInputElement>(null)
 
    return (
       <ChipDropdown
@@ -87,7 +53,7 @@ export const SearchByLocation = () => {
                        height: "100dvh",
                     },
                     contentSx: {
-                       minHeight: "350px",
+                       minHeight: "70dvh",
                        // maxHeight: "45vh",
                        // minHeight: "30dvh",
                        // height: "fit-content"
@@ -99,26 +65,20 @@ export const SearchByLocation = () => {
                     },
                  }
                : {},
-            search: () => {
-               return (
-                  <BrandedTextField
-                     fullWidth
-                     placeholder="Search city, state, canton or country"
-                     sx={styles.searchField}
-                     value={locationSearchValue}
-                     onChange={(e) => setLocationSearchValue(e.target.value)}
-                     autoFocus
-                     InputProps={{
-                        inputRef: inputRef,
-                        autoFocus: true,
-                     }}
-                  />
-               )
+            search: {
+               locationSearchValue,
+               setLocationSearchValue,
+               placeholder: "Search city, state, canton or country",
             },
          }}
          onClose={() => setLocationSearchValue("")}
+         focusSearchInputOnOpenDialog={isMobile}
          onOpen={() => {
-            inputRef.current?.focus()
+            // inputRef.current?.click()
+            // inputRef.current?.focus()
+            // setTimeout(() => {
+            //    inputRef.current?.click()
+            // }, 100)
          }}
       />
    )
