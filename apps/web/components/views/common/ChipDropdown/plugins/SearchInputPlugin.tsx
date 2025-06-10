@@ -4,9 +4,6 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    searchField: {
-      // position: "sticky",
-      // top: "0px",
-
       "& .MuiInputBase-root": {
          p: "4px 12px",
          height: "48px",
@@ -45,20 +42,7 @@ export const SearchInputPlugin = ({
          sx={styles.searchField}
          value={searchValue}
          onChange={(e) => setSearchValue(e.target.value)}
-         // autoFocus
          inputRef={searchInputRef}
-         // inputRef={(input) => input?.focus()}
-         InputProps={{
-            // inputRef: inputRef,
-            autoFocus: true,
-         }}
-         onFocus={() => {
-            // alert("focus")
-         }}
-         // onClick={() => {
-         //    alert("click")
-         // }}
-         // autoFocus
       />
    )
 }

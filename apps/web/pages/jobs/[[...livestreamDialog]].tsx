@@ -17,7 +17,6 @@ import {
    SearchParams,
 } from "components/views/jobs-page/JobsOverviewContext"
 import JobsPageOverview from "components/views/jobs-page/JobsPageOverview"
-import { serialize } from "cookie"
 import {
    customJobRepo,
    livestreamRepo,
@@ -34,7 +33,7 @@ import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useC
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
-export const HEADER_TRANSITION_TIMEOUT = 200
+export const HEADER_TRANSITION_TIMEOUT = 100
 
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -60,7 +59,6 @@ const JobsPage: NextPage<
         ).convertToDocument(Timestamp.fromDate)
       : undefined
 
-   console.log("🚀 ~ serverJob:", serverJob)
    return (
       <>
          <SEO
@@ -73,7 +71,6 @@ const JobsPage: NextPage<
             hideFooter
             headerScrollThreshold={1}
             transitionTimeout={HEADER_TRANSITION_TIMEOUT}
-            // headerFixed
          >
             <LivestreamDialogLayout>
                <JobsOverviewContextProvider
@@ -130,8 +127,6 @@ type JobsPageProps = {
 export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    context
 ) => {
-   const hasRedirected = context.req.cookies["redirected"] || "false"
-   const dialogOpenHeader = context.req.cookies["dialogOpen"]
    const userCountryCode =
       (context.req.headers["x-vercel-ip-country"] as string) || null
 
@@ -140,9 +135,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const term = queryTerm as string
    const jobId = queryJobId as string
 
-   const fromSpecificJob = hasRedirected === "false" && Boolean(jobId)
-   console.log("🚀 ~ fromSpecificJob:", fromSpecificJob)
-   const dialogOpen = fromSpecificJob || dialogOpenHeader === "true"
+   const dialogOpen = Boolean(jobId)
 
    const queryLocations = getQueryStringArray(context.query.location)
    const queryBusinessFunctionTags = getQueryStringArray(
@@ -178,8 +171,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       .map((job) => job as CustomJob)
 
    const firstCustomJob = algoliaCustomJobs?.at(0)
-   console.log("🚀 ~ jobId:", jobId)
-   console.log("🚀 ~ firstCustomJob:", firstCustomJob)
+
    const customJob = jobId
       ? await customJobRepo.getCustomJobById(jobId)
       : firstCustomJob
@@ -192,49 +184,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       algoliaCustomJobs?.map((job) =>
          CustomJobsPresenter.serializeDocument(job)
       ) ?? []
-
-   // Add redirect to include the jobId in the URL if it's not already there
-   // if (hasRedirected === "false" && ((jobId && !customJob) || !jobId)) {
-   //    const params = new URLSearchParams()
-   //    queryLocations.forEach((loc) => params.append("location", loc))
-   //    queryBusinessFunctionTags.forEach((tag) =>
-   //       params.append("businessFunctionTags", tag)
-   //    )
-   //    queryJobTypes.forEach((type) => params.append("jobTypes", type))
-
-   //    if (term) params.set("term", term.toString())
-
-   //    if (firstCustomJob?.id) params.set("jobId", firstCustomJob.id)
-
-   //    const destination = `/jobs?${params.toString()}`
-
-   //    context.res.setHeader(
-   //       "Set-Cookie",
-   //       serialize("redirected", "true", {
-   //          path: "/",
-   //          maxAge: 10, // seconds
-   //          httpOnly: true,
-   //       })
-   //    )
-
-   //    if (dialogOpen) {
-   //       context.res.setHeader(
-   //          "Set-Cookie",
-   //          serialize("dialogOpen", "true", {
-   //             path: "/",
-   //             maxAge: 10, // seconds
-   //             httpOnly: true,
-   //          })
-   //       )
-   //    }
-
-   //    return {
-   //       redirect: {
-   //          destination: destination,
-   //          permanent: false,
-   //       },
-   //    }
-   // }
 
    const serializedSparks: SerializedSpark[] = []
    const livestreamsData: { [p: string]: any }[] = []
@@ -260,15 +209,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          livestreamsData.push(LivestreamPresenter.serializeDocument(event))
       })
    }
-
-   // Clear the cookie for future clean runs
-   context.res.setHeader(
-      "Set-Cookie",
-      serialize("redirected", "", {
-         path: "/",
-         maxAge: -1,
-      })
-   )
 
    return {
       props: {

@@ -1,8 +1,8 @@
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack, SxProps, Theme, Typography } from "@mui/material"
 
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { EmptyPlaceholder } from "components/views/common/icons/EmptyPlaceholder"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    notFoundRoot: {
@@ -63,9 +63,18 @@ export const CustomJobNotFoundDialog = ({
    )
 }
 
-export const CustomJobNotFoundView = () => {
+type CustomJobNotFoundViewProps = {
+   rootSx?: SxProps<Theme>
+}
+
+export const CustomJobNotFoundView = ({
+   rootSx,
+}: CustomJobNotFoundViewProps) => {
    return (
-      <Stack spacing={"12px"} sx={styles.notFoundWrapper}>
+      <Stack
+         spacing={"12px"}
+         sx={combineStyles(styles.notFoundWrapper, rootSx)}
+      >
          <Box sx={styles.emptyPlaceholder}>
             <EmptyPlaceholder />
          </Box>
