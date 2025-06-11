@@ -68,7 +68,6 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "end",
    },
-   logo: {},
 })
 
 type Props = {
@@ -171,7 +170,6 @@ const JobCard = ({
                            mb={1}
                         >
                            <CircularLogo
-                              sx={styles.logo}
                               alt={`${companyName} logo`}
                               src={companyLogoUrl}
                               size={28}
