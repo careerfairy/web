@@ -267,7 +267,7 @@ const handleQueryChange = (
    param: keyof SearchParams,
    value: string | string[]
 ) => {
-   const query = router.query
+   const query = { ...router.query }
 
    if (value) {
       query[param] = value
