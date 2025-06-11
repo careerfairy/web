@@ -5,7 +5,6 @@ import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
-import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 import { CustomJobsList } from "./CustomJobsList"
 import { NoResultsFound } from "./search/SearchResultsCount"
@@ -39,14 +38,12 @@ export const CustomJobsOverviewList = () => {
    }, [searchParams])
 
    useEffect(() => {
-      if (scrollableContainerRef.current && !isMobile) {
-         scrollableContainerRef.current.scrollIntoView({
+      setTimeout(() => {
+         scrollableContainerRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
          })
-      } else {
-         scrollTop()
-      }
+      }, 500)
    }, [filterParams, isMobile])
 
    return (
