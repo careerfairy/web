@@ -17,18 +17,9 @@ const styles = sxStyles({
          sm: "16px !important",
          md: "32px !important",
       },
-      minHeight: {
-         md: "75dvh !important",
-      },
-      maxHeight: {
-         md: "76dvh !important",
-      },
       height: {
-         // xs: "100dvh !important",
-         // sm: "100dvh !important",
-         md: "76dvh !important",
+         md: "calc(100dvh - 176px) !important",
       },
-      // height: "80vh",
       overflow: "hidden",
    },
 })
