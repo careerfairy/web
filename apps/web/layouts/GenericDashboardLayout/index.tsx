@@ -20,6 +20,7 @@ type IGenericDashboardContext = {
    drawerOpen: boolean
    isMobile: boolean
    userCountryCode?: string
+   blurHeaderOnScroll?: boolean
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
@@ -30,6 +31,7 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
    drawerOpen: false,
    isMobile: false,
    userCountryCode: undefined,
+   blurHeaderOnScroll: false,
 })
 
 type Props = {
@@ -78,6 +80,10 @@ type Props = {
     * The component to use for the title
     */
    titleComponent?: React.ElementType
+   /**
+    * If true, the header will be transparent but have a blur effect on scroll
+    */
+   blurHeaderOnScroll?: boolean
 }
 
 const GenericDashboardLayout = ({
@@ -97,6 +103,7 @@ const GenericDashboardLayout = ({
    userCountryCode,
    transitionTimeout = undefined,
    titleComponent = "h1",
+   blurHeaderOnScroll,
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
 
@@ -118,6 +125,7 @@ const GenericDashboardLayout = ({
          drawerOpen,
          isMobile,
          userCountryCode,
+         blurHeaderOnScroll: Boolean(blurHeaderOnScroll),
       }),
       [
          handleOpenCreditsDialog,
@@ -128,6 +136,7 @@ const GenericDashboardLayout = ({
          drawerOpen,
          isMobile,
          userCountryCode,
+         blurHeaderOnScroll,
       ]
    )
 
