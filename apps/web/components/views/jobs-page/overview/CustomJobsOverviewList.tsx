@@ -26,8 +26,13 @@ const styles = sxStyles({
 
 export const CustomJobsOverviewList = () => {
    const isMobile = useIsMobile()
-   const { showDefaultJobs, showResultJobs, showOtherJobs, searchParams } =
-      useJobsOverviewContext()
+   const {
+      showDefaultJobs,
+      showResultJobs,
+      showOtherJobs,
+      searchParams,
+      hasFilters,
+   } = useJobsOverviewContext()
 
    const scrollableContainerRef = useRef<HTMLDivElement>(null)
 
@@ -38,13 +43,14 @@ export const CustomJobsOverviewList = () => {
    }, [searchParams])
 
    useEffect(() => {
+      if (!hasFilters) return
       setTimeout(() => {
          scrollableContainerRef.current?.scrollIntoView({
             behavior: "smooth",
             block: "start",
          })
       }, 500)
-   }, [filterParams, isMobile])
+   }, [filterParams, isMobile, hasFilters])
 
    return (
       <Stack sx={styles.root} spacing={2}>
