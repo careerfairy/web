@@ -25,6 +25,7 @@ import { combineStyles, sxStyles } from "types/commonTypes"
 import { BrandedTooltip } from "../../streaming-page/components/BrandedTooltip"
 import { BrandedCheckbox } from "../inputs/BrandedCheckbox"
 import BrandedSwipeableDrawer from "../inputs/BrandedSwipeableDrawer"
+import { StyledHiddenInput } from "../inputs/StyledHiddenInput"
 import { useChipDropdownContext } from "./ChipDropdownContext"
 import { SearchInputPlugin } from "./plugins/SearchInputPlugin"
 
@@ -334,6 +335,14 @@ export const ChipDropdown = ({
    const searchInputRef = useRef<HTMLInputElement>(null)
    const id = useId()
    const { openDropdownId, setOpenDropdownId } = useChipDropdownContext()
+   const proxyInputRef = useRef<HTMLInputElement>(null)
+
+   const isIOS = useMemo(
+      () =>
+         typeof window !== "undefined" &&
+         /iPad|iPhone|iPod/.test(navigator.userAgent),
+      []
+   )
 
    const initialSelectedOptions = useMemo(
       () => selection.selectedOptions,
@@ -451,6 +460,23 @@ export const ChipDropdown = ({
       }
    }
 
+   const handleProxyFocus = () => {
+      if (!isOpen) {
+         handleToggle()
+      }
+
+      proxyInputRef.current?.blur()
+   }
+
+   const handleChipClick = () => {
+      const isDialogWithSearch = isDialog && search
+      if (isIOS && isDialogWithSearch && !isOpen) {
+         proxyInputRef.current?.focus()
+      } else {
+         handleToggle()
+      }
+   }
+
    const handleApply = useCallback(() => {
       const newSelectedValues = Object.keys(selectedMap).filter(
          (key) => selectedMap[key]
@@ -500,10 +526,8 @@ export const ChipDropdown = ({
    }, [selection.selectedOptions, dispatch])
 
    useEffect(() => {
-      if (isOpen && searchInputRef.current && focusSearchInputOnOpenDialog) {
-         setTimeout(() => {
-            searchInputRef.current?.focus()
-         }, 300)
+      if (isOpen && focusSearchInputOnOpenDialog && searchInputRef.current) {
+         searchInputRef.current.focus({ preventScroll: true })
       }
    }, [isOpen, focusSearchInputOnOpenDialog])
 
@@ -579,10 +603,18 @@ export const ChipDropdown = ({
                         event.stopPropagation()
                         handleToggle()
                      }}
-                     onClick={handleToggle}
+                     onClick={handleChipClick}
                   />
                </BrandedTooltip>
             </Box>
+            {isIOS && isDialog && search ? (
+               <StyledHiddenInput
+                  ref={proxyInputRef}
+                  onFocus={handleProxyFocus}
+                  aria-hidden="true"
+                  tabIndex={-1}
+               />
+            ) : null}
             {isDialog ? (
                <BrandedSwipeableDrawer
                   anchor="bottom"

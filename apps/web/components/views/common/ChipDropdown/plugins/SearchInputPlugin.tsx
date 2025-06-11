@@ -42,6 +42,7 @@ export const SearchInputPlugin = ({
          sx={styles.searchField}
          value={searchValue}
          onChange={(e) => setSearchValue(e.target.value)}
+         autoFocus
          inputRef={searchInputRef}
       />
    )
