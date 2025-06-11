@@ -19,6 +19,7 @@ type IGenericDashboardContext = {
    headerType?: "sticky" | "fixed"
    drawerOpen: boolean
    isMobile: boolean
+   blurHeaderOnScroll?: boolean
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
@@ -28,6 +29,7 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
    headerFixed: false,
    drawerOpen: false,
    isMobile: false,
+   blurHeaderOnScroll: false,
 })
 
 type Props = {
@@ -63,6 +65,10 @@ type Props = {
     * If true, the header will be hidden
     */
    hideHeader?: boolean
+   /**
+    * If true, the header will be transparent but have a blur effect on scroll
+    */
+   blurHeaderOnScroll?: boolean
 }
 
 const GenericDashboardLayout = ({
@@ -79,6 +85,7 @@ const GenericDashboardLayout = ({
    hideBottomNav,
    isBottomNavDark = false,
    hideHeader,
+   blurHeaderOnScroll,
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
 
@@ -99,6 +106,7 @@ const GenericDashboardLayout = ({
          headerType: headerType,
          drawerOpen,
          isMobile,
+         blurHeaderOnScroll: Boolean(blurHeaderOnScroll),
       }),
       [
          handleOpenCreditsDialog,
@@ -108,6 +116,7 @@ const GenericDashboardLayout = ({
          headerType,
          drawerOpen,
          isMobile,
+         blurHeaderOnScroll,
       ]
    )
 

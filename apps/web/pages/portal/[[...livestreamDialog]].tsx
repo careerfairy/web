@@ -1,4 +1,3 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { Box, Typography } from "@mui/material"
 import Container from "@mui/material/Container"
@@ -6,11 +5,6 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
 import { Fragment, ReactNode, useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
-import CarouselContentService, {
-   filterNonRegisteredStreams,
-   type CarouselContent,
-} from "../../components/views/portal/content-carousel/CarouselContentService"
-import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
 import MyNextEvents from "../../components/views/portal/events-preview/MyNextEvents"
 import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
@@ -18,18 +12,13 @@ import { START_DATE_FOR_REPORTED_EVENTS } from "../../data/constants/streamConta
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { useAuth } from "../../HOCs/AuthProvider"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
-import DateUtil from "../../util/DateUtil"
-import {
-   getServerSideUserData,
-   getServerSideUserStats,
-   getUserTokenFromCookie,
-   mapFromServerSide,
-} from "../../util/serverUtil"
+import { mapFromServerSide } from "../../util/serverUtil"
 
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
@@ -54,6 +43,10 @@ const styles = sxStyles({
    sparksCarouselHeader: {
       mr: 2,
    },
+   welcomeTextContainer: {
+      ml: 2,
+      pb: 2,
+   },
 })
 
 const DIALOG_SOURCE = "livestreamDialog"
@@ -61,13 +54,12 @@ const DIALOG_SOURCE = "livestreamDialog"
 const PortalPage = ({
    comingUpNextEvents,
    pastEvents,
-   serializedCarouselContent,
-   serverUserStats,
    livestreamDialogData,
    customJobDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
+   const isMobile = useIsMobile()
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -79,12 +71,6 @@ const PortalPage = ({
       () => mapFromServerSide(comingUpNextEvents),
       [comingUpNextEvents]
    )
-
-   const carouselContent = useMemo<CarouselContent[]>(() => {
-      return CarouselContentService.deserializeContent(
-         serializedCarouselContent
-      )
-   }, [serializedCarouselContent])
 
    const handleSparksClicked = (spark: Spark) => {
       if (!spark) return
@@ -107,7 +93,14 @@ const PortalPage = ({
             }
             title={"CareerFairy | Portal"}
          />
-         <GenericDashboardLayout pageDisplayName={""} isPortalPage={true}>
+         <GenericDashboardLayout
+            pageDisplayName={""}
+            isPortalPage={true}
+            bgColor="linear-gradient(180deg, #2ABAA50F 274px, #F7F8FC0F 400px)"
+            headerType="fixed"
+            blurHeaderOnScroll
+            headerScrollThreshold={20}
+         >
             <Fragment>
                <LivestreamDialogLayout
                   livestreamDialogData={livestreamDialogData}
@@ -120,13 +113,19 @@ const PortalPage = ({
                      }}
                      dialogSource={DIALOG_SOURCE}
                   >
-                     <Container disableGutters sx={{ overflow: "hidden" }}>
-                        <ContentCarousel
-                           content={carouselContent}
-                           serverUserStats={serverUserStats}
-                        />
-                     </Container>
-                     <Container disableGutters>
+                     <Container disableGutters sx={{ mt: isMobile ? 7 : 2.5 }}>
+                        <Box sx={styles.welcomeTextContainer}>
+                           <Typography
+                              variant="brandedH4"
+                              color="neutral.900"
+                              fontWeight={700}
+                           >
+                              {userData?.firstName
+                                 ? `Welcome, ${userData?.firstName}!`
+                                 : "Nice to see you!"}
+                           </Typography>
+                        </Box>
+
                         <PortalTags>
                            <UserSparksCarousel
                               header={
@@ -214,10 +213,6 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-   const token = getUserTokenFromCookie(ctx)
-
-   const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
-
    const promises = []
    promises.push(
       livestreamRepo.getUpcomingEvents(20),
@@ -228,52 +223,18 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       getLivestreamDialogData(ctx)
    )
 
-   // only adds recording request if token has email
-   if (token?.email) {
-      promises.push(
-         livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days),
-         getServerSideUserStats(token.email),
-         getServerSideUserData(token.email)
-      )
-   }
-
    const results = await Promise.allSettled(promises)
 
-   const [
-      comingUpNextEvents,
-      pastEvents,
-      livestreamDialogData,
-      recordedEvents,
-      userStats,
-      userData,
-   ] = results.map((result) =>
-      result.status === "fulfilled" ? result.value : null
+   const [comingUpNextEvents, pastEvents, livestreamDialogData] = results.map(
+      (result) => (result.status === "fulfilled" ? result.value : null)
    )
 
-   const recordedEventsToShare = recordedEvents?.filter(
-      (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
-   )
-
-   const [upcomingLivestreams, pastLivestreams, customJobDialogData] =
-      await Promise.all([
-         filterNonRegisteredStreams(comingUpNextEvents || [], token?.email),
-         filterNonRegisteredStreams(pastEvents || [], token?.email),
-         getCustomJobDialogData(ctx, DIALOG_SOURCE),
-      ])
-
-   const carouselContentService = new CarouselContentService({
-      userData: userData,
-      userStats: userStats,
-      pastLivestreams,
-      upcomingLivestreams,
-      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
-   })
-
-   const carouselContent = await carouselContentService.getCarouselContent()
+   const [customJobDialogData] = await Promise.all([
+      getCustomJobDialogData(ctx, DIALOG_SOURCE),
+   ])
 
    return {
       props: {
-         serverUserStats: userStats || null,
          ...(comingUpNextEvents && {
             comingUpNextEvents: comingUpNextEvents.map(
                LivestreamPresenter.serializeDocument
@@ -282,10 +243,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          ...(pastEvents && {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
-         ...(carouselContent && {
-            serializedCarouselContent:
-               CarouselContentService.serializeContent(carouselContent),
-         }),
+
          customJobDialogData,
          livestreamDialogData,
       },

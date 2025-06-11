@@ -49,6 +49,10 @@ const baseStyles = (drawerWidth: number) => {
       },
       header: {
          backgroundColor: "unset",
+         transition: (theme) =>
+            theme.transitions.create("all", {
+               duration: 500,
+            }),
       },
       drawerWrapper: {
          flexShrink: { md: 0 },
@@ -133,7 +137,7 @@ const AdminGenericLayout: React.FC<Props> = ({
          sx={[
             styles.root,
             {
-               bgcolor: bgColor ? bgColor : "background.default",
+               background: bgColor ? bgColor : "background.default",
             },
          ]}
       >
@@ -220,13 +224,22 @@ type HeaderProps = {
    width?: string
 }
 const HeaderComponent = ({ children, width }: HeaderProps) => {
-   const { headerScrollThreshold, headerFixed, headerType } =
-      useGenericDashboard()
+   const {
+      headerScrollThreshold,
+      headerFixed,
+      headerType,
+      blurHeaderOnScroll,
+   } = useGenericDashboard()
    const isMobile = useIsMobile()
    const styles = useStyles()
 
    const isScrolling = useScrollTrigger({
       threshold: headerScrollThreshold,
+   })
+
+   const blurTrigger = useScrollTrigger({
+      disableHysteresis: true,
+      threshold: 10,
    })
 
    const isVisible = isMobile ? headerFixed || !isScrolling : true
@@ -249,7 +262,15 @@ const HeaderComponent = ({ children, width }: HeaderProps) => {
             position={headerType || "sticky"}
             color="inherit"
             elevation={0}
-            sx={[width && { width }, styles.header]}
+            sx={[
+               styles.header,
+               { width },
+               blurHeaderOnScroll &&
+                  blurTrigger && {
+                     backgroundColor: "#F7F8FCD6",
+                     backdropFilter: "blur(40px)",
+                  },
+            ]}
          >
             <Toolbar sx={styles.header} disableGutters>
                {children}

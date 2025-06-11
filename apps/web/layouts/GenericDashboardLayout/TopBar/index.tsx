@@ -29,6 +29,8 @@ const styles = sxStyles({
          sm: 4,
       },
       py: 1.5,
+   },
+   rootBackground: {
       background: "#F7F8FC",
    },
    leftSection: {
@@ -60,7 +62,7 @@ const TopBar = ({ title }: Props) => {
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
    const { asPath } = useRouter()
-   const { headerType } = useGenericDashboard()
+   const { headerType, blurHeaderOnScroll } = useGenericDashboard()
 
    const SignUpButton = () => (
       <Button
@@ -75,7 +77,13 @@ const TopBar = ({ title }: Props) => {
    )
 
    return (
-      <Box sx={[styles.root, headerType == "fixed" && { background: "unset" }]}>
+      <Box
+         sx={[
+            styles.root,
+            headerType == "fixed" && { background: "unset" },
+            !blurHeaderOnScroll && styles.rootBackground,
+         ]}
+      >
          <Box sx={styles.leftSection}>
             {isMobile ? (
                <MainLogo sx={{ maxWidth: "120px" }} />
