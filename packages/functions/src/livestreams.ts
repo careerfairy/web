@@ -9,6 +9,12 @@ import { notifyLivestreamCreated, notifyLivestreamStarting } from "./api/slack"
 import config from "./config"
 import { getWebBaseUrl, isLocalEnvironment, setCORSHeaders } from "./util"
 // @ts-ignore (required when building the project inside docker)
+import {
+   formatLivestreamStartDate,
+   prepareEmailJobs,
+   prepareEmailSparks,
+   prepareEmailSpeakers,
+} from "@careerfairy/shared-lib/email/helpers"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import { logger } from "firebase-functions/v2"
 import {
@@ -26,12 +32,6 @@ import {
    sparkRepo,
    userRepo,
 } from "./api/repositories"
-import {
-   formatLivestreamStartDate,
-   prepareEmailJobs,
-   prepareEmailSparks,
-   prepareEmailSpeakers,
-} from "./lib/email/helpers"
 import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailAttachment,

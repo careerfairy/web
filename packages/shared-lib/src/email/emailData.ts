@@ -1,18 +1,11 @@
-import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
-import {
-   CustomJob,
-   PublicCustomJob,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Speaker } from "@careerfairy/shared-lib/livestreams/livestreams"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { SparkInteractionSource } from "@careerfairy/shared-lib/sparks/telemetry"
-import {
-   addUtmTagsToLink,
-   companyNameSlugify,
-} from "@careerfairy/shared-lib/utils"
-import { mainProductionDomainWithProtocol as defaultBaseUrl } from "@careerfairy/shared-lib/utils/urls"
 import { DateTime } from "luxon"
-import { JobData, SparkData, SpeakerData } from "./EmailTypes"
+import { TagValuesLookup } from "../constants/tags"
+import { CustomJob, JobType, PublicCustomJob } from "../customJobs/customJobs"
+import { Speaker } from "../livestreams/livestreams"
+import { Spark } from "../sparks/sparks"
+import { SparkInteractionSource } from "../sparks/telemetry"
+import { addUtmTagsToLink, companyNameSlugify } from "../utils"
+import { mainProductionDomainWithProtocol as defaultBaseUrl } from "../utils/urls"
 
 type UTMParams = {
    source?: string
@@ -20,6 +13,35 @@ type UTMParams = {
    campaign?: string
    term?: string
    content?: string
+}
+
+export type JobData = {
+   url: string
+   title: string
+   jobType: JobType
+   businessFunctionsTags: string
+   deadline: string
+}
+
+export type SpeakerData = {
+   name: string
+   position: string
+   avatarUrl: string
+   url: string
+   linkedInUrl: string
+}
+
+export type SparkData = {
+   question: string
+   category_id: string
+   thumbnailUrl: string
+   url: string
+}
+
+export type CalendarData = {
+   google: string
+   apple: string
+   outlook: string
 }
 
 type GetJobEmailDataOptions = {
