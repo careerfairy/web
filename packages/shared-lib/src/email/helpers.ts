@@ -1,13 +1,52 @@
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { DateTime } from "luxon"
+import { CustomJob } from "../customJobs/customJobs"
 import {
+   LivestreamEvent,
+   LiveStreamEventWithUsersLivestreamData,
+} from "../livestreams"
+import { Spark } from "../sparks/sparks"
+import { SparkInteractionSources } from "../sparks/telemetry"
+import {
+   CalendarData,
    getJobEmailData,
    getSparkEmailData,
    getSpeakerEmailData,
-} from "../notifications/util"
+} from "./emailData"
+
+import {
+   createCalendarEvent,
+   getLivestreamICSDownloadUrl,
+   makeUrls,
+} from "../utils"
+
+type GenerateCalendarOptions = {
+   utmCampaign?: string
+   isLocalEnvironment?: boolean
+}
+
+/**
+ * Generates calendar data (Google, Apple, Outlook links) for a livestream event
+ * for use in email templates and other notifications
+ */
+export function generateCalendarData(
+   stream: LivestreamEvent | LiveStreamEventWithUsersLivestreamData,
+   options: GenerateCalendarOptions = {}
+): CalendarData {
+   const calendarEvent = createCalendarEvent(stream)
+   const urls = makeUrls(calendarEvent)
+
+   return {
+      google: urls.google,
+      apple: getLivestreamICSDownloadUrl(
+         stream.id,
+         options.isLocalEnvironment,
+         {
+            utmCampaign: options.utmCampaign,
+         }
+      ),
+      outlook: urls.outlook,
+   }
+}
 
 /**
  * Prepares speaker data for email templates

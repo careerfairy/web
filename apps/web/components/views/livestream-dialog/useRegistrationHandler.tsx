@@ -1,3 +1,4 @@
+import { prepareEmailJobs } from "@careerfairy/shared-lib/email/helpers"
 import { GroupWithPolicy } from "@careerfairy/shared-lib/src/groups"
 import {
    LivestreamEvent,
@@ -8,6 +9,8 @@ import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserI
 import { useAppDispatch } from "components/custom-hook/store"
 import { useRefetchRegisteredStreams } from "components/custom-hook/useRegisteredStreams"
 import { useIsInTalentGuide } from "components/custom-hook/utils/useIsInTalentGuide"
+import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
+import { customJobRepo } from "data/RepositoryInstances"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
@@ -23,6 +26,8 @@ import { errorLogAndNotify } from "../../../util/CommonUtil"
 import { dataLayerLivestreamEvent } from "../../../util/analyticsUtils"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import { useLiveStreamDialog } from "./LivestreamDialog"
+
+type JobData = ReturnType<typeof prepareEmailJobs>[number]
 
 /**
  * Logic for handling the register button click
@@ -248,10 +253,39 @@ export default function useRegistrationHandler() {
                // Increase livestream popularity
                recommendationServiceInstance.registerEvent(livestream, userData)
 
-               dataLayerLivestreamEvent(
-                  AnalyticsEvents.EventRegistrationComplete,
-                  livestream
-               )
+               try {
+                  let formattedJobs: JobData[] = []
+
+                  if (livestream.hasJobs) {
+                     const livestreamJobs =
+                        await customJobRepo.getCustomJobsByLivestreamId(
+                           livestream.id
+                        )
+
+                     formattedJobs = prepareEmailJobs(
+                        livestream,
+                        getBaseUrl(),
+                        livestreamJobs,
+                        "eventRegistration"
+                     )
+                  }
+
+                  dataLayerLivestreamEvent(
+                     AnalyticsEvents.EventRegistrationComplete,
+                     livestream,
+                     {
+                        // Sending jobs here instead of inside the dataLayerLivestreamEvent
+                        // as this requires additional data fetching
+                        jobs: formattedJobs,
+                     }
+                  )
+               } catch (error) {
+                  errorLogAndNotify(error, {
+                     message: "Failed to send registration complete event",
+                     user: authenticatedUser,
+                     livestream,
+                  })
+               }
 
                if (isInTalentGuidePage) {
                   dispatch(
