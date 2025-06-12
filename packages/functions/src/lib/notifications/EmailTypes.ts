@@ -1,4 +1,9 @@
-import { JobType } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CalendarData,
+   JobData,
+   SparkData,
+   SpeakerData,
+} from "@careerfairy/shared-lib/email/emailData"
 import { SendEmailRequestOptions } from "customerio-node/dist/lib/api/requests"
 
 /**
@@ -26,35 +31,6 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
 
 export type CustomerIoEmailTemplateId =
    (typeof CUSTOMERIO_EMAIL_TEMPLATES)[keyof typeof CUSTOMERIO_EMAIL_TEMPLATES]
-
-export type JobData = {
-   url: string
-   title: string
-   jobType: JobType
-   businessFunctionsTags: string
-   deadline: string
-}
-
-export type SpeakerData = {
-   name: string
-   position: string
-   avatarUrl: string
-   url: string
-   linkedInUrl: string
-}
-
-export type SparkData = {
-   question: string
-   category_id: string
-   thumbnailUrl: string
-   url: string
-}
-
-export type CalendarData = {
-   google: string
-   outlook: string
-   apple: string
-}
 
 type BaseLivestreamData = {
    title: string
