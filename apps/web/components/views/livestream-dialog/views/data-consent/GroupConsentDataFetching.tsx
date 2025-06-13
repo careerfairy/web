@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useRef, useState } from "react"
+import { useLatest } from "react-use"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import {
    groupRepo,
@@ -39,12 +40,11 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
    const [isRegistering, setIsRegistering] = useState(false)
    const [hasRegistered, setHasRegistered] = useState(false)
 
-   const completeRegistrationProcessRef = useRef(completeRegistrationProcess)
+   const isRegisteringRef = useLatest(isRegistering)
 
    const livestreamRef = useRef(livestream)
 
    useEffect(() => {
-      completeRegistrationProcessRef.current = completeRegistrationProcess
       livestreamRef.current = livestream
    }, [completeRegistrationProcess, livestream])
 
@@ -88,18 +88,17 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
                switch (registrationStatus()) {
                   case "can_register":
                      // we have enough information to complete the registration
-                     if (isRegistering) {
+                     if (isRegisteringRef.current) {
                         return
                      }
                      setIsRegistering(true)
-                     completeRegistrationProcessRef
-                        .current(
-                           userData,
-                           authenticatedUser,
-                           livestreamRef.current,
-                           groupsWithPolicies,
-                           answers
-                        )
+                     completeRegistrationProcess(
+                        userData,
+                        authenticatedUser,
+                        livestreamRef.current,
+                        groupsWithPolicies,
+                        answers
+                     )
                         .then(() => {
                            setHasRegistered(true)
                            if (onRegisterSuccess) {
@@ -141,12 +140,10 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
       authenticatedUser.email,
       checkIfUserAgreedToGroupPolicy,
       errorNotification,
-      goToView,
       groups,
       registrationDispatch,
       userData,
       registrationStatus,
-      isRegistering,
       hasRegistered,
    ])
 
