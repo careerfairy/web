@@ -37,6 +37,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
       useRegistrationHandler()
 
    const [isRegistering, setIsRegistering] = useState(false)
+   const [hasRegistered, setHasRegistered] = useState(false)
 
    const completeRegistrationProcessRef = useRef(completeRegistrationProcess)
 
@@ -49,6 +50,10 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
 
    // check if user has answered all questions / given consent
    useEffect(() => {
+      if (hasRegistered) {
+         return
+      }
+
       const promises = []
 
       // parallel load
@@ -96,6 +101,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
                            answers
                         )
                         .then(() => {
+                           setHasRegistered(true)
                            if (onRegisterSuccess) {
                               onRegisterSuccess()
                            }
@@ -141,6 +147,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
       userData,
       registrationStatus,
       isRegistering,
+      hasRegistered,
    ])
 
    // mark user as registered to any livestream
