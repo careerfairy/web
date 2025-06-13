@@ -159,7 +159,7 @@ const LiveStreamCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
                      {/* Description and labels */}
                      <Stack sx={styles.descriptionWrapper}>
-                        <Stack spacing={1}>
+                        <Stack width="-webkit-fill-available" spacing={1}>
                            <Title />
                            <Summary />
                         </Stack>
