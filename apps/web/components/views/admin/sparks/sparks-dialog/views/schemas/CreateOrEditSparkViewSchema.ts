@@ -1,16 +1,21 @@
+import { languageOptionCodes } from "@careerfairy/shared-lib/constants/forms"
+import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { SparksCategories } from "@careerfairy/shared-lib/sparks/sparks"
+import { mapOptions } from "components/views/signup/utils"
 import * as yup from "yup"
 import { publishedOptions } from "../components/SparkVisibilitySelect"
-import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 
 const categories = Object.values(SparksCategories).map(
    (category) => category.id
 )
 
+const languages = mapOptions(languageOptionCodes)
+
 const publishedValues = publishedOptions.map((option) => option.value)
 
 const CreateOrEditSparkViewSchema = yup.object().shape({
    categoryId: yup.string().oneOf(categories).required("Category is required"),
+   languageId: yup.string().oneOf(languages).required("Language is required"),
    question: yup
       .string()
       .required()

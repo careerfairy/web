@@ -1,4 +1,4 @@
-import functions = require("firebase-functions")
+import { languageOptionCodes } from "@careerfairy/shared-lib/constants/forms"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import {
@@ -7,18 +7,19 @@ import {
    sparksCategoriesArray,
    UpdateSparkData,
 } from "@careerfairy/shared-lib/sparks/sparks"
-import { onCall } from "firebase-functions/https"
+import { logger } from "firebase-functions/v2"
+import { onCall } from "firebase-functions/v2/https"
 import { boolean, number, object, string } from "yup"
 import { groupRepo, sparkRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
-import { middlewares } from "./middlewares/middlewares"
+import { withMiddlewares } from "./middlewares-gen2/onCall"
 import {
-   dataValidation,
-   userShouldBeGroupAdmin,
-} from "./middlewares/validations"
+   dataValidationMiddleware,
+   userIsGroupAdminMiddleware,
+} from "./middlewares-gen2/onCall/validations"
 import { validateGroupSparks } from "./util/sparks"
 
-const sparkDataValidator = {
+const sparkDataSchema = object().shape({
    question: string()
       .required()
       .max(SPARK_CONSTANTS.QUESTION_MAX_LENGTH)
@@ -26,12 +27,15 @@ const sparkDataValidator = {
    categoryId: string()
       .oneOf(sparksCategoriesArray.map((category) => category.id))
       .required("Category is required"),
+   languageId: string()
+      .oneOf(languageOptionCodes.map((lang) => lang.id))
+      .required("Language is required"),
    published: boolean().required(),
    creatorId: string().required(),
    groupId: string().required(),
-} as const
+})
 
-const videoDataValidator = {
+const videoDataSchema = object().shape({
    video: object()
       .shape({
          uid: string().required(),
@@ -41,110 +45,111 @@ const videoDataValidator = {
          duration: number().required(),
       })
       .required(),
-} as const
+})
+
+type CreateSparkData = AddSparkSparkData & { group: Group }
+type UpdateSparkDataWithGroup = UpdateSparkData & { group: Group }
+type DeleteSparkDataWithGroup = DeleteSparkData & { group: Group }
 
 export const createSpark = onCall(
-   middlewares<AddSparkSparkData & { group: Group }>(
-      dataValidation({
-         ...sparkDataValidator,
-         ...videoDataValidator,
-      }),
-      userShouldBeGroupAdmin(),
+   withMiddlewares(
+      [
+         dataValidationMiddleware(
+            object().shape({
+               ...sparkDataSchema.fields,
+               ...videoDataSchema.fields,
+            })
+         ),
+         userIsGroupAdminMiddleware(),
+      ],
       async (request) => {
          try {
-            const group = request.middlewares.group
+            const { group, ...sparkData } =
+               request.data as unknown as CreateSparkData
 
             const creator = await groupRepo.getCreatorByGroupAndId(
                group.id,
-               request.data.creatorId
+               sparkData.creatorId
             )
 
             if (!creator) {
-               logAndThrow("Creator not found", {
-                  data: request.data,
-                  context: request,
-               })
+               logAndThrow("Creator not found", sparkData)
             }
 
-            await sparkRepo.create(request.data, group, creator)
+            await sparkRepo.create(sparkData, group, creator)
 
-            functions.logger.log(
-               `Create Spark '${request.data.question}' completed, start validation`
+            logger.info(
+               `Create Spark '${sparkData.question}' completed, start validation`
             )
             return validateGroupSparks(group)
          } catch (error) {
-            logAndThrow("Error in creating spark", {
-               data: request.data,
-               error,
-               context: request,
-            })
+            logAndThrow("Error in creating spark", error, request.data)
          }
       }
    )
 )
 
 export const updateSpark = onCall(
-   middlewares<UpdateSparkData & { group: Group }>(
-      dataValidation({
-         ...sparkDataValidator,
-         id: string().required(),
-      }),
-      userShouldBeGroupAdmin(),
+   withMiddlewares(
+      [
+         dataValidationMiddleware(
+            object().shape({
+               ...sparkDataSchema.fields,
+               id: string().required(),
+            })
+         ),
+         userIsGroupAdminMiddleware(),
+      ],
       async (request) => {
          try {
-            const group = request.middlewares.group as Group
+            const { group, ...sparkData } =
+               request.data as unknown as UpdateSparkDataWithGroup
 
             const creator = await groupRepo.getCreatorByGroupAndId(
                group.id,
-               request.data.creatorId
+               sparkData.creatorId
             )
 
             if (!creator) {
-               logAndThrow("Creator not found", {
-                  data: request.data,
-                  context: request,
-               })
+               logAndThrow("Creator not found", sparkData)
             }
 
-            await sparkRepo.update(request.data, creator)
+            await sparkRepo.update(sparkData, creator)
 
-            functions.logger.log(
-               `Update Spark '${request.data.id}' completed, start validation`
+            logger.info(
+               `Update Spark '${sparkData.id}' completed, start validation`
             )
             return validateGroupSparks(group)
          } catch (error) {
-            logAndThrow("Error in updating spark", {
-               data: request.data,
-               error,
-               context: request,
-            })
+            logAndThrow("Error in updating spark", error, request.data)
          }
       }
    )
 )
 
 export const deleteSpark = onCall(
-   middlewares<DeleteSparkData & { group: Group }>(
-      dataValidation({
-         id: string().required(),
-         groupId: string().required(),
-      }),
-      userShouldBeGroupAdmin(),
+   withMiddlewares(
+      [
+         dataValidationMiddleware(
+            object().shape({
+               id: string().required(),
+               groupId: string().required(),
+            })
+         ),
+         userIsGroupAdminMiddleware(),
+      ],
       async (request) => {
          try {
-            const group = request.middlewares.group as Group
-            await sparkRepo.delete(request.data.id)
+            const { group, ...sparkData } =
+               request.data as unknown as DeleteSparkDataWithGroup
+            await sparkRepo.delete(sparkData.id)
 
-            functions.logger.log(
-               `Delete Spark '${request.data.id}' completed, start validation`
+            logger.info(
+               `Delete Spark '${sparkData.id}' completed, start validation`
             )
             return validateGroupSparks(group)
          } catch (error) {
-            logAndThrow("Error in deleting spark", {
-               data: request.data,
-               error,
-               context: request,
-            })
+            logAndThrow("Error in deleting spark", error, request.data)
          }
       }
    )

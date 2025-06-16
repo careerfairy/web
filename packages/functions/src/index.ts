@@ -285,9 +285,9 @@ exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 
 // Group Spark Functions
-exports.createSpark_v5 = groupSparks.createSpark
-exports.updateSpark_v4 = groupSparks.updateSpark
-exports.deleteSpark_v3 = groupSparks.deleteSpark
+exports[FUNCTION_NAMES.createSpark] = groupSparks.createSpark
+exports[FUNCTION_NAMES.updateSpark] = groupSparks.updateSpark
+exports[FUNCTION_NAMES.deleteSpark] = groupSparks.deleteSpark
 
 // User Spark Notification Functions
 exports[FUNCTION_NAMES.createSparksFeedEventNotifications] =
