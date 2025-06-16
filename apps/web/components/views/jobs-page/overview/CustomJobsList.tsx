@@ -1,4 +1,4 @@
-import { Box, CircularProgress, ListItem, Stack } from "@mui/material"
+import { ListItem, Stack } from "@mui/material"
 
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -100,11 +100,13 @@ export const CustomJobsList = ({ customJobs }: Props) => {
                )
             })}
          </CustomInfiniteScroll>
-         {Boolean(isValidating) && (
+         {/* {Boolean(isValidating) && (
             <Box sx={styles.loader}>
                <CircularProgress />
             </Box>
-         )}
+         )} */}
+         {/* <Box sx={styles.loader} height={300}> 
+            </Box> */}
       </Stack>
    )
 }

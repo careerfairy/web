@@ -21,6 +21,9 @@ export const SearchByTags = () => {
          }}
          ui={{
             isDialog: isMobile,
+            popperSx: {
+               zIndex: 2,
+            },
          }}
       />
    )
