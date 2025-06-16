@@ -1,4 +1,5 @@
 import { Identifiable } from "../commonTypes"
+import { languageOptionCodes } from "../constants/forms"
 import { ContentTopicsTags } from "../constants/tags"
 import { Timestamp } from "../firebaseTypes"
 import { PublicGroup } from "../groups"
@@ -39,6 +40,12 @@ export interface Spark extends Identifiable {
     * e.g: Day in the life, Jobs, Role, Application
     */
    category: SparkCategory
+
+   /**
+    * Language ID
+    * e.g: en, nl, fr, de, it, es
+    */
+   language: SparkLanguage
 
    /**
     * Content Tag IDs
@@ -295,6 +302,7 @@ export type SparkVisibility = "public" | "private"
 
 export type AddSparkSparkData = {
    categoryId: Spark["category"]["id"]
+   languageId: Spark["language"]
    question: Spark["question"]
    video: Spark["video"]
    published: Spark["published"]
@@ -305,6 +313,7 @@ export type AddSparkSparkData = {
 export type UpdateSparkData = {
    id: Spark["id"]
    categoryId: Spark["category"]["id"]
+   languageId: Spark["language"]
    groupId: Spark["group"]["id"]
    question: Spark["question"]
    published: Spark["published"]
@@ -445,6 +454,8 @@ export const getCategoryById = (categoryId: SparkCategory["id"]) => {
 
 export type SparkCategory =
    (typeof SparksCategories)[keyof typeof SparksCategories]
+
+export type SparkLanguage = (typeof languageOptionCodes)[number]["id"]
 
 /**
  * By receiving an already sorted IDs list, sorts the also received Spark array

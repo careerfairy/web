@@ -433,6 +433,7 @@ export class SparkFunctionsRepository
          question: data.question,
          video: data.video,
          category: getCategoryById(data.categoryId),
+         language: data.languageId,
          contentTopicsTagIds: SparkCategoriesToTagValuesMapper[data.categoryId]
             ? [SparkCategoriesToTagValuesMapper[data.categoryId]]
             : [],
@@ -453,6 +454,7 @@ export class SparkFunctionsRepository
       const doc: Pick<
          Spark,
          | "category"
+         | "language"
          | "contentTopicsTagIds"
          | "creator"
          | "question"
@@ -463,6 +465,7 @@ export class SparkFunctionsRepository
       > = {
          question: data.question,
          category: getCategoryById(data.categoryId),
+         language: data.languageId,
          contentTopicsTagIds: SparkCategoriesToTagValuesMapper[data.categoryId]
             ? [SparkCategoriesToTagValuesMapper[data.categoryId]]
             : [],
