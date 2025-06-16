@@ -56,6 +56,9 @@ export const SearchByLocation = () => {
                setLocationSearchValue,
                placeholder: "Search city, state, canton or country",
             },
+            popperSx: {
+               zIndex: 2,
+            },
          }}
          onClose={() => setLocationSearchValue("")}
          focusSearchInputOnOpenDialog={isMobile}

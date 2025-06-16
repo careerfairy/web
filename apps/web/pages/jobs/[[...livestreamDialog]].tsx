@@ -69,8 +69,8 @@ const JobsPage: NextPage<
          <GenericDashboardLayout
             userCountryCode={userCountryCode}
             hideFooter
-            headerScrollThreshold={1}
-            transitionTimeout={HEADER_TRANSITION_TIMEOUT}
+            headerFixed={false}
+            transitionTimeout={0}
          >
             <LivestreamDialogLayout>
                <JobsOverviewContextProvider
@@ -150,9 +150,9 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          normalizedJobType: queryJobTypes,
       },
       booleanFilters: {
-         deleted: false,
-         published: true,
-         isPermanentlyExpired: false,
+         // deleted: false,
+         // published: true,
+         // isPermanentlyExpired: false,
       },
    }
 

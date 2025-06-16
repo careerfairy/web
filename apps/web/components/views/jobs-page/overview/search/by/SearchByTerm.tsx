@@ -12,6 +12,7 @@ const styles = sxStyles({
          p: "4px 12px",
          height: "48px",
          borderRadius: "12px",
+         border: (theme) => `1px solid ${theme.palette.neutral[50]}`,
          background: (theme) => theme.brand.white[100],
       },
       "& .MuiInputBase-input": {

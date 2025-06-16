@@ -73,6 +73,9 @@ const customStyles = sxStyles({
       position: "sticky",
       top: -1,
       backgroundColor: (theme) => theme.brand.white[50],
+      zIndex: 1,
+      borderTopLeftRadius: "8px",
+      borderTopRightRadius: "8px",
    },
 })
 
