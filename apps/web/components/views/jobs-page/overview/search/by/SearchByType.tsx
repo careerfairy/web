@@ -18,6 +18,9 @@ export const SearchByType = () => {
          }}
          ui={{
             isDialog: isMobile,
+            popperSx: {
+               zIndex: 2,
+            },
          }}
       />
    )
