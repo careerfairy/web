@@ -18,6 +18,7 @@ export const SPARK_FIELDS_TO_INDEX = [
    "creator",
    "group",
    "languageTagIds",
+   "language",
    "publishedAt",
    "question",
    "updatedAt",
@@ -39,6 +40,7 @@ export type FieldToIndexType = (typeof SPARK_FIELDS_TO_INDEX)[number]
 export const SPARK_SEARCHABLE_ATTRIBUTES = [
    "contentTopicsTagIds",
    "languageTagIds",
+   "language",
    "linkedCustomJobsTagIds",
 ] satisfies FieldToIndexType[]
 
@@ -53,6 +55,7 @@ export const SPARK_FILTERING_FIELDS = [
    "contentTopicsTagIds",
    "linkedCustomJobsTagIds",
    "languageTagIds",
+   "language",
    "group",
 ] satisfies FieldToIndexType[]
 

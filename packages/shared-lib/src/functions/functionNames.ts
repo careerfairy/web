@@ -19,6 +19,11 @@ export const FUNCTION_NAMES = {
    endOfSparksTrialEmails: "endOfSparksTrialEmails_v2",
    manualEndOfSparksTrialEmails: "manualEndOfSparksTrialEmails",
 
+   // Group Spark functions
+   createSpark: "createSpark_v6",
+   updateSpark: "updateSpark_v5",
+   deleteSpark: "deleteSpark_v4",
+
    // Auth functions
    createNewUserAccount: "createNewUserAccount_v5",
 
