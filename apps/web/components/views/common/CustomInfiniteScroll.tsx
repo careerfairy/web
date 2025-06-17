@@ -1,4 +1,4 @@
-import { ReactNode, useRef, useState, useEffect } from "react"
+import { ReactNode, useEffect, useRef, useState } from "react"
 
 type CustomInfiniteScrollProps = {
    hasMore: boolean
@@ -40,7 +40,7 @@ const CustomInfiniteScroll = ({
 
       const observer = new IntersectionObserver(handleIntersect, {
          threshold: 1,
-         rootMargin: `-${offset || 0}px 0px 0px 0px`,
+         rootMargin: `0px 0px ${offset || 0}px 0px`,
       })
 
       if (loaderNode) {

@@ -1,23 +1,32 @@
 import { dropdownValueMapper } from "components/custom-hook/countries/useLocationSearch"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
 
 import useIsMobile from "components/custom-hook/useIsMobile"
 
+import { removeDuplicates } from "@careerfairy/shared-lib/utils"
 import { ChipDropdown } from "components/views/common/ChipDropdown/ChipDropdown"
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
 
 export const SearchByLocation = () => {
    const { searchLocations, setSearchLocations } = useJobsOverviewContext()
+   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
+   const [initialLocationIds, setInitialLocationIds] = useState<string[]>(
+      () => {
+         return removeDuplicates(
+            searchLocations?.concat(selectedLocations) ?? []
+         )
+      }
+   )
 
    const [locationSearchValue, setLocationSearchValue] = useState("")
    const isMobile = useIsMobile()
 
    const { data: locations } = useLocationSearch(locationSearchValue, {
       suspense: false,
-      initialLocationIds: searchLocations ?? [],
+      initialLocationIds,
       limit: 15,
    })
 
@@ -25,20 +34,34 @@ export const SearchByLocation = () => {
       return locations?.map(dropdownValueMapper) ?? []
    }, [locations])
 
+   const handleCleanup = () => {
+      setLocationSearchValue("")
+      setSelectedLocations([])
+      setInitialLocationIds([])
+   }
+
+   useEffect(() => {
+      setInitialLocationIds(
+         removeDuplicates(searchLocations?.concat(selectedLocations)) ?? []
+      )
+   }, [searchLocations, selectedLocations])
+
    return (
       <ChipDropdown
          label={"Location"}
-         options={
-            locationSearchValue?.length || searchLocations?.length
-               ? locationOptions
-               : []
-         }
+         options={locationOptions}
          selection={{
             selectedOptions: searchLocations,
             onChange: setSearchLocations,
             showApply: isMobile,
-            onApply: () => {
-               setLocationSearchValue("")
+            onApply: handleCleanup,
+            onSelectItem: (id) => {
+               setSelectedLocations((prev) => [...prev, id])
+            },
+            onDeleteItem: (id) => {
+               setSelectedLocations((prev) =>
+                  prev.filter((selectedId) => selectedId !== id)
+               )
             },
          }}
          ui={{
@@ -46,9 +69,11 @@ export const SearchByLocation = () => {
             dialog: {
                paperSx: {
                   height: "100dvh",
+                  overflow: "hidden",
                },
                contentSx: {
-                  minHeight: "70dvh",
+                  minHeight: "50dvh",
+                  maxHeight: "55dvh",
                },
             },
             search: {
@@ -60,7 +85,7 @@ export const SearchByLocation = () => {
                zIndex: 2,
             },
          }}
-         onClose={() => setLocationSearchValue("")}
+         onClose={handleCleanup}
          focusSearchInputOnOpenDialog={isMobile}
       />
    )
