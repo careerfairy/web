@@ -8,6 +8,13 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    searchField: {
+      "& .MuiFilledInput-root": {
+         border: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+         background: (theme) => theme.brand.white[100],
+         "&.Mui-focused": {
+            border: (theme) => `1.2px solid ${theme.palette.neutral[100]}`,
+         },
+      },
       "& .MuiInputBase-root": {
          p: "4px 12px",
          height: "48px",

@@ -6,6 +6,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { sxStyles } from "types/commonTypes"
+import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 import { CustomJobsList } from "./CustomJobsList"
 import { NoResultsFound, SearchResultsCount } from "./search/SearchResultsCount"
@@ -17,7 +18,7 @@ const styles = sxStyles({
          xs: "100%",
          md: "339px",
       },
-      overflowY: "auto",
+      overflow: "inherit",
    },
    listTitle: {
       fontWeight: 600,
@@ -46,16 +47,16 @@ export const CustomJobsOverviewList = () => {
 
    useEffect(() => {
       if (!hasFilters || !isMounted) return
-      // scrollableContainerRef.current?.scrollIntoView({
-      //    behavior: "smooth",
-      //    block: "start",
-      // })
-      // setTimeout(() => {
-      //    scrollableContainerRef.current?.scrollIntoView({
-      //       behavior: "smooth",
-      //       block: "start",
-      //    })
-      // }, 500)
+      setTimeout(() => {
+         if (isMobile) {
+            scrollTop()
+         } else {
+            scrollableContainerRef.current?.scrollIntoView({
+               behavior: "smooth",
+               block: "start",
+            })
+         }
+      }, 200)
    }, [filterParams, isMobile, hasFilters, isMounted])
 
    return (

@@ -138,8 +138,9 @@ const styles = sxStyles({
    chipContentRoot: {
       scrollbarWidth: "thin",
       flexGrow: 1,
-      overflowY: "auto",
+      overflowY: "scroll",
       p: 0,
+      maxHeight: "440px",
    },
 })
 
@@ -160,6 +161,8 @@ type SelectionOptions = {
     */
    showApply?: boolean
    onApply?: () => void
+   onDeleteItem?: (option: ChipOptions["id"]) => void
+   onSelectItem?: (option: ChipOptions["id"]) => void
 }
 
 type ChipDropdownUI = {
@@ -329,6 +332,8 @@ export const ChipDropdown = ({
       onChange: handleValueChange,
       showApply = true,
       onApply,
+      onDeleteItem,
+      onSelectItem,
    } = selection
    const {
       search,
@@ -371,7 +376,7 @@ export const ChipDropdown = ({
             const option = options.find((opt) => opt.id === id)
             return option ? { id, value: option.value } : null
          })
-         .filter(Boolean) as { id: string; value: string }[]
+         .filter(Boolean) as ChipOptions[]
    }, [selectedMap, options])
 
    const chipShouldBeStyledAsSelected = useMemo(() => {
@@ -435,6 +440,7 @@ export const ChipDropdown = ({
 
    const handleActualOptionClick = useCallback(
       (optionId: string) => {
+         onSelectItem?.(optionId)
          dispatch({ type: "CLICK_OPTION", payload: { optionId, showApply } })
 
          if (!showApply) {
@@ -448,13 +454,17 @@ export const ChipDropdown = ({
             handleValueChange(newSelectedValues)
          }
       },
-      [selectedMap, showApply, handleValueChange, dispatch]
+      [selectedMap, showApply, handleValueChange, dispatch, onSelectItem]
    )
 
    const handleClose = useCallback(() => {
       dispatch({ type: "CLOSE_DROPDOWN" })
+      dispatch({
+         type: "SYNC_EXTERNAL_SELECTION",
+         payload: { selectedOptions: selection.selectedOptions },
+      })
       onClose?.()
-   }, [onClose])
+   }, [onClose, selection.selectedOptions])
 
    const handleToggle = () => {
       dispatch({ type: "TOGGLE_OPEN" })
@@ -496,10 +506,13 @@ export const ChipDropdown = ({
    const handleReset = useCallback(() => {
       dispatch({ type: "RESET_CHANGES" })
       handleValueChange([])
-   }, [handleValueChange, dispatch])
+      dispatch({ type: "CLOSE_DROPDOWN" })
+      onClose?.()
+   }, [handleValueChange, dispatch, onClose])
 
    const handleDeleteOption = useCallback(
       (idToDelete: string) => {
+         onDeleteItem?.(idToDelete)
          dispatch({
             type: "DELETE_OPTION",
             payload: { optionId: idToDelete, showApply },
@@ -516,7 +529,7 @@ export const ChipDropdown = ({
             handleValueChange(newSelectedValues)
          }
       },
-      [selectedMap, showApply, handleValueChange, dispatch]
+      [selectedMap, showApply, handleValueChange, dispatch, onDeleteItem]
    )
 
    useEffect(() => {
@@ -636,7 +649,7 @@ export const ChipDropdown = ({
                      if (event.propertyName !== "transform") {
                         return
                      }
-                     // alert("end: transition")
+
                      if (isOpen) {
                         onOpen?.()
                      }
@@ -752,6 +765,12 @@ export const ChipDropdown = ({
                                  options={options}
                                  handleOptionClick={handleActualOptionClick}
                                  isChecked={isChecked}
+                                 rootSx={{
+                                    scrollbarWidth: "none",
+                                    "&::-webkit-scrollbar": {
+                                       display: "none",
+                                    },
+                                 }}
                               />
                            </Stack>
                         </motion.div>

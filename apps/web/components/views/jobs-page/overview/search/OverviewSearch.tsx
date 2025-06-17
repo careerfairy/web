@@ -17,7 +17,7 @@ const styles = sxStyles({
       backgroundColor: "#F7F8FC",
       py: 2,
       zIndex: 1,
-      // transition: `top 100ms ease-out`,
+      transition: `top 100ms ease-out`,
    },
    searchBy: {
       px: {
