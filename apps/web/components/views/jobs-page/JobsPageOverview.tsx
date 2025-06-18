@@ -18,33 +18,22 @@ const styles = sxStyles({
          sm: "16px !important",
          md: "32px !important",
       },
-      // Working desktop
-      // height: "calc(100dvh - 176px)",
-      // minHeight: "calc(100dvh - 176px)",
-      // maxHeight: "calc(100dvh - 176px)",
-
       height: {
          xs: "100",
          sm: "100%",
          md: "calc(100dvh - 176px)",
       },
       minHeight: {
-         // xs: "100%",
-         // sm: "100%",
          md: "calc(100dvh - 176px)",
       },
       maxHeight: {
-         // xs: "100%",
-         // sm: "100%",
          md: "calc(100dvh - 176px)",
       },
-
-      // maxHeight: {
-      //    xs: "63dvh",
-      //    sm: "63dvh",
-      //    md: "none",
-      // },
       overflow: "scroll",
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
    },
 })
 
@@ -55,7 +44,7 @@ const JobsPageOverview = () => {
       <Container maxWidth="xl" sx={styles.container}>
          <Stack spacing={2}>
             <OverviewSearch />
-            {!isMobile ? <SearchResultsCount /> : null}
+            <SearchResultsCount />
             <Stack
                direction={isMobile ? "column" : "row"}
                spacing={1}
