@@ -66,10 +66,6 @@ export class StreamerPage extends StreamingPage {
       await this.page
          .locator('input[name="position"]')
          .fill(streaming.streamer.position)
-      await this.page.locator('input[name="email"]').click()
-      await this.page
-         .locator('input[name="email"]')
-         .fill(streaming.streamer.email)
 
       const fileChooserPromise = this.page.waitForEvent("filechooser")
       await this.page.getByText("Upload speaker picture").click()

@@ -33,7 +33,6 @@ const LivestreamFormSpeakersStep = () => {
       setFieldValue("speakers.values", newSpeakersState, true)
    }
 
-
    return (
       <>
          <FormSectionHeader

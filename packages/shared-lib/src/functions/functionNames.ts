@@ -23,7 +23,7 @@ export const FUNCTION_NAMES = {
    createNewUserAccount: "createNewUserAccount_v5",
 
    // Streaming functions
-   // fetchAgoraRtcToken: "fetchAgoraRtcToken_v2",
+   upsertLivestreamSpeaker: "upsertLivestreamSpeaker_v2",
 
    // Reminders functions
    onLivestreamStartScheduleNoShowReminder:
