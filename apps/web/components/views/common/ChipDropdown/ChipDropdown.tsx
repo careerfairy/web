@@ -132,8 +132,7 @@ const styles = sxStyles({
       position: "sticky",
       top: 0,
       zIndex: 1,
-      backgroundColor: (theme) =>
-         theme.brand.white[100] || theme.palette.background.paper,
+      backgroundColor: (theme) => theme.brand.white[100],
    },
    chipContentRoot: {
       scrollbarWidth: "thin",
@@ -356,14 +355,9 @@ export const ChipDropdown = ({
       []
    )
 
-   const initialSelectedOptions = useMemo(
-      () => selection.selectedOptions,
-      [selection.selectedOptions]
-   )
-
    const [state, dispatch] = useReducer(
       chipDropdownReducer,
-      initialSelectedOptions,
+      selection.selectedOptions,
       initialStateFactory
    )
    const { isOpen, isDirty, selectedMap } = state
