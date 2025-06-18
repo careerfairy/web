@@ -1,6 +1,8 @@
+import { Box } from "@mui/material"
 import { SearchInputPluginProps } from "components/views/common/ChipDropdown/ChipDropdown"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { sxStyles } from "types/commonTypes"
+import { XCircleIcon } from "../../icons/XCircleIcon"
 
 const styles = sxStyles({
    searchField: {
@@ -27,6 +29,13 @@ const styles = sxStyles({
          fontWeight: "400",
       },
    },
+   clearIcon: {
+      width: "24px",
+      height: "24px",
+      "&:hover": {
+         cursor: "pointer",
+      },
+   },
 })
 
 export const SearchInputPlugin = ({
@@ -44,6 +53,15 @@ export const SearchInputPlugin = ({
          onChange={(e) => setSearchValue(e.target.value)}
          autoFocus
          inputRef={searchInputRef}
+         InputProps={{
+            endAdornment: searchValue?.length ? (
+               <Box
+                  sx={styles.clearIcon}
+                  component={XCircleIcon}
+                  onClick={() => setSearchValue("")}
+               />
+            ) : null,
+         }}
       />
    )
 }

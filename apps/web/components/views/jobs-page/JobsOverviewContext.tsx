@@ -248,12 +248,13 @@ export const JobsOverviewContextProvider = ({
          setSelectedJob(undefined)
          setIsJobDetailsDialogOpen(false)
       }
-      if (serverJob?.id !== router.query.jobId && router.query.jobId) {
+
+      if (router.query.jobId) {
          handleJobIdChange(router.query.jobId as string)
-      } else {
+      } else if (!isMobile) {
          setSelectedJob(serverJob)
       }
-   }, [router.query.jobId, handleJobIdChange, serverJob])
+   }, [router.query.jobId, handleJobIdChange, serverJob, isMobile])
 
    return (
       <JobsOverviewContext.Provider value={value}>
