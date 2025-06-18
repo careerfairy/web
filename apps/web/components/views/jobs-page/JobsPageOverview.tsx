@@ -19,7 +19,7 @@ const styles = sxStyles({
          md: "32px !important",
       },
       height: {
-         xs: "100",
+         xs: "100%",
          sm: "100%",
          md: "calc(100dvh - 176px)",
       },
