@@ -47,41 +47,52 @@ function getBrandedTooltip(
       </BrandedTooltip>
    )
 }
-const BrandedTextField = styled((props: BrandedTextFieldProps) => (
-   <TextField
-      variant="filled"
-      {...props}
-      label={
-         <Typography>
-            <Box
-               component="span"
-               display="flex"
-               alignItems="center center"
-               columnGap={1}
-               rowGap={0}
-            >
-               <span> {props.label} </span>
-               {props.requiredText ? <span>{props.requiredText}</span> : null}
-               {props.tooltipText ? (
-                  <span className="branded-tooltip">
-                     {getBrandedTooltip(
-                        props.tooltipText,
-                        props.tooltipPlacement
-                     )}
-                  </span>
-               ) : null}
-            </Box>
-         </Typography>
-      }
-      InputProps={Object.assign({}, inputProps, props.InputProps)}
-      InputLabelProps={Object.assign(
-         {},
-         inputLabelProps,
-         props.InputLabelProps
-      )}
-      SelectProps={Object.assign({}, selectProps, props.SelectProps)}
-   />
-))(({ theme, error }) => ({
+const BrandedTextField = styled(
+   (props: BrandedTextFieldProps) => (
+      <TextField
+         variant="filled"
+         {...props}
+         label={
+            <Typography>
+               <Box
+                  component="span"
+                  display="flex"
+                  alignItems="center center"
+                  columnGap={1}
+                  rowGap={0}
+               >
+                  <span> {props.label} </span>
+                  {props.requiredText ? (
+                     <span>{props.requiredText}</span>
+                  ) : null}
+                  {props.tooltipText ? (
+                     <span className="branded-tooltip">
+                        {getBrandedTooltip(
+                           props.tooltipText,
+                           props.tooltipPlacement
+                        )}
+                     </span>
+                  ) : null}
+               </Box>
+            </Typography>
+         }
+         InputProps={Object.assign({}, inputProps, props.InputProps)}
+         InputLabelProps={Object.assign(
+            {},
+            inputLabelProps,
+            props.InputLabelProps
+         )}
+         SelectProps={Object.assign({}, selectProps, props.SelectProps)}
+      />
+   ),
+   {
+      shouldForwardProp: (prop) =>
+         prop !== "tooltipText" &&
+         prop !== "requiredText" &&
+         prop !== "tooltipPlacement" &&
+         prop !== "autocomplete",
+   }
+)(({ theme, error }) => ({
    "& label": {
       color: theme.palette.mode === "dark" ? undefined : "#9999B1",
       maxWidth: "calc(100% - 48px)",

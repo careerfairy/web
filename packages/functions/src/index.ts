@@ -169,8 +169,6 @@ exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v3 = livestreams.getLivestreamICalendarEvent
 
-exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker
-
 // Tags
 exports.fetchTagsContentHits = tags.fetchContentHits
 
@@ -352,7 +350,8 @@ exports.resetQuestion = streaming.resetQuestion
 exports.markQuestionAsCurrent = streaming.markQuestionAsCurrent
 exports.markQuestionAsDone = streaming.markQuestionAsDone
 exports.toggleHandRaise = streaming.toggleHandRaise
-exports.upsertLivestreamSpeaker = streaming.upsertLivestreamSpeaker
+exports[FUNCTION_NAMES.upsertLivestreamSpeaker] =
+   streaming.upsertLivestreamSpeaker
 exports.createCTA = streaming.createCTA
 exports.deleteCTA = streaming.deleteCTA
 exports.updateCTA = streaming.updateCTA

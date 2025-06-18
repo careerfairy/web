@@ -4,7 +4,8 @@ import {
 } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
 import { LoadingButton } from "@mui/lab"
-import { Box, Button } from "@mui/material"
+import { Box, Button, CircularProgress } from "@mui/material"
+import { useCreator } from "components/custom-hook/creator/useCreator"
 import { useSpeakerFormSubmit } from "components/custom-hook/live-stream/useSpeakerFormSubmit"
 import {
    CreatorFormFields,
@@ -31,12 +32,37 @@ const styles = sxStyles({
 
 export const EditSpeakerView = () => {
    const { goBackToSelectSpeaker, selectedSpeaker } = useHostProfileSelection()
+   const { data: creator, isLoading } = useCreator(
+      selectedSpeaker?.groupId,
+      selectedSpeaker?.id
+   )
+
+   const isRelatedToCreator = !!creator
+
+   // Determine the creator data to use based on available information
+   const getCreatorData = () => {
+      if (isRelatedToCreator) {
+         return creator
+      }
+
+      if (selectedSpeaker) {
+         return mapSpeakerToCreator(selectedSpeaker)
+      }
+
+      return undefined
+   }
+
+   const creatorData = getCreatorData()
+
+   if (isLoading) {
+      return <CircularProgress />
+   }
 
    return (
       <CreatorFormProvider
-         creator={
-            selectedSpeaker ? mapSpeakerToCreator(selectedSpeaker) : undefined
-         }
+         creator={creatorData}
+         // Email is only required for creators, not adhoc speakers
+         hideEmailField={!isRelatedToCreator}
       >
          <View component="form">
             <View.Content>
