@@ -297,7 +297,10 @@ const CustomJobHeader = ({
                                  </>
                               ) : null}
                               {jobLocation ? (
-                                 <Typography variant={"xsmall"}>
+                                 <Typography
+                                    variant={"subtitle1"}
+                                    display={"inline"}
+                                 >
                                     <MapPin width={14} />
                                     {jobLocation}
                                     {othersCount ? (
@@ -313,7 +316,7 @@ const CustomJobHeader = ({
                                           }}
                                        >
                                           <Typography
-                                             variant={"xsmall"}
+                                             variant={"subtitle1"}
                                           >{`, +${othersCount}`}</Typography>
                                        </BrandedTooltip>
                                     ) : null}

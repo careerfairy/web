@@ -17,6 +17,10 @@ const styles = sxStyles({
       px: 2,
       pt: 2,
       overflowY: "scroll",
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
    },
    jobDeadline: {
       pb: 2,

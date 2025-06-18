@@ -9,7 +9,7 @@ import { sxStyles } from "types/commonTypes"
 import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 import { CustomJobsList } from "./CustomJobsList"
-import { NoResultsFound, SearchResultsCount } from "./search/SearchResultsCount"
+import { NoResultsFound } from "./search/SearchResultsCount"
 
 const styles = sxStyles({
    root: {
@@ -18,7 +18,11 @@ const styles = sxStyles({
          xs: "100%",
          md: "339px",
       },
-      overflow: "inherit",
+      overflow: "scroll",
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
    },
    listTitle: {
       fontWeight: 600,
@@ -63,7 +67,6 @@ export const CustomJobsOverviewList = () => {
       <Stack sx={styles.root} spacing={2}>
          <Box ref={scrollableContainerRef}>
             <NoResultsFound />
-            {isMobile ? <SearchResultsCount /> : null}
             {showDefaultJobs ? <DefaultJobs /> : null}
             {showResultJobs ? <ResultJobs /> : null}
             {showOtherJobs ? <OtherJobs /> : null}
