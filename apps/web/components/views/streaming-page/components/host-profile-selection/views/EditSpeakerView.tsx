@@ -1,6 +1,6 @@
 import {
    mapCreatorToSpeaker,
-   mapSpeakerToCreator,
+   mapSpeakerToPublicCreator,
 } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchemaType } from "@careerfairy/shared-lib/groups/schemas"
 import { LoadingButton } from "@mui/lab"
@@ -46,7 +46,7 @@ export const EditSpeakerView = () => {
       }
 
       if (selectedSpeaker) {
-         return mapSpeakerToCreator(selectedSpeaker)
+         return mapSpeakerToPublicCreator(selectedSpeaker)
       }
 
       return undefined

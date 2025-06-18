@@ -1,4 +1,4 @@
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { Creator, PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import {
    Box,
@@ -60,7 +60,7 @@ const styles = sxStyles({
 const AVATAR_SIZE = 136
 
 type Props = {
-   creator?: Creator
+   creator?: Creator | PublicCreator
    children?: ReactNode
 } & BoxProps
 
