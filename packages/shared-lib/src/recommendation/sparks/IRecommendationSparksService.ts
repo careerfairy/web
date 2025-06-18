@@ -113,6 +113,7 @@ export default class RecommendationSparksServiceCore {
          .userUniversityCode()
          .userFieldOfStudy()
          .userStudyBackground()
+         .userLanguages()
          .userFeaturedGroups()
          .get()
    }
