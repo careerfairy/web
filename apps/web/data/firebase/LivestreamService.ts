@@ -1230,7 +1230,7 @@ export class LivestreamService {
    async upsertLivestreamSpeaker(data: UpsertSpeakerRequest) {
       return httpsCallable<UpsertSpeakerRequest, Speaker>(
          this.functions,
-         "upsertLivestreamSpeaker"
+         FUNCTION_NAMES.upsertLivestreamSpeaker
       )(data)
    }
 

@@ -23,7 +23,7 @@ const swrOptions: SWRConfiguration = {
  **/
 const useCreatorPublicContent = (creator: Creator) => {
    const swrFetcher = async () => {
-      return groupRepo.getCreatorPublicContent(creator)
+      return groupRepo.getCreatorPublicContent(creator.id, creator.groupId)
    }
 
    return useSWR(`creator-content-${creator.id}`, swrFetcher, swrOptions)

@@ -6,9 +6,10 @@ import {
 import { Grid } from "@mui/material"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { EMAIL_TOOLTIP_INFO } from "constants/pages"
-import { ReactNode } from "react"
+import React, { ReactNode, useMemo } from "react"
 import { FormProvider, UseFormReturn, useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"
+import * as yup from "yup"
 import { ControlledAvatarUpload } from "../common/inputs/ControlledAvatarUpload"
 import { ControlledBrandedTextField } from "../common/inputs/ControlledBrandedTextField"
 import { getInitialValues } from "../sparks/forms/CreateOrEditCreatorForm"
@@ -23,26 +24,59 @@ const styles = sxStyles({
 
 type FormProviderProps = {
    creator?: Creator
+   hideEmailField?: boolean
    children:
       | ((methods: UseFormReturn<CreateCreatorSchemaType>) => ReactNode)
       | ReactNode
 }
 
+// Create a context to pass the isAdhocSpeaker value down
+type CreatorFormContextType = {
+   hideEmailField: boolean
+}
+
+const CreatorFormContext = React.createContext<CreatorFormContextType>({
+   hideEmailField: false,
+})
+
+export const useCreatorForm = () => React.useContext(CreatorFormContext)
+
 export const CreatorFormProvider = ({
    children,
    creator,
+   hideEmailField = false,
 }: FormProviderProps) => {
+   // For adhoc speakers, we modify the schema to make email optional
+   const modifiedSchema = useMemo(() => {
+      if (hideEmailField) {
+         // Create a modified schema with email field optional
+         return CreateCreatorSchema.clone().shape({
+            email: yup.string().notRequired(),
+         })
+      }
+      return CreateCreatorSchema
+   }, [hideEmailField])
+
    const methods = useYupForm({
-      schema: CreateCreatorSchema,
+      schema: modifiedSchema,
       defaultValues: getInitialValues(creator),
       mode: "onChange",
       reValidateMode: "onChange",
    })
 
+   const contextValue = useMemo(
+      () => ({
+         hideEmailField,
+      }),
+      [hideEmailField]
+   )
+
    return (
-      <FormProvider {...methods}>
-         {typeof children === "function" ? children(methods) : children}
-      </FormProvider>
+      <CreatorFormContext.Provider value={contextValue}>
+         <FormProvider {...methods}>
+            {typeof children === "function" ? children(methods) : children}
+         </FormProvider>
+      </CreatorFormContext.Provider>
    )
 }
 
@@ -50,6 +84,7 @@ export const CreatorFormFields = () => {
    const {
       formState: { defaultValues },
    } = useFormContext<CreateCreatorSchemaType>()
+   const { hideEmailField } = useCreatorForm()
 
    const isEditing = Boolean(defaultValues.id)
 
@@ -103,18 +138,20 @@ export const CreatorFormFields = () => {
                tooltipText="Add your LinkedIn profile to connect with more qualified candidates."
             />
          </Grid>
-         <Grid item xs={12}>
-            <ControlledBrandedTextField
-               name="email"
-               type="text"
-               label="Email address"
-               placeholder="E.g.,: John@careerfairy.io"
-               disabled={isEditing} // if we are editing a creator, we don't want to allow changing the email
-               fullWidth
-               requiredText={"(required)"}
-               tooltipText={EMAIL_TOOLTIP_INFO}
-            />
-         </Grid>
+         {hideEmailField ? null : (
+            <Grid item xs={12}>
+               <ControlledBrandedTextField
+                  name="email"
+                  type="text"
+                  label="Email address"
+                  placeholder="E.g.,: John@careerfairy.io"
+                  disabled={isEditing} // if we are editing a creator, we don't want to allow changing the email
+                  fullWidth
+                  requiredText={"(required)"}
+                  tooltipText={EMAIL_TOOLTIP_INFO}
+               />
+            </Grid>
+         )}
          <Grid item xs={12}>
             <ControlledBrandedTextField
                name="story"

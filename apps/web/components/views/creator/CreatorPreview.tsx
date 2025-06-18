@@ -8,6 +8,7 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import { useCreator } from "components/custom-hook/creator/useCreator"
 import { ReactNode } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import CircularLogo from "../common/logos/CircularLogo"
@@ -64,6 +65,7 @@ type Props = {
 } & BoxProps
 
 export const CreatorPreview = ({ creator, sx, children, ...rest }: Props) => {
+   const { data, isLoading } = useCreator(creator?.groupId, creator?.id)
    return (
       <Box sx={combineStyles(styles.root, sx)} {...rest}>
          {creator ? (
@@ -113,13 +115,13 @@ export const CreatorPreview = ({ creator, sx, children, ...rest }: Props) => {
             ) : null}
          </Stack>
          <Box mt={2} />
-         <Details>
-            {creator ? (
-               creator.email
-            ) : (
+         {isLoading ? (
+            <Details>
                <Skeleton variant="text" animation="wave" />
-            )}
-         </Details>
+            </Details>
+         ) : data ? (
+            <Details>{data?.email}</Details>
+         ) : null}
          <Box mt={2} />
          <Typography sx={styles.story}>
             {creator ? (
