@@ -14,6 +14,12 @@ import * as admin from "firebase-admin"
 import { v4 as uuidv4 } from "uuid"
 import { groupQuestions } from "./groups"
 import { firestore } from "./lib/firebase"
+import {
+   createCreatorDocument,
+   createGroupDocument,
+   creatorExists,
+   groupExists,
+} from "./utils/groupUtils"
 
 type SetupUserLivestreamDataOptions = {
    user: UserData
@@ -246,17 +252,23 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
 
       const data = this.random({
          author: {
-            email: faker.internet.email(),
+            authUid: faker.datatype.uuid(),
             groupId: groupId,
          },
          lastUpdatedAuthorInfo: {
-            email: faker.internet.email(),
+            authUid: faker.datatype.uuid(),
             groupId: groupId,
          },
          groupIds: [groupId],
          hasEnded: false,
          ...overrideFields,
       })
+
+      // Ensure all required groups exist
+      await this.ensureGroupsExist(data.groupIds)
+
+      // Ensure group creators exist
+      await this.ensureCreatorsExist(data.speakers, data.groupIds[0])
 
       const livestreamRef = firestore.collection("livestreams").doc(data.id)
 
@@ -421,6 +433,38 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          summary: "",
       }
    }
+
+   /**
+    * Ensures all required groups exist, creating them if necessary
+    */
+   private async ensureGroupsExist(groupIds: string[]): Promise<void> {
+      if (!groupIds?.length) return
+
+      await Promise.all(
+         groupIds.map(async (groupId) => {
+            const exists = await groupExists(groupId)
+            if (!exists) {
+               await createGroupDocument(groupId)
+            }
+         })
+      )
+   }
+
+   private async ensureCreatorsExist(
+      speakers: Speaker[],
+      groupId: string
+   ): Promise<void> {
+      if (!speakers?.length) return
+
+      await Promise.all(
+         speakers.map(async (speaker) => {
+            const exists = await creatorExists(speaker.id)
+            if (!exists) {
+               await createCreatorDocument(speaker, groupId)
+            }
+         })
+      )
+   }
 }
 
 export const createLivestreamGroupQuestions = (groupId: string = uuidv4()) => {
@@ -471,7 +515,6 @@ const generateSpeaker = (): Speaker => ({
    firstName: faker.name.firstName(),
    lastName: faker.name.lastName(),
    position: faker.name.jobTitle(),
-   email: faker.internet.email(),
    roles: [CreatorRoles.Speaker],
 })
 

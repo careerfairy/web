@@ -21,7 +21,7 @@ const swrOptions: SWRConfiguration = {
  * @returns an object with the livestreams and sparks the creator is a part of,
  * as well as if there's jobs available on the corresponding group.
  **/
-const useCreatorPublicContent = (creator: Creator) => {
+const useCreatorPublicContent = (creator: Pick<Creator, "id" | "groupId">) => {
    const swrFetcher = async () => {
       return groupRepo.getCreatorPublicContent(creator.id, creator.groupId)
    }
