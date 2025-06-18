@@ -15,7 +15,6 @@ import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
 import {
    JobsOverviewContextProvider,
    SearchParams,
-   useJobsOverviewContext,
 } from "components/views/jobs-page/JobsOverviewContext"
 import JobsPageOverview from "components/views/jobs-page/JobsPageOverview"
 import {
@@ -30,10 +29,9 @@ import { deserializeAlgoliaSearchResponse } from "util/algolia"
 import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 
-import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
-import { Country, State } from "country-state-city"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 export const HEADER_TRANSITION_TIMEOUT = 100
@@ -43,10 +41,12 @@ const JobsPage: NextPage<
 > = ({
    serializedCustomJobs,
    customJobData,
+   searchParams,
    userCountryCode,
+   numberOfJobs,
    dialogOpen,
-   locationNames,
 }) => {
+   const seoTitle = getSeoTitle(searchParams, numberOfJobs)
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
          CustomJobsPresenter.deserialize(job).convertToDocument(
@@ -61,56 +61,43 @@ const JobsPage: NextPage<
       : undefined
 
    return (
-      <GenericDashboardLayout
-         userCountryCode={userCountryCode}
-         hideFooter
-         headerFixed={false}
-         transitionTimeout={HEADER_TRANSITION_TIMEOUT}
-      >
-         <LivestreamDialogLayout>
-            <JobsOverviewContextProvider
-               serverCustomJobs={serverCustomJobs}
-               serverJob={serverJob}
-               dialogOpen={dialogOpen}
-               locationNames={locationNames}
-            >
-               <PageSEO />
-               <JobsPageOverview />
-            </JobsOverviewContextProvider>
-            <ScrollToTop hasBottomNavBar />
-         </LivestreamDialogLayout>
-      </GenericDashboardLayout>
+      <>
+         {serverJob && serverJob.id === searchParams.jobId ? (
+            <CustomJobSEOSchemaScriptTag job={serverJob} />
+         ) : null}
+         <SEO
+            id={"CareerFairy | Jobs | " + searchParams.term}
+            description={"Find your dream job with CareerFairy."}
+            title={seoTitle}
+         />
+         <GenericDashboardLayout
+            userCountryCode={userCountryCode}
+            hideFooter
+            headerFixed={false}
+            transitionTimeout={HEADER_TRANSITION_TIMEOUT}
+         >
+            <LivestreamDialogLayout>
+               <JobsOverviewContextProvider
+                  serverCustomJobs={serverCustomJobs}
+                  serverJob={serverJob}
+                  dialogOpen={dialogOpen}
+               >
+                  <JobsPageOverview />
+               </JobsOverviewContextProvider>
+               <ScrollToTop hasBottomNavBar />
+            </LivestreamDialogLayout>
+         </GenericDashboardLayout>
+      </>
    )
 }
 
-const PageSEO = () => {
-   const { searchParams, searchResultsCount, selectedLocationsNames } =
-      useJobsOverviewContext()
-
-   return (
-      <SEO
-         id={"CareerFairy | Jobs | " + searchParams.term}
-         description={"Find your dream job with CareerFairy."}
-         title={getSeoTitle(
-            searchParams,
-            searchResultsCount,
-            selectedLocationsNames
-         )}
-      />
-   )
-}
-
-const getSeoTitle = (
-   searchParams: SearchParams,
-   numberOfJobs: number,
-   locationNames: string[]
-) => {
+const getSeoTitle = (searchParams: SearchParams, numberOfJobs: number) => {
    if (!searchParams.location.length && !searchParams.term && numberOfJobs) {
       return `${numberOfJobs} Jobs on CareerFairy`
    }
 
    if (searchParams.location.length && !searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs in ${locationNames.join(
+      return `${numberOfJobs} Jobs in ${searchParams.location.join(
          ", "
       )} on CareerFairy`
    }
@@ -122,7 +109,7 @@ const getSeoTitle = (
    if (searchParams.location.length && searchParams.term && numberOfJobs) {
       return `${numberOfJobs} Jobs for ${
          searchParams.term
-      } in ${locationNames.join(", ")} on CareerFairy`
+      } in ${searchParams.location.join(", ")} on CareerFairy`
    }
 
    return `Jobs on CareerFairy`
@@ -135,7 +122,6 @@ type JobsPageProps = {
       livestreamsData: { [p: string]: any }[]
       sparksData: SerializedSpark[]
    }
-   locationNames: string[]
    searchParams: SearchParams
    userCountryCode: string
    numberOfJobs: number
@@ -156,7 +142,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const dialogOpen = Boolean(jobId)
 
    const queryLocations = getQueryStringArray(context.query.location)
-   const locationNames = getLocationNames(queryLocations)
    const queryBusinessFunctionTags = getQueryStringArray(
       context.query.businessFunctionTags
    )
@@ -240,49 +225,15 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          },
          dialogOpen,
          userCountryCode,
-         locationNames,
          searchParams: {
             location: queryLocations,
             term: term as string,
             businessFunctionTags: queryBusinessFunctionTags,
             jobTypes: queryJobTypes,
+            jobId: jobId || null,
          },
       },
    }
-}
-
-/**
- * Not creating a reusable function, as using country-state-city is not a good idea on  the client side.
- * This way whenever the package needs to be used, each page should declare it's own function and use
- * only on the server side.
- * @param locationIds IDs of the locations to get the names for.
- */
-const getLocationNames = (locationIds: string[]) => {
-   const locations = locationIds?.map((id) => {
-      const { countryIsoCode, stateIsoCode } = getLocationIds(id)
-
-      if (!countryIsoCode) return null
-
-      const country = Country.getCountryByCode(countryIsoCode)
-      if (stateIsoCode) {
-         const state = State.getStateByCodeAndCountry(
-            stateIsoCode,
-            countryIsoCode
-         )
-
-         return {
-            id,
-            name: `${state.name} (${country.name})`,
-         }
-      }
-
-      return {
-         id,
-         name: country.name,
-      }
-   })
-
-   return locations?.map((location) => location?.name) ?? []
 }
 
 export default JobsPage
