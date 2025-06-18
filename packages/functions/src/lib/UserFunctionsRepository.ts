@@ -4,6 +4,7 @@ import {
 } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    CompanyFollowed,
+   ProfileLanguage,
    RegisteredLivestreams,
    StudyBackground,
    UserData,
@@ -487,6 +488,18 @@ export class UserFunctionsRepository
       return querySnapshot.empty
          ? []
          : querySnapshot.docs.map((doc) => doc.data() as StudyBackground)
+   }
+
+   async getUserLanguages(userId: string): Promise<ProfileLanguage[]> {
+      const querySnapshot = await this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("languages")
+         .get()
+
+      return querySnapshot.empty
+         ? []
+         : querySnapshot.docs.map((doc) => doc.data() as ProfileLanguage)
    }
 
    async sendWelcomeEmail(

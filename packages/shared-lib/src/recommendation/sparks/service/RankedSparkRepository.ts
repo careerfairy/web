@@ -25,6 +25,7 @@ export class RankedSparkRepository {
    private readonly pointsPerTargetedCountryMatch = 5
    private readonly pointsPerTargetedFieldOfStudyMatch = 5
    private readonly pointsPerTargetedUniversityMatch = 2
+   private readonly pointsPerLanguageMatch = 10
 
    // from sparks
    private readonly pointsPerCompanyCountryMatch = 4
@@ -283,6 +284,32 @@ export class RankedSparkRepository {
          rankedSparks: sparks,
          targetUserIds: categoryIds,
          targetSparkIdsGetter: (spark) => [spark.getCategoryId()],
+      })
+   }
+
+   /**
+    * Get sparks based on the user's languages
+    *
+    * @param userLanguages - Array of user's language IDs
+    * @param limit - Maximum number of sparks to return
+    * @returns Array of ranked sparks based on the user's languages
+    */
+   public getSparksBasedOnLanguages(
+      userLanguages: string[],
+      limit = 30
+   ): RankedSpark[] {
+      // Get sparks filtered by language
+      const sparks = this.getSparksFilteredByField(
+         "language",
+         userLanguages,
+         limit
+      )
+
+      return this.rankSparks({
+         pointsPerMatch: this.pointsPerLanguageMatch,
+         rankedSparks: sparks,
+         targetUserIds: userLanguages,
+         targetSparkIdsGetter: (spark) => [spark.getLanguage()],
       })
    }
 

@@ -56,6 +56,10 @@ export class RankedSpark {
       return this.model.spark.group?.targetedUniversities.map((e) => e.id) || []
    }
 
+   getLanguage(): string {
+      return this.model.spark.language
+   }
+
    static create(sparkStats: SparkStats) {
       return new RankedSpark(sparkStats)
    }

@@ -32,6 +32,7 @@ export default class SparkRecommendationService
 {
    private additionalUserInfo: AdditionalUserRecommendationInfo = {
       studyBackgrounds: [],
+      languages: [],
    }
 
    constructor(
