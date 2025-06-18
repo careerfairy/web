@@ -1,7 +1,6 @@
-import { Box } from "@mui/material"
 import { styled } from "@mui/material/styles"
 
-export const StyledHiddenInput = styled(Box)({
+export const StyledHiddenInput = styled("input")({
    position: "absolute",
    width: "0px",
    height: "0px",
@@ -23,7 +22,3 @@ export const StyledHiddenInput = styled(Box)({
       boxShadow: "none",
    },
 })
-
-StyledHiddenInput.defaultProps = {
-   component: "input",
-}
