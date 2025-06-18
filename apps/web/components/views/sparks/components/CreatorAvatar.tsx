@@ -43,7 +43,7 @@ const CreatorAvatar: FC<Props> = ({ creator, size, sx, ...props }) => {
                objectFit="cover"
             />
          ) : (
-            `${creator.firstName[0]} ${creator.lastName[0]}`
+            `${creator.firstName?.[0]} ${creator.lastName?.[0]}`
          )}
       </Avatar>
    )

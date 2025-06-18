@@ -14,6 +14,15 @@ module.exports = {
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/ban-ts-ignore": "off",
       "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/ban-types": [
+         "error",
+         {
+            types: {
+               "{}": false, // Allow {} type
+            },
+            extendDefaults: true,
+         },
+      ],
    },
    parser: "@typescript-eslint/parser",
 }

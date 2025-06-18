@@ -31,7 +31,6 @@ const upsertSpeakerSchema: yup.SchemaOf<UpsertSpeakerRequest> = yup.object({
          firstName: baseCreatorShape.firstName,
          lastName: baseCreatorShape.lastName,
          position: baseCreatorShape.position,
-         email: baseCreatorShape.email,
          linkedInUrl: baseCreatorShape.linkedInUrl,
          roles: yup
             .array()

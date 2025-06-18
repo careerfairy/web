@@ -2,7 +2,6 @@ import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import {
    PublicCreator,
    pickPublicDataFromCreator,
-   transformCreatorNameIntoSlug,
 } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import {
@@ -133,30 +132,12 @@ export const getStaticProps: GetStaticProps<{
             const creatorLivestreams = {
                upcoming: serverSideUpcomingLivestreams?.filter((livestream) => {
                   return livestream.speakers.some(
-                     (speaker) =>
-                        speaker.email === creator.email ||
-                        transformCreatorNameIntoSlug(
-                           speaker.firstName,
-                           speaker.lastName
-                        ) ===
-                           transformCreatorNameIntoSlug(
-                              creator.firstName,
-                              creator.lastName
-                           )
+                     (speaker) => speaker.id === creator.id
                   )
                }),
                past: serverSidePastLivestreams?.filter((livestream) => {
                   return livestream.speakers.some(
-                     (speaker) =>
-                        speaker.email === creator.email ||
-                        transformCreatorNameIntoSlug(
-                           speaker.firstName,
-                           speaker.lastName
-                        ) ===
-                           transformCreatorNameIntoSlug(
-                              creator.firstName,
-                              creator.lastName
-                           )
+                     (speaker) => speaker.id === creator.id
                   )
                }),
             }
