@@ -10,6 +10,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
+import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { TabValue } from "components/views/company-page"
 import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import { CustomJobDialogData } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
@@ -17,11 +18,9 @@ import { getCustomJobDialogData } from "components/views/jobs/components/custom-
 import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import {
+   GetServerSideProps,
    GetServerSidePropsContext,
-   GetStaticPaths,
-   GetStaticPathsContext,
-   GetStaticProps,
-   InferGetStaticPropsType,
+   InferGetServerSidePropsType,
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
@@ -53,7 +52,9 @@ type TrackProps = {
    visitorId: string
 }
 
-const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+const CompanyPage: NextPage<
+   InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -95,6 +96,8 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
       )
    }, [customJobDialogData])
 
+   console.log("🚀 ~ serverCustomJob ~ serverCustomJob:", serverCustomJob)
+
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
          <CustomJobDialogProvider
@@ -102,6 +105,9 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             serverSideCustomJob={serverCustomJob}
             customJobId={customJobId}
          >
+            {serverCustomJob && serverCustomJob.id === customJobId ? (
+               <CustomJobSEOSchemaScriptTag job={serverCustomJob} />
+            ) : null}
             <SEO
                id={`CareerFairy | ${universityName}`}
                title={`CareerFairy | ${universityName}`}
@@ -152,10 +158,10 @@ type CompanyPageData = {
 
 type GetCompanyPageDataParams = {
    companyNameSlug: string
-   ctx: Parameters<GetStaticProps>[0]
+   ctx: Parameters<GetServerSideProps>[0]
    parameterSource?: string
    customJobGetter?: (
-      ctx: GetServerSidePropsContext | GetStaticPathsContext
+      ctx: GetServerSidePropsContext
    ) => Promise<CustomJobDialogData>
 }
 
@@ -167,7 +173,7 @@ export async function getCompanyPageData({
 }: GetCompanyPageDataParams): Promise<{
    props?: CompanyPageData
    notFound: boolean
-   revalidate: number
+   revalidate?: number
 }> {
    const companyName = companyNameUnSlugify(companyNameSlug)
 
@@ -175,7 +181,7 @@ export async function getCompanyPageData({
       Sentry.captureException(new Error(`Company ${companyName} not found`), {
          extra: { companyNameSlug, companyName },
       })
-      return { notFound: true, revalidate: 60 }
+      return { notFound: true }
    }
 
    const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
@@ -184,7 +190,7 @@ export async function getCompanyPageData({
       Sentry.captureException(new Error(`Company ${companyName} not found`), {
          extra: { companyNameSlug, companyName },
       })
-      return { notFound: true, revalidate: 60 }
+      return { notFound: true }
    }
 
    if (!serverSideGroup.publicProfile) {
@@ -194,7 +200,7 @@ export async function getCompanyPageData({
          ),
          { extra: { serverSideGroup, companyNameSlug } }
       )
-      return { notFound: true, revalidate: 60 }
+      return { notFound: true }
    }
 
    const [
@@ -237,23 +243,25 @@ export async function getCompanyPageData({
          groupCreators: creators?.map(pickPublicDataFromCreator) || [],
       },
       notFound: false,
-      revalidate: 60,
    }
 }
 
-export const getStaticProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
    const { companyName: companyNameSlug } = ctx.params || {}
 
-   return getCompanyPageData({
+   const result = await getCompanyPageData({
       companyNameSlug: companyNameSlug as string,
       ctx,
       customJobGetter: serverCustomJobGetter,
    })
-}
 
-export const getStaticPaths: GetStaticPaths = () => ({
-   paths: [],
-   fallback: "blocking",
-})
+   if (result.notFound) {
+      return { notFound: true }
+   }
+
+   return {
+      props: result.props!,
+   }
+}
 
 export default CompanyPage

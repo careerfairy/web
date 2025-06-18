@@ -1,14 +1,14 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
+import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { TabValue } from "components/views/company-page"
 import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import {
+   GetServerSideProps,
    GetServerSidePropsContext,
-   GetStaticPaths,
-   GetStaticPropsContext,
-   InferGetStaticPropsType,
+   InferGetServerSidePropsType,
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
@@ -26,7 +26,9 @@ import {
 } from "../../../../util/serverUtil"
 import { getCompanyPageData } from "../[[...livestreamDialog]]"
 
-const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+const JobsPage: NextPage<
+   InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -57,6 +59,9 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             customJobId={customJobId}
          >
             <>
+               {serverCustomJob && serverCustomJob.id === customJobId ? (
+                  <CustomJobSEOSchemaScriptTag job={serverCustomJob} />
+               ) : null}
                <SEO
                   id={`CareerFairy | ${universityName} | Jobs`}
                   title={`CareerFairy | ${universityName} | Jobs`}
@@ -88,11 +93,9 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    )
 }
 
-export const serverCustomJobGetter = async (
-   ctx: GetServerSidePropsContext | GetStaticPropsContext
-) => {
+export const serverCustomJobGetter = async (ctx: GetServerSidePropsContext) => {
    try {
-      const customJobId = (ctx.params.dialogJobId as string) || null
+      const customJobId = (ctx.query.dialogJobId as string) || null
 
       if (customJobId) {
          const customJob = await getServerSideCustomJob(customJobId)
@@ -115,19 +118,22 @@ export const serverCustomJobGetter = async (
    return null
 }
 
-export const getStaticProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
    const { companyName: companyNameSlug } = ctx.params || {}
 
-   return getCompanyPageData({
+   const result = await getCompanyPageData({
       companyNameSlug: companyNameSlug as string,
       ctx,
       customJobGetter: serverCustomJobGetter,
    })
-}
 
-export const getStaticPaths: GetStaticPaths = () => ({
-   paths: [],
-   fallback: "blocking",
-})
+   if (result.notFound) {
+      return { notFound: true }
+   }
+
+   return {
+      props: result.props!,
+   }
+}
 
 export default JobsPage
