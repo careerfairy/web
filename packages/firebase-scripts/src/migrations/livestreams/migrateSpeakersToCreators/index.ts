@@ -228,7 +228,9 @@ function findMatchingCreator(
 ): Creator | null {
    for (const groupId of groupIds) {
       // Try email match first
+      // @ts-expect-error - email is no longer a valid field on Speaker
       if (speaker.email) {
+         // @ts-expect-error - email is no longer a valid field on Speaker
          const emailKey = createEmailKey(speaker.email, groupId)
          const creator = creatorsByEmailAndGroup.get(emailKey)
          if (creator) {
@@ -318,6 +320,7 @@ async function handleNewCreator(
       }
    } catch (error) {
       Counter.log(
+         // @ts-expect-error - email is no longer a valid field on Speaker
          `Error creating creator for speaker ${speaker.email}: ${error.message}`
       )
       return { speaker }
@@ -338,6 +341,7 @@ function createUpdatedSpeakerObject(
       linkedInUrl: speaker.linkedInUrl || "",
       roles: speaker.roles || [],
       groupId: speaker.groupId,
+      // @ts-expect-error - email is no longer a valid field on Speaker
       email: creator.email,
       id: creator.id,
    }
@@ -395,7 +399,9 @@ async function createCreatorFromSpeaker(
       .collection("creators")
       .doc()
 
+   // @ts-expect-error - email is no longer a valid field on Speaker
    const email = speaker.email || generateBackfilledEmail(speaker, groupId)
+   // @ts-expect-error - email is no longer a valid field on Speaker
    if (!speaker.email) {
       counter.addToCustomCount("speakersWithBackfilledEmails", 1)
    }

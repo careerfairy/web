@@ -1,6 +1,6 @@
 import {
-   Creator,
-   mapSpeakerToCreator,
+   mapSpeakerToPublicCreator,
+   PublicCreator,
 } from "@careerfairy/shared-lib/groups/creators"
 import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
@@ -100,7 +100,7 @@ const SpeakerDetailsView: FC = () => {
 
 const SpeakerDetails = ({ speaker }: Props) => {
    const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
-   const creator = mapSpeakerToCreator(speaker)
+   const creator = mapSpeakerToPublicCreator(speaker)
 
    //safeguard for backward compatibility, we can't track old speakers
    const isSpeakerCreator = livestreamPresenter.creatorsIds.includes(speaker.id)
@@ -210,7 +210,7 @@ const LiveStreamButton = () => {
    )
 }
 
-const MentorDetails = ({ mentor }: { mentor: Creator }) => {
+const MentorDetails = ({ mentor }: { mentor: PublicCreator }) => {
    const { data: group } = useGroup(mentor.groupId)
    const {
       data: { livestreams, sparks, hasJobs },

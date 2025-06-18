@@ -11,9 +11,12 @@ import {
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/dist/users"
-import { groupTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
 import { faker } from "@faker-js/faker"
 import { auth, fieldValue, firestore } from "./lib/firebase"
+import {
+   createGroupDocument,
+   getGroup as getGroupFromFirestore,
+} from "./utils/groupUtils"
 import { generateId } from "./utils/utils"
 
 interface GroupSeed {
@@ -89,49 +92,12 @@ class GroupFirebaseSeed implements GroupSeed {
    }
 
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {
-      const batch = firestore.batch()
       const groupId = firestore.collection("careerCenterData").doc().id
-      const universityName =
-         faker.company.companyName().replace(/[^a-zA-Z\d ]/g, "") ??
-         "My university"
-
-      let data: Group = {
-         id: groupId,
-         groupId: groupId,
-         description: faker.company.bs(),
-         logoUrl: faker.image.business(),
-         bannerImageUrl: faker.image.business(),
-         test: false,
-         universityName,
-         normalizedUniversityName: universityName.toLowerCase(),
-         triGrams: groupTriGrams(universityName),
-         atsAdminPageFlag: true,
-      }
-
-      data = Object.assign(data, overrideFields)
-
-      groupQuestions.forEach((questionData) => {
-         const questionRef = firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("groupQuestions")
-            .doc(questionData.id)
-         batch.set(questionRef, questionData)
-      })
-
-      const groupRef = firestore.collection("careerCenterData").doc(groupId)
-      batch.set(groupRef, data)
-      await batch.commit()
-      return data
+      return createGroupDocument(groupId, overrideFields)
    }
 
    async getGroup(groupId: string): Promise<Group> {
-      const groupDoc = await firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .get()
-
-      return groupDoc.exists ? (groupDoc.data() as Group) : null
+      return getGroupFromFirestore(groupId)
    }
 
    generateCompleteCompanyData(): Partial<Group> {

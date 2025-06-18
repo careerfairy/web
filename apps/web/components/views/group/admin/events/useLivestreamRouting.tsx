@@ -1,4 +1,7 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   AuthorInfo,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import { buildLivestreamObject } from "components/helperFunctions/streamFormFunctions"
 import { getLivestreamInitialValues } from "components/views/draftStreamForm/DraftStreamForm"
@@ -23,9 +26,9 @@ export const useLivestreamRouting = () => {
    const handleCreateDraftLivestream = async () => {
       setIsCreating(true)
 
-      const author = {
+      const author: AuthorInfo = {
          groupId: group.id,
-         email: authenticatedUser.email,
+         authUid: authenticatedUser.uid,
       }
 
       const initialValues = getLivestreamInitialValues(group)

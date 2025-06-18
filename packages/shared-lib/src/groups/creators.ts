@@ -50,6 +50,7 @@ export type PublicCreator = Pick<
    | "story"
    | "id"
    | "linkedInUrl"
+   | "documentType"
 >
 
 export type AddCreatorData = Pick<
@@ -77,10 +78,11 @@ export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
       story: creator.story ?? null,
       id: creator.id ?? null,
       linkedInUrl: creator.linkedInUrl ?? null,
+      documentType: creator.documentType ?? null,
    }
 }
 
-export const mapSpeakerToCreator = (speaker: Speaker): Creator => {
+export const mapSpeakerToPublicCreator = (speaker: Speaker): PublicCreator => {
    return {
       id: speaker.id,
       groupId: speaker.groupId,
@@ -88,10 +90,7 @@ export const mapSpeakerToCreator = (speaker: Speaker): Creator => {
       firstName: speaker.firstName || null,
       lastName: speaker.lastName || null,
       position: speaker.position || null,
-      email: speaker.email || null,
       avatarUrl: speaker.avatar || null,
-      createdAt: null,
-      updatedAt: null,
       linkedInUrl: speaker.linkedInUrl || "",
       story: speaker.background || null,
       roles: speaker.roles || [CreatorRoles.Speaker],
@@ -120,7 +119,6 @@ export const mapCreatorToSpeaker = (
       firstName: creator.firstName,
       lastName: creator.lastName,
       position: creator.position,
-      email: creator.email,
       linkedInUrl: creator.linkedInUrl,
       roles: creator.roles,
       groupId: creator.groupId,

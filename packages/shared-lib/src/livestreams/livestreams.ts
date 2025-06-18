@@ -266,8 +266,8 @@ export type LivestreamLanguage = {
 }
 
 export type AuthorInfo = {
-   email: string
    groupId?: string
+   authUid?: string
 }
 
 export interface LivestreamStatus {
@@ -469,8 +469,6 @@ export interface Speaker extends Identifiable {
    lastName?: string
    position?: string
    rank?: number
-   /** @deprecated */
-   email?: string
    linkedInUrl?: string
    roles: CreatorRole[]
    groupId?: string

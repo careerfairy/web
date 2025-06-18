@@ -2,6 +2,7 @@ import {
    Creator,
    CreatorRole,
    CreatorRoles,
+   PublicCreator,
 } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchema } from "@careerfairy/shared-lib/groups/schemas"
 import { Grid } from "@mui/material"
@@ -139,7 +140,9 @@ const CreateOrEditCreatorForm: FC<Props> = ({
    )
 }
 
-const getInitialRolesValues = (creator: Creator): CreatorRole[] => {
+const getInitialRolesValues = (
+   creator?: Creator | PublicCreator
+): CreatorRole[] => {
    if (!creator || creator?.roles?.length === 0) {
       return [CreatorRoles.Spark]
    }
@@ -147,7 +150,9 @@ const getInitialRolesValues = (creator: Creator): CreatorRole[] => {
    return hasSparkRole ? creator.roles : [...creator.roles, CreatorRoles.Spark]
 }
 
-export const getInitialValues = (creator?: Creator): CreatorFormValues => ({
+export const getInitialValues = (
+   creator?: Creator | PublicCreator
+): CreatorFormValues => ({
    avatarUrl: creator?.avatarUrl || "",
    avatarFile: null,
    firstName: creator?.firstName || "",
@@ -155,8 +160,8 @@ export const getInitialValues = (creator?: Creator): CreatorFormValues => ({
    position: creator?.position || "",
    linkedInUrl: creator?.linkedInUrl || "",
    story: creator?.story || "",
-   email: creator?.email || "",
    id: creator?.id || "",
+   email: creator && "email" in creator ? creator.email : "",
    roles: getInitialRolesValues(creator),
 })
 
