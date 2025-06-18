@@ -1,5 +1,8 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   AuthorInfo,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
@@ -46,16 +49,16 @@ export const useLivestreamDialog = (group: Group) => {
       [handleOpenNewStreamModal]
    )
 
-   const getAuthor = useCallback(
+   const getAuthor = useCallback<(livestream: LivestreamEvent) => AuthorInfo>(
       (livestream) => {
-         return livestream?.author?.email
+         return livestream?.author?.authUid
             ? livestream.author
             : {
-                 email: authenticatedUser.email,
+                 authUid: authenticatedUser.uid,
                  ...(group?.id && { groupId: group.id }),
               }
       },
-      [authenticatedUser.email, group?.id]
+      [authenticatedUser.uid, group?.id]
    )
 
    const handlePublishStream = useCallback(

@@ -378,7 +378,7 @@ export const notifySlackWhenALivestreamIsCreated = onDocumentCreated(
          return
       }
 
-      let publisherEmailOrName = livestream.author?.email
+      let publisherAuthUidOrName = livestream.author?.authUid
 
       if (livestream.test) {
          logger.log("The live stream is a test, skipping the notification")
@@ -396,23 +396,18 @@ export const notifySlackWhenALivestreamIsCreated = onDocumentCreated(
       }
 
       try {
+         const publisher = await userRepo.getUserDataByUid(
+            livestream.author?.authUid
+         )
          // Fetch the author details
-         if (publisherEmailOrName) {
-            const userDoc = await firestore
-               .collection("userData")
-               .doc(publisherEmailOrName)
-               .get()
-
-            if (userDoc.exists) {
-               const user = userDoc.data()
-               publisherEmailOrName = `${user.firstName} ${user.lastName}`
-            }
+         if (publisher) {
+            publisherAuthUidOrName = `${publisher.firstName} ${publisher.lastName}`
          }
 
          const webhookUrl = config.slackWebhooks.livestreamCreated
          await notifyLivestreamCreated(
             webhookUrl,
-            publisherEmailOrName,
+            publisherAuthUidOrName,
             livestream
          )
       } catch (e) {
