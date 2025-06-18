@@ -55,6 +55,7 @@ export const MobileAppPrompt = () => {
             height={147}
             style={{
                borderRadius: "12px",
+               border: "8px solid white",
                boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
                marginTop: "-175px",
                marginBottom: "8px",
@@ -110,9 +111,7 @@ const MobilePrompt = () => {
          <Button
             variant="contained"
             component="a"
-            href={
-               "/install-mobile-application?utm_source=careerfairy&utm_campaign=AppDownloadQ12025&utm_medium=lswaitingroom&utm_content=appdownload"
-            }
+            href={"https://careerfairy.app.link/cfappdownloadpage"}
             target="_blank"
             startIcon={<Download />}
          >

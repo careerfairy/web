@@ -76,7 +76,7 @@ export const GetNotifiedCard = ({
                onAddToCalendar={handleAddToCalendar}
                onClose={onClose}
                downloadAppHref={
-                  "/install-mobile-application?utm_source=careerfairy&utm_campaign=AppDownloadQ12025&utm_medium=lsregistrationbutton&utm_content=appdownload"
+                  "https://careerfairy.app.link/CFAppDownloadPage"
                }
                animateLayout={animateLayout}
             />

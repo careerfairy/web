@@ -130,7 +130,7 @@ export const cfMobileIcon =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mobile-app%2Fapp-icon.png?alt=media"
 
 export const appQrCodeLSRoom =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mobile-app%2Fapp-download-qr-code.png?alt=media"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mobile-app%2Fapp-download-qr-code-waiting-room-branch.png?alt=media"
 
 export const appQrCodeLSRegistration =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mobile-app%2Fapp-download-qr-code-ls-registration.png?alt=media"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/mobile-app%2Fapp-download-qr-code-ls-registration-branch.png?alt=media"
