@@ -18,11 +18,12 @@ const styles = sxStyles({
          xs: "100%",
          md: "339px",
       },
-      overflow: "scroll",
-      scrollbarWidth: "none",
-      "&::-webkit-scrollbar": {
-         display: "none",
-      },
+      overflowY: "auto",
+
+      // scrollbarWidth: "none",
+      // "&::-webkit-scrollbar": {
+      //    display: "none",
+      // },
    },
    listTitle: {
       fontWeight: 600,

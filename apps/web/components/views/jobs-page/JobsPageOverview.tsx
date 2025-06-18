@@ -29,11 +29,11 @@ const styles = sxStyles({
       maxHeight: {
          md: "calc(100dvh - 176px)",
       },
-      overflow: "scroll",
-      scrollbarWidth: "none",
-      "&::-webkit-scrollbar": {
-         display: "none",
-      },
+      overflow: "hidden",
+      // scrollbarWidth: "none",
+      // "&::-webkit-scrollbar": {
+      //    display: "none",
+      // },
    },
 })
 
