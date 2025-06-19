@@ -1,5 +1,8 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
-import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
 import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { TabValue } from "components/views/company-page"
@@ -42,7 +45,7 @@ const JobsPage: NextPage<
 
    const customJobId = query.dialogJobId?.toString() || null
 
-   const serverCustomJob = useMemo(() => {
+   const serverCustomJob: CustomJob = useMemo(() => {
       const { serverSideCustomJob } = customJobDialogData || {}
       if (!serverSideCustomJob) return null
       return CustomJobsPresenter.parseDocument(
@@ -50,6 +53,14 @@ const JobsPage: NextPage<
          fromDate
       )
    }, [customJobDialogData])
+
+   const mappedServerCustomJobs: CustomJob[] = useMemo(() => {
+      return (
+         serverSideCustomJobs?.map((job) => {
+            return CustomJobsPresenter.parseDocument(job as any, fromDate)
+         }) || []
+      )
+   }, [serverSideCustomJobs])
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
@@ -61,7 +72,11 @@ const JobsPage: NextPage<
             <>
                {serverCustomJob && serverCustomJob.id === customJobId ? (
                   <CustomJobSEOSchemaScriptTag job={serverCustomJob} />
-               ) : null}
+               ) : (
+                  mappedServerCustomJobs.map((job) => (
+                     <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
+                  ))
+               )}
                <SEO
                   id={`CareerFairy | ${universityName} | Jobs`}
                   title={`CareerFairy | ${universityName} | Jobs`}

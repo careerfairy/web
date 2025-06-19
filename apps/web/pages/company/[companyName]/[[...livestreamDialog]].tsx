@@ -1,5 +1,8 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
-import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import {
    PublicCreator,
@@ -40,7 +43,6 @@ import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
 import {
    deserializeGroupClient,
    getLivestreamsAndDialogData,
-   mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../util/serverUtil"
 import { serverCustomJobGetter } from "./jobs/[[...livestreamDialog]]"
@@ -87,7 +89,7 @@ const CompanyPage: NextPage<
          ),
    }) as unknown as React.RefObject<HTMLDivElement>
 
-   const serverCustomJob = useMemo(() => {
+   const serverCustomJob: CustomJob = useMemo(() => {
       const { serverSideCustomJob } = customJobDialogData || {}
       if (!serverSideCustomJob) return null
       return CustomJobsPresenter.parseDocument(
@@ -95,6 +97,14 @@ const CompanyPage: NextPage<
          fromDate
       )
    }, [customJobDialogData])
+
+   const mappedServerCustomJobs: CustomJob[] = useMemo(() => {
+      return (
+         serverSideCustomJobs?.map((job) => {
+            return CustomJobsPresenter.parseDocument(job as any, fromDate)
+         }) || []
+      )
+   }, [serverSideCustomJobs])
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
@@ -105,7 +115,12 @@ const CompanyPage: NextPage<
          >
             {serverCustomJob && serverCustomJob.id === customJobId ? (
                <CustomJobSEOSchemaScriptTag job={serverCustomJob} />
-            ) : null}
+            ) : (
+               mappedServerCustomJobs.map((job) => (
+                  <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
+               ))
+            )}
+
             <SEO
                id={`CareerFairy | ${universityName}`}
                title={`CareerFairy | ${universityName}`}
@@ -125,9 +140,7 @@ const CompanyPage: NextPage<
                      pastLivestreams={mapFromServerSide(
                         serverSidePastLivestreams
                      )}
-                     customJobs={mapCustomJobsFromServerSide(
-                        serverSideCustomJobs
-                     )}
+                     customJobs={mappedServerCustomJobs}
                      editMode={false}
                      tab={TabValue.overview}
                   />
