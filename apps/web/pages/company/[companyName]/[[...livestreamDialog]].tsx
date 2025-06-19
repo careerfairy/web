@@ -96,8 +96,6 @@ const CompanyPage: NextPage<
       )
    }, [customJobDialogData])
 
-   console.log("🚀 ~ serverCustomJob ~ serverCustomJob:", serverCustomJob)
-
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
          <CustomJobDialogProvider
