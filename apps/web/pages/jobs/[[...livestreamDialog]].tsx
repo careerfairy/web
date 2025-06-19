@@ -64,7 +64,11 @@ const JobsPage: NextPage<
       <>
          {serverJob && serverJob.id === searchParams.jobId ? (
             <CustomJobSEOSchemaScriptTag job={serverJob} />
-         ) : null}
+         ) : (
+            serverCustomJobs.map((job) => (
+               <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
+            ))
+         )}
          <SEO
             id={"CareerFairy | Jobs | " + searchParams.term}
             description={"Find your dream job with CareerFairy."}
