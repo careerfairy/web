@@ -15,9 +15,7 @@ export const SearchByLocation = () => {
    const [selectedLocations, setSelectedLocations] = useState<string[]>([])
    const [initialLocationIds, setInitialLocationIds] = useState<string[]>(
       () => {
-         return removeDuplicates(
-            searchLocations?.concat(selectedLocations) ?? []
-         )
+         return removeDuplicates(searchLocations ?? [])
       }
    )
 
