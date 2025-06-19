@@ -19,11 +19,6 @@ const styles = sxStyles({
          md: "339px",
       },
       overflowY: "auto",
-
-      // scrollbarWidth: "none",
-      // "&::-webkit-scrollbar": {
-      //    display: "none",
-      // },
    },
    listTitle: {
       fontWeight: 600,
