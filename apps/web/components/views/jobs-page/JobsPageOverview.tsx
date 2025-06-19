@@ -30,10 +30,6 @@ const styles = sxStyles({
          md: "calc(100dvh - 176px)",
       },
       overflow: "hidden",
-      // scrollbarWidth: "none",
-      // "&::-webkit-scrollbar": {
-      //    display: "none",
-      // },
    },
 })
 
