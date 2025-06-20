@@ -251,6 +251,8 @@ exports.periodicallyRemoveCachedDocument =
 exports[FUNCTION_NAMES.getRecommendedEvents] =
    recommendation.getRecommendedEvents
 
+exports[FUNCTION_NAMES.getRecommendedJobs] = recommendation.getRecommendedJobs
+
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
 exports.syncLivestreamStartNotifications =

@@ -1,4 +1,9 @@
-import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { ICustomJobRepository } from "@careerfairy/shared-lib/customJobs/CustomJobRepository"
+import {
+   CustomJob,
+   CustomJobApplicant,
+   CustomJobStats,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { FieldOfStudyCategoryMap } from "@careerfairy/shared-lib/fieldOfStudy"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { IGroupRepository } from "@careerfairy/shared-lib/groups/GroupRepository"
@@ -301,5 +306,38 @@ export class SparksDataFetcher {
          this.userId,
          "seenSparks"
       )
+   }
+}
+
+export class CustomJobDataFetcher {
+   constructor(
+      private readonly userId: string,
+      private readonly referenceJobId: string,
+      private readonly userRepo: IUserRepository,
+      private readonly customJobRepo: ICustomJobRepository
+   ) {}
+
+   getUser(): Promise<UserData> {
+      if (!this.userId) return Promise.resolve(null)
+      return this.userRepo.getUserDataById(this.userId)
+   }
+
+   getUserAppliedJobs(limit: number): Promise<CustomJobApplicant[]> {
+      if (!this.userId) return Promise.resolve([])
+      return this.userRepo.getCustomJobApplications(this.userId, limit)
+   }
+
+   getFutureJobs(): Promise<CustomJob[]> {
+      return this.customJobRepo.getPublishedCustomJobs()
+   }
+
+   getReferenceJob(): Promise<CustomJob> {
+      if (!this.referenceJobId) return Promise.resolve(null)
+      return this.customJobRepo.getCustomJobById(this.referenceJobId)
+   }
+
+   getJobStats(jobIds: string[]): Promise<CustomJobStats[]> {
+      if (!jobIds?.length) return Promise.resolve([])
+      return this.customJobRepo.getCustomJobStats(jobIds)
    }
 }
