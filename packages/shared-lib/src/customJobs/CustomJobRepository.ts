@@ -10,6 +10,7 @@ import {
    CustomJob,
    CustomJobApplicant,
    CustomJobApplicationSource,
+   CustomJobStats,
    PublicCustomJob,
    getMaxDaysAfterDeadline,
 } from "./customJobs"
@@ -184,6 +185,8 @@ export interface ICustomJobRepository {
    removeSavedCustomJob(userId: string, customJobId: string): Promise<void>
 
    getPublishedCustomJobs(limit?: number): Promise<CustomJob[]>
+
+   getCustomJobStats(jobIds: string[]): Promise<CustomJobStats[]>
 }
 
 export class FirebaseCustomJobRepository
@@ -303,6 +306,15 @@ export class FirebaseCustomJobRepository
          .get()
 
       return this.addIdToDocs<CustomJob>(snapshot.docs)
+   }
+
+   async getCustomJobStats(jobIds: string[]): Promise<CustomJobStats[]> {
+      const snapshot = await this.firestore
+         .collection("customJobStats")
+         .where("id", "in", jobIds)
+         .get()
+
+      return this.addIdToDocs<CustomJobStats>(snapshot.docs)
    }
 
    async getCustomJobByIds(jobIds: string[]): Promise<CustomJob[]> {

@@ -8,3 +8,9 @@ export type GetRecommendedEventsFnArgs = {
    bypassCache?: boolean
    referenceLivestreamId?: string
 }
+
+export type GetRecommendedJobsFnArgs = {
+   limit: number
+   bypassCache?: boolean
+   referenceJobId?: string
+}
