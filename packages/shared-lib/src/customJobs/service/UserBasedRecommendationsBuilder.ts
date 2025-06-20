@@ -38,6 +38,8 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       jobsData: JobsData
    ) {
       super(limit, rankedCustomJobsRepo, userProfile, jobsData)
+
+      this.results = this.rankedCustomJobsRepo.getRankedCustomJobs()
    }
 
    public userCountriesOfInterest() {
@@ -55,18 +57,7 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       )
       const jobs =
          this.rankedCustomJobsRepo.getCustomJobsBasedOnUserBusinessFunctionTagIds(
-            [
-               "BusinessDevelopment",
-               "Legal",
-               "Marketing",
-               "ProductManagement",
-               "InformationTechnology",
-               "Finance",
-               "Operations",
-               "ResearchDevelopment",
-               "SupplyChainLogistics",
-               "Other",
-            ]
+            ["Legal"]
          )
       this.addResults(jobs)
       console.log(

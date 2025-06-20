@@ -39,7 +39,7 @@ export class RecommendationCustomJobsServiceCore {
       return userRecommendationBuilder
          .userStudyBackgroundBusinessFunctionsTags()
          .userBusinessFunctionsTags()
-         .userBusinessFunctionsTags()
+         .userAppliedJobsBusinessFunctionsTags()
          .get()
    }
 

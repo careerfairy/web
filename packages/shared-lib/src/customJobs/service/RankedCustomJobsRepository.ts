@@ -10,9 +10,6 @@ type RankCustomJobArgs = {
 }
 export class RankedCustomJobsRepository {
    // from userData
-   private readonly pointsPerTargetedCountryMatch = 5
-   private readonly pointsPerTargetedFieldOfStudyMatch = 5
-   private readonly pointsPerTargetedUniversityMatch = 2
 
    private readonly pointsPerBusinessFunctionTagMatch = 1
    private readonly pointsPerAppliedJobsBusinessFunctionTagMatch = 0.5
@@ -21,6 +18,10 @@ export class RankedCustomJobsRepository {
 
    constructor(jobs: CustomJob[]) {
       this.customJobs = jobs.map(RankedCustomJob.create)
+   }
+
+   public getRankedCustomJobs(): RankedCustomJob[] {
+      return this.customJobs
    }
 
    public getCustomJobsBasedOnUserBusinessFunctionTagIds(
