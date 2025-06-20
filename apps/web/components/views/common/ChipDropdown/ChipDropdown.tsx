@@ -141,6 +141,12 @@ const styles = sxStyles({
       p: 0,
       maxHeight: "440px",
    },
+   hiddenScrollbar: {
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
+   },
 })
 
 type ChipOptions = {
@@ -366,11 +372,11 @@ export const ChipDropdown = ({
       if (!options) return []
       return Object.keys(selectedMap)
          .filter((id) => selectedMap[id])
-         .map((id) => {
+         .map<ChipOptions | null>((id) => {
             const option = options.find((opt) => opt.id === id)
             return option ? { id, value: option.value } : null
          })
-         .filter(Boolean) as ChipOptions[]
+         .filter(Boolean)
    }, [selectedMap, options])
 
    const chipShouldBeStyledAsSelected = useMemo(() => {
@@ -759,12 +765,7 @@ export const ChipDropdown = ({
                                  options={options}
                                  handleOptionClick={handleActualOptionClick}
                                  isChecked={isChecked}
-                                 rootSx={{
-                                    scrollbarWidth: "none",
-                                    "&::-webkit-scrollbar": {
-                                       display: "none",
-                                    },
-                                 }}
+                                 rootSx={styles.hiddenScrollbar}
                               />
                            </Stack>
                         </motion.div>
