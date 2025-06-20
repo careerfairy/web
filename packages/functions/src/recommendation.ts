@@ -1,15 +1,23 @@
 import functions = require("firebase-functions")
-import { GetRecommendedEventsFnArgs } from "@careerfairy/shared-lib/functions/types"
+import {
+   GetRecommendedEventsFnArgs,
+   GetRecommendedJobsFnArgs,
+} from "@careerfairy/shared-lib/functions/types"
 import { onCall } from "firebase-functions/https"
 import { boolean, number, string } from "yup"
 import {
+   customJobRepo,
    groupRepo,
    livestreamsRepo,
    sparkRepo,
    userRepo,
 } from "./api/repositories"
+import { CustomJobRecommendationService } from "./lib/recommendation/CustomJobRecommendationService"
 import UserEventRecommendationService from "./lib/recommendation/UserEventRecommendationService"
-import { UserDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import {
+   CustomJobDataFetcher,
+   UserDataFetcher,
+} from "./lib/recommendation/services/DataFetcherRecommendations"
 import { logAndThrow } from "./lib/validations"
 import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
 import { middlewares } from "./middlewares/middlewares"
@@ -33,7 +41,7 @@ export const getRecommendedEvents = onCall(
       }),
       userAuthExists(),
       cacheOnCallValues(
-         "recommendedEvents",
+         "recommendedJobs",
          (request) => [
             request.auth.token.email,
             request.data.limit,
@@ -67,6 +75,56 @@ export const getRecommendedEvents = onCall(
             logAndThrow("Error in getting recommended events", {
                request,
                error,
+            })
+         }
+      }
+   )
+)
+
+export const getRecommendedJobs = onCall(
+   {
+      concurrency: 10,
+   },
+   middlewares<GetRecommendedJobsFnArgs>(
+      dataValidation({
+         limit: number().default(10).max(30),
+         bypassCache: boolean().default(false),
+         referenceJobId: string().optional().nullable(),
+      }),
+      cacheOnCallValues(
+         "recommendedJobs",
+         (request) => [
+            request.auth?.token?.email || "anonymous",
+            request.data.limit,
+            request.data.referenceJobId,
+         ],
+         60 * 60 * 24, // 1 day
+         (request) => request.data.bypassCache === true
+      ),
+      async (request) => {
+         try {
+            const dataFetcher = new CustomJobDataFetcher(
+               request.auth?.token?.email || "anonymous",
+               request.data.referenceJobId,
+               userRepo,
+               customJobRepo
+            )
+
+            const recommendationService =
+               await CustomJobRecommendationService.create(
+                  dataFetcher,
+                  functions.logger
+               )
+
+            return await recommendationService.getRecommendations(
+               request.data.limit
+            )
+         } catch (error) {
+            functions.logger.error("Error getting recommended jobs:", error)
+            logAndThrow("Error getting recommended jobs", {
+               request,
+               error,
+               userId: request.auth?.token?.email || "anonymous",
             })
          }
       }
