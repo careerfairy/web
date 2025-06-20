@@ -35,6 +35,7 @@ import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useC
 import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import { Country, State } from "country-state-city"
+import { useRouter } from "next/router"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 export const HEADER_TRANSITION_TIMEOUT = 100
@@ -45,10 +46,12 @@ const JobsPage: NextPage<
    serializedCustomJobs,
    customJobData,
    userCountryCode,
-   searchParams,
    dialogOpen,
    locationNames,
 }) => {
+   const router = useRouter()
+   const { jobId } = router.query
+
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
          CustomJobsPresenter.deserialize(job).convertToDocument(
@@ -64,7 +67,7 @@ const JobsPage: NextPage<
 
    return (
       <>
-         {serverJob && serverJob.id === searchParams.jobId ? (
+         {serverJob && serverJob.id === jobId ? (
             <CustomJobSEOSchemaScriptTag job={serverJob} />
          ) : (
             serverCustomJobs.map((job) => (
@@ -181,9 +184,9 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          normalizedJobType: queryJobTypes,
       },
       booleanFilters: {
-         deleted: false,
-         published: true,
-         isPermanentlyExpired: false,
+         // deleted: false,
+         // published: true,
+         // isPermanentlyExpired: false,
       },
    }
 
