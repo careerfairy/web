@@ -48,7 +48,15 @@ export const CustomJobSEOSchemaScriptTag = ({ job }: CustomJobSEOProps) => {
 
       const employmentType = job.jobType
          ? job.jobType.replace(" ", "-").toLowerCase()
-         : undefined
+         : null
+
+      const industry = job?.group?.companyIndustries?.at(0)
+         ? {
+              "@type": "DefinedTerm",
+              name: job?.group?.companyIndustries?.at(0).name,
+           }
+         : null
+
       const jobDeadline = job.deadline?.toDate?.()?.toISOString?.()
       const datePosted = job.createdAt?.toDate?.()?.toISOString?.()
 
@@ -66,6 +74,8 @@ export const CustomJobSEOSchemaScriptTag = ({ job }: CustomJobSEOProps) => {
             sameAs: makeGroupCompanyPageUrl(group.universityName),
             logo: logoUrl,
          },
+         industry,
+         url: job.postingUrl,
          jobLocation: jobLocations?.at(0),
          title: job.title,
          validThrough: jobDeadline,
