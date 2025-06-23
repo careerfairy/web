@@ -61,8 +61,8 @@ export const CustomJobSEOSchemaScriptTag = ({ job }: CustomJobSEOProps) => {
       const datePosted = job.createdAt?.toDate?.()?.toISOString?.()
 
       return {
-         "@type": "JobPosting",
          "@context": "https://schema.org",
+         "@type": "JobPosting",
          baseSalary,
          datePosted,
          description: job.description,
