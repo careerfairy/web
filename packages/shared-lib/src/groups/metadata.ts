@@ -1,4 +1,4 @@
-import { uniq } from "lodash"
+import uniq from "lodash/uniq"
 import { CustomJobApplicant } from "../customJobs/customJobs"
 import { Group, GroupOption, pickPublicDataFromGroup } from "../groups"
 import { LivestreamEvent } from "../livestreams"

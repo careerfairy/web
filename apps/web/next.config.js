@@ -3,9 +3,10 @@ const { withSentryConfig } = require("@sentry/nextjs")
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require("path")
 
-// const withBundleAnalyzer = require("@next/bundle-analyzer")({
-//    enabled: process.env.ANALYZE === "true",
-// });
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+   enabled: process.env.ANALYZE === "true",
+})
 
 /** @type {boolean} */
 const notProduction = process.env.NODE_ENV !== "production"
@@ -478,6 +479,6 @@ if (process.env.CI && process.env.NODE_ENV === "production") {
     */
    module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions)
 } else {
-   module.exports = moduleExports
+   module.exports = withBundleAnalyzer(moduleExports)
 }
 // Trigger ci

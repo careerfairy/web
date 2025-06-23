@@ -1,5 +1,5 @@
-import { EmblaCarouselType } from "embla-carousel-react"
-import { debounce } from "lodash"
+import { type EmblaCarouselType } from "embla-carousel-react"
+import debounce from "lodash/debounce"
 import { useEffect, useState } from "react"
 
 const VISIBILITY_THRESHOLD = 0.9
