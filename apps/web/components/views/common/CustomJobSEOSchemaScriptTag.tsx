@@ -46,6 +46,9 @@ export const CustomJobSEOSchemaScriptTag = ({ job }: CustomJobSEOProps) => {
            }
          : undefined
 
+      const employmentType = job.jobType
+         ? job.jobType.replace(" ", "-").toLowerCase()
+         : undefined
       const jobDeadline = job.deadline?.toDate?.()?.toISOString?.()
       const datePosted = job.createdAt?.toDate?.()?.toISOString?.()
 
@@ -56,12 +59,11 @@ export const CustomJobSEOSchemaScriptTag = ({ job }: CustomJobSEOProps) => {
          datePosted,
          description: job.description,
          directApply: true,
+         employmentType,
          hiringOrganization: {
             "@type": "Organization",
             name: group?.universityName,
-            sameAs: makeGroupCompanyPageUrl(group.universityName, {
-               interactionSource: "TDB-APPROPRIATE-SOURCE",
-            }),
+            sameAs: makeGroupCompanyPageUrl(group.universityName),
             logo: logoUrl,
          },
          jobLocation: jobLocations?.at(0),
