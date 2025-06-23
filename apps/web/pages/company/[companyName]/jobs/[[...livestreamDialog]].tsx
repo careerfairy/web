@@ -108,7 +108,7 @@ const JobsPage: NextPage<
    )
 }
 
-export const serverCustomJobGetter = async (ctx: GetServerSidePropsContext) => {
+const serverCustomJobGetter = async (ctx: GetServerSidePropsContext) => {
    try {
       const customJobId = (ctx.query.dialogJobId as string) || null
 
