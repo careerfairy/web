@@ -32,6 +32,16 @@ export const getLocationIds = (location: string) => {
    }
 }
 
+export const getLocationId = (
+   cityIsoCode?: string,
+   stateIsoCode?: string,
+   cityName?: string
+) => {
+   return `${cityIsoCode}${stateIsoCode ? `-${stateIsoCode}` : ""}${
+      cityName ? `-${cityName}` : ""
+   }`
+}
+
 export const getCityCodes = (generatedCityId: string) => {
    const [countryCode, stateCode, cityName] = generatedCityId.split("-")
    return { countryCode, stateCode, cityName }

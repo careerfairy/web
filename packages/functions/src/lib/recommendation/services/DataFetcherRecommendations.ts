@@ -314,7 +314,8 @@ export class CustomJobDataFetcher {
       private readonly userId: string,
       private readonly referenceJobId: string,
       private readonly userRepo: IUserRepository,
-      private readonly customJobRepo: ICustomJobRepository
+      private readonly customJobRepo: ICustomJobRepository,
+      private readonly livestreamRepo: ILivestreamRepository
    ) {}
 
    getUser(): Promise<UserData> {
@@ -339,5 +340,22 @@ export class CustomJobDataFetcher {
    getJobStats(jobIds: string[]): Promise<CustomJobStats[]> {
       if (!jobIds?.length) return Promise.resolve([])
       return this.customJobRepo.getCustomJobStats(jobIds)
+   }
+
+   getUserRegisteredLivestreams(limit: number): Promise<LivestreamEvent[]> {
+      if (!this.userId) return Promise.resolve([])
+      return this.livestreamRepo.getRegisteredEvents(this.userId, {
+         limit,
+      })
+   }
+
+   getUserStudyBackgrounds(): Promise<StudyBackground[]> {
+      if (!this.userId) return Promise.resolve([])
+      return this.userRepo.getUserStudyBackgrounds(this.userId)
+   }
+
+   getUserFollowingCompanies(): Promise<CompanyFollowed[]> {
+      if (!this.userId) return Promise.resolve([])
+      return this.userRepo.getCompaniesUserFollows(this.userId)
    }
 }
