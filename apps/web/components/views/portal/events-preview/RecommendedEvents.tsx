@@ -1,5 +1,4 @@
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { useMemo } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
@@ -35,17 +34,15 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    }
    return (
       <div>
-         <ConditionalWrapper condition={Boolean(events?.length)}>
-            <EventsPreviewCarousel
-               title={!hideTitle && "Recommended for you"}
-               events={events}
-               location={"portal-recommended-livestreams-carousel"}
-               loading={loading}
-               isRecommended
-               isAdmin={userData?.isAdmin}
-               styling={defaultStyling}
-            />
-         </ConditionalWrapper>
+         <EventsPreviewCarousel
+            title={!hideTitle && "Recommended for you"}
+            events={events}
+            location={"portal-recommended-livestreams-carousel"}
+            loading={loading}
+            isRecommended
+            isAdmin={userData?.isAdmin}
+            styling={defaultStyling}
+         />
       </div>
    )
 }
