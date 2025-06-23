@@ -256,7 +256,8 @@ export const CustomJobDetails = ({
                }
             )
          })
-   }, [job, companyName, userData?.authId])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [job.id])
 
    return (
       <>
