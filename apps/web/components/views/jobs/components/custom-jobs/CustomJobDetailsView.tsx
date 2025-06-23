@@ -23,7 +23,7 @@ import {
    useState,
 } from "react"
 import { useSelector } from "react-redux"
-import { useEffectOnce, useMeasure } from "react-use"
+import { useMeasure } from "react-use"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -236,7 +236,7 @@ export const CustomJobDetails = ({
       handleTabClickInternal(event, newValue)
    }
 
-   useEffectOnce(() => {
+   useEffect(() => {
       customJobRepo
          .incrementCustomJobViews(job.id)
          .then(() =>
@@ -256,7 +256,7 @@ export const CustomJobDetails = ({
                }
             )
          })
-   })
+   }, [job, companyName, userData?.authId])
 
    return (
       <>
