@@ -244,6 +244,19 @@ export interface ISparkFunctionsRepository {
     */
    getPublishedSparksByGroupId(groupId: string): Promise<Spark[]>
 
+   /**
+    * Get specific fields from published sparks for a group, optimizing bulk
+    * operations where only specific data is required.
+    * @param groupId The id of the group
+    * @param selectFields Array of field names to retrieve (e.g., ['language'])
+    * @returns Partial Spark objects containing only the requested fields
+    *
+    */
+   getPartialPublishedSparksByGroupId(
+      groupId: string,
+      selectFields: (keyof Spark)[]
+   ): Promise<Partial<Spark>[]>
+
    groupHasPublishedSparks(groupId: string, limit?: number): Promise<boolean>
    /**
     * Get all user sparks feed metrics
@@ -992,6 +1005,23 @@ export class SparkFunctionsRepository
          .where("group.publicSparks", "==", true)
          .where("published", "==", true)
          .orderBy("createdAt", "desc")
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async getPartialPublishedSparksByGroupId(
+      groupId: string,
+      selectFields: (keyof Spark)[]
+   ): Promise<Partial<Spark>[]> {
+      const snapshot = await this.firestore
+         .collection("sparks")
+         .withConverter<Partial<Spark>>(createAdminConverter())
+         .where("group.id", "==", groupId)
+         .where("group.publicSparks", "==", true)
+         .where("published", "==", true)
+         .orderBy("createdAt", "desc")
+         .select(...selectFields)
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
