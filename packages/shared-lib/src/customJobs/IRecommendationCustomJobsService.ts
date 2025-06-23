@@ -40,6 +40,12 @@ export class RecommendationCustomJobsServiceCore {
          .userStudyBackgroundBusinessFunctionsTags()
          .userBusinessFunctionsTags()
          .userAppliedJobsBusinessFunctionsTags()
+         .userLastViewedJobsLocations()
+         .userLastViewedJobsIndustries()
+         .userLastRegisteredLivestreamsIndustries()
+         .referenceJobBusinessFunctionsTags()
+         .referenceJobType()
+         .referenceJobLocation()
          .get()
    }
 

@@ -110,3 +110,12 @@ export const filterByField = <K, T>(
 
    return result
 }
+
+export const arrayToRecordById = <T extends Identifiable>(
+   items: T[]
+): Record<T["id"], T> => {
+   return items.reduce<Record<T["id"], T>>((acc, item) => {
+      acc[item.id] = item
+      return acc
+   }, {} as Record<T["id"], T>)
+}
