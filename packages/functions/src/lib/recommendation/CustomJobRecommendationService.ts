@@ -3,15 +3,16 @@ import {
    RecommendationCustomJobsServiceCore,
 } from "@careerfairy/shared-lib/customJobs/IRecommendationCustomJobsService"
 import {
-   JobStats,
    JobsData,
    UserProfile,
 } from "@careerfairy/shared-lib/customJobs/service/UserBasedRecommendationsBuilder"
+import { arrayToRecordById } from "@careerfairy/shared-lib/recommendation/utils"
 
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { CustomJobDataFetcher } from "./services/DataFetcherRecommendations"
 
-const MAX_USER_APPLIED_JOBS = 10
+const MAX_USER_APPLIED_JOBS = 20
+const MAX_USER_REGISTERED_LIVESTREAMS = 10
 
 export class CustomJobRecommendationService
    extends RecommendationCustomJobsServiceCore
@@ -32,7 +33,7 @@ export class CustomJobRecommendationService
          this.jobsData
       )
 
-      return rankedCustomJobs.map((job) => job.id)
+      return this.process(rankedCustomJobs, limit)
    }
 
    static async create(
@@ -41,28 +42,39 @@ export class CustomJobRecommendationService
    ): Promise<IRecommendationCustomJobsService> {
       const userData = await dataFetcher.getUser()
 
-      const userAppliedJobsFetcher = userData
-         ? dataFetcher.getUserAppliedJobs(MAX_USER_APPLIED_JOBS)
-         : Promise.resolve([])
-
-      const [userAppliedJobs, customJobs, referenceJob] = await Promise.all([
-         userAppliedJobsFetcher,
+      const [
+         userAppliedJobs,
+         customJobs,
+         referenceJob,
+         userRegisteredLivestreams,
+         userStudyBackgrounds,
+         userFollowingCompanies,
+      ] = await Promise.all([
+         dataFetcher.getUserAppliedJobs(MAX_USER_APPLIED_JOBS),
          dataFetcher.getFutureJobs(),
          dataFetcher.getReferenceJob(),
+         dataFetcher.getUserRegisteredLivestreams(
+            MAX_USER_REGISTERED_LIVESTREAMS
+         ),
+         dataFetcher.getUserStudyBackgrounds(),
+         dataFetcher.getUserFollowingCompanies(),
       ])
 
-      const customJobsStats = await dataFetcher.getJobStats(
-         customJobs.map((job) => job.id)
-      )
+      // Also include reference job id to get stats for it
+      const jobIds = [
+         ...new Set([...customJobs.map((job) => job.id), referenceJob?.id]),
+      ]
 
-      const stats: JobStats = customJobsStats.reduce((acc, stat) => {
-         acc[stat.id] = stat
-         return acc
-      }, {})
+      const stats = await dataFetcher
+         .getJobStats(jobIds)
+         .then(arrayToRecordById)
 
       const userProfile: UserProfile = {
          userData,
          jobApplications: userAppliedJobs,
+         registeredLivestreams: userRegisteredLivestreams,
+         studyBackgrounds: userStudyBackgrounds,
+         followingCompanies: userFollowingCompanies,
       }
 
       const jobsData: JobsData = {

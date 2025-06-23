@@ -94,7 +94,9 @@ export const getRecommendedJobs = onCall(
       cacheOnCallValues(
          "recommendedJobs",
          (request) => [
-            request.auth?.token?.email || "anonymous",
+            `${request.auth?.token?.email || "anonymous"}-${
+               request.data.referenceJobId || "no-reference-job"
+            }`,
             request.data.limit,
             request.data.referenceJobId,
          ],
@@ -104,10 +106,11 @@ export const getRecommendedJobs = onCall(
       async (request) => {
          try {
             const dataFetcher = new CustomJobDataFetcher(
-               request.auth?.token?.email || "anonymous",
+               request.auth?.token?.email || null,
                request.data.referenceJobId,
                userRepo,
-               customJobRepo
+               customJobRepo,
+               livestreamsRepo
             )
 
             const recommendationService =
@@ -125,6 +128,7 @@ export const getRecommendedJobs = onCall(
                request,
                error,
                userId: request.auth?.token?.email || "anonymous",
+               referenceJobId: request.data.referenceJobId,
             })
          }
       }
