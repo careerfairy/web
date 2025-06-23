@@ -71,6 +71,12 @@ export interface Group extends Identifiable {
     * */
    plan?: GroupPlan
 
+   /**
+    * Array of language codes used in the company's content (sparks and livestreams)
+    * e.g: ["en", "nl", "fr"]
+    */
+   contentLanguages?: string[]
+
    featured?: FeaturedGroup
    hasJobs?: boolean
    hasSparks?: boolean
