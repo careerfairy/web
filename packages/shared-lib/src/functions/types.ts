@@ -13,4 +13,5 @@ export type GetRecommendedJobsFnArgs = {
    limit: number
    bypassCache?: boolean
    referenceJobId?: string
+   userId?: string
 }

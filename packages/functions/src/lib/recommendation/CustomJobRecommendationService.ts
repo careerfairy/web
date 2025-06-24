@@ -6,13 +6,14 @@ import {
    JobsData,
    UserProfile,
 } from "@careerfairy/shared-lib/customJobs/service/UserBasedRecommendationsBuilder"
-import { arrayToRecordById } from "@careerfairy/shared-lib/recommendation/utils"
 
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { CustomJobDataFetcher } from "./services/DataFetcherRecommendations"
 
 const MAX_USER_APPLIED_JOBS = 20
 const MAX_USER_REGISTERED_LIVESTREAMS = 10
+const MAX_USER_LAST_VIEWED_JOBS = 20
+const MAX_USER_SAVED_JOBS = 10
 
 export class CustomJobRecommendationService
    extends RecommendationCustomJobsServiceCore
@@ -49,6 +50,8 @@ export class CustomJobRecommendationService
          userRegisteredLivestreams,
          userStudyBackgrounds,
          userFollowingCompanies,
+         userLastViewedJobs,
+         userSavedJobs,
       ] = await Promise.all([
          dataFetcher.getUserAppliedJobs(MAX_USER_APPLIED_JOBS),
          dataFetcher.getFutureJobs(),
@@ -58,16 +61,12 @@ export class CustomJobRecommendationService
          ),
          dataFetcher.getUserStudyBackgrounds(),
          dataFetcher.getUserFollowingCompanies(),
+         dataFetcher.getUserLastViewedJobs(MAX_USER_LAST_VIEWED_JOBS),
+         dataFetcher.getUserSavedJobs(MAX_USER_SAVED_JOBS),
       ])
 
-      // Also include reference job id to get stats for it
-      const jobIds = [
-         ...new Set([...customJobs.map((job) => job.id), referenceJob?.id]),
-      ]
-
-      const stats = await dataFetcher
-         .getJobStats(jobIds)
-         .then(arrayToRecordById)
+      const jobsInfo = await dataFetcher.getCustomJobsInfo(customJobs)
+      logger.info("🚀 ~ jobsInfo:", jobsInfo)
 
       const userProfile: UserProfile = {
          userData,
@@ -75,12 +74,23 @@ export class CustomJobRecommendationService
          registeredLivestreams: userRegisteredLivestreams,
          studyBackgrounds: userStudyBackgrounds,
          followingCompanies: userFollowingCompanies,
+         lastViewedJobs: userLastViewedJobs,
+         savedJobs: userSavedJobs,
       }
 
+      // Remove jobs that the user has already applied to
+      // Not removing during test
+      // const filteredJobs = customJobs?.filter( job => !userAppliedJobs?.some( appliedJob => appliedJob.job?.id === job.id)) ?? []
+
+      logger.info(
+         "🚀 ~ userSavedJobs: CustomJobRecommendationService.create ~ userSavedJobs:",
+         userSavedJobs?.map((job) => job.id)
+      )
       const jobsData: JobsData = {
          customJobs,
          referenceJob,
-         stats,
+         stats: {},
+         jobsInfo,
       }
 
       return new CustomJobRecommendationService(userProfile, jobsData, logger)

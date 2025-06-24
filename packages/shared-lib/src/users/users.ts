@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { Job } from "../ats/Job"
 import { Identifiable, UTMParams } from "../commonTypes"
+import { CustomJob } from "../customJobs/customJobs"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import {
    GROUP_DASHBOARD_ROLE,
@@ -217,6 +218,13 @@ export interface ProfileLanguage extends Identifiable {
    authId: string
    languageId: string
    proficiency: number
+}
+
+// Collection /userData/:id/lastViewedJobs/:jobId
+export interface UserLastViewedJob extends Identifiable {
+   job: CustomJob
+   lastViewedAt: Timestamp
+   totalViews: number
 }
 
 export interface ProfileInterest {
