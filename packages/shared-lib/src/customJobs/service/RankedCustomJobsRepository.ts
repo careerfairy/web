@@ -10,20 +10,27 @@ type RankCustomJobArgs = {
 }
 export class RankedCustomJobsRepository {
    // from userData
-   public readonly USER_BUSINESS_FUNCTIONS = 1
-   public readonly USER_APPLIED_JOBS_BUSINESS_FUNCTIONS = 0.5
-   public readonly USER_SB_BUSINESS_FUNCTIONS = 0.5
-   public readonly USER_JOB_LOCATION = 0.5
-   public readonly USER_COUNTRIES_OF_INTEREST = 0.5
-   public readonly USER_FOLLOWING_COMPANIES = 0.5
-   public readonly USER_LAST_VIEWED_JOBS_LOCATIONS = 0.5
-   public readonly USER_LAST_VIEWED_JOBS_INDUSTRIES = 0.5
+   public readonly USER_BUSINESS_FUNCTIONS = 2
+   public readonly USER_APPLIED_JOBS_BUSINESS_FUNCTIONS = 1.5
+   public readonly USER_JOB_LOCATION = 4
+   public readonly USER_COUNTRIES_OF_INTEREST = 1
+   public readonly USER_FOLLOWING_COMPANIES = 1
+   public readonly USER_LAST_VIEWED_JOBS_LOCATIONS = 1.5
+   public readonly USER_LAST_VIEWED_JOBS_INDUSTRIES = 1
    public readonly USER_LAST_REGISTERED_LIVESTREAMS_INDUSTRIES = 0.5
+   public readonly USER_LAST_VIEWED_JOBS_BUSINESS_FUNCTIONS = 0.5
+   public readonly USER_SAVED_JOBS = 2
 
    // from referenceJob
-   public readonly REFERENCE_JOB_TYPE = 0.5
-   public readonly REFERENCE_JOB_BUSINESS_FUNCTIONS = 0.5
-   public readonly REFERENCE_JOB_LOCATION = 0.5
+   public readonly REFERENCE_JOB_TYPE = 1
+   public readonly REFERENCE_JOB_BUSINESS_FUNCTIONS = 1
+   public readonly REFERENCE_JOB_LOCATION = 1.5
+
+   // from jobsInfo
+   public readonly JOB_LINKED_UPCOMING_EVENTS_COUNT = 2
+   public readonly JOB_DEADLINE_ONE_WEEK = 8
+   public readonly JOB_DEADLINE_TWO_WEEKS = 2
+   public readonly JOB_DEADLINE_ONE_MONTH = 0.5
 
    private readonly customJobs: RankedCustomJob[]
 
@@ -78,31 +85,6 @@ export class RankedCustomJobsRepository {
       })
    }
 
-   /**
-    * TODO: needs improvement, as filtering based on countries should take into account the state and city.
-    */
-   public getCustomJobsBasedOnLocations(
-      locations: string[],
-      pointsPerMatch: number
-   ): RankedCustomJob[] {
-      const jobs = filterByField(
-         this.customJobs,
-         (rankedJob: RankedCustomJob) => rankedJob.model,
-         "jobLocation",
-         locations
-      )
-
-      return this.rankCustomJobs({
-         rankedCustomJobs: jobs,
-         targetIds: locations,
-         targetCustomJobIdsGetter: (rankedCustomJob) =>
-            rankedCustomJob.model?.jobLocation?.map(
-               (location) => location.id
-            ) ?? [],
-         pointsPerMatch,
-      })
-   }
-
    public getCustomJobsBasedOnJobTypes(
       types: JobType[],
       pointsPerMatch: number
@@ -125,7 +107,7 @@ export class RankedCustomJobsRepository {
       })
    }
 
-   public getCustomJobsBusinessFunctionTagIds(
+   public getCustomJobsBasedOnBusinessFunctionTagIds(
       businessFunctionTagIds: string[],
       pointsPerMatch: number
    ): RankedCustomJob[] {
@@ -145,6 +127,29 @@ export class RankedCustomJobsRepository {
       })
    }
 
+   public getCustomJobsBasedOnCondition(
+      condition: (job: RankedCustomJob) => boolean,
+      pointsPerMatch: number,
+      pointsMultiplier: number | ((job: RankedCustomJob) => number) = 1
+   ): RankedCustomJob[] {
+      const jobs = this.customJobs.filter(condition)
+      return this.applyRank(jobs, pointsPerMatch, pointsMultiplier)
+   }
+
+   private applyRank(
+      rankedCustomJobs: RankedCustomJob[],
+      points: number,
+      pointsMultiplier: number | ((job: RankedCustomJob) => number) = 1
+   ): RankedCustomJob[] {
+      rankedCustomJobs.forEach((rankedCustomJob) => {
+         const multiplier =
+            typeof pointsMultiplier === "function"
+               ? pointsMultiplier(rankedCustomJob)
+               : pointsMultiplier
+         rankedCustomJob.addPoints(points * multiplier)
+      })
+      return sortRankedByPoints<RankedCustomJob>(rankedCustomJobs)
+   }
    private rankCustomJobs({
       rankedCustomJobs,
       targetIds,

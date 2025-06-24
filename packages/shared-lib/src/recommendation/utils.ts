@@ -8,7 +8,12 @@ type RankedType = RankedLivestreamEvent | RankedSpark | RankedCustomJob
 export const sortRankedByPoints = <T extends RankedType>(
    rankedElements: T[]
 ): T[] => {
-   return [...rankedElements].sort((a, b) => b.getPoints() - a.getPoints())
+   return [...rankedElements].sort((a, b) => {
+      const diff = b.getPoints() - a.getPoints()
+      if (diff !== 0) return diff
+      // Deterministic tie-breaker: sort by id alphabetically
+      return a.id.localeCompare(b.id)
+   })
 }
 
 export const handlePromisesAllSettled = async <TPromiseResolve>(
@@ -59,7 +64,7 @@ export const sortElementsByFrequency = (elements: string[]) => {
 export const filterByField = <K, T>(
    items: K[],
    getItem: (item: unknown) => T,
-   field: keyof T,
+   fieldOrFn: keyof T | ((item: T) => unknown | unknown[]),
    filterValues: unknown | unknown[],
    limit?: number
 ): K[] => {
@@ -77,7 +82,13 @@ export const filterByField = <K, T>(
       }
 
       const item = getItem(rawItem)
-      const fieldValue = item[field]
+      // Determine the value(s) to compare: use function if provided, else field name
+      let fieldValue: unknown
+      if (typeof fieldOrFn === "function") {
+         fieldValue = fieldOrFn(item)
+      } else {
+         fieldValue = item[fieldOrFn]
+      }
 
       let isMatch = false
       if (fieldValue === null || fieldValue === undefined) {
