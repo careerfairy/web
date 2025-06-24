@@ -8,6 +8,8 @@ import {
    UserLastViewedJob,
 } from "../../users/users"
 import { removeDuplicates } from "../../utils"
+import { Logger } from "../../utils/types"
+import { RankedCustomJob } from "../RankedCustomJob"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
 import { CustomJob, CustomJobApplicant, CustomJobStats } from "../customJobs"
 import { RankedCustomJobsRepository } from "./RankedCustomJobsRepository"
@@ -60,6 +62,18 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       jobsData: JobsData
    ) {
       super(limit, rankedCustomJobsRepo, userProfile, jobsData)
+   }
+
+   private logResultsBeforeAdding(
+      logger: Logger,
+      methodName: string,
+      ids: unknown[],
+      jobs: RankedCustomJob[]
+   ) {
+      logger.info(`🚀 ~ ${methodName}`, {
+         filterIds: ids,
+         jobs: jobs.map((job) => job.id + " - " + job.getPoints()),
+      })
    }
 
    public userCountriesOfInterest() {
@@ -139,7 +153,7 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       return this
    }
 
-   public userBusinessFunctionsTags() {
+   public userBusinessFunctionsTags(logger?: Logger) {
       if (!this.userProfile?.userData?.businessFunctionsTagIds?.length)
          return this
 
@@ -148,6 +162,15 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
             this.userProfile.userData.businessFunctionsTagIds,
             this.rankedCustomJobsRepo.USER_BUSINESS_FUNCTIONS
          )
+
+      if (logger) {
+         this.logResultsBeforeAdding(
+            logger,
+            "userBusinessFunctionsTags",
+            this.userProfile.userData.businessFunctionsTagIds,
+            jobs
+         )
+      }
 
       this.addResults(jobs)
 

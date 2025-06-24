@@ -34,7 +34,7 @@ export class RecommendationCustomJobsServiceCore {
       )
 
       return userRecommendationBuilder
-         .userBusinessFunctionsTags()
+         .userBusinessFunctionsTags(this.log)
          .userFollowingCompanies()
          .userStrictLocation()
          .userCountriesOfInterest()

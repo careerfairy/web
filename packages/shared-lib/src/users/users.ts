@@ -220,8 +220,9 @@ export interface ProfileLanguage extends Identifiable {
    proficiency: number
 }
 
-// Collection /userData/:id/lastViewedJobs/:jobId
+// Collection /seenJobs/:userAuthId_jobId
 export interface UserLastViewedJob extends Identifiable {
+   userAuthId: string
    job: CustomJob
    lastViewedAt: Timestamp
    totalViews: number

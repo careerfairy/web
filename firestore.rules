@@ -185,14 +185,16 @@ service cloud.firestore {
                 allow read, write: if isSignedInAndIsSameUser(userId);
             }
 
-            match /seenJobs/{jobId} {
-                allow read, write: if isSignedInAndIsSameUser(userId);
-            }
 
             allow read: if true;
             allow update: if isSignedInAndIsSameUser(userId) && protectedFieldsDidNotChange(["credits", "isAdmin", "userEmail"]);
             allow create: if false; // only admin sdk can create users
             allow delete: if false;
+        }
+
+        // Document ID is correctly formatted (userAuthUid_jobId)
+        match /seenJobs/{docId} {
+            allow read, write: if isSignedInAndIsSameAuthUid(docId.split("_")[0]);
         }
         
         match /talentGuideProgress/{docId} {
