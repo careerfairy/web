@@ -87,7 +87,7 @@ export const getRecommendedJobs = onCall(
    },
    middlewares<GetRecommendedJobsFnArgs>(
       dataValidation({
-         userId: string().optional().nullable(),
+         userAuthId: string().optional().nullable(),
          limit: number().default(10).max(30),
          bypassCache: boolean().default(false),
          referenceJobId: string().optional().nullable(),
@@ -95,7 +95,7 @@ export const getRecommendedJobs = onCall(
       cacheOnCallValues(
          "recommendedJobs",
          (request) => [
-            `${request.data.userId || "anonymous"}-${
+            `${request.data.userAuthId || "anonymous"}-${
                request.data.referenceJobId || "no-reference-job"
             }`,
             request.data.limit,
@@ -107,14 +107,12 @@ export const getRecommendedJobs = onCall(
       async (request) => {
          try {
             const dataFetcher = new CustomJobDataFetcher(
-               request.data.userId || null,
+               request.data.userAuthId || null,
                request.data.referenceJobId,
                userRepo,
                customJobRepo,
                livestreamsRepo
             )
-
-            functions.logger.info("🚀 ~ request.data:", request.data)
 
             const recommendationService =
                await CustomJobRecommendationService.create(
@@ -130,7 +128,7 @@ export const getRecommendedJobs = onCall(
             logAndThrow("Error getting recommended jobs.", {
                request,
                error,
-               userId: request.auth?.token?.email || "anonymous",
+               userAuthId: request.auth?.token?.email || "anonymous",
                referenceJobId: request.data.referenceJobId,
             })
          }
