@@ -331,7 +331,7 @@ export class CustomJobDataFetcher {
    }
 
    getFutureJobs(): Promise<CustomJob[]> {
-      return this.customJobRepo.getPublishedCustomJobs()
+      return this.customJobRepo.getPublishedCustomJobs(null)
    }
 
    getReferenceJob(): Promise<CustomJob> {
@@ -361,9 +361,12 @@ export class CustomJobDataFetcher {
       return this.userRepo.getCompaniesUserFollows(this.userId)
    }
 
-   getUserLastViewedJobs(limit: number): Promise<UserLastViewedJob[]> {
-      if (!this.userId) return Promise.resolve([])
-      return this.userRepo.getUserLastViewedJobs(this.userId, limit)
+   getUserLastViewedJobs(
+      userAuthId: string,
+      limit: number
+   ): Promise<UserLastViewedJob[]> {
+      if (!userAuthId) return Promise.resolve([])
+      return this.userRepo.getUserLastViewedJobs(userAuthId, limit)
    }
 
    getUserSavedJobs(limit: number): Promise<CustomJob[]> {

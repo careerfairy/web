@@ -350,10 +350,10 @@ export interface IUserRepository {
       universityCode: string
    ): Promise<UserData[]>
 
-   updateUserLastViewedJob(job: CustomJob, userId: string): Promise<void>
+   updateUserLastViewedJob(job: CustomJob, userAuthId: string): Promise<void>
 
    getUserLastViewedJobs(
-      userId: string,
+      userAuthId: string,
       limit: number
    ): Promise<UserLastViewedJob[]>
 
@@ -1311,13 +1311,11 @@ export class FirebaseUserRepository
 
    async updateUserLastViewedJob(
       job: CustomJob,
-      userId: string
+      userAuthId: string
    ): Promise<void> {
       const ref = this.firestore
-         .collection("userData")
-         .doc(userId)
          .collection("seenJobs")
-         .doc(job.id)
+         .doc(`${userAuthId}_${job.id}`)
 
       const snap = await ref.get()
 
@@ -1330,7 +1328,8 @@ export class FirebaseUserRepository
       }
 
       const data: UserLastViewedJob = {
-         id: job.id,
+         id: `${userAuthId}_${job.id}`,
+         userAuthId,
          job,
          totalViews: 1,
          lastViewedAt: this.timestamp.now(),
@@ -1340,13 +1339,12 @@ export class FirebaseUserRepository
    }
 
    async getUserLastViewedJobs(
-      userId: string,
+      userAuthId: string,
       limit: number
    ): Promise<UserLastViewedJob[]> {
       const query = this.firestore
-         .collection("userData")
-         .doc(userId)
          .collection("seenJobs")
+         .where("userAuthId", "==", userAuthId)
          .orderBy("totalViews", "desc")
          .orderBy("lastViewedAt", "desc")
          .limit(limit)

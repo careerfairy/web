@@ -296,14 +296,18 @@ export class FirebaseCustomJobRepository
    }
 
    async getPublishedCustomJobs(limit = 10): Promise<CustomJob[]> {
-      const snapshot = await this.firestore
+      let query = this.firestore
          .collection(this.COLLECTION_NAME)
          .where("published", "==", true)
          .where("deleted", "==", false)
          .where("isPermanentlyExpired", "==", false)
          .where("deadline", ">=", new Date())
-         .limit(limit)
-         .get()
+
+      if (limit !== undefined && limit !== null) {
+         query = query.limit(limit)
+      }
+
+      const snapshot = await query.get()
 
       return this.addIdToDocs<CustomJob>(snapshot.docs)
    }
