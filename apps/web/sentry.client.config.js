@@ -48,8 +48,14 @@ Sentry.init({
       return 0.05
    },
 
-   integrations: isDisabled() ? [] : [Sentry.replayIntegration()],
+   integrations: isDisabled()
+      ? []
+      : [
+           // Disabled becaise expensive (doubled Sentry bill) and not used as much
+           // Sentry.replayIntegration()
+        ],
 
    // Session Replay
-   replaysOnErrorSampleRate: isDisabled() ? 0 : 1.0, // Record all errors replay
+   // replaysOnErrorSampleRate: isDisabled() ? 0 : 0, // Record all errors replay
+   replaysOnErrorSampleRate: 0,
 })
