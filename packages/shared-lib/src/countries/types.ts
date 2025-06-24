@@ -70,21 +70,23 @@ export const inLocation = (
    location: string,
    otherLocationIds: string[]
 ): string[] => {
-   const locationSegments = location.split("-")
+   const locationSegments = location?.split("-") ?? []
    const locationDepth = locationSegments.length
 
-   return otherLocationIds.filter((id) => {
-      const idSegments = id.split("-")
-      // Must match at least as deep as the location's specificity
-      if (idSegments.length < locationDepth) return false
-      // For city-level, require exact match
-      if (locationDepth === 3) {
-         return id === location
-      }
-      // For country/state, all segments up to the location's depth must match
-      for (let i = 0; i < locationDepth; i++) {
-         if (idSegments[i] !== locationSegments[i]) return false
-      }
-      return true
-   })
+   return (
+      otherLocationIds?.filter((id) => {
+         const idSegments = id.split("-")
+         // Must match at least as deep as the location's specificity
+         if (idSegments.length < locationDepth) return false
+         // For city-level, require exact match
+         if (locationDepth === 3) {
+            return id === location
+         }
+         // For country/state, all segments up to the location's depth must match
+         for (let i = 0; i < locationDepth; i++) {
+            if (idSegments[i] !== locationSegments[i]) return false
+         }
+         return true
+      }) ?? []
+   )
 }

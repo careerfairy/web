@@ -257,8 +257,8 @@ export const CustomJobDetails = ({
             )
          })
 
-      if (userData?.id) {
-         userRepo.updateUserLastViewedJob(job, userData?.id)
+      if (userData?.authId) {
+         userRepo.updateUserLastViewedJob(job, userData?.authId)
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [job.id])

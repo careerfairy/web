@@ -24,7 +24,7 @@ export class CustomJobRecommendationService
       private readonly jobsData: JobsData,
       logger: Logger
    ) {
-      super(logger)
+      super(logger, true)
    }
 
    async getRecommendations(limit = 10): Promise<string[]> {
@@ -61,10 +61,18 @@ export class CustomJobRecommendationService
          ),
          dataFetcher.getUserStudyBackgrounds(),
          dataFetcher.getUserFollowingCompanies(),
-         dataFetcher.getUserLastViewedJobs(MAX_USER_LAST_VIEWED_JOBS),
+         dataFetcher.getUserLastViewedJobs(
+            userData?.authId,
+            MAX_USER_LAST_VIEWED_JOBS
+         ),
          dataFetcher.getUserSavedJobs(MAX_USER_SAVED_JOBS),
       ])
 
+      logger.info(
+         "🚀 ~ userLastViewedJobs:",
+         userLastViewedJobs?.map((job) => job.id)
+      )
+      logger.info("🚀 ~ total jobs:", customJobs?.length)
       const jobsInfo = await dataFetcher.getCustomJobsInfo(customJobs)
       logger.info("🚀 ~ jobsInfo:", jobsInfo)
 
