@@ -1,3 +1,4 @@
+import { removeDuplicateDocuments } from "../BaseFirebaseRepository"
 import { RankedCustomJob } from "./RankedCustomJob"
 
 export class RecommendationsBuilder {
@@ -14,20 +15,6 @@ export class RecommendationsBuilder {
    }
 
    public get(): RankedCustomJob[] {
-      return this.results
-      // const uniqueEvents = removeDuplicateDocuments(
-      //    this.results.filter(Boolean).flat()
-      // )
-
-      // if (applyCustomPoints) {
-      //    uniqueEvents.forEach(applyCustomPoints)
-      // }
-
-      // // return the list already sorted
-      // const rankedCustomJobs = sortRankedByPoints<RankedCustomJob>(
-      //    uniqueEvents
-      // ).slice(0, this.limit)
-
-      // return rankedCustomJobs
+      return removeDuplicateDocuments(this.results.flat())
    }
 }

@@ -313,7 +313,7 @@ export class SparksDataFetcher {
 
 export class CustomJobDataFetcher {
    constructor(
-      private readonly userId: string,
+      private readonly authId: string,
       private readonly referenceJobId: string,
       private readonly userRepo: IUserRepository,
       private readonly customJobRepo: ICustomJobRepository,
@@ -321,13 +321,16 @@ export class CustomJobDataFetcher {
    ) {}
 
    getUser(): Promise<UserData> {
-      if (!this.userId) return Promise.resolve(null)
-      return this.userRepo.getUserDataById(this.userId)
+      if (!this.authId) return Promise.resolve(null)
+      return this.userRepo.getUserDataByUid(this.authId)
    }
 
-   getUserAppliedJobs(limit: number): Promise<CustomJobApplicant[]> {
-      if (!this.userId) return Promise.resolve([])
-      return this.userRepo.getCustomJobApplications(this.userId, limit)
+   getUserAppliedJobs(
+      userId: string,
+      limit: number
+   ): Promise<CustomJobApplicant[]> {
+      if (!userId) return Promise.resolve([])
+      return this.userRepo.getCustomJobApplications(userId, limit)
    }
 
    getFutureJobs(): Promise<CustomJob[]> {
@@ -344,21 +347,24 @@ export class CustomJobDataFetcher {
       return this.customJobRepo.getCustomJobStats(jobIds)
    }
 
-   getUserRegisteredLivestreams(limit: number): Promise<LivestreamEvent[]> {
-      if (!this.userId) return Promise.resolve([])
-      return this.livestreamRepo.getRegisteredEvents(this.userId, {
+   getUserRegisteredLivestreams(
+      userId: string,
+      limit: number
+   ): Promise<LivestreamEvent[]> {
+      if (!userId) return Promise.resolve([])
+      return this.livestreamRepo.getRegisteredEvents(userId, {
          limit,
       })
    }
 
-   getUserStudyBackgrounds(): Promise<StudyBackground[]> {
-      if (!this.userId) return Promise.resolve([])
-      return this.userRepo.getUserStudyBackgrounds(this.userId)
+   getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]> {
+      if (!userId) return Promise.resolve([])
+      return this.userRepo.getUserStudyBackgrounds(userId)
    }
 
-   getUserFollowingCompanies(): Promise<CompanyFollowed[]> {
-      if (!this.userId) return Promise.resolve([])
-      return this.userRepo.getCompaniesUserFollows(this.userId)
+   getUserFollowingCompanies(userId: string): Promise<CompanyFollowed[]> {
+      if (!userId) return Promise.resolve([])
+      return this.userRepo.getCompaniesUserFollows(userId)
    }
 
    getUserLastViewedJobs(
@@ -369,9 +375,9 @@ export class CustomJobDataFetcher {
       return this.userRepo.getUserLastViewedJobs(userAuthId, limit)
    }
 
-   getUserSavedJobs(limit: number): Promise<CustomJob[]> {
-      if (!this.userId) return Promise.resolve([])
-      return this.userRepo.getSavedJobs(this.userId, limit)
+   getUserSavedJobs(userId: string, limit: number): Promise<CustomJob[]> {
+      if (!userId) return Promise.resolve([])
+      return this.userRepo.getSavedJobs(userId, limit)
    }
 
    /**
