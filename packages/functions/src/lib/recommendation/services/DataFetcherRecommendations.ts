@@ -4,6 +4,7 @@ import {
    CustomJobApplicant,
    CustomJobStats,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { JobsInfo } from "@careerfairy/shared-lib/customJobs/service/UserBasedRecommendationsBuilder"
 import { FieldOfStudyCategoryMap } from "@careerfairy/shared-lib/fieldOfStudy"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { IGroupRepository } from "@careerfairy/shared-lib/groups/GroupRepository"
@@ -24,6 +25,7 @@ import {
    RegisteredLivestreams,
    StudyBackground,
    UserData,
+   UserLastViewedJob,
 } from "@careerfairy/shared-lib/users"
 import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
 import { ISparkFunctionsRepository } from "src/lib/sparks/SparkFunctionsRepository"
@@ -357,5 +359,37 @@ export class CustomJobDataFetcher {
    getUserFollowingCompanies(): Promise<CompanyFollowed[]> {
       if (!this.userId) return Promise.resolve([])
       return this.userRepo.getCompaniesUserFollows(this.userId)
+   }
+
+   getUserLastViewedJobs(limit: number): Promise<UserLastViewedJob[]> {
+      if (!this.userId) return Promise.resolve([])
+      return this.userRepo.getUserLastViewedJobs(this.userId, limit)
+   }
+
+   getUserSavedJobs(limit: number): Promise<CustomJob[]> {
+      if (!this.userId) return Promise.resolve([])
+      return this.userRepo.getSavedJobs(this.userId, limit)
+   }
+
+   /**
+    * Preferring to only return counts as to not keep too much the data in memory.
+    */
+   async getCustomJobsInfo(customJobs: CustomJob[]): Promise<JobsInfo> {
+      if (!customJobs?.length) return Promise.resolve(null)
+      const jobsInfo: JobsInfo = {}
+
+      const upcomingEventIds = await this.livestreamRepo
+         .getUpcomingEvents()
+         .then((events) => events.map((event) => event.id))
+      customJobs.forEach((job) => {
+         const linkedUpcomingEventsCount = job.livestreams.filter(
+            (livestream) => upcomingEventIds.includes(livestream)
+         ).length
+         jobsInfo[job.id] = {
+            linkedUpcomingEventsCount,
+         }
+      })
+
+      return jobsInfo
    }
 }

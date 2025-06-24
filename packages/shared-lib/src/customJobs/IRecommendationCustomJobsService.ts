@@ -26,9 +26,6 @@ export class RecommendationCustomJobsServiceCore {
       userProfile: UserProfile,
       jobsData: JobsData
    ): RankedCustomJob[] {
-      console.log(
-         "🚀 ~ RecommendationCustomJobsServiceCore ~ getting recommendations"
-      )
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
          new RankedCustomJobsRepository(jobsData.customJobs),
@@ -37,15 +34,21 @@ export class RecommendationCustomJobsServiceCore {
       )
 
       return userRecommendationBuilder
-         .userStudyBackgroundBusinessFunctionsTags()
          .userBusinessFunctionsTags()
-         .userAppliedJobsBusinessFunctionsTags()
+         .userFollowingCompanies()
+         .userStrictLocation()
+         .userCountriesOfInterest()
+         .userSavedJobs()
          .userLastViewedJobsLocations()
+         .userLastViewedJobsBusinessFunctionsTags()
          .userLastViewedJobsIndustries()
+         .userAppliedJobsBusinessFunctionsTags()
          .userLastRegisteredLivestreamsIndustries()
          .referenceJobBusinessFunctionsTags()
          .referenceJobType()
          .referenceJobLocation()
+         .jobLinkedUpcomingEventsCount()
+         .jobDeadline()
          .get()
    }
 
@@ -54,10 +57,13 @@ export class RecommendationCustomJobsServiceCore {
       limit: number
    ): string[] {
       const combinedResults = combineRankedDocuments(results)
-      console.log(
-         "🚀 Combine results:",
-         combinedResults.map((job) => job.id + " - " + job.points)
-      )
+      if (this.debug) {
+         this.log.info(
+            "🚀 Recommendation results (unsorted):",
+            combinedResults.map((job) => job.id + " - " + job.points)
+         )
+      }
+
       const sortedRecommendedCustomJobs =
          sortRankedByPoints<RankedCustomJob>(combinedResults)
 
