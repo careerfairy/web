@@ -53,28 +53,25 @@ export class CustomJobRecommendationService
          userLastViewedJobs,
          userSavedJobs,
       ] = await Promise.all([
-         dataFetcher.getUserAppliedJobs(MAX_USER_APPLIED_JOBS),
+         dataFetcher.getUserAppliedJobs(userData?.id, MAX_USER_APPLIED_JOBS),
          dataFetcher.getFutureJobs(),
          dataFetcher.getReferenceJob(),
          dataFetcher.getUserRegisteredLivestreams(
+            userData?.id,
             MAX_USER_REGISTERED_LIVESTREAMS
          ),
-         dataFetcher.getUserStudyBackgrounds(),
-         dataFetcher.getUserFollowingCompanies(),
+         dataFetcher.getUserStudyBackgrounds(userData?.id),
+         dataFetcher.getUserFollowingCompanies(userData?.id),
          dataFetcher.getUserLastViewedJobs(
             userData?.authId,
             MAX_USER_LAST_VIEWED_JOBS
          ),
-         dataFetcher.getUserSavedJobs(MAX_USER_SAVED_JOBS),
+         dataFetcher.getUserSavedJobs(userData?.id, MAX_USER_SAVED_JOBS),
       ])
 
-      logger.info(
-         "🚀 ~ userLastViewedJobs:",
-         userLastViewedJobs?.map((job) => job.id)
-      )
-      logger.info("🚀 ~ total jobs:", customJobs?.length)
+      logger.info("🚀 ~ Total jobs:", customJobs?.length)
+
       const jobsInfo = await dataFetcher.getCustomJobsInfo(customJobs)
-      logger.info("🚀 ~ jobsInfo:", jobsInfo)
 
       const userProfile: UserProfile = {
          userData,
@@ -87,15 +84,16 @@ export class CustomJobRecommendationService
       }
 
       // Remove jobs that the user has already applied to
-      // Not removing during test
-      // const filteredJobs = customJobs?.filter( job => !userAppliedJobs?.some( appliedJob => appliedJob.job?.id === job.id)) ?? []
+      const filteredJobs =
+         customJobs?.filter(
+            (job) =>
+               !userAppliedJobs?.some(
+                  (appliedJob) => appliedJob.job?.id === job.id
+               )
+         ) ?? []
 
-      logger.info(
-         "🚀 ~ userSavedJobs: CustomJobRecommendationService.create ~ userSavedJobs:",
-         userSavedJobs?.map((job) => job.id)
-      )
       const jobsData: JobsData = {
-         customJobs,
+         customJobs: filteredJobs,
          referenceJob,
          stats: {},
          jobsInfo,

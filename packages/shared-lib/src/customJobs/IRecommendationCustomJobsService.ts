@@ -26,15 +26,18 @@ export class RecommendationCustomJobsServiceCore {
       userProfile: UserProfile,
       jobsData: JobsData
    ): RankedCustomJob[] {
+      const logger: Logger | null = this.debug ? this.log : null
+
       const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
          limit,
          new RankedCustomJobsRepository(jobsData.customJobs),
          userProfile,
-         jobsData
+         jobsData,
+         logger
       )
 
       return userRecommendationBuilder
-         .userBusinessFunctionsTags(this.log)
+         .userBusinessFunctionsTags()
          .userFollowingCompanies()
          .userStrictLocation()
          .userCountriesOfInterest()
@@ -57,15 +60,17 @@ export class RecommendationCustomJobsServiceCore {
       limit: number
    ): string[] {
       const combinedResults = combineRankedDocuments(results)
-      if (this.debug) {
-         this.log.info(
-            "🚀 Recommendation results (unsorted):",
-            combinedResults.map((job) => job.id + " - " + job.points)
-         )
-      }
 
       const sortedRecommendedCustomJobs =
          sortRankedByPoints<RankedCustomJob>(combinedResults)
+
+      if (this.debug) {
+         this.log.info("🚀 All recommendation results (SORTED):", {
+            points: sortedRecommendedCustomJobs.map(
+               (job) => job.id + " - " + job.points
+            ),
+         })
+      }
 
       return sortedRecommendedCustomJobs.map((job) => job.id).slice(0, limit)
    }

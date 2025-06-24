@@ -59,26 +59,46 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       limit: number,
       rankedCustomJobsRepo: RankedCustomJobsRepository,
       userProfile: UserProfile,
-      jobsData: JobsData
+      jobsData: JobsData,
+      protected readonly logger: Logger | null
    ) {
       super(limit, rankedCustomJobsRepo, userProfile, jobsData)
    }
 
-   private logResultsBeforeAdding(
-      logger: Logger,
+   private logResults(
       methodName: string,
-      ids: unknown[],
-      jobs: RankedCustomJob[]
+      filterData: unknown,
+      jobs: RankedCustomJob[],
+      currentResultsScore: Record<string, number> = {}
    ) {
-      logger.info(`🚀 ~ ${methodName}`, {
-         filterIds: ids,
-         jobs: jobs.map((job) => job.id + " - " + job.getPoints()),
+      this.logger?.info(`🚀 ~ ${methodName}`, {
+         filterData,
+         jobs: jobs.map(
+            (job) =>
+               job.id +
+               " - " +
+               (currentResultsScore[job.id] ?? 0) +
+               " -> " +
+               job.getPoints()
+         ),
       })
+   }
+
+   private getCurrentResultsScore(): Record<string, number> {
+      if (this.logger) {
+         return this.results.reduce((acc, job) => {
+            acc[job.id] = job.getPoints()
+            return acc
+         }, {})
+      }
+      return {}
    }
 
    public userCountriesOfInterest() {
       if (!this.userProfile?.userData?.countriesOfInterest?.length) return this
 
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
       // Filter jobs by countries of interest, taking into account the state and city
       // Multiplier is the number of countries of interest that match the job location
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnCondition(
@@ -103,6 +123,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                .reduce((acc, curr) => acc + curr, 0)
       )
 
+      this.logResults(
+         "userCountriesOfInterest",
+         this.userProfile.userData.countriesOfInterest,
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
@@ -118,6 +145,9 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       if (!location?.length) return this
 
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
+
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnCondition(
          (job) =>
             inLocation(
@@ -132,6 +162,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
             )?.length
       )
 
+      this.logResults(
+         "userStrictLocation",
+         [location],
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
@@ -139,6 +176,9 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
    public userSavedJobs() {
       if (!this.userProfile?.savedJobs?.length) return this
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
 
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnCondition(
          (job) =>
@@ -148,14 +188,24 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
          this.rankedCustomJobsRepo.USER_SAVED_JOBS
       )
 
+      this.logResults(
+         "userSavedJobs",
+         this.userProfile.savedJobs.map((job) => job.id),
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
    }
 
-   public userBusinessFunctionsTags(logger?: Logger) {
+   public userBusinessFunctionsTags() {
       if (!this.userProfile?.userData?.businessFunctionsTagIds?.length)
          return this
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
 
       const jobs =
          this.rankedCustomJobsRepo.getCustomJobsBasedOnBusinessFunctionTagIds(
@@ -163,14 +213,12 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
             this.rankedCustomJobsRepo.USER_BUSINESS_FUNCTIONS
          )
 
-      if (logger) {
-         this.logResultsBeforeAdding(
-            logger,
-            "userBusinessFunctionsTags",
-            this.userProfile.userData.businessFunctionsTagIds,
-            jobs
-         )
-      }
+      this.logResults(
+         "userBusinessFunctionsTags",
+         this.userProfile.userData.businessFunctionsTagIds,
+         jobs,
+         currentResultsScore
+      )
 
       this.addResults(jobs)
 
@@ -179,6 +227,9 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
    public userAppliedJobsBusinessFunctionsTags() {
       if (!this.userProfile?.jobApplications?.length) return this
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
 
       const tags = removeDuplicates(
          this.userProfile.jobApplications
@@ -194,6 +245,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
             this.rankedCustomJobsRepo.USER_APPLIED_JOBS_BUSINESS_FUNCTIONS
          )
 
+      this.logResults(
+         "userAppliedJobsBusinessFunctionsTags",
+         tags,
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
@@ -202,6 +260,8 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
    public userLastViewedJobsBusinessFunctionsTags() {
       if (!this.userProfile?.lastViewedJobs?.length) return this
 
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
       const tags = removeDuplicates(
          this.userProfile.lastViewedJobs
             .map(
@@ -217,6 +277,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
             this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_BUSINESS_FUNCTIONS
          )
 
+      this.logResults(
+         "userLastViewedJobsBusinessFunctionsTags",
+         tags,
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
@@ -225,6 +292,8 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
    public userFollowingCompanies() {
       if (!this.userProfile?.followingCompanies?.length) return this
 
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
       const companies =
          this.userProfile.followingCompanies?.map(
             (company) => company?.groupId
@@ -233,6 +302,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnGroupIds(
          companies,
          this.rankedCustomJobsRepo.USER_FOLLOWING_COMPANIES
+      )
+
+      this.logResults(
+         "userFollowingCompanies",
+         companies,
+         jobs,
+         currentResultsScore
       )
 
       this.addResults(jobs)
@@ -256,6 +332,8 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       if (!locations.length) return this
 
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
       // Not applying multiplier for multiple locations
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnCondition(
          (job) =>
@@ -271,6 +349,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
          this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_LOCATIONS
       )
 
+      this.logResults(
+         "userLastViewedJobsLocations",
+         locations,
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
@@ -278,6 +363,9 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
    public userLastViewedJobsIndustries() {
       if (!this.userProfile?.lastViewedJobs?.length) return this
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
 
       const industries = removeDuplicates(
          this.userProfile.lastViewedJobs
@@ -294,6 +382,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
          this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_INDUSTRIES
       )
 
+      this.logResults(
+         "userLastViewedJobsIndustries",
+         industries,
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
@@ -301,6 +396,9 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
    public userLastRegisteredLivestreamsIndustries() {
       if (!this.userProfile?.registeredLivestreams?.length) return this
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
 
       const industries = removeDuplicates(
          this.userProfile.registeredLivestreams
@@ -313,6 +411,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
          this.rankedCustomJobsRepo.USER_LAST_REGISTERED_LIVESTREAMS_INDUSTRIES
       )
 
+      this.logResults(
+         "userLastRegisteredLivestreamsIndustries",
+         industries,
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
@@ -322,11 +427,21 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       if (!this.jobsData?.referenceJob?.businessFunctionsTagIds?.length)
          return this
 
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
+
       const jobs =
          this.rankedCustomJobsRepo.getCustomJobsBasedOnBusinessFunctionTagIds(
             this.jobsData.referenceJob.businessFunctionsTagIds,
             this.rankedCustomJobsRepo.REFERENCE_JOB_BUSINESS_FUNCTIONS
          )
+
+      this.logResults(
+         "referenceJobBusinessFunctionsTags",
+         this.jobsData.referenceJob.businessFunctionsTagIds,
+         jobs,
+         currentResultsScore
+      )
 
       this.addResults(jobs)
 
@@ -336,9 +451,19 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
    public referenceJobType() {
       if (!this.jobsData?.referenceJob?.jobType) return this
 
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
+
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnJobTypes(
          [this.jobsData.referenceJob.jobType],
          this.rankedCustomJobsRepo.REFERENCE_JOB_TYPE
+      )
+
+      this.logResults(
+         "referenceJobType",
+         [this.jobsData.referenceJob.jobType],
+         jobs,
+         currentResultsScore
       )
 
       this.addResults(jobs)
@@ -354,6 +479,9 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       )
 
       if (!locations.length) return this
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
 
       // Filter jobs by reference job location, taking into account the state and city
       // Multiplier is the number of reference job locations that match the job location
@@ -381,6 +509,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                .reduce((acc, curr) => acc + curr, 0)
       )
 
+      this.logResults(
+         "referenceJobLocation",
+         locations,
+         jobs,
+         currentResultsScore
+      )
+
       this.addResults(jobs)
 
       return this
@@ -389,11 +524,21 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
    public jobLinkedUpcomingEventsCount() {
       if (!this.jobsData?.jobsInfo) return this
 
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
+
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnCondition(
          (job) =>
             this.jobsData.jobsInfo?.[job.model.id]?.linkedUpcomingEventsCount >
             0,
          this.rankedCustomJobsRepo.JOB_LINKED_UPCOMING_EVENTS_COUNT
+      )
+
+      this.logResults(
+         "jobLinkedUpcomingEventsCount",
+         this.jobsData.jobsInfo,
+         jobs,
+         currentResultsScore
       )
 
       this.addResults(jobs)
@@ -405,6 +550,9 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       const oneWeekFromNow = DateTime.now().plus({ weeks: 1 })
       const twoWeeksFromNow = DateTime.now().plus({ weeks: 2 })
       const oneMonthFromNow = DateTime.now().plus({ months: 1 })
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
 
       const oneWeekFromNowJobs =
          this.rankedCustomJobsRepo.getCustomJobsBasedOnCondition(
@@ -437,6 +585,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
          ...twoWeeksFromNowJobs,
          ...oneMonthFromNowJobs,
       ]
+
+      this.logResults(
+         "jobDeadline",
+         [oneWeekFromNow, twoWeeksFromNow, oneMonthFromNow],
+         jobs,
+         currentResultsScore
+      )
 
       this.addResults(jobs)
 
