@@ -61,6 +61,19 @@ export const sortElementsByFrequency = (elements: string[]) => {
       .map((entry) => entry[0])
 }
 
+/**
+ * Filters an array of items based on a specified field or function.
+ *
+ * Allows quick filtering of items by a field or function.
+ *
+ * @param {K[]} items - The array of items to filter.
+ * @param {function} getItem - Function to transform or extract the item to be evaluated.
+ * @param {keyof T | function} fieldOrFn - The field name or function to use for filtering.
+ * @param {unknown | unknown[]} filterValues - The value(s) to filter by.
+ * @param {number} [limit] - Optional maximum number of results to return.
+ * @returns {K[]} The filtered array of items.
+ */
+
 export const filterByField = <K, T>(
    items: K[],
    getItem: (item: unknown) => T,

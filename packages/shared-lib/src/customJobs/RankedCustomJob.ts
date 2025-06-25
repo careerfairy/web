@@ -14,10 +14,6 @@ export class RankedCustomJob {
       return this.id
    }
 
-   getCompanyCountryId(): string {
-      return this.model.group.companyCountry.id
-   }
-
    static create(customJob: CustomJob) {
       return new RankedCustomJob(customJob)
    }

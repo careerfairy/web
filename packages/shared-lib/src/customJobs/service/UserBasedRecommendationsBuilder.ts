@@ -67,12 +67,12 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
    private logResults(
       methodName: string,
-      filterData: unknown,
+      scoringData: unknown,
       jobs: RankedCustomJob[],
       currentResultsScore: Record<string, number> = {}
    ) {
       this.logger?.info(`🚀 ~ ${methodName}`, {
-         filterData,
+         scoringData,
          jobs: jobs.map(
             (job) =>
                job.id +
@@ -110,7 +110,7 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                      job.model.jobLocation?.map((location) => location.id)
                   )?.length > 0
             ),
-         this.rankedCustomJobsRepo.USER_COUNTRIES_OF_INTEREST,
+         this.rankedCustomJobsRepo.USER_COUNTRIES_OF_INTEREST_POINTS,
          (job) =>
             this.userProfile.userData.countriesOfInterest
                .map(
@@ -125,7 +125,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       this.logResults(
          "userCountriesOfInterest",
-         this.userProfile.userData.countriesOfInterest,
+         {
+            description:
+               "Jobs that are in the user's countries of interest. Locations are hierarchical, meaning 'CH-FR' is inside 'CH'",
+            countriesOfInterest: this.userProfile.userData.countriesOfInterest,
+            points: `${this.rankedCustomJobsRepo.USER_COUNTRIES_OF_INTEREST_POINTS} * NUMBER_OF_MATCHES`,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -154,7 +160,7 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                location,
                job.model.jobLocation?.map((location) => location.id)
             )?.length > 0,
-         this.rankedCustomJobsRepo.USER_JOB_LOCATION,
+         this.rankedCustomJobsRepo.USER_JOB_LOCATION_POINTS,
          (job) =>
             inLocation(
                location,
@@ -164,7 +170,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       this.logResults(
          "userStrictLocation",
-         [location],
+         {
+            description:
+               "Jobs that are in the user's location. Locations are hierarchical, meaning 'CH-FR' is inside 'CH'",
+            location,
+            points: `${this.rankedCustomJobsRepo.USER_JOB_LOCATION_POINTS} * NUMBER_OF_MATCHES`,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -185,12 +197,17 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
             this.userProfile.savedJobs.some(
                (savedJob) => savedJob.id === job.model.id
             ),
-         this.rankedCustomJobsRepo.USER_SAVED_JOBS
+         this.rankedCustomJobsRepo.USER_SAVED_JOBS_POINTS
       )
 
       this.logResults(
          "userSavedJobs",
-         this.userProfile.savedJobs.map((job) => job.id),
+         {
+            description: "Jobs that are in the user's saved jobs",
+            savedJobsIds: this.userProfile.savedJobs.map((job) => job.id),
+            points: this.rankedCustomJobsRepo.USER_SAVED_JOBS_POINTS,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -210,12 +227,18 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       const jobs =
          this.rankedCustomJobsRepo.getCustomJobsBasedOnBusinessFunctionTagIds(
             this.userProfile.userData.businessFunctionsTagIds,
-            this.rankedCustomJobsRepo.USER_BUSINESS_FUNCTIONS
+            this.rankedCustomJobsRepo.USER_BUSINESS_FUNCTIONS_POINTS
          )
 
       this.logResults(
          "userBusinessFunctionsTags",
-         this.userProfile.userData.businessFunctionsTagIds,
+         {
+            description: "Jobs based on the user's business functions tags",
+            businessFunctionsTagIds:
+               this.userProfile.userData.businessFunctionsTagIds,
+            points: `${this.rankedCustomJobsRepo.USER_BUSINESS_FUNCTIONS_POINTS} * NUMBER_OF_MATCHES`,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -242,12 +265,19 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       const jobs =
          this.rankedCustomJobsRepo.getCustomJobsBasedOnBusinessFunctionTagIds(
             tags,
-            this.rankedCustomJobsRepo.USER_APPLIED_JOBS_BUSINESS_FUNCTIONS
+            this.rankedCustomJobsRepo
+               .USER_APPLIED_JOBS_BUSINESS_FUNCTIONS_POINTS
          )
 
       this.logResults(
          "userAppliedJobsBusinessFunctionsTags",
-         tags,
+         {
+            description:
+               "Jobs based on the user's applied jobs business functions tags",
+            businessFunctionsTagIds: tags,
+            points: `${this.rankedCustomJobsRepo.USER_APPLIED_JOBS_BUSINESS_FUNCTIONS_POINTS} * NUMBER_OF_MATCHES`,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -274,12 +304,19 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       const jobs =
          this.rankedCustomJobsRepo.getCustomJobsBasedOnBusinessFunctionTagIds(
             tags,
-            this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_BUSINESS_FUNCTIONS
+            this.rankedCustomJobsRepo
+               .USER_LAST_VIEWED_JOBS_BUSINESS_FUNCTIONS_POINTS
          )
 
       this.logResults(
          "userLastViewedJobsBusinessFunctionsTags",
-         tags,
+         {
+            description:
+               "Jobs based on the user's last viewed jobs business functions tags",
+            businessFunctionsTagIds: tags,
+            points: `${this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_BUSINESS_FUNCTIONS_POINTS} * NUMBER_OF_MATCHES`,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -301,12 +338,18 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnGroupIds(
          companies,
-         this.rankedCustomJobsRepo.USER_FOLLOWING_COMPANIES
+         this.rankedCustomJobsRepo.USER_FOLLOWING_COMPANIES_POINTS
       )
 
       this.logResults(
          "userFollowingCompanies",
-         companies,
+         {
+            description:
+               "Jobs from groups belonging to the user's following companies",
+            followingCompaniesIds: companies,
+            points: this.rankedCustomJobsRepo.USER_FOLLOWING_COMPANIES_POINTS,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -346,12 +389,19 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                      )?.length > 0
                )
                .some(Boolean),
-         this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_LOCATIONS
+         this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_LOCATIONS_POINTS
       )
 
       this.logResults(
          "userLastViewedJobsLocations",
-         locations,
+         {
+            description:
+               "Jobs based on the user's last viewed jobs locations. Locations are hierarchical, meaning 'CH-FR' is inside 'CH'",
+            locations,
+            points:
+               this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_LOCATIONS_POINTS,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -379,12 +429,17 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       )
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnJobIndustries(
          industries,
-         this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_INDUSTRIES
+         this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_INDUSTRIES_POINTS
       )
 
       this.logResults(
          "userLastViewedJobsIndustries",
-         industries,
+         {
+            description: "Jobs based on the user's last viewed jobs industries",
+            industries,
+            points: `${this.rankedCustomJobsRepo.USER_LAST_VIEWED_JOBS_INDUSTRIES_POINTS} * NUMBER_OF_MATCHES`,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -408,12 +463,19 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnJobIndustries(
          industries,
-         this.rankedCustomJobsRepo.USER_LAST_REGISTERED_LIVESTREAMS_INDUSTRIES
+         this.rankedCustomJobsRepo
+            .USER_LAST_REGISTERED_LIVESTREAMS_INDUSTRIES_POINTS
       )
 
       this.logResults(
          "userLastRegisteredLivestreamsIndustries",
-         industries,
+         {
+            description:
+               "Jobs based on the user's last registered livestreams industries",
+            industries,
+            points: `${this.rankedCustomJobsRepo.USER_LAST_REGISTERED_LIVESTREAMS_INDUSTRIES_POINTS} * NUMBER_OF_MATCHES`,
+            userAuthId: this.userProfile.userData.authId,
+         },
          jobs,
          currentResultsScore
       )
@@ -433,12 +495,19 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       const jobs =
          this.rankedCustomJobsRepo.getCustomJobsBasedOnBusinessFunctionTagIds(
             this.jobsData.referenceJob.businessFunctionsTagIds,
-            this.rankedCustomJobsRepo.REFERENCE_JOB_BUSINESS_FUNCTIONS
+            this.rankedCustomJobsRepo.REFERENCE_JOB_BUSINESS_FUNCTIONS_POINTS
          )
 
       this.logResults(
          "referenceJobBusinessFunctionsTags",
-         this.jobsData.referenceJob.businessFunctionsTagIds,
+         {
+            description:
+               "Jobs based on the reference job business functions tags",
+            businessFunctionsTagIds:
+               this.jobsData.referenceJob.businessFunctionsTagIds,
+            points: `${this.rankedCustomJobsRepo.REFERENCE_JOB_BUSINESS_FUNCTIONS_POINTS} * NUMBER_OF_MATCHES`,
+            referenceJobId: this.jobsData.referenceJob.id,
+         },
          jobs,
          currentResultsScore
       )
@@ -456,12 +525,17 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnJobTypes(
          [this.jobsData.referenceJob.jobType],
-         this.rankedCustomJobsRepo.REFERENCE_JOB_TYPE
+         this.rankedCustomJobsRepo.REFERENCE_JOB_TYPE_POINTS
       )
 
       this.logResults(
          "referenceJobType",
-         [this.jobsData.referenceJob.jobType],
+         {
+            description: "Jobs based on the reference job type",
+            jobType: this.jobsData.referenceJob.jobType,
+            points: this.rankedCustomJobsRepo.REFERENCE_JOB_TYPE_POINTS,
+            referenceJobId: this.jobsData.referenceJob.id,
+         },
          jobs,
          currentResultsScore
       )
@@ -496,7 +570,7 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                      )?.length > 0
                )
                .some(Boolean),
-         this.rankedCustomJobsRepo.REFERENCE_JOB_LOCATION,
+         this.rankedCustomJobsRepo.REFERENCE_JOB_LOCATION_POINTS,
          (job) =>
             locations
                .map(
@@ -511,7 +585,13 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       this.logResults(
          "referenceJobLocation",
-         locations,
+         {
+            description:
+               "Jobs based on the reference job location. Locations are hierarchical, meaning 'CH-FR' is inside 'CH'",
+            locations,
+            points: `${this.rankedCustomJobsRepo.REFERENCE_JOB_LOCATION_POINTS} * NUMBER_OF_MATCHES`,
+            referenceJobId: this.jobsData.referenceJob.id,
+         },
          jobs,
          currentResultsScore
       )
@@ -531,12 +611,18 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
          (job) =>
             this.jobsData.jobsInfo?.[job.model.id]?.linkedUpcomingEventsCount >
             0,
-         this.rankedCustomJobsRepo.JOB_LINKED_UPCOMING_EVENTS_COUNT
+         this.rankedCustomJobsRepo.JOB_LINKED_UPCOMING_EVENTS_COUNT_POINTS
       )
 
       this.logResults(
          "jobLinkedUpcomingEventsCount",
-         this.jobsData.jobsInfo,
+         {
+            description: "Jobs that are linked to upcoming events",
+            jobsInfo: this.jobsData.jobsInfo,
+            points:
+               this.rankedCustomJobsRepo
+                  .JOB_LINKED_UPCOMING_EVENTS_COUNT_POINTS,
+         },
          jobs,
          currentResultsScore
       )
@@ -559,7 +645,7 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
             (job) =>
                job.model.deadline &&
                job.model.deadline.toDate() < oneWeekFromNow.toJSDate(),
-            this.rankedCustomJobsRepo.JOB_DEADLINE_ONE_WEEK
+            this.rankedCustomJobsRepo.JOB_DEADLINE_ONE_WEEK_POINTS
          )
 
       const twoWeeksFromNowJobs =
@@ -568,7 +654,7 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                job.model.deadline &&
                job.model.deadline.toDate() < twoWeeksFromNow.toJSDate() &&
                job.model.deadline.toDate() > oneWeekFromNow.toJSDate(),
-            this.rankedCustomJobsRepo.JOB_DEADLINE_TWO_WEEKS
+            this.rankedCustomJobsRepo.JOB_DEADLINE_TWO_WEEKS_POINTS
          )
 
       const oneMonthFromNowJobs =
@@ -577,7 +663,7 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                job.model.deadline &&
                job.model.deadline.toDate() < oneMonthFromNow.toJSDate() &&
                job.model.deadline.toDate() > twoWeeksFromNow.toJSDate(),
-            this.rankedCustomJobsRepo.JOB_DEADLINE_ONE_MONTH
+            this.rankedCustomJobsRepo.JOB_DEADLINE_ONE_MONTH_POINTS
          )
 
       const jobs = [
@@ -588,7 +674,19 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
 
       this.logResults(
          "jobDeadline",
-         [oneWeekFromNow, twoWeeksFromNow, oneMonthFromNow],
+         {
+            description:
+               "Jobs that are within 1 week, 2 weeks, and 1 month from now",
+            points: {
+               oneWeekFromNowJobs:
+                  this.rankedCustomJobsRepo.JOB_DEADLINE_ONE_WEEK_POINTS,
+               twoWeeksFromNowJobs:
+                  this.rankedCustomJobsRepo.JOB_DEADLINE_TWO_WEEKS_POINTS,
+               oneMonthFromNowJobs:
+                  this.rankedCustomJobsRepo.JOB_DEADLINE_ONE_MONTH_POINTS,
+            },
+            weekDeadlines: [oneWeekFromNow, twoWeeksFromNow, oneMonthFromNow],
+         },
          jobs,
          currentResultsScore
       )

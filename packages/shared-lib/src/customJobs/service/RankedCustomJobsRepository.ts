@@ -10,27 +10,27 @@ type RankCustomJobArgs = {
 }
 export class RankedCustomJobsRepository {
    // from userData
-   public readonly USER_BUSINESS_FUNCTIONS = 2
-   public readonly USER_APPLIED_JOBS_BUSINESS_FUNCTIONS = 1.5
-   public readonly USER_JOB_LOCATION = 4
-   public readonly USER_COUNTRIES_OF_INTEREST = 1
-   public readonly USER_FOLLOWING_COMPANIES = 1
-   public readonly USER_LAST_VIEWED_JOBS_LOCATIONS = 1.5
-   public readonly USER_LAST_VIEWED_JOBS_INDUSTRIES = 1
-   public readonly USER_LAST_REGISTERED_LIVESTREAMS_INDUSTRIES = 0.5
-   public readonly USER_LAST_VIEWED_JOBS_BUSINESS_FUNCTIONS = 0.5
-   public readonly USER_SAVED_JOBS = 2
+   public readonly USER_BUSINESS_FUNCTIONS_POINTS = 2
+   public readonly USER_APPLIED_JOBS_BUSINESS_FUNCTIONS_POINTS = 1.5
+   public readonly USER_JOB_LOCATION_POINTS = 4
+   public readonly USER_COUNTRIES_OF_INTEREST_POINTS = 1
+   public readonly USER_FOLLOWING_COMPANIES_POINTS = 1
+   public readonly USER_LAST_VIEWED_JOBS_LOCATIONS_POINTS = 1.5
+   public readonly USER_LAST_VIEWED_JOBS_INDUSTRIES_POINTS = 1
+   public readonly USER_LAST_REGISTERED_LIVESTREAMS_INDUSTRIES_POINTS = 0.5
+   public readonly USER_LAST_VIEWED_JOBS_BUSINESS_FUNCTIONS_POINTS = 0.5
+   public readonly USER_SAVED_JOBS_POINTS = 2
 
    // from referenceJob
-   public readonly REFERENCE_JOB_TYPE = 1
-   public readonly REFERENCE_JOB_BUSINESS_FUNCTIONS = 1
-   public readonly REFERENCE_JOB_LOCATION = 1.5
+   public readonly REFERENCE_JOB_TYPE_POINTS = 1
+   public readonly REFERENCE_JOB_BUSINESS_FUNCTIONS_POINTS = 1
+   public readonly REFERENCE_JOB_LOCATION_POINTS = 1.5
 
    // from jobsInfo
-   public readonly JOB_LINKED_UPCOMING_EVENTS_COUNT = 2
-   public readonly JOB_DEADLINE_ONE_WEEK = 8
-   public readonly JOB_DEADLINE_TWO_WEEKS = 2
-   public readonly JOB_DEADLINE_ONE_MONTH = 0.5
+   public readonly JOB_LINKED_UPCOMING_EVENTS_COUNT_POINTS = 2
+   public readonly JOB_DEADLINE_ONE_WEEK_POINTS = 8
+   public readonly JOB_DEADLINE_TWO_WEEKS_POINTS = 2
+   public readonly JOB_DEADLINE_ONE_MONTH_POINTS = 0.5
 
    private readonly customJobs: RankedCustomJob[]
 
