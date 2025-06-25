@@ -1,6 +1,7 @@
 import { combineRankedDocuments } from "../BaseFirebaseRepository"
 import { sortRankedByPoints } from "../recommendation/utils"
 import { Logger } from "../utils/types"
+import { windowedShuffle } from "../utils/utils"
 import { RankedCustomJob } from "./RankedCustomJob"
 import { RankedCustomJobsRepository } from "./service/RankedCustomJobsRepository"
 import {
@@ -50,8 +51,10 @@ export class RecommendationCustomJobsServiceCore {
          .referenceJobBusinessFunctionsTags()
          .referenceJobType()
          .referenceJobLocation()
+         .referenceJobIndustry()
          .jobLinkedUpcomingEventsCount()
          .jobDeadline()
+         .jobPublishingDate()
          .get()
    }
 
@@ -64,14 +67,26 @@ export class RecommendationCustomJobsServiceCore {
       const sortedRecommendedCustomJobs =
          sortRankedByPoints<RankedCustomJob>(combinedResults)
 
+      const shuffledRecommendedCustomJobs = windowedShuffle(
+         sortedRecommendedCustomJobs,
+         10,
+         2
+      )
+
       if (this.debug) {
          this.log.info("🚀 All recommendation results (SORTED):", {
             points: sortedRecommendedCustomJobs.map(
                (job) => job.id + " - " + job.points
             ),
          })
+
+         this.log.info("🚀 All recommendation results (SHUFFLED):", {
+            points: shuffledRecommendedCustomJobs.map(
+               (job) => job.id + " - " + job.points
+            ),
+         })
       }
 
-      return sortedRecommendedCustomJobs.map((job) => job.id).slice(0, limit)
+      return shuffledRecommendedCustomJobs.map((job) => job.id).slice(0, limit)
    }
 }

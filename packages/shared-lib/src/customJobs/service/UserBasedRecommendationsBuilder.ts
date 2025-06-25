@@ -601,6 +601,41 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
       return this
    }
 
+   public referenceJobIndustry() {
+      if (!this.jobsData?.referenceJob?.group?.companyIndustries?.length)
+         return this
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
+
+      const industries = removeDuplicates(
+         this.jobsData.referenceJob.group.companyIndustries.map(
+            (industry) => industry.id
+         )
+      )
+
+      const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnJobIndustries(
+         industries,
+         this.rankedCustomJobsRepo.REFERENCE_JOB_INDUSTRY_POINTS
+      )
+
+      this.logResults(
+         "referenceJobIndustry",
+         {
+            description: "Jobs based on the reference job industry",
+            industries,
+            points: `${this.rankedCustomJobsRepo.REFERENCE_JOB_INDUSTRY_POINTS} * NUMBER_OF_MATCHES`,
+            referenceJobId: this.jobsData.referenceJob.id,
+         },
+         jobs,
+         currentResultsScore
+      )
+
+      this.addResults(jobs)
+
+      return this
+   }
+
    public jobLinkedUpcomingEventsCount() {
       if (!this.jobsData?.jobsInfo) return this
 
@@ -686,6 +721,36 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
                   this.rankedCustomJobsRepo.JOB_DEADLINE_ONE_MONTH_POINTS,
             },
             weekDeadlines: [oneWeekFromNow, twoWeeksFromNow, oneMonthFromNow],
+         },
+         jobs,
+         currentResultsScore
+      )
+
+      this.addResults(jobs)
+
+      return this
+   }
+
+   public jobPublishingDate() {
+      const twoWeeksAgo = DateTime.now().minus({ weeks: 2 })
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
+
+      const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnCondition(
+         (job) =>
+            job.model.createdAt &&
+            job.model.createdAt.toDate() > twoWeeksAgo.toJSDate(),
+         this.rankedCustomJobsRepo.JOB_PUBLISHING_DATE_TWO_WEEKS_POINTS
+      )
+
+      this.logResults(
+         "jobPublishingDate",
+         {
+            description: "Jobs that are published within the last two weeks",
+            points:
+               this.rankedCustomJobsRepo.JOB_PUBLISHING_DATE_TWO_WEEKS_POINTS,
+            twoWeeksAgo,
          },
          jobs,
          currentResultsScore

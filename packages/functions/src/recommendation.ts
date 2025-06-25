@@ -101,7 +101,7 @@ export const getRecommendedJobs = onCall(
             request.data.limit,
             request.data.referenceJobId,
          ],
-         60 * 60 * 24, // 1 day
+         60 * 60 * 12, // 12 hours
          (request) => request.data.bypassCache === true
       ),
       async (request) => {
@@ -128,7 +128,7 @@ export const getRecommendedJobs = onCall(
             logAndThrow("Error getting recommended jobs.", {
                request,
                error,
-               userAuthId: request.auth?.token?.email || "anonymous",
+               userAuthId: request.data.userAuthId || "anonymous",
                referenceJobId: request.data.referenceJobId,
             })
          }
