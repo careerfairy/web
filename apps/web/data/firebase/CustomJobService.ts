@@ -33,7 +33,7 @@ export class CustomJobService {
 
       if (!jobIds?.length) return []
 
-      return await customJobRepo.getCustomJobByIds(jobIds)
+      return await customJobRepo.getCustomJobByIdsStrict(jobIds)
    }
 
    async confirmJobApplication(
