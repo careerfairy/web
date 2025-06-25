@@ -1,4 +1,9 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
+import { GetRecommendedJobsFnArgs } from "@careerfairy/shared-lib/functions/types"
+import { customJobRepo } from "data/RepositoryInstances"
 import firebase from "firebase/compat/app"
+import { httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
 import HttpsCallableResult = firebase.functions.HttpsCallableResult
 
@@ -6,6 +11,30 @@ export class CustomJobService {
    constructor(
       private readonly firebaseFunctions: firebase.functions.Functions
    ) {}
+
+   async getRecommendedJobs(
+      limit: number,
+      userAuthId: string,
+      bypassCache: boolean = false,
+      referenceJobId?: string
+   ): Promise<CustomJob[]> {
+      const { data: jobIds } = await httpsCallable<
+         GetRecommendedJobsFnArgs,
+         string[]
+      >(
+         this.firebaseFunctions,
+         FUNCTION_NAMES.getRecommendedJobs
+      )({
+         limit,
+         userAuthId,
+         bypassCache,
+         referenceJobId,
+      })
+
+      if (!jobIds?.length) return []
+
+      return await customJobRepo.getCustomJobByIds(jobIds)
+   }
 
    async confirmJobApplication(
       jobId: string,

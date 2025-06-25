@@ -3,8 +3,10 @@ import { useEffect, useMemo, useRef } from "react"
 
 import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import useRecommendedJobs from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
+import CircularLoader from "components/views/loader/CircularLoader"
 import { sxStyles } from "types/commonTypes"
 import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
@@ -82,7 +84,6 @@ const DefaultJobs = () => {
             {title}
             {" 🚀"}
          </Typography>
-         {/* TODO: Replace with new Job Card */}
          <CustomJobsList customJobs={customJobs} />
       </Stack>
    )
@@ -93,22 +94,31 @@ const ResultJobs = () => {
 
    return (
       <Stack spacing={1}>
-         {/* TODO: Replace with new Job Card */}
-         {/* <SearchResultsCount /> */}
          <CustomJobsList customJobs={customJobs} />
       </Stack>
    )
 }
 
 const OtherJobs = () => {
-   const { customJobs } = useJobsOverviewContext()
+   const { jobs: customJobs, loading: isLoading } = useRecommendedJobs({
+      bypassCache: true,
+      limit: 10,
+   })
+
+   if (isLoading)
+      return (
+         <Box mt={2}>
+            <CircularLoader />
+         </Box>
+      )
+
+   if (!customJobs?.length) return null
 
    return (
-      <Stack spacing={1}>
+      <Stack spacing={1} mt={2}>
          <Typography variant="medium" sx={styles.listTitle}>
             Other jobs you might like
          </Typography>
-         {/* TODO: Replace with new Job Card */}
          <CustomJobsList customJobs={customJobs} />
       </Stack>
    )

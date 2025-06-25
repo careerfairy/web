@@ -84,16 +84,16 @@ export class CustomJobRecommendationService
       }
 
       // Remove jobs that the user has already applied to
-      const filteredJobs =
-         customJobs?.filter(
-            (job) =>
-               !userAppliedJobs?.some(
-                  (appliedJob) => appliedJob.job?.id === job.id
-               )
-         ) ?? []
+      // const filteredJobs =
+      //    customJobs?.filter(
+      //       (job) =>
+      //          !userAppliedJobs?.some(
+      //             (appliedJob) => appliedJob.job?.id === job.id
+      //          )
+      //    ) ?? []
 
       const jobsData: JobsData = {
-         customJobs: filteredJobs,
+         customJobs,
          referenceJob,
          stats: {},
          jobsInfo,
