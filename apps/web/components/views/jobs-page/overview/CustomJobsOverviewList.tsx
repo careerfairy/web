@@ -102,15 +102,10 @@ const ResultJobs = () => {
 const OtherJobs = () => {
    const { jobs: customJobs, loading: isLoading } = useRecommendedJobs({
       bypassCache: true,
-      limit: 10,
+      limit: 30,
    })
 
-   if (isLoading)
-      return (
-         <Box mt={2}>
-            <CircularLoader />
-         </Box>
-      )
+   if (isLoading) return <CircularLoader sx={{ mt: 2 }} />
 
    if (!customJobs?.length) return null
 
