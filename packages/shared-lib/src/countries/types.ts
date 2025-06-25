@@ -45,11 +45,11 @@ export const getLocationIds = (location: string) => {
 }
 
 export const getLocationId = (
-   cityIsoCode?: string,
+   countryIsoCode?: string,
    stateIsoCode?: string,
    cityName?: string
 ) => {
-   return `${cityIsoCode}${stateIsoCode ? `-${stateIsoCode}` : ""}${
+   return `${countryIsoCode}${stateIsoCode ? `-${stateIsoCode}` : ""}${
       cityName ? `-${cityName}` : ""
    }`
 }
