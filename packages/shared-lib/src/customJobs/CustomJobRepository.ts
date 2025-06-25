@@ -303,7 +303,7 @@ export class FirebaseCustomJobRepository
          .where("isPermanentlyExpired", "==", false)
          .where("deadline", ">=", new Date())
 
-      if (limit !== undefined && limit !== null) {
+      if (limit) {
          query = query.limit(limit)
       }
 
