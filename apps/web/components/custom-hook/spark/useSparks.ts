@@ -26,7 +26,7 @@ type Options = {
  * Fetches the stats for a given spark if it belongs to the given group.
  **/
 const useSparks = (options?: Options) => {
-   const { totalItems = 8, groupId, disabled } = options || {}
+   const { totalItems = 50, groupId, disabled } = options || {}
 
    return useSWR(
       disabled ? null : ["get-sparks", totalItems, groupId],
