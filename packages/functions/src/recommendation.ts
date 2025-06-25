@@ -41,7 +41,7 @@ export const getRecommendedEvents = onCall(
       }),
       userAuthExists(),
       cacheOnCallValues(
-         "recommendedJobs",
+         "getRecommendedEvents",
          (request) => [
             request.auth.token.email,
             request.data.limit,
