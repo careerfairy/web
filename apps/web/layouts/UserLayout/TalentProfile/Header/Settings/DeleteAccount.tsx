@@ -1,4 +1,5 @@
-import { Button, CircularProgress, Stack, Typography } from "@mui/material"
+import LoadingButton from "@mui/lab/LoadingButton"
+import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -111,20 +112,16 @@ const DeleteAccountConfirmation = () => {
             value={deleteAccountConfirmation}
             onChange={(e) => setDeleteAccountConfirmation(e.target.value)}
          />
-         <Button
+         <LoadingButton
             startIcon={<Trash size={18} />}
-            endIcon={
-               isDeleting ? (
-                  <CircularProgress size={18} color="inherit" />
-               ) : null
-            }
+            loading={isDeleting}
             variant="contained"
             color="error"
             disabled={!confirmed || isDeleting}
             onClick={handleAccountDeletion}
          >
             Delete account
-         </Button>
+         </LoadingButton>
       </Stack>
    )
 }
