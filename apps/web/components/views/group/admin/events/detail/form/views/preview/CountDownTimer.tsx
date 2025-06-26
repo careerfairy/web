@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { alpha } from "@mui/material/styles"
 import { useCountdownToDate } from "components/custom-hook/utils/useCountDownToDate"
-import { isEmpty } from "lodash/fp"
+import isEmpty from "lodash/isEmpty"
 import { memo } from "react"
 import DateUtil from "util/DateUtil"
 

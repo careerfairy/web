@@ -9,7 +9,12 @@ import {
 import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import FirebaseService from "data/firebase/FirebaseService"
 import { Timestamp } from "firebase/firestore"
-import { get, has, isArray, isEqual, omit, set } from "lodash"
+import get from "lodash/get"
+import has from "lodash/has"
+import isArray from "lodash/isArray"
+import isEqual from "lodash/isEqual"
+import omit from "lodash/omit"
+import set from "lodash/set"
 import { LivestreamFormQuestionsTabValues, LivestreamFormValues } from "./types"
 
 export enum TAB_VALUES {

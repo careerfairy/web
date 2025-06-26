@@ -134,6 +134,7 @@
    ],
    "devDependencies": {
       "@careerfairy/seed-data": "*",
+      "@next/bundle-analyzer": "^15.3.3",
       "@playwright/test": "^1.49.0",
       "@svgr/webpack": "^5.5.0",
       "@types/luxon": "^3.3.0",

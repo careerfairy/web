@@ -3,6 +3,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 import { TalentProfileDetails } from "./Details/TalentProfileDetails"
 import { TalentProfileHeader } from "./Header/TalentProfileHeader"
+import { TAB_VALUES } from "./constants"
 
 const styles = sxStyles({
    wrapper: {
@@ -13,25 +14,6 @@ const styles = sxStyles({
       mb: 1,
    },
 })
-
-export const TAB_VALUES = {
-   profile: {
-      value: "/profile",
-      label: "Profile",
-   },
-   jobs: {
-      value: "/profile/career",
-      label: "My Jobs",
-   },
-   company: {
-      value: "/profile/companies",
-      label: "Companies",
-   },
-   settings: {
-      value: "/profile/settings",
-      label: "Settings",
-   },
-} as const
 
 export type TalentProfileTabValues =
    (typeof TAB_VALUES)[keyof typeof TAB_VALUES]["value"]

@@ -38,7 +38,7 @@ import {
 import { useRecordingViewsSWR } from "components/custom-hook/recordings/useRecordingViewsSWR"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { format } from "date-fns"
+import format from "date-fns/format"
 import Image from "next/legacy/image"
 import React, { forwardRef, useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"

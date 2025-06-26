@@ -1,22 +1,22 @@
-import { useAuth } from "../../../../HOCs/AuthProvider"
+import { Box, Chip, Typography } from "@mui/material"
+import isEqual from "lodash/isEqual"
 import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
-import { Box, Chip, Typography } from "@mui/material"
-import { useInterests } from "../../../custom-hook/useCollection"
-import { Interest } from "../../../../types/interests"
-import CircularLoader from "../../loader/CircularLoader"
-import * as actions from "../../../../store/actions"
-import _ from "lodash"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import * as actions from "../../../../store/actions"
+import { Interest } from "../../../../types/interests"
+import { useInterests } from "../../../custom-hook/useCollection"
+import CircularLoader from "../../loader/CircularLoader"
 
 const InterestsSelector = () => {
    const { authenticatedUser: user, userData } = useAuth()
    const [interests, setInterests] = useState<InterestsSelectedState>({})
-   const [hasChanged, setChanged] = useState(false)
+   const [hasChanged, setHasChanged] = useState(false)
    const dispatch = useDispatch()
 
    const onChange = useCallback(() => {
-      setChanged(true)
+      setHasChanged(true)
    }, [])
 
    useEffect(() => {
@@ -28,6 +28,7 @@ const InterestsSelector = () => {
             userData?.interestsIds
          ).catch(console.error)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [interests, hasChanged])
 
    return (
@@ -75,7 +76,7 @@ export const userInterestsDidNotChange = (
 ): boolean => {
    return (
       existingUserInterests &&
-      _.isEqual([...interests].sort(), [...existingUserInterests].sort())
+      isEqual([...interests].sort(), [...existingUserInterests].sort())
    )
 }
 
@@ -83,7 +84,7 @@ export const formatInterests = (
    interests: InterestsSelectedState
 ): string[] => {
    const data = []
-   for (let interestUid in interests) {
+   for (const interestUid in interests) {
       if (interests[interestUid].isSelected) {
          data.push(interestUid)
       }
@@ -104,6 +105,7 @@ export const InterestsChipsSelector = ({
 
    useEffect(() => {
       setInterests(mapInitialState(allInterests, userData?.interestsIds))
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [userData, allInterests])
 
    const toggleInterest = (id: string) => {
@@ -178,7 +180,7 @@ function mapInitialState(
    )
 
    if (userInterests) {
-      for (let userInterestId of userInterests) {
+      for (const userInterestId of userInterests) {
          map[userInterestId] && (map[userInterestId].isSelected = true)
       }
    }

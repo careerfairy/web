@@ -10,7 +10,7 @@ import useRecordingAccess from "components/views/upcoming-livestream/HeroSection
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
-import { omit } from "lodash"
+import omit from "lodash/omit"
 import { GetServerSidePropsContext } from "next"
 import { useRouter } from "next/router"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"

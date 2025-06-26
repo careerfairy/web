@@ -2,10 +2,8 @@ import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJ
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
-import {
-   TAB_VALUES,
-   TalentProfileView,
-} from "layouts/UserLayout/TalentProfile/TalentProfileView"
+import { TalentProfileView } from "layouts/UserLayout/TalentProfile/TalentProfileView"
+import { TAB_VALUES } from "layouts/UserLayout/TalentProfile/constants"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import { useRouter } from "next/router"
 import SEO from "../../../components/util/SEO"
