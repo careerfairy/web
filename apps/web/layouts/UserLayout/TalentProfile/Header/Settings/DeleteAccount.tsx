@@ -1,3 +1,4 @@
+import LoadingButton from "@mui/lab/LoadingButton"
 import { Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
@@ -27,6 +28,7 @@ const styles = sxStyles({
       textUnderlineOffset: "2px",
    },
 })
+
 export const DeleteAccount = () => {
    const [showConfirmation, setShowConfirmation] = useState(false)
 
@@ -55,6 +57,7 @@ export const DeleteAccount = () => {
 }
 
 const DeleteAccountConfirmation = () => {
+   const [isDeleting, setIsDeleting] = useState(false)
    const { userData } = useAuth()
    const [deleteAccountConfirmation, setDeleteAccountConfirmation] =
       useState("")
@@ -64,6 +67,8 @@ const DeleteAccountConfirmation = () => {
 
    const handleAccountDeletion = useCallback(async () => {
       try {
+         setIsDeleting(true)
+
          await dispatch(deleteUser())
 
          await router.push({
@@ -77,6 +82,8 @@ const DeleteAccountConfirmation = () => {
             error,
             `Error deleting account, authId: ${userData?.authId}`
          )
+      } finally {
+         setIsDeleting(false)
       }
    }, [dispatch, router, userData?.authId, errorNotification])
 
@@ -105,15 +112,16 @@ const DeleteAccountConfirmation = () => {
             value={deleteAccountConfirmation}
             onChange={(e) => setDeleteAccountConfirmation(e.target.value)}
          />
-         <Button
+         <LoadingButton
             startIcon={<Trash size={18} />}
+            loading={isDeleting}
             variant="contained"
             color="error"
-            disabled={!confirmed}
+            disabled={!confirmed || isDeleting}
             onClick={handleAccountDeletion}
          >
             Delete account
-         </Button>
+         </LoadingButton>
       </Stack>
    )
 }
