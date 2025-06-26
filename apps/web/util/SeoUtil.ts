@@ -1,9 +1,8 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import { getResizedUrl } from "../components/helperFunctions/HelperFunctions"
 import { SeoProps } from "../components/util/SEO"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import keywordExtractor from "keyword-extractor"
 import DateUtil from "./DateUtil"
-import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 
 export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
    const streamDate = stream.startDate
@@ -34,14 +33,7 @@ export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
          {
             name: "keywords",
             content:
-               keywordExtractor
-                  .extract(getStreamText(stream), {
-                     language: getLanguageName(stream.language?.code),
-                     remove_digits: true,
-                     return_changed_case: true,
-                     remove_duplicates: true,
-                  })
-                  .join(",") +
+               getStreamText(stream).split(" ").join(",") +
                ",careerfairy,career,fairy,fairycareer,CareerFairy,Career Fair",
          },
       ],
@@ -52,53 +44,4 @@ const getStreamText = (stream: LivestreamEvent): string => {
    return `${stream.title || ""} ${stream.company || ""} ${
       stream.summary || ""
    }`
-}
-export type KeywordExtractorLanguageNames =
-   | "danish"
-   | "dutch"
-   | "english"
-   | "french"
-   | "galician"
-   | "german"
-   | "italian"
-   | "polish"
-   | "portuguese"
-   | "romanian"
-   | "russian"
-   | "spanish"
-   | "swedish"
-
-const getLanguageName = (
-   languageCode: string
-): KeywordExtractorLanguageNames => {
-   switch (languageCode) {
-      case "da":
-         return "danish"
-      case "nl":
-         return "dutch"
-      case "en":
-         return "english"
-      case "fr":
-         return "french"
-      case "gl":
-         return "galician"
-      case "de":
-         return "german"
-      case "it":
-         return "italian"
-      case "pl":
-         return "polish"
-      case "pt":
-         return "portuguese"
-      case "ro":
-         return "romanian"
-      case "ru":
-         return "russian"
-      case "es":
-         return "spanish"
-      case "sv":
-         return "swedish"
-      default:
-         return "english"
-   }
 }

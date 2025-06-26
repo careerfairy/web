@@ -1,14 +1,14 @@
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { FC, memo, useCallback, useEffect, useState } from "react"
-import Stack from "@mui/material/Stack"
 import { Divider } from "@mui/material"
-import Typography from "@mui/material/Typography"
-import DateUtil from "../../../../../util/DateUtil"
-import { sxStyles } from "../../../../../types/commonTypes"
-import { alpha } from "@mui/material/styles"
-import { isEmpty } from "lodash/fp"
 import Box from "@mui/material/Box"
 import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
+import { alpha } from "@mui/material/styles"
+import Typography from "@mui/material/Typography"
+import isEmpty from "lodash/isEmpty"
+import { FC, memo, useCallback, useEffect, useState } from "react"
+import { sxStyles } from "../../../../../types/commonTypes"
+import DateUtil from "../../../../../util/DateUtil"
 
 const styles = sxStyles({
    date: {
