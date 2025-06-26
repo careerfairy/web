@@ -8,6 +8,7 @@ import {
 } from "react"
 import AdminGenericLayout from "../AdminGenericLayout"
 import NavBar from "./NavBar"
+import SubNavigationTabs from "./SubNavigationTabs"
 import TopBar from "./TopBar"
 
 type IGroupDashboardState = {
@@ -139,6 +140,7 @@ const GroupDashboardLayoutProvider = ({
             setDrawer={setLeftDrawer}
             toggleDrawer={toggleLeftDrawer}
          >
+            <SubNavigationTabs />
             {children}
          </AdminGenericLayout>
       </GroupDashboardContext.Provider>

@@ -1,4 +1,3 @@
-import { useRouter } from "next/router"
 import { useMemo } from "react"
 
 // react feather
@@ -12,7 +11,11 @@ import Skeleton from "@mui/material/Skeleton"
 import { SPARK_CONSTANTS } from "@careerfairy/shared-lib/sparks/constants"
 import { Box } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
-import { CompanyIcon } from "components/views/common/icons"
+import {
+   CompanyProfileIcon,
+   ContentIcon,
+   TalentPoolIcon,
+} from "components/views/common/icons"
 import CircleIcon from "components/views/common/icons/CircleIcon"
 import { HomeIcon } from "components/views/common/icons/HomeIcon"
 import { JobsIcon } from "components/views/common/icons/JobsIcon"
@@ -20,11 +23,10 @@ import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
 import { SparksIcon } from "components/views/common/icons/SparksIcon"
 import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
 import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
-import NewFeatureHint from "../../components/util/NewFeatureHint"
 import NavList from "../common/NavList"
 import { INavLink } from "../types"
 import ATSStatus from "./ATSStatus"
-import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
+import { CompanyProfileStatus } from "./CompanyProfileStatus"
 import { useGroup } from "./index"
 
 const BASE_HREF_PATH = "group"
@@ -40,17 +42,8 @@ const GroupNavList = () => {
       groupPresenter.isTrialPlan() &&
       groupPresenter.getPlanDaysLeft() <=
          SPARK_CONSTANTS.SPARKS_NAV_TITLE_WARNING_PLAN_DAYS
-   const { push, pathname } = useRouter()
-
-   const { layout } = useGroupDashboard()
 
    const featureFlags = useFeatureFlags()
-
-   const showCompanyPageCTA = Boolean(
-      !groupPresenter.companyPageIsReady() && // their company page is not ready yet
-         companyPagePathName !== pathname && // they are not on the company page
-         !layout.leftDrawerOpen // they are not on mobile
-   )
 
    const hasAccessToSparks =
       featureFlags.sparksAdminPageFlag || group.sparksAdminPageFlag
@@ -63,26 +56,46 @@ const GroupNavList = () => {
       const companyPageHref = `/${BASE_HREF_PATH}/${group.id}/admin/page`
 
       const links: INavLink[] = [
+         // 1. Dashboard - Keep current main page exactly as is
          {
-            id: "main-page",
+            id: "dashboard",
             href: `/${BASE_HREF_PATH}/${group.id}/admin`,
             pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin`,
             Icon: HomeIcon,
-            title: "Main page",
+            title: "Dashboard",
          },
-         ...(hasAccessToSparks
-            ? [
-                 {
-                    id: "sparks",
-                    href: `/${BASE_HREF_PATH}/${group.id}/admin/sparks`,
-                    Icon: SparksIcon,
-                    title: "Sparks",
-                    childLinks: [
+
+         // 2. Content - Move live streams content with slight navigation adjustments
+         {
+            id: "content",
+            title: "Content",
+            Icon: ContentIcon,
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/events`,
+            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events`,
+            childLinks: [
+               {
+                  id: "live-streams",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/events`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events`,
+                  Icon: LiveStreamsIcon,
+                  title: "Live streams",
+               },
+               {
+                  id: "all-live-streams",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/events/all`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events/all/[[...livestreamDialog]]`,
+                  Icon: AllLiveStreamsIcon,
+                  title: "All live streams on CareerFairy",
+               },
+               // TODO: Add new page for non-Sparks customers (CF-1487, CF-1488)
+               ...(hasAccessToSparks
+                  ? [
                        {
-                          id: "videos",
+                          id: "sparks",
                           href: `/${BASE_HREF_PATH}/${group.id}/admin/sparks`,
                           pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/sparks`,
-                          title: "Videos",
+                          Icon: SparksIcon,
+                          title: "Sparks",
                           rightElement: (
                              <ConditionalWrapper
                                 condition={showSparksUpgradeWarning}
@@ -93,84 +106,44 @@ const GroupNavList = () => {
                              </ConditionalWrapper>
                           ),
                        },
-
                        {
-                          id: "analytics",
+                          id: "sparks-analytics",
                           href: `/${BASE_HREF_PATH}/${group.id}/admin/sparks/analytics`,
                           pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/sparks/analytics`,
-                          title: "Analytics",
+                          title: "Sparks analytics",
                        },
-                    ],
-                 },
-              ]
-            : []),
-         {
-            id: "live-streams",
-            title: "Live streams",
-            Icon: LiveStreamsIcon,
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/events`,
-            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events`,
-            childLinks: [
-               {
-                  id: "all-live-streams",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/events/all`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events/all/[[...livestreamDialog]]`,
-                  Icon: AllLiveStreamsIcon,
-                  title: "All live streams on CareerFairy",
-               },
+                    ]
+                  : []),
             ],
          },
+
+         // 3. Jobs - Keep job section exactly as is (recently reworked in job hub V2)
          ...(hasAtsIntegration
             ? []
             : [
                  {
-                    id: "customJobs",
+                    id: "jobs",
                     href: `/${BASE_HREF_PATH}/${group.id}/admin/jobs`,
                     pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/jobs/[[...jobId]]`,
                     Icon: JobsIcon,
                     title: "Jobs",
                  },
               ]),
-         {
-            id: "company",
-            title: "Company",
-            Icon: CompanyIcon,
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/edit`,
-            wrapper: ({ children }) => (
-               <NewFeatureHint
-                  onClickConfirm={() => push(companyPageHref)}
-                  backDrop
-                  localStorageKey={"has-seen-company-page-cta"}
-                  tooltipTitle="🚀 New feature: Company page!"
-                  placement="right"
-                  hide={Boolean(showCompanyPageCTA || group.universityCode)} // Don't show the hint for university Groups
-                  tooltipText="We added company pages to CareerFairy. You can now create a dedicated page for your company and share it with your network of talent."
-                  buttonText={"Manage company page"}
-               >
-                  {children}
-               </NewFeatureHint>
-            ),
-            childLinks: [
-               {
-                  id: "general",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/edit`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/edit`,
-                  title: "General",
-               },
-               {
-                  id: "team-members",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/roles`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/roles`,
-                  title: "Team members",
-               },
-               {
-                  id: "page",
-                  href: companyPageHref,
-                  pathname: companyPagePathName,
-                  title: "Company page",
-               },
-            ],
-         },
+
+         // 4. Talent pool - Move existing analytics/talent-pool page to new section
+         ...(group.universityCode // Hide talent pool for universities
+            ? []
+            : [
+                 {
+                    id: "talent-pool",
+                    href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/talent-pool`,
+                    pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/talent-pool`,
+                    Icon: TalentPoolIcon,
+                    title: "Talent pool",
+                 },
+              ]),
+
+         // 5. Analytics - Adjust navigation between analytics tabs
          {
             id: "analytics",
             href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics`,
@@ -178,23 +151,13 @@ const GroupNavList = () => {
             title: "Analytics",
             childLinks: [
                {
-                  id: "general",
+                  id: "general-analytics",
                   href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics`,
                   pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics`,
                   title: "General",
                },
-               ...(group.universityCode // Hide talent pool for universities
-                  ? []
-                  : [
-                       {
-                          id: "talent-pool",
-                          href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/talent-pool`,
-                          pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/talent-pool`,
-                          title: "Talent pool",
-                       },
-                    ]),
                {
-                  id: "live-stream",
+                  id: "live-stream-analytics",
                   href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-stream`,
                   pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-stream/[[...livestreamId]]`,
                   title: "Live stream analytics",
@@ -211,12 +174,24 @@ const GroupNavList = () => {
                   pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/feedback/[[...feedback]]`,
                   title: "Feedback",
                },
+               // TODO: Add new page for non-Sparks customers (CF-1489, CF-1490)
             ],
+         },
+
+         // 6. Company profile - Move existing company page with alert icon when publicProfile == false
+         {
+            id: "company-profile",
+            title: "Company profile",
+            Icon: CompanyProfileIcon,
+            href: companyPageHref,
+            pathname: companyPagePathName,
+            rightElement: <CompanyProfileStatus group={group} />,
          },
       ]
 
       if (hasAtsIntegration) {
-         links.push({
+         // Insert ATS integration before Support
+         links.splice(-1, 0, {
             id: "ats",
             href: `/${BASE_HREF_PATH}/${group.id}/admin/ats-integration`,
             pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/ats-integration`,
@@ -231,13 +206,10 @@ const GroupNavList = () => {
          shrunk: shrunkLeftMenuIsActive,
       }))
    }, [
-      group.id,
-      group.universityCode,
+      group,
       hasAccessToSparks,
       showSparksUpgradeWarning,
       hasAtsIntegration,
-      showCompanyPageCTA,
-      push,
       shrunkLeftMenuIsActive,
    ])
 

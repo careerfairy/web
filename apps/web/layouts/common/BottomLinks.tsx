@@ -6,6 +6,7 @@ import Stack from "@mui/material/Stack"
 import { HelpCircle } from "react-feather"
 
 // project imports
+import { SettingsIcon } from "components/views/common/icons"
 import { MainLogo, MiniLogoGreenBg } from "../../components/logos"
 import { supportPageLink } from "../../constants/links"
 import { sxStyles } from "../../types/commonTypes"
@@ -23,7 +24,7 @@ type Props = {
 }
 
 const BottomLinks = ({ hideMainLogo }: Props) => {
-   const { shrunkLeftMenuIsActive } = useGroup()
+   const { shrunkLeftMenuIsActive, group } = useGroup()
 
    return (
       <Stack
@@ -38,9 +39,7 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
             </Box>
          }
       >
-         {hideMainLogo ? (
-            <></>
-         ) : (
+         {hideMainLogo ? null : (
             <Box px={5}>
                {shrunkLeftMenuIsActive ? (
                   <MiniLogoGreenBg />
@@ -49,6 +48,16 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
                )}
             </Box>
          )}
+         <Box mx={"16px !important"}>
+            <NavLink
+               href={`/group/${group.id}/admin/edit`}
+               pathname={`/group/[groupId]/admin/edit`}
+               id={"settings-page"}
+               baseTextColor={"text.primary"}
+               title={shrunkLeftMenuIsActive ? "" : "Settings"}
+               Icon={SettingsIcon}
+            />
+         </Box>
 
          <Box mx={"16px !important"}>
             <NavLink
