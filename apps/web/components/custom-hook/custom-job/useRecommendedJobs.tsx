@@ -1,4 +1,3 @@
-import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useAuth } from "HOCs/AuthProvider"
 import { customJobServiceInstance } from "data/firebase/CustomJobService"
@@ -52,7 +51,7 @@ const useRecommendedJobs = (config?: Config) => {
 }
 
 type PreFetchConfig = {
-   limit?: FirebaseInArrayLimit
+   limit?: number
    referenceJobId?: string
 }
 /*
@@ -68,7 +67,7 @@ export const usePreFetchRecommendedJobs = (config?: PreFetchConfig) => {
          [
             "getRecommendedJobs",
             limit,
-            userData.authId,
+            userData?.authId,
             ...(config?.referenceJobId
                ? [`referenceJobId=${config?.referenceJobId}`]
                : []),
@@ -76,12 +75,12 @@ export const usePreFetchRecommendedJobs = (config?: PreFetchConfig) => {
          () =>
             customJobServiceInstance.getRecommendedJobs(
                limit,
-               userData.authId,
+               userData?.authId,
                false,
                config?.referenceJobId
             )
       )
-   }, [limit, isLoggedIn, userData.authId, config?.referenceJobId])
+   }, [limit, isLoggedIn, userData?.authId, config?.referenceJobId])
 
    return null
 }
