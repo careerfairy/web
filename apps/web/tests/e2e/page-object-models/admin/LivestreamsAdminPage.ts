@@ -7,11 +7,11 @@ export class LivestreamsAdminPage extends CommonPage {
    }
 
    public async clickDraftsTab() {
-      await this.page.getByRole("tab", { name: "Drafts" }).click()
+      await this.page.getByRole("link", { name: "Drafts" }).click()
    }
 
    public async clickUpcomingTab() {
-      await this.page.getByRole("tab", { name: "Upcoming" }).click()
+      await this.page.getByRole("link", { name: "Upcoming" }).click()
    }
 
    public async launchEditModal(nth: number = 0) {

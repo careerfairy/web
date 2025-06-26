@@ -1,7 +1,7 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import { Box, Button, Tab, Tabs, Typography } from "@mui/material"
+import { Box, Button, Container, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { useState } from "react"
+import { useRouter } from "next/router"
 import { RefreshCw } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { SparksAudienceTab } from "./audience-tab"
@@ -9,13 +9,13 @@ import { SparksCompetitorTab } from "./competitor-tab"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
 import { SparksOverviewTab } from "./overview-tab"
 import { useSparksAnalytics } from "./SparksAnalyticsContext"
+import { SparksAnalyticsTabs, TabValue } from "./SparksAnalyticsTabs"
 
 const UPDATE_ICON_SIZE = 18
 
 const styles = sxStyles({
    root: {
-      mx: "auto",
-      width: "93.58%",
+      position: "relative",
    },
    controlHeader: {
       display: "flex",
@@ -24,24 +24,21 @@ const styles = sxStyles({
          xs: "column",
          md: "row",
       },
-      marginTop: { md: "17px" },
+      marginTop: { sm: 1, md: 1.5 },
       marginBottom: { md: "20px" },
    },
    tabs: {
-      "*": {
-         textTransform: "none !important",
-         fontWeight: 400,
-         fontSize: {
-            md: "1.2rem",
-         },
+      marginRight: {
+         xs: -2,
+         md: 0,
       },
-      alignSelf: "center",
-      ".Mui-selected": {
-         fontWeight: 600,
-         color: "#6749EA !important",
+      pl: {
+         xs: 0,
+         md: 1.5,
       },
-      ".MuiTabs-indicator": {
-         backgroundColor: "#6749EA",
+      width: {
+         xs: "calc(100% + 16px)",
+         md: "auto",
       },
    },
    mobileLimiter: {
@@ -145,12 +142,12 @@ type TimeFilter = {
 }
 
 const GroupSparkAnalytics = () => {
-   const [tabValue, setTabValue] = useState("overview")
+   const { query } = useRouter()
    const { selectTimeFilter, setSelectTimeFilter, updateAnalytics, isLoading } =
       useSparksAnalytics()
-   const handleTabChange = (_, newValue) => {
-      setTabValue(newValue)
-   }
+
+   // Get tab value from query params for conditional rendering
+   const tabValue = (query.tab as TabValue) || "overview"
 
    const options: TimeFilter[] = [
       { value: "7days", label: "Past 7 days" },
@@ -160,18 +157,9 @@ const GroupSparkAnalytics = () => {
    ]
 
    return (
-      <Box sx={styles.root}>
+      <Container sx={styles.root} maxWidth="xl">
          <Box sx={styles.controlHeader}>
-            <Tabs
-               value={tabValue}
-               onChange={handleTabChange}
-               aria-label="Spark Analytics Tabs"
-               sx={styles.tabs}
-            >
-               <Tab label="Overview" value="overview" />
-               <Tab label="Audience" value="audience" />
-               <Tab label="Competitor" value="competitor" />
-            </Tabs>
+            <SparksAnalyticsTabs sx={styles.tabs} />
             <Box component="span" sx={styles.mobileLimiter} />
             <Box sx={styles.controlsWrapper}>
                <Box sx={styles.updateControlsWrapper}>
@@ -206,7 +194,7 @@ const GroupSparkAnalytics = () => {
             {tabValue === "audience" && <SparksAudienceTab />}
             {tabValue === "competitor" && <SparksCompetitorTab />}
          </Box>
-      </Box>
+      </Container>
    )
 }
 

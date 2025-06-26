@@ -1,3 +1,4 @@
+import { useRouter } from "next/router"
 import React, {
    createContext,
    Dispatch,
@@ -7,7 +8,6 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import FeedbackDialog from "./feedback-dialog/FeedbackDialog"
 
@@ -54,14 +54,14 @@ export const FeedbackPageProvider: FC<{
    const handleOpenFeedbackDialog = useCallback(
       (livestreamId: string) => {
          void push(
-            `/group/${group.id}/admin/analytics/feedback/${livestreamId}`
+            `/group/${group.id}/admin/analytics/live-stream/feedback/${livestreamId}`
          )
       },
       [group.id, push]
    )
 
    const handleCloseFeedbackDialog = useCallback(() => {
-      void push(`/group/${group.id}/admin/analytics/feedback`)
+      void push(`/group/${group.id}/admin/analytics/live-stream/feedback`)
    }, [group.id, push])
 
    const value = useMemo<IFeedbackPageContext>(

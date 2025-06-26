@@ -8,8 +8,8 @@ import LivestreamAdminDetailTopBarNavigation from "components/views/group/admin/
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import LivestreamFetchWrapper from "../../../../../../components/views/group/admin/events/detail/LivestreamFetchWrapper"
-import LivestreamAdminDetailBottomBarNavigation from "../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
+import LivestreamFetchWrapper from "../../../../../../../components/views/group/admin/events/detail/LivestreamFetchWrapper"
+import LivestreamAdminDetailBottomBarNavigation from "../../../../../../../components/views/group/admin/events/detail/navigation/LivestreamAdminDetailBottomBarNavigation"
 
 const LivestreamAdminDetailsPage = () => {
    const {
@@ -31,7 +31,6 @@ const LivestreamAdminDetailsPage = () => {
                   <LivestreamAutoSaveContextProvider>
                      <GroupDashboardLayout
                         titleComponent={"Live stream Details"}
-                        groupId={groupId as string}
                         topBarCta={<LivestreamTopActions />}
                         topBarMobileCta={<LivestreamTopActions />}
                         topBarNavigation={

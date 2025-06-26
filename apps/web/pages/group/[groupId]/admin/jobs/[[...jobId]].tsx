@@ -1,7 +1,6 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
-import { GetServerSidePropsContext } from "next"
-import { FC } from "react"
+import { useRouter } from "next/router"
 import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
 import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
 import CreateJobButton from "../../../../../components/views/admin/jobs/components/CreateJobButton"
@@ -12,16 +11,16 @@ import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
 
-type Props = {
-   groupId: string
-   jobId: string
-}
+const JobsPage = () => {
+   const {
+      query: { jobId: queryJobId },
+   } = useRouter()
 
-const JobsPage: FC<Props> = ({ groupId, jobId }) => {
+   const jobId = queryJobId?.[0] || ""
+
    return (
       <GroupDashboardLayout
          titleComponent={"Jobs"}
-         groupId={groupId as string}
          topBarCta={<CreateJobButton />}
       >
          <DashboardHead title="CareerFairy | Jobs" />
@@ -41,15 +40,4 @@ const JobsPage: FC<Props> = ({ groupId, jobId }) => {
    )
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-   const { groupId, jobId: queryJobId } = context.params
-   const jobId = queryJobId?.[0] || ""
-
-   return {
-      props: {
-         groupId,
-         jobId,
-      },
-   }
-}
 export default JobsPage

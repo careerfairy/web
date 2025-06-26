@@ -13,7 +13,7 @@ import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useRouter } from "next/router"
 import React, {
    createContext,
-   FC,
+   ReactNode,
    SetStateAction,
    useContext,
    useEffect,
@@ -68,27 +68,32 @@ const GroupContext = createContext<GroupAdminContext>({
 })
 
 type GroupDashboardLayoutProps = {
-   groupId: string
-   titleComponent: React.ReactNode
-   children: React.ReactNode
-   topBarCta?: React.ReactNode
-   topBarMobileCta?: React.ReactNode
-   topBarNavigation?: React.ReactNode
-   bottomBarNavigation?: React.ReactNode
+   titleComponent: ReactNode
+   children: ReactNode
+   topBarCta?: ReactNode
+   topBarMobileCta?: ReactNode
+   topBarNavigation?: ReactNode
+   bottomBarNavigation?: ReactNode
    backgroundColor?: string
 }
-const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
-   const { children, groupId, titleComponent, backgroundColor } = props
+
+const GroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
+   const { children, titleComponent, backgroundColor } = props
    const isMobile = useIsMobile()
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
    const [questionsLoaded, setQuestionsLoaded] = useState<boolean>(false)
 
-   const { replace, push } = useRouter()
+   const {
+      replace,
+      push,
+      query: { groupId },
+   } = useRouter()
+
    const pathShouldShrink = usePathShouldShrink()
    const { userData, adminGroups, isLoggedOut } = useAuth()
    const featureFlags = useFeatureFlags()
 
-   const { group, stats } = useAdminGroup(groupId)
+   const { group, stats } = useAdminGroup(groupId as string)
 
    const { data: creators } = useGroupCreators(group?.id)
 

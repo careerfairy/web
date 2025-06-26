@@ -16,6 +16,7 @@ import {
 import { visuallyHidden } from "@mui/utils"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { placeholderAvatar } from "constants/images"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo, useState } from "react"
 import { ChevronDown, ChevronUp } from "react-feather"
@@ -220,7 +221,7 @@ const CollapsibleTable = ({ rows }: CollapsibleTableProps) => {
 
    const sortedRows = useMemo(() => {
       const hasGroup = rows.some(
-         (row) => row.sparks[0].sparkData.group.id === group.groupId
+         (row) => row.sparks[0]?.sparkData.group.id === group.groupId
       )
       const sortedRows = [...rows].sort(getComparator(order, orderBy))
 
@@ -350,7 +351,7 @@ const Row = ({ row, tableIndex, highlight = false }: RowProps) => {
          <Grid item xs={GRID_SIZES[1]}>
             <Box sx={styles.companyDataContainer}>
                <CircularLogo
-                  src={row.groupLogo}
+                  src={row.groupLogo || placeholderAvatar}
                   alt={`${row.groupName} logo`}
                   size={46}
                   objectFit="cover"

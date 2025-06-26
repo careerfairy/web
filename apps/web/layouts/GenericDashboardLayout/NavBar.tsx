@@ -28,7 +28,7 @@ const NavBar = () => {
          </Box>
          <GenericNavList />
          <Box flexGrow={1} />
-         <BottomLinks hideMainLogo={true} />
+         <BottomLinks />
       </Stack>
    )
 }
