@@ -39,7 +39,7 @@ const JobsPageOverview = () => {
    const { hasFilters } = useJobsOverviewContext()
 
    usePreFetchRecommendedJobs({
-      limit: 10,
+      limit: 30,
    })
 
    return (

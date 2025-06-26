@@ -55,7 +55,7 @@ type PreFetchConfig = {
    referenceJobId?: string
 }
 /*
- * Hook to preload the recommended eventIds and store them in the SWR cache
+ * Hook to preload the recommended jobIds and store them in the SWR cache
  * */
 export const usePreFetchRecommendedJobs = (config?: PreFetchConfig) => {
    const limit = config?.limit || 10

@@ -106,10 +106,6 @@ export const getRecommendedJobs = onCall(
       ),
       async (request) => {
          try {
-            functions.logger.info(
-               "🚀 ~ getRecommendedJobs ~ request:",
-               request.data
-            )
             const dataFetcher = new CustomJobDataFetcher(
                request.data.userAuthId || null,
                request.data.referenceJobId,
