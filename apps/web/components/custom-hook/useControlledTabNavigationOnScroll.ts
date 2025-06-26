@@ -1,4 +1,4 @@
-import debounce from "lodash.debounce"
+import debounce from "lodash/debounce"
 import { RefObject, useEffect, useState } from "react"
 
 /**

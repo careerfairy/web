@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { mainProductionDomainWithProtocol } from "@careerfairy/shared-lib/utils/urls"
-import { isEmpty } from "lodash/fp"
+import isEmpty from "lodash/isEmpty"
 import { v4 as uuidv4 } from "uuid"
 import { LONG_NUMBER } from "../util/constants"
 

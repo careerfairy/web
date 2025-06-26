@@ -1,4 +1,4 @@
-import { min } from "lodash"
+import min from "lodash/min"
 import { useCallback, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import useIsMobile from "../useIsMobile"

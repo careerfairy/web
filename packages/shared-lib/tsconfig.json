@@ -9,7 +9,8 @@
       "lib": ["es6", "esnext", "dom"],
       "allowJs": false,
       "declaration": true,
-      "skipLibCheck": true
+      "skipLibCheck": true,
+      "esModuleInterop": true
    },
    "compileOnSave": true,
    "include": ["src"],

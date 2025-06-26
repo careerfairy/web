@@ -11,7 +11,6 @@ import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import { customJobRepo } from "data/RepositoryInstances"
-import { props } from "lodash/fp"
 import { ReactNode, forwardRef } from "react"
 import { useSelector } from "react-redux"
 import { useEffectOnce, useMeasure } from "react-use"
@@ -178,7 +177,6 @@ export const CustomJobDetails = ({
                      applicationSource={context}
                      job={job as PublicCustomJob}
                      handleApplyClick={handleOpen}
-                     {...props}
                   />
                </CustomJobCTABottomContent>
                <Box height={`calc(${height}px + 40px)`} />

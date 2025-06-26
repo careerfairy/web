@@ -3,6 +3,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { Box, Typography } from "@mui/material"
 import Container from "@mui/material/Container"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
+import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
 import { Fragment, ReactNode, useMemo, useState } from "react"
 import SEO from "../../components/util/SEO"
@@ -10,10 +11,7 @@ import CarouselContentService, {
    filterNonRegisteredStreams,
    type CarouselContent,
 } from "../../components/views/portal/content-carousel/CarouselContentService"
-import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
 import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
-import MyNextEvents from "../../components/views/portal/events-preview/MyNextEvents"
-import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../../data/constants/streamContants"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { useAuth } from "../../HOCs/AuthProvider"
@@ -34,27 +32,88 @@ import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CategoryTagsContent from "components/views/common/tags/CategoryTagsContent"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
-import { FeaturedCompanies } from "components/views/portal/companies/featured/FeaturedCompanies"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { UserSparksCarousel } from "components/views/portal/sparks/UserSparksCarousel"
-import TagsCarouselWithArrow from "components/views/tags/TagsCarouselWithArrow"
-import { sxStyles } from "types/commonTypes"
-import { RecommendedCustomJobs } from "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
+import { SparksLoadingFallback } from "components/views/portal/sparks/SparksLoadingFallback"
+import { TagsCarouselSkeleton } from "components/views/tags/TagsCarouselSkeleton"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
-import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
 
-const styles = sxStyles({
-   sparksCarousel: {
-      mb: 4,
-      ml: 2,
-   },
-   sparksCarouselHeader: {
-      mr: 2,
-   },
-})
+const TagsCarouselWithArrow = dynamic(
+   () =>
+      import("components/views/tags/TagsCarouselWithArrow").then((mod) => ({
+         default: mod.default,
+      })),
+   {
+      ssr: false,
+      loading: () => <TagsCarouselSkeleton />,
+   }
+)
+
+const RecommendedCustomJobs = dynamic(
+   () =>
+      import(
+         "../../components/views/jobs/components/custom-jobs/RecommendedCustomJobs"
+      ).then((mod) => ({ default: mod.RecommendedCustomJobs })),
+   {
+      ssr: false,
+   }
+)
+
+const FeaturedCompanies = dynamic(
+   () =>
+      import(
+         "components/views/portal/companies/featured/FeaturedCompanies"
+      ).then((mod) => ({ default: mod.FeaturedCompanies })),
+   {
+      ssr: false,
+   }
+)
+
+const ContentCarousel = dynamic(
+   () =>
+      import("../../components/views/portal/content-carousel/ContentCarousel"),
+   {
+      ssr: false,
+   }
+)
+
+const UserSparksCarousel = dynamic(
+   () =>
+      import("components/views/portal/sparks/UserSparksCarousel").then(
+         (mod) => ({ default: mod.UserSparksCarousel })
+      ),
+   {
+      ssr: false,
+      loading: () => <SparksLoadingFallback />,
+   }
+)
+
+const RecommendedEvents = dynamic(
+   () =>
+      import("../../components/views/portal/events-preview/RecommendedEvents"),
+   {
+      ssr: false,
+   }
+)
+
+const MyNextEvents = dynamic(
+   () => import("../../components/views/portal/events-preview/MyNextEvents"),
+   {
+      ssr: false,
+   }
+)
+
+const WelcomeDialogContainer = dynamic(
+   () =>
+      import(
+         "../../components/views/welcome-dialog/WelcomeDialogContainer"
+      ).then((mod) => ({ default: mod.WelcomeDialogContainer })),
+   {
+      ssr: false,
+   }
+)
 
 const DIALOG_SOURCE = "livestreamDialog"
 
@@ -139,8 +198,6 @@ const PortalPage = ({
                                  </Typography>
                               }
                               handleSparksClicked={handleSparksClicked}
-                              containerSx={styles.sparksCarousel}
-                              headerSx={styles.sparksCarouselHeader}
                            />
                            {hasInterests ? (
                               <RecommendedEvents limit={10} />
