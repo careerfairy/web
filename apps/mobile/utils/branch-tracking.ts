@@ -1,4 +1,4 @@
-import branch from "react-native-branch"
+import branch, { BranchEvent } from "react-native-branch"
 
 class BranchService {
    private static instance: BranchService
@@ -31,6 +31,29 @@ class BranchService {
    async logout(): Promise<void> {
       console.log("Branch: user logged out")
       return branch.logout()
+   }
+
+   async trackEvent(
+      eventName: string,
+      properties: Record<string, any>
+   ): Promise<void> {
+      console.log(`Branch: tracking event ${eventName}`, properties)
+
+      // Map custom event names to Branch standard events
+      const branchEventName = this.mapToStandardEvent(eventName)
+
+      const event = new BranchEvent(branchEventName, undefined, properties)
+
+      await event.logEvent()
+   }
+
+   private mapToStandardEvent(eventName: string): string {
+      const eventMapping: Record<string, string> = {
+         login_complete: BranchEvent.Login,
+         signup_complete_redirect: BranchEvent.CompleteRegistration,
+      }
+
+      return eventMapping[eventName] || eventName
    }
 }
 
