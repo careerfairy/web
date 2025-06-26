@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import { isEmpty } from "lodash/fp"
+import WarningIcon from "@mui/icons-material/Warning"
 import {
    Button,
    CircularProgress,
@@ -14,12 +12,12 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import WarningIcon from "@mui/icons-material/Warning"
+import makeStyles from "@mui/styles/makeStyles"
 import { URL_REGEX } from "components/util/constants"
-import usePreparationOverlay from "../../../custom-hook/usePreparationOverlay"
-import { useRouter } from "next/router"
-import { useTheme } from "@mui/material/styles"
+import isEmpty from "lodash/isEmpty"
+import { useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import usePreparationOverlay from "../../../custom-hook/usePreparationOverlay"
 
 const useStyles = makeStyles((theme) => ({
    background: {
@@ -114,17 +112,11 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
    const { updateSpeaker, addSpeaker } = usePreparationOverlay()
    const { userData } = useAuth()
 
-   const {
-      query: { auto },
-   } = useRouter()
    const [speaker, setSpeaker] = useState({
       firstName: "",
       lastName: "",
       position: "",
    })
-   const {
-      palette: { mode },
-   } = useTheme()
 
    const [showLinkedIn, setShowLinkedIn] = useState(true)
    const [linkedInUrl, setLinkedInUrl] = useState("")
@@ -163,7 +155,7 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
       }
    }, [livestream.liveSpeakers])
 
-   const handleChangeLinkedInShare = (event) => {
+   const handleChangeLinkedInShare = () => {
       setShowLinkedIn(!showLinkedIn)
    }
 
@@ -241,10 +233,11 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                      <FormControl className={classes.marginTop}>
                         <TextField
                            error={
-                              formErrors.firstName &&
-                              isEmpty(speaker.firstName?.trim())
+                              formErrors.firstName
+                                 ? isEmpty(speaker.firstName?.trim())
+                                 : null
                            }
-                           helperText={formErrors.firstName && "Required"}
+                           helperText={formErrors.firstName ? "Required" : null}
                            id="outlined-basic"
                            label="First Name"
                            variant="outlined"
@@ -261,10 +254,11 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                      <FormControl className={classes.marginTop}>
                         <TextField
                            error={
-                              formErrors.lastName &&
-                              isEmpty(speaker.lastName?.trim())
+                              formErrors.lastName
+                                 ? isEmpty(speaker.lastName?.trim())
+                                 : null
                            }
-                           helperText={formErrors.lastName && "Required"}
+                           helperText={formErrors.lastName ? "Required" : null}
                            id="outlined-basic"
                            label="Last Name"
                            variant="outlined"
@@ -281,10 +275,11 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                      <FormControl className={classes.marginTop}>
                         <TextField
                            error={
-                              formErrors.position &&
-                              isEmpty(speaker.position?.trim())
+                              formErrors.position
+                                 ? isEmpty(speaker.position?.trim())
+                                 : null
                            }
-                           helperText={formErrors.position && "Required"}
+                           helperText={formErrors.position ? "Required" : null}
                            id="outlined-basic"
                            label="Occupation"
                            placeholder="Lead Engineer"
@@ -325,11 +320,14 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                            placeholder="https://linkedin.com/in/your-profile"
                            value={linkedInUrl || ""}
                            helperText={
-                              formErrors.linkedInUrl &&
-                              "Please enter a valid URL"
+                              formErrors.linkedInUrl
+                                 ? "Please enter a valid URL"
+                                 : null
                            }
                            error={
-                              formErrors.linkedInUrl && !isValidUrl(linkedInUrl)
+                              formErrors.linkedInUrl
+                                 ? !isValidUrl(linkedInUrl)
+                                 : null
                            }
                            onChange={(event) =>
                               setLinkedInUrl(event.target.value)
@@ -356,7 +354,7 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                })}
                onClick={joinStream}
                disabled={loading}
-               startIcon={loading && <CircularProgress size="small" />}
+               startIcon={loading ? <CircularProgress size="small" /> : null}
             >
                Join now
             </Button>

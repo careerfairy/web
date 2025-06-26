@@ -6,7 +6,7 @@ import {
    removeDuplicates,
 } from "@careerfairy/shared-lib/utils"
 import * as functions from "firebase-functions"
-import _ from "lodash"
+import xor from "lodash/xor"
 
 import { onCall } from "firebase-functions/https"
 import {
@@ -70,7 +70,7 @@ export const syncCustomJobLinkedContentTags = async <
       )
    }
    const businessFunctionTagsChanged = Boolean(
-      _.xor(
+      xor(
          afterJob?.businessFunctionsTagIds ?? [],
          beforeJob?.businessFunctionsTagIds ?? []
       ).length
