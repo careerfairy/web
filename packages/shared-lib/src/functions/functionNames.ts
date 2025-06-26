@@ -10,6 +10,7 @@ export const FUNCTION_NAMES = {
    customerIORecommendedLivestreamsWebhook:
       "customerIORecommendedLivestreamsWebhook",
    customerIORecommendedSparksWebhook: "customerIORecommendedSparksWebhook",
+   customerIORecommendedJobsWebhook: "customerIORecommendedJobsWebhook",
 
    // Group Admin functions
    sendNewlyPublishedEventEmail: "sendNewlyPublishedEventEmail",
