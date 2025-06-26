@@ -19,6 +19,12 @@ type RecommendedJobsRequest = {
  */
 type CustomerIORecommendedJobsWebhookData = {
    id: string
+   url: string
+   title: string
+   company: string
+   jobType: string
+   jobLocation: string[]
+   jobBusinessFunctionTags: string[]
 }
 
 /**
