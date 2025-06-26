@@ -1,4 +1,4 @@
-import { Button, Stack, Typography } from "@mui/material"
+import { Button, CircularProgress, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
@@ -27,6 +27,7 @@ const styles = sxStyles({
       textUnderlineOffset: "2px",
    },
 })
+
 export const DeleteAccount = () => {
    const [showConfirmation, setShowConfirmation] = useState(false)
 
@@ -55,6 +56,7 @@ export const DeleteAccount = () => {
 }
 
 const DeleteAccountConfirmation = () => {
+   const [isDeleting, setIsDeleting] = useState(false)
    const { userData } = useAuth()
    const [deleteAccountConfirmation, setDeleteAccountConfirmation] =
       useState("")
@@ -64,6 +66,8 @@ const DeleteAccountConfirmation = () => {
 
    const handleAccountDeletion = useCallback(async () => {
       try {
+         setIsDeleting(true)
+
          await dispatch(deleteUser())
 
          await router.push({
@@ -77,6 +81,8 @@ const DeleteAccountConfirmation = () => {
             error,
             `Error deleting account, authId: ${userData?.authId}`
          )
+      } finally {
+         setIsDeleting(false)
       }
    }, [dispatch, router, userData?.authId, errorNotification])
 
@@ -107,9 +113,14 @@ const DeleteAccountConfirmation = () => {
          />
          <Button
             startIcon={<Trash size={18} />}
+            endIcon={
+               isDeleting ? (
+                  <CircularProgress size={18} color="inherit" />
+               ) : null
+            }
             variant="contained"
             color="error"
-            disabled={!confirmed}
+            disabled={!confirmed || isDeleting}
             onClick={handleAccountDeletion}
          >
             Delete account
