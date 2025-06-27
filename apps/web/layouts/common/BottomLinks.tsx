@@ -6,26 +6,11 @@ import Stack from "@mui/material/Stack"
 import { HelpCircle } from "react-feather"
 
 // project imports
-import { SettingsIcon } from "components/views/common/icons"
-import { MainLogo, MiniLogoGreenBg } from "../../components/logos"
+import { Fragment } from "react"
 import { supportPageLink } from "../../constants/links"
-import { sxStyles } from "../../types/commonTypes"
-import { useGroup } from "../GroupDashboardLayout"
 import { NavLink } from "./NavList"
 
-const styles = sxStyles({
-   logo: {
-      maxWidth: "80%",
-   },
-})
-
-type Props = {
-   hideMainLogo?: boolean
-}
-
-const BottomLinks = ({ hideMainLogo }: Props) => {
-   const { shrunkLeftMenuIsActive, group } = useGroup()
-
+const BottomLinks = () => {
    return (
       <Stack
          spacing={2}
@@ -39,32 +24,15 @@ const BottomLinks = ({ hideMainLogo }: Props) => {
             </Box>
          }
       >
-         {hideMainLogo ? null : (
-            <Box px={5}>
-               {shrunkLeftMenuIsActive ? (
-                  <MiniLogoGreenBg />
-               ) : (
-                  <MainLogo sx={styles.logo} />
-               )}
-            </Box>
-         )}
-         <Box mx={"16px !important"}>
-            <NavLink
-               href={`/group/${group.id}/admin/edit`}
-               pathname={`/group/[groupId]/admin/edit`}
-               id={"settings-page"}
-               baseTextColor={"text.primary"}
-               title={shrunkLeftMenuIsActive ? "" : "Settings"}
-               Icon={SettingsIcon}
-            />
-         </Box>
+         {/* Triggers the divider */}
+         <Fragment />
 
          <Box mx={"16px !important"}>
             <NavLink
                href={supportPageLink}
                id={"support-page"}
                baseTextColor={"text.primary"}
-               title={shrunkLeftMenuIsActive ? "" : "Support"}
+               title={"Support"}
                Icon={HelpCircle}
                external
             />

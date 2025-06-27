@@ -1,58 +1,40 @@
 // material-ui
-import { Box, Typography } from "@mui/material"
 import EditGroupIcon from "@mui/icons-material/EditOutlined"
+import { Box, Stack, Typography, styled } from "@mui/material"
 
 // project imports
-import { getMaxLineStyles } from "../../components/helperFunctions/HelperFunctions"
-import { sxStyles } from "../../types/commonTypes"
-import { useGroup } from "./index"
-import CircularLogo from "components/views/common/logos/CircularLogo"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import HoverOverlay from "components/views/common/HoverOverlay"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useGroup } from "./index"
 
-const styles = sxStyles({
-   root: {
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      width: "80%",
-      padding: 1,
-      gap: 1,
-   },
-   rootHeightNormal: {
-      height: 180,
-   },
-   rootHeightCompact: {
-      height: 100,
-   },
-   details: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "flex-start",
-      justifyContent: "center",
-   },
-   maxOneLine: {
-      ...getMaxLineStyles(1),
-   },
-   hoverOverlay: {
-      color: "white",
-   },
+const RootContainer = styled(Stack)(({ theme }) => ({
+   width: "100%",
+   padding: theme.spacing(1, 3),
+   marginTop: theme.spacing(2),
+   marginBottom: theme.spacing(2),
+}))
+
+const DetailsContainer = styled(Box)({
+   display: "flex",
+   flexDirection: "column",
+   alignItems: "flex-start",
+   justifyContent: "center",
+})
+
+const TruncatedText = styled(Typography)(getMaxLineStyles(1))
+
+const HoverIcon = styled(EditGroupIcon)({
+   color: "white",
 })
 
 const EditGroupCard = () => {
-   const { group, shrunkLeftMenuState } = useGroup()
+   const { group } = useGroup()
 
    const companyName = group?.universityName
-   const numberOfCharsThatDontBreakUI = 14
 
    return (
-      <Box
-         sx={[
-            styles.root,
-            shrunkLeftMenuState !== "disabled"
-               ? styles.rootHeightCompact
-               : styles.rootHeightNormal,
-         ]}
-      >
+      <RootContainer spacing={0.5}>
          <CircularLogo
             src={group?.logoUrl}
             alt={`logo of company ${companyName}`}
@@ -60,25 +42,26 @@ const EditGroupCard = () => {
          >
             <HoverOverlay
                href={`/group/${group.id}/admin/edit`}
-               icon={
-                  <EditGroupIcon sx={styles.hoverOverlay} fontSize="large" />
-               }
+               icon={<HoverIcon fontSize="large" />}
             />
          </CircularLogo>
-         <Box sx={styles.details}>
-            <Typography fontWeight={300} variant={"body1"} color={"#959595"}>
+         <DetailsContainer>
+            <Typography
+               fontWeight={400}
+               variant={"xsmall"}
+               color={"neutral.400"}
+            >
                {"Dashboard"}
             </Typography>
-            <Typography sx={styles.maxOneLine} fontWeight={500} color="black">
-               {
-                  // fix for CF-673
-                  companyName.length > numberOfCharsThatDontBreakUI
-                     ? companyName.substring(0, 15)
-                     : companyName
-               }
-            </Typography>
-         </Box>
-      </Box>
+            <TruncatedText
+               fontWeight={400}
+               variant={"medium"}
+               color="neutral.900"
+            >
+               {companyName}
+            </TruncatedText>
+         </DetailsContainer>
+      </RootContainer>
    )
 }
 
