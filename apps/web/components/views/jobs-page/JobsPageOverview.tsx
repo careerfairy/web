@@ -1,5 +1,4 @@
 import { Container, Stack } from "@mui/material"
-import { usePreFetchRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 import { useJobsOverviewContext } from "./JobsOverviewContext"
@@ -38,9 +37,9 @@ const JobsPageOverview = () => {
    const isMobile = useIsMobile()
    const { hasFilters } = useJobsOverviewContext()
 
-   usePreFetchRecommendedJobs({
-      limit: 30,
-   })
+   // usePreFetchRecommendedJobs({
+   //    limit: 30,
+   // })
 
    return (
       <Container maxWidth="xl" sx={styles.container}>

@@ -41,6 +41,7 @@ export class RecommendationCustomJobsServiceCore {
          .userBusinessFunctionsTags()
          .userFollowingCompanies()
          .userStrictLocation()
+         .userExternalCountryIsoCode()
          .userCountriesOfInterest()
          .userSavedJobs()
          .userLastViewedJobsLocations()

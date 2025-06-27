@@ -10,6 +10,7 @@ import {
    FilterOptions,
    useCustomJobSearchAlgolia,
 } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import useRecommendedJobs from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { customJobRepo } from "data/RepositoryInstances"
 import { NextRouter, useRouter } from "next/router"
@@ -24,6 +25,8 @@ import {
    useState,
 } from "react"
 import { useDebounce } from "react-use"
+
+const RECOMMENDATION_LIMIT = 30
 
 type JobsOverviewContextType = {
    selectedJob: CustomJob | undefined
@@ -51,6 +54,9 @@ type JobsOverviewContextType = {
    jobNotFound: boolean
    setJobDetailsDialogOpen: (open: boolean) => void
    selectedLocationsNames: string[]
+   recommendedJobs: CustomJob[]
+   isRecommendedJobsLoading: boolean
+   recommendationLimit: number
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -130,6 +136,15 @@ export const JobsOverviewContextProvider = ({
          initialData: serverCustomJobs,
       }
    )
+
+   const { jobs: recommendedJobs, loading: isRecommendedJobsLoading } =
+      useRecommendedJobs({
+         bypassCache: true,
+         limit: RECOMMENDATION_LIMIT,
+         referenceJobId: serverJob?.id,
+         initialData: serverCustomJobs,
+         forceFetch: true,
+      })
 
    const infiniteJobs = useMemo(() => {
       return data?.flatMap((page) => page.deserializedHits) ?? []
@@ -238,6 +253,9 @@ export const JobsOverviewContextProvider = ({
          jobNotFound,
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
          selectedLocationsNames,
+         recommendedJobs,
+         isRecommendedJobsLoading,
+         recommendationLimit: RECOMMENDATION_LIMIT,
       }
    }, [
       infiniteJobs,
@@ -256,6 +274,8 @@ export const JobsOverviewContextProvider = ({
       isMobile,
       jobNotFound,
       selectedLocationsNames,
+      recommendedJobs,
+      isRecommendedJobsLoading,
    ])
 
    useEffect(() => {

@@ -29,6 +29,7 @@ export type UserProfile = {
    followingCompanies: CompanyFollowed[]
    lastViewedJobs: UserLastViewedJob[]
    savedJobs: CustomJob[]
+   externalCountryIsoCode: string | null
 }
 
 export type JobStats = Record<string, CustomJobStats>
@@ -176,6 +177,51 @@ export class UserBasedRecommendationsBuilder extends BaseRecommendationsBuilder 
             location,
             points: `${this.rankedCustomJobsRepo.USER_JOB_LOCATION_POINTS} * NUMBER_OF_MATCHES`,
             userAuthId: this.userProfile.userData.authId,
+         },
+         jobs,
+         currentResultsScore
+      )
+
+      this.addResults(jobs)
+
+      return this
+   }
+
+   public userExternalCountryIsoCode() {
+      if (
+         !this.userProfile?.externalCountryIsoCode ||
+         this.userProfile?.userData?.countryIsoCode
+      )
+         return this
+
+      const location = getLocationId(this.userProfile.externalCountryIsoCode)
+
+      if (!location?.length) return this
+
+      const currentResultsScore: Record<string, number> =
+         this.getCurrentResultsScore()
+
+      const jobs = this.rankedCustomJobsRepo.getCustomJobsBasedOnCondition(
+         (job) =>
+            inLocation(
+               location,
+               job.model.jobLocation?.map((location) => location.id)
+            )?.length > 0,
+         this.rankedCustomJobsRepo.USER_JOB_LOCATION_POINTS,
+         (job) =>
+            inLocation(
+               location,
+               job.model.jobLocation?.map((location) => location.id)
+            )?.length
+      )
+
+      this.logResults(
+         "userExternalCountryIsoCode",
+         {
+            description:
+               "Jobs that are in the external country iso code (only applies when the user is not logged in)",
+            countryIsoCode: this.userProfile.externalCountryIsoCode,
+            points: this.rankedCustomJobsRepo.USER_JOB_LOCATION_POINTS,
          },
          jobs,
          currentResultsScore
