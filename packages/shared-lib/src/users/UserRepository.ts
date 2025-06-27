@@ -1317,25 +1317,16 @@ export class FirebaseUserRepository
          .collection("seenJobs")
          .doc(`${userAuthId}_${job.id}`)
 
-      const snap = await ref.get()
-
-      if (snap.exists) {
-         const data = snap.data() as UserLastViewedJob
-         data.totalViews = (data.totalViews || 0) + 1
-         data.lastViewedAt = this.timestamp.now()
-         await ref.set(data)
-         return
-      }
-
-      const data: UserLastViewedJob = {
-         id: `${userAuthId}_${job.id}`,
-         userAuthId,
-         job,
-         totalViews: 1,
-         lastViewedAt: this.timestamp.now(),
-      }
-
-      await ref.set(data)
+      await ref.set(
+         {
+            id: `${userAuthId}_${job.id}`,
+            userAuthId,
+            job,
+            totalViews: this.fieldValue.increment(1),
+            lastViewedAt: this.timestamp.now(),
+         },
+         { merge: true }
+      )
    }
 
    async getUserLastViewedJobs(
