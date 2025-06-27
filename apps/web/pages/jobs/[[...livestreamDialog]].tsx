@@ -32,6 +32,7 @@ import ScrollToTop from "../../components/views/common/ScrollToTop"
 
 import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import { usePreFetchRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import { Country, State } from "country-state-city"
@@ -64,6 +65,10 @@ const JobsPage: NextPage<
            customJobData.serializedCustomJob
         ).convertToDocument(Timestamp.fromDate)
       : undefined
+
+   usePreFetchRecommendedJobs({
+      referenceJobId: serverJob?.id,
+   })
 
    return (
       <>

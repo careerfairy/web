@@ -75,7 +75,9 @@ export const CustomJobsOverviewList = () => {
 
 const DefaultJobs = () => {
    const { isLoggedIn } = useAuth()
-   const { customJobs } = useJobsOverviewContext()
+   const { recommendedJobs: customJobs, isRecommendedJobsLoading } =
+      useJobsOverviewContext()
+
    const title = isLoggedIn ? "Right for you" : "Trending jobs"
 
    return (
@@ -84,7 +86,10 @@ const DefaultJobs = () => {
             {title}
             {" 🚀"}
          </Typography>
-         <CustomJobsList customJobs={customJobs} />
+         {isRecommendedJobsLoading ? <CircularLoader sx={{ mt: 2 }} /> : null}
+         {!isRecommendedJobsLoading && customJobs?.length ? (
+            <CustomJobsList customJobs={customJobs} />
+         ) : null}
       </Stack>
    )
 }
@@ -100,12 +105,16 @@ const ResultJobs = () => {
 }
 
 const OtherJobs = () => {
-   const { jobs: customJobs, loading: isLoading } = useRecommendedJobs({
-      bypassCache: true,
-      limit: 30,
-   })
+   const { recommendationLimit, selectedJob } = useJobsOverviewContext()
+   const { jobs: customJobs, loading: isRecommendedJobsLoading } =
+      useRecommendedJobs({
+         bypassCache: true, // Always bypass in this case to have shuffled results
+         limit: recommendationLimit,
+         referenceJobId: selectedJob?.id,
+         forceFetch: true,
+      })
 
-   if (isLoading) return <CircularLoader sx={{ mt: 2 }} />
+   if (isRecommendedJobsLoading) return <CircularLoader sx={{ mt: 2 }} />
 
    if (!customJobs?.length) return null
 

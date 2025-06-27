@@ -311,7 +311,13 @@ export class SparksDataFetcher {
    }
 }
 
+type ExternalData = {
+   countryIsoCode?: string
+}
+
 export class CustomJobDataFetcher {
+   private externalData: ExternalData
+
    constructor(
       private readonly authId: string,
       private readonly referenceJobId: string,
@@ -319,6 +325,10 @@ export class CustomJobDataFetcher {
       private readonly customJobRepo: ICustomJobRepository,
       private readonly livestreamRepo: ILivestreamRepository
    ) {}
+
+   setExternalData(externalData: ExternalData) {
+      this.externalData = externalData
+   }
 
    getUser(): Promise<UserData> {
       if (!this.authId) return Promise.resolve(null)
@@ -378,6 +388,10 @@ export class CustomJobDataFetcher {
    getUserSavedJobs(userId: string, limit: number): Promise<CustomJob[]> {
       if (!userId) return Promise.resolve([])
       return this.userRepo.getSavedJobs(userId, limit)
+   }
+
+   getExternalCountryIsoCode(): string {
+      return this.externalData?.countryIsoCode ?? null
    }
 
    /**
