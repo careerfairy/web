@@ -2,7 +2,11 @@ import {
    CreatorRoles,
    PublicCreator,
 } from "@careerfairy/shared-lib/groups/creators"
-import { Spark, SparkVideo } from "@careerfairy/shared-lib/sparks/sparks"
+import {
+   Spark,
+   SparkLanguage,
+   SparkVideo,
+} from "@careerfairy/shared-lib/sparks/sparks"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { groupRepo } from "data/RepositoryInstances"
 import { sparkService } from "data/firebase/SparksService"
@@ -13,6 +17,7 @@ import { closeSparkDialog } from "store/reducers/adminSparksReducer"
 
 export type SparkFormValues = {
    categoryId: Spark["category"]["id"] | ""
+   languageId: SparkLanguage | ""
    question: string
    published: "true" | "false" // visibility
    video: SparkVideo
@@ -78,6 +83,7 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                // update spark
                await sparkService.updateSpark({
                   categoryId: values.categoryId,
+                  languageId: values.languageId,
                   question: values.question,
                   published,
                   creatorId: values.creator.id,
@@ -88,6 +94,7 @@ const useSparkFormSubmit = (groupId: string): UseSparkFormSubmit => {
                // create new spark
                await sparkService.createSpark({
                   categoryId: values.categoryId,
+                  languageId: values.languageId,
                   question: values.question,
                   video: values.video,
                   published,
