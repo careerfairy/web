@@ -22,7 +22,6 @@ import {
    customJobRepo,
    livestreamRepo,
    sparkRepo,
-   userRepo,
 } from "data/RepositoryInstances"
 import algoliaRepo from "data/algolia/AlgoliaRepository"
 import { Timestamp } from "firebase/firestore"
@@ -174,7 +173,8 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const { term: queryTerm = "", jobId: queryJobId } = context.query
 
-   const token = getUserTokenFromCookie(context)
+   const token = getUserTokenFromCookie(context) as any
+   const userAuthId = token?.user_id
 
    const term = queryTerm as string
    const jobId = queryJobId as string
@@ -220,12 +220,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const algoliaCustomJobs = algoliaResponse.hits
       .map(deserializeAlgoliaSearchResponse)
       .map((job) => job as CustomJob)
-
-   let userAuthId = null
-   if (token?.email && !hasFilters) {
-      const userData = await userRepo.getUserDataById(token?.email)
-      userAuthId = userData?.authId
-   }
 
    const recommendedJobs = !hasFilters
       ? await customJobServiceInstance.getRecommendedJobs(
