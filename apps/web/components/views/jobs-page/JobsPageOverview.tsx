@@ -37,10 +37,6 @@ const JobsPageOverview = () => {
    const isMobile = useIsMobile()
    const { hasFilters } = useJobsOverviewContext()
 
-   // usePreFetchRecommendedJobs({
-   //    limit: 30,
-   // })
-
    return (
       <Container maxWidth="xl" sx={styles.container}>
          <Stack spacing={2}>
