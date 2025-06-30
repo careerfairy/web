@@ -273,7 +273,7 @@ const FormComponent: FC = () => {
                            placeholder="Insert Spark question"
                            fullWidth
                            multiline
-                           rows={10}
+                           rows={6}
                         />
                      </Grid>
                      <Grid item xs={12}>
