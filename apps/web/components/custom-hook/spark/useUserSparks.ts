@@ -45,7 +45,7 @@ const createBaseFeedQuery = (userId: string) =>
    query(
       collection(FirestoreInstance, `userData/${userId}/sparksFeed`),
       where("group.publicSparks", "==", true),
-      orderBy("publishedAt", "desc"),
+      orderBy("addedToFeedAt", "desc"),
       limit(SPARKS_LIMIT)
    ).withConverter<Spark>(createGenericConverter())
 

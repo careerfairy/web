@@ -89,6 +89,7 @@ import countries = require("./countries")
 import levels = require("./levels")
 import remindersNew = require("./reminders-new")
 import followups = require("./followups")
+
 // Auth
 exports[FUNCTION_NAMES.createNewUserAccount] = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount = auth.createNewGroupAdminUserAccount
@@ -339,6 +340,8 @@ exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
 exports.fetchCompanies = companies.fetchCompanies
 exports.syncFeaturedCompaniesData = companies.syncFeaturedCompaniesData
 exports.trackGroupEvents = companies.trackGroupEvents
+exports.syncCompanyLanguages = companies.syncCompanyLanguages
+exports.manualSyncCompanyLanguages = companies.manualSyncCompanyLanguages
 
 // Streaming
 exports.deleteLivestreamChatEntry = streaming.deleteLivestreamChatEntry
