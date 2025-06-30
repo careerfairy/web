@@ -3,14 +3,15 @@ import { useEffect, useMemo, useRef } from "react"
 
 import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import useRecommendedJobs from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
-import CircularLoader from "components/views/loader/CircularLoader"
+import { RECOMMENDED_JOBS_LIMIT } from "pages/jobs/[[...livestreamDialog]]"
 import { sxStyles } from "types/commonTypes"
 import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 import { CustomJobsList } from "./CustomJobsList"
+import { AnonymousRecommendedJobs } from "./recommendation/AnonymousRecommendedJobs"
+import { AuthedRecommendedJobs } from "./recommendation/AuthedRecommendedJobs"
 import { NoResultsFound } from "./search/SearchResultsCount"
 
 const styles = sxStyles({
@@ -75,9 +76,6 @@ export const CustomJobsOverviewList = () => {
 
 const DefaultJobs = () => {
    const { isLoggedIn } = useAuth()
-   const { recommendedJobs: customJobs, isRecommendedJobsLoading } =
-      useJobsOverviewContext()
-
    const title = isLoggedIn ? "Right for you" : "Trending jobs"
 
    return (
@@ -86,10 +84,7 @@ const DefaultJobs = () => {
             {title}
             {" 🚀"}
          </Typography>
-         {isRecommendedJobsLoading ? <CircularLoader sx={{ mt: 2 }} /> : null}
-         {!isRecommendedJobsLoading && customJobs?.length ? (
-            <CustomJobsList customJobs={customJobs} />
-         ) : null}
+         <RecommendedJobs />
       </Stack>
    )
 }
@@ -105,25 +100,34 @@ const ResultJobs = () => {
 }
 
 const OtherJobs = () => {
-   const { recommendationLimit, selectedJob } = useJobsOverviewContext()
-   const { jobs: customJobs, loading: isRecommendedJobsLoading } =
-      useRecommendedJobs({
-         bypassCache: true, // Always bypass in this case to have shuffled results
-         limit: recommendationLimit,
-         referenceJobId: selectedJob?.id,
-         forceFetch: true,
-      })
-
-   if (isRecommendedJobsLoading) return <CircularLoader sx={{ mt: 2 }} />
-
-   if (!customJobs?.length) return null
-
    return (
       <Stack spacing={1} mt={2}>
          <Typography variant="medium" sx={styles.listTitle}>
             Other jobs you might like
          </Typography>
-         <CustomJobsList customJobs={customJobs} />
+         <RecommendedJobs />
       </Stack>
+   )
+}
+
+const RecommendedJobs = () => {
+   const { authenticatedUser } = useAuth()
+
+   if (!authenticatedUser?.email)
+      return (
+         <AnonymousRecommendedJobs
+            limit={RECOMMENDED_JOBS_LIMIT}
+            forceFetch
+            bypassCache
+         />
+      )
+
+   return (
+      <AuthedRecommendedJobs
+         userAuthId={authenticatedUser.uid}
+         limit={RECOMMENDED_JOBS_LIMIT}
+         forceFetch
+         bypassCache
+      />
    )
 }

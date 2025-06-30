@@ -22,6 +22,7 @@ import {
    customJobRepo,
    livestreamRepo,
    sparkRepo,
+   userRepo,
 } from "data/RepositoryInstances"
 import algoliaRepo from "data/algolia/AlgoliaRepository"
 import { Timestamp } from "firebase/firestore"
@@ -36,10 +37,13 @@ import { usePreFetchRecommendedJobs } from "components/custom-hook/custom-job/us
 import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import { Country, State } from "country-state-city"
+import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { useRouter } from "next/router"
+import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 export const HEADER_TRANSITION_TIMEOUT = 100
+export const RECOMMENDED_JOBS_LIMIT = 30
 
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -67,7 +71,7 @@ const JobsPage: NextPage<
       : undefined
 
    usePreFetchRecommendedJobs({
-      referenceJobId: serverJob?.id,
+      limit: RECOMMENDED_JOBS_LIMIT,
    })
 
    return (
@@ -170,6 +174,8 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const { term: queryTerm = "", jobId: queryJobId } = context.query
 
+   const token = getUserTokenFromCookie(context)
+
    const term = queryTerm as string
    const jobId = queryJobId as string
 
@@ -181,6 +187,11 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       context.query.businessFunctionTags
    )
    const queryJobTypes = getQueryStringArray(context.query.jobTypes)
+
+   const hasFilters =
+      queryLocations.length ||
+      queryBusinessFunctionTags.length ||
+      queryJobTypes.length
 
    const filterOptions = {
       arrayFilters: {
@@ -209,7 +220,23 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       .map(deserializeAlgoliaSearchResponse)
       .map((job) => job as CustomJob)
 
-   const firstCustomJob = algoliaCustomJobs?.at(0)
+   let userAuthId = null
+   if (token?.email && !hasFilters) {
+      const userData = await userRepo.getUserDataById(token?.email)
+      userAuthId = userData?.authId
+   }
+
+   const recommendedJobs = !hasFilters
+      ? await customJobServiceInstance.getRecommendedJobs(
+           RECOMMENDED_JOBS_LIMIT,
+           userAuthId,
+           false
+        )
+      : []
+
+   const firstCustomJob = hasFilters
+      ? algoliaCustomJobs?.at(0)
+      : recommendedJobs?.at(0)
 
    const customJob = jobId
       ? await customJobRepo.getCustomJobById(jobId)
