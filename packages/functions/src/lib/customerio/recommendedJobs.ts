@@ -1,11 +1,18 @@
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { logger } from "firebase-functions/v2"
 import { onRequest } from "firebase-functions/v2/https"
-import { userRepo } from "../../api/repositories"
+import {
+   customJobRepo,
+   livestreamsRepo,
+   userRepo,
+} from "../../api/repositories"
 import {
    customerIOWebhookSignatureMiddleware,
-   warmingMiddleware,
    withMiddlewares,
 } from "../../middlewares-gen2/onRequest"
+import { CustomJobRecommendationService } from "../recommendation/CustomJobRecommendationService"
+import { CustomJobDataFetcher } from "../recommendation/services/DataFetcherRecommendations"
+import functions = require("firebase-functions")
 
 /**
  * Type definition for the request body from Customer.io
@@ -27,17 +34,15 @@ type CustomerIORecommendedJobsWebhookData = {
    jobBusinessFunctionTags: string[]
 }
 
+const LIMIT = 3
+
 /**
  * Webhook endpoint for Customer.io to get recommended Jobs for a user.
- * This endpoint will be called by Customer.io during their onboarding journey.
+ * This endpoint will be called by Customer.io.
  */
 export const customerIORecommendedJobsWebhook = onRequest(
-   {
-      concurrency: 20,
-   },
    withMiddlewares(
       [
-         warmingMiddleware,
          customerIOWebhookSignatureMiddleware(
             process.env.CUSTOMERIO_WEBHOOK_SIGNING_KEY
          ),
@@ -71,10 +76,40 @@ export const customerIORecommendedJobsWebhook = onRequest(
                return
             }
 
-            const recommendedJobs: CustomerIORecommendedJobsWebhookData[] = []
+            const dataFetcher = new CustomJobDataFetcher(
+               userAuthId,
+               null,
+               userRepo,
+               customJobRepo,
+               livestreamsRepo
+            )
+
+            const recommendationService =
+               await CustomJobRecommendationService.create(
+                  dataFetcher,
+                  functions.logger
+               )
+            const jobIds = await recommendationService.getRecommendations(LIMIT)
+
+            const jobs = await customJobRepo.getCustomJobByIds(jobIds)
+
+            const recommendedJobs: CustomerIORecommendedJobsWebhookData[] =
+               jobs.map((job) => ({
+                  id: job.id,
+                  url: job.postingUrl,
+                  title: job.title,
+                  company: job.group?.universityName,
+                  jobType: job.jobType,
+                  jobLocation: job.jobLocation?.map(
+                     (location) => location.name
+                  ),
+                  jobBusinessFunctionTags: job.businessFunctionsTagIds.map(
+                     (tagId) => TagValuesLookup[tagId]
+                  ),
+               }))
 
             response.status(200).json({
-               jobs: recommendedJobs.slice(0, 3),
+               jobs: recommendedJobs,
             })
          } catch (error) {
             logger.error("Error processing recommended Jobs webhook", error)
