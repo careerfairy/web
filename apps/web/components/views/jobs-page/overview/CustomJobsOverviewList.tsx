@@ -3,15 +3,15 @@ import { useEffect, useMemo, useRef } from "react"
 
 import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { useUserRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
+import CircularLoader from "components/views/loader/CircularLoader"
 import { RECOMMENDED_JOBS_LIMIT } from "pages/jobs/[[...livestreamDialog]]"
 import { sxStyles } from "types/commonTypes"
 import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 import { CustomJobsList } from "./CustomJobsList"
-import { AnonymousRecommendedJobs } from "./recommendation/AnonymousRecommendedJobs"
-import { AuthedRecommendedJobs } from "./recommendation/AuthedRecommendedJobs"
 import { NoResultsFound } from "./search/SearchResultsCount"
 
 const styles = sxStyles({
@@ -111,23 +111,17 @@ const OtherJobs = () => {
 }
 
 const RecommendedJobs = () => {
-   const { authenticatedUser } = useAuth()
+   const { isLoadingAuth, authenticatedUser } = useAuth()
 
-   if (!authenticatedUser?.email)
-      return (
-         <AnonymousRecommendedJobs
-            limit={RECOMMENDED_JOBS_LIMIT}
-            forceFetch
-            bypassCache
-         />
-      )
+   const { jobs: recommendedJobs, loading: isLoadingRecommendedJobs } =
+      useUserRecommendedJobs({
+         userAuthId: authenticatedUser?.uid,
+         limit: RECOMMENDED_JOBS_LIMIT,
+         bypassCache: true,
+      })
 
-   return (
-      <AuthedRecommendedJobs
-         userAuthId={authenticatedUser.uid}
-         limit={RECOMMENDED_JOBS_LIMIT}
-         forceFetch
-         bypassCache
-      />
-   )
+   if (isLoadingRecommendedJobs || isLoadingAuth)
+      return <CircularLoader sx={{ mt: 2 }} />
+
+   return <CustomJobsList customJobs={recommendedJobs} />
 }
