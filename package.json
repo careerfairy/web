@@ -2,6 +2,7 @@
    "name": "careerfairy-monorepo",
    "version": "0.0.0",
    "private": true,
+   "description": "CareerFairy monorepo - Test PR change",
    "workspaces": [
       "apps/*",
       "packages/*"
