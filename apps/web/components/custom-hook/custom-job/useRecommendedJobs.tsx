@@ -15,6 +15,7 @@ type Config = {
 }
 
 export const useUserRecommendedJobs = (config?: Config) => {
+   const { isLoadingAuth } = useAuth()
    const {
       limit = 10,
       suspense = false,
@@ -25,13 +26,15 @@ export const useUserRecommendedJobs = (config?: Config) => {
    } = config || {}
 
    const { data: jobs, isLoading } = useSWR<CustomJob[]>(
-      [
-         "getRecommendedJobs",
-         limit,
-         ...(userAuthId ? [`userAuthId=${userAuthId}`] : []),
-         ...(bypassCache ? [`bypassCache=${bypassCache}`] : []),
-         ...(referenceJobId ? [`referenceJobId=${referenceJobId}`] : []),
-      ],
+      !isLoadingAuth
+         ? [
+              "getRecommendedJobs",
+              limit,
+              ...(userAuthId ? [`userAuthId=${userAuthId}`] : []),
+              ...(bypassCache ? [`bypassCache=${bypassCache}`] : []),
+              ...(referenceJobId ? [`referenceJobId=${referenceJobId}`] : []),
+           ]
+         : null,
       async () =>
          customJobServiceInstance.getRecommendedJobs(
             limit,
