@@ -191,7 +191,8 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const hasFilters =
       queryLocations.length ||
       queryBusinessFunctionTags.length ||
-      queryJobTypes.length
+      queryJobTypes.length ||
+      term?.length
 
    const filterOptions = {
       arrayFilters: {
