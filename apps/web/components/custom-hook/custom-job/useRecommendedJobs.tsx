@@ -3,7 +3,6 @@ import { useAuth } from "HOCs/AuthProvider"
 import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { useEffect, useMemo } from "react"
 import useSWR, { preload } from "swr"
-import { v4 as uuidv4 } from "uuid"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 type Config = {
@@ -12,91 +11,38 @@ type Config = {
    bypassCache?: boolean
    referenceJobId?: string
    initialData?: CustomJob[]
-   forceFetch?: boolean
+   userAuthId?: string
 }
 
-export const useUserRecommendedJobs = (
-   config?: Config & { userAuthId: string }
-) => {
+export const useUserRecommendedJobs = (config?: Config) => {
    const {
       limit = 10,
       suspense = false,
-      forceFetch = false,
       userAuthId,
+      bypassCache = false,
+      referenceJobId,
+      initialData,
    } = config || {}
 
-   const key = useMemo(() => {
-      if (!userAuthId) return null
-
-      return [
+   const { data: jobs, isLoading } = useSWR<CustomJob[]>(
+      [
          "getRecommendedJobs",
          limit,
-         userAuthId,
-         ...(config?.bypassCache ? [`bypassCache=${config?.bypassCache}`] : []),
-         ...(config?.referenceJobId
-            ? [`referenceJobId=${config?.referenceJobId}`]
-            : []),
-         ...(forceFetch ? [`forceFetchUid=${uuidv4()}`] : []),
-      ]
-   }, [
-      limit,
-      userAuthId,
-      config?.bypassCache,
-      config?.referenceJobId,
-      forceFetch,
-   ])
-   const { data: jobs, isLoading } = useSWR<CustomJob[]>(
-      key,
+         ...(userAuthId ? [`userAuthId=${userAuthId}`] : []),
+         ...(bypassCache ? [`bypassCache=${bypassCache}`] : []),
+         ...(referenceJobId ? [`referenceJobId=${referenceJobId}`] : []),
+      ],
       async () =>
          customJobServiceInstance.getRecommendedJobs(
             limit,
             userAuthId,
-            config?.bypassCache,
-            config?.referenceJobId
+            bypassCache,
+            referenceJobId
          ),
       {
          ...reducedRemoteCallsOptions,
          suspense,
-         fallbackData: config?.initialData,
-      }
-   )
-
-   return useMemo(
-      () => ({
-         jobs,
-         loading: isLoading,
-      }),
-      [jobs, isLoading]
-   )
-}
-
-export const useAnonymousRecommendedJobs = (config?: Config) => {
-   const { limit = 10, suspense = false, forceFetch = false } = config || {}
-
-   const key = useMemo(() => {
-      return [
-         "getRecommendedJobs-anonymous",
-         limit,
-         ...(config?.bypassCache ? [`bypassCache=${config?.bypassCache}`] : []),
-         ...(config?.referenceJobId
-            ? [`referenceJobId=${config?.referenceJobId}`]
-            : []),
-         ...(forceFetch ? [`forceFetchUid=${uuidv4()}`] : []),
-      ]
-   }, [limit, config?.bypassCache, config?.referenceJobId, forceFetch])
-   const { data: jobs, isLoading } = useSWR<CustomJob[]>(
-      key,
-      async () =>
-         customJobServiceInstance.getRecommendedJobs(
-            limit,
-            null,
-            config?.bypassCache,
-            config?.referenceJobId
-         ),
-      {
-         ...reducedRemoteCallsOptions,
-         suspense,
-         fallbackData: config?.initialData,
+         fallbackData: initialData,
       }
    )
 
