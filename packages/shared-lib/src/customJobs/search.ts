@@ -7,7 +7,9 @@ import { CustomJob } from "./customJobs"
 export type TransformedCustomJob = CustomJob & {
    locationNameTags?: string[]
    locationIdTags?: string[]
+   normalizedLocationIds?: string[]
    normalizedJobType?: string
+   deadlineAtMs?: number
 }
 
 export const CUSTOM_JOB_FIELDS_TO_INDEX = [
@@ -34,6 +36,8 @@ export const CUSTOM_JOB_FIELDS_TO_INDEX = [
    "locationNameTags",
    "locationIdTags",
    "normalizedJobType",
+   "deadlineAtMs",
+   "normalizedLocationIds",
 ] satisfies (keyof TransformedCustomJob)[]
 
 export type CustomJobFieldToIndexType =
@@ -48,13 +52,14 @@ export const CUSTOM_JOB_SEARCHABLE_ATTRIBUTES = [
    "id",
    "title",
    "group",
-   "description", // We might not want to index this field, as it might bring noise to the search results
    "jobLocation",
    "locationNameTags",
    "businessFunctionsTagIds",
    "jobType",
+   "description", // We might not want to index this field, as it might bring noise to the search results
    "normalizedJobType",
    "workplace",
+   "normalizedLocationIds",
 ] satisfies CustomJobFieldToIndexType[]
 
 /**
@@ -74,13 +79,17 @@ export const CUSTOM_JOB_FILTERING_FIELDS = [
    "published",
    "isPermanentlyExpired",
    "deleted",
+   "normalizedLocationIds",
 ] satisfies CustomJobFieldToIndexType[]
 
 type FilterFieldType = (typeof CUSTOM_JOB_FILTERING_FIELDS)[number]
 
 export type ArrayFilterFieldType = Extract<
    FilterFieldType,
-   "locationIdTags" | "businessFunctionsTagIds" | "normalizedJobType"
+   | "locationIdTags"
+   | "businessFunctionsTagIds"
+   | "normalizedJobType"
+   | "normalizedLocationIds"
 > &
    "objectID"
 
@@ -90,7 +99,7 @@ export type BooleanFilterFieldType = Extract<
 >
 
 export const CUSTOM_JOB_REPLICAS = {
-   TITLE_ASC: "customJobs_title_asc",
+   DEADLINE_DESC: "customJobs_deadlineAtMs_desc",
 } as const
 
 export type CustomJobReplicaType =
