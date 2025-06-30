@@ -15,18 +15,23 @@ type Config = {
    forceFetch?: boolean
 }
 
-const useRecommendedJobs = (config?: Config) => {
-   const { authenticatedUser } = useAuth()
-
-   const { limit = 10, suspense = false, forceFetch = false } = config || {}
+export const useUserRecommendedJobs = (
+   config?: Config & { userAuthId: string }
+) => {
+   const {
+      limit = 10,
+      suspense = false,
+      forceFetch = false,
+      userAuthId,
+   } = config || {}
 
    const key = useMemo(() => {
+      if (!userAuthId) return null
+
       return [
          "getRecommendedJobs",
          limit,
-         ...(authenticatedUser?.uid
-            ? [`uid=${authenticatedUser?.uid}`]
-            : [`uid=anonymous`]),
+         userAuthId,
          ...(config?.bypassCache ? [`bypassCache=${config?.bypassCache}`] : []),
          ...(config?.referenceJobId
             ? [`referenceJobId=${config?.referenceJobId}`]
@@ -35,18 +40,56 @@ const useRecommendedJobs = (config?: Config) => {
       ]
    }, [
       limit,
-      authenticatedUser?.uid,
+      userAuthId,
       config?.bypassCache,
       config?.referenceJobId,
       forceFetch,
    ])
-
    const { data: jobs, isLoading } = useSWR<CustomJob[]>(
       key,
       async () =>
          customJobServiceInstance.getRecommendedJobs(
             limit,
-            authenticatedUser?.uid,
+            userAuthId,
+            config?.bypassCache,
+            config?.referenceJobId
+         ),
+      {
+         ...reducedRemoteCallsOptions,
+         suspense,
+         fallbackData: config?.initialData,
+      }
+   )
+
+   return useMemo(
+      () => ({
+         jobs,
+         loading: isLoading,
+      }),
+      [jobs, isLoading]
+   )
+}
+
+export const useAnonymousRecommendedJobs = (config?: Config) => {
+   const { limit = 10, suspense = false, forceFetch = false } = config || {}
+
+   const key = useMemo(() => {
+      return [
+         "getRecommendedJobs-anonymous",
+         limit,
+         ...(config?.bypassCache ? [`bypassCache=${config?.bypassCache}`] : []),
+         ...(config?.referenceJobId
+            ? [`referenceJobId=${config?.referenceJobId}`]
+            : []),
+         ...(forceFetch ? [`forceFetchUid=${uuidv4()}`] : []),
+      ]
+   }, [limit, config?.bypassCache, config?.referenceJobId, forceFetch])
+   const { data: jobs, isLoading } = useSWR<CustomJob[]>(
+      key,
+      async () =>
+         customJobServiceInstance.getRecommendedJobs(
+            limit,
+            null,
             config?.bypassCache,
             config?.referenceJobId
          ),
@@ -77,33 +120,26 @@ type PreFetchConfig = {
  * */
 export const usePreFetchRecommendedJobs = (config?: PreFetchConfig) => {
    const limit = config?.limit || 10
-   const { authenticatedUser } = useAuth()
-
-   const key = useMemo(() => {
-      return [
-         "getRecommendedJobs",
-         limit,
-         ...(authenticatedUser?.uid
-            ? [`uid=${authenticatedUser?.uid}`]
-            : [`uid=anonymous`]),
-         ...(config?.referenceJobId
-            ? [`referenceJobId=${config?.referenceJobId}`]
-            : []),
-      ]
-   }, [limit, authenticatedUser?.uid, config?.referenceJobId])
+   const { authenticatedUser, isLoggedIn } = useAuth()
 
    useEffect(() => {
-      preload(key, () =>
-         customJobServiceInstance.getRecommendedJobs(
+      preload(
+         [
+            "getRecommendedJobs",
             limit,
-            authenticatedUser?.uid,
-            false,
-            config?.referenceJobId
-         )
+            ...(authenticatedUser?.uid
+               ? [`uid=${authenticatedUser?.uid}`]
+               : []),
+         ],
+         () =>
+            customJobServiceInstance.getRecommendedJobs(
+               limit,
+               authenticatedUser?.uid,
+               false,
+               config?.referenceJobId
+            )
       )
-   }, [key, limit, authenticatedUser?.uid, config?.referenceJobId])
+   }, [limit, isLoggedIn, authenticatedUser?.uid, config?.referenceJobId])
 
    return null
 }
-
-export default useRecommendedJobs
