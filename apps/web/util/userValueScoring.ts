@@ -1,4 +1,5 @@
 import { UserData } from "@careerfairy/shared-lib/users"
+import { MobileUtils } from "./mobile.utils"
 
 //=============================================================================
 // SCORING WEIGHTS
@@ -127,6 +128,11 @@ const VALUE_WEIGHTS = {
    isLookingForJob: 30, // Job seeking status
    isSubscribed: 20, // Email engagement
    hasLinkedin: 20, // LinkedIn profile presence
+
+   //-------------------------------------------------------------------------
+   // Platform & Engagement
+   //-------------------------------------------------------------------------
+   isMobileAppUser: 20, // Mobile app user engagement
 }
 
 //=============================================================================
@@ -144,6 +150,7 @@ const MAX_SCORES = {
    EMAIL_SUBSCRIPTION: VALUE_WEIGHTS.isSubscribed,
    LINKEDIN: VALUE_WEIGHTS.hasLinkedin,
    CURRENT_REGION: Math.max(...Object.values(VALUE_WEIGHTS.currentRegion)),
+   MOBILE_APP_USER: VALUE_WEIGHTS.isMobileAppUser,
 } as const
 
 //=============================================================================
@@ -224,6 +231,12 @@ export const calculateUserValue = (
    // LinkedIn profile
    totalScore += userData.linkedinUrl ? VALUE_WEIGHTS.hasLinkedin : 0
    maxPossibleScore += MAX_SCORES.LINKEDIN
+
+   // Mobile app user engagement
+   totalScore += MobileUtils.webViewPresence()
+      ? VALUE_WEIGHTS.isMobileAppUser
+      : 0
+   maxPossibleScore += MAX_SCORES.MOBILE_APP_USER
 
    // Convert to 0-100 scale
    return Math.round((totalScore / maxPossibleScore) * 100)

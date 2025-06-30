@@ -339,8 +339,10 @@ const WebViewComponent = ({
 
    const handleIdentifyCustomer = async (data: IDENTIFY_CUSTOMER) => {
       try {
-         await customerIO.identifyCustomer(data.userAuthId)
-         await branchTracking.identifyUser(data.userAuthId).catch(console.error)
+         await Promise.allSettled([
+            customerIO.identifyCustomer(data.userAuthId),
+            branchTracking.identifyUser(data.userAuthId),
+         ])
       } catch (error) {
          console.error(`Failed to identify customer: ${error}`)
       }
@@ -348,7 +350,10 @@ const WebViewComponent = ({
 
    const handleTrackEvent = async (data: TRACK_EVENT) => {
       try {
-         await customerIO.trackEvent(data.eventName, data.properties)
+         await Promise.allSettled([
+            customerIO.trackEvent(data.eventName, data.properties),
+            branchTracking.trackEvent(data.eventName, data.properties),
+         ])
       } catch (error) {
          console.error(`Failed to track event: ${error}`)
       }
