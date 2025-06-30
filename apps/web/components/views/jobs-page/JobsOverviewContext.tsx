@@ -1,3 +1,4 @@
+import { normalizeLocationIdsForFiltering } from "@careerfairy/shared-lib/countries/types"
 import {
    CustomJob,
    CustomJobApplicationSource,
@@ -104,7 +105,9 @@ export const JobsOverviewContextProvider = ({
    const filterOptions = useMemo<FilterOptions>(
       () => ({
          arrayFilters: {
-            locationIdTags: searchParams.location,
+            normalizedLocationIds: normalizeLocationIdsForFiltering(
+               searchParams.location
+            ),
             businessFunctionsTagIds: searchParams.businessFunctionTags,
             normalizedJobType: searchParams.jobTypes,
          },
@@ -116,8 +119,8 @@ export const JobsOverviewContextProvider = ({
       }),
       [
          searchParams.businessFunctionTags,
-         searchParams.location,
          searchParams.jobTypes,
+         searchParams.location,
       ]
    )
 
@@ -125,7 +128,7 @@ export const JobsOverviewContextProvider = ({
       searchParams.term,
       {
          filterOptions,
-         targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
+         targetReplica: CUSTOM_JOB_REPLICAS.DEADLINE_DESC,
          itemsPerPage: 10,
          initialData: serverCustomJobs,
       }
