@@ -10,7 +10,7 @@ import {
    serializePublicGroup,
 } from "../groups"
 import { imageKitLoader } from "../utils/video"
-import { Spark, SparkCategory, SparkVideo } from "./sparks"
+import { Spark, SparkCategory, SparkLanguage, SparkVideo } from "./sparks"
 
 interface SparkPresenterInterface
    extends Omit<
@@ -77,6 +77,7 @@ export class SparkPresenter implements SparkPresenterInterface {
    addedToFeedAt: Date
    published: boolean
    category: SparkCategory
+   language: SparkLanguage
    question: string
    video: SparkVideo
 
