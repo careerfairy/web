@@ -37,7 +37,7 @@ export const useGroupLivestreams = (
                query(
                   collection(firestore, "livestreams"),
                   where("groupIds", "array-contains", groupId),
-                  where("teasdasdst", "==", false),
+                  where("test", "==", false),
                   where(
                      "start",
                      ">",
@@ -86,14 +86,7 @@ export const useGroupLivestreams = (
             throw new Error(`Unknown stream type: ${type}`)
       }
 
-      return querySnapshot.docs.map((doc) => ({
-         id: doc.id,
-         rowId: doc.id,
-         rowID: doc.id,
-         date: doc.data().start?.toDate?.(),
-         ...doc.data(),
-         isDraft: type === "draft",
-      }))
+      return querySnapshot.docs.map((doc) => doc.data())
    }
 
    return useSWR<LivestreamEvent[]>(
