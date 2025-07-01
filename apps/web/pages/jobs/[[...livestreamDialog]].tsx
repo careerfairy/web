@@ -220,7 +220,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       term as string,
       filters,
       0,
-      CUSTOM_JOB_REPLICAS.DEADLINE_DESC,
+      CUSTOM_JOB_REPLICAS.DEADLINE_ASC,
       30
    )
 

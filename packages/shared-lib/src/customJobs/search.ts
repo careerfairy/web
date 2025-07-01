@@ -99,7 +99,7 @@ export type BooleanFilterFieldType = Extract<
 >
 
 export const CUSTOM_JOB_REPLICAS = {
-   DEADLINE_DESC: "customJobs_deadlineAtMs_desc",
+   DEADLINE_ASC: "customJobs_deadlineAtMs_asc",
 } as const
 
 export type CustomJobReplicaType =

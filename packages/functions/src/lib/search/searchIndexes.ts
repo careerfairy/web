@@ -135,7 +135,7 @@ const customJobsIndex = {
    settings: {
       attributesForFaceting: CUSTOM_JOB_FILTERING_FIELDS,
       searchableAttributes: CUSTOM_JOB_SEARCHABLE_ATTRIBUTES,
-      replicas: [CUSTOM_JOB_REPLICAS.DEADLINE_DESC],
+      replicas: [CUSTOM_JOB_REPLICAS.DEADLINE_ASC],
    },
 } satisfies Index<CustomJob, TransformedCustomJob>
 
