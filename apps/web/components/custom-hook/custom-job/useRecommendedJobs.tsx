@@ -12,6 +12,7 @@ type Config = {
    referenceJobId?: string
    initialData?: CustomJob[]
    userAuthId?: string
+   countryCode?: string
 }
 
 export const useUserRecommendedJobs = (config?: Config) => {
@@ -23,6 +24,7 @@ export const useUserRecommendedJobs = (config?: Config) => {
       bypassCache = false,
       referenceJobId,
       initialData,
+      countryCode,
    } = config || {}
 
    const { data: jobs, isLoading } = useSWR<CustomJob[]>(
@@ -33,6 +35,7 @@ export const useUserRecommendedJobs = (config?: Config) => {
               ...(userAuthId ? [`userAuthId=${userAuthId}`] : []),
               ...(bypassCache ? [`bypassCache=${bypassCache}`] : []),
               ...(referenceJobId ? [`referenceJobId=${referenceJobId}`] : []),
+              ...(countryCode ? [`countryCode=${countryCode}`] : []),
            ]
          : null,
       async () =>
@@ -40,7 +43,10 @@ export const useUserRecommendedJobs = (config?: Config) => {
             limit,
             userAuthId,
             bypassCache,
-            referenceJobId
+            {
+               referenceJobId,
+               userCountryCode: countryCode,
+            }
          ),
       {
          ...reducedRemoteCallsOptions,
@@ -58,37 +64,48 @@ export const useUserRecommendedJobs = (config?: Config) => {
    )
 }
 
-type PreFetchConfig = {
-   limit?: number
-   referenceJobId?: string
-   initialData?: CustomJob[]
-}
-
 /*
  * Hook to preload the recommended jobIds and store them in the SWR cache
  * */
-export const usePreFetchRecommendedJobs = (config?: PreFetchConfig) => {
+export const usePreFetchRecommendedJobs = (config?: Config) => {
    const limit = config?.limit || 10
-   const { authenticatedUser, isLoggedIn } = useAuth()
+   const { authenticatedUser, isLoadingAuth } = useAuth()
+   const { userAuthId, bypassCache, referenceJobId, countryCode } = config || {}
 
    useEffect(() => {
       preload(
-         [
-            "getRecommendedJobs",
-            limit,
-            ...(authenticatedUser?.uid
-               ? [`uid=${authenticatedUser?.uid}`]
-               : []),
-         ],
+         isLoadingAuth
+            ? [
+                 "getRecommendedJobs",
+                 limit,
+                 ...(userAuthId ? [`userAuthId=${userAuthId}`] : []),
+                 ...(bypassCache ? [`bypassCache=${bypassCache}`] : []),
+                 ...(referenceJobId
+                    ? [`referenceJobId=${referenceJobId}`]
+                    : []),
+                 ...(countryCode ? [`countryCode=${countryCode}`] : []),
+              ]
+            : null,
          () =>
             customJobServiceInstance.getRecommendedJobs(
                limit,
                authenticatedUser?.uid,
-               false,
-               config?.referenceJobId
+               bypassCache,
+               {
+                  referenceJobId,
+                  userCountryCode: countryCode,
+               }
             )
       )
-   }, [limit, isLoggedIn, authenticatedUser?.uid, config?.referenceJobId])
+   }, [
+      limit,
+      authenticatedUser?.uid,
+      referenceJobId,
+      isLoadingAuth,
+      userAuthId,
+      bypassCache,
+      countryCode,
+   ])
 
    return null
 }

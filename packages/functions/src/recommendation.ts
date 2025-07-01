@@ -92,6 +92,7 @@ export const getRecommendedJobs = onCall(
          limit: number().default(10).max(30),
          bypassCache: boolean().default(false),
          referenceJobId: string().optional().nullable(),
+         userCountryCode: string().optional().nullable(),
       }),
       cacheOnCallValues(
          "recommendedJobs",
@@ -101,13 +102,16 @@ export const getRecommendedJobs = onCall(
             }`,
             request.data.limit,
             request.data.referenceJobId,
+            request.data.userCountryCode,
          ],
          60 * 60 * 12, // 12 hours
          (request) => request.data.bypassCache === true
       ),
       async (request) => {
          try {
-            const countryCode = getCountryCode(request)
+            const countryCode =
+               request.data.userCountryCode || getCountryCode(request)
+            functions.logger.info("🚀 ~ countryCode:", countryCode)
 
             const dataFetcher = new CustomJobDataFetcher(
                request.data.userAuthId || null,

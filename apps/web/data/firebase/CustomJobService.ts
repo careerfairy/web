@@ -7,6 +7,10 @@ import { httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
 import HttpsCallableResult = firebase.functions.HttpsCallableResult
 
+type Options = {
+   referenceJobId?: string
+   userCountryCode?: string
+}
 export class CustomJobService {
    constructor(
       private readonly firebaseFunctions: firebase.functions.Functions
@@ -16,8 +20,9 @@ export class CustomJobService {
       limit: number,
       userAuthId: string,
       bypassCache: boolean = false,
-      referenceJobId?: string
+      options?: Options
    ): Promise<CustomJob[]> {
+      const { referenceJobId, userCountryCode } = options || {}
       const { data: jobIds } = await httpsCallable<
          GetRecommendedJobsFnArgs,
          string[]
@@ -29,6 +34,7 @@ export class CustomJobService {
          userAuthId,
          bypassCache,
          referenceJobId,
+         userCountryCode,
       })
 
       if (!jobIds?.length) return []
