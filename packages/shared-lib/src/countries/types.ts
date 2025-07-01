@@ -1,6 +1,7 @@
 import { ICity, ICountry, IState } from "country-state-city"
 import { removeDuplicates } from "../utils"
 
+const LOCATION_ID_SEPARATOR = "-"
 /**
  * This file contains functions to generate and manipulate location ids.
  *
@@ -25,11 +26,11 @@ export type CityOption = {
 }
 
 export const generateCityId = (city: ICity) => {
-   return `${city.countryCode}-${city.stateCode}-${city.name}`
+   return `${city.countryCode}${LOCATION_ID_SEPARATOR}${city.stateCode}${LOCATION_ID_SEPARATOR}${city.name}`
 }
 
 export const generateStateId = (state: IState) => {
-   return `${state.countryCode}-${state.isoCode}`
+   return `${state.countryCode}${LOCATION_ID_SEPARATOR}${state.isoCode}`
 }
 
 export const generateCountryId = (country: ICountry) => {
@@ -37,7 +38,7 @@ export const generateCountryId = (country: ICountry) => {
 }
 
 export const getLocationIds = (location: string) => {
-   const segments = location.split("-")
+   const segments = location.split(LOCATION_ID_SEPARATOR)
    return {
       countryIsoCode: segments?.at(0),
       stateIsoCode: segments?.at(1),
@@ -50,13 +51,15 @@ export const getLocationId = (
    stateIsoCode?: string,
    cityName?: string
 ) => {
-   return `${countryIsoCode}${stateIsoCode ? `-${stateIsoCode}` : ""}${
-      cityName ? `-${cityName}` : ""
-   }`
+   return `${countryIsoCode}${
+      stateIsoCode ? `${LOCATION_ID_SEPARATOR}${stateIsoCode}` : ""
+   }${cityName ? `${LOCATION_ID_SEPARATOR}${cityName}` : ""}`
 }
 
 export const getCityCodes = (generatedCityId: string) => {
-   const [countryCode, stateCode, cityName] = generatedCityId.split("-")
+   const [countryCode, stateCode, cityName] = generatedCityId.split(
+      LOCATION_ID_SEPARATOR
+   )
    return { countryCode, stateCode, cityName }
 }
 
@@ -71,12 +74,12 @@ export const inLocation = (
    location: string,
    otherLocationIds: string[]
 ): string[] => {
-   const locationSegments = location?.split("-") ?? []
+   const locationSegments = location?.split(LOCATION_ID_SEPARATOR) ?? []
    const locationDepth = locationSegments.length
 
    return (
       otherLocationIds?.filter((id) => {
-         const idSegments = id.split("-")
+         const idSegments = id.split(LOCATION_ID_SEPARATOR)
          // Must match at least as deep as the location's specificity
          if (idSegments.length < locationDepth) return false
          // For city-level, require exact match
@@ -121,15 +124,15 @@ export const normalizeLocationId = (locationId: string): string[] => {
 
    const combinations = []
    if (countryIsoCode) {
-      const countryId = `Country_${countryIsoCode}`
+      const countryId = getLocationId(countryIsoCode)
       combinations.push(countryId)
 
       if (stateIsoCode) {
-         const stateId = `${countryId}_State_${stateIsoCode}`
+         const stateId = getLocationId(countryIsoCode, stateIsoCode)
          combinations.push(stateId)
 
          if (cityName) {
-            const cityId = `${countryId}_State_${stateIsoCode}_City_${cityName}`
+            const cityId = getLocationId(countryIsoCode, stateIsoCode, cityName)
             combinations.push(cityId)
          }
       }
@@ -140,43 +143,4 @@ export const normalizeLocationId = (locationId: string): string[] => {
 
 export const normalizeLocationIds = (locationIds: string[]): string[] => {
    return removeDuplicates(locationIds?.map(normalizeLocationId)?.flat() ?? [])
-}
-
-/**
- * Returns the normalized location id for a given location id to be used as a filter value.
- *
- * Unlike the normalizeLocationId function, this function only returns the highest level of precision
- * and does not return all the possible location hierarchies.
- *
- * @param locationId - A location id (country, state, or city id)
- * @returns string - The normalized location id for the given location id
- */
-export const normalizeLocationIdForFiltering = (locationId: string): string => {
-   const { countryIsoCode, stateIsoCode, cityName } = getLocationIds(locationId)
-
-   let id = ""
-   if (countryIsoCode) {
-      const countryId = `Country_${countryIsoCode}`
-      id = countryId
-
-      if (stateIsoCode) {
-         const stateId = `${countryId}_State_${stateIsoCode}`
-         id = stateId
-
-         if (cityName) {
-            const cityId = `${stateId}_City_${cityName}`
-            id = cityId
-         }
-      }
-   }
-
-   return id
-}
-
-export const normalizeLocationIdsForFiltering = (
-   locationIds: string[]
-): string[] => {
-   return removeDuplicates(
-      locationIds?.map(normalizeLocationIdForFiltering) ?? []
-   )
 }
