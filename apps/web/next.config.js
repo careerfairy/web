@@ -305,6 +305,18 @@ const moduleExports = {
             destination: "/",
             permanent: false,
          },
+         {
+            source: "/group/:groupId/admin/events/:livestreamId",
+            destination:
+               "/group/:groupId/admin/content/live-streams/:livestreamId",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/content/live-streams/:livestreamId",
+            destination:
+               "/group/:groupId/admin/content/live-streams/:livestreamId",
+            permanent: false,
+         },
       ]
    },
 

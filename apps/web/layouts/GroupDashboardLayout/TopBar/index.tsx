@@ -7,7 +7,6 @@ import Stack from "@mui/material/Stack"
 
 // project imports
 import { LoadingButton } from "@mui/lab"
-import { alpha } from "@mui/material"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
 import { ReactNode } from "react"
@@ -25,8 +24,6 @@ const getStyles = (hasNavigationBar?: boolean) =>
          flexWrap: "wrap",
          flex: 1,
          alignItems: "center",
-         borderBottom: (theme) =>
-            `2px solid ${alpha(theme.palette.divider, 0.03)}`,
          px: {
             xs: 2,
             sm: 5,

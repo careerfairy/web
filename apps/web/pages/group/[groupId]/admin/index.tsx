@@ -10,10 +10,10 @@ const MainPage = () => {
 
    return (
       <GroupDashboardLayout
-         titleComponent={"Main Page"}
+         titleComponent={"Dashboard"}
          groupId={groupId as string}
       >
-         <DashboardHead title="CareerFairy | Main Page of" />
+         <DashboardHead title="CareerFairy | Dashboard of" />
 
          <MainPageContent />
       </GroupDashboardLayout>

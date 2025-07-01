@@ -73,7 +73,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    public assertMainPageHeader() {
-      return this.assertTextIsVisible("Main Page")
+      return this.assertTextIsVisible("Dashboard")
    }
 
    public async assertGroupDashboardIsOpen() {
@@ -155,7 +155,7 @@ export class GroupDashboardPage extends CommonPage {
    public async clickCreateNewLivestreamTop() {
       await this.page
          .getByRole("banner")
-         .getByRole("button", { name: "Create New Live Stream" })
+         .getByRole("button", { name: "Create" })
          .click()
    }
 

@@ -40,7 +40,7 @@ interface Props {
    isDraft: boolean
    group: Group
    publishingDraft: boolean
-   handlePublishStream: (stream: LivestreamEvent) => void
+   onPublishStream: (stream: LivestreamEvent) => void
    isPast: boolean
    setGroupsDictionary: React.Dispatch<
       React.SetStateAction<Record<string, Group>>
@@ -54,7 +54,7 @@ const EventsTable = ({
    isDraft,
    group,
    publishingDraft,
-   handlePublishStream,
+   onPublishStream,
    isPast,
    setGroupsDictionary,
    groupsDictionary,
@@ -239,7 +239,7 @@ const EventsTable = ({
                   : "Publish Stream",
                onClick: !rowData.status?.pendingApproval
                   ? () => handleEditStreamV2(group.groupId, rowData.id)
-                  : () => handlePublishStream(rowData),
+                  : () => onPublishStream(rowData),
                hidden: !isDraft,
                disabled: publishingDraft,
                hintTitle: "Publish Stream",
@@ -262,7 +262,7 @@ const EventsTable = ({
          handleEditStreamV2,
          handleOpenStreamerLinksModal,
          handleClickDeleteStream,
-         handlePublishStream,
+         onPublishStream,
       ]
    )
 

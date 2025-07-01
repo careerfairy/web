@@ -14,6 +14,7 @@ import {
 } from "components/views/common/icons"
 import { DashboardIcon } from "components/views/common/icons/DashboardIcon"
 import { JobsIcon } from "components/views/common/icons/JobsIcon"
+import { useRouter } from "next/router"
 import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
 import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
 import NavList from "../common/NavList"
@@ -30,6 +31,7 @@ const companyPagePathName = `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/page/[[...li
 
 const GroupNavList = () => {
    const { group, shrunkLeftMenuIsActive } = useGroup()
+   const { pathname } = useRouter()
 
    const featureFlags = useFeatureFlags()
 
@@ -55,8 +57,15 @@ const GroupNavList = () => {
             id: "content",
             title: "Content",
             Icon: ContentIcon,
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/events`,
-            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events`,
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/content/live-streams`,
+            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/live-streams`,
+            isStillActive:
+               pathname.startsWith(
+                  `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content`
+               ) &&
+               !pathname.startsWith(
+                  `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/live-streams/[livestreamId]`
+               ),
          },
 
          // 3. Jobs - Keep job section exactly as is (recently reworked in job hub V2)
@@ -88,10 +97,13 @@ const GroupNavList = () => {
          // 5. Analytics - Adjust navigation between analytics tabs
          {
             id: "analytics",
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics`,
-            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics`,
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-stream`,
+            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-stream`,
             Icon: AnalyticsIcon,
             title: "Analytics",
+            isStillActive: pathname.startsWith(
+               `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics`
+            ),
          },
 
          // 6. Company profile - Move existing company page with alert icon when publicProfile == false
@@ -121,7 +133,7 @@ const GroupNavList = () => {
          ...link,
          shrunk: shrunkLeftMenuIsActive,
       }))
-   }, [group, hasAtsIntegration, shrunkLeftMenuIsActive])
+   }, [group, hasAtsIntegration, shrunkLeftMenuIsActive, pathname])
 
    return <NavList links={navLinks} />
 }

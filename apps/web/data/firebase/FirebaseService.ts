@@ -1062,34 +1062,11 @@ class FirebaseService {
       return ref.onSnapshot(callback)
    }
 
-   listenToUpcomingLiveStreamsByGroupId = (groupId, callback) => {
-      const ninetyMinutesInMilliseconds = 1000 * 60 * 90
-      const ref = this.firestore
-         .collection("livestreams")
-         .where("groupIds", "array-contains", groupId)
-         .where("test", "==", false)
-         .where(
-            "start",
-            ">",
-            new Date(Date.now() - ninetyMinutesInMilliseconds)
-         )
-         .orderBy("start", "asc")
-      return ref.onSnapshot(callback)
-   }
-
    queryDraftLiveStreamsByGroupId = (groupId) => {
       return this.firestore
          .collection("draftLivestreams")
          .where("groupIds", "array-contains", groupId)
          .orderBy("start", "asc")
-   }
-
-   listenToDraftLiveStreamsByGroupId = (groupId, callback) => {
-      const ref = this.firestore
-         .collection("draftLivestreams")
-         .where("groupIds", "array-contains", groupId)
-         .orderBy("start", "asc")
-      return ref.onSnapshot(callback)
    }
 
    getPastLiveStreamsByGroupId = (groupId) => {
@@ -2635,34 +2612,6 @@ class FirebaseService {
          dataArray.push(data)
       })
       return dataArray
-   }
-
-   findTargetEvent = async (eventId) => {
-      let targetStream = null
-      let typeOfStream = ""
-      try {
-         const streamSnap = await this.firestore
-            .collection("livestreams")
-            .doc(eventId)
-            .get()
-         if (streamSnap.exists) {
-            targetStream = { id: streamSnap.id, ...streamSnap.data() }
-            const startDate = targetStream.start?.toDate?.()
-            typeOfStream = this.isPastEvent(startDate) ? "past" : "upcoming"
-         } else {
-            const draftSnap = await this.firestore
-               .collection("draftLivestreams")
-               .doc(eventId)
-               .get()
-            if (draftSnap.exists) {
-               targetStream = { id: draftSnap.id, ...draftSnap.data() }
-               typeOfStream = "draft"
-            }
-         }
-      } catch (e) {
-         /* empty */
-      }
-      return { targetStream, typeOfStream }
    }
 
    isPastEvent = (eventStartDate) => {

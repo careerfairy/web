@@ -13,7 +13,7 @@ export const ContentIcon = ({ fill, ...props }: SvgIconProps) => {
                viewBox="0 0 24 25"
                fill="none"
             >
-               <g clip-path="url(#clip0_20477_4070)">
+               <g clipPath="url(#clip0_20477_4070)">
                   <path
                      d="M12 2.03027C6.48 2.03027 2 6.51027 2 12.0303C2 17.5503 6.48 22.0303 12 22.0303C17.52 22.0303 22 17.5503 22 12.0303C22 6.51027 17.52 2.03027 12 2.03027ZM9.5 14.7003V9.36027C9.5 8.57027 10.38 8.09027 11.04 8.52027L15.19 11.1903C15.8 11.5803 15.8 12.4803 15.19 12.8703L11.04 15.5403C10.38 15.9703 9.5 15.4903 9.5 14.7003Z"
                      fill="currentColor"
@@ -44,11 +44,11 @@ export const ContentIcon = ({ fill, ...props }: SvgIconProps) => {
             viewBox="0 0 24 24"
             fill="none"
          >
-            <g clip-path="url(#clip0_20477_4045)">
+            <g clipPath="url(#clip0_20477_4045)">
                <path
                   d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM9.5 14.67V9.33C9.5 8.54 10.38 8.06 11.04 8.49L15.19 11.16C15.8 11.55 15.8 12.45 15.19 12.84L11.04 15.51C10.38 15.94 9.5 15.46 9.5 14.67Z"
                   stroke="currentColor"
-                  stroke-width="1.5"
+                  strokeWidth="1.5"
                />
             </g>
             <defs>

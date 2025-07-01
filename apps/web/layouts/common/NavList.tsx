@@ -111,6 +111,7 @@ export const NavLink = ({
    title,
    pathname,
    childLinks,
+   isStillActive,
    shrunk,
    external = false,
    baseTextColor,
@@ -128,7 +129,7 @@ export const NavLink = ({
       return childLinks.some((child) => child.pathname === routerPathname)
    }, [childLinks, isNavLinkGroup, routerPathname])
 
-   const isActivePath = pathname === routerPathname
+   const isActivePath = isStillActive || pathname === routerPathname
 
    const isOpen = childLinkActive || isActivePath
 

@@ -1,50 +1,36 @@
 import { Box, Tab, Tabs } from "@mui/material"
+import { styled } from "@mui/material/styles"
+import Link from "components/views/common/Link"
 import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
-import { sxStyles } from "../../types/commonTypes"
 import { INavLink } from "../types"
 import { useGroup } from "./index"
 
-const styles = sxStyles({
-   tabsWrapper: {
-      borderBottom: 1,
-      borderColor: (theme) => theme.brand.black[400],
-      mb: 3,
-      backgroundColor: "white",
-   },
-   tabs: {
-      display: "flex",
-      alignItems: "flex-start",
-      alignSelf: "stretch",
-      minHeight: 0,
-      ".Mui-selected": {
-         fontWeight: 600,
-      },
-   },
-   tab: {
-      display: "flex",
-      flexDirection: "row",
-      padding: "12px 24px",
-      justifyContent: "center",
-      alignItems: "center",
-      gap: "8px",
-      color: (theme) => theme.palette.neutral[500],
-      minHeight: 0,
-      textTransform: "none !important",
-      fontWeight: 400,
-      fontSize: "16px",
-   },
-   icon: {
-      width: "20px",
-      height: "20px",
-      mb: "0 !important",
+const StyledTabsWrapper = styled(Box)(({ theme }) => ({
+   marginBottom: theme.spacing(3),
+   borderBottom: `1px solid ${theme.palette.neutral[200]}`,
+}))
+
+const StyledTabs = styled(Tabs)({
+   display: "flex",
+   alignItems: "flex-start",
+   alignSelf: "stretch",
+   minHeight: 0,
+   "& .Mui-selected": {
+      fontWeight: 600,
    },
 })
 
-// Define which sections should show sub-navigation
-// const SECTIONS_WITH_SUB_NAV = ["content", "settings", "analytics"]
+// @ts-expect-error - textTransform is not a valid prop for Tab, bug with styled()
+const StyledTab = styled(Tab)<{ href: string }>(({ theme }) => ({
+   padding: "8px 32px 12px",
+   color: theme.palette.neutral[700],
+   fontWeight: 400,
+   fontSize: "16px",
+   textTransform: "none !important",
+}))
 
-const SubNavigationTabs = () => {
+export const SubNavigationTabs = () => {
    const { pathname, push } = useRouter()
    const { group } = useGroup()
 
@@ -60,20 +46,20 @@ const SubNavigationTabs = () => {
          {
             id: "content",
             title: "Content",
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/events`,
-            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events`,
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/content/live-streams`,
+            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/live-streams`,
             childLinks: [
                {
                   id: "live-streams",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/events`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events`,
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/content/live-streams`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/live-streams`,
                   title: "Live streams",
                },
                {
-                  id: "all-live-streams",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/events/all`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/events/all/[[...livestreamDialog]]`,
-                  title: "All live streams on CareerFairy",
+                  id: "sparks",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/content/sparks`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/sparks`,
+                  title: "Sparks",
                },
             ],
          },
@@ -100,32 +86,20 @@ const SubNavigationTabs = () => {
          // Analytics section
          {
             id: "analytics",
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics`,
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams`,
             title: "Analytics",
             childLinks: [
                {
-                  id: "general-analytics",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics`,
-                  title: "General",
-               },
-               {
                   id: "live-stream-analytics",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-stream`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-stream/[[...livestreamId]]`,
-                  title: "Live stream analytics",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-streams`,
+                  title: "Live stream",
                },
                {
-                  id: "registration-sources",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/registration-sources`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/registration-sources`,
-                  title: "Registration sources",
-               },
-               {
-                  id: "feedback",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/feedback`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/feedback/[[...feedback]]`,
-                  title: "Feedback",
+                  id: "sparks-analytics",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/sparks`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/sparks`,
+                  title: "Sparks",
                },
             ],
          },
@@ -142,12 +116,17 @@ const SubNavigationTabs = () => {
       return currentSection?.childLinks || []
    }, [navLinks, pathname])
 
-   const handleTabClick = useCallback(
-      (option: INavLink) => {
-         setTabValue(option.pathname)
-         void push(option.href)
+   const handleTabChange = useCallback(
+      (event: React.SyntheticEvent, newValue: string) => {
+         setTabValue(newValue)
+         const selectedTab = currentSectionTabs.find(
+            (tab) => tab.pathname === newValue
+         )
+         if (selectedTab) {
+            void push(selectedTab.href)
+         }
       },
-      [push]
+      [push, currentSectionTabs]
    )
 
    // Only show sub-navigation if we have tabs and we're in a supported section
@@ -156,22 +135,26 @@ const SubNavigationTabs = () => {
    }
 
    return (
-      <Box sx={styles.tabsWrapper}>
-         <Tabs value={tabValue} sx={styles.tabs}>
+      <StyledTabsWrapper>
+         <StyledTabs
+            textColor="secondary"
+            indicatorColor="secondary"
+            value={tabValue}
+            onChange={handleTabChange}
+         >
             {currentSectionTabs.map((tab) => {
                return (
-                  <Tab
+                  <StyledTab
+                     LinkComponent={Link}
                      key={tab.id}
                      label={tab.title}
                      value={tab.pathname}
-                     onClick={() => handleTabClick(tab)}
-                     sx={styles.tab}
+                     // @ts-expect-error - href is not a valid prop for Tab, bug with styled()
+                     href={tab.href}
                   />
                )
             })}
-         </Tabs>
-      </Box>
+         </StyledTabs>
+      </StyledTabsWrapper>
    )
 }
-
-export default SubNavigationTabs

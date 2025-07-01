@@ -1,6 +1,6 @@
-import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
-import EventsOverview from "../../../../../components/views/group/admin/events"
+import { EventsOverview } from "../../../../../../components/views/group/admin/events"
+import GroupDashboardLayout from "../../../../../../layouts/GroupDashboardLayout"
+import DashboardHead from "../../../../../../layouts/GroupDashboardLayout/DashboardHead"
 
 const EventsPage = ({ groupId }) => {
    return (

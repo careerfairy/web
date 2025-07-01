@@ -43,6 +43,7 @@ import {
    UserLivestreamData,
    hasUpvotedLivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
+import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import {
    HandRaise,
    HandRaiseState,
@@ -52,6 +53,7 @@ import { getSecondsPassedFromYoutubeUrl } from "components/util/reactPlayer"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { STREAM_IDENTIFIERS, StreamIdentifier } from "constants/streaming"
 import { groupRepo } from "data/RepositoryInstances"
+import { START_DATE_FOR_REPORTED_EVENTS } from "data/constants/streamContants"
 import GroupsUtil from "data/util/GroupsUtil"
 import {
    DocumentReference,
@@ -1436,6 +1438,64 @@ export class LivestreamService {
             { merge: true }
          )
       })
+   }
+
+   /**
+    * Finds a target event by ID, searching in both livestreams and draft livestreams collections
+    * @param eventId - The ID of the event to find
+    * @returns Promise containing the target stream and its type (past, upcoming, or draft)
+    */
+   async findTargetEvent(eventId: string): Promise<{
+      targetStream: LivestreamEvent | null
+      typeOfStream: "past" | "upcoming" | "draft"
+   }> {
+      let targetStream: LivestreamEvent | null = null
+      let typeOfStream: "past" | "upcoming" | "draft" = "upcoming"
+
+      try {
+         // First, try to find the event in the livestreams collection
+         const livestreamRef = this.getLivestreamRef(eventId)
+         const streamSnap = await getDoc(livestreamRef)
+
+         if (streamSnap.exists()) {
+            targetStream = streamSnap.data()
+            const startDate = targetStream.start?.toDate?.()
+            typeOfStream = this.isPastEvent(startDate) ? "past" : "upcoming"
+         } else {
+            // If not found in livestreams, try draftLivestreams collection
+            const draftRef = doc(
+               FirestoreInstance,
+               "draftLivestreams",
+               eventId
+            ).withConverter(createGenericConverter<LivestreamEvent>())
+
+            const draftSnap = await getDoc(draftRef)
+
+            if (draftSnap.exists()) {
+               targetStream = draftSnap.data()
+               typeOfStream = "draft"
+            }
+         }
+      } catch (error) {
+         console.error("Error finding target event:", error)
+      }
+
+      return { targetStream, typeOfStream }
+   }
+
+   /**
+    * Determines if an event is in the past based on its start date
+    * @param eventStartDate - The start date of the event
+    * @returns True if the event is in the past, false otherwise
+    */
+   private isPastEvent(eventStartDate: Date): boolean {
+      if (!eventStartDate) return false
+
+      return (
+         eventStartDate <
+            new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS) &&
+         eventStartDate > new Date(START_DATE_FOR_REPORTED_EVENTS)
+      )
    }
 }
 
