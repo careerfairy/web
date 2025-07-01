@@ -128,7 +128,7 @@ export const JobsOverviewContextProvider = ({
       searchParams.term,
       {
          filterOptions,
-         targetReplica: CUSTOM_JOB_REPLICAS.DEADLINE_DESC,
+         targetReplica: CUSTOM_JOB_REPLICAS.DEADLINE_ASC,
          itemsPerPage: 10,
          initialData: serverCustomJobs,
       }
