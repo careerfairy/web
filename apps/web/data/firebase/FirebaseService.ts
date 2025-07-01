@@ -636,7 +636,7 @@ class FirebaseService {
       livestream: LivestreamEvent,
       collection: "livestreams" | "draftLivestreams",
       author: AuthorInfo,
-      promotion,
+      promotion?: LivestreamPromotions,
       newRatings?: EventRating[]
    ) => {
       try {

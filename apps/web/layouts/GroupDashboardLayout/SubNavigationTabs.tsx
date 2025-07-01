@@ -7,7 +7,6 @@ import { INavLink } from "../types"
 import { useGroup } from "./index"
 
 const StyledTabsWrapper = styled(Box)(({ theme }) => ({
-   marginBottom: theme.spacing(3),
    borderBottom: `1px solid ${theme.palette.neutral[200]}`,
 }))
 

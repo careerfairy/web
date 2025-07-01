@@ -20,7 +20,10 @@ import { errorLogAndNotify } from "util/CommonUtil"
 
 type StreamType = "upcoming" | "past" | "draft"
 
-export const useGroupLivestreams = (groupId: string, type: StreamType) => {
+export const useGroupLivestreams = (
+   groupId: string,
+   type: StreamType = "upcoming"
+) => {
    const firestore = useFirestore()
 
    const fetchStreams = async (): Promise<LivestreamEvent[]> => {

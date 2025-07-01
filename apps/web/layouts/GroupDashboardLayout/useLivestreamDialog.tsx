@@ -3,6 +3,7 @@ import {
    AuthorInfo,
    EventRating,
    LivestreamEvent,
+   LivestreamPromotions,
 } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -65,7 +66,7 @@ export const useLivestreamDialog = (group: Group) => {
    const handlePublishStream = useCallback(
       async (
          streamObj: LivestreamEvent,
-         promotion?: boolean,
+         promotion?: LivestreamPromotions,
          ratings?: EventRating[]
       ) => {
          try {
@@ -95,7 +96,7 @@ export const useLivestreamDialog = (group: Group) => {
 
             await deleteLivestream(streamObj.id, "draftLivestreams")
             await replace(
-               `/group/${group.id}/admin/events?eventId=${publishedStreamId}`
+               `/group/${group.id}/admin/content/live-streams?eventId=${publishedStreamId}`
             )
          } catch (e) {
             setIsPublishing(false)

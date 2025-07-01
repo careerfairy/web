@@ -10,6 +10,7 @@ import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
 import { CircularProgress, Typography } from "@mui/material"
 import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import useTraceUpdate from "components/custom-hook/utils/useTraceUpdate"
 import { useRouter } from "next/router"
 import React, {
    createContext,
@@ -185,6 +186,12 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          }
       }
    }, [groupId, group?.id])
+
+   useTraceUpdate({
+      creatorsLength: creators?.length,
+      featureFlags,
+      group,
+   })
 
    const groupPresenter = useMemo(() => {
       if (!group) return null

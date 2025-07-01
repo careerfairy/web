@@ -43,6 +43,13 @@ export function useLivestreamCsvData({
    // Dictionary of loading states for each stream
    const [loadingData, setLoadingData] = useState<Record<string, boolean>>({})
 
+   // useTraceUpdate({
+   //    targetStream,
+   //    groupQuestions,
+   //    userType,
+   //    group,
+   //    groupPresenter,
+   // })
    useEffect(() => {
       if (targetStream) {
          const fetchUsers = async () => {

@@ -1,7 +1,9 @@
 import { Box, CircularProgress } from "@mui/material"
+import { BrandedTabs } from "components/views/common/BrandedTabs"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useRouter } from "next/router"
-import { Fragment, useEffect, useMemo, useState } from "react"
+import { Fragment, SyntheticEvent, useEffect, useMemo, useState } from "react"
+import { useLatest } from "react-use"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
@@ -12,19 +14,19 @@ import EventsTable from "./events-table/EventsTable"
 export const EventsOverview = () => {
    const { group, livestreamDialog } = useGroup()
 
-   const [tabValue, setTabValue] = useState<"upcoming" | "past" | "draft">(
-      "upcoming"
-   )
-
    const [triggered, setTriggered] = useState(false)
    const [groupsDictionary, setGroupsDictionary] = useState({})
+   const router = useRouter()
    const {
-      query: { eventId },
-   } = useRouter()
+      query: { eventId, tab },
+   } = router
+
+   // Get tab value from query params, default to "upcoming"
+   const tabValue = (tab as "upcoming" | "past" | "draft") || "upcoming"
+   const latestTabValue = useLatest(tabValue)
 
    // Use a single hook call for the current tab
    const currentStreams = useGroupLivestreams(group?.id, tabValue)
-   console.log("🚀 ~ EventsOverview ~ currentStreams:", currentStreams)
 
    // Process streams data with eventId repositioning
    const streams = useMemo(() => {
@@ -61,10 +63,22 @@ export const EventsOverview = () => {
 
    // Set tab value when target event data is available
    useEffect(() => {
-      if (targetEventData?.typeOfStream && targetEventData?.targetStream) {
-         setTabValue(targetEventData.typeOfStream)
+      if (
+         !triggered &&
+         targetEventData?.typeOfStream &&
+         targetEventData.typeOfStream !== latestTabValue.current
+      ) {
+         router.push(
+            {
+               pathname: router.pathname,
+               query: { ...router.query, tab: targetEventData.typeOfStream },
+            },
+            undefined,
+            { shallow: true }
+         )
+         setTriggered(true)
       }
-   }, [targetEventData])
+   }, [targetEventData, router, triggered, latestTabValue])
 
    // Handle fallback to past tab if upcoming is empty
    useEffect(() => {
@@ -74,20 +88,47 @@ export const EventsOverview = () => {
          currentStreams.data?.length === 0 &&
          !triggered
       ) {
-         setTabValue("past")
+         router.push(
+            {
+               pathname: router.pathname,
+               query: { ...router.query, tab: "past" },
+            },
+            undefined,
+            { shallow: true }
+         )
          setTriggered(true)
       }
-   }, [tabValue, currentStreams.isLoading, currentStreams.data, triggered])
+   }, [
+      tabValue,
+      currentStreams.isLoading,
+      currentStreams.data,
+      triggered,
+      router,
+   ])
 
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   const handleChange = (event, newValue) => {
-      setTabValue(newValue)
+   const handleChange = (
+      _: SyntheticEvent,
+      newValue: "upcoming" | "past" | "draft"
+   ) => {
+      router.push(
+         {
+            pathname: router.pathname,
+            query: { ...router.query, tab: newValue },
+         },
+         undefined,
+         { shallow: true }
+      )
    }
 
    const isLoading = currentStreams.isLoading
 
    return (
       <Fragment>
+         <BrandedTabs mt={1.5} activeValue={tabValue} onChange={handleChange}>
+            <BrandedTabs.Tab label="Upcoming" value="upcoming" />
+            <BrandedTabs.Tab label="Past" value="past" />
+            <BrandedTabs.Tab label="Draft" value="draft" />
+         </BrandedTabs>
          <Box p={3}>
             {isLoading ? (
                <Box

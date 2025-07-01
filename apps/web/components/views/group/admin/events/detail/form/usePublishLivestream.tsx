@@ -56,7 +56,11 @@ export const usePublishLivestream = () => {
             mapFeedbackQuestionToRatings(question, livestreamObject.duration)
          )
 
-      return handlePublishStream(livestreamObject, {}, ratings)
+      return handlePublishStream(
+         livestreamObject as LivestreamEvent,
+         {},
+         ratings
+      )
    }, [
       allFieldsOfStudy,
       enqueueSnackbar,
