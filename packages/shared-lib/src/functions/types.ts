@@ -14,4 +14,5 @@ export type GetRecommendedJobsFnArgs = {
    bypassCache?: boolean
    referenceJobId?: string
    userAuthId?: string
+   userCountryCode?: string
 }

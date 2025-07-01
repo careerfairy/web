@@ -5,6 +5,7 @@ import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useUserRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import CircularLoader from "components/views/loader/CircularLoader"
 import { RECOMMENDED_JOBS_LIMIT } from "pages/jobs/[[...livestreamDialog]]"
@@ -112,12 +113,12 @@ const OtherJobs = () => {
 
 const RecommendedJobs = () => {
    const { isLoadingAuth, authenticatedUser } = useAuth()
-
+   const { userCountryCode } = useUserCountryCode()
    const { jobs: recommendedJobs, loading: isLoadingRecommendedJobs } =
       useUserRecommendedJobs({
          userAuthId: authenticatedUser?.uid,
          limit: RECOMMENDED_JOBS_LIMIT,
-         bypassCache: true,
+         countryCode: userCountryCode,
       })
 
    if (isLoadingRecommendedJobs || isLoadingAuth)

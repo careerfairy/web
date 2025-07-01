@@ -31,6 +31,7 @@ import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 
 import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
+import { useAuth } from "HOCs/AuthProvider"
 import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
 import { usePreFetchRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
@@ -55,6 +56,7 @@ const JobsPage: NextPage<
 }) => {
    const router = useRouter()
    const { jobId } = router.query
+   const { authenticatedUser } = useAuth()
 
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
@@ -71,6 +73,8 @@ const JobsPage: NextPage<
 
    usePreFetchRecommendedJobs({
       limit: RECOMMENDED_JOBS_LIMIT,
+      userAuthId: authenticatedUser?.uid,
+      countryCode: userCountryCode,
    })
 
    return (
@@ -225,7 +229,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       ? await customJobServiceInstance.getRecommendedJobs(
            RECOMMENDED_JOBS_LIMIT,
            userAuthId,
-           false
+           false,
+           {
+              userCountryCode,
+           }
         )
       : []
 
