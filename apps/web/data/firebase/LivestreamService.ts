@@ -1450,7 +1450,7 @@ export class LivestreamService {
       typeOfStream: "past" | "upcoming" | "draft"
    }> {
       let targetStream: LivestreamEvent | null = null
-      let typeOfStream: "past" | "upcoming" | "draft" = "upcoming"
+      let typeOfStream: "past" | "upcoming" | "draft" | null = null
 
       try {
          // First, try to find the event in the livestreams collection

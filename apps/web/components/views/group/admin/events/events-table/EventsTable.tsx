@@ -125,7 +125,7 @@ const EventsTable = ({
    }, [streams])
 
    const handleSpeakerSearch = useCallback(
-      (term, rowData) =>
+      (term: string, rowData: LivestreamEvent) =>
          rowData.speakers.some(
             (speaker) =>
                speaker.firstName.toLowerCase().indexOf(term.toLowerCase()) >=
@@ -136,7 +136,7 @@ const EventsTable = ({
    )
 
    const handleHostsSearch = useCallback(
-      (term, rowData) =>
+      (term: string, rowData: LivestreamEvent) =>
          rowData.groupIds?.some(
             (groupId) =>
                groupsDictionary[groupId]?.universityName
@@ -146,7 +146,7 @@ const EventsTable = ({
       [groupsDictionary]
    )
    const handleCompanySearch = useCallback(
-      (term, rowData) =>
+      (term: string, rowData: LivestreamEvent) =>
          rowData.company?.toLowerCase?.().indexOf(term.toLowerCase()) >= 0,
       []
    )
@@ -171,31 +171,38 @@ const EventsTable = ({
       setStreamIdToBeDeleted(null)
    }, [isDraft, firebase, streamIdToBeDeleted])
 
-   const handleOpenStreamerLinksModal = useCallback((rowData) => {
-      if (rowData.id) {
-         setTargetLivestreamStreamerLinksId(rowData.id)
-      }
-   }, [])
+   const handleOpenStreamerLinksModal = useCallback(
+      (rowData: LivestreamEvent) => {
+         if (rowData.id) {
+            setTargetLivestreamStreamerLinksId(rowData.id)
+         }
+      },
+      []
+   )
    const handleCloseStreamerLinksModal = useCallback(() => {
       setTargetLivestreamStreamerLinksId("")
    }, [])
 
-   const handleClickDeleteStream = useCallback((streamId) => {
+   const handleClickDeleteStream = useCallback((streamId: string) => {
       setStreamIdToBeDeleted(streamId)
    }, [])
 
-   const handleEditStreamV2 = useCallback((groupId, livestreamId) => {
-      router.push(`/group/${groupId}/admin/events/${livestreamId}`)
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [])
+   const handleEditStreamV2 = useCallback(
+      (livestreamId) => {
+         router.push(
+            `/group/${group.id}/admin/content/live-streams/${livestreamId}`
+         )
+      },
+      [router, group.id]
+   )
 
    const manageStreamActions = useCallback(
-      (rowData) => {
+      (rowData: LivestreamEvent) => {
          const result = [
             {
                icon: <EditIcon color="action" />,
                tooltip: "Edit Event",
-               onClick: () => handleEditStreamV2(group.groupId, rowData.id),
+               onClick: () => handleEditStreamV2(rowData.id),
                hintTitle: "Edit live stream in new flow",
                hintDescription:
                   "Edit the details of the event like the start date and speakers in the new flow.",
@@ -238,7 +245,7 @@ const EventsTable = ({
                   ? "Needs Approval"
                   : "Publish Stream",
                onClick: !rowData.status?.pendingApproval
-                  ? () => handleEditStreamV2(group.groupId, rowData.id)
+                  ? () => handleEditStreamV2(rowData.id)
                   : () => onPublishStream(rowData),
                hidden: !isDraft,
                disabled: publishingDraft,
@@ -299,7 +306,7 @@ const EventsTable = ({
                <CompanyLogo
                   onClick={(event) => {
                      event.stopPropagation()
-                     handleEditStreamV2(group.groupId, rowData.id)
+                     handleEditStreamV2(rowData.id)
                   }}
                   livestream={rowData}
                />
@@ -370,7 +377,6 @@ const EventsTable = ({
          handleHostsSearch,
          theme.shadows,
          handleEditStreamV2,
-         group.groupId,
          getNumberOfRegisteredStudents,
          clickedRows,
          isDraft,
@@ -411,7 +417,10 @@ const EventsTable = ({
       }
    }
 
-   const handleRowClick = (event, rowData) => {
+   const handleRowClick = (
+      _: React.MouseEvent<HTMLDivElement>,
+      rowData: Pick<LivestreamEvent, "id">
+   ) => {
       setClickedRows((prevState) => {
          const newClickedRows = { ...prevState }
          newClickedRows[rowData.id] = !newClickedRows[rowData.id]

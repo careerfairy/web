@@ -1,25 +1,17 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
 import { CAREER_CENTER_COLLECTION } from "../util/constants"
-import { useFirestoreDocument } from "./utils/useFirestoreDocument"
+import { useListenToDocument } from "./useListenToDocument"
 
 const useAdminGroup = (
    groupId: string
 ): { group: Group; stats: GroupStats } => {
-   const { data: group } = useFirestoreDocument<Group>(
-      CAREER_CENTER_COLLECTION,
-      [groupId],
-      {
-         idField: "id",
-      }
+   const { data: group } = useListenToDocument<Group>(
+      groupId ? `${CAREER_CENTER_COLLECTION}/${groupId}` : null
    )
 
-   const { data: stats } = useFirestoreDocument<GroupStats>(
-      CAREER_CENTER_COLLECTION,
-      [groupId, "stats", "groupStats"],
-      {
-         idField: "id",
-      }
+   const { data: stats } = useListenToDocument<GroupStats>(
+      groupId ? `${CAREER_CENTER_COLLECTION}/${groupId}/stats/groupStats` : null
    )
 
    return { group, stats }

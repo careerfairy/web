@@ -1,4 +1,5 @@
 import { Box, BoxProps, Typography, styled } from "@mui/material"
+import { LinkProps } from "next/link"
 import { Fragment, ReactNode, createContext, useContext, useMemo } from "react"
 import Link from "../Link"
 
@@ -63,15 +64,25 @@ const TabContext = createContext<TabContextType>({
 type TabProps<T extends string | number = string | number> = {
    label: string
    icon?: ReactNode
-   href?: string
    value: T
-} & BoxProps
+} & BoxProps &
+   (
+      | {
+           href: LinkProps["href"]
+           shallow?: LinkProps["shallow"]
+        }
+      | {
+           href?: never
+           shallow?: never
+        }
+   )
 
 const Tab = <T extends string | number = string | number>({
    label,
    icon,
    href,
    value,
+   shallow,
    ...props
 }: TabProps<T>) => {
    const { activeValue, onChange } = useContext(TabContext)
@@ -81,7 +92,14 @@ const Tab = <T extends string | number = string | number>({
       <TabButton
          isActive={isActive}
          component={href ? Link : "button"}
-         onClick={(e) => onChange(e, value)}
+         {...(href ? { href, shallow } : {})}
+         onClick={(e) => {
+            if (href) {
+               return // let Link handle the click
+            } else {
+               return onChange(e, value)
+            }
+         }}
          {...props}
       >
          <Fragment>

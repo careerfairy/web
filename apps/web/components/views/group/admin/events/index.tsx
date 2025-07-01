@@ -1,40 +1,64 @@
 import { Box, CircularProgress } from "@mui/material"
 import { BrandedTabs } from "components/views/common/BrandedTabs"
-import { livestreamService } from "data/firebase/LivestreamService"
 import { useRouter } from "next/router"
 import { Fragment, SyntheticEvent, useEffect, useMemo, useState } from "react"
-import { useLatest } from "react-use"
-import useSWR from "swr"
-import { errorLogAndNotify } from "util/CommonUtil"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import { useGroupLivestreams } from "../../../../custom-hook/live-stream/useGroupLivestreams"
+import { useLivestreamOrDraft } from "../../../../custom-hook/live-stream/useLivestreamOrDraft"
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions"
 import EventsTable from "./events-table/EventsTable"
 
-export const EventsOverview = () => {
-   const { group, livestreamDialog } = useGroup()
+const tabs = [
+   {
+      label: "Upcoming",
+      value: "upcoming",
+   },
+   {
+      label: "Past",
+      value: "past",
+   },
+   {
+      label: "Draft",
+      value: "draft",
+   },
+] as const
 
-   const [triggered, setTriggered] = useState(false)
+type TabValue = (typeof tabs)[number]["value"]
+
+export const EventsOverview = () => {
+   const { query, push, pathname } = useRouter()
+
+   const { group, livestreamDialog } = useGroup()
    const [groupsDictionary, setGroupsDictionary] = useState({})
-   const router = useRouter()
-   const {
-      query: { eventId, tab },
-   } = router
 
    // Get tab value from query params, default to "upcoming"
-   const tabValue = (tab as "upcoming" | "past" | "draft") || "upcoming"
-   const latestTabValue = useLatest(tabValue)
+   const tabValue =
+      tabs.find((tabItem) => tabItem.value === query.tab)?.value || "upcoming"
 
    // Use a single hook call for the current tab
    const currentStreams = useGroupLivestreams(group?.id, tabValue)
+
+   const { data: highlightedEventData } = useLivestreamOrDraft(
+      query.eventId as string
+   )
+
+   /**
+    * Auto switch tabs to the relevant tab
+    */
+   useAutoSwitchTabs({
+      typeOfHighlightedStream: highlightedEventData?.typeOfStream,
+      currentTabValue: tabValue,
+      isFetchingEvents: currentStreams.isLoading,
+      hasNoEvents: currentStreams.data?.length === 0,
+   })
 
    // Process streams data with eventId repositioning
    const streams = useMemo(() => {
       const streamsData = currentStreams.data || []
 
-      if (eventId && streamsData.length > 0) {
+      if (query.eventId && streamsData.length > 0) {
          const queryEventIndex = streamsData.findIndex(
-            (el) => el.id === eventId
+            (el) => el.id === query.eventId
          )
          if (queryEventIndex > -1) {
             const reorderedStreams = [...streamsData]
@@ -44,76 +68,18 @@ export const EventsOverview = () => {
       }
 
       return streamsData
-   }, [currentStreams.data, eventId])
+   }, [currentStreams.data, query.eventId])
 
-   // Use SWR to fetch target event data
-   const { data: targetEventData } = useSWR(
-      eventId ? `targetEvent-${eventId}` : null,
-      () => livestreamService.findTargetEvent(eventId.toString()),
-      {
-         revalidateOnFocus: false,
-         revalidateOnReconnect: false,
-         onError: (error) => {
-            errorLogAndNotify(error, {
-               title: "Error fetching target event",
-            })
-         },
-      }
-   )
+   const handleChange = (_: SyntheticEvent, newValue: TabValue) => {
+      const cleanQuery = { ...query }
 
-   // Set tab value when target event data is available
-   useEffect(() => {
-      if (
-         !triggered &&
-         targetEventData?.typeOfStream &&
-         targetEventData.typeOfStream !== latestTabValue.current
-      ) {
-         router.push(
-            {
-               pathname: router.pathname,
-               query: { ...router.query, tab: targetEventData.typeOfStream },
-            },
-            undefined,
-            { shallow: true }
-         )
-         setTriggered(true)
-      }
-   }, [targetEventData, router, triggered, latestTabValue])
+      delete cleanQuery.eventId
+      cleanQuery.tab = newValue
 
-   // Handle fallback to past tab if upcoming is empty
-   useEffect(() => {
-      if (
-         tabValue === "upcoming" &&
-         !currentStreams.isLoading &&
-         currentStreams.data?.length === 0 &&
-         !triggered
-      ) {
-         router.push(
-            {
-               pathname: router.pathname,
-               query: { ...router.query, tab: "past" },
-            },
-            undefined,
-            { shallow: true }
-         )
-         setTriggered(true)
-      }
-   }, [
-      tabValue,
-      currentStreams.isLoading,
-      currentStreams.data,
-      triggered,
-      router,
-   ])
-
-   const handleChange = (
-      _: SyntheticEvent,
-      newValue: "upcoming" | "past" | "draft"
-   ) => {
-      router.push(
+      push(
          {
-            pathname: router.pathname,
-            query: { ...router.query, tab: newValue },
+            pathname,
+            query: cleanQuery,
          },
          undefined,
          { shallow: true }
@@ -125,9 +91,15 @@ export const EventsOverview = () => {
    return (
       <Fragment>
          <BrandedTabs mt={1.5} activeValue={tabValue} onChange={handleChange}>
-            <BrandedTabs.Tab label="Upcoming" value="upcoming" />
-            <BrandedTabs.Tab label="Past" value="past" />
-            <BrandedTabs.Tab label="Draft" value="draft" />
+            {tabs.map((tab) => (
+               <BrandedTabs.Tab
+                  key={tab.value}
+                  label={tab.label}
+                  value={tab.value}
+                  href={`/group/${group?.id}/admin/content/live-streams?tab=${tab.value}`}
+                  shallow
+               />
+            ))}
          </BrandedTabs>
          <Box p={3}>
             {isLoading ? (
@@ -147,7 +119,7 @@ export const EventsOverview = () => {
                   streams={streams}
                   groupsDictionary={groupsDictionary}
                   group={group}
-                  eventId={eventId as string}
+                  eventId={query.eventId as string}
                   setGroupsDictionary={setGroupsDictionary}
                   onPublishStream={livestreamDialog.handlePublishStream}
                   publishingDraft={livestreamDialog.isPublishing}
@@ -156,4 +128,81 @@ export const EventsOverview = () => {
          </Box>
       </Fragment>
    )
+}
+
+type AutoSwitchTabsProps = {
+   typeOfHighlightedStream: TabValue
+   currentTabValue: TabValue
+   isFetchingEvents: boolean
+   hasNoEvents: boolean
+}
+
+/**
+ * Custom hook that automatically switches tabs based on highlighted stream type and event availability
+ */
+const useAutoSwitchTabs = ({
+   typeOfHighlightedStream,
+   currentTabValue,
+   isFetchingEvents,
+   hasNoEvents,
+}: AutoSwitchTabsProps) => {
+   const { pathname, query, push } = useRouter()
+
+   const [alreadyNavigated, setAlreadyNavigated] = useState(false)
+
+   /**
+    * If there is a highlighted event, switch to the relevant (upcoming, past, draft) tab to highlight it
+    */
+   useEffect(() => {
+      if (alreadyNavigated) return
+
+      if (
+         typeOfHighlightedStream &&
+         typeOfHighlightedStream !== currentTabValue
+      ) {
+         push(
+            {
+               pathname,
+               query: { ...query, tab: typeOfHighlightedStream },
+            },
+            undefined,
+            { shallow: true }
+         )
+         setAlreadyNavigated(true)
+      }
+   }, [
+      typeOfHighlightedStream,
+      query,
+      alreadyNavigated,
+      push,
+      pathname,
+      currentTabValue,
+   ])
+
+   /**
+    * If there are no upcoming events, switch to the past events tab
+    */
+   useEffect(() => {
+      if (isFetchingEvents || alreadyNavigated) return
+
+      if (currentTabValue === "upcoming" && hasNoEvents && !alreadyNavigated) {
+         push(
+            {
+               pathname,
+               query: { ...query, tab: "past" },
+            },
+            undefined,
+            { shallow: true }
+         )
+         setAlreadyNavigated(true)
+      }
+   }, [
+      currentTabValue,
+      hasNoEvents,
+      alreadyNavigated,
+      query,
+      isFetchingEvents,
+      push,
+      pathname,
+   ])
 }
