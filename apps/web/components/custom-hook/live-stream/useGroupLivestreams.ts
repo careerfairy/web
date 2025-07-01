@@ -37,7 +37,7 @@ export const useGroupLivestreams = (
                query(
                   collection(firestore, "livestreams"),
                   where("groupIds", "array-contains", groupId),
-                  where("test", "==", false),
+                  where("teasdasdst", "==", false),
                   where(
                      "start",
                      ">",

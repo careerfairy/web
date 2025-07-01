@@ -2,6 +2,7 @@ import { Box, CircularProgress } from "@mui/material"
 import { BrandedTabs } from "components/views/common/BrandedTabs"
 import { useRouter } from "next/router"
 import { Fragment, SyntheticEvent, useEffect, useMemo, useState } from "react"
+import { CheckCircle, File, Video } from "react-feather"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import { useGroupLivestreams } from "../../../../custom-hook/live-stream/useGroupLivestreams"
 import { useLivestreamOrDraft } from "../../../../custom-hook/live-stream/useLivestreamOrDraft"
@@ -12,14 +13,17 @@ const tabs = [
    {
       label: "Upcoming",
       value: "upcoming",
+      icon: <CheckCircle />,
    },
    {
       label: "Past",
       value: "past",
+      icon: <Video />,
    },
    {
       label: "Draft",
       value: "draft",
+      icon: <File />,
    },
 ] as const
 
@@ -95,6 +99,7 @@ export const EventsOverview = () => {
                <BrandedTabs.Tab
                   key={tab.value}
                   label={tab.label}
+                  icon={tab.icon}
                   value={tab.value}
                   href={`/group/${group?.id}/admin/content/live-streams?tab=${tab.value}`}
                   shallow
@@ -146,7 +151,7 @@ const useAutoSwitchTabs = ({
    isFetchingEvents,
    hasNoEvents,
 }: AutoSwitchTabsProps) => {
-   const { pathname, query, push } = useRouter()
+   const { pathname, query, push, replace } = useRouter()
 
    const [alreadyNavigated, setAlreadyNavigated] = useState(false)
 
@@ -186,7 +191,7 @@ const useAutoSwitchTabs = ({
       if (isFetchingEvents || alreadyNavigated) return
 
       if (currentTabValue === "upcoming" && hasNoEvents && !alreadyNavigated) {
-         push(
+         replace(
             {
                pathname,
                query: { ...query, tab: "past" },
@@ -202,7 +207,7 @@ const useAutoSwitchTabs = ({
       alreadyNavigated,
       query,
       isFetchingEvents,
-      push,
+      replace,
       pathname,
    ])
 }
