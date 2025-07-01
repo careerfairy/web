@@ -1,7 +1,4 @@
-import {
-   getLocationIds,
-   normalizeLocationIdsForFiltering,
-} from "@careerfairy/shared-lib/countries/types"
+import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import {
    CustomJobsPresenter,
    SerializedCustomJob,
@@ -202,8 +199,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const filterOptions = {
       arrayFilters: {
-         normalizedLocationIds:
-            normalizeLocationIdsForFiltering(queryLocations),
+         normalizedLocationIds: queryLocations,
          businessFunctionsTagIds: queryBusinessFunctionTags,
          normalizedJobType: queryJobTypes,
       },
