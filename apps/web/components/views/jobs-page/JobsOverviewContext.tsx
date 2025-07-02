@@ -63,6 +63,7 @@ type JobsOverviewContextProviderType = {
    children: ReactNode
    dialogOpen?: boolean
    locationNames?: string[]
+   numberOfJobs?: number
 }
 
 export type SearchParams = {
@@ -79,6 +80,7 @@ export const JobsOverviewContextProvider = ({
    serverJob,
    dialogOpen,
    locationNames,
+   numberOfJobs,
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
@@ -195,7 +197,9 @@ export const JobsOverviewContextProvider = ({
             searchParams?.term?.length
       )
 
-      const searchResultsCount = data?.at(0)?.nbHits ?? 0
+      const searchResultsCount = hasFilters
+         ? data?.at(0)?.nbHits ?? 0
+         : numberOfJobs ?? 0
 
       const nextPage = () => {
          if (searchResultsCount > infiniteJobs?.length) {
@@ -256,6 +260,7 @@ export const JobsOverviewContextProvider = ({
       isMobile,
       jobNotFound,
       selectedLocationsNames,
+      numberOfJobs,
    ])
 
    useEffect(() => {

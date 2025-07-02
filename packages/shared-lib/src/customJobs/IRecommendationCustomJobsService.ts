@@ -61,7 +61,8 @@ export class RecommendationCustomJobsServiceCore {
 
    protected process(
       results: RankedCustomJob[] | RankedCustomJob[][],
-      limit: number
+      limit: number,
+      sortValueGetter: (job: RankedCustomJob) => number
    ): string[] {
       const combinedResults = combineRankedDocuments(results)
 
@@ -71,7 +72,10 @@ export class RecommendationCustomJobsServiceCore {
       const shuffledRecommendedCustomJobs = windowedShuffle(
          sortedRecommendedCustomJobs,
          10,
-         2
+         0,
+         {
+            sortValueGetter,
+         }
       )
 
       if (this.debug) {
