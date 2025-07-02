@@ -23,8 +23,8 @@ const tabs = [
    },
    {
       label: "Feedback",
-      value: "/group/[groupId]/admin/analytics/feedback",
-      catchAllPath: "/group/[groupId]/admin/analytics/feedback/[[...feedback]]",
+      value: "/group/[groupId]/admin/analytics/live-stream/feedback/[[...feedback]]",
+      catchAllPath: undefined,
    },
    {
       label: "Registration Sources",

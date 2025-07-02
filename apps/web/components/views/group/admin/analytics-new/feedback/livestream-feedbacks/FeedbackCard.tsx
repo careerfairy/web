@@ -1,6 +1,9 @@
-import React, { FC } from "react"
+import {
+   getGlobalRatingAverage,
+   getTotalNumberOfRatings,
+} from "@careerfairy/shared-lib/livestreams/ratings"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded"
 import {
    Card,
    CardActionArea,
@@ -10,21 +13,18 @@ import {
    Typography,
 } from "@mui/material"
 import CardMedia from "@mui/material/CardMedia"
+import Skeleton from "@mui/material/Skeleton"
+import Stack from "@mui/material/Stack"
 import Image from "next/legacy/image"
+import Link from "next/link"
+import { FC } from "react"
+import { company_building } from "../../../../../../../constants/images"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import DateUtil from "../../../../../../../util/DateUtil"
 import {
    getMaxLineStyles,
    getResizedUrl,
 } from "../../../../../../helperFunctions/HelperFunctions"
-import DateUtil from "../../../../../../../util/DateUtil"
-import {
-   getGlobalRatingAverage,
-   getTotalNumberOfRatings,
-} from "@careerfairy/shared-lib/livestreams/ratings"
-import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded"
-import Stack from "@mui/material/Stack"
-import { company_building } from "../../../../../../../constants/images"
-import Link from "next/link"
-import Skeleton from "@mui/material/Skeleton"
 
 const MEDIA_HEIGHT = 90
 const styles = sxStyles({
@@ -73,7 +73,7 @@ const FeedbackCard: FC<Props> = ({ stats, groupId }) => {
    return (
       <Card sx={styles.root}>
          <Link
-            href={`/group/${groupId}/admin/analytics/feedback/${stats.livestream.id}`}
+            href={`/group/${groupId}/admin/analytics/live-stream/feedback/${stats.livestream.id}`}
             passHref
             legacyBehavior
          >

@@ -1,7 +1,8 @@
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
-import LivestreamAnalyticsPageContent from "../../../../../../components/views/group/admin/analytics-new/live-stream"
+import { SubNavigationTabs } from "layouts/GroupDashboardLayout/SubNavigationTabs"
 import { useRouter } from "next/router"
+import LivestreamAnalyticsPageContent from "../../../../../../components/views/group/admin/analytics-new/live-stream"
 
 const LivestreamPage = () => {
    const {
@@ -14,7 +15,7 @@ const LivestreamPage = () => {
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Live Stream Analytics of" />
-
+         <SubNavigationTabs showSubNavigationFor="analytics" />
          <LivestreamAnalyticsPageContent />
       </GroupDashboardLayout>
    )

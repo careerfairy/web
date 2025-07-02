@@ -1,3 +1,4 @@
+import { LivestreamAnalyticsNavigationTabs } from "layouts/GroupDashboardLayout/LivestreamAnalyticsNavigationTabs"
 import { useRouter } from "next/router"
 import AnalyticsFeedbackPageContent from "../../../../../../../components/views/group/admin/analytics-new/feedback"
 import GroupDashboardLayout from "../../../../../../../layouts/GroupDashboardLayout"
@@ -14,6 +15,7 @@ const FeedbackPage = () => {
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Feedback of" />
+         <LivestreamAnalyticsNavigationTabs />
          <AnalyticsFeedbackPageContent />
       </GroupDashboardLayout>
    )

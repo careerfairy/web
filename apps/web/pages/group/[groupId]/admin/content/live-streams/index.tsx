@@ -1,3 +1,4 @@
+import { SubNavigationTabs } from "layouts/GroupDashboardLayout/SubNavigationTabs"
 import { useRouter } from "next/router"
 import { EventsOverview } from "../../../../../../components/views/group/admin/events"
 import GroupDashboardLayout from "../../../../../../layouts/GroupDashboardLayout"
@@ -10,10 +11,11 @@ const EventsPage = () => {
 
    return (
       <GroupDashboardLayout
-         titleComponent={"Live Streams"}
+         titleComponent={"Content"}
          groupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Admin Live Streams of" />
+         <SubNavigationTabs showSubNavigationFor="content" />
          <EventsOverview />
       </GroupDashboardLayout>
    )

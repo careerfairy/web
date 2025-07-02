@@ -1,7 +1,8 @@
+import AnalyticsGeneralPageContent from "components/views/group/admin/analytics-new/general"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
+import { SubNavigationTabs } from "layouts/GroupDashboardLayout/SubNavigationTabs"
 import { useRouter } from "next/router"
-import AnalyticsGeneralPageContent from "components/views/group/admin/analytics-new/general"
 
 const GeneralPage = () => {
    const {
@@ -10,11 +11,11 @@ const GeneralPage = () => {
 
    return (
       <GroupDashboardLayout
-         titleComponent={"General"}
+         titleComponent={"Analytics"}
          groupId={groupId as string}
       >
-         <DashboardHead title="CareerFairy | General Page of" />
-
+         <DashboardHead title="CareerFairy | Live Stream Analytics of" />
+         <SubNavigationTabs showSubNavigationFor="analytics" />
          <AnalyticsGeneralPageContent />
       </GroupDashboardLayout>
    )

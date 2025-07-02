@@ -26,11 +26,11 @@ const getStyles = (hasNavigationBar?: boolean) =>
          alignItems: "center",
          px: {
             xs: 2,
-            sm: 5,
+            sm: 3,
          },
          py: {
             xs: 0,
-            md: 3.2,
+            md: 2,
          },
          paddingBottom: hasNavigationBar ? "0 !important" : "initial",
          backdropFilter: "blur(8px)",

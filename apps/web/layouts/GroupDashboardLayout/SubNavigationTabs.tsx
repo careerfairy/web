@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles"
 import { useFeatureFlags } from "components/custom-hook/useFeatureFlags"
 import Link from "components/views/common/Link"
 import { useRouter } from "next/router"
-import { Fragment, useCallback, useMemo, useState } from "react"
+import { Fragment, SyntheticEvent, useCallback, useMemo, useState } from "react"
 import { INavLink } from "../types"
 import { useGroup } from "./index"
 
@@ -30,7 +30,13 @@ const StyledTab = styled(Tab)<{ href: string }>(({ theme }) => ({
    textTransform: "none !important",
 }))
 
-export const SubNavigationTabs = () => {
+type ValidTabs = "analytics" | "content" | "settings"
+
+type Props = {
+   showSubNavigationFor: ValidTabs
+}
+
+export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
    const { pathname, push } = useRouter()
    const { group } = useGroup()
 
@@ -41,14 +47,13 @@ export const SubNavigationTabs = () => {
    const hasAccessToSparks =
       featureFlags.sparksAdminPageFlag || group.sparksAdminPageFlag
 
-   // Create navigation links similar to GroupNavList
-   const navLinks = useMemo(() => {
+   // Create navigation links based on showSubNavigationFor
+   const currentSection = useMemo(() => {
       const BASE_HREF_PATH = "group"
       const BASE_PARAM = "[groupId]"
 
-      const links = [
-         // Content section
-         {
+      const navigationLookup = {
+         content: {
             id: "content",
             title: "Content",
             href: `/${BASE_HREF_PATH}/${group.id}/admin/content/live-streams`,
@@ -72,8 +77,7 @@ export const SubNavigationTabs = () => {
                   : []),
             ],
          },
-         // Analytics section
-         {
+         analytics: {
             id: "analytics",
             href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-stream`,
             title: "Analytics",
@@ -92,8 +96,7 @@ export const SubNavigationTabs = () => {
                },
             ],
          },
-         // Settings section
-         {
+         settings: {
             id: "settings",
             title: "Settings",
             href: `/${BASE_HREF_PATH}/${group.id}/admin/edit`,
@@ -112,21 +115,13 @@ export const SubNavigationTabs = () => {
                },
             ],
          },
-      ] as const satisfies INavLink[]
+      } as const satisfies Record<ValidTabs, INavLink>
 
-      return links
-   }, [group.id, hasAccessToSparks])
-
-   // Find the current section and its child links
-   const currentSection = useMemo(() => {
-      const currentSection = navLinks.find((link) =>
-         link?.childLinks?.some((childLink) => childLink.pathname === pathname)
-      )
-      return currentSection
-   }, [navLinks, pathname])
+      return navigationLookup[showSubNavigationFor]
+   }, [group.id, hasAccessToSparks, showSubNavigationFor])
 
    const handleTabChange = useCallback(
-      (event: React.SyntheticEvent, newValue: string) => {
+      (_: SyntheticEvent, newValue: string) => {
          setTabValue(newValue)
          const selectedTab = currentSection?.childLinks?.find(
             (tab) => tab.pathname === newValue
