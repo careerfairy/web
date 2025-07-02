@@ -312,12 +312,6 @@ const moduleExports = {
             permanent: false,
          },
          {
-            source: "/group/:groupId/admin/content/live-streams/:livestreamId",
-            destination:
-               "/group/:groupId/admin/content/live-streams/:livestreamId",
-            permanent: false,
-         },
-         {
             source: "/group/:groupId/admin/sparks",
             destination: "/group/:groupId/admin/content/sparks",
             permanent: false,
