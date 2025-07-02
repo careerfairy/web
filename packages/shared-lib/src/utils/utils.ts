@@ -731,7 +731,7 @@ export const windowedShuffle = <T>(
    windowSize = 10,
    swapCount = 0,
    options?: {
-      sortValueGetter?: (item: T) => number | string
+      sortValueGetter?: (item: T) => number
    }
 ): T[] => {
    // Split into windows using chunkArray
@@ -767,9 +767,7 @@ export const windowedShuffle = <T>(
          const aValue = options.sortValueGetter(a)
          const bValue = options.sortValueGetter(b)
 
-         if (aValue > bValue) return 1
-         if (aValue < bValue) return -1
-         return 0
+         return bValue - aValue
       })
    }
 

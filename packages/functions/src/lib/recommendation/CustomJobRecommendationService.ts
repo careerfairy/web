@@ -51,7 +51,11 @@ export class CustomJobRecommendationService
               )?.length ?? 0
             : 0
 
-         return inExternalCountry + inUserCountry
+         const sum = inExternalCountry + inUserCountry
+         if (sum > 0) {
+            return Math.floor(Math.random() * sum) + 1
+         }
+         return 0
       }
 
       return this.process(rankedCustomJobs, limit, sorter)
