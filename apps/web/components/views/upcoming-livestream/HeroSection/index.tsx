@@ -265,7 +265,10 @@ const HeroSection = ({
          // update to a bigger screen on desktop
          setShowBigVideoPlayer(true)
       }
-   }, [isMobile, startCounting])
+      
+      // track recording play event when playback actually starts
+      dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
+   }, [isMobile, startCounting, stream])
 
    // handle preview play icon click
    const handlePreviewPlay = useCallback(() => {
@@ -278,9 +281,6 @@ const HeroSection = ({
 
       // play recording
       handleRecordingPlay()
-
-      // track recording play event
-      dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
    }, [handleRecordingPlay, stream, userData?.userEmail])
 
    const handleCloseRecordingPlayer = useCallback(() => {
