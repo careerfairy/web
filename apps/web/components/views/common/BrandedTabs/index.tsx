@@ -12,7 +12,9 @@ const TabsContainer = styled(Box)({
    width: "100%",
 })
 
-const TabButton = styled(Box)<{ isActive: boolean }>(({ isActive, theme }) => ({
+const TabButton = styled(Box, {
+   shouldForwardProp: (prop) => prop !== "isActive",
+})<{ isActive: boolean }>(({ isActive, theme }) => ({
    display: "flex",
    alignItems: "center",
    gap: 8,
@@ -28,7 +30,9 @@ const TabButton = styled(Box)<{ isActive: boolean }>(({ isActive, theme }) => ({
    },
 }))
 
-const TabIcon = styled(Box)<{ isActive: boolean }>(({ isActive }) => ({
+const TabIcon = styled(Box, {
+   shouldForwardProp: (prop) => prop !== "isActive",
+})<{ isActive: boolean }>(({ isActive }) => ({
    width: 24,
    height: 24,
    "& svg": {
@@ -39,17 +43,15 @@ const TabIcon = styled(Box)<{ isActive: boolean }>(({ isActive }) => ({
    },
 }))
 
-const TabText = styled(Typography)<{ isActive: boolean }>(
-   ({ isActive, theme }) => ({
-      fontSize: 16,
-      fontWeight: isActive ? 600 : 400,
-      color: isActive
-         ? theme.palette.secondary.main
-         : theme.palette.neutral[800],
-      textAlign: "center",
-      whiteSpace: "nowrap",
-   })
-)
+const TabText = styled(Typography, {
+   shouldForwardProp: (prop) => prop !== "isActive",
+})<{ isActive: boolean }>(({ isActive, theme }) => ({
+   fontSize: 16,
+   fontWeight: isActive ? 600 : 400,
+   color: isActive ? theme.palette.secondary.main : theme.palette.neutral[800],
+   textAlign: "center",
+   whiteSpace: "nowrap",
+}))
 
 type TabContextType<T extends string | number = string | number> = {
    activeValue: T

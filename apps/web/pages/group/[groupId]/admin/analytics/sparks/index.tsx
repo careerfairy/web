@@ -4,8 +4,8 @@ import CreateSparkButton from "components/views/admin/sparks/components/CreateSp
 import SparksDialog from "components/views/admin/sparks/sparks-dialog/SparksDialog"
 import { useRouter } from "next/router"
 import { FC } from "react"
-import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import GroupDashboardLayout from "../../../../../../layouts/GroupDashboardLayout"
+import DashboardHead from "../../../../../../layouts/GroupDashboardLayout/DashboardHead"
 
 const CreateSparkButtonWrapper: FC = () => {
    return (
@@ -23,7 +23,7 @@ const AdminSparksAnalyticsPage: FC = () => {
 
    return (
       <GroupDashboardLayout
-         titleComponent={"Sparks Analytics"}
+         titleComponent={"Analytics"}
          groupId={groupId as string}
          topBarCta={<CreateSparkButtonWrapper />}
       >

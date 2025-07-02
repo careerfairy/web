@@ -11,7 +11,7 @@ import JobList from "./JobList"
 
 const JobsContent = () => {
    const { group } = useGroupFromState()
-   const allJobsWithStats = useGroupCustomJobsStats(group.groupId, {
+   const allJobsWithStats = useGroupCustomJobsStats(group.id, {
       deletedJobs: false,
    })
    const { push } = useRouter()
@@ -23,9 +23,9 @@ const JobsContent = () => {
 
    const handleJobClick = useCallback(
       ({ id }: CustomJob) => {
-         void push(`/group/${group.groupId}/admin/jobs/${id}`)
+         void push(`/group/${group.id}/admin/jobs/${id}`)
       },
-      [group.groupId, push]
+      [group.id, push]
    )
 
    return sortedJobs.length > 0 ? (

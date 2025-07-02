@@ -1,5 +1,6 @@
 import { Box, Tab, Tabs } from "@mui/material"
 import { styled } from "@mui/material/styles"
+import { useFeatureFlags } from "components/custom-hook/useFeatureFlags"
 import Link from "components/views/common/Link"
 import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
@@ -35,6 +36,11 @@ export const SubNavigationTabs = () => {
 
    const [tabValue, setTabValue] = useState(pathname)
 
+   const featureFlags = useFeatureFlags()
+
+   const hasAccessToSparks =
+      featureFlags.sparksAdminPageFlag || group.sparksAdminPageFlag
+
    // Create navigation links similar to GroupNavList
    const navLinks = useMemo(() => {
       const BASE_HREF_PATH = "group"
@@ -54,10 +60,34 @@ export const SubNavigationTabs = () => {
                   pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/live-streams`,
                   title: "Live streams",
                },
+               ...(hasAccessToSparks
+                  ? [
+                       {
+                          id: "sparks",
+                          href: `/${BASE_HREF_PATH}/${group.id}/admin/content/sparks`,
+                          pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/sparks`,
+                          title: "Sparks",
+                       },
+                    ]
+                  : []),
+            ],
+         },
+         // Analytics section
+         {
+            id: "analytics",
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-stream`,
+            title: "Analytics",
+            childLinks: [
                {
-                  id: "sparks",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/content/sparks`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/sparks`,
+                  id: "live-stream-analytics",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-stream/[[...livestreamId]]`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-stream/[[...livestreamId]]`,
+                  title: "Live stream",
+               },
+               {
+                  id: "sparks-analytics",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/sparks`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/sparks`,
                   title: "Sparks",
                },
             ],
@@ -82,30 +112,10 @@ export const SubNavigationTabs = () => {
                },
             ],
          },
-         // Analytics section
-         {
-            id: "analytics",
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams`,
-            title: "Analytics",
-            childLinks: [
-               {
-                  id: "live-stream-analytics",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-streams`,
-                  title: "Live stream",
-               },
-               {
-                  id: "sparks-analytics",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/sparks`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/sparks`,
-                  title: "Sparks",
-               },
-            ],
-         },
       ]
 
       return links
-   }, [group.id])
+   }, [group.id, hasAccessToSparks])
 
    // Find the current section and its child links
    const currentSectionTabs = useMemo((): INavLink[] => {
@@ -150,6 +160,7 @@ export const SubNavigationTabs = () => {
                      value={tab.pathname}
                      // @ts-expect-error - href is not a valid prop for Tab, bug with styled()
                      href={tab.href}
+                     shallow
                   />
                )
             })}
