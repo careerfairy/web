@@ -15,15 +15,20 @@ type TrackProps = {
  * Track Livestream page view
  * Increases the Livestream page views and popularity
  */
-const useTrackLivestreamView = (livestream: LivestreamEvent) => {
+const useTrackLivestreamView = (
+   livestream: LivestreamEvent,
+   isRecording: boolean = false
+) => {
    const { trackDetailPageView } = useFirebaseService()
 
    const handleTrack = ({ id, visitorId, extraData: stream }: TrackProps) => {
       if (stream) {
-         dataLayerLivestreamEvent(
-            AnalyticsEvents.EventDetailsPageViewed,
-            stream
-         )
+         // Use different analytics events based on whether it's a recording or upcoming livestream
+         const analyticsEvent = isRecording
+            ? AnalyticsEvents.RecordingDetailsPageViewed
+            : AnalyticsEvents.EventDetailsPageViewed
+
+         dataLayerLivestreamEvent(analyticsEvent, stream)
 
          // increase event popularity
          recommendationServiceInstance.visitDetailPage(
