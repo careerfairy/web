@@ -12,7 +12,7 @@ export class RankedCustomJobsRepository {
    // from userData
    public readonly USER_BUSINESS_FUNCTIONS_POINTS = 2
    public readonly USER_APPLIED_JOBS_BUSINESS_FUNCTIONS_POINTS = 1.5
-   public readonly USER_JOB_LOCATION_POINTS = 5
+   public readonly USER_JOB_LOCATION_POINTS = 20
    public readonly USER_COUNTRIES_OF_INTEREST_POINTS = 1
    public readonly USER_FOLLOWING_COMPANIES_POINTS = 3
    public readonly USER_LAST_VIEWED_JOBS_LOCATIONS_POINTS = 2.5
@@ -24,7 +24,7 @@ export class RankedCustomJobsRepository {
    // from referenceJob
    public readonly REFERENCE_JOB_TYPE_POINTS = 0.5
    public readonly REFERENCE_JOB_BUSINESS_FUNCTIONS_POINTS = 1
-   public readonly REFERENCE_JOB_LOCATION_POINTS = 1
+   public readonly REFERENCE_JOB_LOCATION_POINTS = 10
    public readonly REFERENCE_JOB_INDUSTRY_POINTS = 1.5
 
    // from jobsInfo
