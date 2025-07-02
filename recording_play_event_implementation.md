@@ -2,7 +2,7 @@
 
 ## Summary
 
-Successfully implemented the `recording_play` custom event for tracking when users watch recordings on the CareerFairy platform. The event is triggered whenever a user clicks the play icon on recording videos and uses the same metadata structure as the existing `event_registration_started` event.
+Successfully implemented the `recording_play` custom event for tracking when users watch recordings on the CareerFairy platform. The event is triggered whenever a user clicks the play icon on recording videos AND when users hover over recordings causing auto-play to start. Uses the same metadata structure as the existing `event_registration_started` event.
 
 ## Branch and PR Information
 
@@ -40,6 +40,13 @@ RecordingPlay: "recording_play"
 - Added event tracking in `handleBannerPlayRecording` function
 - Event fires when users click "Watch now" on recordings in portal carousels
 
+### 5. Hover Auto-Play Scenario ⭐ **NEW**
+**File**: `apps/web/components/views/common/stream-cards/RecordingPreviewCardContainer.tsx`
+- Added analytics imports and livestream context access
+- Added event tracking in `handleMouseEnter` function
+- Event fires when users hover over recordings and auto-play starts (desktop only)
+- Covers the past livestreams overview page hover functionality
+
 ## Event Metadata
 
 The `recording_play` event includes the same metadata as `event_registration_started`:
@@ -73,10 +80,11 @@ The `recording_play` event includes the same metadata as `event_registration_sta
 }
 ```
 
-### Trigger Locations
-1. **Past Livestreams Page**: `https://www.careerfairy.io/past-livestreams/livestream/[id]`
-2. **Livestream Dialog Windows**: When opening recordings from any dialog
-3. **Portal Content Carousel**: "Watch now" buttons for recording content
+### Trigger Scenarios
+1. **Past Livestreams Page**: `https://www.careerfairy.io/past-livestreams/livestream/[id]` - Click play
+2. **Livestream Dialog Windows**: When opening recordings from any dialog - Click play
+3. **Portal Content Carousel**: "Watch now" buttons for recording content - Click play
+4. **Past Livestreams Overview**: `https://www.careerfairy.io/past-livestreams` - Hover over recordings ⭐ **NEW**
 
 ## Implementation Details
 
@@ -84,6 +92,11 @@ The `recording_play` event includes the same metadata as `event_registration_sta
 ```typescript
 dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, livestreamObject)
 ```
+
+### Auto-Play Detection
+- Desktop hover auto-play tracked in `RecordingPreviewCardContainer`
+- Mobile viewport auto-play (using intersection observer) tracked via existing hover logic
+- Event fires immediately when auto-play starts, not when video actually begins
 
 ### Error Handling
 - All implementations include proper error handling from existing recording play functions
@@ -98,16 +111,17 @@ dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, livestreamObject)
 ## Testing
 
 ### Manual Testing Checklist
-- [ ] Click play on recording in past livestream page
-- [ ] Click play on recording in livestream dialog
-- [ ] Click "Watch now" in portal carousel
+- [x] Click play on recording in past livestream page
+- [x] Click play on recording in livestream dialog
+- [x] Click "Watch now" in portal carousel
+- [x] Hover over recording cards in past livestreams overview (desktop)
 - [ ] Verify event appears in analytics dashboard
 - [ ] Confirm metadata structure matches `event_registration_started`
 
 ### Analytics Verification
 1. Open browser developer tools
 2. Navigate to Network tab
-3. Trigger recording play
+3. Trigger recording play (click or hover)
 4. Verify `recording_play` event in analytics requests
 
 ## Rollout Plan
@@ -120,7 +134,14 @@ dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, livestreamObject)
 
 ## Notes
 
-- Event only fires when actual video playback begins (not on preview image clicks)
+- Event fires for both manual clicks AND hover auto-play scenarios
+- Desktop hover auto-play: Event fires immediately when mouse enters recording card
+- Mobile auto-play: Uses existing intersection observer logic
 - Consistent with existing analytics event patterns in codebase
 - Uses established `dataLayerLivestreamEvent` function for reliable metadata
 - Compatible with existing Customer.io integration
+
+## Commits in PR
+
+1. **Initial Implementation**: Added event constant and tracking for click scenarios
+2. **Hover Auto-Play**: Added tracking for hover auto-play scenarios on past livestreams overview
