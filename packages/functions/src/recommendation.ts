@@ -85,6 +85,7 @@ export const getRecommendedEvents = onCall(
 export const getRecommendedJobs = onCall(
    {
       concurrency: 10,
+      memory: "512MiB",
    },
    middlewares<GetRecommendedJobsFnArgs>(
       dataValidation({

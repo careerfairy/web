@@ -52,6 +52,7 @@ const JobsPage: NextPage<
    userCountryCode,
    dialogOpen,
    locationNames,
+   numberOfJobs,
 }) => {
    const router = useRouter()
    const { jobId } = router.query
@@ -98,6 +99,7 @@ const JobsPage: NextPage<
                   serverJob={serverJob}
                   dialogOpen={dialogOpen}
                   locationNames={locationNames}
+                  numberOfJobs={numberOfJobs}
                >
                   <PageSEO />
                   <JobsPageOverview />
@@ -230,7 +232,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
            userAuthId,
            false,
            {
-              userCountryCode: userCountryCode + "TEST_WG",
+              userCountryCode: userCountryCode,
            }
         )
       : []
