@@ -114,7 +114,7 @@ const OtherJobs = () => {
 const RecommendedJobs = () => {
    const { isLoadingAuth, authenticatedUser } = useAuth()
    const { userCountryCode } = useUserCountryCode()
-   const { jobs: recommendedJobs, loading: isLoadingRecommendedJobs } =
+   const { data: recommendedJobs, isLoading: isLoadingRecommendedJobs } =
       useUserRecommendedJobs({
          userAuthId: authenticatedUser?.uid,
          limit: RECOMMENDED_JOBS_LIMIT,

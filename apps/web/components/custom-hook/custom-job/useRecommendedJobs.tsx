@@ -1,7 +1,7 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { useAuth } from "HOCs/AuthProvider"
 import { customJobServiceInstance } from "data/firebase/CustomJobService"
-import { useEffect, useMemo } from "react"
+import { useEffect } from "react"
 import useSWR, { preload } from "swr"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
@@ -27,7 +27,7 @@ export const useUserRecommendedJobs = (config?: Config) => {
       countryCode,
    } = config || {}
 
-   const { data: jobs, isLoading } = useSWR<CustomJob[]>(
+   return useSWR<CustomJob[]>(
       !isLoadingAuth
          ? [
               "getRecommendedJobs",
@@ -53,14 +53,6 @@ export const useUserRecommendedJobs = (config?: Config) => {
          suspense,
          fallbackData: initialData,
       }
-   )
-
-   return useMemo(
-      () => ({
-         jobs,
-         loading: isLoading,
-      }),
-      [jobs, isLoading]
    )
 }
 
