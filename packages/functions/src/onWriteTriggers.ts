@@ -218,9 +218,15 @@ export const syncUserStats = onDocumentWritten(
 
       // Run side effects for all livestreamStats changes
       sideEffectPromises.push(rewardSideEffectsUserStats(userEmail, event.data))
-      sideEffectPromises.push(
-         handleUserStatsBadges(userEmail, event.data.after.data() as UserStats)
-      )
+
+      if (!changeTypes.isDelete) {
+         sideEffectPromises.push(
+            handleUserStatsBadges(
+               userEmail,
+               event.data.after.data() as UserStats
+            )
+         )
+      }
 
       return handleSideEffects(sideEffectPromises)
    }
