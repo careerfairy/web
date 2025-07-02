@@ -306,6 +306,11 @@ const moduleExports = {
             permanent: false,
          },
          {
+            source: "/group/:groupId/admin/events",
+            destination: "/group/:groupId/admin/content/live-streams",
+            permanent: false,
+         },
+         {
             source: "/group/:groupId/admin/events/:livestreamId",
             destination:
                "/group/:groupId/admin/content/live-streams/:livestreamId",
@@ -314,6 +319,26 @@ const moduleExports = {
          {
             source: "/group/:groupId/admin/sparks",
             destination: "/group/:groupId/admin/content/sparks",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/sparks/analytics",
+            destination: "/group/:groupId/admin/analytics/sparks",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/analytics/talent-pool",
+            destination: "/group/:groupId/admin/talent-pool",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/analytics/live-stream",
+            destination: "/group/:groupId/admin/analytics/live-streams", // Page is not plural for consistency
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/analytics/feedback",
+            destination: "/group/:groupId/admin/analytics/live-stream/feedback",
             permanent: false,
          },
       ]

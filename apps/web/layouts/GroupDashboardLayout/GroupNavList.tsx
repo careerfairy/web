@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 
 // react feather
-import { BarChart2 as AnalyticsIcon, Sliders as ATSIcon } from "react-feather"
+import { Sliders as ATSIcon } from "react-feather"
 
 // material-ui
 import Skeleton from "@mui/material/Skeleton"
@@ -12,6 +12,7 @@ import {
    ContentIcon,
    TalentPoolIcon,
 } from "components/views/common/icons"
+import { AnalyticsIcon } from "components/views/common/icons/AnalyticsIcon"
 import { DashboardIcon } from "components/views/common/icons/DashboardIcon"
 import { JobsIcon } from "components/views/common/icons/JobsIcon"
 import { useRouter } from "next/router"
@@ -87,8 +88,8 @@ const GroupNavList = () => {
             : [
                  {
                     id: "talent-pool",
-                    href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/talent-pool`,
-                    pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/talent-pool`,
+                    href: `/${BASE_HREF_PATH}/${group.id}/admin/talent-pool`,
+                    pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/talent-pool`,
                     Icon: TalentPoolIcon,
                     title: "Talent pool",
                  },

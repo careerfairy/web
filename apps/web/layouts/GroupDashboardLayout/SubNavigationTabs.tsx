@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles"
 import { useFeatureFlags } from "components/custom-hook/useFeatureFlags"
 import Link from "components/views/common/Link"
 import { useRouter } from "next/router"
-import { useCallback, useMemo, useState } from "react"
+import { Fragment, useCallback, useMemo, useState } from "react"
 import { INavLink } from "../types"
 import { useGroup } from "./index"
 
@@ -46,7 +46,7 @@ export const SubNavigationTabs = () => {
       const BASE_HREF_PATH = "group"
       const BASE_PARAM = "[groupId]"
 
-      const links: INavLink[] = [
+      const links = [
          // Content section
          {
             id: "content",
@@ -112,59 +112,62 @@ export const SubNavigationTabs = () => {
                },
             ],
          },
-      ]
+      ] as const satisfies INavLink[]
 
       return links
    }, [group.id, hasAccessToSparks])
 
    // Find the current section and its child links
-   const currentSectionTabs = useMemo((): INavLink[] => {
+   const currentSection = useMemo(() => {
       const currentSection = navLinks.find((link) =>
          link?.childLinks?.some((childLink) => childLink.pathname === pathname)
       )
-      return currentSection?.childLinks || []
+      return currentSection
    }, [navLinks, pathname])
 
    const handleTabChange = useCallback(
       (event: React.SyntheticEvent, newValue: string) => {
          setTabValue(newValue)
-         const selectedTab = currentSectionTabs.find(
+         const selectedTab = currentSection?.childLinks?.find(
             (tab) => tab.pathname === newValue
          )
+
          if (selectedTab) {
             void push(selectedTab.href)
          }
       },
-      [push, currentSectionTabs]
+      [push, currentSection]
    )
 
    // Only show sub-navigation if we have tabs and we're in a supported section
-   if (currentSectionTabs.length === 0) {
+   if (!currentSection?.childLinks?.length) {
       return null
    }
 
    return (
-      <StyledTabsWrapper>
-         <StyledTabs
-            textColor="secondary"
-            indicatorColor="secondary"
-            value={tabValue}
-            onChange={handleTabChange}
-         >
-            {currentSectionTabs.map((tab) => {
-               return (
-                  <StyledTab
-                     LinkComponent={Link}
-                     key={tab.id}
-                     label={tab.title}
-                     value={tab.pathname}
-                     // @ts-expect-error - href is not a valid prop for Tab, bug with styled()
-                     href={tab.href}
-                     shallow
-                  />
-               )
-            })}
-         </StyledTabs>
-      </StyledTabsWrapper>
+      <Fragment>
+         <StyledTabsWrapper>
+            <StyledTabs
+               textColor="secondary"
+               indicatorColor="secondary"
+               value={tabValue}
+               onChange={handleTabChange}
+            >
+               {currentSection?.childLinks?.map((tab) => {
+                  return (
+                     <StyledTab
+                        LinkComponent={Link}
+                        key={tab.id}
+                        label={tab.title}
+                        value={tab.pathname}
+                        // @ts-expect-error - href is not a valid prop for Tab, bug with styled()
+                        href={tab.href}
+                        shallow
+                     />
+                  )
+               })}
+            </StyledTabs>
+         </StyledTabsWrapper>
+      </Fragment>
    )
 }

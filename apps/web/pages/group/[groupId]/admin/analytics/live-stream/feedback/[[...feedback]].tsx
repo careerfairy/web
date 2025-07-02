@@ -1,7 +1,7 @@
-import GroupDashboardLayout from "../../../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../../../layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import AnalyticsFeedbackPageContent from "../../../../../../components/views/group/admin/analytics-new/feedback"
+import AnalyticsFeedbackPageContent from "../../../../../../../components/views/group/admin/analytics-new/feedback"
+import GroupDashboardLayout from "../../../../../../../layouts/GroupDashboardLayout"
+import DashboardHead from "../../../../../../../layouts/GroupDashboardLayout/DashboardHead"
 
 const FeedbackPage = () => {
    const {
