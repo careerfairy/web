@@ -6,6 +6,8 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import React, { FC, useCallback } from "react"
 import { Volume2, VolumeX } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useEventPreviewCardContext } from "./EventPreviewCardContext"
 import RecordingCardPlayer from "./RecordingCardPlayer"
 
@@ -93,13 +95,14 @@ const RecordingPreviewCardContainer: FC<Props> = ({
    onSecondPassed,
 }) => {
    const isMobile = useIsMobile()
-   const { setAutoPlaying, setMuted, muted } = useEventPreviewCardContext()
+   const { setAutoPlaying, setMuted, muted, livestream } = useEventPreviewCardContext()
 
    const handleMouseEnter = useCallback(() => {
       if (!isMobile) {
          setAutoPlaying(true)
+         dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, livestream)
       }
-   }, [isMobile, setAutoPlaying])
+   }, [isMobile, setAutoPlaying, livestream])
 
    const handleMouseLeave = useCallback(() => {
       if (!isMobile) {
