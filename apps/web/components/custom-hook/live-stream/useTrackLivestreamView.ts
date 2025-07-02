@@ -1,4 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import { recommendationServiceInstance } from "../../../data/firebase/RecommendationService"
 import useTrackPageView from "../useTrackDetailPageView"
@@ -18,6 +20,11 @@ const useTrackLivestreamView = (livestream: LivestreamEvent) => {
 
    const handleTrack = ({ id, visitorId, extraData: stream }: TrackProps) => {
       if (stream) {
+         dataLayerLivestreamEvent(
+            AnalyticsEvents.EventDetailsPageViewed,
+            stream
+         )
+
          // increase event popularity
          recommendationServiceInstance.visitDetailPage(
             stream as LivestreamEvent,
