@@ -112,11 +112,6 @@ export const getRecommendedJobs = onCall(
          try {
             const countryCode =
                request.data.userCountryCode || getCountryCode(request)
-            functions.logger.info(
-               "🚀 ~ countryCode, userId:",
-               countryCode,
-               request.data.userAuthId
-            )
 
             const dataFetcher = new CustomJobDataFetcher(
                request.data.userAuthId || null,
