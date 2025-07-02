@@ -1,3 +1,4 @@
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
@@ -20,10 +21,12 @@ const useTrackLivestreamView = (livestream: LivestreamEvent) => {
 
    const handleTrack = ({ id, visitorId, extraData: stream }: TrackProps) => {
       if (stream) {
-         dataLayerLivestreamEvent(
-            AnalyticsEvents.EventDetailsPageViewed,
-            stream
-         )
+         const presenter = LivestreamPresenter.createFromDocument(stream)
+         const eventName = presenter.isPast()
+            ? AnalyticsEvents.RecordingDetailsPageViewed
+            : AnalyticsEvents.EventDetailsPageViewed
+
+         dataLayerLivestreamEvent(eventName, stream)
 
          // increase event popularity
          recommendationServiceInstance.visitDetailPage(
