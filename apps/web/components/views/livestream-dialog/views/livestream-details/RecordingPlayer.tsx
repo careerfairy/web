@@ -24,6 +24,8 @@ import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
+import { AnalyticsEvents } from "../../../../../util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { useFirestoreDocument } from "../../../../custom-hook/utils/useFirestoreDocument"
@@ -303,12 +305,15 @@ export const useRecordingControls = (
 
    // handle play recording click
    const handleRecordingPlay = useCallback(() => {
+      // Track the recording play event with the same metadata as event_registration_started
+      dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
+
       setVideoPaused(false)
       if (!isMobile) {
          // update to a bigger screen on desktop
          setShowBigVideoPlayer(true)
       }
-   }, [isMobile])
+   }, [isMobile, stream])
 
    const handleCloseRecordingPlayer = useCallback(() => {
       setShowBigVideoPlayer(false)

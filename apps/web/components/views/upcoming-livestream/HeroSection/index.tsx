@@ -18,6 +18,8 @@ import { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { AnalyticsEvents } from "../../../../util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "../../../../util/analyticsUtils"
 import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 import useCountTime from "../../../custom-hook/useCountTime"
 import useIsMobile from "../../../custom-hook/useIsMobile"
@@ -257,13 +259,16 @@ const HeroSection = ({
 
    // handle play recording click
    const handleRecordingPlay = useCallback(() => {
+      // Track the recording play event with the same metadata as event_registration_started
+      dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
+
       startCounting()
 
       if (!isMobile) {
          // update to a bigger screen on desktop
          setShowBigVideoPlayer(true)
       }
-   }, [isMobile, startCounting])
+   }, [isMobile, startCounting, stream])
 
    // handle preview play icon click
    const handlePreviewPlay = useCallback(() => {
