@@ -1,0 +1,294 @@
+{
+   "fields": [
+      {
+         "description": "The ID of the document.",
+         "name": "id",
+         "type": "string"
+      },
+      {
+         "description": "Map containing different rating categories for the livestream.",
+         "fields": [
+            {
+               "description": "Map containing overall rating statistics.",
+               "fields": [
+                  {
+                     "description": "The average rating for the overall category.",
+                     "name": "averageRating",
+                     "type": "number"
+                  },
+                  {
+                     "description": "The number of ratings for the overall category.",
+                     "name": "numberOfRatings",
+                     "type": "number"
+                  }
+               ],
+               "name": "overall",
+               "type": "map"
+            },
+            {
+               "description": "Map containing company rating statistics.",
+               "fields": [
+                  {
+                     "description": "The average rating for the company category.",
+                     "name": "averageRating",
+                     "type": "number"
+                  },
+                  {
+                     "description": "The number of ratings for the company category.",
+                     "name": "numberOfRatings",
+                     "type": "number"
+                  }
+               ],
+               "name": "company",
+               "type": "map"
+            },
+            {
+               "description": "Map containing willingness to apply rating statistics.",
+               "fields": [
+                  {
+                     "description": "The average rating for the willingness to apply category.",
+                     "name": "averageRating",
+                     "type": "number"
+                  },
+                  {
+                     "description": "The number of ratings for the willingness to apply category.",
+                     "name": "numberOfRatings",
+                     "type": "number"
+                  }
+               ],
+               "name": "willingnessToApply",
+               "type": "map"
+            }
+         ],
+         "name": "ratings",
+         "type": "map"
+      },
+      {
+         "description": "Map containing information about the livestream.",
+         "fields": [
+            {
+               "description": "Array of interest IDs associated with the livestream.",
+               "name": "interestsIds",
+               "type": "array"
+            },
+            {
+               "description": "Array of target levels of study for the livestream.",
+               "name": "targetLevelsOfStudy",
+               "type": "array"
+            },
+            {
+               "description": "The ID of the livestream.",
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "description": "A short summary or description of the livestream.",
+               "name": "summary",
+               "type": "string"
+            },
+            {
+               "description": "The name of the company hosting the livestream.",
+               "name": "company",
+               "type": "string"
+            },
+            {
+               "description": "The title of the livestream.",
+               "name": "title",
+               "type": "string"
+            },
+            {
+               "description": "The start timestamp of the livestream.",
+               "name": "start",
+               "type": "timestamp"
+            },
+            {
+               "description": "URL of the company logo image.",
+               "name": "companyLogoUrl",
+               "type": "string"
+            },
+            {
+               "description": "Field indicating whether the livestream has tests associated with it.",
+               "name": "test",
+               "type": "boolean"
+            },
+            {
+               "description": "Array of group IDs associated with the livestream.",
+               "name": "groupIds",
+               "type": "array"
+            },
+            {
+               "description": "Array of target fields of study for the livestream.",
+               "fields": [
+                  {
+                     "description": "The ID of the field of study.",
+                     "name": "id",
+                     "type": "string"
+                  },
+                  {
+                     "description": "The name of the field of study.",
+                     "name": "name",
+                     "type": "string"
+                  }
+               ],
+               "name": "targetFieldsOfStudy",
+               "type": "array"
+            },
+            {
+               "description": "Number of impressions for the livestream.",
+               "name": "impressions",
+               "type": "number"
+            },
+            {
+               "description": "The created timestamp of the livestream.",
+               "name": "created",
+               "type": "timestamp"
+            },
+            {
+               "description": "Indicates whether the livestream has associated jobs.",
+               "name": "hasJobs",
+               "type": "boolean"
+            },
+            {
+               "description": "The duration of the livestream in minutes.",
+               "name": "duration",
+               "type": "number"
+            },
+            {
+               "description": "URL of the background image for the livestream.",
+               "name": "backgroundImageUrl",
+               "type": "string"
+            }
+         ],
+         "name": "livestream",
+         "type": "map"
+      },
+      {
+         "description": "Map containing general statistics about the livestream.",
+         "fields": [
+            {
+               "description": "The number of participants in the livestream.",
+               "name": "numberOfParticipants",
+               "type": "number"
+            },
+            {
+               "description": "The number of registrations for the livestream.",
+               "name": "numberOfRegistrations",
+               "type": "number"
+            },
+            {
+               "description": "The number of talent pool profiles associated with the livestream.",
+               "name": "numberOfTalentPoolProfiles",
+               "type": "number"
+            },
+            {
+               "description": "The number of applicants for jobs related to the livestream.",
+               "name": "numberOfApplicants",
+               "type": "number"
+            },
+            {
+               "description": "The number of people reached by the livestream.",
+               "name": "numberOfPeopleReached",
+               "type": "number"
+            }
+         ],
+         "name": "generalStats",
+         "type": "map"
+      },
+      {
+         "description": "Map containing statistics about the livestream participants based on their field of study. Each field of study ID is a key in the map, with values being LivestreamStatsMap objects.",
+         "fields": [
+            {
+               "description": "The number of participants for this field of study.",
+               "name": "numberOfParticipants",
+               "type": "number"
+            },
+            {
+               "description": "The number of registrations for this field of study.",
+               "name": "numberOfRegistrations",
+               "type": "number"
+            },
+            {
+               "description": "The number of talent pool profiles for this field of study.",
+               "name": "numberOfTalentPoolProfiles",
+               "type": "number"
+            },
+            {
+               "description": "The number of applicants for this field of study.",
+               "name": "numberOfApplicants",
+               "type": "number"
+            },
+            {
+               "description": "The number of people reached for this field of study.",
+               "name": "numberOfPeopleReached",
+               "type": "number"
+            }
+         ],
+         "name": "fieldOfStudyStats",
+         "type": "map"
+      },
+      {
+         "description": "Map containing statistics about the livestream participants based on their university. Each university ID is a key in the map, with values being LivestreamStatsMap objects.",
+         "fields": [
+            {
+               "description": "The number of participants from this university.",
+               "name": "numberOfParticipants",
+               "type": "number"
+            },
+            {
+               "description": "The number of registrations from this university.",
+               "name": "numberOfRegistrations",
+               "type": "number"
+            },
+            {
+               "description": "The number of talent pool profiles from this university.",
+               "name": "numberOfTalentPoolProfiles",
+               "type": "number"
+            },
+            {
+               "description": "The number of applicants from this university.",
+               "name": "numberOfApplicants",
+               "type": "number"
+            },
+            {
+               "description": "The number of people reached from this university.",
+               "name": "numberOfPeopleReached",
+               "type": "number"
+            }
+         ],
+         "name": "universityStats",
+         "type": "map"
+      },
+      {
+         "description": "Map containing statistics about the livestream participants based on their country. Each country code is a key in the map, with values being LivestreamStatsMap objects.",
+         "fields": [
+            {
+               "description": "The number of participants from this country.",
+               "name": "numberOfParticipants",
+               "type": "number"
+            },
+            {
+               "description": "The number of registrations from this country.",
+               "name": "numberOfRegistrations",
+               "type": "number"
+            },
+            {
+               "description": "The number of talent pool profiles from this country.",
+               "name": "numberOfTalentPoolProfiles",
+               "type": "number"
+            },
+            {
+               "description": "The number of applicants from this country.",
+               "name": "numberOfApplicants",
+               "type": "number"
+            },
+            {
+               "description": "The number of people reached from this country.",
+               "name": "numberOfPeopleReached",
+               "type": "number"
+            }
+         ],
+         "name": "countryStats",
+         "type": "map"
+      }
+   ]
+}
