@@ -5,7 +5,9 @@ import {
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
 import { UserStats } from "@careerfairy/shared-lib/users"
-import { Box } from "@mui/material"
+import {
+   Box
+} from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useUserCountryCode from "components/custom-hook/useUserCountryCode"
@@ -14,6 +16,8 @@ import { useRouter } from "next/router"
 import { FC, useCallback, useEffect, useMemo, useState } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { autoPlay } from "react-swipeable-views-utils"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -177,6 +181,7 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             )
          )
          startCounting()
+         dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, livestream)
       },
       [startCounting, userData?.userEmail]
    )
