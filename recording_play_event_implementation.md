@@ -26,13 +26,13 @@ RecordingPlay: "recording_play"
 ### 2. Recording Player Component (Livestream Dialogs)
 **File**: `apps/web/components/views/livestream-dialog/views/livestream-details/RecordingPlayer.tsx`
 - Added analytics imports
-- Added event tracking in `handlePreviewPlay` function
+- Added event tracking in `handleRecordingPlay` function (where video playback actually starts)
 - Event fires when users click play on recordings in dialog views
 
 ### 3. HeroSection Recording Player
 **File**: `apps/web/components/views/upcoming-livestream/HeroSection/index.tsx` 
 - Added analytics imports
-- Added event tracking in `handlePreviewPlay` function
+- Added event tracking in `handleRecordingPlay` function (where video playback actually starts)
 - Event fires when users click play on recordings in past livestream pages
 
 ### 4. Content Carousel Banner Play
@@ -93,6 +93,12 @@ The `recording_play` event includes the same metadata as `event_registration_sta
 dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, livestreamObject)
 ```
 
+### Semantic Accuracy ⭐ **IMPORTANT**
+- Event tracking is placed in `handleRecordingPlay` functions (not `handlePreviewPlay`)
+- Events fire when video playback actually starts (`setVideoPaused(false)`, `startCounting()`)
+- This ensures we track actual recording playback, not just preview clicks
+- More accurate representation of user behavior
+
 ### Auto-Play Detection
 - Desktop hover auto-play tracked in `RecordingPreviewCardContainer`
 - Mobile viewport auto-play (using intersection observer) tracked via existing hover logic
@@ -137,6 +143,7 @@ dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, livestreamObject)
 - Event fires for both manual clicks AND hover auto-play scenarios
 - Desktop hover auto-play: Event fires immediately when mouse enters recording card
 - Mobile auto-play: Uses existing intersection observer logic
+- **Semantic accuracy**: Events fire in `handleRecordingPlay` where video actually starts playing
 - Consistent with existing analytics event patterns in codebase
 - Uses established `dataLayerLivestreamEvent` function for reliable metadata
 - Compatible with existing Customer.io integration
@@ -145,3 +152,4 @@ dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, livestreamObject)
 
 1. **Initial Implementation**: Added event constant and tracking for click scenarios
 2. **Hover Auto-Play**: Added tracking for hover auto-play scenarios on past livestreams overview
+3. **Semantic Fix**: Moved event tracking from `handlePreviewPlay` to `handleRecordingPlay` for accuracy ⭐ **IMPORTANT**
