@@ -27,6 +27,7 @@ import ConfirmDeleteSparkDialog from "../../components/ConfirmDeleteSparkDialog"
 import SparksDialog, { useSparksForm } from "../SparksDialog"
 import CreatorCard from "./components/CreatorCard"
 import SparkCategorySelect from "./components/SparkCategorySelect"
+import SparkLanguageSelect from "./components/SparkLanguageSelect"
 import SparkVisibilitySelect from "./components/SparkVisibilitySelect"
 import { SubmittingOverlay } from "./components/SubmittingOverlay"
 import VideoUpload from "./components/VideoUpload"
@@ -65,6 +66,7 @@ const getInitialSparkValues = (
 
    return {
       categoryId: spark?.category.id ?? "",
+      languageId: spark?.language ?? "",
       question: spark?.question ?? "",
       video: spark?.video ?? null,
       published:
@@ -262,13 +264,16 @@ const FormComponent: FC = () => {
                         <SparkCategorySelect name="categoryId" />
                      </Grid>
                      <Grid item xs={12}>
+                        <SparkLanguageSelect name="languageId" />
+                     </Grid>
+                     <Grid item xs={12}>
                         <FormBrandedTextField
                            name="question"
                            label="Question"
                            placeholder="Insert Spark question"
                            fullWidth
                            multiline
-                           rows={10}
+                           rows={6}
                         />
                      </Grid>
                      <Grid item xs={12}>

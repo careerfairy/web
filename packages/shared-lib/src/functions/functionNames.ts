@@ -19,6 +19,11 @@ export const FUNCTION_NAMES = {
    endOfSparksTrialEmails: "endOfSparksTrialEmails_v2",
    manualEndOfSparksTrialEmails: "manualEndOfSparksTrialEmails",
 
+   // Group Spark functions
+   createSpark: "createSpark_v6",
+   updateSpark: "updateSpark_v5",
+   deleteSpark: "deleteSpark_v4",
+
    // Auth functions
    createNewUserAccount: "createNewUserAccount_v5",
 
@@ -43,7 +48,8 @@ export const FUNCTION_NAMES = {
    createUserSparksFeedEventNotifications:
       "createUserSparksFeedEventNotifications_v4",
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
-   getSparksFeed: "getSparksFeed_v11",
+   getSparksFeed: "getSparksFeed_v12",
+
 
    // Location functions
    searchLocations: "searchLocations",

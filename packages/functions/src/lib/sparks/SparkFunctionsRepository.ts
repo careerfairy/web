@@ -33,7 +33,7 @@ import {
 } from "@careerfairy/shared-lib/src/commonTypes"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
-import { getArrayDifference } from "@careerfairy/shared-lib/utils"
+import { getArrayDifference, shuffle } from "@careerfairy/shared-lib/utils"
 import { DocumentSnapshot } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { Change } from "firebase-functions"
@@ -244,6 +244,19 @@ export interface ISparkFunctionsRepository {
     */
    getPublishedSparksByGroupId(groupId: string): Promise<Spark[]>
 
+   /**
+    * Get specific fields from published sparks for a group, optimizing bulk
+    * operations where only specific data is required.
+    * @param groupId The id of the group
+    * @param selectFields Array of field names to retrieve (e.g., ['language'])
+    * @returns Partial Spark objects containing only the requested fields
+    *
+    */
+   getPartialPublishedSparksByGroupId(
+      groupId: string,
+      selectFields: (keyof Spark)[]
+   ): Promise<Partial<Spark>[]>
+
    groupHasPublishedSparks(groupId: string, limit?: number): Promise<boolean>
    /**
     * Get all user sparks feed metrics
@@ -433,6 +446,7 @@ export class SparkFunctionsRepository
          question: data.question,
          video: data.video,
          category: getCategoryById(data.categoryId),
+         language: data.languageId,
          contentTopicsTagIds: SparkCategoriesToTagValuesMapper[data.categoryId]
             ? [SparkCategoriesToTagValuesMapper[data.categoryId]]
             : [],
@@ -453,6 +467,7 @@ export class SparkFunctionsRepository
       const doc: Pick<
          Spark,
          | "category"
+         | "language"
          | "contentTopicsTagIds"
          | "creator"
          | "question"
@@ -463,6 +478,7 @@ export class SparkFunctionsRepository
       > = {
          question: data.question,
          category: getCategoryById(data.categoryId),
+         language: data.languageId,
          contentTopicsTagIds: SparkCategoriesToTagValuesMapper[data.categoryId]
             ? [SparkCategoriesToTagValuesMapper[data.categoryId]]
             : [],
@@ -581,12 +597,17 @@ export class SparkFunctionsRepository
          sparkRepo
       )
 
-      const [studyBackgrounds, recommendationService] = await Promise.all([
-         userRepo.getUserStudyBackgrounds(userId),
-         SparkRecommendationService.create(dataFetcher),
-      ])
+      const [studyBackgrounds, languages, recommendationService] =
+         await Promise.all([
+            userRepo.getUserStudyBackgrounds(userId),
+            userRepo.getUserLanguages(userId),
+            SparkRecommendationService.create(dataFetcher),
+         ])
 
-      recommendationService.setStudyBackgrounds(studyBackgrounds)
+      recommendationService.setAdditionalUserInfo({
+         studyBackgrounds,
+         languages,
+      })
 
       const recommendedSparkIds =
          await recommendationService.getRecommendations(this.TARGET_SPARK_COUNT)
@@ -606,6 +627,9 @@ export class SparkFunctionsRepository
       const feedRef = this.firestore.collection("sparksFeedMetrics").doc(userId)
 
       batch.set(feedRef, userFeed, { merge: true })
+
+      // Shuffle the recommended sparks for a bit of variation
+      shuffle(recommendedSparks)
 
       // Store in UserFeed
       recommendedSparks.forEach((spark) => {
@@ -636,7 +660,7 @@ export class SparkFunctionsRepository
          .where("group.publicSparks", "==", true)
 
       const userFeedRef = query
-         .orderBy("publishedAt", "desc")
+         .orderBy("addedToFeedAt", "desc")
          .limit(limit)
          .withConverter<Spark>(createAdminConverter())
 
@@ -984,6 +1008,23 @@ export class SparkFunctionsRepository
          .where("group.publicSparks", "==", true)
          .where("published", "==", true)
          .orderBy("createdAt", "desc")
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async getPartialPublishedSparksByGroupId(
+      groupId: string,
+      selectFields: (keyof Spark)[]
+   ): Promise<Partial<Spark>[]> {
+      const snapshot = await this.firestore
+         .collection("sparks")
+         .withConverter<Partial<Spark>>(createAdminConverter())
+         .where("group.id", "==", groupId)
+         .where("group.publicSparks", "==", true)
+         .where("published", "==", true)
+         .orderBy("createdAt", "desc")
+         .select(...selectFields)
          .get()
 
       return snapshot.docs.map((doc) => doc.data())

@@ -64,6 +64,7 @@ import {
 } from "../api/firestoreAdmin"
 import { customJobRepo } from "../api/repositories"
 import { FunctionsLogger, getChangeTypes } from "../util"
+import { createAdminConverter } from "../util/firestore-admin"
 import { addOperations } from "./stats/livestream"
 import type { OperationsToMake } from "./stats/util"
 import { syncCustomJobLinkedContentTags } from "./tagging/tags"
@@ -182,6 +183,19 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    ): Promise<void>
 
    fetchLivestreams(options: LivestreamQueryOptions): Promise<LivestreamEvent[]>
+
+   /**
+    * Get specific fields from livestreams for a group, optimizing bulk operations
+    * where only specific data is required.
+    * @param groupId The id of the group
+    * @param selectFields Array of field names to retrieve (e.g., ['language'])
+    * @returns Partial LivestreamEvent objects containing only the requested fields
+    *
+    */
+   getPartialLivestreamsByGroupId(
+      groupId: string,
+      selectFields: (keyof LivestreamEvent)[]
+   ): Promise<Partial<LivestreamEvent>[]>
 
    /**
     * Retrieves all the admin information for a given livestream.
@@ -1369,5 +1383,22 @@ export class LivestreamFunctionsRepository
       }
 
       return taskDoc.data() as LivestreamReminderTask
+   }
+
+   async getPartialLivestreamsByGroupId(
+      groupId: string,
+      selectFields: (keyof LivestreamEvent)[]
+   ): Promise<Partial<LivestreamEvent>[]> {
+      const snapshot = await firestoreAdmin
+         .collection("livestreams")
+         .withConverter<Partial<LivestreamEvent>>(createAdminConverter())
+         .where("groupIds", "array-contains", groupId)
+         .where("test", "==", false)
+         .where("hidden", "==", false)
+         .orderBy("start", "desc")
+         .select(...selectFields)
+         .get()
+
+      return snapshot.docs.map((doc) => doc.data())
    }
 }

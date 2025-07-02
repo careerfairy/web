@@ -46,6 +46,7 @@ export const COMPANY_FIELDS_TO_INDEX = [
    "hasUpcomingEvents",
    "hasSparks",
    "featured",
+   "contentLanguages",
 ] satisfies (keyof TransformedGroup)[]
 
 export type CompanyFieldToIndexType = (typeof COMPANY_FIELDS_TO_INDEX)[number]
@@ -72,13 +73,18 @@ export const COMPANY_FILTERING_FIELDS = [
    "inActive",
    "publicSparks",
    "publicProfile",
+   "contentLanguages",
 ] satisfies CompanyFieldToIndexType[]
 
 type FilterFieldType = (typeof COMPANY_FILTERING_FIELDS)[number]
 
 export type ArrayFilterFieldType = Extract<
    FilterFieldType,
-   "companySize" | "companyIndustriesIdTags" | "companyCountryId" | "id"
+   | "companySize"
+   | "companyIndustriesIdTags"
+   | "companyCountryId"
+   | "id"
+   | "contentLanguages"
 > &
    "objectID"
 
