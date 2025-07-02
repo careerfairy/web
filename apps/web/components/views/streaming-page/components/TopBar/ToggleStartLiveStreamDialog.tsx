@@ -30,7 +30,7 @@ export const ToggleStartLiveStreamDialog = ({
          title={shouldStop ? "End live stream" : "Start live stream"}
          description={
             shouldStop
-               ? "Are you sure you want to end your live stream? Your viewers will no longer be able to see or hear you."
+               ? "Are you sure you want to end your live stream? Your viewers will no longer be able to see or hear you and the other speakers."
                : "Are you sure you want to start your live stream? Once you go live, your viewers will be able to see and hear you."
          }
          icon={shouldStop ? <StopStreamIcon /> : <StartStreamIcon />}

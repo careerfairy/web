@@ -1,12 +1,14 @@
+import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
 import { Box, BoxProps, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { ReactNode, forwardRef } from "react"
+import { ReactNode, forwardRef, useEffect } from "react"
 import {
    useIsRecordingWindow,
    useShowEndScreen,
    useStreamHasJobs,
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
+import { MobileUtils } from "util/mobile.utils"
 import { EndOfStreamHeader } from "./EndOfStreamHeader"
 import { Hero } from "./Hero"
 import { Jobs } from "./Jobs"
@@ -41,6 +43,12 @@ type Props = {
  */
 export const EndOfStream = ({ children, isHost }: Props) => {
    const showEndScreen = useShowEndScreen(isHost)
+
+   useEffect(() => {
+      if (showEndScreen) {
+         MobileUtils.send(MESSAGING_TYPE.FEEDBACK_PROMPT, null)
+      }
+   }, [showEndScreen])
 
    if (showEndScreen) {
       return <EndOfStreamView />

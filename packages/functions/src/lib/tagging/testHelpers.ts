@@ -133,6 +133,7 @@ const generateSparkData = (options: NewSparkDataOptions): Spark => {
       creator: undefined,
       published: false,
       category: undefined,
+      language: undefined,
       video: undefined,
       question: undefined,
    }

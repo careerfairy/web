@@ -86,6 +86,20 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
       return this
    }
 
+   public userLanguages() {
+      if (this.userAdditionalInfo.languages?.length > 0) {
+         // Fetch the top recommended sparks based on the user's languages
+         this.addResults(
+            this.rankedSparkRepo.getSparksBasedOnLanguages(
+               this.userAdditionalInfo.languages.map((lang) => lang.languageId),
+               this.limit
+            )
+         )
+      }
+
+      return this
+   }
+
    public userFeaturedGroups() {
       const allResults = removeDuplicateDocuments(
          this.results.filter(Boolean).flat()

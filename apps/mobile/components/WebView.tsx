@@ -16,6 +16,7 @@ import { Camera } from "expo-camera"
 import * as Notifications from "expo-notifications"
 import * as ScreenOrientation from "expo-screen-orientation"
 import * as SecureStore from "expo-secure-store"
+import * as StoreReview from "expo-store-review"
 import * as WebBrowser from "expo-web-browser"
 import React, {
    RefObject,
@@ -269,6 +270,17 @@ const WebViewComponent = ({
       )
    }
 
+   const handleFeedbackPrompt = async () => {
+      try {
+         const isAvailable = await StoreReview.isAvailableAsync()
+         if (isAvailable) {
+            await StoreReview.requestReview()
+         }
+      } catch (error) {
+         console.error("Failed to show store review:", error)
+      }
+   }
+
    const handleMessage = (event: NativeEventStringified) => {
       try {
          const receivedData = JSON.parse(event.nativeEvent.data)
@@ -294,6 +306,8 @@ const WebViewComponent = ({
                return handleTrackScreen(data)
             case MESSAGING_TYPE.ON_AUTH_MOUNTED:
                return handleOnAuthMounted(data)
+            case MESSAGING_TYPE.FEEDBACK_PROMPT:
+               return handleFeedbackPrompt()
             default:
                break
          }
@@ -325,8 +339,10 @@ const WebViewComponent = ({
 
    const handleIdentifyCustomer = async (data: IDENTIFY_CUSTOMER) => {
       try {
-         await customerIO.identifyCustomer(data.userAuthId)
-         await branchTracking.identifyUser(data.userAuthId).catch(console.error)
+         await Promise.allSettled([
+            customerIO.identifyCustomer(data.userAuthId),
+            branchTracking.identifyUser(data.userAuthId),
+         ])
       } catch (error) {
          console.error(`Failed to identify customer: ${error}`)
       }
@@ -334,7 +350,10 @@ const WebViewComponent = ({
 
    const handleTrackEvent = async (data: TRACK_EVENT) => {
       try {
-         await customerIO.trackEvent(data.eventName, data.properties)
+         await Promise.allSettled([
+            customerIO.trackEvent(data.eventName, data.properties),
+            branchTracking.trackEvent(data.eventName, data.properties),
+         ])
       } catch (error) {
          console.error(`Failed to track event: ${error}`)
       }

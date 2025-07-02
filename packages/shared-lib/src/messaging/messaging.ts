@@ -14,6 +14,7 @@ export enum MESSAGING_TYPE {
    "CLEAR_CUSTOMER" = "CLEAR_CUSTOMER",
    "IDENTIFY_CUSTOMER" = "IDENTIFY_CUSTOMER",
    "ON_AUTH_MOUNTED" = "ON_AUTH_MOUNTED",
+   "FEEDBACK_PROMPT" = "FEEDBACK_PROMPT",
 
    /**
     * ------------------------------------------------------------
@@ -74,6 +75,7 @@ export type NativeEvent =
    | { type: MESSAGING_TYPE.CLEAR_CUSTOMER; data: null }
    | { type: MESSAGING_TYPE.ON_AUTH_MOUNTED; data: ON_AUTH_MOUNTED }
    | { type: MESSAGING_TYPE.IDENTIFY_CUSTOMER; data: IDENTIFY_CUSTOMER }
+   | { type: MESSAGING_TYPE.FEEDBACK_PROMPT; data: null }
 
 export type WebEvent =
    | { type: MESSAGING_TYPE.LOGOUT_WEB_VIEW; data: null }

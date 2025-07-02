@@ -1,15 +1,17 @@
 import BusinessCenterRoundedIcon from "@mui/icons-material/BusinessCenterRounded"
 import MicOutlinedIcon from "@mui/icons-material/MicOutlined"
 import TheatersRoundedIcon from "@mui/icons-material/TheatersRounded"
-import { FormHelperText } from "@mui/material"
+import {
+   Button,
+   Collapse,
+   Container,
+   FormHelperText,
+   Grid,
+   TextField,
+   Typography,
+} from "@mui/material"
 import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
 import CircularProgress from "@mui/material/CircularProgress"
-import Collapse from "@mui/material/Collapse"
-import Container from "@mui/material/Container"
-import Grid from "@mui/material/Grid"
-import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import { userRepo } from "data/RepositoryInstances"
 import { Timestamp } from "firebase/firestore"

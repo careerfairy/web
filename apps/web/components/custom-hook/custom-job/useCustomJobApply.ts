@@ -2,6 +2,7 @@ import {
    CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { trackLevelsJobApplied } from "store/reducers/talentGuideReducer"
@@ -11,6 +12,7 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import { customJobRepo } from "../../../data/RepositoryInstances"
 import { customJobServiceInstance } from "../../../data/firebase/CustomJobService"
 import { dataLayerCustomJobEvent } from "../../../util/analyticsUtils"
+import { MobileUtils } from "../../../util/mobile.utils"
 import { useAppDispatch } from "../store"
 import useFingerPrint from "../useFingerPrint"
 import useSnackbarNotifications from "../useSnackbarNotifications"
@@ -63,6 +65,8 @@ const useCustomJobApply = (
                   "You have successfully applied to the job!",
                   "Congrats"
                )
+
+               MobileUtils.send(MESSAGING_TYPE.FEEDBACK_PROMPT, null)
 
                dataLayerCustomJobEvent(
                   AnalyticsEvents.CustomJobApplicationComplete,

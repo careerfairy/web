@@ -6,11 +6,13 @@ import {
    GroupEventActions,
    GroupEventServer,
 } from "@careerfairy/shared-lib/groups/telemetry"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import {
    chunkArray,
    isWithinNormalizationLimit,
 } from "@careerfairy/shared-lib/utils/utils"
-import { onCall } from "firebase-functions/https"
+import { onCall, onRequest } from "firebase-functions/https"
 import { logger } from "firebase-functions/v2"
 import { onSchedule } from "firebase-functions/v2/scheduler"
 import { InferType, SchemaOf, array, boolean, mixed, object, string } from "yup"
@@ -230,3 +232,128 @@ export const trackGroupEvents = onCall(
       }
    )
 )
+
+/**
+ * Updates the languages used in each company's
+ * content (sparks and livestreams) every hour
+ */
+export const syncCompanyLanguages = onSchedule(
+   {
+      schedule: "every 1 hours",
+      timeoutSeconds: 540,
+      memory: "8GiB",
+   },
+   async () => {
+      await processSyncCompanyLanguages()
+   }
+)
+
+/** For local testing */
+export const manualSyncCompanyLanguages = onRequest(async (_, response) => {
+   await processSyncCompanyLanguages()
+   response.send("Success")
+})
+
+const processSyncCompanyLanguages = async () => {
+   try {
+      logger.info("Starting scheduled update of company languages")
+      const bulkWriter = firestore.bulkWriter()
+      const groups = await groupRepo.fetchCompanies({})
+
+      const groupUpdateData: Record<
+         string,
+         Pick<Group, "contentLanguages">
+      > = {}
+
+      await processInBatches(
+         groups,
+         25,
+         async (group) => {
+            logger.info("processing group", group.id)
+            const [sparks, livestreams] = await Promise.all([
+               sparkRepo.getPartialPublishedSparksByGroupId(group.id, [
+                  "language",
+               ]),
+               livestreamsRepo.getPartialLivestreamsByGroupId(group.id, [
+                  "language",
+               ]),
+            ])
+
+            // Extract unique languages from content
+            const sparkLanguages = new Set(
+               sparks
+                  .filter((spark: Spark) => spark.language)
+                  .map((spark: Spark) => spark.language)
+            )
+
+            const livestreamLanguages = new Set(
+               livestreams
+                  .filter(
+                     (livestream: LivestreamEvent) => livestream.language?.code
+                  )
+                  .map(
+                     (livestream: LivestreamEvent) => livestream.language.code
+                  )
+            )
+
+            // Combine all unique languages
+            const allLanguages = new Set([
+               ...sparkLanguages,
+               ...livestreamLanguages,
+            ])
+
+            groupUpdateData[group.id] = {
+               contentLanguages: Array.from(allLanguages),
+            }
+         },
+         logger
+      )
+
+      logger.info("Updating company languages")
+
+      const chunkedGroupUpdateData = chunkArray(
+         Object.entries(groupUpdateData),
+         25
+      )
+
+      for (const batch of chunkedGroupUpdateData) {
+         for (const [groupId, groupData] of batch) {
+            const existingLanguages = new Set(
+               groups[groupId]?.contentLanguages || []
+            )
+            const newLanguages = new Set(groupData?.contentLanguages || [])
+
+            if (
+               existingLanguages.size === newLanguages.size &&
+               [...existingLanguages].every((language: string) =>
+                  newLanguages.has(language)
+               )
+            ) {
+               logger.info("Skipping, no data changes", groupId)
+               continue
+            }
+
+            logger.info(
+               "Updating company languages",
+               groupId,
+               groupData.contentLanguages
+            )
+
+            const docRef = firestore.collection("careerCenterData").doc(groupId)
+
+            void bulkWriter.update(docRef, {
+               contentLanguages: groupData.contentLanguages,
+            })
+         }
+
+         await bulkWriter.flush()
+      }
+
+      logger.info(
+         "Successfully completed scheduled update of company languages"
+      )
+   } catch (error) {
+      logger.error("Error in scheduled update of company languages:", error)
+      throw error
+   }
+}

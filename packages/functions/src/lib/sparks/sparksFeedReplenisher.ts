@@ -110,12 +110,17 @@ export class SparksFeedReplenisher {
             sparkRepo
          )
 
-         const [studyBackgrounds, recommendationService] = await Promise.all([
-            userRepo.getUserStudyBackgrounds(userId),
-            SparkRecommendationService.create(dataFetcher),
-         ])
+         const [studyBackgrounds, languages, recommendationService] =
+            await Promise.all([
+               userRepo.getUserStudyBackgrounds(userId),
+               userRepo.getUserLanguages(userId),
+               SparkRecommendationService.create(dataFetcher),
+            ])
 
-         recommendationService.setStudyBackgrounds(studyBackgrounds)
+         recommendationService.setAdditionalUserInfo({
+            studyBackgrounds,
+            languages,
+         })
 
          const recommendedSparkIds =
             await recommendationService.getRecommendations(
