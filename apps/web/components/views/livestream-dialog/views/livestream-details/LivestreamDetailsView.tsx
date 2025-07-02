@@ -50,13 +50,14 @@ const LivestreamDetailsView = () => {
 
    const isMobile = useIsMobile()
 
-   const viewRef = useTrackLivestreamView(livestream)
    const { authenticatedUser } = useAuth()
 
    const { showRecording } = useRecordingAccess(
       authenticatedUser.email || serverUserEmail,
       livestreamPresenter
    )
+
+   const viewRef = useTrackLivestreamView(livestream, showRecording)
 
    const { count: jobsCount } = useCustomJobsCount({
       businessFunctionTagIds: [],

@@ -58,8 +58,6 @@ const UpcomingLivestreamPage = ({
    const questionsRef = useRef(null)
    const { deregisterFromLivestream } = useFirebaseService()
 
-   const viewRef = useTrackLivestreamView(serverStream)
-
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
 
@@ -94,6 +92,8 @@ const UpcomingLivestreamPage = ({
    }, [userStatsPlain, userStats])
 
    const { showRecording } = useRecordingAccess(userEmail, streamPresenter)
+
+   const viewRef = useTrackLivestreamView(serverStream, showRecording)
 
    const companyGroupData = useMemo<Group | null>(() => {
       const companyGroups = unfilteredGroups?.filter(

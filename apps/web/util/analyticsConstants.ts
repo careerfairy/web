@@ -121,6 +121,36 @@ export const AnalyticsEvents = {
    LevelsMentorView: "levels_mentor_view",
    LevelsMentorClick: "levels_mentor_click",
    LevelsMentorLinkedinClick: "levels_mentor_linkedin_click",
+   SparkClickTalentPoolCTA: "spark_click_talent_pool_cta",
+   SparkClickLinkedinCTA: "spark_click_linkedin_cta",
+   SparkClickFollowCTA: "spark_click_follow_cta",
+   SparkClickEventCTA: "spark_click_event_cta",
+   SparkClickNextCTA: "spark_click_next_cta",
+   SparkClickPreviousCTA: "spark_click_previous_cta",
+   SparkClickPauseCTA: "spark_click_pause_cta",
+   SparkClickPlayCTA: "spark_click_play_cta",
+   SparkClickFullscreenCTA: "spark_click_fullscreen_cta",
+   SparkClickVolumeOnCTA: "spark_click_volume_on_cta",
+   SparkClickVolumeOffCTA: "spark_click_volume_off_cta",
+   SparkClickCategoryDropdown: "spark_click_category_dropdown",
+   SparkClickCategoryFilter: "spark_click_category_filter",
+   SparkClickNotificationsCTA: "spark_click_notifications_cta",
+   SparkClickCloseCTA: "spark_click_close_cta",
+   SparkClickBackCTA: "spark_click_back_cta",
+   SparkClickContinueCTA: "spark_click_continue_cta",
+   SparkClickLoginCTA: "spark_click_login_cta",
+   SparkClickLogoutCTA: "spark_click_logout_cta",
+   SparkClickSignupCTA: "spark_click_signup_cta",
+   SparkClickReachOutCTA: "spark_click_reach_out_cta",
+   SparkClickReachOutExternal: "spark_click_reach_out_external",
+   SparkClickReachOutInternal: "spark_click_reach_out_internal",
+   SparkClickReachOutTelegram: "spark_click_reach_out_telegram",
+   SparkClickReachOutWhatsapp: "spark_click_reach_out_whatsapp",
+   SparkClickReachOutInstagram: "spark_click_reach_out_instagram",
+   LivestreamJobApplicationWaitingList:
+      "livestream_job_application_waiting_list",
+   LivestreamJobApplicationWaitingListRemoved:
+      "livestream_job_application_waiting_list_removed",
    LivestreamOpenSupport: "livestream_open_support",
    LivestreamSpeakerSave: "livestream_speaker_save",
    LivestreamChatNewMessage: "livestream_chat_new_message",
@@ -129,6 +159,10 @@ export const AnalyticsEvents = {
 
    // Value Scoring
    Purchase: "Purchase",
+   
+   // Event Detail Page Views
+   EventDetailsPageViewed: "event_details_page_viewed",
+   RecordingDetailsPageViewed: "recording_details_page_viewed",
 } as const
 
 export type AnalyticsEvent =
