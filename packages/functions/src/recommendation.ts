@@ -106,14 +106,7 @@ export const getRecommendedJobs = onCall(
             request.data.userCountryCode,
          ],
          60 * 60 * 12, // 12 hours
-         (request) => {
-            functions.logger.info(
-               "🚀 ~ caching test.data.userCountryCode:",
-               request.data.userCountryCode,
-               request.data.userAuthId
-            )
-            return true
-         }
+         (request) => request.data.bypassCache === true
       ),
       async (request) => {
          try {
