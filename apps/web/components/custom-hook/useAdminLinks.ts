@@ -1,15 +1,29 @@
-import { CompanyIcon } from "components/views/common/icons"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
    Calendar as CalendarIcon,
    User as ProfileIcon,
    BarChart2 as StatisticsIcon,
    Film as StreamIcon,
 } from "react-feather"
+import { CompanyIcon } from "components/views/common/icons"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 
-const initialHeaderLinks = [
+// Type definitions for link objects
+interface AdminLink {
+   href: string
+   title: string
+   basePath?: string
+   icon?: React.ComponentType<any> | (() => React.JSX.Element)
+}
+
+interface UseAdminLinksReturn {
+   drawerBottomLinks: AdminLink[]
+   drawerTopLinks: AdminLink[]
+   headerLinks: AdminLink[]
+}
+
+const initialHeaderLinks: AdminLink[] = [
    {
       href: `/portal`,
       title: "PORTAL",
@@ -19,7 +33,8 @@ const initialHeaderLinks = [
       title: "NEXT LIVE STREAMS",
    },
 ]
-const initialDrawerBottomLinks = [
+
+const initialDrawerBottomLinks: AdminLink[] = [
    {
       href: `https://companies.careerfairy.io`,
       title: "FOR COMPANIES",
@@ -35,7 +50,7 @@ const initialDrawerBottomLinks = [
    },
 ]
 
-const pushNotificationTesters = [
+const pushNotificationTesters: string[] = [
    "matilde.ramos@careerfairy.io",
    "goncalo@careerfairy.io",
    "puzic.sead@gmail.com",
@@ -46,15 +61,16 @@ const pushNotificationTesters = [
    "walter.goncalves@careerfairy.io",
    "amal-thomas.roy@careerfairy.io",
 ]
-const useAdminLinks = () => {
+
+const useAdminLinks = (): UseAdminLinksReturn => {
    const { userData } = useAuth()
    const firebase = useFirebaseService()
 
-   const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks)
-   const [drawerBottomLinks, setDrawerBottomLinks] = useState(
+   const [headerLinks, setHeaderLinks] = useState<AdminLink[]>(initialHeaderLinks)
+   const [drawerBottomLinks, setDrawerBottomLinks] = useState<AdminLink[]>(
       initialDrawerBottomLinks
    )
-   const [drawerTopLinks, setDrawerTopLinks] = useState([])
+   const [drawerTopLinks, setDrawerTopLinks] = useState<AdminLink[]>([])
 
    useEffect(() => {
       if (firebase.auth?.currentUser?.emailVerified) {
