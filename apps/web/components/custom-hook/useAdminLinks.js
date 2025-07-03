@@ -4,7 +4,7 @@ import {
    Calendar as CalendarIcon,
    User as ProfileIcon,
    BarChart2 as StatisticsIcon,
-   Film as StreamIcon
+   Film as StreamIcon,
 } from "react-feather"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
