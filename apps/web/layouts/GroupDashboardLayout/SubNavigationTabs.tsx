@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles"
 import { useFeatureFlags } from "components/custom-hook/useFeatureFlags"
 import Link from "components/views/common/Link"
 import { useRouter } from "next/router"
-import { Fragment, SyntheticEvent, useCallback, useMemo, useState } from "react"
+import { Fragment, SyntheticEvent, useCallback, useMemo } from "react"
 import { INavLink } from "../types"
 import { useGroup } from "./index"
 
@@ -38,10 +38,7 @@ type Props = {
 
 export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
    const { pathname, push } = useRouter()
-   console.log("🚀", { pathname, showSubNavigationFor })
    const { group } = useGroup()
-
-   const [tabValue, setTabValue] = useState(pathname)
 
    const featureFlags = useFeatureFlags()
 
@@ -53,7 +50,7 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
       const BASE_HREF_PATH = "group"
       const BASE_PARAM = "[groupId]"
 
-      const navigationLookup = {
+      const navigationLookup: Record<ValidTabs, INavLink> = {
          content: {
             id: "content",
             title: "Content",
@@ -80,13 +77,13 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
          },
          analytics: {
             id: "analytics",
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams`,
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams/overview`,
             title: "Analytics",
             childLinks: [
                {
                   id: "live-stream-analytics",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-streams/[[...livestreamId]]`,
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams/overview`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-streams/overview`,
                   title: "Live stream",
                },
                {
@@ -116,14 +113,27 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
                },
             ],
          },
-      } as const satisfies Record<ValidTabs, INavLink>
+      } as const
 
       return navigationLookup[showSubNavigationFor]
    }, [group.id, hasAccessToSparks, showSubNavigationFor])
 
+   // Determine which tab should be active based on current pathname
+   const activeTab = useMemo(() => {
+      if (!currentSection?.childLinks?.length) return null
+
+      // First try to find exact pathname match
+      const exactMatch = currentSection.childLinks.find(
+         (tab) => tab.pathname === pathname
+      )
+      if (exactMatch) return exactMatch
+
+      // Fallback to first tab
+      return currentSection.childLinks[0]
+   }, [currentSection, pathname])
+
    const handleTabChange = useCallback(
       (_: SyntheticEvent, newValue: string) => {
-         setTabValue(newValue)
          const selectedTab = currentSection?.childLinks?.find(
             (tab) => tab.pathname === newValue
          )
@@ -146,7 +156,7 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
             <StyledTabs
                textColor="secondary"
                indicatorColor="secondary"
-               value={tabValue}
+               value={activeTab?.pathname || false}
                onChange={handleTabChange}
             >
                {currentSection?.childLinks?.map((tab) => {

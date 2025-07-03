@@ -335,6 +335,15 @@ const moduleExports = {
             destination: "/group/:groupId/admin/analytics/live-streams", // Page is not plural for consistency
             permanent: false,
          },
+         /**
+          * General analytics page has been renamed to live stream analytics page
+          */
+         {
+            source: "/group/:groupId/admin/analytics",
+            destination:
+               "/group/:groupId/admin/analytics/live-streams/overview",
+            permanent: false,
+         },
          {
             source: "/group/:groupId/admin/analytics/feedback",
             destination:

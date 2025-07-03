@@ -2,6 +2,7 @@ import { Box } from "@mui/material"
 import { BrandedTabs } from "components/views/common/BrandedTabs"
 import { useRouter } from "next/router"
 import { SyntheticEvent } from "react"
+import { AtSign, Hexagon, MessageCircle, Users } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -12,29 +13,29 @@ const styles = sxStyles({
 
 const tabs = [
    {
-      label: "Live Streams",
-      value: "/group/[groupId]/admin/analytics/live-stream",
+      label: "Overview",
+      value: "/group/[groupId]/admin/analytics/live-streams/overview",
       catchAllPath: undefined,
+      icon: <Hexagon />,
    },
    {
-      label: "Live Stream Details",
-      value: "/group/[groupId]/admin/analytics/live-stream/[[...livestreamId]]",
+      label: "Live stream analytics",
+      value: "/group/[groupId]/admin/analytics/live-streams",
+      catchAllPath:
+         "/group/[groupId]/admin/analytics/live-streams/[[...livestreamId]]",
+      icon: <AtSign />,
+   },
+   {
+      label: "Registration Source",
+      value: "/group/[groupId]/admin/analytics/live-streams/registration-sources",
       catchAllPath: undefined,
+      icon: <Users />,
    },
    {
       label: "Feedback",
-      value: "/group/[groupId]/admin/analytics/live-stream/feedback/[[...feedback]]",
+      value: "/group/[groupId]/admin/analytics/live-streams/feedback/[[...feedback]]",
       catchAllPath: undefined,
-   },
-   {
-      label: "Registration Sources",
-      value: "/group/[groupId]/admin/analytics/registration-sources",
-      catchAllPath: undefined,
-   },
-   {
-      label: "Sparks",
-      value: "/group/[groupId]/admin/analytics/sparks",
-      catchAllPath: undefined,
+      icon: <MessageCircle />,
    },
 ] as const
 
@@ -70,6 +71,7 @@ export const LivestreamAnalyticsNavigationTabs = () => {
                   label={tab.label}
                   value={tab.value}
                   href={tab.value.replace("[groupId]", groupId)}
+                  icon={tab.icon}
                />
             ))}
          </BrandedTabs>

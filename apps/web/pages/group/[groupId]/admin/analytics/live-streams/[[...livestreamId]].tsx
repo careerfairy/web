@@ -1,4 +1,4 @@
-import AnalyticsGeneralPageContent from "components/views/group/admin/analytics-new/general"
+import { LivestreamAnalyticsNavigationTabs } from "components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { SubNavigationTabs } from "layouts/GroupDashboardLayout/SubNavigationTabs"
@@ -7,12 +7,8 @@ import LivestreamAnalyticsPageContent from "../../../../../../components/views/g
 
 const LivestreamPage = () => {
    const {
-      query: { groupId, livestreamId },
+      query: { groupId },
    } = useRouter()
-
-   // If no livestreamId parameters are provided, show general analytics
-   // If livestreamId parameters are provided, show specific livestream analytics
-   const hasLivestreamParams = livestreamId?.length > 0
 
    return (
       <GroupDashboardLayout
@@ -21,11 +17,8 @@ const LivestreamPage = () => {
       >
          <DashboardHead title="CareerFairy | Live Stream Analytics of" />
          <SubNavigationTabs showSubNavigationFor="analytics" />
-         {hasLivestreamParams ? (
-            <LivestreamAnalyticsPageContent />
-         ) : (
-            <AnalyticsGeneralPageContent />
-         )}
+         <LivestreamAnalyticsNavigationTabs />
+         <LivestreamAnalyticsPageContent />
       </GroupDashboardLayout>
    )
 }
