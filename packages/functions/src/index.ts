@@ -387,6 +387,8 @@ exports[FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook] =
    customerio.customerIORecommendedLivestreamsWebhook
 exports[FUNCTION_NAMES.customerIORecommendedSparksWebhook] =
    customerio.customerIORecommendedSparksWebhook
+exports[FUNCTION_NAMES.customerIORecommendedJobsWebhook] =
+   customerio.customerIORecommendedJobsWebhook
 
 // Reminders
 exports.schedule5MinutesReminderEmails =
