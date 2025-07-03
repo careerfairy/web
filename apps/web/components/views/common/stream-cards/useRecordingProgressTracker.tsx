@@ -3,6 +3,8 @@ import { useUserRecordingProgress } from "components/custom-hook/recordings/useU
 import { livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCallback, useEffect, useState } from "react"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 
 const useRecordingProgressTracker = ({
    livestream,
@@ -24,6 +26,8 @@ const useRecordingProgressTracker = ({
       initialProgress?.lastSecondWatched
    )
    const [duration, setDuration] = useState(0)
+   const [recordingWatchEventDispatched, setRecordingWatchEventDispatched] =
+      useState(false)
 
    // Calculate duration from timestamps
    useEffect(() => {
@@ -72,6 +76,12 @@ const useRecordingProgressTracker = ({
                })
          }
 
+         // Dispatch RecordingWatch event after 1 minute of continuous watching
+         if (secondsPassed >= 60 && !recordingWatchEventDispatched) {
+            dataLayerLivestreamEvent(AnalyticsEvents.RecordingWatch, livestream)
+            setRecordingWatchEventDispatched(true)
+         }
+
          // Update minutes watched every 60 seconds
          if (Math.round(secondsPassed) % 60 === 0 && userData?.userEmail) {
             livestreamRepo.updateRecordingStats({
@@ -84,7 +94,7 @@ const useRecordingProgressTracker = ({
             })
          }
       },
-      [livestream.id, livestream.start, duration, userData?.userEmail]
+      [livestream, duration, userData?.userEmail, recordingWatchEventDispatched]
    )
 
    return {
