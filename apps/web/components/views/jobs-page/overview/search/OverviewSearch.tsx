@@ -13,29 +13,24 @@ const styles = sxStyles({
    },
    stickyRoot: {
       position: "sticky",
-      top: 64,
+      top: `calc(var(--app-bar-visible, 0) * 60px)`,
       backgroundColor: "#F7F8FC",
       py: 2,
+      zIndex: 1,
+      transition: `top 100ms ease-out`,
    },
    searchBy: {
-      overflowX: "auto",
-      boxSizing: "border-box",
-      overflowClipMargin: "106px",
-      scrollbarWidth: "none",
-      "&::-webkit-scrollbar": {
-         display: "none",
-      },
       px: {
-         xs: "16px !important",
-         sm: "16px !important",
-         md: "32px !important",
+         xs: "16px",
+         sm: "16px",
+         md: "32px",
       },
    },
    searchByTerm: {
       px: {
-         xs: "16px !important",
-         sm: "16px !important",
-         md: "32px !important",
+         xs: "16px",
+         sm: "16px",
+         md: "32px",
       },
    },
 })
@@ -48,7 +43,7 @@ export const OverviewSearch = () => {
          <Box sx={styles.searchByTerm}>
             <SearchByTerm />
          </Box>
-         <Stack direction="row" spacing={2} sx={styles.searchBy}>
+         <Stack direction="row" spacing={1} sx={styles.searchBy}>
             <ChipDropdownProvider>
                <SearchByLocation />
                <SearchByTags />

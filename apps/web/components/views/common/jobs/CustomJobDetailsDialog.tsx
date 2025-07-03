@@ -11,25 +11,26 @@ import {
    DialogActions,
    DialogContent,
    IconButton,
+   Stack,
    SxProps,
 } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useCustomJob from "components/custom-hook/custom-job/useCustomJob"
-import useGroupsByIds from "components/custom-hook/useGroupsByIds"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { ProfileRemoveCustomJobConfirmation } from "components/views/jobs/components/custom-jobs/ProfileRemoveCustomJobConfirmation"
 import CustomJobDetailsSkeleton from "components/views/jobs/components/custom-jobs/skeletons/CustomJobDetailsSkeleton"
-import { Fragment, ReactNode } from "react"
-import { sxStyles } from "types/commonTypes"
+import { ReactNode } from "react"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { ResponsiveDialogLayout } from "../ResponsiveDialog"
 import {
    CustomJobDetailsProvider,
    useCustomJobDetailsDialog,
 } from "./CustomJobDetailsProvider"
-import { CustomJobNotFoundView } from "./CustomJobNotFoundView"
+import { CustomJobNotFoundView } from "./CustomJobNotFound"
 
 const styles = sxStyles({
    fixedBottomContent: {
@@ -38,14 +39,52 @@ const styles = sxStyles({
       bgcolor: "background.paper",
    },
    jobApplyConfirmationDialog: {
-      m: 2,
-      bottom: 10,
+      bottom: 16,
+      mx: 2,
    },
    dialogContent: {
       p: 0,
       m: 0,
    },
-   customJobDetailsView: { pt: "0px !important" },
+   customJobDetailsView: {
+      pt: "0px !important",
+   },
+   inlineCustomJobDetailsView: {
+      p: "0px !important",
+   },
+   inlineActions: {
+      p: "16px",
+      background: (theme) => theme.brand.white[200],
+      borderTop: (theme) => `1px solid ${theme.brand.black[300]}`,
+   },
+   dialogHeader: {
+      py: "0px !important",
+      px: {
+         xs: "16px !important",
+         sm: "16px !important",
+         md: "24px !important",
+      },
+   },
+   header: {
+      py: "0px !important",
+      px: "16px !important",
+   },
+   inlineHeader: {
+      p: "12px !important",
+   },
+   inlineContentWrapper: {
+      overflow: "scroll",
+      borderTopLeftRadius: "8px",
+      borderTopRightRadius: "8px",
+      maxHeight: "720px",
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
+   },
+   notFoundWrapper: {
+      border: "none",
+   },
 })
 
 type Props = {
@@ -60,6 +99,7 @@ type Props = {
    hideApplicationConfirmation?: boolean
    hideLinkedLivestreams?: boolean
    hideLinkedSparks?: boolean
+   suspense?: boolean
 }
 
 const CustomJobDetailsDialog = (props: Props) => {
@@ -91,27 +131,54 @@ const DialogDetailsContent = ({
    hideApplicationConfirmation,
    hideLinkedLivestreams,
    hideLinkedSparks,
+   suspense,
    onClose,
 }: Props) => {
+   const isMobile = useIsMobile()
    const hasInitialData =
       serverSideCustomJob && customJobId === serverSideCustomJob?.id
 
    const customJob = useCustomJob(
       customJobId,
-      hasInitialData ? serverSideCustomJob : undefined
+      hasInitialData ? { initialData: serverSideCustomJob } : undefined
    )
 
-   if (!customJob) return <CustomJobNotFound onClose={onClose} />
+   if (!customJob) {
+      return (
+         <>
+            <DialogContent sx={styles.dialogContent}>
+               <CustomJobNotFoundView rootSx={styles.notFoundWrapper} />
+            </DialogContent>
+            <DialogActions sx={styles.fixedBottomContent}>
+               <Button
+                  fullWidth={isMobile}
+                  variant="contained"
+                  onClick={onClose}
+               >
+                  Back
+               </Button>
+            </DialogActions>
+         </>
+      )
+   }
 
    return (
-      <CustomJobDetailsProvider customJob={customJob} source={source}>
+      <CustomJobDetailsProvider
+         customJob={customJob}
+         source={source}
+         hideApplicationConfirmation={hideApplicationConfirmation}
+         hideLinkedLivestreams={hideLinkedLivestreams}
+         hideLinkedSparks={hideLinkedSparks}
+         suspense={suspense}
+      >
          <DialogContent sx={styles.dialogContent}>
             <Content
                heroContent={heroContent}
                heroSx={heroSx}
-               hideApplicationConfirmation={hideApplicationConfirmation}
-               hideLinkedLivestreams={hideLinkedLivestreams}
-               hideLinkedSparks={hideLinkedSparks}
+               headerSx={styles.dialogHeader}
+               sx={{
+                  p: "0px !important",
+               }}
             />
          </DialogContent>
          <DialogActions sx={styles.fixedBottomContent}>
@@ -121,48 +188,18 @@ const DialogDetailsContent = ({
    )
 }
 
-type CustomJobNotFoundProps = {
-   onClose: () => void
-}
-
-const CustomJobNotFound = ({ onClose }: CustomJobNotFoundProps) => {
-   return (
-      <Fragment>
-         <DialogContent sx={styles.dialogContent}>
-            <CustomJobNotFoundView
-               title="No job found"
-               description="The job you are looking for does not exist. It may have been deleted or closed or the link you followed may be broken."
-            />
-         </DialogContent>
-         <DialogActions sx={styles.fixedBottomContent}>
-            <Button
-               variant="contained"
-               onClick={onClose}
-               color="primary"
-               disableElevation
-               size="small"
-            >
-               Back
-            </Button>
-         </DialogActions>
-      </Fragment>
-   )
-}
-
 type ContentProps = {
    heroContent?: ReactNode
    heroSx?: SxProps<DefaultTheme>
-   hideApplicationConfirmation?: boolean
-   hideLinkedLivestreams?: boolean
-   hideLinkedSparks?: boolean
+   headerSx?: SxProps<DefaultTheme>
+   sx?: SxProps<DefaultTheme>
 }
 
 export const Content = ({
    heroContent,
    heroSx,
-   hideApplicationConfirmation,
-   hideLinkedLivestreams,
-   hideLinkedSparks,
+   headerSx,
+   sx,
 }: ContentProps) => {
    const {
       customJob,
@@ -173,11 +210,13 @@ export const Content = ({
       isAutoApply,
       handleConfirmationClose,
       handleRemoveJobClose,
+      group,
+      suspense,
+      hideApplicationConfirmation,
+      hideLinkedLivestreams,
+      hideLinkedSparks,
+      hideCTAButtons,
    } = useCustomJobDetailsDialog()
-
-   const {
-      data: [group],
-   } = useGroupsByIds([customJob.groupId])
 
    return (
       <>
@@ -186,11 +225,14 @@ export const Content = ({
             heroContent={heroContent}
             applicationInitiatedOnly={applicationInitiatedOnly}
             heroSx={heroSx}
-            sx={styles.customJobDetailsView}
-            companyLogoUrl={group.logoUrl}
-            companyName={group.universityName}
+            sx={combineStyles(styles.customJobDetailsView, sx)}
+            companyLogoUrl={group?.logoUrl}
+            headerSx={combineStyles(styles.header, headerSx)}
+            companyName={group?.universityName}
             hideLinkedLivestreams={hideLinkedLivestreams}
             hideLinkedSparks={hideLinkedSparks}
+            suspense={suspense}
+            hideCTAButtons={hideCTAButtons}
          />
 
          {!hideApplicationConfirmation && isApplyConfirmationOpen ? (
@@ -213,6 +255,45 @@ export const Content = ({
             onRemove={handleRemoveJobClose}
          />
       </>
+   )
+}
+
+type InlineDetailsContentProps = ContentProps & {
+   customJob: CustomJob
+   source: CustomJobApplicationSource
+}
+
+export const InlineCustomJobDetailsContent = (
+   props: InlineDetailsContentProps
+) => {
+   if (!props.customJob) {
+      return (
+         <Box sx={{ p: 2 }}>
+            <CustomJobNotFoundView />
+         </Box>
+      )
+   }
+
+   return (
+      <CustomJobDetailsProvider
+         customJob={props.customJob}
+         source={props.source}
+         hideCTAButtons
+         suspense={false}
+      >
+         <Stack spacing={0} alignItems={"space-between"} height={"100%"}>
+            <Box sx={styles.inlineContentWrapper}>
+               <Content
+                  {...props}
+                  sx={styles.inlineCustomJobDetailsView}
+                  headerSx={styles.inlineHeader}
+               />
+            </Box>
+            <Box sx={styles.inlineActions}>
+               <Actions />
+            </Box>
+         </Stack>
+      </CustomJobDetailsProvider>
    )
 }
 

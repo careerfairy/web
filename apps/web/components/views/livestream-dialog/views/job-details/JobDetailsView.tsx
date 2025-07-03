@@ -9,6 +9,7 @@ import {
 import { ButtonProps, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
+import { CustomJobDetailsProvider } from "components/views/common/jobs/CustomJobDetailsProvider"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
 import { useRouter } from "next/router"
@@ -199,16 +200,21 @@ const JobDetails: FC<Props> = ({ jobId }) => {
          }
       />
    ) : (
-      <CustomJobDetailsView
-         job={job as CustomJob}
-         sx={{ p: "16px !important" }}
-         heroSx={{ p: "16px !important" }}
-         heroContent={livestreamDetailCustomJobHeroContent}
-         companyName={livestreamPresenter.company}
-         companyLogoUrl={livestreamPresenter.companyLogoUrl}
-         context={applicationSource}
-         onApply={onApply}
-      />
+      <CustomJobDetailsProvider
+         customJob={job as CustomJob}
+         source={applicationSource}
+      >
+         <CustomJobDetailsView
+            job={job as CustomJob}
+            sx={{ p: "16px !important" }}
+            heroSx={{ p: "16px !important" }}
+            heroContent={livestreamDetailCustomJobHeroContent}
+            companyName={livestreamPresenter.company}
+            companyLogoUrl={livestreamPresenter.companyLogoUrl}
+            context={applicationSource}
+            onApply={onApply}
+         />
+      </CustomJobDetailsProvider>
    )
 }
 
