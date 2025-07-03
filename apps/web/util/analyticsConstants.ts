@@ -36,6 +36,10 @@ export const AnalyticsEvents = {
     */
    RecordingPlay: "livestream_recording_play",
    /**
+    * Dispatched when the recording card is hovered on desktop
+    */
+   RecordingHover: "livestream_recording_hover",
+   /**
     * Dispatched when the recording is played for one minute
     */
    RecordingWatch: "livestream_recording_watch",
