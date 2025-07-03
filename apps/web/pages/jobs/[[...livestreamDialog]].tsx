@@ -100,6 +100,7 @@ const JobsPage: NextPage<
                   dialogOpen={dialogOpen}
                   locationNames={locationNames}
                   numberOfJobs={numberOfJobs}
+                  userCountryCode={userCountryCode}
                >
                   <PageSEO />
                   <JobsPageOverview />

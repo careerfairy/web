@@ -51,6 +51,7 @@ type JobsOverviewContextType = {
    jobNotFound: boolean
    setJobDetailsDialogOpen: (open: boolean) => void
    selectedLocationsNames: string[]
+   userCountryCode?: string
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -64,6 +65,7 @@ type JobsOverviewContextProviderType = {
    dialogOpen?: boolean
    locationNames?: string[]
    numberOfJobs?: number
+   userCountryCode?: string
 }
 
 export type SearchParams = {
@@ -81,6 +83,7 @@ export const JobsOverviewContextProvider = ({
    dialogOpen,
    locationNames,
    numberOfJobs,
+   userCountryCode,
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
@@ -242,6 +245,7 @@ export const JobsOverviewContextProvider = ({
          jobNotFound,
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
          selectedLocationsNames,
+         userCountryCode,
       }
    }, [
       infiniteJobs,
@@ -261,6 +265,7 @@ export const JobsOverviewContextProvider = ({
       jobNotFound,
       selectedLocationsNames,
       numberOfJobs,
+      userCountryCode,
    ])
 
    useEffect(() => {
