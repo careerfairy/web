@@ -32,8 +32,10 @@ import ScrollToTop from "../../components/views/common/ScrollToTop"
 
 import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import { Country, State } from "country-state-city"
+import { useRouter } from "next/router"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 export const HEADER_TRANSITION_TIMEOUT = 100
@@ -47,6 +49,9 @@ const JobsPage: NextPage<
    dialogOpen,
    locationNames,
 }) => {
+   const router = useRouter()
+   const { jobId } = router.query
+
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
          CustomJobsPresenter.deserialize(job).convertToDocument(
@@ -61,25 +66,35 @@ const JobsPage: NextPage<
       : undefined
 
    return (
-      <GenericDashboardLayout
-         userCountryCode={userCountryCode}
-         hideFooter
-         headerFixed={false}
-         transitionTimeout={HEADER_TRANSITION_TIMEOUT}
-      >
-         <LivestreamDialogLayout>
-            <JobsOverviewContextProvider
-               serverCustomJobs={serverCustomJobs}
-               serverJob={serverJob}
-               dialogOpen={dialogOpen}
-               locationNames={locationNames}
-            >
-               <PageSEO />
-               <JobsPageOverview />
-            </JobsOverviewContextProvider>
-            <ScrollToTop hasBottomNavBar />
-         </LivestreamDialogLayout>
-      </GenericDashboardLayout>
+      <>
+         {serverJob && serverJob.id === jobId ? (
+            <CustomJobSEOSchemaScriptTag job={serverJob} />
+         ) : (
+            serverCustomJobs.map((job) => (
+               <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
+            ))
+         )}
+
+         <GenericDashboardLayout
+            userCountryCode={userCountryCode}
+            hideFooter
+            headerFixed={false}
+            transitionTimeout={HEADER_TRANSITION_TIMEOUT}
+         >
+            <LivestreamDialogLayout>
+               <JobsOverviewContextProvider
+                  serverCustomJobs={serverCustomJobs}
+                  serverJob={serverJob}
+                  dialogOpen={dialogOpen}
+                  locationNames={locationNames}
+               >
+                  <PageSEO />
+                  <JobsPageOverview />
+               </JobsOverviewContextProvider>
+               <ScrollToTop hasBottomNavBar />
+            </LivestreamDialogLayout>
+         </GenericDashboardLayout>
+      </>
    )
 }
 
