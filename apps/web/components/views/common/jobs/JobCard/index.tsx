@@ -3,13 +3,22 @@ import {
    CustomJob,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Box, ButtonBase, Grid, SxProps, useTheme } from "@mui/material"
+import {
+   Box,
+   ButtonBase,
+   Grid,
+   Stack,
+   SxProps,
+   Typography,
+   useTheme,
+} from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
+import CircularLogo from "../../logos/CircularLogo"
 import { isJobValidButNoLinkedContent } from "../utils"
 import JobCardAction from "./JobCardAction"
 import JobCardDetails from "./JobCardDetails"
@@ -18,7 +27,7 @@ const styles = sxStyles({
    jobState: {
       display: "flex",
       borderRadius: "8px 0 0 8px",
-      width: "8px",
+      width: "4px",
    },
    listItemContainer: {
       display: "flex",
@@ -44,6 +53,15 @@ const styles = sxStyles({
       display: "flex",
       width: "100%",
       textAlign: "left",
+      "& .MuiTouchRipple-child": {
+         backgroundColor: (theme) => theme.brand.black[800],
+      },
+   },
+   selectedJobCard: {
+      border: (theme) => `1px solid ${theme.brand.tq[200]}`,
+      borderRadius: "8px",
+      background:
+         "linear-gradient(0deg, rgba(42, 186, 165, 0.03) 0%, rgba(42, 186, 165, 0.03) 100%), #FFF",
    },
    statsWrapper: {
       display: "flex",
@@ -64,7 +82,10 @@ type Props = {
    titleSx?: SxProps<DefaultTheme>
    typographySx?: SxProps<DefaultTheme>
    companyName?: string
+   companyLogoUrl?: string
+   showCompanyLogo?: boolean
    applied?: boolean
+   selected?: boolean
 }
 
 const JobCard = ({
@@ -79,7 +100,10 @@ const JobCard = ({
    titleSx,
    typographySx,
    companyName,
+   companyLogoUrl,
+   showCompanyLogo,
    applied,
+   selected,
 }: Props) => {
    const isJobExpired = useIsJobExpired(job as PublicCustomJob)
    const isAtsJob = useIsAtsJob(job)
@@ -119,7 +143,12 @@ const JobCard = ({
          focusRipple
       >
          <Grid container>
-            <Box sx={styles.listItemContainer}>
+            <Box
+               sx={[
+                  styles.listItemContainer,
+                  selected && styles.selectedJobCard,
+               ]}
+            >
                {isAtsJob ? null : (
                   <Box
                      sx={[styles.jobState, { background: getStateColor(job) }]}
@@ -133,6 +162,23 @@ const JobCard = ({
                      lg={smallCard ? 12 : 9}
                      sx={styles.infoWrapper}
                   >
+                     {showCompanyLogo ? (
+                        <Stack
+                           direction={"row"}
+                           spacing={1}
+                           alignItems={"center"}
+                           mb={1}
+                        >
+                           <CircularLogo
+                              alt={`${companyName} logo`}
+                              src={companyLogoUrl}
+                              size={28}
+                           />
+                           <Typography variant={"xsmall"} color={"neutral.600"}>
+                              {companyName}
+                           </Typography>
+                        </Stack>
+                     ) : null}
                      <JobCardDetails
                         job={job}
                         previewMode={previewMode}
@@ -141,6 +187,7 @@ const JobCard = ({
                         titleSx={titleSx}
                         typographySx={typographySx}
                         companyName={companyName}
+                        hideCompanyName={showCompanyLogo}
                      />
                   </Grid>
 

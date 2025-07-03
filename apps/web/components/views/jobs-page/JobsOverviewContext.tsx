@@ -1,10 +1,15 @@
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobApplicationSource,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
 import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
 import {
    FilterOptions,
    useCustomJobSearchAlgolia,
 } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { customJobRepo } from "data/RepositoryInstances"
 import { NextRouter, useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
@@ -32,6 +37,18 @@ type JobsOverviewContextType = {
    setSearchBusinessFunctionTags: (businessFunctionTags: string[]) => void
    searchJobTypes: string[]
    setSearchJobTypes: (jobTypes: string[]) => void
+   hasFilters: boolean
+   searchResultsCount: number
+   showDefaultJobs: boolean
+   showResultJobs: boolean
+   showOtherJobs: boolean
+   isValidating: boolean
+   nextPage: () => void
+   hasMore: boolean
+   context: CustomJobApplicationSource
+   jobDetailsDialogOpen: boolean
+   jobNotFound: boolean
+   setJobDetailsDialogOpen: (open: boolean) => void
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -42,6 +59,7 @@ type JobsOverviewContextProviderType = {
    serverCustomJobs?: CustomJob[]
    serverJob?: CustomJob
    children: ReactNode
+   dialogOpen?: boolean
 }
 
 export type SearchParams = {
@@ -49,17 +67,24 @@ export type SearchParams = {
    term?: string
    businessFunctionTags?: string[]
    jobTypes?: string[]
+   jobId?: string
 }
 
 export const JobsOverviewContextProvider = ({
    children,
    serverCustomJobs,
    serverJob,
+   dialogOpen,
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
-
+   const isMobile = useIsMobile()
+   const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
+      useState(dialogOpen)
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
+   const [jobNotFound, setJobNotFound] = useState(
+      searchParams.jobId && !serverJob
+   )
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
 
@@ -70,6 +95,11 @@ export const JobsOverviewContextProvider = ({
             businessFunctionsTagIds: searchParams.businessFunctionTags,
             normalizedJobType: searchParams.jobTypes,
          },
+         booleanFilters: {
+            deleted: false,
+            published: true,
+            isPermanentlyExpired: false,
+         },
       }),
       [
          searchParams.businessFunctionTags,
@@ -78,12 +108,15 @@ export const JobsOverviewContextProvider = ({
       ]
    )
 
-   const { data } = useCustomJobSearchAlgolia(searchParams.term, {
-      filterOptions,
-      targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
-      itemsPerPage: 10,
-      initialData: serverCustomJobs,
-   })
+   const { data, isValidating, setSize } = useCustomJobSearchAlgolia(
+      searchParams.term,
+      {
+         filterOptions,
+         targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
+         itemsPerPage: 10,
+         initialData: serverCustomJobs,
+      }
+   )
 
    const infiniteJobs = useMemo(() => {
       return data?.flatMap((page) => page.deserializedHits) ?? []
@@ -96,17 +129,24 @@ export const JobsOverviewContextProvider = ({
 
             if (customJob) {
                setSelectedJob(customJob)
+               setIsJobDetailsDialogOpen(true)
+               setJobNotFound(false)
                return
             }
+            setJobNotFound(true)
          }
 
+         setIsJobDetailsDialogOpen(false)
          setSelectedJob(undefined)
+         setJobNotFound(Boolean(jobId?.length))
       },
-      [setSelectedJob]
+      [setSelectedJob, setIsJobDetailsDialogOpen]
    )
 
    const handleSelectedJobChange = useCallback(
-      (job: CustomJob) => handleQueryChange(router, "jobId", job.id),
+      (job: CustomJob | undefined) => {
+         handleQueryChange(router, "jobId", job?.id)
+      },
       [router]
    )
 
@@ -135,6 +175,25 @@ export const JobsOverviewContextProvider = ({
    ])
 
    const value: JobsOverviewContextType = useMemo(() => {
+      const hasFilters = Boolean(
+         searchParams?.location?.length ||
+            searchParams?.businessFunctionTags?.length ||
+            searchParams?.jobTypes?.length ||
+            searchParams?.term?.length
+      )
+
+      const searchResultsCount = data?.at(0)?.nbHits ?? 0
+
+      const nextPage = () => {
+         if (searchResultsCount > infiniteJobs?.length) {
+            setSize((prevSize) => prevSize + 1)
+         }
+
+         return Promise.resolve()
+      }
+
+      const hasMore = searchResultsCount > infiniteJobs?.length
+
       return {
          selectedJob: selectedJob,
          setSelectedJob: handleSelectedJobChange,
@@ -148,6 +207,23 @@ export const JobsOverviewContextProvider = ({
          setSearchJobTypes: handleJobTypesChange,
          customJobs: infiniteJobs,
          searchParams,
+         hasFilters,
+         searchResultsCount,
+         showDefaultJobs: !hasFilters,
+         showResultJobs: hasFilters && searchResultsCount > 0,
+         showOtherJobs: hasFilters && searchResultsCount === 0,
+         isValidating,
+         nextPage,
+         hasMore,
+         context: {
+            source: CustomJobApplicationSourceTypes.JobSection,
+            // Could be changed
+            id: searchParams.jobId || selectedJob?.id || "jobSection",
+         },
+         jobDetailsDialogOpen:
+            isJobDetailsDialogOpen && isMobile && Boolean(selectedJob),
+         jobNotFound,
+         setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
       }
    }, [
       infiniteJobs,
@@ -158,10 +234,21 @@ export const JobsOverviewContextProvider = ({
       handleLocationChange,
       handleJobTypesChange,
       searchTerm,
+      data,
+      isValidating,
+      setSize,
+      isJobDetailsDialogOpen,
+      setIsJobDetailsDialogOpen,
+      isMobile,
+      jobNotFound,
    ])
 
    useEffect(() => {
-      if (serverJob?.id !== router.query.jobId) {
+      if (!router.query.jobId) {
+         setSelectedJob(undefined)
+         setIsJobDetailsDialogOpen(false)
+      }
+      if (serverJob?.id !== router.query.jobId && router.query.jobId) {
          handleJobIdChange(router.query.jobId as string)
       } else {
          setSelectedJob(serverJob)
@@ -177,16 +264,21 @@ export const JobsOverviewContextProvider = ({
 
 const handleQueryChange = (
    router: NextRouter,
-   param: keyof SearchParams | "jobId",
+   param: keyof SearchParams,
    value: string | string[]
 ) => {
+   const query = { ...router.query }
+
+   if (value) {
+      query[param] = value
+   } else {
+      delete query[param]
+   }
+
    router.push(
       {
          pathname: router.pathname,
-         query: {
-            ...router.query,
-            [param]: value,
-         },
+         query: query,
       },
       undefined,
       { shallow: true }
@@ -195,6 +287,7 @@ const handleQueryChange = (
 
 const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
    const term = (query.term as string) || ""
+   const jobId = (query.jobId as string) || ""
 
    const searchParamLocations = getQueryStringArray(query.location)
    const searchParamBusinessFunctionTags = getQueryStringArray(
@@ -207,6 +300,7 @@ const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
       term: term,
       businessFunctionTags: searchParamBusinessFunctionTags,
       jobTypes: searchParamJobTypes,
+      jobId,
    }
 }
 

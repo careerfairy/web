@@ -17,7 +17,6 @@ import {
    SearchParams,
 } from "components/views/jobs-page/JobsOverviewContext"
 import JobsPageOverview from "components/views/jobs-page/JobsPageOverview"
-import { serialize } from "cookie"
 import {
    customJobRepo,
    livestreamRepo,
@@ -31,7 +30,10 @@ import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 
 import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+
+export const HEADER_TRANSITION_TIMEOUT = 100
 
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -41,6 +43,7 @@ const JobsPage: NextPage<
    searchParams,
    userCountryCode,
    numberOfJobs,
+   dialogOpen,
 }) => {
    const seoTitle = getSeoTitle(searchParams, numberOfJobs)
    const serverCustomJobs =
@@ -55,6 +58,7 @@ const JobsPage: NextPage<
            customJobData.serializedCustomJob
         ).convertToDocument(Timestamp.fromDate)
       : undefined
+
    return (
       <>
          <SEO
@@ -62,14 +66,22 @@ const JobsPage: NextPage<
             description={"Find your dream job with CareerFairy."}
             title={seoTitle}
          />
-         <GenericDashboardLayout userCountryCode={userCountryCode} headerFixed>
-            <JobsOverviewContextProvider
-               serverCustomJobs={serverCustomJobs}
-               serverJob={serverJob}
-            >
-               <JobsPageOverview />
-            </JobsOverviewContextProvider>
-            <ScrollToTop hasBottomNavBar />
+         <GenericDashboardLayout
+            userCountryCode={userCountryCode}
+            hideFooter
+            headerScrollThreshold={1}
+            transitionTimeout={HEADER_TRANSITION_TIMEOUT}
+         >
+            <LivestreamDialogLayout>
+               <JobsOverviewContextProvider
+                  serverCustomJobs={serverCustomJobs}
+                  serverJob={serverJob}
+                  dialogOpen={dialogOpen}
+               >
+                  <JobsPageOverview />
+               </JobsOverviewContextProvider>
+               <ScrollToTop hasBottomNavBar />
+            </LivestreamDialogLayout>
          </GenericDashboardLayout>
       </>
    )
@@ -109,12 +121,12 @@ type JobsPageProps = {
    searchParams: SearchParams
    userCountryCode: string
    numberOfJobs: number
+   dialogOpen: boolean
 }
 
 export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    context
 ) => {
-   const hasRedirected = context.req.cookies["redirected"]
    const userCountryCode =
       (context.req.headers["x-vercel-ip-country"] as string) || null
 
@@ -122,6 +134,8 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const term = queryTerm as string
    const jobId = queryJobId as string
+
+   const dialogOpen = Boolean(jobId)
 
    const queryLocations = getQueryStringArray(context.query.location)
    const queryBusinessFunctionTags = getQueryStringArray(
@@ -134,6 +148,11 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          locationIdTags: queryLocations,
          businessFunctionsTagIds: queryBusinessFunctionTags,
          normalizedJobType: queryJobTypes,
+      },
+      booleanFilters: {
+         deleted: false,
+         published: true,
+         isPermanentlyExpired: false,
       },
    }
 
@@ -166,38 +185,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          CustomJobsPresenter.serializeDocument(job)
       ) ?? []
 
-   // Add redirect to include the jobId in the URL if it's not already there
-   if (!hasRedirected && ((jobId && !customJob) || !jobId)) {
-      const params = new URLSearchParams()
-      queryLocations.forEach((loc) => params.append("location", loc))
-      queryBusinessFunctionTags.forEach((tag) =>
-         params.append("businessFunctionTags", tag)
-      )
-      queryJobTypes.forEach((type) => params.append("jobTypes", type))
-
-      if (term) params.set("term", term.toString())
-
-      if (firstCustomJob?.id) params.set("jobId", firstCustomJob.id)
-
-      const destination = `/jobs?${params.toString()}`
-
-      context.res.setHeader(
-         "Set-Cookie",
-         serialize("redirected", "true", {
-            path: "/",
-            maxAge: 10, // seconds
-            httpOnly: true,
-         })
-      )
-
-      return {
-         redirect: {
-            destination: destination,
-            permanent: false,
-         },
-      }
-   }
-
    const serializedSparks: SerializedSpark[] = []
    const livestreamsData: { [p: string]: any }[] = []
 
@@ -223,15 +210,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       })
    }
 
-   // Clear the cookie for future clean runs
-   context.res.setHeader(
-      "Set-Cookie",
-      serialize("redirected", "", {
-         path: "/",
-         maxAge: -1,
-      })
-   )
-
    return {
       props: {
          serializedCustomJobs: serializedCustomJobs,
@@ -241,6 +219,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
             livestreamsData,
             sparksData: serializedSparks,
          },
+         dialogOpen,
          userCountryCode,
          searchParams: {
             location: queryLocations,

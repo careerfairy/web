@@ -5,6 +5,8 @@ import {
    ClickAwayListener,
    Popper,
    Stack,
+   SxProps,
+   Theme,
    Typography,
 } from "@mui/material"
 import { useTextTruncation } from "components/custom-hook/utils/useTextTruncation"
@@ -19,11 +21,13 @@ import React, {
    useRef,
 } from "react"
 import { ChevronDown } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { BrandedTooltip } from "../../streaming-page/components/BrandedTooltip"
 import { BrandedCheckbox } from "../inputs/BrandedCheckbox"
 import BrandedSwipeableDrawer from "../inputs/BrandedSwipeableDrawer"
+import { StyledHiddenInput } from "../inputs/StyledHiddenInput"
 import { useChipDropdownContext } from "./ChipDropdownContext"
+import { SearchInputPlugin } from "./plugins/SearchInputPlugin"
 
 const popperContentVariants = {
    closed: {
@@ -65,9 +69,10 @@ const styles = sxStyles({
       backgroundColor: "white",
       boxShadow: "0px 4px 16px rgba(0, 0, 0, 0.08)",
       borderRadius: "8px",
-      overflow: "hidden",
+      overflow: "scroll",
       width: "353px",
       transformOrigin: "top",
+      maxHeight: "500px",
    },
    chipContentItem: {
       p: "12px",
@@ -111,6 +116,25 @@ const styles = sxStyles({
    disabledApplyText: {
       color: (theme) => `${theme.brand.black[700]} !important`,
    },
+   dialogContentRoot: {
+      justifyContent: "space-between",
+   },
+   paper: {
+      maxHeight: "90dvh",
+   },
+   searchContainer: {
+      position: "sticky",
+      top: 0,
+      zIndex: 1,
+      backgroundColor: (theme) =>
+         theme.brand.white[100] || theme.palette.background.paper,
+   },
+   chipContentRoot: {
+      scrollbarWidth: "thin",
+      flexGrow: 1,
+      overflowY: "auto",
+      p: 0,
+   },
 })
 
 type ChipOptions = {
@@ -134,12 +158,28 @@ type SelectionOptions = {
 
 type ChipDropdownUI = {
    /**
-    * A render prop for the search UI, receives addedOptions and onDeleteOption
+    * When required parameters are provided, the search input will be rendered.
+    *
+    * @param locationSearchValue - The value of the search input.
+    * @param setLocationSearchValue - The function to set the value of the search input.
+    * @param placeholder - The placeholder of the search input.
     */
-   search?: (
-      currentAddedOptions: ChipOptions[],
-      onDeleteOption: (id: ChipOptions["id"]) => void
-   ) => ReactNode
+   search?: {
+      locationSearchValue: string
+      setLocationSearchValue: (value: string) => void
+      placeholder?: string
+   }
+
+   /**
+    * Custom styles for the dialog component, applies only to the dialog mode, rendered as a swipeable drawer.
+    * @default undefined
+    *
+    */
+   dialog?: {
+      rootSx?: SxProps<Theme>
+      paperSx?: SxProps<Theme>
+      contentSx?: SxProps<Theme>
+   }
    /**
     * If true, the dropdown will be a dialog.
     * @default false
@@ -157,12 +197,23 @@ type ChipDropdownUI = {
    closeOnApply?: boolean
 }
 
+export type SearchInputPluginProps = {
+   searchValue: string
+   setSearchValue: (value: string) => void
+   searchInputRef?: React.MutableRefObject<HTMLInputElement>
+   currentAddedOptions: ChipOptions[]
+   onDeleteOption: (id: ChipOptions["id"]) => void
+   placeholder?: string
+}
+
 type ChipDropdownProps = {
    label: string
    options?: ChipOptions[]
    selection: SelectionOptions
    ui?: ChipDropdownUI
    onClose?: () => void
+   focusSearchInputOnOpenDialog?: boolean
+   onOpen?: () => void
 }
 
 type ChipDropdownState = {
@@ -263,6 +314,8 @@ export const ChipDropdown = ({
    selection,
    ui,
    onClose,
+   onOpen,
+   focusSearchInputOnOpenDialog = false,
 }: ChipDropdownProps) => {
    const {
       selectedOptions,
@@ -270,14 +323,34 @@ export const ChipDropdown = ({
       showApply = true,
       onApply,
    } = selection
-   const { search, isDialog, forceLabel, closeOnApply = true } = ui || {}
+   const {
+      search,
+      dialog,
+      isDialog,
+      forceLabel,
+      closeOnApply = true,
+   } = ui || {}
    const anchorRef = useRef<HTMLDivElement>(null)
+   const searchInputRef = useRef<HTMLInputElement>(null)
    const id = useId()
    const { openDropdownId, setOpenDropdownId } = useChipDropdownContext()
+   const proxyInputRef = useRef<HTMLInputElement>(null)
+
+   const isIOS = useMemo(
+      () =>
+         typeof window !== "undefined" &&
+         /iPad|iPhone|iPod/.test(navigator.userAgent),
+      []
+   )
+
+   const initialSelectedOptions = useMemo(
+      () => selection.selectedOptions,
+      [selection.selectedOptions]
+   )
 
    const [state, dispatch] = useReducer(
       chipDropdownReducer,
-      selectedOptions,
+      initialSelectedOptions,
       initialStateFactory
    )
    const { isOpen, isDirty, selectedMap } = state
@@ -386,6 +459,23 @@ export const ChipDropdown = ({
       }
    }
 
+   const handleProxyFocus = () => {
+      if (!isOpen) {
+         handleToggle()
+      }
+
+      proxyInputRef.current?.blur()
+   }
+
+   const handleChipClick = () => {
+      const isDialogWithSearch = isDialog && search
+      if (isIOS && isDialogWithSearch && !isOpen) {
+         proxyInputRef.current?.focus()
+      } else {
+         handleToggle()
+      }
+   }
+
    const handleApply = useCallback(() => {
       const newSelectedValues = Object.keys(selectedMap).filter(
          (key) => selectedMap[key]
@@ -430,13 +520,19 @@ export const ChipDropdown = ({
    useEffect(() => {
       dispatch({
          type: "SYNC_EXTERNAL_SELECTION",
-         payload: { selectedOptions },
+         payload: { selectedOptions: selection.selectedOptions },
       })
-   }, [selectedOptions, dispatch])
+   }, [selection.selectedOptions, dispatch])
+
+   useEffect(() => {
+      if (isOpen && focusSearchInputOnOpenDialog && searchInputRef.current) {
+         searchInputRef.current.focus({ preventScroll: true })
+      }
+   }, [isOpen, focusSearchInputOnOpenDialog])
 
    return (
       <ClickAwayListener onClickAway={handleClose}>
-         <Box ref={anchorRef}>
+         <Box ref={anchorRef} sx={{ position: "relative" }}>
             <Box>
                <BrandedTooltip title={tooltipRequired ? tooltipFullLabel : ""}>
                   <Chip
@@ -502,62 +598,115 @@ export const ChipDropdown = ({
                            <Box size={16} component={ChevronDown} />
                         </motion.div>
                      }
-                     onDelete={handleToggle}
-                     onClick={handleToggle}
+                     onDelete={(event) => {
+                        event.stopPropagation()
+                        handleToggle()
+                     }}
+                     onClick={handleChipClick}
                   />
                </BrandedTooltip>
             </Box>
+            {isIOS && isDialog && search ? (
+               <StyledHiddenInput
+                  ref={proxyInputRef}
+                  onFocus={handleProxyFocus}
+                  aria-hidden="true"
+                  tabIndex={-1}
+               />
+            ) : null}
             {isDialog ? (
                <BrandedSwipeableDrawer
+                  anchor="bottom"
                   open={isOpen}
                   onClose={handleClose}
                   onOpen={handleToggle}
-               >
-                  <ChipContent
-                     options={options}
-                     search={
-                        search
-                           ? search(currentAddedOptions, handleDeleteOption)
-                           : null
+                  PaperProps={{
+                     sx: combineStyles(styles.paper, dialog?.paperSx),
+                  }}
+                  onTransitionEnd={(event) => {
+                     // The transition might fire for multiple properties (e.g., opacity for backdrop, transform for paper).
+                     // We only want to react to one of them to prevent the logic from running twice.
+                     // The `transform` property is a good candidate as it relates to the drawer sliding in.
+                     if (event.propertyName !== "transform") {
+                        return
                      }
-                     handleOptionClick={handleActualOptionClick}
-                     isChecked={isChecked}
-                  />
-                  {showApply ? (
-                     <Stack
-                        spacing={1}
-                        p={"16px"}
-                        borderTop={(theme) =>
-                           `1px solid ${theme.brand.white[500]}`
-                        }
-                     >
-                        <Button
-                           variant="contained"
-                           color={"primary"}
-                           onClick={handleApply}
-                           disabled={!isDirty}
-                        >
-                           <Typography
-                              variant="brandedBody"
-                              sx={[
-                                 styles.applyText,
-                                 !isDirty && styles.disabledApplyText,
-                              ]}
-                           >
-                              Apply
-                           </Typography>
-                        </Button>
-                        <Button variant="text" onClick={handleReset}>
-                           <Typography
-                              variant="brandedBody"
-                              color="neutral.600"
-                              fontWeight={400}
-                           >
-                              Reset
-                           </Typography>
-                        </Button>
+                     // alert("end: transition")
+                     if (isOpen) {
+                        onOpen?.()
+                     }
+                  }}
+               >
+                  <Stack
+                     sx={combineStyles(
+                        styles.dialogContentRoot,
+                        dialog?.rootSx
+                     )}
+                     justifyContent="space-between"
+                  >
+                     <Stack>
+                        {search ? (
+                           <Box p={"12px"} sx={styles.searchContainer}>
+                              <SearchInputPlugin
+                                 searchValue={search.locationSearchValue}
+                                 setSearchValue={search.setLocationSearchValue}
+                                 searchInputRef={searchInputRef}
+                                 currentAddedOptions={currentAddedOptions}
+                                 onDeleteOption={handleDeleteOption}
+                                 placeholder={search.placeholder ?? "Search"}
+                              />
+                           </Box>
+                        ) : null}
+                        <ChipContent
+                           options={options}
+                           handleOptionClick={handleActualOptionClick}
+                           isChecked={isChecked}
+                           rootSx={dialog?.contentSx}
+                        />
                      </Stack>
-                  ) : null}
+                     {showApply ? (
+                        <Stack
+                           spacing={1}
+                           p={"16px"}
+                           borderTop={(theme) =>
+                              `1px solid ${theme.brand.white[500]}`
+                           }
+                           sx={{
+                              position: "sticky",
+                              bottom: 0,
+                              zIndex: 1,
+                              backgroundColor: (theme) =>
+                                 theme.brand.white[100] ||
+                                 theme.palette.background.paper,
+                           }}
+                        >
+                           <Button
+                              variant="contained"
+                              color={"primary"}
+                              onClick={handleApply}
+                              disabled={!isDirty}
+                           >
+                              <Typography
+                                 variant="brandedBody"
+                                 sx={[
+                                    styles.applyText,
+                                    !isDirty && styles.disabledApplyText,
+                                 ]}
+                              >
+                                 Apply
+                              </Typography>
+                           </Button>
+                           <Button variant="text" onClick={handleReset}>
+                              <Typography
+                                 variant="brandedBody"
+                                 color="neutral.600"
+                                 fontWeight={400}
+                              >
+                                 Reset
+                              </Typography>
+                           </Button>
+                        </Stack>
+                     ) : null}
+                  </Stack>
                </BrandedSwipeableDrawer>
             ) : (
                <Popper
@@ -576,19 +725,29 @@ export const ChipDropdown = ({
                            variants={popperContentVariants}
                            style={styles.popperContentWrapper}
                         >
-                           <ChipContent
-                              options={options}
-                              search={
-                                 search
-                                    ? search(
-                                         currentAddedOptions,
-                                         handleDeleteOption
-                                      )
-                                    : null
-                              }
-                              handleOptionClick={handleActualOptionClick}
-                              isChecked={isChecked}
-                           />
+                           <Stack>
+                              {search ? (
+                                 <Box p={"12px"} sx={styles.searchContainer}>
+                                    <SearchInputPlugin
+                                       searchValue={search.locationSearchValue}
+                                       setSearchValue={
+                                          search.setLocationSearchValue
+                                       }
+                                       currentAddedOptions={currentAddedOptions}
+                                       onDeleteOption={handleDeleteOption}
+                                       placeholder={
+                                          search.placeholder ?? "Search"
+                                       }
+                                       searchInputRef={searchInputRef}
+                                    />
+                                 </Box>
+                              ) : null}
+                              <ChipContent
+                                 options={options}
+                                 handleOptionClick={handleActualOptionClick}
+                                 isChecked={isChecked}
+                              />
+                           </Stack>
                         </motion.div>
                      ) : null}
                   </AnimatePresence>
@@ -604,22 +763,17 @@ type ChipContentInternalProps = {
    handleOptionClick: (optionId: ChipOptions["id"]) => void
    isChecked: (optionId: ChipOptions["id"]) => boolean
    search?: ReactNode
+   rootSx?: SxProps<Theme>
 }
 
 const ChipContentInternal = ({
    options,
-   search,
    handleOptionClick,
    isChecked,
+   rootSx,
 }: ChipContentInternalProps) => {
    return (
-      <Stack
-         p={0}
-         maxHeight={"452px"}
-         overflow="auto"
-         sx={{ scrollbarWidth: "thin" }}
-      >
-         {search ? <Box p={"12px"}>{search}</Box> : null}
+      <Stack sx={combineStyles(styles.chipContentRoot, rootSx)}>
          <Box>
             {options?.map((option) => (
                <ChipContentItem
@@ -635,7 +789,7 @@ const ChipContentInternal = ({
    )
 }
 
-export const ChipContent = React.memo(ChipContentInternal)
+export const ChipContent = ChipContentInternal
 
 type ChipContentItemProps = {
    onItemClick: (id: string) => void
