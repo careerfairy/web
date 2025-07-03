@@ -1,4 +1,5 @@
 export const AnalyticsEvents = {
+   CustomPageView: "custom_page_view",
    LivestreamJobOpen: "livestream_job_open",
    LivestreamJobApplicationComplete: "livestream_job_application_complete",
    LivestreamSpeakerLinkedinClick: "livestream_speaker_linkedin_click",
@@ -30,7 +31,14 @@ export const AnalyticsEvents = {
    EventRegistrationTalentpoolSkip: "event_registration_talentpool_skip",
    EventDetailsPageViewed: "event_details_page_viewed",
    RecordingDetailsPageViewed: "recording_details_page_viewed",
+   /**
+    * Dispatched when the recording play icon is clicked
+    */
    RecordingPlay: "recording_play",
+   /**
+    * Dispatched when the recording is played for one minute
+    */
+   RecordingWatch: "recording_watch",
    NewsletterAcceptedOn1stReminder: "newsletter_accepted_on_1st_reminder",
    NewsletterAcceptedOn2ndReminder: "newsletter_accepted_on_2nd_reminder",
    NewsletterAcceptedOnSignup: "newsletter_accepted_on_signup",
