@@ -58,19 +58,19 @@ const styles = sxStyles({
    },
 })
 
-export interface BrandedSearchBarProps {
+export interface BrandedSearchFieldProps {
    value: string
    onChange: (value: string) => void
    placeholder?: string
    fullWidth?: boolean
 }
 
-export const BrandedSearchBar = ({
+export const BrandedSearchField = ({
    value,
    onChange,
    placeholder = "Search...",
    fullWidth = true,
-}: BrandedSearchBarProps) => {
+}: BrandedSearchFieldProps) => {
    return (
       <BrandedTextField
          fullWidth={fullWidth}
@@ -94,4 +94,4 @@ export const BrandedSearchBar = ({
    )
 }
 
-export default BrandedSearchBar
+export default BrandedSearchField
