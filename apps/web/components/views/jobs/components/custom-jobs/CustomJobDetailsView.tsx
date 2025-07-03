@@ -11,7 +11,7 @@ import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApp
 import useControlledTabNavigationOnScroll from "components/custom-hook/useControlledTabNavigationOnScroll"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { customJobRepo } from "data/RepositoryInstances"
+import { customJobRepo, userRepo } from "data/RepositoryInstances"
 import { props } from "lodash/fp"
 import * as React from "react"
 import {
@@ -256,6 +256,10 @@ export const CustomJobDetails = ({
                }
             )
          })
+
+      if (userData?.authId) {
+         userRepo.updateUserLastViewedJob(job, userData?.authId)
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [job.id])
 

@@ -718,3 +718,43 @@ export const calculateOptimalTruncation = (
       shouldShowTooltip: items.length > 0,
    }
 }
+
+/**
+ * Shuffle items within windows and optionally swap between windows.
+ * @param items Sorted array (highest points first)
+ * @param windowSize Number of items per window to shuffle
+ * @param swapCount Number of swaps between adjacent windows
+ * @returns Shuffled array
+ */
+export const windowedShuffle = <T>(
+   items: T[],
+   windowSize = 10,
+   swapCount = 0
+): T[] => {
+   // Split into windows using chunkArray
+   const windows = chunkArray(items, windowSize)
+
+   // Shuffle each window in place
+   windows.forEach((window) => {
+      shuffle(window)
+   })
+
+   // Optionally swap items between adjacent windows
+   for (let w = 0; w < windows.length - 1; w++) {
+      // For each pair of adjacent windows, perform 'swapCount' swaps
+      for (let s = 0; s < swapCount; s++) {
+         // Skip if either window is empty
+         if (windows[w].length === 0 || windows[w + 1].length === 0) continue
+         // Randomly select an index in the current window
+         const i = Math.floor(Math.random() * windows[w].length)
+         // Randomly select an index in the next window
+         const j = Math.floor(Math.random() * windows[w + 1].length)
+         // Swap the selected items between the two windows
+         // This allows some items to move up or down between windows, increasing variety
+         swapPositions(windows[w], i, j)
+      }
+   }
+
+   // Flatten back to a single array
+   return windows.flat()
+}
