@@ -34,11 +34,11 @@ export const AnalyticsEvents = {
    /**
     * Dispatched when the recording play icon is clicked
     */
-   RecordingPlay: "recording_play",
+   RecordingPlay: "livestream_recording_play",
    /**
     * Dispatched when the recording is played for one minute
     */
-   RecordingWatch: "recording_watch",
+   RecordingWatch: "livestream_recording_watch",
    NewsletterAcceptedOn1stReminder: "newsletter_accepted_on_1st_reminder",
    NewsletterAcceptedOn2ndReminder: "newsletter_accepted_on_2nd_reminder",
    NewsletterAcceptedOnSignup: "newsletter_accepted_on_signup",
