@@ -23,7 +23,7 @@ import {
    useState,
 } from "react"
 import { useSelector } from "react-redux"
-import { useEffectOnce, useMeasure } from "react-use"
+import { useMeasure } from "react-use"
 import { AutomaticActions } from "store/reducers/sparksFeedReducer"
 import { autoAction } from "store/selectors/sparksFeedSelectors"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -73,6 +73,9 @@ const customStyles = sxStyles({
       position: "sticky",
       top: -1,
       backgroundColor: (theme) => theme.brand.white[50],
+      zIndex: 1,
+      borderTopLeftRadius: "8px",
+      borderTopRightRadius: "8px",
    },
 })
 
@@ -233,7 +236,7 @@ export const CustomJobDetails = ({
       handleTabClickInternal(event, newValue)
    }
 
-   useEffectOnce(() => {
+   useEffect(() => {
       customJobRepo
          .incrementCustomJobViews(job.id)
          .then(() =>
@@ -253,7 +256,8 @@ export const CustomJobDetails = ({
                }
             )
          })
-   })
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [job.id])
 
    return (
       <>

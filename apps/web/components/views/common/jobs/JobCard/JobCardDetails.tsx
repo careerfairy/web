@@ -308,7 +308,8 @@ const JobCardDetails = ({
                         smallCard ? styles.smallExpiredDate : null,
                      ]}
                   >
-                     {jobApplication.alreadyApplied
+                     {jobApplication.alreadyApplied &&
+                     jobApplication?.job?.appliedAt
                         ? getJobApplicationDateText(
                              jobApplication.job.appliedAt.toDate()
                           )

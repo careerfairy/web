@@ -5,6 +5,7 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
 import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
+import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
 import {
    FilterOptions,
    useCustomJobSearchAlgolia,
@@ -49,6 +50,7 @@ type JobsOverviewContextType = {
    jobDetailsDialogOpen: boolean
    jobNotFound: boolean
    setJobDetailsDialogOpen: (open: boolean) => void
+   selectedLocationsNames: string[]
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -60,6 +62,7 @@ type JobsOverviewContextProviderType = {
    serverJob?: CustomJob
    children: ReactNode
    dialogOpen?: boolean
+   locationNames?: string[]
 }
 
 export type SearchParams = {
@@ -75,6 +78,7 @@ export const JobsOverviewContextProvider = ({
    serverCustomJobs,
    serverJob,
    dialogOpen,
+   locationNames,
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
@@ -85,6 +89,15 @@ export const JobsOverviewContextProvider = ({
    const [jobNotFound, setJobNotFound] = useState(
       searchParams.jobId && !serverJob
    )
+   const [selectedLocationsNames, setSelectedLocationsNames] = useState<
+      string[]
+   >(locationNames ?? [])
+
+   const { data: locationsData } = useLocationSearch(null, {
+      initialLocationIds: searchParams.location,
+      limit: 15,
+      suspense: false,
+   })
 
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
 
@@ -224,6 +237,7 @@ export const JobsOverviewContextProvider = ({
             isJobDetailsDialogOpen && isMobile && Boolean(selectedJob),
          jobNotFound,
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
+         selectedLocationsNames,
       }
    }, [
       infiniteJobs,
@@ -241,6 +255,7 @@ export const JobsOverviewContextProvider = ({
       setIsJobDetailsDialogOpen,
       isMobile,
       jobNotFound,
+      selectedLocationsNames,
    ])
 
    useEffect(() => {
@@ -248,12 +263,19 @@ export const JobsOverviewContextProvider = ({
          setSelectedJob(undefined)
          setIsJobDetailsDialogOpen(false)
       }
-      if (serverJob?.id !== router.query.jobId && router.query.jobId) {
+
+      if (router.query.jobId) {
          handleJobIdChange(router.query.jobId as string)
-      } else {
+      } else if (!isMobile) {
          setSelectedJob(serverJob)
       }
-   }, [router.query.jobId, handleJobIdChange, serverJob])
+   }, [router.query.jobId, handleJobIdChange, serverJob, isMobile])
+
+   useEffect(() => {
+      setSelectedLocationsNames(
+         locationsData?.map((location) => location.name) ?? []
+      )
+   }, [locationsData])
 
    return (
       <JobsOverviewContext.Provider value={value}>
