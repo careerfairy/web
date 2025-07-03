@@ -310,10 +310,7 @@ export const useRecordingControls = (
          // update to a bigger screen on desktop
          setShowBigVideoPlayer(true)
       }
-      
-      // track recording_play event when playback actually starts
-      dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
-   }, [isMobile, stream])
+   }, [isMobile])
 
    const handleCloseRecordingPlayer = useCallback(() => {
       setShowBigVideoPlayer(false)
@@ -332,13 +329,9 @@ export const useRecordingControls = (
 
       // play recording
       handleRecordingPlay()
-   }, [
-      handleRecordingPlay,
-      stream?.id,
-      stream?.start,
-      userData?.userEmail,
-      isLoggedIn,
-   ])
+      // track recording_play event when playback actually starts
+      dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
+   }, [isLoggedIn, stream, userData?.userEmail, handleRecordingPlay])
 
    const handlePause = useCallback(() => {
       setVideoPaused(true)
