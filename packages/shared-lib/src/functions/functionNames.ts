@@ -39,6 +39,7 @@ export const FUNCTION_NAMES = {
    sendPhysicalEventRegistrationConfirmationEmail:
       "sendPhysicalEventRegistrationConfirmationEmail",
    getRecommendedEvents: "getRecommendedEvents_v7",
+   getRecommendedJobs: "getRecommendedJobs",
 
    // Recording functions
    getRecordingViews: "getRecordingViews",
