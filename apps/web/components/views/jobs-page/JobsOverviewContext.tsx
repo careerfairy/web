@@ -1,7 +1,12 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { usePublishedCustomJobs } from "components/custom-hook/custom-job/usePublishedCustomJobs"
+import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
+import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
+import {
+   FilterOptions,
+   useCustomJobSearchAlgolia,
+} from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
 import { customJobRepo } from "data/RepositoryInstances"
-import { useRouter } from "next/router"
+import { NextRouter, useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import {
    ReactNode,
@@ -12,12 +17,21 @@ import {
    useMemo,
    useState,
 } from "react"
+import { useDebounce } from "react-use"
 
 type JobsOverviewContextType = {
    selectedJob: CustomJob | undefined
    setSelectedJob: (job: CustomJob) => void
    customJobs: CustomJob[]
    searchParams: SearchParams
+   searchTerm: string
+   setSearchTerm: (term: string) => void
+   setSearchLocations: (locations: string[]) => void
+   searchLocations: string[]
+   searchBusinessFunctionTags: string[]
+   setSearchBusinessFunctionTags: (businessFunctionTags: string[]) => void
+   searchJobTypes: string[]
+   setSearchJobTypes: (jobTypes: string[]) => void
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -33,6 +47,8 @@ type JobsOverviewContextProviderType = {
 export type SearchParams = {
    location?: string[]
    term?: string
+   businessFunctionTags?: string[]
+   jobTypes?: string[]
 }
 
 export const JobsOverviewContextProvider = ({
@@ -42,12 +58,36 @@ export const JobsOverviewContextProvider = ({
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
+
+   const [searchTerm, setSearchTerm] = useState(searchParams.term)
+
    const [selectedJob, setSelectedJob] = useState<CustomJob>(serverJob)
 
-   // TODO: Replace customJobs with Algolia search
-   const { data: searchCustomJobs } = usePublishedCustomJobs({
+   const filterOptions = useMemo<FilterOptions>(
+      () => ({
+         arrayFilters: {
+            locationIdTags: searchParams.location,
+            businessFunctionsTagIds: searchParams.businessFunctionTags,
+            normalizedJobType: searchParams.jobTypes,
+         },
+      }),
+      [
+         searchParams.businessFunctionTags,
+         searchParams.location,
+         searchParams.jobTypes,
+      ]
+   )
+
+   const { data } = useCustomJobSearchAlgolia(searchParams.term, {
+      filterOptions,
+      targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
+      itemsPerPage: 10,
       initialData: serverCustomJobs,
    })
+
+   const infiniteJobs = useMemo(() => {
+      return data?.flatMap((page) => page.deserializedHits) ?? []
+   }, [data])
 
    const handleJobIdChange = useCallback(
       async (jobId: string) => {
@@ -66,34 +106,59 @@ export const JobsOverviewContextProvider = ({
    )
 
    const handleSelectedJobChange = useCallback(
-      (job: CustomJob) => {
-         router.push(
-            {
-               pathname: router.pathname,
-               query: {
-                  ...(searchParams.location && {
-                     location: searchParams.location,
-                  }),
-                  ...(searchParams.term && { term: searchParams.term }),
-                  jobId: job.id,
-               },
-            },
-            undefined,
-            { shallow: true }
-         )
-      },
-      [router, searchParams]
+      (job: CustomJob) => handleQueryChange(router, "jobId", job.id),
+      [router]
    )
 
-   // TODO: Add additional state to the context
+   const handleLocationChange = useCallback(
+      (locations: string[]) => handleQueryChange(router, "location", locations),
+      [router]
+   )
+
+   const handleBusinessFunctionTagsChange = useCallback(
+      (businessFunctionTags: string[]) =>
+         handleQueryChange(
+            router,
+            "businessFunctionTags",
+            businessFunctionTags
+         ),
+      [router]
+   )
+
+   const handleJobTypesChange = useCallback(
+      (jobTypes: string[]) => handleQueryChange(router, "jobTypes", jobTypes),
+      [router]
+   )
+
+   useDebounce(() => handleQueryChange(router, "term", searchTerm), 300, [
+      searchTerm,
+   ])
+
    const value: JobsOverviewContextType = useMemo(() => {
       return {
          selectedJob: selectedJob,
          setSelectedJob: handleSelectedJobChange,
-         customJobs: searchCustomJobs, // TODO: Replace with Algolia search, using the initial data from the server
+         searchTerm,
+         setSearchTerm,
+         setSearchLocations: handleLocationChange,
+         searchLocations: searchParams.location,
+         searchBusinessFunctionTags: searchParams.businessFunctionTags,
+         setSearchBusinessFunctionTags: handleBusinessFunctionTagsChange,
+         searchJobTypes: searchParams.jobTypes,
+         setSearchJobTypes: handleJobTypesChange,
+         customJobs: infiniteJobs,
          searchParams,
       }
-   }, [searchCustomJobs, searchParams, selectedJob, handleSelectedJobChange])
+   }, [
+      infiniteJobs,
+      searchParams,
+      selectedJob,
+      handleSelectedJobChange,
+      handleBusinessFunctionTagsChange,
+      handleLocationChange,
+      handleJobTypesChange,
+      searchTerm,
+   ])
 
    useEffect(() => {
       if (serverJob?.id !== router.query.jobId) {
@@ -110,21 +175,38 @@ export const JobsOverviewContextProvider = ({
    )
 }
 
-const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
-   const searchParamLocations: string[] = []
-   const term = query.term as string
+const handleQueryChange = (
+   router: NextRouter,
+   param: keyof SearchParams | "jobId",
+   value: string | string[]
+) => {
+   router.push(
+      {
+         pathname: router.pathname,
+         query: {
+            ...router.query,
+            [param]: value,
+         },
+      },
+      undefined,
+      { shallow: true }
+   )
+}
 
-   if (query.location) {
-      if (Array.isArray(query.location)) {
-         searchParamLocations.push(...query.location)
-      } else {
-         searchParamLocations.push(query.location as string)
-      }
-   }
+const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
+   const term = (query.term as string) || ""
+
+   const searchParamLocations = getQueryStringArray(query.location)
+   const searchParamBusinessFunctionTags = getQueryStringArray(
+      query.businessFunctionTags
+   )
+   const searchParamJobTypes = getQueryStringArray(query.jobTypes)
 
    return {
       location: searchParamLocations,
       term: term,
+      businessFunctionTags: searchParamBusinessFunctionTags,
+      jobTypes: searchParamJobTypes,
    }
 }
 

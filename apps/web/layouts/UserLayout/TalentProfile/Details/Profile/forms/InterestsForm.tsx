@@ -177,7 +177,7 @@ export const InterestFormFields = () => {
       <Stack spacing={0} sx={styles.formRoot}>
          <Stack>
             <Typography variant="medium" sx={styles.tagTitle}>
-               Job areas
+               Job fields
             </Typography>
             {businessFunctionsState.invalid ? (
                <Typography variant="xsmall" color={"error.500"}>
