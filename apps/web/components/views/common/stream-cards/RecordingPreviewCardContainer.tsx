@@ -101,7 +101,7 @@ const RecordingPreviewCardContainer: FC<Props> = ({
    const handleMouseEnter = useCallback(() => {
       if (!isMobile) {
          setAutoPlaying(true)
-         dataLayerLivestreamEvent(AnalyticsEvents.RecordingHover, livestream)
+         dataLayerLivestreamEvent(AnalyticsEvents.RecordingAutoplay, livestream)
       }
    }, [isMobile, setAutoPlaying, livestream])
 
