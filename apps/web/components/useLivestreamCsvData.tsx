@@ -1,18 +1,18 @@
-import StatsUtil from "data/util/StatsUtil"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { CircularProgress } from "@mui/material"
-import RegisteredUsersIcon from "@mui/icons-material/People"
-import ButtonWithHint from "./views/group/admin/events/events-table/ButtonWithHint"
-import { useTheme } from "@mui/material/styles"
 import {
    LivestreamEvent,
    LivestreamUserAction,
 } from "@careerfairy/shared-lib/livestreams"
-import { livestreamRepo } from "../data/RepositoryInstances"
 import { CSVDownloadUserData } from "@careerfairy/shared-lib/users"
+import RegisteredUsersIcon from "@mui/icons-material/People"
+import { CircularProgress } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
+import StatsUtil from "data/util/StatsUtil"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { livestreamRepo } from "../data/RepositoryInstances"
 import { useGroup } from "../layouts/GroupDashboardLayout"
-import { CSVDialogDownload } from "./custom-hook/useMetaDataActions"
 import { errorLogAndNotify } from "../util/CommonUtil"
+import { CSVDialogDownload } from "./custom-hook/useMetaDataActions"
+import ButtonWithHint from "./views/group/admin/events/events-table/ButtonWithHint"
 
 interface MetaDataActionsProps {
    // The type of user we are downloading data for
@@ -94,6 +94,8 @@ export function useLivestreamCsvData({
          const canDownloadUserData = Boolean(canDownload)
          const hintTitle = `Download ${title}`
 
+         const noUsers = !targetUserData && !actionLoading
+
          return {
             icon: actionLoading ? (
                <CircularProgress size={15} color="inherit" />
@@ -108,7 +110,7 @@ export function useLivestreamCsvData({
                ? `Getting ${title}...`
                : `Get ${title}`,
             onClick: () => {},
-            hidden: !canDownloadUserData,
+            hidden: !canDownloadUserData || noUsers,
             disabled: actionLoading || !canDownloadUserData,
             loadedButton: targetUserData && (
                <CSVDialogDownload
