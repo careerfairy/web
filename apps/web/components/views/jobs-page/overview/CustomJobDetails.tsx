@@ -84,6 +84,7 @@ export const CustomJobDetails = () => {
             <InlineCustomJobDetailsContent
                customJob={selectedJob}
                source={context}
+               key={selectedJob?.id}
             />
          ) : null}
       </Box>

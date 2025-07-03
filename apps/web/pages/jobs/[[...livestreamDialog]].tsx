@@ -1,3 +1,4 @@
+import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import {
    CustomJobsPresenter,
    SerializedCustomJob,
@@ -12,34 +13,32 @@ import {
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
+import { useAuth } from "HOCs/AuthProvider"
+import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import { usePreFetchRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
+import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import {
    JobsOverviewContextProvider,
    SearchParams,
    useJobsOverviewContext,
 } from "components/views/jobs-page/JobsOverviewContext"
 import JobsPageOverview from "components/views/jobs-page/JobsPageOverview"
+import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
+import { Country, State } from "country-state-city"
 import {
    customJobRepo,
    livestreamRepo,
    sparkRepo,
 } from "data/RepositoryInstances"
 import algoliaRepo from "data/algolia/AlgoliaRepository"
+import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
+import { useRouter } from "next/router"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
+import { getUserTokenFromCookie } from "util/serverUtil"
 import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
-
-import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
-import { useAuth } from "HOCs/AuthProvider"
-import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
-import { usePreFetchRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
-import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
-import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
-import { Country, State } from "country-state-city"
-import { customJobServiceInstance } from "data/firebase/CustomJobService"
-import { useRouter } from "next/router"
-import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 export const HEADER_TRANSITION_TIMEOUT = 100
@@ -53,6 +52,7 @@ const JobsPage: NextPage<
    userCountryCode,
    dialogOpen,
    locationNames,
+   numberOfJobs,
 }) => {
    const router = useRouter()
    const { jobId } = router.query
@@ -99,6 +99,8 @@ const JobsPage: NextPage<
                   serverJob={serverJob}
                   dialogOpen={dialogOpen}
                   locationNames={locationNames}
+                  numberOfJobs={numberOfJobs}
+                  userCountryCode={userCountryCode}
                >
                   <PageSEO />
                   <JobsPageOverview />
@@ -200,7 +202,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const filterOptions = {
       arrayFilters: {
-         locationIdTags: queryLocations,
+         normalizedLocationIds: queryLocations,
          businessFunctionsTagIds: queryBusinessFunctionTags,
          normalizedJobType: queryJobTypes,
       },
@@ -217,7 +219,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       term as string,
       filters,
       0,
-      CUSTOM_JOB_REPLICAS.TITLE_ASC,
+      CUSTOM_JOB_REPLICAS.DEADLINE_ASC,
       30
    )
 
@@ -231,7 +233,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
            userAuthId,
            false,
            {
-              userCountryCode,
+              userCountryCode: userCountryCode,
            }
         )
       : []

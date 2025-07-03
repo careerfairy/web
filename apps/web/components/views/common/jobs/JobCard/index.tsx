@@ -54,7 +54,7 @@ const styles = sxStyles({
       width: "100%",
       textAlign: "left",
       "& .MuiTouchRipple-child": {
-         backgroundColor: (theme) => theme.brand.black[800],
+         backgroundColor: (theme) => `${theme.brand.black[800]} !important`,
       },
    },
    selectedJobCard: {

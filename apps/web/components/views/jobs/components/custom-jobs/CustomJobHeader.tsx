@@ -92,6 +92,9 @@ const styles = sxStyles({
       color: (t) => t.palette.neutral[700],
       fontWeight: 400,
    },
+   nonPublicGroupHeaderLink: {
+      cursor: "default !important",
+   },
 })
 
 type Props = {
@@ -129,6 +132,8 @@ const CustomJobHeader = ({
          maxLocationsToShow: maxLocationsToShow,
       }
    )
+
+   const isPublicGroup = job?.group?.publicProfile
 
    const businessFunctionTags = (job.businessFunctionsTagIds || [])
       .map((tagId) => TagValuesLookup[tagId])
@@ -169,11 +174,16 @@ const CustomJobHeader = ({
                            alignItems={"center"}
                            spacing={1}
                            mb={"8px"}
-                           sx={styles.headerCompanyLink}
-                           component={Link}
-                           href={makeGroupCompanyPageUrl(companyName, {
-                              interactionSource: InteractionSources.Job_Header,
-                           })}
+                           sx={isPublicGroup ? styles.headerCompanyLink : null}
+                           component={isPublicGroup ? Link : "div"}
+                           href={
+                              isPublicGroup
+                                 ? makeGroupCompanyPageUrl(companyName, {
+                                      interactionSource:
+                                         InteractionSources.Job_Header,
+                                   })
+                                 : undefined
+                           }
                         >
                            <CircularLogo
                               src={getResizedUrl(companyLogoUrl, "lg")}

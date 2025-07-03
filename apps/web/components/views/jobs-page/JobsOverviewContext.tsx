@@ -51,6 +51,7 @@ type JobsOverviewContextType = {
    jobNotFound: boolean
    setJobDetailsDialogOpen: (open: boolean) => void
    selectedLocationsNames: string[]
+   userCountryCode?: string
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -63,6 +64,8 @@ type JobsOverviewContextProviderType = {
    children: ReactNode
    dialogOpen?: boolean
    locationNames?: string[]
+   numberOfJobs?: number
+   userCountryCode?: string
 }
 
 export type SearchParams = {
@@ -79,6 +82,8 @@ export const JobsOverviewContextProvider = ({
    serverJob,
    dialogOpen,
    locationNames,
+   numberOfJobs,
+   userCountryCode,
 }: JobsOverviewContextProviderType) => {
    const router = useRouter()
    const searchParams = getSearchParams(router.query)
@@ -104,7 +109,7 @@ export const JobsOverviewContextProvider = ({
    const filterOptions = useMemo<FilterOptions>(
       () => ({
          arrayFilters: {
-            locationIdTags: searchParams.location,
+            normalizedLocationIds: searchParams.location,
             businessFunctionsTagIds: searchParams.businessFunctionTags,
             normalizedJobType: searchParams.jobTypes,
          },
@@ -116,8 +121,8 @@ export const JobsOverviewContextProvider = ({
       }),
       [
          searchParams.businessFunctionTags,
-         searchParams.location,
          searchParams.jobTypes,
+         searchParams.location,
       ]
    )
 
@@ -125,7 +130,7 @@ export const JobsOverviewContextProvider = ({
       searchParams.term,
       {
          filterOptions,
-         targetReplica: CUSTOM_JOB_REPLICAS.TITLE_ASC,
+         targetReplica: CUSTOM_JOB_REPLICAS.DEADLINE_ASC,
          itemsPerPage: 10,
          initialData: serverCustomJobs,
       }
@@ -195,7 +200,9 @@ export const JobsOverviewContextProvider = ({
             searchParams?.term?.length
       )
 
-      const searchResultsCount = data?.at(0)?.nbHits ?? 0
+      const searchResultsCount = hasFilters
+         ? data?.at(0)?.nbHits ?? 0
+         : numberOfJobs ?? 0
 
       const nextPage = () => {
          if (searchResultsCount > infiniteJobs?.length) {
@@ -238,6 +245,7 @@ export const JobsOverviewContextProvider = ({
          jobNotFound,
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
          selectedLocationsNames,
+         userCountryCode,
       }
    }, [
       infiniteJobs,
@@ -256,6 +264,8 @@ export const JobsOverviewContextProvider = ({
       isMobile,
       jobNotFound,
       selectedLocationsNames,
+      numberOfJobs,
+      userCountryCode,
    ])
 
    useEffect(() => {

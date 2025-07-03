@@ -17,6 +17,7 @@ import {
    TransformedGroup,
 } from "@careerfairy/shared-lib/groups/search"
 
+import { normalizeLocationIds } from "@careerfairy/shared-lib/countries/types"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    CUSTOM_JOB_FIELDS_TO_INDEX,
@@ -124,13 +125,17 @@ const customJobsIndex = {
          data.jobLocation?.map((location) => location.name) ?? [],
       locationIdTags: data.jobLocation?.map((location) => location.id) ?? [],
       normalizedJobType: data.jobType?.replace(" ", "-") ?? "",
+      deadlineAtMs: data.deadline?.toDate?.().getTime() ?? null,
+      normalizedLocationIds: normalizeLocationIds(
+         data.jobLocation?.map((location) => location.id) ?? []
+      ),
    }),
    shouldIndex: () => true, // We could index only valid custom jobs
    fullIndexSyncQueryConstraints: (collectionRef) => collectionRef,
    settings: {
       attributesForFaceting: CUSTOM_JOB_FILTERING_FIELDS,
       searchableAttributes: CUSTOM_JOB_SEARCHABLE_ATTRIBUTES,
-      replicas: [CUSTOM_JOB_REPLICAS.TITLE_ASC],
+      replicas: [CUSTOM_JOB_REPLICAS.DEADLINE_ASC],
    },
 } satisfies Index<CustomJob, TransformedCustomJob>
 
