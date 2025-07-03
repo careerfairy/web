@@ -6,9 +6,12 @@ import Image from "next/image"
 import { FC, useCallback, useEffect, useRef, useState } from "react"
 import { BaseReactPlayerProps, OnProgressProps } from "react-player/base"
 import ReactPlayer from "react-player/file"
-import { usePrevious } from "react-use"
+import { useLatest, usePrevious } from "react-use"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { useEventPreviewCardContext } from "./EventPreviewCardContext"
 
 const styles = sxStyles({
    root: {
@@ -113,6 +116,9 @@ const RecordingCardPlayer: FC<Props> = ({
 }) => {
    const playerRef = useRef<ReactPlayer | null>(null)
    const [isVideoReady, setIsVideoReady] = useState(false)
+   const { livestream } = useEventPreviewCardContext()
+
+   const livestreamRef = useLatest(livestream)
 
    const prevIdentifier = usePrevious(identifier)
    const playingVideo = Boolean(playing && !shouldPause)
@@ -152,6 +158,10 @@ const RecordingCardPlayer: FC<Props> = ({
 
    useEffect(() => {
       if (autoPlaying) {
+         dataLayerLivestreamEvent(
+            AnalyticsEvents.RecordingAutoplay,
+            livestreamRef.current
+         )
          // if previewing, tease at 10% of the video, otherwise skip initial 8 seconds loading time
          if (startAt && !preview) {
             playerRef.current?.seekTo(startAt)
@@ -161,6 +171,7 @@ const RecordingCardPlayer: FC<Props> = ({
             playerRef.current?.seekTo(8)
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [preview, autoPlaying, startAt])
 
    return (

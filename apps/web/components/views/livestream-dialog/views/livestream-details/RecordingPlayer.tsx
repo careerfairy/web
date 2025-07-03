@@ -24,6 +24,8 @@ import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { livestreamRepo } from "../../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DateUtil from "../../../../../util/DateUtil"
+import { AnalyticsEvents } from "../../../../../util/analyticsConstants"
+import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { useFirestoreDocument } from "../../../../custom-hook/utils/useFirestoreDocument"
@@ -327,13 +329,9 @@ export const useRecordingControls = (
 
       // play recording
       handleRecordingPlay()
-   }, [
-      handleRecordingPlay,
-      stream?.id,
-      stream?.start,
-      userData?.userEmail,
-      isLoggedIn,
-   ])
+      // track recording_play event when playback actually starts
+      dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
+   }, [isLoggedIn, stream, userData?.userEmail, handleRecordingPlay])
 
    const handlePause = useCallback(() => {
       setVideoPaused(true)
