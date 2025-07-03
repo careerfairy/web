@@ -1,4 +1,9 @@
 export const AnalyticsEvents = {
+   /**
+    * Custom page view event for enhanced Customer.io campaign flexibility
+    * Dispatched on every page navigation
+    * Why: Customer.io native page view is limited, custom event provides more flexibility
+    */
    CustomPageView: "custom_page_view",
    LivestreamJobOpen: "livestream_job_open",
    LivestreamJobApplicationComplete: "livestream_job_application_complete",
