@@ -1,10 +1,25 @@
+import { Timestamp } from "firebase/firestore"
 import { BaseModel, fromSerializedDate } from "../BaseModel"
 import {
    fromDateConverter,
    fromDateFirestoreFn,
    toDate,
 } from "../firebaseTypes"
+import {
+   PublicGroup,
+   deserializePublicGroup,
+   serializePublicGroup,
+} from "../groups"
+import { SerializedPublicGroup } from "../groups/groups"
 import { CustomJob, JobType } from "./customJobs"
+
+export interface SerializedCustomJob
+   extends Omit<CustomJob, "createdAt" | "updatedAt" | "deadline" | "group"> {
+   createdAt: number
+   updatedAt: number
+   deadline: number
+   group: SerializedPublicGroup
+}
 
 export class CustomJobsPresenter extends BaseModel {
    constructor(
@@ -25,10 +40,12 @@ export class CustomJobsPresenter extends BaseModel {
       public readonly deleted?: boolean,
       public readonly businessFunctionsTagIds?: string[],
       public readonly isPermanentlyExpired?: boolean,
-      public readonly disableUrlTracking?: boolean
+      public readonly disableUrlTracking?: boolean,
+      public readonly group?: PublicGroup
    ) {
       super()
    }
+
    static createFromPlainObject(customJob: CustomJobsPresenter) {
       return new CustomJobsPresenter(
          customJob.id,
@@ -48,9 +65,11 @@ export class CustomJobsPresenter extends BaseModel {
          customJob.deleted,
          customJob.businessFunctionsTagIds,
          customJob.isPermanentlyExpired,
-         customJob.disableUrlTracking
+         customJob.disableUrlTracking,
+         customJob.group
       )
    }
+
    static parseDocument(
       customJob: CustomJobsPresenter,
       fromDate: fromDateFirestoreFn
@@ -78,13 +97,44 @@ export class CustomJobsPresenter extends BaseModel {
          doc.deleted,
          doc.businessFunctionsTagIds,
          doc.isPermanentlyExpired,
-         doc.disableUrlTracking
+         doc.disableUrlTracking,
+         doc.group
       )
    }
    static serializeDocument(doc: CustomJob) {
-      return CustomJobsPresenter.createFromDocument(
-         doc
-      ).serializeToPlainObject()
+      const serialized =
+         CustomJobsPresenter.createFromDocument(doc).serializeToPlainObject()
+
+      return {
+         ...serialized,
+         group: serializePublicGroup(serialized.group),
+      } as SerializedCustomJob
+   }
+
+   static deserialize(
+      serializedCustomJob: SerializedCustomJob
+   ): CustomJobsPresenter {
+      return new CustomJobsPresenter(
+         serializedCustomJob.id,
+         serializedCustomJob.groupId,
+         serializedCustomJob.documentType,
+         serializedCustomJob.title,
+         serializedCustomJob.description,
+         serializedCustomJob.postingUrl,
+         fromSerializedDate(serializedCustomJob.deadline),
+         fromSerializedDate(serializedCustomJob.createdAt),
+         fromSerializedDate(serializedCustomJob.updatedAt),
+         serializedCustomJob.livestreams,
+         serializedCustomJob.sparks,
+         serializedCustomJob.published,
+         serializedCustomJob.jobType,
+         serializedCustomJob.salary,
+         serializedCustomJob.deleted,
+         serializedCustomJob.businessFunctionsTagIds,
+         serializedCustomJob.isPermanentlyExpired,
+         serializedCustomJob.disableUrlTracking,
+         deserializePublicGroup(serializedCustomJob.group, Timestamp.fromDate)
+      )
    }
 
    convertToDocument(fromDate: fromDateFirestoreFn): CustomJob {
@@ -106,8 +156,8 @@ export class CustomJobsPresenter extends BaseModel {
          deleted: this.deleted,
          businessFunctionsTagIds: this.businessFunctionsTagIds,
          isPermanentlyExpired: this.isPermanentlyExpired,
-         group: null,
          disableUrlTracking: this.disableUrlTracking,
+         group: this.group,
       }
    }
 }

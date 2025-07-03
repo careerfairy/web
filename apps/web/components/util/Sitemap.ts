@@ -1,3 +1,4 @@
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
@@ -57,6 +58,19 @@ export const mapGroupsToSiteMap = (path: string, groups: Group[]): string => {
       .join("")}`
 }
 
+export const mapCustomJobsToSiteMap = (
+   path: string,
+   jobs: CustomJob[]
+): string => {
+   return `${jobs
+      .map((job) => {
+         return `<url>
+         <loc>${`${path}/${job.id}`}</loc>
+         <lastmod>${job.updatedAt?.toDate?.().toString()}</lastmod>
+      </url>`
+      })
+      .join("")}`
+}
 /**
  * Maps web flow paths to sitemap URLs
  * @param paths - Array of paths to be mapped
