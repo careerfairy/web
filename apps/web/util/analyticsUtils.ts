@@ -22,7 +22,7 @@ import {
    TalentGuideModule,
 } from "data/hygraph/types"
 import { errorLogAndNotify } from "./CommonUtil"
-import { AnalyticsEvent } from "./analyticsConstants"
+import { AnalyticsEvent, AnalyticsEvents } from "./analyticsConstants"
 import { prepareLivestreamCustomerIoVariables } from "./customerIoLivestreamUtils"
 import { getProgressPercentage } from "./levels"
 import { MobileUtils } from "./mobile.utils"
@@ -257,7 +257,17 @@ export const analyticsTrackEvent = (
 ) => {
    if (typeof window === "undefined") return
 
-   const enrichedProperties = { ...properties }
+   const enrichedProperties: Record<string, unknown> = {
+      ...properties,
+      navigatorLanguage: navigator?.language || null,
+   }
+
+   try {
+      enrichedProperties.timezone =
+         Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone
+   } catch (error) {
+      console.error("Failed to retrieve timezone:", error)
+   }
 
    // Incase cookies are not available, we don't want to crash the analytics tracking
    try {
@@ -389,6 +399,14 @@ export const analyticsRemoveUserAssociationFromEntity = (
  */
 export const analyticsTrackPageView = () => {
    if (typeof window === "undefined") return
+
+   dataLayerEvent(AnalyticsEvents.CustomPageView, {
+      path: window.location.pathname,
+      url: window.location.href,
+      title: document.title,
+      referrer: document.referrer,
+      search: window.location.search,
+   })
 
    if (MobileUtils.webViewPresence()) {
       return MobileUtils.send<TRACK_SCREEN>(MESSAGING_TYPE.TRACK_SCREEN, {
