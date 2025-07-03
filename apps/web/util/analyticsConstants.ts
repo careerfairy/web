@@ -41,9 +41,10 @@ export const AnalyticsEvents = {
     */
    RecordingPlay: "livestream_recording_play",
    /**
-    * Dispatched when the recording card is hovered on desktop
+    * Dispatched when the recording card auto plays when hovered on desktop or auto plays when
+    * in the viewport on mobile
     */
-   RecordingHover: "livestream_recording_hover",
+   RecordingAutoplay: "livestream_recording_autoplay",
    /**
     * Dispatched when the recording is played for one minute
     */
