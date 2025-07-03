@@ -7,6 +7,8 @@ import {
    UserProfile,
 } from "@careerfairy/shared-lib/customJobs/service/UserBasedRecommendationsBuilder"
 
+import { inLocation } from "@careerfairy/shared-lib/countries/types"
+import { RankedCustomJob } from "@careerfairy/shared-lib/customJobs/RankedCustomJob"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { CustomJobDataFetcher } from "./services/DataFetcherRecommendations"
 
@@ -34,7 +36,29 @@ export class CustomJobRecommendationService
          this.jobsData
       )
 
-      return this.process(rankedCustomJobs, limit)
+      const sorter = (job: RankedCustomJob) => {
+         const inExternalCountry = this.userProfile.externalCountryIsoCode
+            ? inLocation(
+                 this.userProfile.externalCountryIsoCode,
+                 job.model.jobLocation?.map((location) => location.id) ?? []
+              )?.length ?? 0
+            : 0
+
+         const inUserCountry = this.userProfile.userData?.countryIsoCode
+            ? inLocation(
+                 this.userProfile.userData?.countryIsoCode,
+                 job.model.jobLocation?.map((location) => location.id) ?? []
+              )?.length ?? 0
+            : 0
+
+         const sum = inExternalCountry + inUserCountry
+         if (sum > 0) {
+            return Math.floor(Math.random() * sum) + 1
+         }
+         return 0
+      }
+
+      return this.process(rankedCustomJobs, limit, sorter)
    }
 
    static async create(

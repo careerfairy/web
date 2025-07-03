@@ -85,6 +85,7 @@ export const getRecommendedEvents = onCall(
 export const getRecommendedJobs = onCall(
    {
       concurrency: 10,
+      memory: "512MiB",
    },
    middlewares<GetRecommendedJobsFnArgs>(
       dataValidation({
@@ -111,7 +112,6 @@ export const getRecommendedJobs = onCall(
          try {
             const countryCode =
                request.data.userCountryCode || getCountryCode(request)
-            functions.logger.info("🚀 ~ countryCode:", countryCode)
 
             const dataFetcher = new CustomJobDataFetcher(
                request.data.userAuthId || null,

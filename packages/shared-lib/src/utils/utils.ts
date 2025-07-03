@@ -729,7 +729,10 @@ export const calculateOptimalTruncation = (
 export const windowedShuffle = <T>(
    items: T[],
    windowSize = 10,
-   swapCount = 0
+   swapCount = 0,
+   options?: {
+      sortValueGetter?: (item: T) => number
+   }
 ): T[] => {
    // Split into windows using chunkArray
    const windows = chunkArray(items, windowSize)
@@ -756,5 +759,17 @@ export const windowedShuffle = <T>(
    }
 
    // Flatten back to a single array
-   return windows.flat()
+   let result = windows.flat()
+
+   // If a sortValueGetter is provided, sort the result accordingly
+   if (options?.sortValueGetter) {
+      result = result.sort((a, b) => {
+         const aValue = options.sortValueGetter(a)
+         const bValue = options.sortValueGetter(b)
+
+         return bValue - aValue
+      })
+   }
+
+   return result
 }
