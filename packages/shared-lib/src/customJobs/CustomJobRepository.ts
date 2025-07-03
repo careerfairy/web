@@ -187,6 +187,13 @@ export interface ICustomJobRepository {
    getPublishedCustomJobs(limit?: number): Promise<CustomJob[]>
 
    getCustomJobStats(jobIds: string[]): Promise<CustomJobStats[]>
+
+   /**
+    * Like getCustomJobByIds, but guarantees the returned array is in the same order as the input ids,
+    * omitting any missing documents.
+    * @param jobIds
+    */
+   getCustomJobByIdsStrict(jobIds: string[]): Promise<CustomJob[]>
 }
 
 export class FirebaseCustomJobRepository
@@ -690,5 +697,36 @@ export class FirebaseCustomJobRepository
          .get()
 
       return this.addIdToDocs<CustomJob>(docs.docs)
+   }
+
+   /**
+    * Like getCustomJobByIds, but guarantees the returned array is in the same order as the input ids,
+    * omitting any missing documents.
+    * @param jobIds
+    */
+   async getCustomJobByIdsStrict(jobIds: string[]): Promise<CustomJob[]> {
+      if (!jobIds.length) return []
+      const chunks = chunkArray(jobIds, 10)
+      const promises = []
+      for (const chunk of chunks) {
+         promises.push(
+            this.firestore
+               .collection(this.COLLECTION_NAME)
+               .where("id", "in", chunk)
+               .get()
+               .then(mapFirestoreDocuments)
+         )
+      }
+      const responses = await Promise.allSettled(promises)
+      const jobs = responses
+         .filter((r) => r.status === "fulfilled")
+         .map((r) => (r as PromiseFulfilledResult<CustomJob[]>).value)
+         .flat()
+      // Map id to job for fast lookup
+      const jobMap = new Map(jobs.map((job) => [job.id, job]))
+      // Return in the same order as jobIds, omitting missing
+      return jobIds
+         .map((id) => jobMap.get(id))
+         .filter((job): job is CustomJob => Boolean(job))
    }
 }

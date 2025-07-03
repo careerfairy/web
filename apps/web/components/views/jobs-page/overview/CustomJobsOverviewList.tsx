@@ -3,8 +3,12 @@ import { useEffect, useMemo, useRef } from "react"
 
 import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { useUserRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useUserCountryCode from "components/custom-hook/useUserCountryCode"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
+import CircularLoader from "components/views/loader/CircularLoader"
+import { RECOMMENDED_JOBS_LIMIT } from "pages/jobs/[[...livestreamDialog]]"
 import { sxStyles } from "types/commonTypes"
 import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
@@ -73,7 +77,6 @@ export const CustomJobsOverviewList = () => {
 
 const DefaultJobs = () => {
    const { isLoggedIn } = useAuth()
-   const { customJobs } = useJobsOverviewContext()
    const title = isLoggedIn ? "Right for you" : "Trending jobs"
 
    return (
@@ -82,8 +85,7 @@ const DefaultJobs = () => {
             {title}
             {" 🚀"}
          </Typography>
-         {/* TODO: Replace with new Job Card */}
-         <CustomJobsList customJobs={customJobs} />
+         <RecommendedJobs />
       </Stack>
    )
 }
@@ -93,23 +95,34 @@ const ResultJobs = () => {
 
    return (
       <Stack spacing={1}>
-         {/* TODO: Replace with new Job Card */}
-         {/* <SearchResultsCount /> */}
          <CustomJobsList customJobs={customJobs} />
       </Stack>
    )
 }
 
 const OtherJobs = () => {
-   const { customJobs } = useJobsOverviewContext()
-
    return (
-      <Stack spacing={1}>
+      <Stack spacing={1} mt={2}>
          <Typography variant="medium" sx={styles.listTitle}>
             Other jobs you might like
          </Typography>
-         {/* TODO: Replace with new Job Card */}
-         <CustomJobsList customJobs={customJobs} />
+         <RecommendedJobs />
       </Stack>
    )
+}
+
+const RecommendedJobs = () => {
+   const { isLoadingAuth, authenticatedUser } = useAuth()
+   const { userCountryCode } = useUserCountryCode()
+   const { data: recommendedJobs, isLoading: isLoadingRecommendedJobs } =
+      useUserRecommendedJobs({
+         userAuthId: authenticatedUser?.uid,
+         limit: RECOMMENDED_JOBS_LIMIT,
+         countryCode: userCountryCode,
+      })
+
+   if (isLoadingRecommendedJobs || isLoadingAuth)
+      return <CircularLoader sx={{ mt: 2 }} />
+
+   return <CustomJobsList customJobs={recommendedJobs} />
 }

@@ -31,14 +31,19 @@ import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 
 import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
+import { useAuth } from "HOCs/AuthProvider"
 import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import { usePreFetchRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import { Country, State } from "country-state-city"
+import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { useRouter } from "next/router"
+import { getUserTokenFromCookie } from "util/serverUtil"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 export const HEADER_TRANSITION_TIMEOUT = 100
+export const RECOMMENDED_JOBS_LIMIT = 30
 
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -51,6 +56,7 @@ const JobsPage: NextPage<
 }) => {
    const router = useRouter()
    const { jobId } = router.query
+   const { authenticatedUser } = useAuth()
 
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
@@ -64,6 +70,12 @@ const JobsPage: NextPage<
            customJobData.serializedCustomJob
         ).convertToDocument(Timestamp.fromDate)
       : undefined
+
+   usePreFetchRecommendedJobs({
+      limit: RECOMMENDED_JOBS_LIMIT,
+      userAuthId: authenticatedUser?.uid,
+      countryCode: userCountryCode,
+   })
 
    return (
       <>
@@ -165,6 +177,9 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const { term: queryTerm = "", jobId: queryJobId } = context.query
 
+   const token = getUserTokenFromCookie(context) as any
+   const userAuthId = token?.user_id
+
    const term = queryTerm as string
    const jobId = queryJobId as string
 
@@ -176,6 +191,12 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       context.query.businessFunctionTags
    )
    const queryJobTypes = getQueryStringArray(context.query.jobTypes)
+
+   const hasFilters =
+      queryLocations.length ||
+      queryBusinessFunctionTags.length ||
+      queryJobTypes.length ||
+      term?.length
 
    const filterOptions = {
       arrayFilters: {
@@ -204,7 +225,20 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       .map(deserializeAlgoliaSearchResponse)
       .map((job) => job as CustomJob)
 
-   const firstCustomJob = algoliaCustomJobs?.at(0)
+   const recommendedJobs = !hasFilters
+      ? await customJobServiceInstance.getRecommendedJobs(
+           RECOMMENDED_JOBS_LIMIT,
+           userAuthId,
+           false,
+           {
+              userCountryCode,
+           }
+        )
+      : []
+
+   const firstCustomJob = hasFilters
+      ? algoliaCustomJobs?.at(0)
+      : recommendedJobs?.at(0)
 
    const customJob = jobId
       ? await customJobRepo.getCustomJobById(jobId)
