@@ -1,23 +1,59 @@
-import { Typography } from "@mui/material"
-
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { ChipDropdownProvider } from "components/views/common/ChipDropdown/ChipDropdownContext"
 import { sxStyles } from "types/commonTypes"
+import { SearchByLocation } from "./by/SearchByLocation"
+import { SearchByTags } from "./by/SearchByTags"
+import { SearchByTerm } from "./by/SearchByTerm"
+import { SearchByType } from "./by/SearchByType"
 
 const styles = sxStyles({
    root: {
       width: "100%",
-      borderRadius: 2,
-      border: "1px solid #E0E0E0",
-      padding: 2,
+   },
+   stickyRoot: {
+      position: "sticky",
+      top: 64,
+      backgroundColor: "#F7F8FC",
+      py: 2,
+   },
+   searchBy: {
+      overflowX: "auto",
+      boxSizing: "border-box",
+      overflowClipMargin: "106px",
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
+      px: {
+         xs: "16px !important",
+         sm: "16px !important",
+         md: "32px !important",
+      },
+   },
+   searchByTerm: {
+      px: {
+         xs: "16px !important",
+         sm: "16px !important",
+         md: "32px !important",
+      },
    },
 })
 
 export const OverviewSearch = () => {
+   const isMobile = useIsMobile()
+
    return (
-      <Stack sx={styles.root}>
-         <Typography>Jobs search</Typography>
-         <Stack direction="row" spacing={1}>
-            <Typography>Filters here</Typography>
+      <Stack sx={[styles.root, isMobile && styles.stickyRoot]} spacing={2}>
+         <Box sx={styles.searchByTerm}>
+            <SearchByTerm />
+         </Box>
+         <Stack direction="row" spacing={2} sx={styles.searchBy}>
+            <ChipDropdownProvider>
+               <SearchByLocation />
+               <SearchByTags />
+               <SearchByType />
+            </ChipDropdownProvider>
          </Stack>
       </Stack>
    )

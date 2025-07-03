@@ -19,15 +19,30 @@ const swrOptions: SWRConfiguration = {
       }),
 }
 
-const getKey = (searchValue: string, limit?: number) => {
-   return searchValue?.length
-      ? [FUNCTION_NAMES.searchLocations, { searchValue, limit }]
+type GetKeyOptions = {
+   searchValue: string
+   limit?: number
+   initialLocationIds?: string[]
+}
+const getKey = (options: GetKeyOptions) => {
+   const { searchValue, limit, initialLocationIds } = options
+
+   return searchValue?.length || initialLocationIds?.length
+      ? [
+           FUNCTION_NAMES.searchLocations,
+           { searchValue, limit, initialLocationIds },
+        ]
       : null
 }
 
 type Options = {
    suspense?: boolean
    limit?: number
+   /**
+    * When provided, the locations with the ids are always included in the results.
+    * Regardless of the search value.
+    */
+   initialLocationIds?: string[]
 }
 
 /**
@@ -39,7 +54,7 @@ export const useLocationSearch = (
    searchValue: string,
    options: Options = {}
 ) => {
-   const { suspense = true, limit = 10 } = options
+   const { suspense = true, limit = 20, initialLocationIds } = options
 
    const fetcher = useFunctionsSWR<OptionGroup[]>()
 
@@ -54,11 +69,20 @@ export const useLocationSearch = (
    )
 
    return useSWR<Omit<OptionGroup, "groupId">[]>(
-      getKey(debouncedSearchValue, limit),
+      getKey({ searchValue: debouncedSearchValue, limit, initialLocationIds }),
       fetcher,
       {
          ...swrOptions,
          suspense,
       }
    )
+}
+
+export const dropdownValueMapper = (
+   option: OptionGroup
+): { id: string; value: string } => {
+   return {
+      id: option.id,
+      value: option.name,
+   }
 }

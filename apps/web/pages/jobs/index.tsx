@@ -2,6 +2,8 @@ import {
    CustomJobsPresenter,
    SerializedCustomJob,
 } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
 import {
@@ -9,6 +11,7 @@ import {
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
+import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
 import {
    JobsOverviewContextProvider,
    SearchParams,
@@ -20,10 +23,14 @@ import {
    livestreamRepo,
    sparkRepo,
 } from "data/RepositoryInstances"
+import algoliaRepo from "data/algolia/AlgoliaRepository"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
+import { deserializeAlgoliaSearchResponse } from "util/algolia"
 import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
+
+import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 const JobsPage: NextPage<
@@ -33,8 +40,9 @@ const JobsPage: NextPage<
    customJobData,
    searchParams,
    userCountryCode,
+   numberOfJobs,
 }) => {
-   const seoTitle = getSeoTitle(serializedCustomJobs, searchParams)
+   const seoTitle = getSeoTitle(searchParams, numberOfJobs)
    const serverCustomJobs =
       serializedCustomJobs?.map((job) =>
          CustomJobsPresenter.deserialize(job).convertToDocument(
@@ -54,7 +62,7 @@ const JobsPage: NextPage<
             description={"Find your dream job with CareerFairy."}
             title={seoTitle}
          />
-         <GenericDashboardLayout userCountryCode={userCountryCode}>
+         <GenericDashboardLayout userCountryCode={userCountryCode} headerFixed>
             <JobsOverviewContextProvider
                serverCustomJobs={serverCustomJobs}
                serverJob={serverJob}
@@ -67,42 +75,23 @@ const JobsPage: NextPage<
    )
 }
 
-const getSeoTitle = (
-   serializedCustomJobs: SerializedCustomJob[],
-   searchParams: SearchParams
-) => {
-   if (
-      !searchParams.location.length &&
-      !searchParams.term &&
-      serializedCustomJobs?.length
-   ) {
-      return `${serializedCustomJobs?.length} Jobs on CareerFairy`
+const getSeoTitle = (searchParams: SearchParams, numberOfJobs: number) => {
+   if (!searchParams.location.length && !searchParams.term && numberOfJobs) {
+      return `${numberOfJobs} Jobs on CareerFairy`
    }
 
-   if (
-      searchParams.location.length &&
-      !searchParams.term &&
-      serializedCustomJobs?.length
-   ) {
-      return `${
-         serializedCustomJobs?.length
-      } Jobs in ${searchParams.location.join(", ")} on CareerFairy`
+   if (searchParams.location.length && !searchParams.term && numberOfJobs) {
+      return `${numberOfJobs} Jobs in ${searchParams.location.join(
+         ", "
+      )} on CareerFairy`
    }
 
-   if (
-      !searchParams.location.length &&
-      searchParams.term &&
-      serializedCustomJobs?.length
-   ) {
-      return `${serializedCustomJobs?.length} Jobs for ${searchParams.term} on CareerFairy`
+   if (!searchParams.location.length && searchParams.term && numberOfJobs) {
+      return `${numberOfJobs} Jobs for ${searchParams.term} on CareerFairy`
    }
 
-   if (
-      searchParams.location.length &&
-      searchParams.term &&
-      serializedCustomJobs?.length
-   ) {
-      return `${serializedCustomJobs?.length} Jobs for ${
+   if (searchParams.location.length && searchParams.term && numberOfJobs) {
+      return `${numberOfJobs} Jobs for ${
          searchParams.term
       } in ${searchParams.location.join(", ")} on CareerFairy`
    }
@@ -119,6 +108,7 @@ type JobsPageProps = {
    }
    searchParams: SearchParams
    userCountryCode: string
+   numberOfJobs: number
 }
 
 export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
@@ -127,16 +117,44 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const hasRedirected = context.req.cookies["redirected"]
    const userCountryCode =
       (context.req.headers["x-vercel-ip-country"] as string) || null
-   const { location, term = "", jobId } = context.query
-   const locations = (location as string[]) || []
 
-   // TODO: Replace with Algolia search using the searchParams, also add default limit
-   // TODO: Check also size limit, as returning high number of jobs might cause performance issues
-   const customJobs = await customJobRepo.getPublishedCustomJobs()
-   const firstCustomJob = customJobs?.at(0)
+   const { term: queryTerm = "", jobId: queryJobId } = context.query
+
+   const term = queryTerm as string
+   const jobId = queryJobId as string
+
+   const queryLocations = getQueryStringArray(context.query.location)
+   const queryBusinessFunctionTags = getQueryStringArray(
+      context.query.businessFunctionTags
+   )
+   const queryJobTypes = getQueryStringArray(context.query.jobTypes)
+
+   const filterOptions = {
+      arrayFilters: {
+         locationIdTags: queryLocations,
+         businessFunctionsTagIds: queryBusinessFunctionTags,
+         normalizedJobType: queryJobTypes,
+      },
+   }
+
+   const filters: string = buildAlgoliaFilterString(filterOptions)
+
+   const algoliaResponse = await algoliaRepo.searchCustomJobs(
+      term as string,
+      filters,
+      0,
+      CUSTOM_JOB_REPLICAS.TITLE_ASC,
+      30
+   )
+
+   const algoliaCustomJobs = algoliaResponse.hits
+      .map(deserializeAlgoliaSearchResponse)
+      .map((job) => job as CustomJob)
+
+   const firstCustomJob = algoliaCustomJobs?.at(0)
 
    const customJob = jobId
-      ? await customJobRepo.getCustomJobById(jobId as string)
+      ? await customJobRepo.getCustomJobById(jobId)
       : firstCustomJob
 
    const serializedCustomJob = customJob
@@ -144,10 +162,25 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       : null
 
    const serializedCustomJobs =
-      customJobs?.map((job) => CustomJobsPresenter.serializeDocument(job)) ?? []
+      algoliaCustomJobs?.map((job) =>
+         CustomJobsPresenter.serializeDocument(job)
+      ) ?? []
 
    // Add redirect to include the jobId in the URL if it's not already there
    if (!hasRedirected && ((jobId && !customJob) || !jobId)) {
+      const params = new URLSearchParams()
+      queryLocations.forEach((loc) => params.append("location", loc))
+      queryBusinessFunctionTags.forEach((tag) =>
+         params.append("businessFunctionTags", tag)
+      )
+      queryJobTypes.forEach((type) => params.append("jobTypes", type))
+
+      if (term) params.set("term", term.toString())
+
+      if (firstCustomJob?.id) params.set("jobId", firstCustomJob.id)
+
+      const destination = `/jobs?${params.toString()}`
+
       context.res.setHeader(
          "Set-Cookie",
          serialize("redirected", "true", {
@@ -159,12 +192,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
       return {
          redirect: {
-            destination: `/jobs?${new URLSearchParams({
-               ...(locations.length && { location: locations.join(",") }),
-               ...(term && { term: term.toString() }),
-               // If there is no jobId, we redirect to the first job
-               jobId: firstCustomJob?.id || "",
-            })}`,
+            destination: destination,
             permanent: false,
          },
       }
@@ -207,6 +235,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    return {
       props: {
          serializedCustomJobs: serializedCustomJobs,
+         numberOfJobs: algoliaResponse.nbHits,
          customJobData: {
             serializedCustomJob,
             livestreamsData,
@@ -214,10 +243,13 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          },
          userCountryCode,
          searchParams: {
-            location: locations,
+            location: queryLocations,
             term: term as string,
+            businessFunctionTags: queryBusinessFunctionTags,
+            jobTypes: queryJobTypes,
          },
       },
    }
 }
+
 export default JobsPage
