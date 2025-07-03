@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react"
+import { CompanyIcon } from "components/views/common/icons"
+import React, { useEffect, useState } from "react"
 import {
    Calendar as CalendarIcon,
    User as ProfileIcon,
    BarChart2 as StatisticsIcon,
    Film as StreamIcon,
 } from "react-feather"
-import { CompanyIcon } from "components/views/common/icons"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 
@@ -14,7 +14,7 @@ interface AdminLink {
    href: string
    title: string
    basePath?: string
-   icon?: any
+   icon?: React.ComponentType<any> | (() => React.JSX.Element)
 }
 
 interface UseAdminLinksReturn {
@@ -50,23 +50,14 @@ const initialDrawerBottomLinks: AdminLink[] = [
    },
 ]
 
-const pushNotificationTesters: string[] = [
-   "matilde.ramos@careerfairy.io",
-   "goncalo@careerfairy.io",
-   "puzic.sead@gmail.com",
-   "simone@careerfairy.io",
-   "habib@careerfairy.io",
-   "lucas@careerfairy.io",
-   "carlos.rijo@careerfairy.io",
-   "walter.goncalves@careerfairy.io",
-   "amal-thomas.roy@careerfairy.io",
-]
+// Removed pushNotificationTesters array as it's no longer needed since push notifications are hidden
 
 const useAdminLinks = (): UseAdminLinksReturn => {
    const { userData } = useAuth()
    const firebase = useFirebaseService()
 
-   const [headerLinks, setHeaderLinks] = useState<AdminLink[]>(initialHeaderLinks)
+   const [headerLinks, setHeaderLinks] =
+      useState<AdminLink[]>(initialHeaderLinks)
    const [drawerBottomLinks, setDrawerBottomLinks] = useState<AdminLink[]>(
       initialDrawerBottomLinks
    )
@@ -141,7 +132,7 @@ const useAdminLinks = (): UseAdminLinksReturn => {
             },
             {
                href: `/admin/company-plans`,
-               icon: () => <CompanyIcon fill="none" />,
+               icon: CompanyIcon,
                title: "Companies",
                basePath: `/admin/company-plans`,
             },
