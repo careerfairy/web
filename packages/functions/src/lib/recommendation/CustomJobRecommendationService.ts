@@ -73,6 +73,8 @@ export class CustomJobRecommendationService
 
       const jobsInfo = await dataFetcher.getCustomJobsInfo(customJobs)
 
+      const externalCountryIsoCode = dataFetcher.getExternalCountryIsoCode()
+
       const userProfile: UserProfile = {
          userData,
          jobApplications: userAppliedJobs,
@@ -81,6 +83,7 @@ export class CustomJobRecommendationService
          followingCompanies: userFollowingCompanies,
          lastViewedJobs: userLastViewedJobs,
          savedJobs: userSavedJobs,
+         externalCountryIsoCode,
       }
 
       // Remove jobs that the user has already applied to

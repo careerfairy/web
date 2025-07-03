@@ -22,6 +22,7 @@ import { logAndThrow } from "./lib/validations"
 import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation, userAuthExists } from "./middlewares/validations"
+import { getCountryCode } from "./util"
 
 /**
  * Get Recommended Events
@@ -91,6 +92,7 @@ export const getRecommendedJobs = onCall(
          limit: number().default(10).max(30),
          bypassCache: boolean().default(false),
          referenceJobId: string().optional().nullable(),
+         userCountryCode: string().optional().nullable(),
       }),
       cacheOnCallValues(
          "recommendedJobs",
@@ -100,12 +102,17 @@ export const getRecommendedJobs = onCall(
             }`,
             request.data.limit,
             request.data.referenceJobId,
+            request.data.userCountryCode,
          ],
          60 * 60 * 12, // 12 hours
          (request) => request.data.bypassCache === true
       ),
       async (request) => {
          try {
+            const countryCode =
+               request.data.userCountryCode || getCountryCode(request)
+            functions.logger.info("🚀 ~ countryCode:", countryCode)
+
             const dataFetcher = new CustomJobDataFetcher(
                request.data.userAuthId || null,
                request.data.referenceJobId,
@@ -113,6 +120,12 @@ export const getRecommendedJobs = onCall(
                customJobRepo,
                livestreamsRepo
             )
+
+            if (countryCode) {
+               dataFetcher.setExternalData({
+                  countryIsoCode: countryCode,
+               })
+            }
 
             const recommendationService =
                await CustomJobRecommendationService.create(

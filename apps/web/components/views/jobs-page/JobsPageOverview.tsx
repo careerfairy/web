@@ -36,6 +36,7 @@ const styles = sxStyles({
 const JobsPageOverview = () => {
    const isMobile = useIsMobile()
    const { hasFilters } = useJobsOverviewContext()
+
    return (
       <Container maxWidth="xl" sx={styles.container}>
          <Stack spacing={2}>
