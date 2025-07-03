@@ -38,6 +38,7 @@ type Props = {
 
 export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
    const { pathname, push } = useRouter()
+   console.log("🚀", { pathname, showSubNavigationFor })
    const { group } = useGroup()
 
    const [tabValue, setTabValue] = useState(pathname)
@@ -79,13 +80,13 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
          },
          analytics: {
             id: "analytics",
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-stream`,
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams`,
             title: "Analytics",
             childLinks: [
                {
                   id: "live-stream-analytics",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-stream/[[...livestreamId]]`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-stream/[[...livestreamId]]`,
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-streams/[[...livestreamId]]`,
                   title: "Live stream",
                },
                {

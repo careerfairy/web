@@ -292,7 +292,6 @@ const moduleExports = {
       REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
    },
 
-   // Disabling landing pages for now (CF-701)
    redirects: async () => {
       return [
          {
@@ -306,7 +305,7 @@ const moduleExports = {
             permanent: false,
          },
          {
-            source: "/group/:groupId/admin/events",
+            source: "/group/:groupId/admin/events", // Moved events table to content
             destination: "/group/:groupId/admin/content/live-streams",
             permanent: false,
          },

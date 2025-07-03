@@ -1,9 +1,7 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box, Button, Container, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { BrandedTabs } from "components/views/common/BrandedTabs"
 import { useRouter } from "next/router"
-import { SyntheticEvent } from "react"
 import { RefreshCw } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { SparksAudienceTab } from "./audience-tab"
@@ -11,11 +9,14 @@ import { SparksCompetitorTab } from "./competitor-tab"
 import { ResponsiveSelectWithDrawer } from "./components/ResponsiveSelectWithDrawer"
 import { SparksOverviewTab } from "./overview-tab"
 import { useSparksAnalytics } from "./SparksAnalyticsContext"
+import { SparksAnalyticsTabs, TabValue } from "./SparksAnalyticsTabs"
 
 const UPDATE_ICON_SIZE = 18
 
 const styles = sxStyles({
-   root: {},
+   root: {
+      position: "relative",
+   },
    controlHeader: {
       display: "flex",
       justifyContent: "space-between",
@@ -26,7 +27,20 @@ const styles = sxStyles({
       marginTop: { sm: 1, md: 1.5 },
       marginBottom: { md: "20px" },
    },
-
+   tabs: {
+      marginRight: {
+         xs: -2,
+         md: 0,
+      },
+      pl: {
+         xs: 0,
+         md: 1.5,
+      },
+      width: {
+         xs: "calc(100% + 16px)",
+         md: "auto",
+      },
+   },
    mobileLimiter: {
       display: {
          md: "none",
@@ -127,36 +141,13 @@ type TimeFilter = {
    label: string
 }
 
-const tabs = [
-   { label: "Overview", value: "overview" },
-   { label: "Audience", value: "audience" },
-   { label: "Competitor", value: "competitor" },
-] as const
-
-type TabValue = (typeof tabs)[number]["value"]
-
 const GroupSparkAnalytics = () => {
-   const { query, push, pathname } = useRouter()
+   const { query } = useRouter()
    const { selectTimeFilter, setSelectTimeFilter, updateAnalytics, isLoading } =
       useSparksAnalytics()
 
-   // Get tab value from query params, default to "overview"
-   const tabValue =
-      tabs.find((tabItem) => tabItem.value === query.tab)?.value || "overview"
-
-   const handleTabChange = (_: SyntheticEvent, newValue: TabValue) => {
-      const cleanQuery = { ...query }
-      cleanQuery.tab = newValue
-
-      push(
-         {
-            pathname,
-            query: cleanQuery,
-         },
-         undefined,
-         { shallow: true }
-      )
-   }
+   // Get tab value from query params for conditional rendering
+   const tabValue = (query.tab as TabValue) || "overview"
 
    const options: TimeFilter[] = [
       { value: "7days", label: "Past 7 days" },
@@ -166,17 +157,9 @@ const GroupSparkAnalytics = () => {
    ]
 
    return (
-      <Container maxWidth="xl" sx={styles.root}>
+      <Container sx={styles.root} maxWidth="xl">
          <Box sx={styles.controlHeader}>
-            <BrandedTabs activeValue={tabValue} onChange={handleTabChange}>
-               {tabs.map((tab) => (
-                  <BrandedTabs.Tab
-                     key={tab.value}
-                     label={tab.label}
-                     value={tab.value}
-                  />
-               ))}
-            </BrandedTabs>
+            <SparksAnalyticsTabs sx={styles.tabs} />
             <Box component="span" sx={styles.mobileLimiter} />
             <Box sx={styles.controlsWrapper}>
                <Box sx={styles.updateControlsWrapper}>

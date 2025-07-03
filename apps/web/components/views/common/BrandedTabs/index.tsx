@@ -1,6 +1,15 @@
 import { Box, BoxProps, Typography, styled } from "@mui/material"
 import { LinkProps } from "next/link"
-import { Fragment, ReactNode, createContext, useContext, useMemo } from "react"
+import {
+   Fragment,
+   ReactNode,
+   createContext,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+} from "react"
 import Link from "../Link"
 
 const TabsContainer = styled(Box)({
@@ -10,6 +19,7 @@ const TabsContainer = styled(Box)({
    gap: 16,
    padding: 12,
    width: "100%",
+   overflowX: "auto",
 })
 
 const TabButton = styled(Box, {
@@ -56,11 +66,15 @@ const TabText = styled(Typography, {
 type TabContextType<T extends string | number = string | number> = {
    activeValue: T
    onChange: (event: React.SyntheticEvent, newValue: T) => void
+   containerRef: React.RefObject<HTMLDivElement>
+   registerTab: (value: T, element: HTMLElement | null) => void
 }
 
 const TabContext = createContext<TabContextType>({
    activeValue: null,
    onChange: () => {},
+   containerRef: { current: null },
+   registerTab: () => {},
 })
 
 type TabProps<T extends string | number = string | number> = {
@@ -87,11 +101,17 @@ const Tab = <T extends string | number = string | number>({
    shallow,
    ...props
 }: TabProps<T>) => {
-   const { activeValue, onChange } = useContext(TabContext)
+   const { activeValue, onChange, registerTab } = useContext(TabContext)
    const isActive = value === activeValue
+   const tabRef = useRef<HTMLDivElement>(null)
+
+   useEffect(() => {
+      registerTab(value, tabRef.current)
+   }, [value, registerTab])
 
    return (
       <TabButton
+         ref={tabRef}
          isActive={isActive}
          component={href ? Link : "button"}
          {...(href ? { href, shallow } : {})}
@@ -112,7 +132,7 @@ const Tab = <T extends string | number = string | number>({
    )
 }
 
-type BrandedTabsProps<T extends string | number = string | number> = {
+export type BrandedTabsProps<T extends string | number = string | number> = {
    activeValue: T
    onChange: (event: React.SyntheticEvent, newValue: T) => void
 } & Omit<BoxProps, "onChange">
@@ -123,14 +143,45 @@ export const BrandedTabs = <T extends string | number = string | number>({
    onChange,
    ...props
 }: BrandedTabsProps<T>) => {
+   const containerRef = useRef<HTMLDivElement>(null)
+   const tabRefs = useRef<Map<T, HTMLElement>>(new Map())
+
+   const registerTab = useCallback((value: T, element: HTMLElement | null) => {
+      if (element) {
+         tabRefs.current.set(value, element)
+      } else {
+         tabRefs.current.delete(value)
+      }
+   }, [])
+
+   /**
+    * In the case of overflow (e.g. mobile), we scroll the active tab into view
+    * when the active value changes.
+    */
+   useEffect(() => {
+      const activeTabElement = tabRefs.current.get(activeValue)
+      const container = containerRef.current
+
+      if (activeTabElement && container) {
+         // Scroll the active tab into view
+         activeTabElement.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+            inline: "center",
+         })
+      }
+   }, [activeValue])
+
    const value: TabContextType<T> = useMemo(
-      () => ({ activeValue, onChange }),
-      [activeValue, onChange]
+      () => ({ activeValue, onChange, containerRef, registerTab }),
+      [activeValue, onChange, registerTab]
    )
 
    return (
       <TabContext.Provider value={value}>
-         <TabsContainer {...props}>{children}</TabsContainer>
+         <TabsContainer ref={containerRef} {...props}>
+            {children}
+         </TabsContainer>
       </TabContext.Provider>
    )
 }

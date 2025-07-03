@@ -3,20 +3,21 @@ import { SparksAnalyticsProvider } from "components/views/admin/sparks/analytics
 import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
 import SparksDialog from "components/views/admin/sparks/sparks-dialog/SparksDialog"
 import { useRouter } from "next/router"
-import { FC } from "react"
+import { Fragment } from "react"
 import GroupDashboardLayout from "../../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import { SubNavigationTabs } from "../../../../../../layouts/GroupDashboardLayout/SubNavigationTabs"
 
-const CreateSparkButtonWrapper: FC = () => {
+const CreateSparkButtonWrapper = () => {
    return (
-      <>
+      <Fragment>
          <CreateSparkButton />
          <SparksDialog />
-      </>
+      </Fragment>
    )
 }
 
-const AdminSparksAnalyticsPage: FC = () => {
+const AdminSparksAnalyticsPage = () => {
    const {
       query: { groupId },
    } = useRouter()
@@ -28,6 +29,7 @@ const AdminSparksAnalyticsPage: FC = () => {
          topBarCta={<CreateSparkButtonWrapper />}
       >
          <DashboardHead title="CareerFairy | My Sparks Analytics" />
+         <SubNavigationTabs showSubNavigationFor="analytics" />
          <SparksAnalyticsProvider>
             <GroupSparkAnalytics />
          </SparksAnalyticsProvider>
