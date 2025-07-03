@@ -13,7 +13,7 @@ const styles = sxStyles({
    },
    stickyRoot: {
       position: "sticky",
-      top: `calc(var(--app-bar-visible, 0) * 60px)`,
+      top: `calc(var(--app-bar-visible, 0) * 64px)`,
       backgroundColor: "#F7F8FC",
       py: 2,
       zIndex: 1,

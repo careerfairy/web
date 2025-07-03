@@ -85,7 +85,7 @@ const CustomJobLinkedLivestreams = ({
    return (
       <Stack spacing={0}>
          <Typography variant={"subtitle1"} sx={styles.subTitle}>
-            Recordings related to this job
+            Live streams related to this job
          </Typography>
          <Box sx={styles.linkedContentWrapper}>
             <EventsPreviewCarousel

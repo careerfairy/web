@@ -4,7 +4,9 @@ import { useEffect, useMemo, useRef } from "react"
 import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import { sxStyles } from "types/commonTypes"
+import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 import { CustomJobsList } from "./CustomJobsList"
 import { NoResultsFound } from "./search/SearchResultsCount"
@@ -16,7 +18,7 @@ const styles = sxStyles({
          xs: "100%",
          md: "339px",
       },
-      overflowY: "scroll",
+      overflowY: "auto",
    },
    listTitle: {
       fontWeight: 600,
@@ -25,6 +27,7 @@ const styles = sxStyles({
 })
 
 export const CustomJobsOverviewList = () => {
+   const isMounted = useIsMounted()
    const isMobile = useIsMobile()
    const {
       showDefaultJobs,
@@ -43,19 +46,23 @@ export const CustomJobsOverviewList = () => {
    }, [searchParams])
 
    useEffect(() => {
-      if (!hasFilters) return
+      if (!hasFilters || !isMounted) return
       setTimeout(() => {
-         scrollableContainerRef.current?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-         })
-      }, 500)
-   }, [filterParams, isMobile, hasFilters])
+         if (isMobile) {
+            scrollTop()
+         } else {
+            scrollableContainerRef.current?.scrollIntoView({
+               behavior: "smooth",
+               block: "start",
+            })
+         }
+      }, 200)
+   }, [filterParams, isMobile, hasFilters, isMounted])
 
    return (
       <Stack sx={styles.root} spacing={2}>
-         <NoResultsFound />
          <Box ref={scrollableContainerRef}>
+            <NoResultsFound />
             {showDefaultJobs ? <DefaultJobs /> : null}
             {showResultJobs ? <ResultJobs /> : null}
             {showOtherJobs ? <OtherJobs /> : null}
@@ -87,6 +94,7 @@ const ResultJobs = () => {
    return (
       <Stack spacing={1}>
          {/* TODO: Replace with new Job Card */}
+         {/* <SearchResultsCount /> */}
          <CustomJobsList customJobs={customJobs} />
       </Stack>
    )

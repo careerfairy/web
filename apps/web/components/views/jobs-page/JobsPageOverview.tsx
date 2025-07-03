@@ -1,6 +1,5 @@
 import { Container, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { useEffect, useMemo, useRef } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useJobsOverviewContext } from "./JobsOverviewContext"
 import { CustomJobDetails } from "./overview/CustomJobDetails"
@@ -20,6 +19,14 @@ const styles = sxStyles({
          md: "32px !important",
       },
       height: {
+         xs: "100%",
+         sm: "100%",
+         md: "calc(100dvh - 176px)",
+      },
+      minHeight: {
+         md: "calc(100dvh - 176px)",
+      },
+      maxHeight: {
          md: "calc(100dvh - 176px)",
       },
       overflow: "hidden",
@@ -28,29 +35,9 @@ const styles = sxStyles({
 
 const JobsPageOverview = () => {
    const isMobile = useIsMobile()
-   const { hasFilters, searchParams } = useJobsOverviewContext()
-
-   const scrollableContainerRef = useRef<HTMLDivElement>(null)
-
-   const filterParams = useMemo(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { jobId, ...rest } = searchParams
-      return JSON.stringify(rest)
-   }, [searchParams])
-
-   useEffect(() => {
-      scrollableContainerRef.current?.scrollIntoView({
-         behavior: "smooth",
-         block: "start",
-      })
-   }, [filterParams, isMobile])
-
+   const { hasFilters } = useJobsOverviewContext()
    return (
-      <Container
-         maxWidth="xl"
-         sx={styles.container}
-         ref={scrollableContainerRef}
-      >
+      <Container maxWidth="xl" sx={styles.container}>
          <Stack spacing={2}>
             <OverviewSearch />
             <SearchResultsCount />
@@ -59,9 +46,11 @@ const JobsPageOverview = () => {
                spacing={1}
                sx={[
                   styles.jobsContainer,
-                  hasFilters && {
-                     height: "calc(100dvh - 216px) !important",
-                  },
+                  hasFilters &&
+                     !isMobile && {
+                        maxHeight: "calc(100dvh - 216px) !important",
+                        minHeight: "calc(100dvh - 216px) !important",
+                     },
                ]}
             >
                <CustomJobsOverviewList />

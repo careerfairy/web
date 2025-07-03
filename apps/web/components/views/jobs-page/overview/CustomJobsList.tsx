@@ -1,4 +1,4 @@
-import { Box, CircularProgress, ListItem, Stack } from "@mui/material"
+import { ListItem } from "@mui/material"
 
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -46,65 +46,56 @@ export const CustomJobsList = ({ customJobs }: Props) => {
    } = useJobsOverviewContext()
 
    return (
-      <Stack spacing={1}>
-         <CustomInfiniteScroll
-            hasMore={hasMore}
-            loading={isValidating}
-            next={() => Promise.resolve(nextPage())}
-            offset={200}
-         >
-            {customJobs.map((customJob, idx) => {
-               return (
-                  <Link
-                     href={{
-                        pathname: router.pathname,
-                        query: {
-                           ...router.query,
-                           jobId: customJob.id,
-                        },
-                     }}
-                     onClick={() => {
-                        if (isMobile) {
-                           setJobDetailsDialogOpen(true)
-                        }
-                     }}
-                     shallow
-                     passHref
-                     // Prevents the page from scrolling to the top when the link is clicked
-                     scroll={false}
-                     key={idx}
+      <CustomInfiniteScroll
+         hasMore={hasMore}
+         loading={isValidating}
+         next={() => Promise.resolve(nextPage())}
+         offset={1000}
+      >
+         {customJobs.map((customJob, idx) => {
+            return (
+               <Link
+                  href={{
+                     pathname: router.pathname,
+                     query: {
+                        ...router.query,
+                        jobId: customJob.id,
+                     },
+                  }}
+                  onClick={() => {
+                     if (isMobile) {
+                        setJobDetailsDialogOpen(true)
+                     }
+                  }}
+                  shallow
+                  passHref
+                  // Prevents the page from scrolling to the top when the link is clicked
+                  scroll={false}
+                  key={idx}
+               >
+                  <ListItem
+                     sx={[
+                        styles.jobListItemWrapper,
+                        idx === customJobs.length - 1 &&
+                           styles.lastJobListItemWrapper,
+                     ]}
                   >
-                     <ListItem
-                        sx={[
-                           styles.jobListItemWrapper,
-                           idx === customJobs.length - 1 &&
-                              styles.lastJobListItemWrapper,
-                        ]}
-                     >
-                        <JobCard
-                           job={customJob}
-                           previewMode
-                           titleSx={isMobile ? null : styles.title}
-                           typographySx={isMobile ? null : styles.typography}
-                           hideJobUrl
-                           smallCard
-                           showCompanyLogo
-                           companyLogoUrl={customJob.group?.logoUrl}
-                           companyName={customJob.group?.universityName}
-                           selected={
-                              selectedJob?.id === customJob.id && !isMobile
-                           }
-                        />
-                     </ListItem>
-                  </Link>
-               )
-            })}
-         </CustomInfiniteScroll>
-         {Boolean(isValidating) && (
-            <Box sx={styles.loader}>
-               <CircularProgress />
-            </Box>
-         )}
-      </Stack>
+                     <JobCard
+                        job={customJob}
+                        previewMode
+                        titleSx={isMobile ? null : styles.title}
+                        typographySx={isMobile ? null : styles.typography}
+                        hideJobUrl
+                        smallCard
+                        showCompanyLogo
+                        companyLogoUrl={customJob.group?.logoUrl}
+                        companyName={customJob.group?.universityName}
+                        selected={selectedJob?.id === customJob.id && !isMobile}
+                     />
+                  </ListItem>
+               </Link>
+            )
+         })}
+      </CustomInfiniteScroll>
    )
 }

@@ -45,6 +45,7 @@ const popperContentVariants = {
 const styles = sxStyles({
    chip: {
       p: "8px 12px 8px 16px",
+      backgroundColor: "neutral.50",
       "& .MuiChip-label": {
          pl: 0,
          pr: "8px",
@@ -73,6 +74,10 @@ const styles = sxStyles({
       width: "353px",
       transformOrigin: "top",
       maxHeight: "500px",
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
    },
    chipContentItem: {
       p: "12px",
@@ -108,6 +113,7 @@ const styles = sxStyles({
       "& svg": {
          color: (theme) => `${theme.brand.white[50]} !important`,
       },
+      maxWidth: "250px !important",
    },
    applyText: {
       fontWeight: 400,
@@ -126,14 +132,20 @@ const styles = sxStyles({
       position: "sticky",
       top: 0,
       zIndex: 1,
-      backgroundColor: (theme) =>
-         theme.brand.white[100] || theme.palette.background.paper,
+      backgroundColor: (theme) => theme.brand.white[100],
    },
    chipContentRoot: {
       scrollbarWidth: "thin",
       flexGrow: 1,
-      overflowY: "auto",
+      overflowY: "scroll",
       p: 0,
+      maxHeight: "440px",
+   },
+   hiddenScrollbar: {
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
    },
 })
 
@@ -154,6 +166,8 @@ type SelectionOptions = {
     */
    showApply?: boolean
    onApply?: () => void
+   onDeleteItem?: (option: ChipOptions["id"]) => void
+   onSelectItem?: (option: ChipOptions["id"]) => void
 }
 
 type ChipDropdownUI = {
@@ -195,6 +209,7 @@ type ChipDropdownUI = {
     * @default true
     */
    closeOnApply?: boolean
+   popperSx?: SxProps<Theme>
 }
 
 export type SearchInputPluginProps = {
@@ -322,6 +337,8 @@ export const ChipDropdown = ({
       onChange: handleValueChange,
       showApply = true,
       onApply,
+      onDeleteItem,
+      onSelectItem,
    } = selection
    const {
       search,
@@ -329,6 +346,7 @@ export const ChipDropdown = ({
       isDialog,
       forceLabel,
       closeOnApply = true,
+      popperSx,
    } = ui || {}
    const anchorRef = useRef<HTMLDivElement>(null)
    const searchInputRef = useRef<HTMLInputElement>(null)
@@ -343,14 +361,9 @@ export const ChipDropdown = ({
       []
    )
 
-   const initialSelectedOptions = useMemo(
-      () => selection.selectedOptions,
-      [selection.selectedOptions]
-   )
-
    const [state, dispatch] = useReducer(
       chipDropdownReducer,
-      initialSelectedOptions,
+      selection.selectedOptions,
       initialStateFactory
    )
    const { isOpen, isDirty, selectedMap } = state
@@ -359,11 +372,11 @@ export const ChipDropdown = ({
       if (!options) return []
       return Object.keys(selectedMap)
          .filter((id) => selectedMap[id])
-         .map((id) => {
+         .map<ChipOptions | null>((id) => {
             const option = options.find((opt) => opt.id === id)
             return option ? { id, value: option.value } : null
          })
-         .filter(Boolean) as { id: string; value: string }[]
+         .filter(Boolean)
    }, [selectedMap, options])
 
    const chipShouldBeStyledAsSelected = useMemo(() => {
@@ -427,6 +440,7 @@ export const ChipDropdown = ({
 
    const handleActualOptionClick = useCallback(
       (optionId: string) => {
+         onSelectItem?.(optionId)
          dispatch({ type: "CLICK_OPTION", payload: { optionId, showApply } })
 
          if (!showApply) {
@@ -440,13 +454,17 @@ export const ChipDropdown = ({
             handleValueChange(newSelectedValues)
          }
       },
-      [selectedMap, showApply, handleValueChange, dispatch]
+      [selectedMap, showApply, handleValueChange, dispatch, onSelectItem]
    )
 
    const handleClose = useCallback(() => {
       dispatch({ type: "CLOSE_DROPDOWN" })
+      dispatch({
+         type: "SYNC_EXTERNAL_SELECTION",
+         payload: { selectedOptions: selection.selectedOptions },
+      })
       onClose?.()
-   }, [onClose])
+   }, [onClose, selection.selectedOptions])
 
    const handleToggle = () => {
       dispatch({ type: "TOGGLE_OPEN" })
@@ -488,10 +506,13 @@ export const ChipDropdown = ({
    const handleReset = useCallback(() => {
       dispatch({ type: "RESET_CHANGES" })
       handleValueChange([])
-   }, [handleValueChange, dispatch])
+      dispatch({ type: "CLOSE_DROPDOWN" })
+      onClose?.()
+   }, [handleValueChange, dispatch, onClose])
 
    const handleDeleteOption = useCallback(
       (idToDelete: string) => {
+         onDeleteItem?.(idToDelete)
          dispatch({
             type: "DELETE_OPTION",
             payload: { optionId: idToDelete, showApply },
@@ -508,7 +529,7 @@ export const ChipDropdown = ({
             handleValueChange(newSelectedValues)
          }
       },
-      [selectedMap, showApply, handleValueChange, dispatch]
+      [selectedMap, showApply, handleValueChange, dispatch, onDeleteItem]
    )
 
    useEffect(() => {
@@ -533,79 +554,77 @@ export const ChipDropdown = ({
    return (
       <ClickAwayListener onClickAway={handleClose}>
          <Box ref={anchorRef} sx={{ position: "relative" }}>
-            <Box>
-               <BrandedTooltip title={tooltipRequired ? tooltipFullLabel : ""}>
-                  <Chip
-                     sx={[
-                        styles.chip,
-                        chipShouldBeStyledAsSelected &&
-                           styles.chipWithSelectedItems,
-                     ]}
-                     label={
-                        <Box sx={{ position: "relative" }}>
-                           {/* Sizer Element */}
-                           <Typography
-                              component="span"
-                              aria-hidden="true"
-                              sx={{
-                                 visibility: "hidden",
-                                 whiteSpace: "nowrap",
-                                 // Inherits font styles from .MuiChip-label
-                              }}
-                           >
-                              {label} {/* Original label for sizing only */}
-                           </Typography>
-                           {/* Actual Display Element */}
-                           <Typography
-                              ref={textContainerCallbackRef}
-                              component="span"
-                              sx={{
-                                 position: "absolute",
-                                 top: 0,
-                                 left: 0,
-                                 width: "100%",
-                                 height: "100%",
-                                 display: "flex", // Added to allow alignment of text and plusCount
-                                 alignItems: "center",
-                                 whiteSpace: "nowrap",
-                                 overflow: "hidden",
-                                 textOverflow: "ellipsis",
-                                 // minWidth removed, sizing is handled by the sizer
-                              }}
-                           >
-                              {displayChipLabel}
-                              {plusCount !== null && plusCount > 0 && (
-                                 <Typography
-                                    component="span"
-                                    sx={{
-                                       whiteSpace: "nowrap",
-                                       flexShrink: 0,
-                                    }}
-                                 >
-                                    {`, +${plusCount}`}
-                                 </Typography>
-                              )}
-                           </Typography>
-                        </Box>
-                     }
-                     deleteIcon={
-                        <motion.div
-                           initial={false}
-                           animate={{ rotate: isOpen ? 180 : 0 }}
-                           transition={{ duration: 0.2, ease: "easeInOut" }}
-                           style={{ display: "flex" }}
+            <BrandedTooltip title={tooltipRequired ? tooltipFullLabel : ""}>
+               <Chip
+                  sx={[
+                     styles.chip,
+                     chipShouldBeStyledAsSelected &&
+                        styles.chipWithSelectedItems,
+                  ]}
+                  label={
+                     <Box sx={{ position: "relative" }}>
+                        {/* Sizer Element */}
+                        <Typography
+                           component="span"
+                           aria-hidden="true"
+                           sx={{
+                              visibility: "hidden",
+                              whiteSpace: "nowrap",
+                              // Inherits font styles from .MuiChip-label
+                           }}
                         >
-                           <Box size={16} component={ChevronDown} />
-                        </motion.div>
-                     }
-                     onDelete={(event) => {
-                        event.stopPropagation()
-                        handleToggle()
-                     }}
-                     onClick={handleChipClick}
-                  />
-               </BrandedTooltip>
-            </Box>
+                           {label} {/* Original label for sizing only */}
+                        </Typography>
+                        {/* Actual Display Element */}
+                        <Typography
+                           ref={textContainerCallbackRef}
+                           component="span"
+                           sx={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              display: "flex", // Added to allow alignment of text and plusCount
+                              alignItems: "center",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              // minWidth removed, sizing is handled by the sizer
+                           }}
+                        >
+                           {displayChipLabel}
+                           {plusCount !== null && plusCount > 0 && (
+                              <Typography
+                                 component="span"
+                                 sx={{
+                                    whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                 }}
+                              >
+                                 {`, +${plusCount}`}
+                              </Typography>
+                           )}
+                        </Typography>
+                     </Box>
+                  }
+                  deleteIcon={
+                     <motion.div
+                        initial={false}
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        style={{ display: "flex" }}
+                     >
+                        <Box size={16} component={ChevronDown} />
+                     </motion.div>
+                  }
+                  onDelete={(event) => {
+                     event.stopPropagation()
+                     handleToggle()
+                  }}
+                  onClick={handleChipClick}
+               />
+            </BrandedTooltip>
             {isIOS && isDialog && search ? (
                <StyledHiddenInput
                   ref={proxyInputRef}
@@ -630,7 +649,7 @@ export const ChipDropdown = ({
                      if (event.propertyName !== "transform") {
                         return
                      }
-                     // alert("end: transition")
+
                      if (isOpen) {
                         onOpen?.()
                      }
@@ -713,7 +732,7 @@ export const ChipDropdown = ({
                   open={Boolean(anchorRef.current)}
                   anchorEl={anchorRef.current}
                   placement="bottom-start"
-                  sx={styles.popper}
+                  sx={combineStyles(styles.popper, popperSx)}
                >
                   <AnimatePresence>
                      {isOpen ? (
@@ -746,6 +765,7 @@ export const ChipDropdown = ({
                                  options={options}
                                  handleOptionClick={handleActualOptionClick}
                                  isChecked={isChecked}
+                                 rootSx={styles.hiddenScrollbar}
                               />
                            </Stack>
                         </motion.div>

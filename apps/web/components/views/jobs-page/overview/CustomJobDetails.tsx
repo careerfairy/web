@@ -19,6 +19,7 @@ const styles = sxStyles({
       borderTop: (theme) => `1px solid ${theme.palette.neutral[50]}`,
       borderLeft: (theme) => `1px solid ${theme.palette.neutral[50]}`,
       borderRight: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      overflow: "hidden",
    },
    notFoundRoot: {
       width: "100%",
