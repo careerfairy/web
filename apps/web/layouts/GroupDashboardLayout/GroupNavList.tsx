@@ -15,7 +15,6 @@ import {
 import { AnalyticsIcon } from "components/views/common/icons/AnalyticsIcon"
 import { DashboardIcon } from "components/views/common/icons/DashboardIcon"
 import { JobsIcon } from "components/views/common/icons/JobsIcon"
-import { useRouter } from "next/router"
 import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
 import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
 import NavList from "../common/NavList"
@@ -32,7 +31,6 @@ const companyPagePathName = `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/page/[[...li
 
 const GroupNavList = () => {
    const { group, shrunkLeftMenuIsActive } = useGroup()
-   const { pathname } = useRouter()
 
    const featureFlags = useFeatureFlags()
 
@@ -60,9 +58,7 @@ const GroupNavList = () => {
             Icon: ContentIcon,
             href: `/${BASE_HREF_PATH}/${group.id}/admin/content/live-streams`,
             pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/live-streams`,
-            isStillActive: pathname.startsWith(
-               `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content`
-            ),
+            activePathPrefix: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content`,
          },
 
          // 3. Jobs - Keep job section exactly as is (recently reworked in job hub V2)
@@ -98,9 +94,7 @@ const GroupNavList = () => {
             pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-streams/overview`,
             Icon: AnalyticsIcon,
             title: "Analytics",
-            isStillActive: pathname.startsWith(
-               `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics`
-            ),
+            activePathPrefix: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics`,
          },
 
          // 6. Company profile - Move existing company page with alert icon when publicProfile == false
@@ -130,7 +124,7 @@ const GroupNavList = () => {
          ...link,
          shrunk: shrunkLeftMenuIsActive,
       }))
-   }, [group, hasAtsIntegration, shrunkLeftMenuIsActive, pathname])
+   }, [group, hasAtsIntegration, shrunkLeftMenuIsActive])
 
    return <NavList links={navLinks} />
 }

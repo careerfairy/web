@@ -15,10 +15,11 @@ export type INavLink = {
    pathname?: string
    Icon?: IconComponent
    /**
-    * Another way to set the active state of the link. Primarily used for nav links that have nested paths
-    * If this is set, it will override the link.pathname and router.pathname checks.
+    * Path prefix pattern to match against router pathname for determining active state.
+    * Used for section-level navigation where the link should be active for multiple sub-paths.
+    * Example: "/group/[groupId]/admin/content" would match "/group/[groupId]/admin/content/live-streams"
     */
-   isStillActive?: boolean
+   activePathPrefix?: string
    /**
     * The children of the link. If this is set, the link will also be a dropdown.
     * */
