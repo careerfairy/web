@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import {
    Calendar as CalendarIcon,
    User as ProfileIcon,
@@ -14,7 +14,7 @@ interface AdminLink {
    href: string
    title: string
    basePath?: string
-   icon?: React.ComponentType<any> | (() => React.JSX.Element)
+   icon?: any
 }
 
 interface UseAdminLinksReturn {
