@@ -2,11 +2,9 @@ import { CompanyIcon } from "components/views/common/icons"
 import { useEffect, useState } from "react"
 import {
    Calendar as CalendarIcon,
-   Search as FindIcon,
    User as ProfileIcon,
-   Smartphone as SmartphoneIcon,
    BarChart2 as StatisticsIcon,
-   Film as StreamIcon,
+   Film as StreamIcon
 } from "react-feather"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
@@ -102,22 +100,23 @@ const useAdminLinks = () => {
                title: "Past Streams",
                basePath: `/admin/past-livestreams`,
             },
-            {
-               href: `/admin/query-users`,
-               icon: FindIcon,
-               title: "Query Users",
-               basePath: `/admin/query-users`,
-            },
-            ...(pushNotificationTesters.includes(userData.userEmail)
-               ? [
-                    {
-                       href: `/admin/saved-push-notifications`,
-                       icon: SmartphoneIcon,
-                       title: "Push Notifications",
-                       basePath: `/admin/saved-push-notifications`,
-                    },
-                 ]
-               : []),
+            // Hidden per request: Query Users and Push Notifications pages
+            // {
+            //    href: `/admin/query-users`,
+            //    icon: FindIcon,
+            //    title: "Query Users",
+            //    basePath: `/admin/query-users`,
+            // },
+            // ...(pushNotificationTesters.includes(userData.userEmail)
+            //    ? [
+            //         {
+            //            href: `/admin/saved-push-notifications`,
+            //            icon: SmartphoneIcon,
+            //            title: "Push Notifications",
+            //            basePath: `/admin/saved-push-notifications`,
+            //         },
+            //      ]
+            //    : []),
             {
                href: `/admin/academic-calendar-manager`,
                icon: CalendarIcon,
