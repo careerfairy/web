@@ -3,18 +3,10 @@ import AnalyticsRegistrationSourcesPageContent from "components/views/group/admi
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { SubNavigationTabs } from "layouts/GroupDashboardLayout/SubNavigationTabs"
-import { useRouter } from "next/router"
 
 const RegistrationSourcesPage = () => {
-   const {
-      query: { groupId },
-   } = useRouter()
-
    return (
-      <GroupDashboardLayout
-         titleComponent={"Analytics"}
-         groupId={groupId as string}
-      >
+      <GroupDashboardLayout titleComponent={"Analytics"}>
          <DashboardHead title="CareerFairy | Registration Sources of" />
          <SubNavigationTabs showSubNavigationFor="analytics" />
          <LivestreamAnalyticsNavigationTabs />

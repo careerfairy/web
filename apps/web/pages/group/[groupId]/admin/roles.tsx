@@ -1,17 +1,16 @@
+import RolesOverview from "../../../../components/views/group/admin/roles"
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
 import { SubNavigationTabs } from "../../../../layouts/GroupDashboardLayout/SubNavigationTabs"
 
-import CompanyInformationPageContent from "components/views/group/admin/company-information"
-
-const EditGroupProfile = () => {
+const RolesPage = () => {
    return (
       <GroupDashboardLayout titleComponent={"Settings"}>
-         <DashboardHead title="CareerFairy | Admin Edit Details of" />
+         <DashboardHead title="CareerFairy | Member Roles of" />
          <SubNavigationTabs showSubNavigationFor="settings" />
-         <CompanyInformationPageContent />
+         <RolesOverview />
       </GroupDashboardLayout>
    )
 }
 
-export default EditGroupProfile
+export default RolesPage

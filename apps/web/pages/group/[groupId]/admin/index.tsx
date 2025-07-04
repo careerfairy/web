@@ -1,18 +1,10 @@
 import MainPageContent from "components/views/group/admin/main"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
-import { useRouter } from "next/router"
 
 const MainPage = () => {
-   const {
-      query: { groupId },
-   } = useRouter()
-
    return (
-      <GroupDashboardLayout
-         titleComponent={"Dashboard"}
-         groupId={groupId as string}
-      >
+      <GroupDashboardLayout titleComponent={"Dashboard"}>
          <DashboardHead title="CareerFairy | Dashboard of" />
 
          <MainPageContent />

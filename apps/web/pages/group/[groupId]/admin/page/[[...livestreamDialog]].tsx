@@ -48,10 +48,7 @@ const CompanyPage: NextPage<
             }}
             customJobId={customJobId}
          >
-            <GroupDashboardLayout
-               titleComponent={"Company Page"}
-               groupId={groupId}
-            >
+            <GroupDashboardLayout titleComponent={"Company Page"}>
                <DashboardHead title={`CareerFairy | ${universityName}`} />
                <CompanyPageOverview
                   group={deserializeGroupClient(serverSideGroup)}

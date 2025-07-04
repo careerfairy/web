@@ -356,6 +356,46 @@ const moduleExports = {
                "/group/:groupId/admin/analytics/live-streams/registration-sources",
             permanent: false,
          },
+         /**
+          * Redirect upcoming-livestreams page to content/live-streams
+          */
+         {
+            source: "/group/:groupId/admin/upcoming-livestreams",
+            destination:
+               "/group/:groupId/admin/content/live-streams?eventId=:livestreamId",
+            permanent: false,
+            has: [
+               {
+                  type: "query",
+                  key: "livestreamId",
+               },
+            ],
+         },
+         {
+            source: "/group/:groupId/admin/upcoming-livestreams",
+            destination: "/group/:groupId/admin/content/live-streams",
+            permanent: false,
+         },
+         /**
+          * Redirect past-livestreams page to content/live-streams
+          */
+         {
+            source: "/group/:groupId/admin/past-livestreams",
+            destination:
+               "/group/:groupId/admin/content/live-streams?eventId=:livestreamId",
+            permanent: false,
+            has: [
+               {
+                  type: "query",
+                  key: "livestreamId",
+               },
+            ],
+         },
+         {
+            source: "/group/:groupId/admin/past-livestreams",
+            destination: "/group/:groupId/admin/content/live-streams",
+            permanent: false,
+         },
       ]
    },
 

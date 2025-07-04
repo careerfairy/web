@@ -31,7 +31,6 @@ const LivestreamAdminDetailsPage = () => {
                   <LivestreamAutoSaveContextProvider>
                      <GroupDashboardLayout
                         titleComponent={"Live stream Details"}
-                        groupId={groupId as string}
                         topBarCta={<LivestreamTopActions />}
                         topBarMobileCta={<LivestreamTopActions />}
                         topBarNavigation={

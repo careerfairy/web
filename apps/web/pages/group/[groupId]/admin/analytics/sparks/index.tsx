@@ -2,7 +2,6 @@ import GroupSparkAnalytics from "components/views/admin/sparks/analytics"
 import { SparksAnalyticsProvider } from "components/views/admin/sparks/analytics/SparksAnalyticsContext"
 import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
 import SparksDialog from "components/views/admin/sparks/sparks-dialog/SparksDialog"
-import { useRouter } from "next/router"
 import { Fragment } from "react"
 import GroupDashboardLayout from "../../../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../../../layouts/GroupDashboardLayout/DashboardHead"
@@ -18,14 +17,9 @@ const CreateSparkButtonWrapper = () => {
 }
 
 const AdminSparksAnalyticsPage = () => {
-   const {
-      query: { groupId },
-   } = useRouter()
-
    return (
       <GroupDashboardLayout
          titleComponent={"Analytics"}
-         groupId={groupId as string}
          topBarCta={<CreateSparkButtonWrapper />}
       >
          <DashboardHead title="CareerFairy | My Sparks Analytics" />

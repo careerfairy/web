@@ -13,7 +13,7 @@ const FeedbackPage = () => {
    return (
       <GroupDashboardLayout
          titleComponent={"Analytics"}
-         groupId={groupId as string}
+         serverGroupId={groupId as string}
       >
          <DashboardHead title="CareerFairy | Feedback of" />
          <SubNavigationTabs showSubNavigationFor="analytics" />
