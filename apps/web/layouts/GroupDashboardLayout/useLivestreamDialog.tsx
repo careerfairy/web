@@ -3,7 +3,6 @@ import {
    AuthorInfo,
    EventRating,
    LivestreamEvent,
-   LivestreamPromotions,
 } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -64,11 +63,7 @@ export const useLivestreamDialog = (group: Group) => {
    )
 
    const handlePublishStream = useCallback(
-      async (
-         streamObj: LivestreamEvent,
-         promotion?: LivestreamPromotions,
-         ratings?: EventRating[]
-      ) => {
+      async (streamObj: LivestreamEvent, ratings?: EventRating[]) => {
          try {
             setIsPublishing(true)
             const newStream = { ...streamObj }
@@ -78,7 +73,6 @@ export const useLivestreamDialog = (group: Group) => {
                newStream,
                "livestreams",
                author,
-               promotion,
                ratings
             )
             newStream.id = publishedStreamId

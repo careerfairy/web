@@ -27,7 +27,6 @@ import {
    LivestreamImpression,
    LivestreamPoll,
    LivestreamPresentation,
-   LivestreamPromotions,
    LivestreamQuestion,
    Speaker,
    UserLivestreamData,
@@ -636,7 +635,6 @@ class FirebaseService {
       livestream: LivestreamEvent,
       collection: "livestreams" | "draftLivestreams",
       author: AuthorInfo,
-      promotion?: LivestreamPromotions,
       newRatings?: EventRating[]
    ) => {
       try {
@@ -708,13 +706,6 @@ class FirebaseService {
             .doc(livestreamsRef.id)
             .collection("promotions")
             .doc("promotions")
-
-         const promotionToUpdate: LivestreamPromotions = {
-            ...promotion,
-            livestreamId: livestreamsRef.id,
-         }
-
-         batch.set(promotionsRef, promotionToUpdate, { merge: true })
 
          await batch.commit()
          return livestreamsRef.id

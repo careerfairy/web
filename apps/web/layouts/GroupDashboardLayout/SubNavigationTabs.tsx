@@ -113,7 +113,7 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
                },
             ],
          },
-      } as const
+      }
 
       return navigationLookup[showSubNavigationFor]
    }, [group.id, hasAccessToSparks, showSubNavigationFor])

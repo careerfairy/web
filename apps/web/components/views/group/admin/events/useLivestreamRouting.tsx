@@ -52,7 +52,6 @@ export const useLivestreamRouting = () => {
             draftLivestream,
             "draftLivestreams",
             author,
-            null,
             initialFeedbackQuestions
          )
 
