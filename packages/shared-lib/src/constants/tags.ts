@@ -60,6 +60,14 @@ export const BusinessFunctionsTags = {
       id: "SupplyChainLogistics",
       name: "Supply chain & logistics",
    },
+   Accounting: {
+      id: "Accounting",
+      name: "Accounting",
+   },
+   HumanResources: {
+      id: "HumanResources",
+      name: "Human resources",
+   },
 } as const
 
 export const BusinessFunctionsTagValues = Object.entries(
