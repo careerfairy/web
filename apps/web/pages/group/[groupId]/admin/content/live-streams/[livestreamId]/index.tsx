@@ -1,4 +1,5 @@
 import useAdminGroup from "components/custom-hook/useAdminGroup"
+import { BackToStreamsHeader } from "components/views/group/admin/events/detail/BackToStreamsHeader"
 import { LivestreamAutoSaveContextProvider } from "components/views/group/admin/events/detail/LivestreamAutoSaveContext"
 import { LivestreamCreationContextProvider } from "components/views/group/admin/events/detail/LivestreamCreationContext"
 import { LivestreamTopActions } from "components/views/group/admin/events/detail/LivestreamTopActions"
@@ -30,7 +31,9 @@ const LivestreamAdminDetailsPage = () => {
                >
                   <LivestreamAutoSaveContextProvider>
                      <GroupDashboardLayout
-                        titleComponent={"Live stream Details"}
+                        titleComponent={
+                           <BackToStreamsHeader groupId={groupId as string} />
+                        }
                         topBarCta={<LivestreamTopActions />}
                         topBarMobileCta={<LivestreamTopActions />}
                         topBarNavigation={
