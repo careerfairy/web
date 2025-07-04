@@ -28,6 +28,7 @@ export const BackToStreamsHeader = ({ groupId }: Props) => {
          sx={styles.root}
          component={Link}
          href={`/group/${groupId}/admin/content/live-streams`}
+         shallow
       >
          <Box component={ChevronLeft} />
          {"Live stream details"}
