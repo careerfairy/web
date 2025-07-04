@@ -66,7 +66,7 @@ export const BusinessFunctionsTags = {
    },
    HumanResources: {
       id: "HumanResources",
-      name: "Human resources",
+      name: "Human resources (HR)",
    },
 } as const
 
