@@ -32,8 +32,9 @@ export const GroupBottomLinks = () => {
          <Divider />
          <LinksList spacing={2}>
             <NavLink
-               href={`/group/${group.id}/admin/edit`}
-               pathname={`/group/[groupId]/admin/edit`}
+               href={`/group/${group.id}/admin/settings/general`}
+               pathname={`/group/[groupId]/admin/settings/general`}
+               activePathPrefix={`/group/[groupId]/admin/settings`}
                id={"settings-page"}
                baseTextColor={"text.primary"}
                title={shrunkLeftMenuIsActive ? "" : "Settings"}

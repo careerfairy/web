@@ -1,10 +1,10 @@
-import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
-import { SubNavigationTabs } from "../../../../layouts/GroupDashboardLayout/SubNavigationTabs"
+import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
+import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import { SubNavigationTabs } from "../../../../../layouts/GroupDashboardLayout/SubNavigationTabs"
 
 import CompanyInformationPageContent from "components/views/group/admin/company-information"
 
-const EditGroupProfile = () => {
+const GeneralSettingsPage = () => {
    return (
       <GroupDashboardLayout titleComponent={"Settings"}>
          <DashboardHead title="CareerFairy | Admin Edit Details of" />
@@ -14,4 +14,4 @@ const EditGroupProfile = () => {
    )
 }
 
-export default EditGroupProfile
+export default GeneralSettingsPage

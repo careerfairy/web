@@ -377,6 +377,19 @@ const moduleExports = {
             permanent: false,
          },
          /**
+          * Redirect old settings pages to new settings structure
+          */
+         {
+            source: "/group/:groupId/admin/edit",
+            destination: "/group/:groupId/admin/settings/general",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/roles",
+            destination: "/group/:groupId/admin/settings/team-members",
+            permanent: false,
+         },
+         /**
           * Redirect past-livestreams page to content/live-streams
           */
          {

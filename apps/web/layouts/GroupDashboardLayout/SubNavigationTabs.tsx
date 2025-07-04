@@ -97,18 +97,18 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
          settings: {
             id: "settings",
             title: "Settings",
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/edit`,
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/settings/general`,
             childLinks: [
                {
                   id: "general-settings",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/edit`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/edit`,
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/settings/general`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/settings/general`,
                   title: "General",
                },
                {
                   id: "team-members",
-                  href: `/${BASE_HREF_PATH}/${group.id}/admin/roles`,
-                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/roles`,
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/settings/team-members`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/settings/team-members`,
                   title: "Team members",
                },
             ],
