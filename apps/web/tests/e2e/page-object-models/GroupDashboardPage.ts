@@ -73,7 +73,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    public assertMainPageHeader() {
-      return this.assertTextIsVisible("Dashboard")
+      return this.page.getByRole("heading", { name: "Dashboard" }).isVisible()
    }
 
    public async assertGroupDashboardIsOpen() {
@@ -90,15 +90,22 @@ export class GroupDashboardPage extends CommonPage {
    // Navigation
 
    public async goToCompanyPage() {
-      await this.goToPage("Company")
+      // Company settings are now under Settings section
+      await this.goToPage("Settings")
+      // This will go to Settings and should default to General tab
    }
 
    public async goToMembersPage() {
-      await this.goToPage("Team members")
+      // Team members is now under Settings sub-navigation
+      await this.goToPage("Settings")
+      // Wait for sub-navigation to load and click Team members tab
+      await this.page.getByRole("link", { name: "Team members" }).click()
    }
 
    public async goToLivestreams() {
-      await this.goToPage("Live streams")
+      // Live streams is now under Content section
+      await this.goToPage("Content")
+      // The Content section should default to Live streams tab
 
       return new LivestreamsAdminPage(this)
    }
@@ -116,7 +123,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    public async goToTalentPoolAnalyticsPage() {
-      await this.goToPage("Talent pool")
+      await this.goToPage("Talent Pool")
    }
 
    public async goToLivestreamAnalyticsPage() {
@@ -132,7 +139,8 @@ export class GroupDashboardPage extends CommonPage {
    // Team Members page
 
    public async goToCompanyPageAdmin() {
-      await this.goToPage("Company page")
+      // Company page is now called Company Profile
+      await this.goToPage("Company Profile")
    }
 
    public async goToCompaniesPage() {
@@ -419,13 +427,15 @@ export class GroupDashboardPage extends CommonPage {
 
    private async goToPage(
       name:
-         | "Company"
-         | "Team members"
-         | "Live streams"
-         | "Company page"
+         | "Dashboard"
+         | "Content"
+         | "Settings"
+         | "Company Profile"
          | "ATS Integration"
          | "Analytics"
-         | "Talent pool"
+         | "Talent Pool"
+         | "Jobs"
+         // Analytics sub-pages that might still be accessed directly
          | "Live stream analytics"
          | "Registration sources"
          | "Feedback"

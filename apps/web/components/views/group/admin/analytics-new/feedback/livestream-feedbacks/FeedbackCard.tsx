@@ -73,7 +73,7 @@ const FeedbackCard: FC<Props> = ({ stats, groupId }) => {
    return (
       <Card sx={styles.root}>
          <Link
-            href={`/group/${groupId}/admin/analytics/live-stream/feedback/${stats.livestream.id}`}
+            href={`/group/${groupId}/admin/analytics/live-streams/feedback/${stats.livestream.id}`}
             passHref
             legacyBehavior
          >

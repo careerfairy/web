@@ -18,7 +18,7 @@ import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 
-type StreamType = "upcoming" | "past" | "draft"
+type StreamType = "upcoming" | "past" | "drafts"
 
 export const useGroupLivestreams = (
    groupId: string,
@@ -71,7 +71,7 @@ export const useGroupLivestreams = (
             break
          }
 
-         case "draft": {
+         case "drafts": {
             querySnapshot = await getDocs(
                query(
                   collection(firestore, "draftLivestreams"),

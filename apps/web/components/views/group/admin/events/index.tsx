@@ -21,8 +21,8 @@ const tabs = [
       icon: <Video />,
    },
    {
-      label: "Draft",
-      value: "draft",
+      label: "Drafts",
+      value: "drafts",
       icon: <File />,
    },
 ] as const
@@ -119,7 +119,7 @@ export const EventsOverview = () => {
                </Box>
             ) : (
                <EventsTable
-                  isDraft={tabValue === "draft"}
+                  isDraft={tabValue === "drafts"}
                   isPast={tabValue === "past"}
                   streams={streams}
                   groupsDictionary={groupsDictionary}

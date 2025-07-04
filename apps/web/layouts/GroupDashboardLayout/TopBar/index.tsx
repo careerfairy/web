@@ -84,7 +84,7 @@ const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
          {/* toggler button */}
          {!drawerPresent ? <MobileToggleButton /> : null}
          <Box sx={styles.leftSection}>
-            <Typography fontWeight={600} sx={styles.title}>
+            <Typography role="heading" fontWeight={600} sx={styles.title}>
                {title}
             </Typography>
          </Box>

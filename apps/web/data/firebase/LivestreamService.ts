@@ -1447,10 +1447,10 @@ export class LivestreamService {
     */
    async findTargetEvent(eventId: string): Promise<{
       targetStream: LivestreamEvent | null
-      typeOfStream: "past" | "upcoming" | "draft"
+      typeOfStream: "past" | "upcoming" | "drafts"
    }> {
       let targetStream: LivestreamEvent | null = null
-      let typeOfStream: "past" | "upcoming" | "draft" | null = null
+      let typeOfStream: "past" | "upcoming" | "drafts" | null = null
 
       try {
          // First, try to find the event in the livestreams collection
@@ -1473,7 +1473,7 @@ export class LivestreamService {
 
             if (draftSnap.exists()) {
                targetStream = draftSnap.data()
-               typeOfStream = "draft"
+               typeOfStream = "drafts"
             }
          }
       } catch (error) {
