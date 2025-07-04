@@ -11,55 +11,60 @@ const styles = sxStyles({
    },
 })
 
-const tabs = [
-   {
-      label: "Overview",
-      value: "/group/[groupId]/admin/analytics/live-streams/overview",
-      catchAllPath: undefined,
-      icon: <Hexagon />,
-   },
-   {
-      label: "Live stream analytics",
-      value: "/group/[groupId]/admin/analytics/live-streams",
-      catchAllPath:
-         "/group/[groupId]/admin/analytics/live-streams/[[...livestreamId]]",
-      icon: <AtSign />,
-   },
-   {
-      label: "Registration Source",
-      value: "/group/[groupId]/admin/analytics/live-streams/registration-sources",
-      catchAllPath: undefined,
-      icon: <Users />,
-   },
-   {
-      label: "Feedback",
-      value: "/group/[groupId]/admin/analytics/live-streams/feedback/[[...feedback]]",
-      catchAllPath: undefined,
-      icon: <MessageCircle />,
-   },
-] as const
-
-type TabValue = (typeof tabs)[number]["value"]
-
 export const LivestreamAnalyticsNavigationTabs = () => {
    const { push, query, pathname } = useRouter()
    const groupId = query.groupId as string
+
+   const tabs = [
+      {
+         label: "Overview",
+         pathname: "/group/[groupId]/admin/analytics/live-streams/overview",
+         catchAllPath: undefined,
+         icon: <Hexagon />,
+      },
+      {
+         label: "Live stream analytics",
+         pathname: "/group/[groupId]/admin/analytics/live-streams",
+         catchAllPath:
+            "/group/[groupId]/admin/analytics/live-streams/[[...livestreamId]]",
+         icon: <AtSign />,
+      },
+      {
+         label: "Registration Source",
+         pathname:
+            "/group/[groupId]/admin/analytics/live-streams/registration-sources",
+         catchAllPath: undefined,
+         icon: <Users />,
+      },
+      {
+         label: "Feedback",
+         pathname:
+            "/group/[groupId]/admin/analytics/live-streams/feedback/[[...feedback]]",
+         catchAllPath: undefined,
+         icon: <MessageCircle />,
+      },
+   ] as const
+
+   type TabValue = (typeof tabs)[number]["pathname"]
 
    // Find active tab by matching the current pathname with tab values
    const getActiveTab = (): TabValue => {
       return tabs.find(
          (tab) =>
-            tab.value === pathname ||
+            tab.pathname === pathname ||
             (tab.catchAllPath && tab.catchAllPath === pathname)
-      )?.value
+      )?.pathname
    }
 
    const activeTab = getActiveTab()
 
    const handleTabChange = (_: SyntheticEvent, newValue: TabValue) => {
-      // Replace [groupId] with actual groupId in the pathname
-      const actualPath = newValue.replace("[groupId]", groupId)
-      push(actualPath)
+      push({
+         pathname: newValue,
+         query: {
+            groupId,
+         },
+      })
    }
 
    return (
@@ -67,11 +72,17 @@ export const LivestreamAnalyticsNavigationTabs = () => {
          <BrandedTabs activeValue={activeTab} onChange={handleTabChange}>
             {tabs.map((tab) => (
                <BrandedTabs.Tab
-                  key={tab.value}
+                  key={tab.pathname}
                   label={tab.label}
-                  value={tab.value}
-                  href={tab.value.replace("[groupId]", groupId)}
+                  value={tab.pathname}
+                  href={{
+                     pathname: tab.pathname,
+                     query: {
+                        groupId,
+                     },
+                  }}
                   icon={tab.icon}
+                  shallow
                />
             ))}
          </BrandedTabs>

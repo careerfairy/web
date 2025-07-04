@@ -54,14 +54,14 @@ export const FeedbackPageProvider: FC<{
    const handleOpenFeedbackDialog = useCallback(
       (livestreamId: string) => {
          void push(
-            `/group/${group.id}/admin/analytics/live-stream/feedback/${livestreamId}`
+            `/group/${group.id}/admin/analytics/live-streams/feedback/${livestreamId}`
          )
       },
       [group.id, push]
    )
 
    const handleCloseFeedbackDialog = useCallback(() => {
-      void push(`/group/${group.id}/admin/analytics/live-stream/feedback`)
+      void push(`/group/${group.id}/admin/analytics/live-streams/feedback`)
    }, [group.id, push])
 
    const value = useMemo<IFeedbackPageContext>(
