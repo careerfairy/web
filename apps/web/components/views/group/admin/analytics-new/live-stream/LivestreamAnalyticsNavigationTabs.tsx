@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 import { BrandedTabs } from "components/views/common/BrandedTabs"
 import { useRouter } from "next/router"
-import { ReactNode, SyntheticEvent } from "react"
+import { SyntheticEvent } from "react"
 import { AtSign, Hexagon, MessageCircle, Users } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -10,12 +10,6 @@ const styles = sxStyles({
       width: "100%",
    },
 })
-
-type Tab = {
-   label: string
-   pathname: string
-   icon: ReactNode
-}
 
 const tabs = [
    {
@@ -41,7 +35,7 @@ const tabs = [
          "/group/[groupId]/admin/analytics/live-streams/feedback/[[...feedback]]",
       icon: <MessageCircle />,
    },
-] as const satisfies Tab[]
+] as const
 
 export const LivestreamAnalyticsNavigationTabs = () => {
    const { push, query, pathname } = useRouter()
