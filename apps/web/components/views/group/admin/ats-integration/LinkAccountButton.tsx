@@ -1,12 +1,10 @@
+import { useMergeLink } from "@mergeapi/react-merge-link"
+import LoadingButton from "@mui/lab/LoadingButton"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { useSelector } from "react-redux"
-import { groupSelector } from "../../../../../store/selectors/groupSelectors"
+import * as Sentry from "@sentry/nextjs"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useEffect, useReducer } from "react"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
-import * as Sentry from "@sentry/nextjs"
-import LoadingButton from "@mui/lab/LoadingButton"
-import { useMergeLink } from "@mergeapi/react-merge-link"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 
 const initialState = {
@@ -42,7 +40,7 @@ const atsState = createSlice({
 const { start, linkTokenGrabbed, mergeLinkReady, complete } = atsState.actions
 
 const LinkAccountButton = ({ title }: { title: string }) => {
-   const group: Group = useSelector(groupSelector)
+   const { group } = useGroup()
    const { errorNotification } = useSnackbarNotifications()
    const [state, dispatch] = useReducer(atsState.reducer, initialState)
 
@@ -96,11 +94,11 @@ const MergeDialogConnector = ({
 
    // Finalize the integration
    const onSuccess = useCallback(
-      (public_token) => {
+      (public_token: string) => {
          try {
             atsServiceInstance
                .exchangeAccountToken(groupId, integrationId, public_token)
-               .then((_) => {
+               .then(() => {
                   dispatch(complete())
                })
          } catch (e) {
