@@ -15,7 +15,7 @@ import EventPreviewCard from "../stream-cards/EventPreviewCard"
 
 const styles = sxStyles({
    section: {
-      mt: 6,
+      mt: 0, // Spacing handled by separator line
       mb: 4,
    },
    header: {
