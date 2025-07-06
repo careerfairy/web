@@ -1,11 +1,11 @@
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 import {
-    Box,
-    Button,
-    CircularProgress,
-    Container,
-    Grid,
-    Typography,
+   Box,
+   Button,
+   CircularProgress,
+   Container,
+   Grid,
+   Typography,
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { LivestreamSearchResult } from "types/algolia"
@@ -103,7 +103,7 @@ const RecentLivestreamsSection = ({
                         item
                      >
                         <EventPreviewCard
-                           event={livestream}
+                           event={{ ...livestream, triGrams: {} }}
                            location={ImpressionLocation.nextLivestreams}
                            index={index}
                            totalElements={recentLivestreams.length}
