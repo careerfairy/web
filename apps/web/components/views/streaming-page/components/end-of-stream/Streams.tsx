@@ -150,8 +150,12 @@ const Content = ({ streams }: ContentProps) => {
                   color="primary"
                   fullWidth
                   href="/next-livestreams"
+                  sx={{
+                     mx: 4,
+                     typography: "brandedBody",
+                  }}
                >
-                  More upcoming live streams
+                  More to watch
                </Button>
             </Box>
          )}
