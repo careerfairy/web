@@ -3,9 +3,11 @@ import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
 import { queryParamToArr } from "@careerfairy/shared-lib/utils"
 import {
    Box,
+   Button,
    Card,
    CircularProgress,
    Container,
+   Divider,
    Grid,
    Typography,
 } from "@mui/material"
@@ -302,6 +304,47 @@ const NextLiveStreamsWithFilter = ({
             minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
+         
+         {/* More to watch button with 32px margins */}
+         <Box sx={{ mx: 4, my: 3 }}>
+            <Button
+               component={Link}
+               variant="contained"
+               color="primary"
+               fullWidth
+               href="/past-livestreams"
+               sx={{
+                  typography: "brandedBody", // body - regular - desktop style
+               }}
+            >
+               More to watch
+            </Button>
+         </Box>
+
+         {/* Separator with 32px margins matching upcoming live streams components */}
+         <Box sx={{ mx: 4 }}>
+            <Divider />
+         </Box>
+
+         {/* Recent live streams section 24px below separator with 32px margins */}
+         <Box sx={{ mx: 4, mt: 3 }}>
+            <Typography 
+               variant="brandedH4" 
+               component="h2" 
+               sx={{ mb: 2, fontWeight: 600 }}
+            >
+               Recent live streams
+            </Typography>
+            <StreamsSection
+               value="pastEvents"
+               upcomingLivestreams={[]}
+               listenToUpcoming={false}
+               pastLivestreams={infiniteLivestreams.slice(0, 6)}
+               minimumUpcomingStreams={0}
+               noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
+            />
+         </Box>
+
          {Boolean(isValidating) && (
             <Box sx={styles.loader}>
                <CircularProgress />
