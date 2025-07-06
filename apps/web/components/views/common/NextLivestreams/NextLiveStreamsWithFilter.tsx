@@ -31,6 +31,7 @@ import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
+import RecentLivestreamsSection from "./RecentLivestreamsSection"
 import { StreamsSection } from "./StreamsSection"
 
 const styles = sxStyles({
@@ -188,6 +189,52 @@ const NextLiveStreamsWithFilter = ({
       return data?.flatMap((page) => page.deserializedHits) || []
    }, [data])
 
+   // Check if we should show recent livestreams (when there are < 6 upcoming and no filters/search)
+   const shouldShowRecentLivestreams = useMemo(() => {
+      return (
+         initialTabValue === "upcomingEvents" &&
+         infiniteLivestreams.length < 6 &&
+         !hasAppliedFilters &&
+         !inputValue &&
+         !isValidating
+      )
+   }, [
+      initialTabValue,
+      infiniteLivestreams.length,
+      hasAppliedFilters,
+      inputValue,
+      isValidating,
+   ])
+
+   // Fetch recent past livestreams when needed
+   const recentLivestreamsFilterOptions = useMemo<FilterOptions>(
+      () => ({
+         arrayFilters: {},
+         booleanFilters: {
+            hidden: false,
+            test: false,
+            hasEnded: true,
+         },
+         dateFilter: "past",
+      }),
+      []
+   )
+
+   const {
+      data: recentLivestreamsData,
+      isValidating: isLoadingRecentLivestreams,
+   } = useLivestreamSearchAlgolia(
+      "",
+      recentLivestreamsFilterOptions,
+      LIVESTREAM_REPLICAS.START_DESC,
+      !shouldShowRecentLivestreams, // disable when not needed
+      9 // fetch exactly 9 items
+   )
+
+   const recentLivestreams = useMemo(() => {
+      return recentLivestreamsData?.[0]?.deserializedHits?.slice(0, 9) || []
+   }, [recentLivestreamsData])
+
    const isValidatingRef = useRef(isValidating)
    isValidatingRef.current = isValidating
 
@@ -302,6 +349,14 @@ const NextLiveStreamsWithFilter = ({
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
+
+         {shouldShowRecentLivestreams && (
+            <RecentLivestreamsSection
+               recentLivestreams={recentLivestreams}
+               isLoading={isLoadingRecentLivestreams}
+            />
+         )}
+
          {Boolean(isValidating) && (
             <Box sx={styles.loader}>
                <CircularProgress />
