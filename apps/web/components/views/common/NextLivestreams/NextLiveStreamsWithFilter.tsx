@@ -360,13 +360,15 @@ const NextLiveStreamsWithFilter = ({
                         backgroundColor: "neutral.100",
                         width: "100%",
                         mt: 3, // 24px spacing from upcoming streams
-                        mb: 3, // 24px spacing to recent streams
+                        mx: { xs: 0, md: 2 }, // Match the main grid margins
                      }}
                   />
-                  <RecentLivestreamsSection
-                     recentLivestreams={recentLivestreams}
-                     isLoading={isLoadingRecentLivestreams}
-                  />
+                  <Box sx={{ mt: 3 }}> {/* 24px spacing below divider */}
+                     <RecentLivestreamsSection
+                        recentLivestreams={recentLivestreams}
+                        isLoading={isLoadingRecentLivestreams}
+                     />
+                  </Box>
                </>
             ) : null}
          </Container>
