@@ -60,7 +60,6 @@ const MyRegistrations: NextPage<
                   value={"upcomingEvents"}
                   upcomingLivestreams={registeredStreams}
                   listenToUpcoming
-                  minimumUpcomingStreams={0}
                   noResultsComponent={
                      <NoResultsMessage message={noResultsMessage} />
                   }
