@@ -3,9 +3,8 @@ import {
    Box,
    Button,
    CircularProgress,
-   Container,
    Grid,
-   Typography,
+   Typography
 } from "@mui/material"
 import { useRouter } from "next/router"
 import { ChevronRight } from "react-feather"
@@ -69,11 +68,9 @@ const RecentLivestreamsSection = ({
 
    if (isLoading) {
       return (
-         <Container maxWidth="xl" disableGutters>
-            <Box sx={styles.loader}>
-               <CircularProgress />
-            </Box>
-         </Container>
+         <Box sx={styles.loader}>
+            <CircularProgress />
+         </Box>
       )
    }
 
@@ -82,48 +79,46 @@ const RecentLivestreamsSection = ({
    }
 
    return (
-      <Container maxWidth="xl" disableGutters>
-         <Box sx={styles.section}>
-            <Box sx={styles.header}>
-               <Typography variant="h4" sx={styles.title}>
-                  Recent live streams
-               </Typography>
-            </Box>
-
-            <Box sx={styles.cardsContainer}>
-               <Grid container spacing={2} sx={{ margin: 1 }}>
-                  {recentLivestreams.map((livestream, index) => (
-                     <Grid
-                        key={livestream.id}
-                        xs={12}
-                        md={6}
-                        lg={4}
-                        xl={3}
-                        item
-                     >
-                        <EventPreviewCard
-                           event={{ ...livestream, triGrams: {} }}
-                           location={ImpressionLocation.nextLivestreams}
-                           index={index}
-                           totalElements={recentLivestreams.length}
-                        />
-                     </Grid>
-                  ))}
-               </Grid>
-            </Box>
-
-            <Box sx={styles.moreButton}>
-               <Button
-                  variant="outlined"
-                  onClick={handleMoreToWatchClick}
-                  endIcon={<ChevronRight size={16} />}
-                  sx={styles.button}
-               >
-                  More to watch
-               </Button>
-            </Box>
+      <Box sx={styles.section}>
+         <Box sx={styles.header}>
+            <Typography variant="h4" sx={styles.title}>
+               Recent live streams
+            </Typography>
          </Box>
-      </Container>
+
+         <Box sx={styles.cardsContainer}>
+            <Grid container spacing={2} sx={{ margin: 1 }}>
+               {recentLivestreams.map((livestream, index) => (
+                  <Grid
+                     key={livestream.id}
+                     xs={12}
+                     md={6}
+                     lg={4}
+                     xl={3}
+                     item
+                  >
+                     <EventPreviewCard
+                        event={{ ...livestream, triGrams: {} }}
+                        location={ImpressionLocation.nextLivestreams}
+                        index={index}
+                        totalElements={recentLivestreams.length}
+                     />
+                  </Grid>
+               ))}
+            </Grid>
+         </Box>
+
+         <Box sx={styles.moreButton}>
+            <Button
+               variant="outlined"
+               onClick={handleMoreToWatchClick}
+               endIcon={<ChevronRight size={16} />}
+               sx={styles.button}
+            >
+               More to watch
+            </Button>
+         </Box>
+      </Box>
    )
 }
 
