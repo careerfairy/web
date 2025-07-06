@@ -8,7 +8,6 @@ import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import EventsPreviewCarousel, {
    EventsCarouselStyling,
 } from "./EventsPreviewCarousel"
-import { formatLivestreamsEvents } from "./utils"
 
 const config = {
    suspense: false,
@@ -89,7 +88,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          id={"upcoming-events"}
          title={COMING_UP_NEXT_EVENT_TITLE}
          location={"portal-next-livestreams-carousel"}
-         events={formatLivestreamsEvents(localEvents)}
+         events={localEvents}
          seeMoreLink={"/next-livestreams"}
          isRecommended
          styling={defaultStyling}

@@ -1,12 +1,11 @@
-import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { InferGetServerSidePropsType } from "next"
-import { formatLivestreamsEvents } from "components/views/portal/events-preview/utils"
 import EventsPreview, {
    EventsTypes,
 } from "components/views/portal/events-preview/EventsPreview"
+import { InferGetServerSidePropsType } from "next"
 import { useMemo } from "react"
 import { mapFromServerSide } from "util/serverUtil"
+import { livestreamRepo } from "../../data/RepositoryInstances"
 
 const CARDS_NUM = 9
 
@@ -27,7 +26,7 @@ const EmbeddedUpcomingLivestreamsPage = ({
          limit={CARDS_NUM}
          title={"COMING UP NEXT"}
          type={EventsTypes.comingUp}
-         events={formatLivestreamsEvents(livestreamDocs)}
+         events={livestreamDocs}
          isEmbedded
          // No need to show loading as these events have already been queried server side
          loading={false}
