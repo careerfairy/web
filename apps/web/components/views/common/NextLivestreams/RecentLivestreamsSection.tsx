@@ -14,18 +14,18 @@ import EventPreviewCard from "../stream-cards/EventPreviewCard"
 
 const styles = sxStyles({
    section: {
-      mt: 0, // Spacing handled by separator line
-      mb: 4,
+      mt: 0, // Spacing handled by parent
    },
    header: {
-      mb: 3,
+      mb: 2, // 16px spacing between title and cards
    },
    title: {
       fontWeight: 600,
       color: "text.primary",
    },
    cardsContainer: {
-      mb: 4,
+      p: { xs: 0, md: 2 }, // Match main grid padding
+      width: "100%",
    },
    moreButton: {
       m: 4, // 32px margins on all sides
@@ -87,12 +87,12 @@ const RecentLivestreamsSection = ({
          </Box>
 
          <Box sx={styles.cardsContainer}>
-            <Grid container spacing={2} sx={{ margin: 1 }}>
+            <Grid container spacing={2}>
                {recentLivestreams.map((livestream, index) => (
                   <Grid
                      key={livestream.id}
                      xs={12}
-                     md={6}
+                     lsCardsGallery={6}
                      lg={4}
                      xl={3}
                      item
