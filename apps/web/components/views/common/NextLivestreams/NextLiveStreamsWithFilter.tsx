@@ -346,7 +346,6 @@ const NextLiveStreamsWithFilter = ({
             upcomingLivestreams={infiniteLivestreams}
             listenToUpcoming
             pastLivestreams={infiniteLivestreams}
-            minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
             showSeparator={shouldShowRecentLivestreams}
          />
