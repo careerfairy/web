@@ -29,8 +29,7 @@ const styles = sxStyles({
       mb: 4,
    },
    moreButton: {
-      mt: 4,
-      mx: 1, // Match the margin of the cards container
+      m: 4, // 32px margins on all sides
    },
    button: {
       borderRadius: "24px",
