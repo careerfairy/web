@@ -355,7 +355,7 @@ const NextLiveStreamsWithFilter = ({
                <Container maxWidth="xl" disableGutters>
                   <Box
                      sx={{
-                        height: 1,
+                        height: "1px",
                         backgroundColor: "neutral.100",
                         width: "100%",
                         mt: 3, // 24px spacing from upcoming streams

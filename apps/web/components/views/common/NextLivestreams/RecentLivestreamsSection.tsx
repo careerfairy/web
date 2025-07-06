@@ -25,10 +25,6 @@ const styles = sxStyles({
       fontWeight: 600,
       color: "text.primary",
    },
-   subtitle: {
-      color: "text.secondary",
-      mt: 1,
-   },
    cardsContainer: {
       mb: 4,
    },
@@ -92,9 +88,6 @@ const RecentLivestreamsSection = ({
             <Box sx={styles.header}>
                <Typography variant="h4" sx={styles.title}>
                   Recent live streams
-               </Typography>
-               <Typography variant="body1" sx={styles.subtitle}>
-                  Catch up on what you missed
                </Typography>
             </Box>
 
