@@ -350,18 +350,31 @@ const NextLiveStreamsWithFilter = ({
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
 
-         {shouldShowRecentLivestreams && (
-            <RecentLivestreamsSection
-               recentLivestreams={recentLivestreams}
-               isLoading={isLoadingRecentLivestreams}
-            />
-         )}
+         {shouldShowRecentLivestreams ? (
+            <>
+               <Container maxWidth="xl" disableGutters>
+                  <Box
+                     sx={{
+                        height: 1,
+                        backgroundColor: "neutral.100",
+                        width: "100%",
+                        mt: 3, // 24px spacing from upcoming streams
+                        mb: 3, // 24px spacing to recent streams
+                     }}
+                  />
+               </Container>
+               <RecentLivestreamsSection
+                  recentLivestreams={recentLivestreams}
+                  isLoading={isLoadingRecentLivestreams}
+               />
+            </>
+         ) : null}
 
-         {Boolean(isValidating) && (
+         {isValidating ? (
             <Box sx={styles.loader}>
                <CircularProgress />
             </Box>
-         )}
+         ) : null}
          <Box ref={ref} />
       </>
    )
