@@ -1,10 +1,9 @@
-import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
-import { isLoaded } from "react-redux-firebase"
-import NextLivestreams from "../NextLivestreams"
-import { Box, CircularProgress } from "@mui/material"
+import { Box, CircularProgress, Container } from "@mui/material"
 import * as PropTypes from "prop-types"
-import React from "react"
+import { isLoaded } from "react-redux-firebase"
+import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
 import { formatLivestreamsEvents } from "../../../portal/events-preview/utils"
+import NextLivestreams from "../NextLivestreams"
 
 const styles = {
    loaderWrapper: {
@@ -26,20 +25,36 @@ export function StreamsSection({
    value,
    minimumUpcomingStreams = 6,
    noResultsComponent,
+   showSeparator = false,
 }) {
    return (
       <Box sx={styles.wrapper}>
          <SwipeablePanel value={value} index={"upcomingEvents"}>
             {isLoaded(upcomingLivestreams) ? (
-               <NextLivestreams
-                  listenToUpcoming={listenToUpcoming}
-                  livestreams={formatLivestreamsEvents(
-                     upcomingLivestreams,
-                     minimumUpcomingStreams
-                  )}
-                  currentGroup={currentGroup}
-                  noResultsComponent={noResultsComponent}
-               />
+               <>
+                  <NextLivestreams
+                     listenToUpcoming={listenToUpcoming}
+                     livestreams={formatLivestreamsEvents(
+                        upcomingLivestreams,
+                        minimumUpcomingStreams
+                     )}
+                     currentGroup={currentGroup}
+                     noResultsComponent={noResultsComponent}
+                  />
+                  {showSeparator ? (
+                     <Container maxWidth="xl" disableGutters>
+                        <Box
+                           sx={{
+                              height: "1px",
+                              backgroundColor: "neutral.100",
+                              width: "100%",
+                              mt: 3, // 24px spacing from upcoming streams
+                              mb: 3, // 24px spacing to recent streams
+                           }}
+                        />
+                     </Container>
+                  ) : null}
+               </>
             ) : (
                <Box sx={styles.loaderWrapper}>
                   <CircularProgress color="primary" />
@@ -72,4 +87,5 @@ StreamsSection.propTypes = {
    pastLivestreams: PropTypes.any,
    minimumUpcomingStreams: PropTypes.number,
    noResultsComponent: PropTypes.element,
+   showSeparator: PropTypes.bool,
 }

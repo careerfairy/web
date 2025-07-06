@@ -348,26 +348,14 @@ const NextLiveStreamsWithFilter = ({
             pastLivestreams={infiniteLivestreams}
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
+            showSeparator={shouldShowRecentLivestreams}
          />
 
          {shouldShowRecentLivestreams ? (
-            <>
-               <Container maxWidth="xl" disableGutters>
-                  <Box
-                     sx={{
-                        height: "1px",
-                        backgroundColor: "neutral.100",
-                        width: "100%",
-                        mt: 3, // 24px spacing from upcoming streams
-                        mb: 3, // 24px spacing to recent streams
-                     }}
-                  />
-               </Container>
-               <RecentLivestreamsSection
-                  recentLivestreams={recentLivestreams}
-                  isLoading={isLoadingRecentLivestreams}
-               />
-            </>
+            <RecentLivestreamsSection
+               recentLivestreams={recentLivestreams}
+               isLoading={isLoadingRecentLivestreams}
+            />
          ) : null}
 
          {isValidating ? (
