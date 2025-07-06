@@ -2,7 +2,6 @@ import { Box, CircularProgress, Container } from "@mui/material"
 import * as PropTypes from "prop-types"
 import { isLoaded } from "react-redux-firebase"
 import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
-import { formatLivestreamsEvents } from "../../../portal/events-preview/utils"
 import NextLivestreams from "../NextLivestreams"
 
 const styles = {
@@ -23,7 +22,6 @@ export function StreamsSection({
    upcomingLivestreams,
    listenToUpcoming,
    value,
-   minimumUpcomingStreams = 6,
    noResultsComponent,
    showSeparator = false,
 }) {
@@ -34,10 +32,7 @@ export function StreamsSection({
                <>
                   <NextLivestreams
                      listenToUpcoming={listenToUpcoming}
-                     livestreams={formatLivestreamsEvents(
-                        upcomingLivestreams,
-                        minimumUpcomingStreams
-                     )}
+                     livestreams={upcomingLivestreams}
                      currentGroup={currentGroup}
                      noResultsComponent={noResultsComponent}
                   />
@@ -85,7 +80,6 @@ StreamsSection.propTypes = {
    upcomingLivestreams: PropTypes.arrayOf(PropTypes.any),
    currentGroup: PropTypes.any,
    pastLivestreams: PropTypes.any,
-   minimumUpcomingStreams: PropTypes.number,
    noResultsComponent: PropTypes.element,
    showSeparator: PropTypes.bool,
 }
