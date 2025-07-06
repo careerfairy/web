@@ -8,6 +8,7 @@ import {
    Typography,
 } from "@mui/material"
 import { useRouter } from "next/router"
+import { ChevronRight } from "react-feather"
 import { LivestreamSearchResult } from "types/algolia"
 import { sxStyles } from "../../../../types/commonTypes"
 import EventPreviewCard from "../stream-cards/EventPreviewCard"
@@ -42,6 +43,12 @@ const styles = sxStyles({
       py: 1.5,
       textTransform: "none",
       fontWeight: 600,
+      borderColor: "neutral.200",
+      color: "neutral.600",
+      "&:hover": {
+         borderColor: "neutral.300",
+         backgroundColor: "neutral.50",
+      },
    },
    loader: {
       display: "flex",
@@ -115,9 +122,9 @@ const RecentLivestreamsSection = ({
 
             <Box sx={styles.moreButton}>
                <Button
-                  variant="contained"
-                  color="primary"
+                  variant="outlined"
                   onClick={handleMoreToWatchClick}
+                  endIcon={<ChevronRight size={16} />}
                   sx={styles.button}
                >
                   More to watch
