@@ -306,7 +306,7 @@ const NextLiveStreamsWithFilter = ({
          />
          
          {/* More to watch button with 32px margins */}
-         <Box sx={{ mx: 4, my: 3 }}>
+         <Box sx={{ m: 4 }}>
             <Button
                component={Link}
                variant="contained"
