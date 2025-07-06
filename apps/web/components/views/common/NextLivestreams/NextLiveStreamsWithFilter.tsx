@@ -299,7 +299,7 @@ const NextLiveStreamsWithFilter = ({
             upcomingLivestreams={infiniteLivestreams}
             listenToUpcoming
             pastLivestreams={infiniteLivestreams}
-            minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
+            minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
          {Boolean(isValidating) && (
