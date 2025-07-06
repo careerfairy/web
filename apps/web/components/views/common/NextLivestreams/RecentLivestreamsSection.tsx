@@ -29,21 +29,21 @@ const styles = sxStyles({
       mb: 4,
    },
    moreButton: {
-      display: "flex",
-      justifyContent: "center",
       mt: 4,
+      mx: 1, // Match the margin of the cards container
    },
    button: {
-      borderRadius: 2,
-      px: 4,
-      py: 1.5,
+      borderRadius: "24px",
+      height: "48px",
+      width: "100%",
       textTransform: "none",
       fontWeight: 600,
       borderColor: "neutral.200",
       color: "neutral.600",
+      backgroundColor: "transparent",
       "&:hover": {
          borderColor: "neutral.300",
-         backgroundColor: "neutral.50",
+         backgroundColor: "transparent",
       },
    },
    loader: {
