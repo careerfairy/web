@@ -1,10 +1,9 @@
-import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
-import { isLoaded } from "react-redux-firebase"
-import NextLivestreams from "../NextLivestreams"
 import { Box, CircularProgress } from "@mui/material"
 import * as PropTypes from "prop-types"
-import React from "react"
+import { isLoaded } from "react-redux-firebase"
+import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
 import { formatLivestreamsEvents } from "../../../portal/events-preview/utils"
+import NextLivestreams from "../NextLivestreams"
 
 const styles = {
    loaderWrapper: {
@@ -15,6 +14,11 @@ const styles = {
    },
    wrapper: {
       minHeight: "80vh",
+      display: "flex",
+      flexDirection: "column",
+   },
+   panelContainer: {
+      flex: 1,
    },
 }
 
@@ -29,7 +33,11 @@ export function StreamsSection({
 }) {
    return (
       <Box sx={styles.wrapper}>
-         <SwipeablePanel value={value} index={"upcomingEvents"}>
+         <SwipeablePanel 
+            value={value} 
+            index={"upcomingEvents"}
+            sx={styles.panelContainer}
+         >
             {isLoaded(upcomingLivestreams) ? (
                <NextLivestreams
                   listenToUpcoming={listenToUpcoming}
@@ -46,7 +54,11 @@ export function StreamsSection({
                </Box>
             )}
          </SwipeablePanel>
-         <SwipeablePanel value={value} index={"pastEvents"}>
+         <SwipeablePanel 
+            value={value} 
+            index={"pastEvents"}
+            sx={styles.panelContainer}
+         >
             {isLoaded(pastLivestreams) ? (
                <NextLivestreams
                   listenToUpcoming={listenToUpcoming}
