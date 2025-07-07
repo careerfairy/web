@@ -347,6 +347,7 @@ const NextLiveStreamsWithFilter = ({
             upcomingLivestreams={infiniteLivestreams}
             listenToUpcoming
             pastLivestreams={infiniteLivestreams}
+            currentGroup={null}
             minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
@@ -370,7 +371,7 @@ const NextLiveStreamsWithFilter = ({
                      component={Link}
                      href="/past-livestreams"
                      variant="outlined"
-                     endIcon={<ChevronRightIcon />}
+                     endIcon={<ChevronRight size={16} />}
                      sx={styles.moreToWatchButton}
                   >
                      More to watch
