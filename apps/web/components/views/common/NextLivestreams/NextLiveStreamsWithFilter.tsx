@@ -31,7 +31,7 @@ import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
-import RecentLivestreamsGrid from "./RecentLivestreamsGrid"
+import RecentLivestreamsSection from "./RecentLivestreamsGrid"
 import { StreamsSection } from "./StreamsSection"
 
 const styles = sxStyles({
@@ -192,6 +192,52 @@ const NextLiveStreamsWithFilter = ({
       return data?.flatMap((page) => page.deserializedHits) || []
    }, [data])
 
+   // Check if we should show recent livestreams (when there are < 6 upcoming and no filters/search)
+   const shouldShowRecentLivestreams = useMemo(() => {
+      return (
+         initialTabValue === "upcomingEvents" &&
+         infiniteLivestreams.length < 6 &&
+         !hasAppliedFilters &&
+         !inputValue &&
+         !isValidating
+      )
+   }, [
+      initialTabValue,
+      infiniteLivestreams.length,
+      hasAppliedFilters,
+      inputValue,
+      isValidating,
+   ])
+
+   // Fetch recent past livestreams when needed
+   const recentLivestreamsFilterOptions = useMemo<FilterOptions>(
+      () => ({
+         arrayFilters: {},
+         booleanFilters: {
+            hidden: false,
+            test: false,
+            hasEnded: true,
+         },
+         dateFilter: "past",
+      }),
+      []
+   )
+
+   const {
+      data: recentLivestreamsData,
+      isValidating: isLoadingRecentLivestreams,
+   } = useLivestreamSearchAlgolia(
+      "",
+      recentLivestreamsFilterOptions,
+      LIVESTREAM_REPLICAS.START_DESC,
+      !shouldShowRecentLivestreams, // disable when not needed
+      9 // fetch exactly 9 items
+   )
+
+   const recentLivestreams = useMemo(() => {
+      return recentLivestreamsData?.[0]?.deserializedHits?.slice(0, 9) || []
+   }, [recentLivestreamsData])
+
    const isValidatingRef = useRef(isValidating)
    isValidatingRef.current = isValidating
 
@@ -202,16 +248,6 @@ const NextLiveStreamsWithFilter = ({
          setSize((prevSize) => prevSize + 1)
       }
    }, [inView, setSize])
-
-   // Check if we should show recent livestreams grid
-   const shouldShowRecentStreams = useMemo(() => {
-      return (
-         initialTabValue === "upcomingEvents" && 
-         !hasAppliedFilters && 
-         !inputValue && 
-         infiniteLivestreams.length < 6
-      )
-   }, [initialTabValue, hasAppliedFilters, inputValue, infiniteLivestreams.length])
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -313,21 +349,40 @@ const NextLiveStreamsWithFilter = ({
             upcomingLivestreams={infiniteLivestreams}
             listenToUpcoming
             pastLivestreams={infiniteLivestreams}
+            currentGroup={undefined}
             minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
 
-         {shouldShowRecentStreams && (
-            <Container maxWidth="xl" sx={styles.recentStreamsContainer}>
-               <RecentLivestreamsGrid />
-            </Container>
-         )}
+         <Container maxWidth="xl" disableGutters>
+            {shouldShowRecentLivestreams ? (
+               <>
+                  <Box
+                     sx={{
+                        height: "1px",
+                        backgroundColor: "neutral.100",
+                        width: "100%",
+                        mt: 3, // 24px spacing from upcoming streams
+                        mx: { xs: 0, md: 2 }, // Match the main grid margins
+                     }}
+                  />
+                  <Box sx={{ mt: 3 }}>
+                     {" "}
+                     {/* 24px spacing below divider */}
+                     <RecentLivestreamsSection
+                        recentLivestreams={recentLivestreams}
+                        isLoading={isLoadingRecentLivestreams}
+                     />
+                  </Box>
+               </>
+            ) : null}
+         </Container>
 
-         {Boolean(isValidating) && (
+         {isValidating ? (
             <Box sx={styles.loader}>
                <CircularProgress />
             </Box>
-         )}
+         ) : null}
          <Box ref={ref} />
       </>
    )
