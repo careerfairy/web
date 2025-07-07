@@ -222,7 +222,29 @@ function SignUpUserForm() {
                message: "Error creating user in Auth and Firebase",
                email: values.email,
             })
-            setErrorMessage(error)
+            
+            // Provide better error messages for common issues
+            let userFriendlyError = error
+            
+            if (error.code === 'auth/too-many-requests') {
+               userFriendlyError = {
+                  message: 'Too many account creation attempts. Please try again later or contact support.'
+               }
+            } else if (error.code === 'resource-exhausted') {
+               userFriendlyError = {
+                  message: 'Account creation temporarily limited. Please try again later or contact support.'
+               }
+            } else if (error.message?.includes('blocked') || error.message?.includes('Access blocked')) {
+               userFriendlyError = {
+                  message: 'Account creation is temporarily blocked. This usually resolves within 24-48 hours. Try using a different network or contact support if this continues.'
+               }
+            } else if (error.code === 'auth/email-already-in-use') {
+               userFriendlyError = {
+                  message: 'An account with this email already exists. Try logging in instead.'
+               }
+            }
+            
+            setErrorMessage(userFriendlyError)
             setGeneralLoading(false)
             setSubmitting(false)
          })

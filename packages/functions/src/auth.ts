@@ -26,6 +26,54 @@ import { userUpdateFields } from "./lib/user"
 import { logAndThrow } from "./lib/validations"
 import { generateReferralCode } from "./util"
 
+// Rate limiting for account creation to prevent abuse
+const accountCreationAttempts = new Map<string, { count: number; lastAttempt: number }>()
+
+function checkRateLimit(clientIP: string): void {
+   const now = Date.now()
+   const hourInMs = 60 * 60 * 1000
+   const maxAttempts = 3
+   
+   const attempt = accountCreationAttempts.get(clientIP)
+   
+   if (attempt) {
+      // Reset count if more than an hour has passed
+      if (now - attempt.lastAttempt > hourInMs) {
+         accountCreationAttempts.set(clientIP, { count: 1, lastAttempt: now })
+         return
+      }
+      
+      // Check if exceeded rate limit
+      if (attempt.count >= maxAttempts) {
+         throw new functions.https.HttpsError(
+            "resource-exhausted",
+            "Too many account creation attempts. Please try again later or contact support."
+         )
+      }
+      
+      // Increment count
+      accountCreationAttempts.set(clientIP, { count: attempt.count + 1, lastAttempt: now })
+   } else {
+      // First attempt from this IP
+      accountCreationAttempts.set(clientIP, { count: 1, lastAttempt: now })
+   }
+}
+
+async function logAccountCreationAttempt(clientIP: string, email: string, status: string): Promise<void> {
+   try {
+      await firestore.collection('accountCreationLogs').add({
+         ip: clientIP,
+         email: email,
+         status: status,
+         timestamp: FieldValue.serverTimestamp(),
+         userAgent: 'unknown' // Could be enhanced to capture actual user agent
+      })
+   } catch (error) {
+      // Log error but don't fail the main process
+      console.error('Failed to log account creation attempt:', error)
+   }
+}
+
 export const createNewUserAccount = onCall(async (request) => {
    if (request.auth) {
       // Throwing an HttpsError so that the client gets the error details.
@@ -34,6 +82,10 @@ export const createNewUserAccount = onCall(async (request) => {
          "The function must be called while logged out."
       )
    }
+
+   // Apply rate limiting
+   const clientIP = request.rawRequest.ip || 'unknown'
+   checkRateLimit(clientIP)
 
    const { data } = request
 
@@ -56,6 +108,10 @@ export const createNewUserAccount = onCall(async (request) => {
    } = userData
 
    console.log(`Starting auth account creation process for ${recipientEmail}`)
+   
+   // Log the account creation attempt for monitoring
+   await logAccountCreationAttempt(clientIP, recipientEmail, 'started')
+   
    try {
       const user = await auth.createUser({
          email: recipientEmail,
@@ -159,7 +215,7 @@ export const createNewUserAccount = onCall(async (request) => {
                validationPin: pinCode,
             })
 
-            console.log(`Sent email successfully for ${recipientEmail}`)
+                                             console.log(`Sent email successfully for ${recipientEmail}`)
 
             return response
          } catch (error) {
