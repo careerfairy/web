@@ -1,77 +1,113 @@
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
-import { Box, Button, Grid, Typography } from "@mui/material"
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material"
 import { useRouter } from "next/router"
-import { InView } from "react-intersection-observer"
+import { ChevronRight } from "react-feather"
+import { LivestreamSearchResult } from "types/algolia"
 import { sxStyles } from "../../../../types/commonTypes"
-import { useRecentLivestreams } from "../../../custom-hook/live-stream/useRecentLivestreams"
 import EventPreviewCard from "../stream-cards/EventPreviewCard"
 
 const styles = sxStyles({
-   container: {
-      mt: 4,
-      mb: 2,
+   section: {
+      mt: 0, // Spacing handled by parent
+   },
+   header: {
+      mb: 2, // 16px spacing between title and cards
    },
    title: {
-      mb: 3,
       fontWeight: 600,
+      color: "text.primary",
    },
-   grid: {
-      mb: 3,
+   cardsContainer: {
+      p: { xs: 0, md: 2 }, // Match main grid padding
+      width: "100%",
+   },
+   moreButton: {
+      m: 4, // 32px margins on all sides
    },
    button: {
+      borderRadius: "24px",
+      height: "48px",
+      width: "100%",
+      textTransform: "none",
+      fontWeight: 600,
+      borderColor: "neutral.200",
+      color: "neutral.600",
+      backgroundColor: "transparent",
+      "&:hover": {
+         borderColor: "neutral.300",
+         backgroundColor: "transparent",
+      },
+   },
+   loader: {
       display: "flex",
       justifyContent: "center",
-      mt: 2,
+      py: 4,
    },
 })
 
-const RecentLivestreamsGrid = () => {
+type RecentLivestreamsSectionProps = {
+   recentLivestreams: LivestreamSearchResult[]
+   isLoading: boolean
+}
+
+const RecentLivestreamsSection = ({
+   recentLivestreams,
+   isLoading,
+}: RecentLivestreamsSectionProps) => {
    const router = useRouter()
-   const { data: recentLivestreams, isLoading } = useRecentLivestreams(9)
 
    const handleMoreToWatchClick = () => {
-      router.push("/past-livestreams")
+      void router.push("/past-livestreams")
    }
 
-   if (isLoading || !recentLivestreams?.length) {
+   if (isLoading) {
+      return (
+         <Box sx={styles.loader}>
+            <CircularProgress />
+         </Box>
+      )
+   }
+
+   if (!recentLivestreams.length) {
       return null
    }
 
    return (
-      <Box sx={styles.container}>
-         <Typography variant="h4" sx={styles.title}>
-            Recent live streams
-         </Typography>
-         
-         <Grid container spacing={2} sx={styles.grid}>
-            {recentLivestreams.map((livestream, index) => (
-               <Grid key={livestream.id} item xs={12} sm={6} md={4}>
-                  <InView triggerOnce>
-                     {({ inView, ref }) =>
-                        inView ? (
-                           <EventPreviewCard
-                              ref={ref}
-                              index={index}
-                              totalElements={recentLivestreams.length}
-                              location={ImpressionLocation.nextLivestreams}
-                              event={livestream}
-                              disableAutoPlay={true}
-                           />
-                        ) : (
-                           <EventPreviewCard ref={ref} loading />
-                        )
-                     }
-                  </InView>
-               </Grid>
-            ))}
-         </Grid>
+      <Box sx={styles.section}>
+         <Box sx={styles.header}>
+            <Typography variant="h4" sx={styles.title}>
+               Recent live streams
+            </Typography>
+         </Box>
 
-         <Box sx={styles.button}>
+         <Box sx={styles.cardsContainer}>
+            <Grid container spacing={2}>
+               {recentLivestreams.map((livestream, index) => (
+                  <Grid
+                     key={livestream.id}
+                     xs={12}
+                     lsCardsGallery={6}
+                     lg={4}
+                     xl={3}
+                     item
+                  >
+                     <EventPreviewCard
+                        event={{ ...livestream, triGrams: {} }}
+                        location={ImpressionLocation.nextLivestreams}
+                        index={index}
+                        totalElements={recentLivestreams.length}
+                     />
+                  </Grid>
+               ))}
+            </Grid>
+         </Box>
+
+         <Box sx={styles.moreButton}>
             <Button
                variant="outlined"
-               color="primary"
                onClick={handleMoreToWatchClick}
-               size="large"
+               endIcon={<ChevronRight size={16} />}
+               sx={styles.button}
             >
                More to watch
             </Button>
@@ -80,4 +116,4 @@ const RecentLivestreamsGrid = () => {
    )
 }
 
-export default RecentLivestreamsGrid
+export default RecentLivestreamsSection
