@@ -2,6 +2,7 @@ import { Box, CircularProgress, Container } from "@mui/material"
 import * as PropTypes from "prop-types"
 import { isLoaded } from "react-redux-firebase"
 import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
+import { formatLivestreamsEvents } from "../../../portal/events-preview/utils"
 import NextLivestreams from "../NextLivestreams"
 
 const styles = {
@@ -13,6 +14,11 @@ const styles = {
    },
    wrapper: {
       minHeight: "80vh",
+      display: "flex",
+      flexDirection: "column",
+   },
+   panelContainer: {
+      flex: 1,
    },
 }
 
@@ -22,17 +28,25 @@ export function StreamsSection({
    upcomingLivestreams,
    listenToUpcoming,
    value,
+   minimumUpcomingStreams = 6,
    noResultsComponent,
    showSeparator = false,
 }) {
    return (
       <Box sx={styles.wrapper}>
-         <SwipeablePanel value={value} index={"upcomingEvents"}>
+         <SwipeablePanel 
+            value={value} 
+            index={"upcomingEvents"}
+            sx={styles.panelContainer}
+         >
             {isLoaded(upcomingLivestreams) ? (
                <>
                   <NextLivestreams
                      listenToUpcoming={listenToUpcoming}
-                     livestreams={upcomingLivestreams}
+                     livestreams={formatLivestreamsEvents(
+                        upcomingLivestreams,
+                        minimumUpcomingStreams
+                     )}
                      currentGroup={currentGroup}
                      noResultsComponent={noResultsComponent}
                   />
@@ -56,7 +70,11 @@ export function StreamsSection({
                </Box>
             )}
          </SwipeablePanel>
-         <SwipeablePanel value={value} index={"pastEvents"}>
+         <SwipeablePanel 
+            value={value} 
+            index={"pastEvents"}
+            sx={styles.panelContainer}
+         >
             {isLoaded(pastLivestreams) ? (
                <NextLivestreams
                   listenToUpcoming={listenToUpcoming}
@@ -80,6 +98,7 @@ StreamsSection.propTypes = {
    upcomingLivestreams: PropTypes.arrayOf(PropTypes.any),
    currentGroup: PropTypes.any,
    pastLivestreams: PropTypes.any,
+   minimumUpcomingStreams: PropTypes.number,
    noResultsComponent: PropTypes.element,
    showSeparator: PropTypes.bool,
 }
