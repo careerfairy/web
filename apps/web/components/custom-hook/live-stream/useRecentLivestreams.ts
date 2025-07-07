@@ -9,19 +9,18 @@ import { useLivestreamSearchAlgolia } from "./useLivestreamSearchAlgolia"
  */
 export const useRecentLivestreams = (limit: number = 9) => {
    const { data, isValidating } = useLivestreamSearchAlgolia(
-      "", // no search query
+      "",
       {
          arrayFilters: {},
          booleanFilters: {
             hidden: false,
-            test: false,
             hasEnded: true,
          },
          dateFilter: "past",
       },
-      LIVESTREAM_REPLICAS.START_DESC, // Most recent first
-      false, // not disabled
-      limit // items per page
+      LIVESTREAM_REPLICAS.START_DESC,
+      undefined,
+      limit
    )
 
    const recentLivestreams = data?.flatMap((page) => page.deserializedHits) || []
