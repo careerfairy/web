@@ -31,7 +31,7 @@ import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
-// import RecentLivestreamsGrid from "./RecentLivestreamsGrid"
+import RecentLivestreamsGrid from "./RecentLivestreamsGrid"
 import { StreamsSection } from "./StreamsSection"
 
 const styles = sxStyles({
@@ -317,13 +317,11 @@ const NextLiveStreamsWithFilter = ({
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
 
-         {/* Temporarily commented out to test build
          {shouldShowRecentStreams && (
             <Container maxWidth="xl" sx={styles.recentStreamsContainer}>
                <RecentLivestreamsGrid />
             </Container>
          )}
-         */}
 
          {Boolean(isValidating) && (
             <Box sx={styles.loader}>
