@@ -45,7 +45,7 @@ const RecentLivestreamsGrid = () => {
          
          <Grid container spacing={2} sx={styles.grid}>
             {recentLivestreams.map((livestream, index) => (
-               <Grid key={livestream.id} xs={12} sm={6} md={4} lg={4} xl={4} item>
+               <Grid key={livestream.id} item xs={12} sm={6} md={4} lg={4} xl={4}>
                   <InView triggerOnce>
                      {({ inView, ref }) =>
                         inView ? (
