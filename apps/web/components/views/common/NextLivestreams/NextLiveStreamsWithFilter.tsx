@@ -58,9 +58,6 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
    },
-   recentStreamsContainer: {
-      px: { xs: 2, md: 3 },
-   },
 })
 
 const getQueryVariables = (query: ParsedUrlQuery) => {
