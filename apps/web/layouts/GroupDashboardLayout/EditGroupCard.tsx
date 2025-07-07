@@ -41,7 +41,7 @@ const EditGroupCard = () => {
             size={80}
          >
             <HoverOverlay
-               href={`/group/${group.id}/admin/edit`}
+               href={`/group/${group.id}/admin/settings/general`}
                icon={<HoverIcon fontSize="large" />}
             />
          </CircularLogo>
