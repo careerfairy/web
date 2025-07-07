@@ -16,11 +16,13 @@ import { AnalyticsIcon } from "components/views/common/icons/AnalyticsIcon"
 import { DashboardIcon } from "components/views/common/icons/DashboardIcon"
 import { JobsIcon } from "components/views/common/icons/JobsIcon"
 import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
 import NavList from "../common/NavList"
 import { INavLink } from "../types"
 import ATSStatus from "./ATSStatus"
 import { CompanyProfileStatus } from "./CompanyProfileStatus"
+import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 import { useGroup } from "./index"
 
 const BASE_HREF_PATH = "group"
@@ -28,11 +30,19 @@ const BASE_PARAM = "[groupId]"
 
 const GroupNavList = () => {
    const { group, shrunkLeftMenuIsActive } = useGroup()
+   const { setLeftDrawer } = useGroupDashboard()
+   const isMobile = useIsMobile()
 
    const featureFlags = useFeatureFlags()
 
    const hasAtsIntegration =
       featureFlags.atsAdminPageFlag || group.atsAdminPageFlag
+
+   const handleMobileNavigate = () => {
+      if (isMobile) {
+         setLeftDrawer(false)
+      }
+   }
 
    const navLinks = useMemo(() => {
       // Declare hrefs here if you are using them in multiple places
@@ -129,7 +139,7 @@ const GroupNavList = () => {
       }))
    }, [group, hasAtsIntegration, shrunkLeftMenuIsActive])
 
-   return <NavList links={navLinks} />
+   return <NavList links={navLinks} onMobileNavigate={handleMobileNavigate} />
 }
 
 const SuspensefulATSStatus = ({ groupId }: { groupId: string }) => {

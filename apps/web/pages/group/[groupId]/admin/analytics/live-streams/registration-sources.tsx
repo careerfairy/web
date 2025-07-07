@@ -1,15 +1,9 @@
-import { LivestreamAnalyticsNavigationTabs } from "components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
-import AnalyticsRegistrationSourcesPageContent from "components/views/group/admin/analytics-new/registration-sources"
 import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
 import { ReactElement } from "react"
+import RegistrationSourcesPageContent from "../../../../../../components/views/group/admin/analytics-new/registration-sources"
 
 const RegistrationSourcesPage = () => {
-   return (
-      <>
-         <LivestreamAnalyticsNavigationTabs />
-         <AnalyticsRegistrationSourcesPageContent />
-      </>
-   )
+   return <RegistrationSourcesPageContent />
 }
 
 RegistrationSourcesPage.getLayout = function getLayout(page: ReactElement) {

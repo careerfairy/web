@@ -1,15 +1,9 @@
 import AnalyticsGeneralPageContent from "components/views/group/admin/analytics-new/general"
-import { LivestreamAnalyticsNavigationTabs } from "components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
 import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
 import { ReactElement } from "react"
 
 const LivestreamPage = () => {
-   return (
-      <>
-         <LivestreamAnalyticsNavigationTabs />
-         <AnalyticsGeneralPageContent />
-      </>
-   )
+   return <AnalyticsGeneralPageContent />
 }
 
 LivestreamPage.getLayout = function getLayout(page: ReactElement) {

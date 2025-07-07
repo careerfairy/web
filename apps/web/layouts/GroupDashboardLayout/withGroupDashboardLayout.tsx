@@ -1,5 +1,6 @@
 import { useRouter } from "next/router"
 import { ReactElement, ReactNode } from "react"
+import { LivestreamAnalyticsNavigationTabs } from "../../components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
 import DashboardHead from "./DashboardHead"
 import GroupDashboardLayout from "./index"
 import { SubNavigationTabs } from "./SubNavigationTabs"
@@ -37,6 +38,11 @@ export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
             ? titleComponent(router)
             : titleComponent
 
+      // Check if we're on analytics live stream pages
+      const isAnalyticsLiveStreamPage = router.pathname.includes(
+         "/admin/analytics/live-streams"
+      )
+
       const layoutContent = (
          <GroupDashboardLayout
             titleComponent={resolvedTitleComponent}
@@ -51,6 +57,9 @@ export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
             )}
             {Boolean(subNavigationFor) && (
                <SubNavigationTabs showSubNavigationFor={subNavigationFor} />
+            )}
+            {Boolean(isAnalyticsLiveStreamPage) && (
+               <LivestreamAnalyticsNavigationTabs />
             )}
             {page}
          </GroupDashboardLayout>
