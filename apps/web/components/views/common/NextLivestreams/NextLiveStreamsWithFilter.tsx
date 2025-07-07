@@ -31,6 +31,7 @@ import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
+import RecentLivestreamsGrid from "./RecentLivestreamsGrid"
 import { StreamsSection } from "./StreamsSection"
 
 const styles = sxStyles({
@@ -56,6 +57,9 @@ const styles = sxStyles({
    loader: {
       display: "flex",
       justifyContent: "center",
+   },
+   recentStreamsContainer: {
+      px: { xs: 2, md: 3 },
    },
 })
 
@@ -199,6 +203,16 @@ const NextLiveStreamsWithFilter = ({
       }
    }, [inView, setSize])
 
+   // Check if we should show recent livestreams grid
+   const shouldShowRecentStreams = useMemo(() => {
+      return (
+         initialTabValue === "upcomingEvents" && 
+         !hasAppliedFilters && 
+         !inputValue && 
+         infiniteLivestreams.length < 6
+      )
+   }, [initialTabValue, hasAppliedFilters, inputValue, infiniteLivestreams.length])
+
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
          <Grid xs={12} mt={4} mx={1} item>
@@ -302,6 +316,13 @@ const NextLiveStreamsWithFilter = ({
             minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
+
+         {shouldShowRecentStreams && (
+            <Container maxWidth="xl" sx={styles.recentStreamsContainer}>
+               <RecentLivestreamsGrid />
+            </Container>
+         )}
+
          {Boolean(isValidating) && (
             <Box sx={styles.loader}>
                <CircularProgress />
