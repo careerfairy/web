@@ -17,6 +17,11 @@ interface GroupDashboardLayoutProps {
    wrapper?: (children: ReactElement) => ReactElement
 }
 
+/**
+ * Higher-Order Component that enables Next.js getLayout pattern for admin pages,
+ * eliminating layout flicker during navigation while supporting complex context
+ * requirements through an optional wrapper parameter.
+ */
 export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
    const LayoutWrapper = (page: ReactElement) => {
       const {
