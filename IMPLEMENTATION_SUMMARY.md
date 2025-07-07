@@ -16,91 +16,106 @@ This PR improves the user experience on the CareerFairy platform when there aren
 
 #### Next Live Streams Page (`/next-livestreams`)
 - **File:** `apps/web/components/views/common/NextLivestreams/StreamsSection/index.js`
-- **Change:** Added logic to calculate `actualMinimum` based on upcoming livestreams count
-- **Effect:** No more placeholder cards when there are less than 4 upcoming streams
+- **Change:** Modified the `formatLivestreamsEvents` call to pass `0` as minimum when `events?.length < 4`
+- **Effect:** No more placeholder cards in the upcoming live streams section
 
-### 2. Recent Live Streams Section
+### 2. Add "Recent live streams" Section
 
 **When there are less than 6 upcoming live streams on `/next-livestreams`:**
 
-#### New Custom Hook
+#### New Hook Created
 - **File:** `apps/web/components/custom-hook/live-stream/useRecentPastLivestreams.ts`
-- **Purpose:** Fetches the 9 most recent past livestreams
-- **Query:** Orders by `start` date descending, filters out test/hidden streams
+- **Purpose:** Fetches the 9 most recent past live streams
+- **Features:** 
+  - Uses SWR for caching and performance
+  - Filters for ended, non-test, non-hidden streams
+  - Orders by start date descending
+  - Configurable limit (default 9)
+  - Proper error handling with notifications
 
-#### NextLiveStreamsWithFilter Component
+#### Next Live Streams Page Enhancement
 - **File:** `apps/web/components/views/common/NextLivestreams/NextLiveStreamsWithFilter.tsx`
-- **Added Features:**
-  - Import and use `useRecentPastLivestreams` hook
-  - Conditional rendering logic for the new section
+- **New Section:** Added "Recent live streams" section with:
   - 1px divider with `neutral[100]` color
-  - "Recent live streams" title with 16px spacing
-  - Grid display using existing `GroupStreams` component
-  - "More to watch" button with ChevronRight icon from react-feather
+  - "Recent live streams" title with proper typography
+  - Grid of 9 most recent past live streams using `GroupStreams` component
+  - Consistent spacing and margins matching existing sections
+  - 16px spacing between title and grid
 
-#### Styling & Layout
-- **Divider:** 1px border with `theme.palette.neutral[100]` color
-- **Button:** Stroke `neutral[200]`, text `neutral[600]`, no fill, responsive width
-- **Spacing:** Consistent margins matching existing grid layout
-- **Icon:** ChevronRight from react-feather (16px size)
+#### "More to watch" Button
+- **Styling:** 
+  - Stroke color: `neutral[200]`
+  - Text color: `neutral[600]`
+  - No fill color (transparent background)
+  - Hover state: `neutral[50]` background
+  - ChevronRight icon from react-feather
+- **Functionality:** Redirects to `/past-livestreams`
+- **Responsive:** Full width with proper text transform
 
 ### 3. Conditional Display Logic
 
-The Recent live streams section only shows when:
-- User is on the upcoming events tab (`initialTabValue === "upcomingEvents"`)
+The "Recent live streams" section only shows when:
+- On the upcoming events tab (`initialTabValue === "upcomingEvents"`)
 - Less than 6 upcoming live streams
-- No search filters applied
-- No search input text
-- Recent past livestreams are available
+- No filters applied
+- No search input
+- At least 1 recent past live stream available
 
-### 4. Build Fixes Applied
+## Technical Implementation Details
 
-**Issues Resolved:**
-- **Missing Import:** Added `ChevronRight` import from `react-feather`
-- **Type Error:** Fixed `currentGroup` prop for `StreamsSection` component (passed `null` instead of empty object)
-- **Component Reference:** Updated button icon to use `ChevronRight` with proper sizing
+### Import Additions
+- Added `ChevronRight` import from `react-feather`
+- Added `useRecentPastLivestreams` hook import
+- Added Material-UI components: `Divider`, `Button`
 
-## Technical Details
-
-### Dependencies
-- Uses existing `GroupStreams` component for consistent card display
-- Leverages `RecordingCard` components from the past live streams page
-- Utilizes Material UI components for styling consistency
-- Implements SWR for efficient data fetching
-- Uses react-feather icons for consistency with existing UI
+### Styling
+- Added comprehensive sx styles for the new section
+- Proper theme integration with neutral color palette
+- Responsive design considerations
+- Consistent spacing with existing components
 
 ### Performance Considerations
-- Hook only fetches when needed (9 items limit)
-- Conditional rendering prevents unnecessary DOM elements
-- Reuses existing components to maintain bundle size
+- Used SWR for efficient data fetching and caching
+- Lazy loading with conditional rendering
+- Proper memoization of computed values
 
-### Responsive Design
-- Button adapts to page width
-- Spacing adjusts for mobile/desktop breakpoints
-- Maintains existing responsive behavior of stream cards
+## Build Fixes Applied
 
-### Build & Compatibility
-- ✅ TypeScript compilation fixed
-- ✅ All imports properly resolved
-- ✅ Component props correctly typed
-- ✅ No breaking changes to existing APIs
+### Issue: Missing ChevronRight Import
+- **Problem:** ChevronRight component was used but not imported
+- **Fix:** Added ChevronRight to the react-feather import statement
+- **Result:** Resolved TypeScript compilation error
+
+### Issue: Component Props
+- **Problem:** StreamsSection component missing currentGroup prop
+- **Fix:** Added `currentGroup={null}` to StreamsSection props
+- **Result:** Resolved TypeScript prop validation error
 
 ## Files Modified
-
 1. `apps/web/components/views/portal/events-preview/ComingUpNextEvents.tsx`
 2. `apps/web/components/views/common/NextLivestreams/StreamsSection/index.js`
 3. `apps/web/components/views/common/NextLivestreams/NextLiveStreamsWithFilter.tsx`
 4. `apps/web/components/custom-hook/live-stream/useRecentPastLivestreams.ts` (new file)
 
 ## Testing Recommendations
+- Test with various numbers of upcoming streams (0-10)
+- Verify responsive behavior on mobile and desktop
+- Test button navigation to past livestreams page
+- Verify proper loading states and error handling
+- Test with and without filters applied
 
-1. **Portal Page:** Test with < 4 upcoming streams to verify placeholder removal
-2. **Next Live Streams Page:** Test with < 4 upcoming streams for placeholder removal
-3. **Recent Section:** Test with < 6 upcoming streams to verify section appears
-4. **Responsive:** Test button and layout on mobile/tablet/desktop
-5. **Navigation:** Verify "More to watch" button redirects to `/past-livestreams`
-6. **Edge Cases:** Test with no recent streams, no upcoming streams, etc.
-7. **Build:** Verify TypeScript compilation and linting passes
+## Accessibility & UX
+- Proper semantic HTML structure
+- Keyboard navigation support
+- Screen reader friendly
+- Consistent visual hierarchy
+- Clear call-to-action with descriptive button text
+
+## Performance Impact
+- Minimal: Only fetches data when needed
+- Cached responses via SWR
+- Conditional rendering reduces unnecessary computations
+- Leverages existing components for consistency
 
 ## Deployment Notes
 
