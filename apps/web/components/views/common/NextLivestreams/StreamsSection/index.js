@@ -1,10 +1,9 @@
-import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
-import { isLoaded } from "react-redux-firebase"
-import NextLivestreams from "../NextLivestreams"
 import { Box, CircularProgress } from "@mui/material"
 import * as PropTypes from "prop-types"
-import React from "react"
+import { isLoaded } from "react-redux-firebase"
+import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
 import { formatLivestreamsEvents } from "../../../portal/events-preview/utils"
+import NextLivestreams from "../NextLivestreams"
 
 const styles = {
    loaderWrapper: {
@@ -27,6 +26,9 @@ export function StreamsSection({
    minimumUpcomingStreams = 6,
    noResultsComponent,
 }) {
+   // Calculate the actual minimum to pass based on the number of upcoming livestreams
+   const actualMinimum = upcomingLivestreams?.length < 4 ? 0 : minimumUpcomingStreams
+
    return (
       <Box sx={styles.wrapper}>
          <SwipeablePanel value={value} index={"upcomingEvents"}>
@@ -35,7 +37,7 @@ export function StreamsSection({
                   listenToUpcoming={listenToUpcoming}
                   livestreams={formatLivestreamsEvents(
                      upcomingLivestreams,
-                     minimumUpcomingStreams
+                     actualMinimum
                   )}
                   currentGroup={currentGroup}
                   noResultsComponent={noResultsComponent}

@@ -3,9 +3,11 @@ import { LIVESTREAM_REPLICAS } from "@careerfairy/shared-lib/livestreams/search"
 import { queryParamToArr } from "@careerfairy/shared-lib/utils"
 import {
    Box,
+   Button,
    Card,
    CircularProgress,
    Container,
+   Divider,
    Grid,
    Typography,
 } from "@mui/material"
@@ -13,6 +15,7 @@ import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import { useRecentPastLivestreams } from "components/custom-hook/live-stream/useRecentPastLivestreams"
 import { isInIframe } from "components/helperFunctions/HelperFunctions"
 import { usePartnership } from "HOCs/PartnershipProvider"
 import { useRouter } from "next/router"
@@ -30,6 +33,7 @@ import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
+import GroupStreams from "./GroupStreams/GroupStreams"
 import NoResultsMessage from "./NoResultsMessage"
 import { StreamsSection } from "./StreamsSection"
 
@@ -56,6 +60,30 @@ const styles = sxStyles({
    loader: {
       display: "flex",
       justifyContent: "center",
+   },
+   recentStreamsSection: {
+      mt: 4,
+      px: { xs: 2, md: 3 },
+   },
+   divider: {
+      my: 3,
+      borderColor: (theme) => theme.palette.neutral[100],
+   },
+   recentStreamsTitle: {
+      mb: 2,
+      fontWeight: 600,
+      color: (theme) => theme.palette.neutral[800],
+   },
+   moreToWatchButton: {
+      mt: 3,
+      width: "100%",
+      border: (theme) => `1px solid ${theme.palette.neutral[200]}`,
+      color: (theme) => theme.palette.neutral[600],
+      backgroundColor: "transparent",
+      textTransform: "none",
+      "&:hover": {
+         backgroundColor: (theme) => theme.palette.neutral[50],
+      },
    },
 })
 
@@ -188,6 +216,26 @@ const NextLiveStreamsWithFilter = ({
       return data?.flatMap((page) => page.deserializedHits) || []
    }, [data])
 
+   // Fetch recent past livestreams for the new section
+   const { data: recentPastLivestreams } = useRecentPastLivestreams({ limit: 9 })
+
+   // Check if we should show the recent live streams section
+   const shouldShowRecentStreams = useMemo(() => {
+      return (
+         initialTabValue === "upcomingEvents" &&
+         infiniteLivestreams.length < 6 &&
+         !hasAppliedFilters &&
+         !inputValue &&
+         recentPastLivestreams?.length > 0
+      )
+   }, [
+      initialTabValue,
+      infiniteLivestreams.length,
+      hasAppliedFilters,
+      inputValue,
+      recentPastLivestreams?.length,
+   ])
+
    const isValidatingRef = useRef(isValidating)
    isValidatingRef.current = isValidating
 
@@ -302,6 +350,35 @@ const NextLiveStreamsWithFilter = ({
             minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
+
+         {shouldShowRecentStreams && (
+            <Container maxWidth="xl" disableGutters>
+               <Box sx={styles.recentStreamsSection}>
+                  <Divider sx={styles.divider} />
+                  <Typography variant="h6" sx={styles.recentStreamsTitle}>
+                     Recent live streams
+                  </Typography>
+                  <GroupStreams
+                     groupData={{}}
+                     livestreams={recentPastLivestreams}
+                     mobile={isMobile}
+                     searching={false}
+                     listenToUpcoming={false}
+                     isPastLivestreams={true}
+                  />
+                  <Button
+                     component={Link}
+                     href="/past-livestreams"
+                     variant="outlined"
+                     endIcon={<ChevronRightIcon />}
+                     sx={styles.moreToWatchButton}
+                  >
+                     More to watch
+                  </Button>
+               </Box>
+            </Container>
+         )}
+
          {Boolean(isValidating) && (
             <Box sx={styles.loader}>
                <CircularProgress />

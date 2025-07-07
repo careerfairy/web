@@ -89,7 +89,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
          id={"upcoming-events"}
          title={COMING_UP_NEXT_EVENT_TITLE}
          location={"portal-next-livestreams-carousel"}
-         events={formatLivestreamsEvents(localEvents)}
+         events={formatLivestreamsEvents(localEvents, localEvents?.length < 4 ? 0 : 4)}
          seeMoreLink={"/next-livestreams"}
          isRecommended
          styling={defaultStyling}
