@@ -66,20 +66,14 @@ const EVENT_PLACEHOLDERS = [
 const MIN_LIMITS_EVENT = 4
 
 /**
- * Validate if we have enough events, more than the *MIN_LIMITS_EVENT*
- * if yes, render that events
- * if not, create *numberOfMissingEvents* placeholder events to fulfill the *MIN_LIMITS_EVENT*
+ * Return the events without adding placeholder cards
  */
 export const formatLivestreamsEvents = (
    events: LivestreamEvent[] = [],
    minimum: number = MIN_LIMITS_EVENT
 ): LivestreamEvent[] => {
-   const numberOfMissingEvents = minimum - events.length
-
-   if (numberOfMissingEvents < 0) {
-      return events
-   }
-   return [...events, ...createPlaceHolderEvents(numberOfMissingEvents)]
+   // Simply return the events without adding placeholders
+   return events
 }
 
 /**
