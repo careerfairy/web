@@ -13,6 +13,11 @@ const styles = {
    },
    wrapper: {
       minHeight: "80vh",
+      display: "flex",
+      flexDirection: "column",
+   },
+   panelContainer: {
+      flex: 1,
    },
 }
 
@@ -27,7 +32,11 @@ export function StreamsSection({
 }) {
    return (
       <Box sx={styles.wrapper}>
-         <SwipeablePanel value={value} index={"upcomingEvents"}>
+         <SwipeablePanel 
+            value={value} 
+            index={"upcomingEvents"}
+            sx={styles.panelContainer}
+         >
             {isLoaded(upcomingLivestreams) ? (
                <>
                   <NextLivestreams
@@ -56,7 +65,11 @@ export function StreamsSection({
                </Box>
             )}
          </SwipeablePanel>
-         <SwipeablePanel value={value} index={"pastEvents"}>
+         <SwipeablePanel 
+            value={value} 
+            index={"pastEvents"}
+            sx={styles.panelContainer}
+         >
             {isLoaded(pastLivestreams) ? (
                <NextLivestreams
                   listenToUpcoming={listenToUpcoming}

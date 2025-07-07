@@ -153,7 +153,11 @@ const GroupStreams = ({
 
    return (
       <>
-         <Box sx={{ p: { xs: 0, md: 2 }, width: "100%" }} ref={autoPlayRef}>
+         <Box sx={{ 
+            p: { xs: 0, md: 2 }, 
+            px: { xs: 2, md: 3 },
+            width: "100%" 
+         }} ref={autoPlayRef}>
             <Grid container spacing={2}>
                {groupData.id || listenToUpcoming ? (
                   searching ? (
