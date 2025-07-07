@@ -1,4 +1,5 @@
 import type { SvgIconProps } from "@mui/material"
+import { type LinkProps } from "next/link"
 import type { FC, ReactNode } from "react"
 import type { Icon } from "react-feather"
 
@@ -29,4 +30,4 @@ export type INavLink = {
       children: ReactNode
    }>
    disabled?: boolean
-}
+} & LinkProps

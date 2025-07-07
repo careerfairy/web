@@ -39,6 +39,7 @@ export const GroupBottomLinks = () => {
                baseTextColor={"text.primary"}
                title={shrunkLeftMenuIsActive ? "" : "Settings"}
                Icon={SettingsIcon}
+               shallow
             />
             <NavLink
                href={supportPageLink}

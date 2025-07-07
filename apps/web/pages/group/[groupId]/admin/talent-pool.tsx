@@ -1,15 +1,16 @@
 import AnalyticsTalentPoolPageContent from "components/views/group/admin/analytics-new/talent-pool"
-import GroupDashboardLayout from "layouts/GroupDashboardLayout"
-import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
+import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
+import { ReactElement } from "react"
 
 const TalentPoolPage = () => {
-   return (
-      <GroupDashboardLayout titleComponent={"Talent Pool"}>
-         <DashboardHead title="CareerFairy | Talent Pool of" />
+   return <AnalyticsTalentPoolPageContent />
+}
 
-         <AnalyticsTalentPoolPageContent />
-      </GroupDashboardLayout>
-   )
+TalentPoolPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Talent Pool",
+      dashboardHeadTitle: "CareerFairy | Talent Pool of",
+   })(page)
 }
 
 export default TalentPoolPage

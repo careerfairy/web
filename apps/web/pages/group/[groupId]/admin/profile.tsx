@@ -1,14 +1,16 @@
+import { ReactElement } from "react"
 import Profile from "../../../../components/views/admin/profile"
-import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
+import { withGroupDashboardLayout } from "../../../../layouts/GroupDashboardLayout/withGroupDashboardLayout"
 
 const AdminProfile = () => {
-   return (
-      <GroupDashboardLayout titleComponent={"My Profile"}>
-         <DashboardHead title="CareerFairy | My Profile" />
-         <Profile />
-      </GroupDashboardLayout>
-   )
+   return <Profile />
+}
+
+AdminProfile.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "My Profile",
+      dashboardHeadTitle: "CareerFairy | My Profile",
+   })(page)
 }
 
 export default AdminProfile

@@ -1,18 +1,23 @@
 import { LivestreamAnalyticsNavigationTabs } from "components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
 import AnalyticsRegistrationSourcesPageContent from "components/views/group/admin/analytics-new/registration-sources"
-import GroupDashboardLayout from "layouts/GroupDashboardLayout"
-import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
-import { SubNavigationTabs } from "layouts/GroupDashboardLayout/SubNavigationTabs"
+import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
+import { ReactElement } from "react"
 
 const RegistrationSourcesPage = () => {
    return (
-      <GroupDashboardLayout titleComponent={"Analytics"}>
-         <DashboardHead title="CareerFairy | Registration Sources of" />
-         <SubNavigationTabs showSubNavigationFor="analytics" />
+      <>
          <LivestreamAnalyticsNavigationTabs />
          <AnalyticsRegistrationSourcesPageContent />
-      </GroupDashboardLayout>
+      </>
    )
+}
+
+RegistrationSourcesPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Analytics",
+      dashboardHeadTitle: "CareerFairy | Registration Sources of",
+      subNavigationFor: "analytics",
+   })(page)
 }
 
 export default RegistrationSourcesPage
