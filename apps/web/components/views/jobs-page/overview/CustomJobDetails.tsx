@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CustomJobDetailsDialog, {
@@ -70,18 +70,9 @@ export const CustomJobDetails = () => {
       jobNotFound,
       setSelectedJob,
       setJobDetailsDialogOpen,
-      isLoadingJobs,
    } = useJobsOverviewContext()
 
    const [isNotFoundDialogOpen, setIsNotFoundDialogOpen] = useState(jobNotFound)
-
-   if (!isMobile && isLoadingJobs) {
-      return (
-         <Box sx={styles.loadingWrapper}>
-            <CircularProgress />
-         </Box>
-      )
-   }
 
    return (
       <Box sx={styles.root}>

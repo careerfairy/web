@@ -254,12 +254,12 @@ export const JobsOverviewContextProvider = ({
 
       const hasMore = searchResultsCount > infiniteJobs?.length
 
-      const effectiveJob =
-         selectedJob ||
-         (hasFilters && infiniteJobs?.length > 0
-            ? infiniteJobs?.at(0)
-            : recommendedJobs?.at(0)) ||
-         serverJob
+      const effectiveJob = jobNotFound
+         ? undefined
+         : selectedJob ||
+           (hasFilters && infiniteJobs?.length > 0
+              ? infiniteJobs?.at(0)
+              : recommendedJobs?.at(0))
 
       const isLoadingJobs =
          isLoadingRecommendedJobs || isValidating || isLoading
@@ -322,7 +322,6 @@ export const JobsOverviewContextProvider = ({
       recommendedJobs,
       isLoadingRecommendedJobs,
       hasFilters,
-      serverJob,
       isLoading,
    ])
 
