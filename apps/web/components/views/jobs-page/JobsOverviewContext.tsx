@@ -5,11 +5,13 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
 import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
+import { useAuth } from "HOCs/AuthProvider"
 import { useLocationSearch } from "components/custom-hook/countries/useLocationSearch"
 import {
    FilterOptions,
    useCustomJobSearchAlgolia,
 } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import { useUserRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { customJobRepo } from "data/RepositoryInstances"
 import { NextRouter, useRouter } from "next/router"
@@ -52,6 +54,8 @@ type JobsOverviewContextType = {
    setJobDetailsDialogOpen: (open: boolean) => void
    selectedLocationsNames: string[]
    userCountryCode?: string
+   recommendedJobs: CustomJob[]
+   isLoadingRecommendedJobs: boolean
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -85,7 +89,9 @@ export const JobsOverviewContextProvider = ({
    numberOfJobs,
    userCountryCode,
 }: JobsOverviewContextProviderType) => {
+   const { authenticatedUser } = useAuth()
    const router = useRouter()
+   const [isFirstRender, setIsFirstRender] = useState(true)
    const searchParams = getSearchParams(router.query)
    const isMobile = useIsMobile()
    const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
@@ -126,6 +132,13 @@ export const JobsOverviewContextProvider = ({
       ]
    )
 
+   const hasFilters = Boolean(
+      searchParams?.location?.length ||
+         searchParams?.businessFunctionTags?.length ||
+         searchParams?.jobTypes?.length ||
+         searchParams?.term?.length
+   )
+
    const { data, isValidating, setSize } = useCustomJobSearchAlgolia(
       searchParams.term,
       {
@@ -135,6 +148,14 @@ export const JobsOverviewContextProvider = ({
          initialData: serverCustomJobs,
       }
    )
+
+   const { data: recommendedJobs, isLoading: isLoadingRecommendedJobs } =
+      useUserRecommendedJobs({
+         userAuthId: authenticatedUser?.uid,
+         limit: 30,
+         countryCode: userCountryCode,
+         initialData: serverCustomJobs,
+      })
 
    const infiniteJobs = useMemo(() => {
       return data?.flatMap((page) => page.deserializedHits) ?? []
@@ -168,38 +189,56 @@ export const JobsOverviewContextProvider = ({
       [router]
    )
 
+   const handleFilterChange = useCallback(
+      (param: keyof SearchParams, value: string | string[]) => {
+         const query = { ...router.query }
+         if (!isFirstRender) {
+            delete query.jobId
+         }
+         if (
+            value &&
+            (Array.isArray(value) ? value.length > 0 : value !== "")
+         ) {
+            query[param] = value
+         } else {
+            delete query[param]
+         }
+
+         router
+            .push(
+               {
+                  pathname: router.pathname,
+                  query: query,
+               },
+               undefined,
+               { shallow: true }
+            )
+            .then(() => {
+               setIsFirstRender(false)
+            })
+      },
+      [router, isFirstRender]
+   )
+
    const handleLocationChange = useCallback(
-      (locations: string[]) => handleQueryChange(router, "location", locations),
-      [router]
+      (locations: string[]) => handleFilterChange("location", locations),
+      [handleFilterChange]
    )
 
    const handleBusinessFunctionTagsChange = useCallback(
       (businessFunctionTags: string[]) =>
-         handleQueryChange(
-            router,
-            "businessFunctionTags",
-            businessFunctionTags
-         ),
-      [router]
+         handleFilterChange("businessFunctionTags", businessFunctionTags),
+      [handleFilterChange]
    )
 
    const handleJobTypesChange = useCallback(
-      (jobTypes: string[]) => handleQueryChange(router, "jobTypes", jobTypes),
-      [router]
+      (jobTypes: string[]) => handleFilterChange("jobTypes", jobTypes),
+      [handleFilterChange]
    )
 
-   useDebounce(() => handleQueryChange(router, "term", searchTerm), 300, [
-      searchTerm,
-   ])
+   useDebounce(() => handleFilterChange("term", searchTerm), 300, [searchTerm])
 
    const value: JobsOverviewContextType = useMemo(() => {
-      const hasFilters = Boolean(
-         searchParams?.location?.length ||
-            searchParams?.businessFunctionTags?.length ||
-            searchParams?.jobTypes?.length ||
-            searchParams?.term?.length
-      )
-
       const searchResultsCount = hasFilters
          ? data?.at(0)?.nbHits ?? 0
          : numberOfJobs ?? 0
@@ -214,8 +253,13 @@ export const JobsOverviewContextProvider = ({
 
       const hasMore = searchResultsCount > infiniteJobs?.length
 
+      const effectiveJob =
+         selectedJob ||
+         (hasFilters ? infiniteJobs?.at(0) : recommendedJobs?.at(0)) ||
+         serverJob
+
       return {
-         selectedJob: selectedJob,
+         selectedJob: effectiveJob,
          setSelectedJob: handleSelectedJobChange,
          searchTerm,
          setSearchTerm,
@@ -246,6 +290,8 @@ export const JobsOverviewContextProvider = ({
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
          selectedLocationsNames,
          userCountryCode,
+         recommendedJobs,
+         isLoadingRecommendedJobs,
       }
    }, [
       infiniteJobs,
@@ -266,19 +312,14 @@ export const JobsOverviewContextProvider = ({
       selectedLocationsNames,
       numberOfJobs,
       userCountryCode,
+      recommendedJobs,
+      isLoadingRecommendedJobs,
+      hasFilters,
+      serverJob,
    ])
 
    useEffect(() => {
-      if (!router.query.jobId) {
-         setSelectedJob(undefined)
-         setIsJobDetailsDialogOpen(false)
-      }
-
-      if (router.query.jobId) {
-         handleJobIdChange(router.query.jobId as string)
-      } else if (!isMobile) {
-         setSelectedJob(serverJob)
-      }
+      handleJobIdChange(router.query.jobId as string)
    }, [router.query.jobId, handleJobIdChange, serverJob, isMobile])
 
    useEffect(() => {

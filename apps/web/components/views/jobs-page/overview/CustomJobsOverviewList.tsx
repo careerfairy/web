@@ -3,11 +3,9 @@ import { useEffect, useMemo, useRef } from "react"
 
 import { Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import { useUserRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import CircularLoader from "components/views/loader/CircularLoader"
-import { RECOMMENDED_JOBS_LIMIT } from "pages/jobs/[[...livestreamDialog]]"
 import { sxStyles } from "types/commonTypes"
 import { scrollTop } from "util/CommonUtil"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
@@ -111,16 +109,11 @@ const OtherJobs = () => {
 }
 
 const RecommendedJobs = () => {
-   const { isLoadingAuth, authenticatedUser } = useAuth()
-   const { userCountryCode } = useJobsOverviewContext()
-   const { data: recommendedJobs, isLoading: isLoadingRecommendedJobs } =
-      useUserRecommendedJobs({
-         userAuthId: authenticatedUser?.uid,
-         limit: RECOMMENDED_JOBS_LIMIT,
-         countryCode: userCountryCode,
-      })
+   const { isLoadingAuth } = useAuth()
+   const { recommendedJobs, isLoadingRecommendedJobs } =
+      useJobsOverviewContext()
 
-   if (isLoadingRecommendedJobs || isLoadingAuth)
+   if (isLoadingAuth || isLoadingRecommendedJobs)
       return <CircularLoader sx={{ mt: 2 }} />
 
    return <CustomJobsList customJobs={recommendedJobs} />
