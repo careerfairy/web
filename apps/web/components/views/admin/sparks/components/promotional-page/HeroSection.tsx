@@ -11,7 +11,7 @@ import {
    StyledBrandAwarenessCard,
    StyledCardBenefits,
    StyledFullCard,
-   StyledHeroSection,
+   StyledHeroContent,
    StyledPricingSection,
    StyledProgressHeader,
    StyledProgressIcon,
@@ -22,7 +22,7 @@ import {
 
 const HeroSection = () => {
    return (
-      <StyledHeroSection>
+      <StyledHeroContent>
          {/* Header */}
          <Stack alignItems="center" width="100%">
             <Typography
@@ -204,7 +204,7 @@ const HeroSection = () => {
                </Button>
             </StyledFullCard>
          </StyledPricingSection>
-      </StyledHeroSection>
+      </StyledHeroContent>
    )
 }
 
