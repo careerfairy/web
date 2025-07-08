@@ -56,6 +56,7 @@ type JobsOverviewContextType = {
    userCountryCode?: string
    recommendedJobs: CustomJob[]
    isLoadingRecommendedJobs: boolean
+   isLoadingJobs: boolean
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -139,7 +140,7 @@ export const JobsOverviewContextProvider = ({
          searchParams?.term?.length
    )
 
-   const { data, isValidating, setSize } = useCustomJobSearchAlgolia(
+   const { data, isValidating, setSize, isLoading } = useCustomJobSearchAlgolia(
       searchParams.term,
       {
          filterOptions,
@@ -255,8 +256,13 @@ export const JobsOverviewContextProvider = ({
 
       const effectiveJob =
          selectedJob ||
-         (hasFilters ? infiniteJobs?.at(0) : recommendedJobs?.at(0)) ||
+         (hasFilters && infiniteJobs?.length > 0
+            ? infiniteJobs?.at(0)
+            : recommendedJobs?.at(0)) ||
          serverJob
+
+      const isLoadingJobs =
+         isLoadingRecommendedJobs || isValidating || isLoading
 
       return {
          selectedJob: effectiveJob,
@@ -292,6 +298,7 @@ export const JobsOverviewContextProvider = ({
          userCountryCode,
          recommendedJobs,
          isLoadingRecommendedJobs,
+         isLoadingJobs,
       }
    }, [
       infiniteJobs,
@@ -316,6 +323,7 @@ export const JobsOverviewContextProvider = ({
       isLoadingRecommendedJobs,
       hasFilters,
       serverJob,
+      isLoading,
    ])
 
    useEffect(() => {
