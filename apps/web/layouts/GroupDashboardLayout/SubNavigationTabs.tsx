@@ -1,6 +1,5 @@
 import { Box, Tab, Tabs } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import { useFeatureFlags } from "components/custom-hook/useFeatureFlags"
 import Link from "components/views/common/Link"
 import { useRouter } from "next/router"
 import { Fragment, SyntheticEvent, useCallback, useMemo } from "react"
@@ -40,11 +39,6 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
    const { pathname, push } = useRouter()
    const { group } = useGroup()
 
-   const featureFlags = useFeatureFlags()
-
-   const hasAccessToSparks =
-      featureFlags.sparksAdminPageFlag || group.sparksAdminPageFlag
-
    // Create navigation links based on showSubNavigationFor
    const currentSection = useMemo(() => {
       const BASE_HREF_PATH = "group"
@@ -63,16 +57,12 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
                   pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/live-streams`,
                   title: "Live streams",
                },
-               ...(hasAccessToSparks
-                  ? [
-                       {
-                          id: "sparks",
-                          href: `/${BASE_HREF_PATH}/${group.id}/admin/content/sparks`,
-                          pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/sparks`,
-                          title: "Sparks",
-                       },
-                    ]
-                  : []),
+               {
+                  id: "sparks",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/content/sparks`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/sparks`,
+                  title: "Sparks",
+               },
             ],
          },
          analytics: {
@@ -120,7 +110,7 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
       }
 
       return navigationLookup[showSubNavigationFor]
-   }, [group.id, hasAccessToSparks, showSubNavigationFor])
+   }, [group.id, showSubNavigationFor])
 
    // Determine which tab should be active based on current pathname
    const activeTab = useMemo(() => {
