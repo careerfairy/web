@@ -298,7 +298,7 @@ export const JobsOverviewContextProvider = ({
          userCountryCode,
          recommendedJobs,
          isLoadingRecommendedJobs,
-         isLoadingJobs,
+         isLoadingJobs: isLoadingJobs,
       }
    }, [
       infiniteJobs,
@@ -326,7 +326,14 @@ export const JobsOverviewContextProvider = ({
    ])
 
    useEffect(() => {
-      handleJobIdChange(router.query.jobId as string)
+      if (isMobile) {
+         handleJobIdChange(router.query.jobId as string)
+      }
+
+      if (!isFirstRender && !isMobile) {
+         handleJobIdChange(router.query.jobId as string)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [router.query.jobId, handleJobIdChange, serverJob, isMobile])
 
    useEffect(() => {

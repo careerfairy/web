@@ -78,7 +78,10 @@ export const CustomJobDetails = () => {
       <Box sx={styles.root}>
          <CustomJobNotFoundDialog
             isOpen={Boolean(isNotFoundDialogOpen && isMobile)}
-            handleNotFoundClose={() => setIsNotFoundDialogOpen(false)}
+            handleNotFoundClose={() => {
+               setSelectedJob(undefined)
+               setIsNotFoundDialogOpen(false)
+            }}
          />
          <CustomJobDetailsDialog
             isOpen={jobDetailsDialogOpen}
