@@ -62,6 +62,7 @@ export const CustomJobDetails = () => {
       jobDetailsDialogOpen,
       jobNotFound,
       setSelectedJob,
+      setJobDetailsDialogOpen,
    } = useJobsOverviewContext()
 
    const [isNotFoundDialogOpen, setIsNotFoundDialogOpen] = useState(jobNotFound)
@@ -74,7 +75,10 @@ export const CustomJobDetails = () => {
          />
          <CustomJobDetailsDialog
             isOpen={jobDetailsDialogOpen}
-            onClose={() => setSelectedJob(undefined)}
+            onClose={() => {
+               setSelectedJob(undefined)
+               setJobDetailsDialogOpen(false)
+            }}
             customJobId={selectedJob?.id}
             source={context}
             serverSideCustomJob={selectedJob}

@@ -31,12 +31,10 @@ import {
    sparkRepo,
 } from "data/RepositoryInstances"
 import algoliaRepo from "data/algolia/AlgoliaRepository"
-import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
-import { getUserTokenFromCookie } from "util/serverUtil"
 import SEO from "../../components/util/SEO"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
@@ -179,9 +177,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const { term: queryTerm = "", jobId: queryJobId } = context.query
 
-   const token = getUserTokenFromCookie(context) as any
-   const userAuthId = token?.user_id
-
    const term = queryTerm as string
    const jobId = queryJobId as string
 
@@ -193,12 +188,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       context.query.businessFunctionTags
    )
    const queryJobTypes = getQueryStringArray(context.query.jobTypes)
-
-   const hasFilters =
-      queryLocations.length ||
-      queryBusinessFunctionTags.length ||
-      queryJobTypes.length ||
-      term?.length
 
    const filterOptions = {
       arrayFilters: {
@@ -227,20 +216,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       .map(deserializeAlgoliaSearchResponse)
       .map((job) => job as CustomJob)
 
-   const recommendedJobs = !hasFilters
-      ? await customJobServiceInstance.getRecommendedJobs(
-           RECOMMENDED_JOBS_LIMIT,
-           userAuthId,
-           false,
-           {
-              userCountryCode: userCountryCode,
-           }
-        )
-      : []
-
-   const firstCustomJob = hasFilters
-      ? algoliaCustomJobs?.at(0)
-      : recommendedJobs?.at(0)
+   const firstCustomJob = algoliaCustomJobs?.at(0)
 
    const customJob = jobId
       ? await customJobRepo.getCustomJobById(jobId)
@@ -275,7 +251,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       jobSparks.forEach((spark) => {
          serializedSparks.push(SparkPresenter.serialize(spark))
       })
-      jobEvents.forEach((event) => {
+      jobEvents?.filter(Boolean)?.forEach((event) => {
          livestreamsData.push(LivestreamPresenter.serializeDocument(event))
       })
    }

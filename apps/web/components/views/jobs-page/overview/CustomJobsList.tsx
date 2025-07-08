@@ -37,13 +37,8 @@ type Props = {
 export const CustomJobsList = ({ customJobs }: Props) => {
    const isMobile = useIsMobile()
    const router = useRouter()
-   const {
-      isValidating,
-      nextPage,
-      selectedJob,
-      hasMore,
-      setJobDetailsDialogOpen,
-   } = useJobsOverviewContext()
+   const { isValidating, nextPage, selectedJob, hasMore } =
+      useJobsOverviewContext()
 
    return (
       <CustomInfiniteScroll
@@ -61,11 +56,6 @@ export const CustomJobsList = ({ customJobs }: Props) => {
                         ...router.query,
                         jobId: customJob.id,
                      },
-                  }}
-                  onClick={() => {
-                     if (isMobile) {
-                        setJobDetailsDialogOpen(true)
-                     }
                   }}
                   shallow
                   passHref

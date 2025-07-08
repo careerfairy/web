@@ -102,7 +102,7 @@ type Props = {
 const TAB_CONFIG: TabConfig[] = [
    { id: "overview", label: "Job description" },
    { id: "salary", label: "Salary" },
-   { id: "insidelook", label: "Inside look" },
+   { id: "insidelook", label: "In their words" },
 ]
 
 const CustomJobDetailsView = (props: Props) => {

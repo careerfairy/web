@@ -12,6 +12,10 @@ export type GroupedTags = {
 }
 
 export const BusinessFunctionsTags = {
+   Accounting: {
+      id: "Accounting",
+      name: "Accounting",
+   },
    BusinessDevelopment: {
       id: "BusinessDevelopment",
       name: "Business development",
@@ -27,6 +31,10 @@ export const BusinessFunctionsTags = {
    Finance: {
       id: "Finance",
       name: "Finance",
+   },
+   HumanResources: {
+      id: "HumanResources",
+      name: "Human resources (HR)",
    },
    InformationTechnology: {
       id: "InformationTechnology",
@@ -48,25 +56,17 @@ export const BusinessFunctionsTags = {
       id: "Other",
       name: "Other",
    },
-   ResearchDevelopment: {
-      id: "ResearchDevelopment",
-      name: "Research & development",
-   },
    ProductManagement: {
       id: "ProductManagement",
       name: "Product management",
    },
+   ResearchDevelopment: {
+      id: "ResearchDevelopment",
+      name: "Research & development",
+   },
    SupplyChainLogistics: {
       id: "SupplyChainLogistics",
       name: "Supply chain & logistics",
-   },
-   Accounting: {
-      id: "Accounting",
-      name: "Accounting",
-   },
-   HumanResources: {
-      id: "HumanResources",
-      name: "Human resources (HR)",
    },
 } as const
 
