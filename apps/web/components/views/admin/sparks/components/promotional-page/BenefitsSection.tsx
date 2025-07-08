@@ -11,7 +11,7 @@ import {
 } from "./styles"
 
 const BenefitsSection = () => {
-   const isMobile = useIsMobile("md")
+   const isMobile = useIsMobile()
 
    const [emblaRef, emblaApi] = useEmblaCarousel({
       align: "start",
@@ -319,12 +319,14 @@ const BenefitsSection = () => {
    return (
       <StyledBenefitsSection>
          <Typography
-            variant="h5"
+            variant={isMobile ? "mobileBrandedH3" : "desktopBrandedH4"}
+            component="h3"
             fontWeight={700}
             textAlign="center"
-            color="#3D3D47"
+            color="neutral.800"
+            maxWidth="76%"
          >
-            What Sparks videos can offer you?
+            What&nbsp;Sparks&nbsp;videos can&nbsp;offer&nbsp;you?
          </Typography>
 
          {/* Desktop Grid */}
