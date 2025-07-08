@@ -12,6 +12,7 @@ const styles = sxStyles({
    },
    header: {
       mb: 2, // 16px spacing between title and cards
+      pl: { xs: 2, md: 4 }, // 32px left padding on desktop to match other cards
    },
    title: {
       fontWeight: 600,
