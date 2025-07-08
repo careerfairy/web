@@ -11,24 +11,29 @@ const styles = sxStyles({
       mt: 0, // Spacing handled by parent
    },
    header: {
-      mb: 2, // 16px spacing between title and cards
+      mb: 3, // 24px spacing between title and cards to match design
       pl: { xs: 2, md: 4 }, // 32px left padding on desktop to match other cards
    },
    title: {
       fontWeight: 600,
+      fontSize: "1.5rem", // Match design typography
       color: "text.primary",
    },
    cardsContainer: {
-      p: { xs: 0, md: 2 }, // Match main grid padding
+      px: { xs: 2, md: 4 }, // 32px padding to match other sections
       width: "100%",
    },
    moreButton: {
-      m: 4, // 32px margins on all sides
+      display: "flex",
+      justifyContent: "center",
+      px: { xs: 2, md: 4 }, // Match container padding
+      pt: 4, // 32px top margin
+      pb: 2, // 16px bottom margin
    },
    button: {
       borderRadius: "24px",
       height: "48px",
-      width: "100%",
+      maxWidth: "200px", // Limit button width as shown in design
       textTransform: "none",
       fontWeight: 600,
       borderColor: "neutral.200",
@@ -36,7 +41,7 @@ const styles = sxStyles({
       backgroundColor: "transparent",
       "&:hover": {
          borderColor: "neutral.300",
-         backgroundColor: "transparent",
+         backgroundColor: "rgba(0, 0, 0, 0.04)",
       },
    },
    loader: {
@@ -82,16 +87,9 @@ const RecentLivestreamsSection = ({
          </Box>
 
          <Box sx={styles.cardsContainer}>
-            <Grid container spacing={2}>
+            <Grid container spacing={3}>
                {recentLivestreams.map((livestream, index) => (
-                  <Grid
-                     key={livestream.id}
-                     xs={12}
-                     lsCardsGallery={6}
-                     lg={4}
-                     xl={3}
-                     item
-                  >
+                  <Grid key={livestream.id} xs={12} sm={6} md={4} item>
                      <EventPreviewCard
                         event={{ ...livestream, triGrams: {} }}
                         location={ImpressionLocation.nextLivestreams}
