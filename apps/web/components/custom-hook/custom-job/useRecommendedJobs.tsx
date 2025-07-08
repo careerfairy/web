@@ -52,6 +52,7 @@ export const useUserRecommendedJobs = (config?: Config) => {
          ...reducedRemoteCallsOptions,
          suspense,
          fallbackData: initialData,
+         keepPreviousData: true,
       }
    )
 }
