@@ -104,12 +104,12 @@ export const StyledPricingCard = styled(Card)(({ theme }) => ({
    height: "311px",
    [theme.breakpoints.down("md")]: {
       width: "100%",
-      height: "auto",
    },
 }))
 
 export const StyledTrialCard = styled(StyledPricingCard)({
    background: "linear-gradient(135deg, #26C6DA 0%, #00BFA6 100%)",
+   position: "relative",
 })
 
 export const StyledTrialCardTitle = styled(Typography)(({ theme }) => ({
@@ -117,6 +117,20 @@ export const StyledTrialCardTitle = styled(Typography)(({ theme }) => ({
    fontWeight: 900,
    color: theme.brand.white[100],
    fontStyle: "italic",
+}))
+
+export const StyledTrialCardFreeTag = styled(Box)(() => ({
+   position: "absolute",
+   top: 15,
+   right: -44.773,
+   backgroundColor: "#23546E",
+   color: "white",
+   padding: "4px 12px",
+   borderRadius: "4px",
+   fontSize: "14px",
+   textAlign: "center",
+   width: 175,
+   transform: "rotate(32.189deg)",
 }))
 
 export const StyledCardBenefits = styled(Stack)(({ theme }) => ({
