@@ -1,17 +1,29 @@
 import { CompanyIcon } from "components/views/common/icons"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
    Calendar as CalendarIcon,
-   Search as FindIcon,
    User as ProfileIcon,
-   Smartphone as SmartphoneIcon,
    BarChart2 as StatisticsIcon,
    Film as StreamIcon,
 } from "react-feather"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 
-const initialHeaderLinks = [
+// Type definitions for link objects
+interface AdminLink {
+   href: string
+   title: string
+   basePath?: string
+   icon?: React.ComponentType<any> | (() => React.JSX.Element)
+}
+
+interface UseAdminLinksReturn {
+   drawerBottomLinks: AdminLink[]
+   drawerTopLinks: AdminLink[]
+   headerLinks: AdminLink[]
+}
+
+const initialHeaderLinks: AdminLink[] = [
    {
       href: `/portal`,
       title: "PORTAL",
@@ -21,7 +33,8 @@ const initialHeaderLinks = [
       title: "NEXT LIVE STREAMS",
    },
 ]
-const initialDrawerBottomLinks = [
+
+const initialDrawerBottomLinks: AdminLink[] = [
    {
       href: `https://companies.careerfairy.io`,
       title: "FOR COMPANIES",
@@ -37,26 +50,18 @@ const initialDrawerBottomLinks = [
    },
 ]
 
-const pushNotificationTesters = [
-   "matilde.ramos@careerfairy.io",
-   "goncalo@careerfairy.io",
-   "puzic.sead@gmail.com",
-   "simone@careerfairy.io",
-   "habib@careerfairy.io",
-   "lucas@careerfairy.io",
-   "carlos.rijo@careerfairy.io",
-   "walter.goncalves@careerfairy.io",
-   "amal-thomas.roy@careerfairy.io",
-]
-const useAdminLinks = () => {
+// Removed pushNotificationTesters array as it's no longer needed since push notifications are hidden
+
+const useAdminLinks = (): UseAdminLinksReturn => {
    const { userData } = useAuth()
    const firebase = useFirebaseService()
 
-   const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks)
-   const [drawerBottomLinks, setDrawerBottomLinks] = useState(
+   const [headerLinks, setHeaderLinks] =
+      useState<AdminLink[]>(initialHeaderLinks)
+   const [drawerBottomLinks, setDrawerBottomLinks] = useState<AdminLink[]>(
       initialDrawerBottomLinks
    )
-   const [drawerTopLinks, setDrawerTopLinks] = useState([])
+   const [drawerTopLinks, setDrawerTopLinks] = useState<AdminLink[]>([])
 
    useEffect(() => {
       if (firebase.auth?.currentUser?.emailVerified) {
@@ -102,22 +107,23 @@ const useAdminLinks = () => {
                title: "Past Streams",
                basePath: `/admin/past-livestreams`,
             },
-            {
-               href: `/admin/query-users`,
-               icon: FindIcon,
-               title: "Query Users",
-               basePath: `/admin/query-users`,
-            },
-            ...(pushNotificationTesters.includes(userData.userEmail)
-               ? [
-                    {
-                       href: `/admin/saved-push-notifications`,
-                       icon: SmartphoneIcon,
-                       title: "Push Notifications",
-                       basePath: `/admin/saved-push-notifications`,
-                    },
-                 ]
-               : []),
+            // Hidden per request: Query Users and Push Notifications pages
+            // {
+            //    href: `/admin/query-users`,
+            //    icon: FindIcon,
+            //    title: "Query Users",
+            //    basePath: `/admin/query-users`,
+            // },
+            // ...(pushNotificationTesters.includes(userData.userEmail)
+            //    ? [
+            //         {
+            //            href: `/admin/saved-push-notifications`,
+            //            icon: SmartphoneIcon,
+            //            title: "Push Notifications",
+            //            basePath: `/admin/saved-push-notifications`,
+            //         },
+            //      ]
+            //    : []),
             {
                href: `/admin/academic-calendar-manager`,
                icon: CalendarIcon,
@@ -126,7 +132,7 @@ const useAdminLinks = () => {
             },
             {
                href: `/admin/company-plans`,
-               icon: () => <CompanyIcon fill="none" />,
+               icon: CompanyIcon,
                title: "Companies",
                basePath: `/admin/company-plans`,
             },
