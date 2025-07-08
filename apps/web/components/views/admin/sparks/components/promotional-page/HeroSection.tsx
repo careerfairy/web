@@ -17,10 +17,11 @@ import {
    StyledProgressIcon,
    StyledProgressSection,
    StyledTrialCard,
+   StyledTrialCardFreeTag,
    StyledTrialCardTitle,
 } from "./styles"
 
-const HeroSection = () => {
+export const HeroSection = () => {
    return (
       <StyledHeroContent>
          {/* Header */}
@@ -130,22 +131,7 @@ const HeroSection = () => {
                      </StyledCardBenefits>
                   </Box>
                </CardContent>
-
-               <Box
-                  sx={{
-                     position: "absolute",
-                     top: -31,
-                     right: 0,
-                     backgroundColor: "#23546E",
-                     color: "white",
-                     padding: "4px 12px",
-                     borderRadius: "4px",
-                     fontSize: "14px",
-                  }}
-               >
-                  Free
-               </Box>
-
+               <StyledTrialCardFreeTag>Free</StyledTrialCardFreeTag>
                <Button
                   variant="contained"
                   fullWidth
@@ -207,5 +193,3 @@ const HeroSection = () => {
       </StyledHeroContent>
    )
 }
-
-export default HeroSection
