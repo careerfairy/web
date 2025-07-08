@@ -8,7 +8,7 @@ export const StyledContainer = styled(Container)(({ theme }) => ({
    gap: "24px",
    padding: "24px 32px",
    [theme.breakpoints.down("md")]: {
-      padding: "12px 0px",
+      padding: "12px 0px 56px 0px",
    },
 }))
 
@@ -24,7 +24,8 @@ export const StyledPageBackground = styled(Box)(({ theme }) => ({
    width: "100%",
    maxWidth: "1200px",
    [theme.breakpoints.down("md")]: {
-      gap: "24px",
+      borderRadius: "16px",
+      gap: "48px",
       padding: "32px 16px",
       border: "none",
    },
@@ -157,6 +158,7 @@ export const StyledBenefitsSection = styled(Box)(({ theme }) => ({
    [theme.breakpoints.down("md")]: {
       padding: "8px",
       maxWidth: "none",
+      gap: "12px",
    },
 }))
 
@@ -193,6 +195,19 @@ export const StyledMockupContainer = styled(Box)(({ theme }) => ({
    justifyContent: "center",
    [theme.breakpoints.down("md")]: {
       height: "120px",
+   },
+}))
+
+export const StyledCTATitle = styled(Typography)(({ theme }) => ({
+   fontSize: 40,
+   fontWeight: 800,
+   color: theme.palette.neutral[800],
+   letterSpacing: "-2px",
+   textAlign: "center",
+   [theme.breakpoints.down("md")]: {
+      fontSize: 28,
+      letterSpacing: "-1.4px",
+      lineHeight: 1.09,
    },
 }))
 
