@@ -9,13 +9,16 @@ import Stack from "@mui/material/Stack"
 import { LoadingButton } from "@mui/lab"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
-import { ReactNode } from "react"
+import { ReactNode, useMemo } from "react"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../types/commonTypes"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
 import NotificationsButton from "./NotificationsButton"
 import UserAvatarWithDetails from "./UserAvatarWithDetails"
+
+// framer motion
+import { motion } from "framer-motion"
 
 const getStyles = (hasNavigationBar?: boolean) =>
    sxStyles({
@@ -70,20 +73,40 @@ type Props = {
    navigation?: ReactNode
 }
 
+const titleVariants = {
+   initial: { opacity: 0, x: -10 },
+   animate: { opacity: 1, x: 0 },
+   exit: { opacity: 0, x: 10 },
+}
+
 const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
    const isMobile = useIsMobile()
    const { layout } = useGroupDashboard()
    const { createDraftLivestream, isCreating } = useLivestreamRouting()
+   const { asPath } = useRouter()
 
    const drawerPresent = !isMobile && layout.leftDrawerOpen
 
    const styles = getStyles(Boolean(navigation))
 
+   const titleKey = useMemo(() => {
+      return typeof title === "string" ? title : asPath
+   }, [asPath, title])
+
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
          {!drawerPresent ? <MobileToggleButton /> : null}
-         <Box sx={styles.leftSection}>
+         <Box
+            component={motion.div}
+            key={titleKey}
+            variants={titleVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            sx={styles.leftSection}
+         >
             <Typography role="heading" fontWeight={600} sx={styles.title}>
                {title}
             </Typography>
