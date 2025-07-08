@@ -12,13 +12,10 @@ export const StyledContainer = styled(Container)(({ theme }) => ({
    },
 }))
 
-export const StyledHeroSection = styled(Box)(({ theme }) => ({
-   background: `linear-gradient(135deg, 
-      #FCFCFE 0%, 
-      rgba(147, 215, 208, 0.1) 10%, 
-      rgba(34, 117, 216, 0.8) 100%)`,
+export const StyledPageBackground = styled(Box)(({ theme }) => ({
+   background: `linear-gradient(180deg, rgba(147, 215, 208, 0.15) 6.95%, rgba(34, 117, 216, 0.15) 69.54%), #FCFCFE`,
    borderRadius: "16px 16px 0px 0px",
-   border: `1px solid ${theme.palette.grey[200]}`,
+   border: `1px solid ${theme.brand.white[400]}`,
    padding: "32px 20px",
    display: "flex",
    flexDirection: "column",
@@ -29,8 +26,17 @@ export const StyledHeroSection = styled(Box)(({ theme }) => ({
    [theme.breakpoints.down("md")]: {
       gap: "24px",
       padding: "32px 16px",
+      border: "none",
    },
 }))
+
+export const StyledHeroContent = styled(Box)({
+   display: "flex",
+   flexDirection: "column",
+   alignItems: "center",
+   gap: "32px",
+   width: "100%",
+})
 
 export const StyledBrandAwarenessCard = styled(Box)(({ theme }) => ({
    backgroundColor: "#F7F9FF",
