@@ -26,7 +26,6 @@ import {
    useMemo,
    useState,
 } from "react"
-import { useDebounce } from "react-use"
 import { AlgoliaCustomJobResponse } from "types/algolia"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
 
@@ -100,7 +99,6 @@ export const JobsOverviewContextProvider = ({
    const isMobile = useIsMobile()
    const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
       useState(dialogOpen)
-   const [searchTerm, setSearchTerm] = useState(searchParams.term)
    const [jobNotFound, setJobNotFound] = useState(
       searchParams.currentJobId && !serverJob
    )
@@ -215,9 +213,10 @@ export const JobsOverviewContextProvider = ({
       [router]
    )
 
-   useDebounce(() => handleQueryChange(router, "term", searchTerm), 300, [
-      searchTerm,
-   ])
+   const handleSearchTermChange = useCallback(
+      (term: string) => handleQueryChange(router, "term", term),
+      [router]
+   )
 
    const value: JobsOverviewContextType = useMemo(() => {
       const searchResultsCount = data?.at(0)?.nbHits
@@ -245,8 +244,8 @@ export const JobsOverviewContextProvider = ({
       return {
          selectedJob: effectiveJob,
          setSelectedJob: handleSelectedJobChange,
-         searchTerm,
-         setSearchTerm,
+         searchTerm: searchParams.term,
+         setSearchTerm: handleSearchTermChange,
          setSearchLocations: handleLocationChange,
          searchLocations: searchParams.location,
          searchBusinessFunctionTags: searchParams.businessFunctionTags,
@@ -286,7 +285,7 @@ export const JobsOverviewContextProvider = ({
       handleBusinessFunctionTagsChange,
       handleLocationChange,
       handleJobTypesChange,
-      searchTerm,
+      handleSearchTermChange,
       isValidating,
       setSize,
       isJobDetailsDialogOpen,
