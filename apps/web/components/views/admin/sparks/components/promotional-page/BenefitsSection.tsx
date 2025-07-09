@@ -1,4 +1,4 @@
-import { Box, styled, Typography } from "@mui/material"
+import { Box, Stack, styled, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Autoplay from "embla-carousel-autoplay"
 import useEmblaCarousel from "embla-carousel-react"
@@ -54,7 +54,7 @@ type BenefitCardData = {
    id: string
    mockupContent: ReactNode
    title: string
-   description: string
+   description: ReactNode
 }
 
 export const benefitCardsData: BenefitCardData[] = [
@@ -69,8 +69,12 @@ export const benefitCardsData: BenefitCardData[] = [
       id: "engagement",
       mockupContent: <EngagementMockup />,
       title: "Easy to make, hard to ignore",
-      description:
-         "Quick to create, no big production needed. Authentic videos that perform best with Gen Z",
+      description: (
+         <>
+            Quick to create, no big production needed. Authentic videos that
+            perform best with Gen&nbsp;Z
+         </>
+      ),
    },
    {
       id: "analytics",
@@ -95,20 +99,19 @@ type BenefitCardProps = {
 const BenefitCard = ({ card }: BenefitCardProps) => (
    <StyledBenefitCard>
       {card.mockupContent}
-      <Box textAlign="center">
+      <Stack spacing={0.5} textAlign="center">
          <Typography
-            variant="h6"
+            variant="medium"
+            component="h6"
             fontWeight={600}
-            px={3}
-            color="#3D3D47"
-            gutterBottom
+            color="neutral.800"
          >
             {card.title}
          </Typography>
-         <Typography variant="body2" color="#5C5C6A">
+         <Typography variant="medium" color="neutral.700" component="p">
             {card.description}
          </Typography>
-      </Box>
+      </Stack>
    </StyledBenefitCard>
 )
 

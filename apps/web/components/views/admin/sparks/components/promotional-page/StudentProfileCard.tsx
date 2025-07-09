@@ -15,6 +15,22 @@ const Root = styled(Box)({
    boxShadow: "0px 0px 35px 0px rgba(20, 20, 20, 0.08)",
 })
 
+const NameText = styled(Typography)({
+   fontSize: "10px",
+   fontWeight: 600,
+   textAlign: "center",
+   lineHeight: 1.5,
+   color: "#000",
+})
+
+const SubjectText = styled(Typography)({
+   fontSize: "8.397px",
+   fontWeight: 300,
+   color: "#000",
+   textAlign: "center",
+   lineHeight: 1.5,
+})
+
 type Props = {
    name: string
    subject: string
@@ -38,25 +54,8 @@ export const StudentProfileCard = ({
    return (
       <Root sx={{ ...position }} zIndex={zIndex}>
          <CircularLogo src={imageSrc} alt={name} objectFit="cover" size={56} />
-         <Typography
-            variant="caption"
-            fontSize="10px"
-            fontWeight={600}
-            textAlign="center"
-            lineHeight="1.5"
-         >
-            {name}
-         </Typography>
-         <Typography
-            variant="caption"
-            fontSize="8.5px"
-            fontWeight={300}
-            color="grey"
-            textAlign="center"
-            lineHeight="1.5"
-         >
-            {subject}
-         </Typography>
+         <NameText variant="caption">{name}</NameText>
+         <SubjectText variant="caption">{subject}</SubjectText>
       </Root>
    )
 }
