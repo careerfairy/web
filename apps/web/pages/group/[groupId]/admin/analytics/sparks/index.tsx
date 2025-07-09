@@ -2,6 +2,7 @@ import GroupSparkAnalytics from "components/views/admin/sparks/analytics"
 import { SparksAnalyticsProvider } from "components/views/admin/sparks/analytics/SparksAnalyticsContext"
 import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
 import SparksDialog from "components/views/admin/sparks/sparks-dialog/SparksDialog"
+import { HasAccessToSparksWrapper } from "layouts/GroupDashboardLayout/HasAccessToSparksWrapper"
 import { Fragment, ReactElement } from "react"
 import { withGroupDashboardLayout } from "../../../../../../layouts/GroupDashboardLayout/withGroupDashboardLayout"
 
@@ -16,9 +17,11 @@ const CreateSparkButtonWrapper = () => {
 
 const AdminSparksAnalyticsPage = () => {
    return (
-      <SparksAnalyticsProvider>
-         <GroupSparkAnalytics />
-      </SparksAnalyticsProvider>
+      <HasAccessToSparksWrapper>
+         <SparksAnalyticsProvider>
+            <GroupSparkAnalytics />
+         </SparksAnalyticsProvider>
+      </HasAccessToSparksWrapper>
    )
 }
 
