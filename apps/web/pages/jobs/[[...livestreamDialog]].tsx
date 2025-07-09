@@ -172,7 +172,6 @@ const getMetaContent = (
       }. Apply directly on CareerFairy.`
    }
 
-   console.log("🚀 ~ description:", description)
    return description
 }
 
