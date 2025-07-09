@@ -11,6 +11,7 @@ export const StyledCTATitle = styled(Typography)(({ theme }) => ({
       fontSize: 28,
       letterSpacing: "-1.4px",
       lineHeight: 1.09,
+      padding: "0 32px",
    },
 }))
 
