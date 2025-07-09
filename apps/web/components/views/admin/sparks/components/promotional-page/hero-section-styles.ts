@@ -1,4 +1,11 @@
-import { Box, Card, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Card,
+   LinearProgress,
+   linearProgressClasses,
+   Stack,
+   Typography,
+} from "@mui/material"
 import { styled } from "@mui/material/styles"
 
 export const StyledHeroContent = styled(Box)({
@@ -113,4 +120,14 @@ export const StyledCardBenefits = styled(Stack)(({ theme }) => ({
 
 export const StyledFullCard = styled(StyledPricingCard)({
    background: "linear-gradient(135deg, #7454FF 0%, #6749EA 100%)",
+})
+
+export const StyledLinearProgress = styled(LinearProgress)({
+   height: 14,
+   borderRadius: 100,
+   backgroundColor: "rgba(227, 233, 253, 0.56)",
+   [`& .${linearProgressClasses.bar}`]: {
+      backgroundColor: "#01AF3C",
+      borderRadius: "100px",
+   },
 })
