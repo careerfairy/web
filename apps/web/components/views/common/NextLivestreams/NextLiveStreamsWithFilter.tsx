@@ -6,15 +6,16 @@ import {
    Card,
    CircularProgress,
    Container,
+   Divider,
    Grid,
    Typography,
 } from "@mui/material"
+import { usePartnership } from "HOCs/PartnershipProvider"
 import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 import { isInIframe } from "components/helperFunctions/HelperFunctions"
-import { usePartnership } from "HOCs/PartnershipProvider"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -349,31 +350,21 @@ const NextLiveStreamsWithFilter = ({
             currentGroup={undefined}
             minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
+            wrapperSx={{ minHeight: "unset" }}
          />
 
-         <Container maxWidth="xl" disableGutters>
-            {shouldShowRecentLivestreams ? (
-               <>
-                  <Box
-                     sx={{
-                        height: "1px",
-                        backgroundColor: "neutral.100",
-                        width: "100%",
-                        mt: 3, // 24px spacing from upcoming streams
-                        mx: { xs: 0, md: 2 }, // Match the main grid margins
-                     }}
+         <Divider sx={{ mx: { xs: 0, md: 2 }, height: "1px" }} />
+
+         {shouldShowRecentLivestreams ? (
+            <Container maxWidth="xl" disableGutters>
+               <Box sx={{ pt: { xs: 2, md: 3 } }}>
+                  <RecentLivestreamsSection
+                     recentLivestreams={recentLivestreams}
+                     isLoading={isLoadingRecentLivestreams}
                   />
-                  <Box sx={{ mt: 3 }}>
-                     {" "}
-                     {/* 24px spacing below divider */}
-                     <RecentLivestreamsSection
-                        recentLivestreams={recentLivestreams}
-                        isLoading={isLoadingRecentLivestreams}
-                     />
-                  </Box>
-               </>
-            ) : null}
-         </Container>
+               </Box>
+            </Container>
+         ) : null}
 
          {isValidating ? (
             <Box sx={styles.loader}>
