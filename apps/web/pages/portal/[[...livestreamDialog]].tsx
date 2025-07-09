@@ -24,6 +24,8 @@ import { CustomJobDialogLayout } from "components/views/jobs/components/custom-j
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { SparksLoadingFallback } from "components/views/portal/sparks/SparksLoadingFallback"
+import { SearchProvider } from "components/views/search/SearchContext"
+import SearchField from "components/views/search/SearchField"
 import { TagsCarouselSkeleton } from "components/views/tags/TagsCarouselSkeleton"
 import { sxStyles } from "types/commonTypes"
 import {
@@ -102,6 +104,10 @@ const styles = sxStyles({
    welcomeTextContainer: {
       ml: 2,
       pb: 2,
+      mt: {
+         xs: 2,
+         md: 0,
+      },
    },
 })
 
@@ -181,6 +187,10 @@ const PortalPage = ({
                                  : "Nice to see you!"}
                            </Typography>
                         </Box>
+
+                        <SearchProvider>
+                           <SearchField />
+                        </SearchProvider>
 
                         <PortalTags>
                            <UserSparksCarousel

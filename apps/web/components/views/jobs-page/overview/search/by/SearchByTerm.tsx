@@ -1,4 +1,4 @@
-import BrandedSearchField from "components/views/common/inputs/BrandedSearchBar"
+import BrandedSearchField from "components/views/common/inputs/BrandedSearchField"
 
 import { useJobsOverviewContext } from "components/views/jobs-page/JobsOverviewContext"
 
