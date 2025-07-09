@@ -1,3 +1,4 @@
+import { SearchResponse } from "@algolia/client-search"
 import {
    CustomJob,
    CustomJobApplicationSource,
@@ -26,6 +27,8 @@ import {
    useState,
 } from "react"
 import { useDebounce } from "react-use"
+import { AlgoliaCustomJobResponse } from "types/algolia"
+import { deserializeAlgoliaSearchResponse } from "util/algolia"
 
 type JobsOverviewContextType = {
    selectedJob: CustomJob | undefined
@@ -64,7 +67,8 @@ const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
 )
 
 type JobsOverviewContextProviderType = {
-   serverCustomJobs?: CustomJob[]
+   /** The full Algolia search response from the server, including metadata like nbHits */
+   algoliaServerResponse?: SearchResponse<AlgoliaCustomJobResponse>
    serverJob?: CustomJob
    children: ReactNode
    dialogOpen?: boolean
@@ -83,7 +87,7 @@ export type SearchParams = {
 
 export const JobsOverviewContextProvider = ({
    children,
-   serverCustomJobs,
+   algoliaServerResponse,
    serverJob,
    dialogOpen,
    locationNames,
@@ -146,7 +150,7 @@ export const JobsOverviewContextProvider = ({
          filterOptions,
          targetReplica: CUSTOM_JOB_REPLICAS.DEADLINE_ASC,
          itemsPerPage: 10,
-         initialData: serverCustomJobs,
+         initialData: algoliaServerResponse,
       }
    )
 
@@ -155,7 +159,9 @@ export const JobsOverviewContextProvider = ({
          userAuthId: authenticatedUser?.uid,
          limit: 30,
          countryCode: userCountryCode,
-         initialData: serverCustomJobs,
+         initialData: algoliaServerResponse?.hits?.map(
+            deserializeAlgoliaSearchResponse
+         ),
       })
 
    const infiniteJobs = useMemo(() => {
