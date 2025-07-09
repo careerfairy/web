@@ -5,7 +5,7 @@ const FinalCTASection = () => {
    return (
       <StyledFinalCTA>
          <StyledCTATitle>
-            Get your brand <br /> seen now!
+            Get&nbsp;your&nbsp;brand seen&nbsp;now!
          </StyledCTATitle>
          <Button
             variant="contained"
