@@ -82,7 +82,7 @@ export type SearchParams = {
    term?: string
    businessFunctionTags?: string[]
    jobTypes?: string[]
-   jobId?: string
+   currentJobId?: string
 }
 
 export const JobsOverviewContextProvider = ({
@@ -91,19 +91,18 @@ export const JobsOverviewContextProvider = ({
    serverJob,
    dialogOpen,
    locationNames,
-   numberOfJobs,
    userCountryCode,
 }: JobsOverviewContextProviderType) => {
    const { authenticatedUser } = useAuth()
    const router = useRouter()
-   const [isFirstRender, setIsFirstRender] = useState(true)
+
    const searchParams = getSearchParams(router.query)
    const isMobile = useIsMobile()
    const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
       useState(dialogOpen)
    const [searchTerm, setSearchTerm] = useState(searchParams.term)
    const [jobNotFound, setJobNotFound] = useState(
-      searchParams.jobId && !serverJob
+      searchParams.currentJobId && !serverJob
    )
    const [selectedLocationsNames, setSelectedLocationsNames] = useState<
       string[]
@@ -168,10 +167,10 @@ export const JobsOverviewContextProvider = ({
       return data?.flatMap((page) => page.deserializedHits) ?? []
    }, [data])
 
-   const handleJobIdChange = useCallback(
-      async (jobId: string) => {
-         if (jobId) {
-            const customJob = await customJobRepo.getCustomJobById(jobId)
+   const handleCurrentJobIdChange = useCallback(
+      async (currentJobId: string) => {
+         if (currentJobId) {
+            const customJob = await customJobRepo.getCustomJobById(currentJobId)
 
             if (customJob) {
                setSelectedJob(customJob)
@@ -184,71 +183,44 @@ export const JobsOverviewContextProvider = ({
 
          setIsJobDetailsDialogOpen(false)
          setSelectedJob(undefined)
-         setJobNotFound(Boolean(jobId?.length))
+         setJobNotFound(Boolean(currentJobId?.length))
       },
       [setSelectedJob, setIsJobDetailsDialogOpen]
    )
 
    const handleSelectedJobChange = useCallback(
       (job: CustomJob | undefined) => {
-         handleQueryChange(router, "jobId", job?.id)
+         handleQueryChange(router, "currentJobId", job?.id)
       },
       [router]
    )
 
-   const handleFilterChange = useCallback(
-      (param: keyof SearchParams, value: string | string[]) => {
-         const query = { ...router.query }
-         if (!isFirstRender) {
-            delete query.jobId
-         }
-         if (
-            value &&
-            (Array.isArray(value) ? value.length > 0 : value !== "")
-         ) {
-            query[param] = value
-         } else {
-            delete query[param]
-         }
-
-         router
-            .push(
-               {
-                  pathname: router.pathname,
-                  query: query,
-               },
-               undefined,
-               { shallow: true }
-            )
-            .then(() => {
-               setIsFirstRender(false)
-            })
-      },
-      [router, isFirstRender]
-   )
-
    const handleLocationChange = useCallback(
-      (locations: string[]) => handleFilterChange("location", locations),
-      [handleFilterChange]
+      (locations: string[]) => handleQueryChange(router, "location", locations),
+      [router]
    )
 
    const handleBusinessFunctionTagsChange = useCallback(
       (businessFunctionTags: string[]) =>
-         handleFilterChange("businessFunctionTags", businessFunctionTags),
-      [handleFilterChange]
+         handleQueryChange(
+            router,
+            "businessFunctionTags",
+            businessFunctionTags
+         ),
+      [router]
    )
 
    const handleJobTypesChange = useCallback(
-      (jobTypes: string[]) => handleFilterChange("jobTypes", jobTypes),
-      [handleFilterChange]
+      (jobTypes: string[]) => handleQueryChange(router, "jobTypes", jobTypes),
+      [router]
    )
 
-   useDebounce(() => handleFilterChange("term", searchTerm), 300, [searchTerm])
+   useDebounce(() => handleQueryChange(router, "term", searchTerm), 300, [
+      searchTerm,
+   ])
 
    const value: JobsOverviewContextType = useMemo(() => {
-      const searchResultsCount = hasFilters
-         ? data?.at(0)?.nbHits ?? 0
-         : numberOfJobs ?? 0
+      const searchResultsCount = data?.at(0)?.nbHits
 
       const nextPage = () => {
          if (searchResultsCount > infiniteJobs?.length) {
@@ -294,7 +266,7 @@ export const JobsOverviewContextProvider = ({
          context: {
             source: CustomJobApplicationSourceTypes.JobSection,
             // Could be changed
-            id: searchParams.jobId || selectedJob?.id || "jobSection",
+            id: searchParams.currentJobId || selectedJob?.id || "jobSection",
          },
          jobDetailsDialogOpen:
             isJobDetailsDialogOpen && isMobile && Boolean(selectedJob),
@@ -315,7 +287,6 @@ export const JobsOverviewContextProvider = ({
       handleLocationChange,
       handleJobTypesChange,
       searchTerm,
-      data,
       isValidating,
       setSize,
       isJobDetailsDialogOpen,
@@ -323,24 +294,32 @@ export const JobsOverviewContextProvider = ({
       isMobile,
       jobNotFound,
       selectedLocationsNames,
-      numberOfJobs,
       userCountryCode,
       recommendedJobs,
       isLoadingRecommendedJobs,
-      hasFilters,
       isLoading,
+      hasFilters,
+      data,
    ])
 
    useEffect(() => {
-      if (isMobile) {
-         handleJobIdChange(router.query.jobId as string)
+      if (!router.query.currentJobId) {
+         setSelectedJob(undefined)
+         setIsJobDetailsDialogOpen(false)
       }
 
-      if (!isFirstRender && !isMobile) {
-         handleJobIdChange(router.query.jobId as string)
+      if (router.query.currentJobId) {
+         handleCurrentJobIdChange(router.query.currentJobId as string)
+      } else if (!isMobile) {
+         setSelectedJob(serverJob)
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [router.query.jobId, handleJobIdChange, serverJob, isMobile])
+   }, [
+      router.query.currentJobId,
+      handleCurrentJobIdChange,
+      serverJob,
+      isMobile,
+      router,
+   ])
 
    useEffect(() => {
       setSelectedLocationsNames(
@@ -380,7 +359,7 @@ const handleQueryChange = (
 
 const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
    const term = (query.term as string) || ""
-   const jobId = (query.jobId as string) || ""
+   const currentJobId = (query.currentJobId as string) || ""
 
    const searchParamLocations = getQueryStringArray(query.location)
    const searchParamBusinessFunctionTags = getQueryStringArray(
@@ -393,7 +372,7 @@ const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
       term: term,
       businessFunctionTags: searchParamBusinessFunctionTags,
       jobTypes: searchParamJobTypes,
-      jobId,
+      currentJobId,
    }
 }
 
