@@ -1,10 +1,12 @@
 import { Box, BoxProps, IconButton, Stack, SxProps } from "@mui/material"
+import { UseEmblaCarouselType } from "embla-carousel-react"
+
 import {
-   EmblaCarouselType,
-   EmblaOptionsType,
-   EmblaPluginType,
-   UseEmblaCarouselType,
-} from "embla-carousel-react"
+   type EmblaCarouselType,
+   type EmblaOptionsType,
+   type EmblaPluginType,
+} from "embla-carousel"
+
 import { ReactElement, createContext, useContext, useMemo } from "react"
 import { ChevronLeft, ChevronRight } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
