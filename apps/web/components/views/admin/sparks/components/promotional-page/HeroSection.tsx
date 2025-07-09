@@ -19,7 +19,7 @@ import {
    StyledTrialCard,
    StyledTrialCardFreeTag,
    StyledTrialCardTitle,
-} from "./styles"
+} from "./hero-section-styles"
 
 export const HeroSection = () => {
    return (

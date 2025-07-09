@@ -1,18 +1,53 @@
-import { Box, Typography } from "@mui/material"
+import { Box, styled, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useEmblaCarousel from "embla-carousel-react"
 import { GenericCarousel } from "../../../../common/carousels/GenericCarousel"
-import {
-   StyledBenefitCard,
-   StyledBenefitsGrid,
-   StyledBenefitsSection,
-} from "./styles"
 
 import { ReactNode } from "react"
 import { AnalyticsMockup } from "./AnalyticsMockup"
 import { EngagementMockup } from "./EngagementMockup"
 import { LivestreamMockup } from "./LivestreamMockup"
 import { StudentMockup } from "./StudentMockup"
+
+export const StyledBenefitsSection = styled(Box)(({ theme }) => ({
+   backgroundColor: "#FAFAFE",
+   borderRadius: "12px",
+   padding: "24px",
+   display: "flex",
+   flexDirection: "column",
+   alignItems: "center",
+   gap: "16px",
+   width: "100%",
+   maxWidth: "942px",
+   [theme.breakpoints.down("md")]: {
+      padding: "8px",
+      maxWidth: "none",
+      gap: "12px",
+   },
+}))
+
+export const StyledBenefitsGrid = styled(Box)(({ theme }) => ({
+   display: "grid",
+   gridTemplateColumns: "repeat(2, 1fr)",
+   gap: "16px",
+   width: "100%",
+   [theme.breakpoints.down("md")]: {
+      display: "none",
+   },
+}))
+
+export const StyledBenefitCard = styled(Box)(({ theme }) => ({
+   backgroundColor: "#FFFFFF",
+   borderRadius: "8px",
+   padding: "12px",
+   display: "flex",
+   flexDirection: "column",
+   gap: "12px",
+   [theme.breakpoints.down("md")]: {
+      minWidth: "299px",
+      padding: "8px",
+   },
+}))
 
 type BenefitCardData = {
    id: string
