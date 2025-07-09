@@ -1,6 +1,6 @@
 import { Box } from "@mui/material"
 import { XCircleIcon } from "components/views/common/icons/XCircleIcon"
-import { ChangeEvent } from "react"
+import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react"
 import { Search } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import BrandedTextField from "./BrandedTextField"
@@ -63,6 +63,8 @@ export interface BrandedSearchFieldProps {
    onChange: (value: string) => void
    placeholder?: string
    fullWidth?: boolean
+   name?: string
+   autoComplete?: string
 }
 
 export const BrandedSearchField = ({
@@ -70,26 +72,62 @@ export const BrandedSearchField = ({
    onChange,
    placeholder = "Search...",
    fullWidth = true,
+   name = "job-search",
+   autoComplete = "on",
 }: BrandedSearchFieldProps) => {
+   const inputRef = useRef<HTMLInputElement>(null)
+   const [showClearButton, setShowClearButton] = useState(!!value)
+
+   // Sync external value changes to the input
+   useEffect(() => {
+      if (inputRef.current && inputRef.current.value !== value) {
+         inputRef.current.value = value
+         setShowClearButton(!!value)
+      }
+   }, [value])
+
+   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+         const currentValue = inputRef.current?.value || ""
+         onChange(currentValue)
+      }
+   }
+
+   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+      // Update clear button visibility based on current input value
+      setShowClearButton(!!e.target.value)
+   }
+
+   const handleClear = () => {
+      if (inputRef.current) {
+         inputRef.current.value = ""
+         inputRef.current.focus()
+      }
+      setShowClearButton(false)
+      onChange("")
+   }
+
    return (
       <BrandedTextField
          fullWidth={fullWidth}
          placeholder={placeholder}
+         name={name}
+         autoComplete={autoComplete}
+         inputRef={inputRef}
+         defaultValue={value}
          sx={styles.searchField}
          InputProps={{
             startAdornment: <Box component={Search} sx={styles.searchIcon} />,
-            endAdornment: value?.length ? (
+            endAdornment: showClearButton ? (
                <Box
                   sx={styles.clearIcon}
                   component={XCircleIcon}
-                  onClick={() => onChange("")}
+                  onClick={handleClear}
                />
             ) : null,
          }}
-         value={value}
-         onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            onChange(e.target.value)
-         }
+         onChange={handleChange}
+         onKeyDown={handleKeyDown}
       />
    )
 }
