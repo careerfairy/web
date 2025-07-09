@@ -1,6 +1,6 @@
-import { Box } from "@mui/material"
 import { AnalyticsMockup } from "./AnalyticsMockup"
 import { EngagementMockup } from "./EngagementMockup"
+import { LivestreamMockup } from "./LivestreamMockup"
 import { StudentMockup } from "./StudentMockup"
 
 export const benefitCardsData = [
@@ -27,78 +27,7 @@ export const benefitCardsData = [
    },
    {
       id: "livestreams",
-      mockupContent: (
-         <Box
-            sx={{
-               backgroundColor: "#F3EDFD",
-               borderRadius: "4px",
-               height: "158px",
-               position: "relative",
-               display: "flex",
-               alignItems: "center",
-               justifyContent: "center",
-            }}
-         >
-            <Box
-               sx={{
-                  width: "140px",
-                  height: "100px",
-                  backgroundColor: "white",
-                  borderRadius: "8px",
-                  border: "2px solid white",
-                  position: "relative",
-               }}
-            >
-               <Box
-                  sx={{
-                     position: "absolute",
-                     top: "8px",
-                     right: "8px",
-                     backgroundColor: "#856DEE",
-                     borderRadius: "12px",
-                     padding: "2px 4px",
-                     border: "1px solid #EFE9F9",
-                  }}
-               >
-                  <Box display="flex" flexDirection="column" gap="1px">
-                     <Box
-                        sx={{
-                           width: "4px",
-                           height: "2px",
-                           backgroundColor: "white",
-                        }}
-                     />
-                     <Box
-                        sx={{
-                           width: "4px",
-                           height: "2px",
-                           backgroundColor: "rgba(255,255,255,0.5)",
-                        }}
-                     />
-                     <Box
-                        sx={{
-                           width: "4px",
-                           height: "2px",
-                           backgroundColor: "rgba(255,255,255,0.2)",
-                        }}
-                     />
-                  </Box>
-               </Box>
-               <Box
-                  sx={{
-                     position: "absolute",
-                     bottom: "8px",
-                     left: "8px",
-                     right: "8px",
-                     height: "12px",
-                     backgroundColor: "rgba(253, 252, 255, 0.78)",
-                     backdropFilter: "blur(16px)",
-                     borderRadius: "4px",
-                  }}
-               />
-            </Box>
-         </Box>
-      ),
+      mockupContent: <LivestreamMockup />,
       title: "Get more out of your Live Streams",
       description:
          "Use Sparks to warm up student interest early, so more of them join your events and apply afterward",
