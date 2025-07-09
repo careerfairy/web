@@ -18,8 +18,9 @@ export const LivestreamMockup = () => {
          <Image
             src="/mockup/livestream.png"
             alt="Livestream"
-            layout="fill"
-            objectFit="cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 400px"
+            style={{ objectFit: "cover" }}
             quality={100}
          />
       </Container>

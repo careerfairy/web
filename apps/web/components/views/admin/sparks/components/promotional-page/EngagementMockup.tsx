@@ -27,7 +27,6 @@ const PhoneMockup = styled(Box)({
 })
 
 const StyledImage = styled(Image)({
-   objectFit: "cover",
    borderRadius: "9px",
 })
 
@@ -78,7 +77,9 @@ export const EngagementMockup = () => {
             <StyledImage
                src="/mockup/engagement.jpg"
                alt="Avatar"
-               layout="fill"
+               fill
+               sizes="136px"
+               style={{ objectFit: "cover" }}
                quality={100}
             />
             <AvatarCircle />
