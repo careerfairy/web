@@ -65,6 +65,9 @@ const ImageElement = styled(Box)({
    transform: "translateY(50%)",
    right: "calc(50% - 71.769px)",
    top: "34%",
+   "& img": {
+      transform: "rotate(-4.909deg)",
+   },
 })
 
 export const AnalyticsMockup = () => {
@@ -90,9 +93,6 @@ export const AnalyticsMockup = () => {
                height={42.004}
                src="/student-avatars/hand.png"
                alt="Analytics"
-               style={{
-                  transform: "rotate(-4.909deg)",
-               }}
             />
          </ImageElement>
       </Container>

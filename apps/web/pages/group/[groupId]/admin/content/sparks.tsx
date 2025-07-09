@@ -1,7 +1,7 @@
 import { useFeatureFlags } from "components/custom-hook/useFeatureFlags"
 import Sparks from "components/views/admin/sparks"
 import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
-import { SparksPromotionalPage } from "components/views/admin/sparks/components/promotional-page"
+import { SparksPromotionalPage } from "components/views/admin/sparks/components/promotional-page/SparksPromotionalPage"
 import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment, ReactElement } from "react"
@@ -30,7 +30,6 @@ const AdminSparksPage = () => {
    )
 }
 
-// Create a component to conditionally render the CTA button
 const ConditionalCreateSparkButton = () => {
    const { group } = useGroup()
    const featureFlags = useFeatureFlags()
