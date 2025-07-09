@@ -1,9 +1,9 @@
-import BenefitsSection from "./BenefitsSection"
-import FinalCTASection from "./FinalCTASection"
+import { BenefitsSection } from "./BenefitsSection"
+import { FinalCTASection } from "./FinalCTASection"
 import { HeroSection } from "./HeroSection"
 import { StyledContainer, StyledPageBackground } from "./styles"
 
-const SparksPromotionalPage = () => {
+export const SparksPromotionalPage = () => {
    return (
       <StyledContainer maxWidth="xl">
          <StyledPageBackground>
@@ -14,5 +14,3 @@ const SparksPromotionalPage = () => {
       </StyledContainer>
    )
 }
-
-export default SparksPromotionalPage

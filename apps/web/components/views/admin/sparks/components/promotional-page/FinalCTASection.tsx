@@ -1,7 +1,7 @@
 import { Button } from "@mui/material"
 import { StyledCTATitle, StyledFinalCTA } from "./styles"
 
-const FinalCTASection = () => {
+export const FinalCTASection = () => {
    return (
       <StyledFinalCTA>
          <StyledCTATitle>
@@ -18,5 +18,3 @@ const FinalCTASection = () => {
       </StyledFinalCTA>
    )
 }
-
-export default FinalCTASection
