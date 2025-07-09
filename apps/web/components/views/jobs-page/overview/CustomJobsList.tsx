@@ -1,11 +1,12 @@
-import { ListItem } from "@mui/material"
+import { Box, CircularProgress, ListItem } from "@mui/material"
 
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import CustomInfiniteScroll from "components/views/common/CustomInfiniteScroll"
 import JobCard from "components/views/common/jobs/JobCard"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { Fragment, useEffect, useRef } from "react"
+import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import { useJobsOverviewContext } from "../JobsOverviewContext"
 
@@ -40,13 +41,24 @@ export const CustomJobsList = ({ customJobs }: Props) => {
    const { isValidating, nextPage, selectedJob, hasMore } =
       useJobsOverviewContext()
 
+   const { inView, ref } = useInView({
+      rootMargin: "0px 0px 200px 0px",
+   })
+
+   const isValidatingRef = useRef(isValidating)
+   isValidatingRef.current = isValidating
+
+   useEffect(() => {
+      if (isValidatingRef.current) return
+      if (!hasMore) return
+
+      if (inView) {
+         nextPage()
+      }
+   }, [inView, nextPage, hasMore])
+
    return (
-      <CustomInfiniteScroll
-         hasMore={hasMore}
-         loading={isValidating}
-         next={() => Promise.resolve(nextPage())}
-         offset={1000}
-      >
+      <Fragment>
          {customJobs.map((customJob, idx) => {
             return (
                <Link
@@ -86,6 +98,13 @@ export const CustomJobsList = ({ customJobs }: Props) => {
                </Link>
             )
          })}
-      </CustomInfiniteScroll>
+
+         {Boolean(isValidating) && (
+            <Box sx={styles.loader}>
+               <CircularProgress />
+            </Box>
+         )}
+         {Boolean(hasMore) && <Box height={100} ref={ref} />}
+      </Fragment>
    )
 }

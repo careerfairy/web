@@ -1,5 +1,4 @@
 import { SearchResponse } from "@algolia/client-search"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
    ArrayFilterFieldType,
    BooleanFilterFieldType,
@@ -11,7 +10,6 @@ import useSWRInfinite from "swr/infinite"
 import { AlgoliaCustomJobResponse, CustomJobSearchResult } from "types/algolia"
 import { errorLogAndNotify, isTestEnvironment } from "util/CommonUtil"
 import {
-   createAlgoliaSearchResponse,
    deserializeAlgoliaSearchResponse,
    generateArrayFilterString,
    generateBooleanFilterStrings,
@@ -66,13 +64,14 @@ type Options = {
    targetReplica?: CustomJobReplicaType
    disable?: boolean
    itemsPerPage?: number
-   initialData?: CustomJob[]
+   initialData?: SearchResponse<AlgoliaCustomJobResponse>
 }
 
 /**
  * A custom React hook used for performing searches of companies in Algolia.
  * @param  inputValue - The search string input by the user
  * @param  options - The filter options to apply to the search
+ * @param  options.initialData - The initial Algolia search response from the server
  */
 export const useCustomJobSearchAlgolia = (
    inputValue: string,
@@ -82,11 +81,14 @@ export const useCustomJobSearchAlgolia = (
       options
 
    const fallbackData = initialData
-      ? createAlgoliaSearchResponse<
-           CustomJob,
-           AlgoliaCustomJobResponse,
-           CustomJobSearchResult
-        >(initialData)
+      ? [
+           {
+              ...initialData,
+              deserializedHits: initialData.hits.map(
+                 deserializeAlgoliaSearchResponse
+              ),
+           },
+        ]
       : undefined
 
    const getKey = useCallback(
