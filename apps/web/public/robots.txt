@@ -3,4 +3,5 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /group/
 Disallow: /landing/
+Disallow: /portal/search/
 Allow: /next-livestreams/group/

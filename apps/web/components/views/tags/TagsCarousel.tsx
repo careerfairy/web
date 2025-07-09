@@ -11,6 +11,8 @@ const mobileSlideWidth = 280 + slideSpacing
 const styles = sxStyles({
    viewport: {
       overflow: "hidden",
+      px: { xs: 2, md: 0 },
+      mx: { xs: -2, md: 0 },
    },
    slide: {
       flex: {
@@ -67,7 +69,7 @@ const TagsCarousel = forwardRef<ChildRefType, PropType>((props, ref) => {
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
-         <Stack direction={"row"} spacing={"12px"} pl={2}>
+         <Stack direction={"row"} spacing={"12px"}>
             {/* Chip for All  */}
             <Chip
                sx={[

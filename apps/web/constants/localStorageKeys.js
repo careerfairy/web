@@ -8,3 +8,6 @@ export const localStorageAudienceDrawerKey = "hasSeenAudienceDrawer"
 // Referral system
 export const localStorageReferralCode = "referralCode"
 export const localStorageInvite = "inviteLivestream"
+
+// Portal search system
+export const localStorageRecentSearches = "recentSearches"
