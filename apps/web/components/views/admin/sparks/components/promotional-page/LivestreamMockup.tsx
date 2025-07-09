@@ -16,7 +16,7 @@ export const LivestreamMockup = () => {
    return (
       <Container>
          <Image
-            src="/student-avatars/livestream.png"
+            src="/mockup/livestream.png"
             alt="Livestream"
             layout="fill"
             objectFit="cover"

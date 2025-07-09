@@ -91,7 +91,7 @@ export const AnalyticsMockup = () => {
             <Image
                width={39.538}
                height={42.004}
-               src="/student-avatars/hand.png"
+               src="/mockup/hand.png"
                alt="Analytics"
             />
          </ImageElement>

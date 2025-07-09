@@ -76,7 +76,7 @@ export const EngagementMockup = () => {
       <Container>
          <PhoneMockup>
             <StyledImage
-               src="/student-avatars/engagement.jpg"
+               src="/mockup/engagement.jpg"
                alt="Avatar"
                layout="fill"
                quality={100}
