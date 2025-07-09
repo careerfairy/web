@@ -2,7 +2,7 @@ import { Box, styled } from "@mui/material"
 import { ComponentProps } from "react"
 import { StudentProfileCard } from "./StudentProfileCard"
 
-const Root = styled(Box)({
+const Container = styled(Box)({
    backgroundColor: "#E6F3FB",
    borderRadius: "4px",
    height: "158px",
@@ -48,12 +48,12 @@ const studentProfiles: ComponentProps<typeof StudentProfileCard>[] = [
 
 export const StudentMockup = () => {
    return (
-      <Root id="student-mockup">
+      <Container id="student-mockup">
          <StudentProfileCardContainer>
             {studentProfiles.map((profile) => (
                <StudentProfileCard key={profile.name} {...profile} />
             ))}
          </StudentProfileCardContainer>
-      </Root>
+      </Container>
    )
 }

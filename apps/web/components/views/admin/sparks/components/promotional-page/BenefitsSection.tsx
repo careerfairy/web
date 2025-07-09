@@ -2,18 +2,71 @@ import { Box, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useEmblaCarousel from "embla-carousel-react"
 import { GenericCarousel } from "../../../../common/carousels/GenericCarousel"
-import { benefitCardsData } from "./benefitCardsData"
 import {
    StyledBenefitCard,
    StyledBenefitsGrid,
    StyledBenefitsSection,
 } from "./styles"
 
-const BenefitCard = ({ card }: { card: (typeof benefitCardsData)[0] }) => (
+import { ReactNode } from "react"
+import { AnalyticsMockup } from "./AnalyticsMockup"
+import { EngagementMockup } from "./EngagementMockup"
+import { LivestreamMockup } from "./LivestreamMockup"
+import { StudentMockup } from "./StudentMockup"
+
+type BenefitCardData = {
+   id: string
+   mockupContent: ReactNode
+   title: string
+   description: string
+}
+
+export const benefitCardsData: BenefitCardData[] = [
+   {
+      id: "students",
+      mockupContent: <StudentMockup />,
+      title: "Get in front of the right students",
+      description:
+         "Target by study field, degree level, and more to engage students and build your pipeline",
+   },
+   {
+      id: "engagement",
+      mockupContent: <EngagementMockup />,
+      title: "Easy to make, hard to ignore",
+      description:
+         "Quick to create, no big production needed. Authentic videos that perform best with Gen Z",
+   },
+   {
+      id: "analytics",
+      mockupContent: <AnalyticsMockup />,
+      title: "Understand what's working",
+      description:
+         "Track views, likes and shares in real time to double down on what students actually care about",
+   },
+   {
+      id: "livestreams",
+      mockupContent: <LivestreamMockup />,
+      title: "Get more out of your Live Streams",
+      description:
+         "Use Sparks to warm up student interest early, so more of them join your events and apply afterward",
+   },
+]
+
+type BenefitCardProps = {
+   card: BenefitCardData
+}
+
+const BenefitCard = ({ card }: BenefitCardProps) => (
    <StyledBenefitCard>
       {card.mockupContent}
       <Box textAlign="center">
-         <Typography variant="h6" fontWeight={600} color="#3D3D47" gutterBottom>
+         <Typography
+            variant="h6"
+            fontWeight={600}
+            px={3}
+            color="#3D3D47"
+            gutterBottom
+         >
             {card.title}
          </Typography>
          <Typography variant="body2" color="#5C5C6A">
@@ -23,7 +76,7 @@ const BenefitCard = ({ card }: { card: (typeof benefitCardsData)[0] }) => (
    </StyledBenefitCard>
 )
 
-const BenefitsSection = () => {
+export const BenefitsSection = () => {
    const isMobile = useIsMobile()
 
    const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -69,5 +122,3 @@ const BenefitsSection = () => {
       </StyledBenefitsSection>
    )
 }
-
-export default BenefitsSection
