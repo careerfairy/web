@@ -4,10 +4,8 @@ import {
    GenericCarousel,
    GenericCarouselProps,
 } from "components/views/common/carousels/GenericCarousel"
-import useEmblaCarousel, {
-   EmblaOptionsType,
-   UseEmblaCarouselType,
-} from "embla-carousel-react"
+import { type EmblaOptionsType } from "embla-carousel"
+import useEmblaCarousel, { UseEmblaCarouselType } from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import React, { ReactNode, useCallback, useRef } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
