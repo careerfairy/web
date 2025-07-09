@@ -52,6 +52,13 @@ const styles = sxStyles({
       px: "12px",
       height: "85dvh",
    },
+   loadingWrapper: {
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
 })
 
 export const CustomJobDetails = () => {
@@ -62,6 +69,7 @@ export const CustomJobDetails = () => {
       jobDetailsDialogOpen,
       jobNotFound,
       setSelectedJob,
+      setJobDetailsDialogOpen,
    } = useJobsOverviewContext()
 
    const [isNotFoundDialogOpen, setIsNotFoundDialogOpen] = useState(jobNotFound)
@@ -70,11 +78,17 @@ export const CustomJobDetails = () => {
       <Box sx={styles.root}>
          <CustomJobNotFoundDialog
             isOpen={Boolean(isNotFoundDialogOpen && isMobile)}
-            handleNotFoundClose={() => setIsNotFoundDialogOpen(false)}
+            handleNotFoundClose={() => {
+               setSelectedJob(undefined)
+               setIsNotFoundDialogOpen(false)
+            }}
          />
          <CustomJobDetailsDialog
             isOpen={jobDetailsDialogOpen}
-            onClose={() => setSelectedJob(undefined)}
+            onClose={() => {
+               setSelectedJob(undefined)
+               setJobDetailsDialogOpen(false)
+            }}
             customJobId={selectedJob?.id}
             source={context}
             serverSideCustomJob={selectedJob}

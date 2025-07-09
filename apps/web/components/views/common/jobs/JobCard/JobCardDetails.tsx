@@ -29,9 +29,12 @@ const styles = sxStyles({
       color: "text.primary",
       fontWeight: 600,
       fontSize: "16px !important",
-      whiteSpace: "nowrap",
+      whiteSpace: "break-spaces",
       overflow: "hidden",
       textOverflow: "ellipsis",
+      display: "-webkit-box",
+      WebkitLineClamp: 2,
+      WebkitBoxOrient: "vertical",
    },
    warningContainer: {
       display: "flex",

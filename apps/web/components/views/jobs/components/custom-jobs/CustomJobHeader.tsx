@@ -200,7 +200,11 @@ const CustomJobHeader = ({
                         />
                      </Stack>
                   ) : null}
-                  <Typography variant={"brandedH5"} sx={styles.jobTitle}>
+                  <Typography
+                     variant={"brandedH5"}
+                     component={"h1"}
+                     sx={styles.jobTitle}
+                  >
                      {job.title}
                   </Typography>
 
@@ -272,6 +276,7 @@ const CustomJobHeader = ({
                               {workplaceText ? (
                                  <Typography
                                     variant={"subtitle1"}
+                                    component="span"
                                     sx={{
                                        ...styles.details,
                                        display: "inline",
@@ -310,6 +315,7 @@ const CustomJobHeader = ({
                                  <Typography
                                     variant={"subtitle1"}
                                     display={"inline"}
+                                    component="span"
                                  >
                                     <MapPin width={14} />
                                     {jobLocation}
@@ -327,12 +333,14 @@ const CustomJobHeader = ({
                                        >
                                           <Typography
                                              variant={"subtitle1"}
+                                             component="span"
                                           >{`, +${othersCount}`}</Typography>
                                        </BrandedTooltip>
                                     ) : null}
                                     {workplaceText ? (
                                        <Typography
                                           variant={"subtitle1"}
+                                          component="span"
                                           sx={{
                                              ...styles.details,
                                              display: "inline",
