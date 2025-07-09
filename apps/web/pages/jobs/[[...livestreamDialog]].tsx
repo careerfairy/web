@@ -1,3 +1,4 @@
+import { SearchResponse } from "@algolia/client-search"
 import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import {
    CustomJobsPresenter,
@@ -35,6 +36,7 @@ import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
+import { AlgoliaCustomJobResponse } from "types/algolia"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import SEO from "../../components/util/SEO"
@@ -52,7 +54,7 @@ const JobsPage: NextPage<
    userCountryCode,
    dialogOpen,
    locationNames,
-   numberOfJobs,
+   algoliaServerResponse,
 }) => {
    const router = useRouter()
    const { jobId } = router.query
@@ -95,11 +97,10 @@ const JobsPage: NextPage<
          >
             <LivestreamDialogLayout>
                <JobsOverviewContextProvider
-                  serverCustomJobs={serverCustomJobs}
                   serverJob={serverJob}
                   dialogOpen={dialogOpen}
                   locationNames={locationNames}
-                  numberOfJobs={numberOfJobs}
+                  algoliaServerResponse={algoliaServerResponse}
                   userCountryCode={userCountryCode}
                >
                   <PageSEO />
@@ -167,7 +168,7 @@ type JobsPageProps = {
    locationNames: string[]
    searchParams: SearchParams
    userCountryCode: string
-   numberOfJobs: number
+   algoliaServerResponse: SearchResponse<AlgoliaCustomJobResponse>
    dialogOpen: boolean
 }
 
@@ -272,7 +273,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          jobSparks = await sparkRepo.getSparksByIds(customJob.sparks)
       }
 
-      jobSparks.forEach((spark) => {
+      jobSparks?.forEach((spark) => {
          serializedSparks.push(SparkPresenter.serialize(spark))
       })
       jobEvents?.filter(Boolean)?.forEach((event) => {
@@ -283,7 +284,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    return {
       props: {
          serializedCustomJobs: serializedCustomJobs,
-         numberOfJobs: algoliaResponse.nbHits,
+         algoliaServerResponse: algoliaResponse,
          customJobData: {
             serializedCustomJob,
             livestreamsData,
