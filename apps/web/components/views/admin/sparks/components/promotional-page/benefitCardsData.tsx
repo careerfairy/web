@@ -1,7 +1,7 @@
-import { Box, Typography } from "@mui/material"
-import { Eye } from "react-feather"
-import { StudentMockup } from "./StudentMockup"
+import { Box } from "@mui/material"
+import { AnalyticsMockup } from "./AnalyticsMockup"
 import { EngagementMockup } from "./EngagementMockup"
+import { StudentMockup } from "./StudentMockup"
 
 export const benefitCardsData = [
    {
@@ -20,54 +20,7 @@ export const benefitCardsData = [
    },
    {
       id: "analytics",
-      mockupContent: (
-         <Box
-            sx={{
-               backgroundColor: "#E6FBED",
-               borderRadius: "4px",
-               height: "158px",
-               position: "relative",
-               display: "flex",
-               alignItems: "center",
-               justifyContent: "center",
-            }}
-         >
-            <Box
-               sx={{
-                  backgroundColor: "white",
-                  borderRadius: "50px",
-                  padding: "16px 24px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  border: "1px solid #00D247",
-                  boxShadow: "0px 0px 60px 9px rgba(17, 226, 87, 0.22)",
-               }}
-            >
-               <Eye size={24} color="#3D3D47" />
-               <Typography variant="h6" color="#3D3D47">
-                  1.328
-               </Typography>
-            </Box>
-            <Box
-               sx={{
-                  position: "absolute",
-                  top: "20px",
-                  right: "20px",
-                  backgroundColor: "#00D247",
-                  borderRadius: "16px",
-                  padding: "4px 8px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-               }}
-            >
-               <Typography variant="caption" color="white" fontWeight={400}>
-                  +75%
-               </Typography>
-            </Box>
-         </Box>
-      ),
+      mockupContent: <AnalyticsMockup />,
       title: "Understand what&apos;s working",
       description:
          "Track views, likes and shares in real time to double down on what students actually care about",
