@@ -1,9 +1,14 @@
+import { SearchResponse } from "@algolia/client-search"
+import { BusinessFunctionsTags } from "@careerfairy/shared-lib/constants/tags"
 import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import {
    CustomJobsPresenter,
    SerializedCustomJob,
 } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   jobTypeOptions,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
@@ -35,6 +40,7 @@ import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
+import { AlgoliaCustomJobResponse } from "types/algolia"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
 import { getUserTokenFromCookie } from "util/serverUtil"
 import SEO from "../../components/util/SEO"
@@ -52,10 +58,10 @@ const JobsPage: NextPage<
    userCountryCode,
    dialogOpen,
    locationNames,
-   numberOfJobs,
+   algoliaServerResponse,
 }) => {
    const router = useRouter()
-   const { jobId } = router.query
+   const { currentJobId } = router.query
    const { authenticatedUser } = useAuth()
 
    const serverCustomJobs =
@@ -79,7 +85,7 @@ const JobsPage: NextPage<
 
    return (
       <>
-         {serverJob && serverJob.id === jobId ? (
+         {serverJob && serverJob.id === currentJobId ? (
             <CustomJobSEOSchemaScriptTag job={serverJob} />
          ) : (
             serverCustomJobs.map((job) => (
@@ -95,11 +101,11 @@ const JobsPage: NextPage<
          >
             <LivestreamDialogLayout>
                <JobsOverviewContextProvider
-                  serverCustomJobs={serverCustomJobs}
                   serverJob={serverJob}
                   dialogOpen={dialogOpen}
                   locationNames={locationNames}
-                  numberOfJobs={numberOfJobs}
+                  algoliaServerResponse={algoliaServerResponse}
+                  numberOfJobs={algoliaServerResponse?.nbHits}
                   userCountryCode={userCountryCode}
                >
                   <PageSEO />
@@ -112,20 +118,87 @@ const JobsPage: NextPage<
    )
 }
 
+const getMetaContent = (
+   searchParams: SearchParams,
+   numberOfJobs: number,
+   locationNames: string[]
+) => {
+   // Helper to get job type labels
+   const getJobTypeLabels = (jobTypes?: string[]) => {
+      if (!jobTypes?.length) return []
+      return jobTypes
+         .map((type) => jobTypeOptions.find((opt) => opt.value === type)?.label)
+         .filter(Boolean)
+   }
+
+   // Helper to get business function tag labels
+   const getBusinessFunctionTagLabels = (tags?: string[]) => {
+      if (!tags?.length) return []
+      return tags.map((tag) => BusinessFunctionsTags[tag]?.name).filter(Boolean)
+   }
+
+   const locations = locationNames?.length ? locationNames.join(", ") : null
+   const jobTypes = getJobTypeLabels(searchParams.jobTypes)
+   const jobTypesStr = jobTypes.length ? jobTypes.join(", ") : null
+   const businessFunctions = getBusinessFunctionTagLabels(
+      searchParams.businessFunctionTags
+   )
+   const businessFunctionsStr = businessFunctions.length
+      ? businessFunctions.join(", ")
+      : null
+   const term = searchParams.term
+
+   // Compose dynamic description
+   let description = `Browse ${numberOfJobs} early-career jobs, internships and graduate programs across tech, consulting & engineering.`
+
+   const filters: string[] = []
+   if (locations)
+      filters.push(
+         `location${locationNames.length > 1 ? "s" : ""} in ${locations}`
+      )
+   if (jobTypesStr)
+      filters.push(`job type${jobTypes.length > 1 ? "s" : ""}: ${jobTypesStr}`)
+   if (businessFunctionsStr)
+      filters.push(
+         `job area${
+            businessFunctions.length > 1 ? "s" : ""
+         }: ${businessFunctionsStr}`
+      )
+   if (term) filters.push(`matching "${term}"`)
+
+   if (filters.length) {
+      description = `Browse ${numberOfJobs} early-career jobs${
+         filters.length ? " filtered by " + filters.join(", ") : ""
+      }. Apply directly on CareerFairy.`
+   }
+
+   return description
+}
+
 const PageSEO = () => {
    const { searchParams, searchResultsCount, selectedLocationsNames } =
       useJobsOverviewContext()
 
    return (
-      <SEO
-         id={"CareerFairy | Jobs | " + searchParams.term}
-         description={"Find your dream job with CareerFairy."}
-         title={getSeoTitle(
-            searchParams,
-            searchResultsCount,
-            selectedLocationsNames
-         )}
-      />
+      <>
+         <meta
+            name="description"
+            content={getMetaContent(
+               searchParams,
+               searchResultsCount,
+               selectedLocationsNames
+            )}
+         />
+         <SEO
+            id={"CareerFairy | Jobs | " + searchParams.term}
+            description={"Find your dream job with CareerFairy."}
+            title={getSeoTitle(
+               searchParams,
+               searchResultsCount,
+               selectedLocationsNames
+            )}
+         />
+      </>
    )
 }
 
@@ -167,7 +240,7 @@ type JobsPageProps = {
    locationNames: string[]
    searchParams: SearchParams
    userCountryCode: string
-   numberOfJobs: number
+   algoliaServerResponse: SearchResponse<AlgoliaCustomJobResponse>
    dialogOpen: boolean
 }
 
@@ -177,15 +250,16 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const userCountryCode =
       (context.req.headers["x-vercel-ip-country"] as string) || null
 
-   const { term: queryTerm = "", jobId: queryJobId } = context.query
+   const { term: queryTerm = "", currentJobId: queryCurrentJobId } =
+      context.query
 
    const token = getUserTokenFromCookie(context) as any
    const userAuthId = token?.user_id
 
    const term = queryTerm as string
-   const jobId = queryJobId as string
+   const currentJobId = queryCurrentJobId as string
 
-   const dialogOpen = Boolean(jobId)
+   const dialogOpen = Boolean(currentJobId)
 
    const queryLocations = getQueryStringArray(context.query.location)
    const locationNames = getLocationNames(queryLocations)
@@ -242,8 +316,8 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       ? algoliaCustomJobs?.at(0)
       : recommendedJobs?.at(0)
 
-   const customJob = jobId
-      ? await customJobRepo.getCustomJobById(jobId)
+   const customJob = currentJobId
+      ? await customJobRepo.getCustomJobById(currentJobId)
       : firstCustomJob
 
    const serializedCustomJob = customJob
@@ -272,10 +346,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          jobSparks = await sparkRepo.getSparksByIds(customJob.sparks)
       }
 
-      jobSparks.forEach((spark) => {
+      jobSparks?.forEach((spark) => {
          serializedSparks.push(SparkPresenter.serialize(spark))
       })
-      jobEvents.forEach((event) => {
+      jobEvents?.filter(Boolean)?.forEach((event) => {
          livestreamsData.push(LivestreamPresenter.serializeDocument(event))
       })
    }
@@ -283,7 +357,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    return {
       props: {
          serializedCustomJobs: serializedCustomJobs,
-         numberOfJobs: algoliaResponse.nbHits,
+         algoliaServerResponse: algoliaResponse,
          customJobData: {
             serializedCustomJob,
             livestreamsData,
