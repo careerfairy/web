@@ -38,7 +38,7 @@ const JobsPageOverview = () => {
    const { hasFilters } = useJobsOverviewContext()
 
    return (
-      <Container maxWidth="xl" sx={styles.container}>
+      <Container id="jobs-page-overview" maxWidth="xl" sx={styles.container}>
          <Stack spacing={2}>
             <OverviewSearch />
             <SearchResultsCount />

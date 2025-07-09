@@ -272,6 +272,7 @@ const CustomJobHeader = ({
                               {workplaceText ? (
                                  <Typography
                                     variant={"subtitle1"}
+                                    component="span"
                                     sx={{
                                        ...styles.details,
                                        display: "inline",
@@ -310,6 +311,7 @@ const CustomJobHeader = ({
                                  <Typography
                                     variant={"subtitle1"}
                                     display={"inline"}
+                                    component="span"
                                  >
                                     <MapPin width={14} />
                                     {jobLocation}
@@ -327,12 +329,14 @@ const CustomJobHeader = ({
                                        >
                                           <Typography
                                              variant={"subtitle1"}
+                                             component="span"
                                           >{`, +${othersCount}`}</Typography>
                                        </BrandedTooltip>
                                     ) : null}
                                     {workplaceText ? (
                                        <Typography
                                           variant={"subtitle1"}
+                                          component="span"
                                           sx={{
                                              ...styles.details,
                                              display: "inline",
