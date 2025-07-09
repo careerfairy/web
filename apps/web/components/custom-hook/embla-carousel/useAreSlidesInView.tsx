@@ -1,4 +1,4 @@
-import { type EmblaCarouselType } from "embla-carousel-react"
+import { type EmblaCarouselType } from "embla-carousel"
 import debounce from "lodash/debounce"
 import { useEffect, useState } from "react"
 
