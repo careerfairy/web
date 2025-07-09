@@ -96,7 +96,7 @@ export const useNavLinks = (
          {
             id: "jobs",
             href: `/jobs`,
-            pathname: `/jobs`,
+            pathname: `/jobs/[[...livestreamDialog]]`,
             Icon: JobsIcon,
             title: "Jobs",
          },

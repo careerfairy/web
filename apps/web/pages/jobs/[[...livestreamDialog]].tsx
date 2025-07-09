@@ -118,25 +118,38 @@ const JobsPage: NextPage<
    )
 }
 
+const PageSEO = () => {
+   const { searchParams, searchResultsCount, selectedLocationsNames } =
+      useJobsOverviewContext()
+
+   return (
+      <>
+         <meta
+            name="description"
+            content={getMetaContent(
+               searchParams,
+               searchResultsCount,
+               selectedLocationsNames
+            )}
+         />
+         <SEO
+            id={"CareerFairy | Jobs | " + searchParams.term}
+            description={"Find your dream job with CareerFairy."}
+            title={getSeoTitle(
+               searchParams,
+               searchResultsCount,
+               selectedLocationsNames
+            )}
+         />
+      </>
+   )
+}
+
 const getMetaContent = (
    searchParams: SearchParams,
    numberOfJobs: number,
    locationNames: string[]
 ) => {
-   // Helper to get job type labels
-   const getJobTypeLabels = (jobTypes?: string[]) => {
-      if (!jobTypes?.length) return []
-      return jobTypes
-         .map((type) => jobTypeOptions.find((opt) => opt.value === type)?.label)
-         .filter(Boolean)
-   }
-
-   // Helper to get business function tag labels
-   const getBusinessFunctionTagLabels = (tags?: string[]) => {
-      if (!tags?.length) return []
-      return tags.map((tag) => BusinessFunctionsTags[tag]?.name).filter(Boolean)
-   }
-
    const locations = locationNames?.length ? locationNames.join(", ") : null
    const jobTypes = getJobTypeLabels(searchParams.jobTypes)
    const jobTypesStr = jobTypes.length ? jobTypes.join(", ") : null
@@ -175,59 +188,71 @@ const getMetaContent = (
    return description
 }
 
-const PageSEO = () => {
-   const { searchParams, searchResultsCount, selectedLocationsNames } =
-      useJobsOverviewContext()
-
-   return (
-      <>
-         <meta
-            name="description"
-            content={getMetaContent(
-               searchParams,
-               searchResultsCount,
-               selectedLocationsNames
-            )}
-         />
-         <SEO
-            id={"CareerFairy | Jobs | " + searchParams.term}
-            description={"Find your dream job with CareerFairy."}
-            title={getSeoTitle(
-               searchParams,
-               searchResultsCount,
-               selectedLocationsNames
-            )}
-         />
-      </>
-   )
-}
-
 const getSeoTitle = (
    searchParams: SearchParams,
    numberOfJobs: number,
    locationNames: string[]
 ) => {
-   if (!searchParams.location.length && !searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs on CareerFairy`
+   const jobTypes = getJobTypeLabels(searchParams.jobTypes)
+   const businessFunctions = getBusinessFunctionTagLabels(
+      searchParams.businessFunctionTags
+   )
+   const locations = locationNames?.length ? locationNames.join(", ") : null
+   const term = searchParams.term
+
+   // Build title components
+   const titleParts: string[] = []
+
+   // Start with number of jobs
+   titleParts.push(numberOfJobs.toString())
+
+   // Add job types (e.g., "Part-Time", "Full-Time")
+   if (jobTypes.length) {
+      titleParts.push(jobTypes.join(", "))
    }
 
-   if (searchParams.location.length && !searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs in ${locationNames.join(
-         ", "
-      )} on CareerFairy`
+   // Add business functions (e.g., "Accounting", "Engineering")
+   if (businessFunctions.length) {
+      titleParts.push(businessFunctions.join(", "))
    }
 
-   if (!searchParams.location.length && searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs for ${searchParams.term} on CareerFairy`
+   // Add "Jobs"
+   titleParts.push("Jobs")
+
+   // Build the base title
+   let title = titleParts.join(" ")
+
+   // Add location with "in" prefix
+   if (locations) {
+      title += ` in ${locations}`
    }
 
-   if (searchParams.location.length && searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs for ${
-         searchParams.term
-      } in ${locationNames.join(", ")} on CareerFairy`
+   // Add search term with "matching" prefix
+   if (term) {
+      title += ` matching "${term}"`
    }
 
-   return `Jobs on CareerFairy`
+   // Add platform branding
+   title += " on CareerFairy"
+
+   return title
+}
+
+// Helper to get job type labels
+const getJobTypeLabels = (jobTypes?: string[]) => {
+   if (!jobTypes?.length) return []
+   return jobTypes
+      .map((type) => jobTypeOptions.find((opt) => opt.value === type)?.label)
+      .filter(Boolean)
+}
+
+// Helper to get business function tag labels
+const getBusinessFunctionTagLabels = (tags?: string[]) => {
+   if (!tags?.length) return []
+   return tags
+      .filter((tag) => tag !== "Other")
+      .map((tag) => BusinessFunctionsTags[tag]?.name)
+      .filter(Boolean)
 }
 
 type JobsPageProps = {
