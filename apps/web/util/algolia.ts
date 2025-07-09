@@ -1,6 +1,6 @@
-import { Hit } from "@algolia/client-search"
+import { Hit, SearchResponse } from "@algolia/client-search"
 import firebase from "firebase/compat/app"
-import { DeserializeTimestamps } from "types/algolia"
+import { DeserializeTimestamps, SerializeTimestamps } from "types/algolia"
 
 /**
  * Converts an Algolia search hit to a deserialized result type, transforming any timestamp objects
@@ -57,9 +57,16 @@ export const deserializeAlgoliaSearchResponse = <
  */
 export const generateArrayFilterString = (
    arrayFilters: Record<string, string[]>,
-   exclude: boolean = false
+   exclude: boolean = false,
+   options: {
+      normalizeFilterValues: boolean
+   } = {
+      normalizeFilterValues: false,
+   }
 ): string => {
    if (!arrayFilters) return ""
+
+   const { normalizeFilterValues } = options
    const filters = []
    // Go through each filter type (e.g., "tags", "categories").
    Object.entries(arrayFilters).forEach(([filterName, filterValues]) => {
@@ -68,7 +75,14 @@ export const generateArrayFilterString = (
             // For exclusion, create a single NOT condition for the OR group
             const filterValueString = filterValues
                .filter(Boolean)
-               .map((filterValue) => `NOT ${filterName}:${filterValue}`)
+               .map(
+                  (filterValue) =>
+                     `NOT ${filterName}:${
+                        normalizeFilterValues
+                           ? normalizeFilterValue(filterValue)
+                           : filterValue
+                     }`
+               )
                .join(" AND ")
 
             if (filterValueString) {
@@ -78,7 +92,14 @@ export const generateArrayFilterString = (
             // Original inclusion logic with OR
             const filterValueString = filterValues
                .filter(Boolean)
-               .map((filterValue) => `${filterName}:${filterValue}`)
+               .map(
+                  (filterValue) =>
+                     `${filterName}:${
+                        normalizeFilterValues
+                           ? normalizeFilterValue(filterValue)
+                           : filterValue
+                     }`
+               )
                .join(" OR ")
 
             if (filterValueString) {
@@ -90,6 +111,10 @@ export const generateArrayFilterString = (
 
    // Link different filter types with "AND"
    return filters.join(" AND ")
+}
+
+const normalizeFilterValue = (filterValue: string) => {
+   return filterValue.replace(" ", "-")
 }
 
 /**
@@ -136,4 +161,72 @@ export const generateDateFilter = (
    }
 
    return ""
+}
+
+/**
+ * Creates a generic Algolia search response, useful for providing fallback (initial) data to SWR.
+ * This function handles timestamp serialization and object ID mapping automatically.
+ *
+ * @template E - The original entity type (e.g. CustomJob)
+ * @template S - The serialized type for Algolia (e.g. AlgoliaCustomJobResponse)
+ * @template D - The deserialized result type (e.g. CustomJobSearchResult)
+ * @param entities - Array of original entities to serialize
+ * @returns Array of SearchResponse
+ */
+export const createAlgoliaSearchResponse = <
+   E extends { id: string },
+   S extends SerializeTimestamps<E>,
+   D extends object
+>(
+   entities: E[]
+): (SearchResponse<S> & { deserializedHits: D[] })[] => {
+   const serializeEntity = (entity: E): Hit<S> => {
+      const serialized = Object.fromEntries(
+         Object.entries(entity).map(([key, value]: [string, unknown]) => {
+            if (
+               value &&
+               typeof value === "object" &&
+               value instanceof firebase.firestore.Timestamp
+            ) {
+               return [
+                  key,
+                  { _seconds: value.seconds, _nanoseconds: value.nanoseconds },
+               ]
+            } else if (value && typeof value === "object") {
+               return [
+                  key,
+                  serializeEntity(value as any).objectID
+                     ? serializeEntity(value as any)
+                     : value,
+               ]
+            }
+            return [key, value]
+         })
+      ) as S
+
+      return {
+         ...serialized,
+         objectID: entity.id,
+      }
+   }
+
+   const serializedHits = entities.map(serializeEntity)
+
+   const response: SearchResponse<S> & { deserializedHits: D[] } = {
+      hits: serializedHits,
+      deserializedHits: entities.map((entity) => ({
+         ...entity,
+         objectID: entity.id,
+      })) as unknown as D[],
+      page: 0,
+      nbHits: entities.length,
+      nbPages: 1,
+      hitsPerPage: entities.length,
+      processingTimeMS: 0,
+      exhaustiveNbHits: true,
+      query: "",
+      params: "",
+   }
+
+   return [response]
 }

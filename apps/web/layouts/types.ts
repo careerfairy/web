@@ -1,5 +1,5 @@
-import type { FC, ReactNode } from "react"
 import type { SvgIconProps } from "@mui/material"
+import type { FC, ReactNode } from "react"
 import type { Icon } from "react-feather"
 
 type IconComponent = FC<SvgIconProps> | Icon
@@ -22,4 +22,5 @@ export type INavLink = {
    wrapper?: FC<{
       children: ReactNode
    }>
+   disabled?: boolean
 }

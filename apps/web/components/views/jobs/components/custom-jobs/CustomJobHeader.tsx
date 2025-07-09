@@ -9,7 +9,7 @@ import { useCustomJobLocation } from "components/custom-hook/custom-job/useCusto
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
-import { useRouter } from "next/router"
+import Link from "next/link"
 import { FC, useRef, useState } from "react"
 import { Briefcase, Edit, MapPin, Zap } from "react-feather"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
@@ -45,9 +45,9 @@ const styles = sxStyles({
       color: (t) => t.palette.neutral[800],
    },
    groupName: {
-      fontWeight: 600,
       wordBreak: "break-word",
-      color: (t) => t.palette.neutral[800],
+      color: (t) => t.palette.neutral[600],
+      fontWeight: 400,
    },
    editButton: {
       textTransform: "none",
@@ -65,7 +65,7 @@ const styles = sxStyles({
    },
    details: {
       color: (t) => t.palette.neutral[500],
-      fontSize: "12px",
+      fontSize: "14px",
    },
    detailsValue: {
       display: "inline",
@@ -92,6 +92,9 @@ const styles = sxStyles({
       color: (t) => t.palette.neutral[700],
       fontWeight: 400,
    },
+   nonPublicGroupHeaderLink: {
+      cursor: "default !important",
+   },
 })
 
 type Props = {
@@ -114,7 +117,6 @@ const CustomJobHeader = ({
    isAdmin,
 }: Props) => {
    const isMobile = useIsMobile()
-   const { push } = useRouter()
 
    const [tooltipOpen, setTooltipOpen] = useState(false)
    const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -130,6 +132,8 @@ const CustomJobHeader = ({
          maxLocationsToShow: maxLocationsToShow,
       }
    )
+
+   const isPublicGroup = job?.group?.publicProfile
 
    const businessFunctionTags = (job.businessFunctionsTagIds || [])
       .map((tagId) => TagValuesLookup[tagId])
@@ -170,25 +174,23 @@ const CustomJobHeader = ({
                            alignItems={"center"}
                            spacing={1}
                            mb={"8px"}
-                           sx={styles.headerCompanyLink}
-                           onClick={() => {
-                              push(
-                                 makeGroupCompanyPageUrl(companyName, {
-                                    interactionSource:
-                                       InteractionSources.Job_Header,
-                                 })
-                              )
-                           }}
+                           sx={isPublicGroup ? styles.headerCompanyLink : null}
+                           component={isPublicGroup ? Link : "div"}
+                           href={
+                              isPublicGroup
+                                 ? makeGroupCompanyPageUrl(companyName, {
+                                      interactionSource:
+                                         InteractionSources.Job_Header,
+                                   })
+                                 : undefined
+                           }
                         >
                            <CircularLogo
                               src={getResizedUrl(companyLogoUrl, "lg")}
                               alt={`company ${companyName} logo`}
-                              size={44}
+                              size={40}
                            />
-                           <Typography
-                              variant={isMobile ? "small" : "medium"}
-                              sx={styles.groupName}
-                           >
+                           <Typography variant={"small"} sx={styles.groupName}>
                               {companyName}
                            </Typography>
                         </Stack>
@@ -198,7 +200,11 @@ const CustomJobHeader = ({
                         />
                      </Stack>
                   ) : null}
-                  <Typography variant={"brandedH3"} sx={styles.jobTitle}>
+                  <Typography
+                     variant={"brandedH5"}
+                     component={"h1"}
+                     sx={styles.jobTitle}
+                  >
                      {job.title}
                   </Typography>
 
@@ -270,6 +276,7 @@ const CustomJobHeader = ({
                               {workplaceText ? (
                                  <Typography
                                     variant={"subtitle1"}
+                                    component="span"
                                     sx={{
                                        ...styles.details,
                                        display: "inline",
@@ -305,28 +312,13 @@ const CustomJobHeader = ({
                                  </>
                               ) : null}
                               {jobLocation ? (
-                                 <Typography variant={"xsmall"}>
+                                 <Typography
+                                    variant={"subtitle1"}
+                                    display={"inline"}
+                                    component="span"
+                                 >
                                     <MapPin width={14} />
                                     {jobLocation}
-                                    {/* {othersCount ? (
-                                       <Tooltip
-                                          title={
-                                             <LocationTooltip
-                                                tooltipText={tooltipText}
-                                             />
-                                          }
-                                          placement="top"
-                                       >
-                                          <Typography
-                                             variant={"subtitle1"}
-                                             sx={{
-                                                ...styles.details,
-                                                display: "inline",
-                                                ml: "0px !important",
-                                             }}
-                                          >{`, +${othersCount}`}</Typography>
-                                       </Tooltip>
-                                    ) : null} */}
                                     {othersCount ? (
                                        <BrandedTooltip
                                           title={
@@ -340,13 +332,15 @@ const CustomJobHeader = ({
                                           }}
                                        >
                                           <Typography
-                                             variant={"xsmall"}
+                                             variant={"subtitle1"}
+                                             component="span"
                                           >{`, +${othersCount}`}</Typography>
                                        </BrandedTooltip>
                                     ) : null}
                                     {workplaceText ? (
                                        <Typography
                                           variant={"subtitle1"}
+                                          component="span"
                                           sx={{
                                              ...styles.details,
                                              display: "inline",

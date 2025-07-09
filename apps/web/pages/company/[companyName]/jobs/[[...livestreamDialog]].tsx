@@ -1,14 +1,17 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
-import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
+import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { TabValue } from "components/views/company-page"
 import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import {
+   GetServerSideProps,
    GetServerSidePropsContext,
-   GetStaticPaths,
-   GetStaticPropsContext,
-   InferGetStaticPropsType,
+   InferGetServerSidePropsType,
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
@@ -26,7 +29,9 @@ import {
 } from "../../../../util/serverUtil"
 import { getCompanyPageData } from "../[[...livestreamDialog]]"
 
-const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+const JobsPage: NextPage<
+   InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -40,7 +45,7 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
    const customJobId = query.dialogJobId?.toString() || null
 
-   const serverCustomJob = useMemo(() => {
+   const serverCustomJob: CustomJob = useMemo(() => {
       const { serverSideCustomJob } = customJobDialogData || {}
       if (!serverSideCustomJob) return null
       return CustomJobsPresenter.parseDocument(
@@ -48,6 +53,14 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
          fromDate
       )
    }, [customJobDialogData])
+
+   const mappedServerCustomJobs: CustomJob[] = useMemo(() => {
+      return (
+         serverSideCustomJobs?.map((job) => {
+            return CustomJobsPresenter.parseDocument(job as any, fromDate)
+         }) || []
+      )
+   }, [serverSideCustomJobs])
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
@@ -57,6 +70,13 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             customJobId={customJobId}
          >
             <>
+               {serverCustomJob && serverCustomJob.id === customJobId ? (
+                  <CustomJobSEOSchemaScriptTag job={serverCustomJob} />
+               ) : (
+                  mappedServerCustomJobs.map((job) => (
+                     <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
+                  ))
+               )}
                <SEO
                   id={`CareerFairy | ${universityName} | Jobs`}
                   title={`CareerFairy | ${universityName} | Jobs`}
@@ -88,11 +108,9 @@ const JobsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    )
 }
 
-export const serverCustomJobGetter = async (
-   ctx: GetServerSidePropsContext | GetStaticPropsContext
-) => {
+const serverCustomJobGetter = async (ctx: GetServerSidePropsContext) => {
    try {
-      const customJobId = (ctx.params.dialogJobId as string) || null
+      const customJobId = (ctx.query.dialogJobId as string) || null
 
       if (customJobId) {
          const customJob = await getServerSideCustomJob(customJobId)
@@ -115,19 +133,22 @@ export const serverCustomJobGetter = async (
    return null
 }
 
-export const getStaticProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
    const { companyName: companyNameSlug } = ctx.params || {}
 
-   return getCompanyPageData({
+   const result = await getCompanyPageData({
       companyNameSlug: companyNameSlug as string,
       ctx,
       customJobGetter: serverCustomJobGetter,
    })
-}
 
-export const getStaticPaths: GetStaticPaths = () => ({
-   paths: [],
-   fallback: "blocking",
-})
+   if (result.notFound) {
+      return { notFound: true }
+   }
+
+   return {
+      props: result.props!,
+   }
+}
 
 export default JobsPage

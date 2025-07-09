@@ -1,4 +1,10 @@
-import { CustomJobApplicant } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { ICustomJobRepository } from "@careerfairy/shared-lib/customJobs/CustomJobRepository"
+import {
+   CustomJob,
+   CustomJobApplicant,
+   CustomJobStats,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
+import { JobsInfo } from "@careerfairy/shared-lib/customJobs/service/UserBasedRecommendationsBuilder"
 import { FieldOfStudyCategoryMap } from "@careerfairy/shared-lib/fieldOfStudy"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { IGroupRepository } from "@careerfairy/shared-lib/groups/GroupRepository"
@@ -19,6 +25,7 @@ import {
    RegisteredLivestreams,
    StudyBackground,
    UserData,
+   UserLastViewedJob,
 } from "@careerfairy/shared-lib/users"
 import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
 import { ISparkFunctionsRepository } from "src/lib/sparks/SparkFunctionsRepository"
@@ -301,5 +308,111 @@ export class SparksDataFetcher {
          this.userId,
          "seenSparks"
       )
+   }
+}
+
+type ExternalData = {
+   countryIsoCode?: string
+}
+
+export class CustomJobDataFetcher {
+   private externalData: ExternalData
+
+   constructor(
+      private readonly authId: string,
+      private readonly referenceJobId: string,
+      private readonly userRepo: IUserRepository,
+      private readonly customJobRepo: ICustomJobRepository,
+      private readonly livestreamRepo: ILivestreamRepository
+   ) {}
+
+   setExternalData(externalData: ExternalData) {
+      this.externalData = externalData
+   }
+
+   getUser(): Promise<UserData> {
+      if (!this.authId) return Promise.resolve(null)
+      return this.userRepo.getUserDataByUid(this.authId)
+   }
+
+   getUserAppliedJobs(
+      userId: string,
+      limit: number
+   ): Promise<CustomJobApplicant[]> {
+      if (!userId) return Promise.resolve([])
+      return this.userRepo.getCustomJobApplications(userId, limit)
+   }
+
+   getFutureJobs(): Promise<CustomJob[]> {
+      return this.customJobRepo.getPublishedCustomJobs(null)
+   }
+
+   getReferenceJob(): Promise<CustomJob> {
+      if (!this.referenceJobId) return Promise.resolve(null)
+      return this.customJobRepo.getCustomJobById(this.referenceJobId)
+   }
+
+   getJobStats(jobIds: string[]): Promise<CustomJobStats[]> {
+      if (!jobIds?.length) return Promise.resolve([])
+      return this.customJobRepo.getCustomJobStats(jobIds)
+   }
+
+   getUserRegisteredLivestreams(
+      userId: string,
+      limit: number
+   ): Promise<LivestreamEvent[]> {
+      if (!userId) return Promise.resolve([])
+      return this.livestreamRepo.getRegisteredEvents(userId, {
+         limit,
+      })
+   }
+
+   getUserStudyBackgrounds(userId: string): Promise<StudyBackground[]> {
+      if (!userId) return Promise.resolve([])
+      return this.userRepo.getUserStudyBackgrounds(userId)
+   }
+
+   getUserFollowingCompanies(userId: string): Promise<CompanyFollowed[]> {
+      if (!userId) return Promise.resolve([])
+      return this.userRepo.getCompaniesUserFollows(userId)
+   }
+
+   getUserLastViewedJobs(
+      userAuthId: string,
+      limit: number
+   ): Promise<UserLastViewedJob[]> {
+      if (!userAuthId) return Promise.resolve([])
+      return this.userRepo.getUserLastViewedJobs(userAuthId, limit)
+   }
+
+   getUserSavedJobs(userId: string, limit: number): Promise<CustomJob[]> {
+      if (!userId) return Promise.resolve([])
+      return this.userRepo.getSavedJobs(userId, limit)
+   }
+
+   getExternalCountryIsoCode(): string {
+      return this.externalData?.countryIsoCode ?? null
+   }
+
+   /**
+    * Preferring to only return counts as to not keep too much the data in memory.
+    */
+   async getCustomJobsInfo(customJobs: CustomJob[]): Promise<JobsInfo> {
+      if (!customJobs?.length) return Promise.resolve(null)
+      const jobsInfo: JobsInfo = {}
+
+      const upcomingEventIds = await this.livestreamRepo
+         .getUpcomingEvents()
+         .then((events) => events.map((event) => event.id))
+      customJobs.forEach((job) => {
+         const linkedUpcomingEventsCount = job.livestreams.filter(
+            (livestream) => upcomingEventIds.includes(livestream)
+         ).length
+         jobsInfo[job.id] = {
+            linkedUpcomingEventsCount,
+         }
+      })
+
+      return jobsInfo
    }
 }

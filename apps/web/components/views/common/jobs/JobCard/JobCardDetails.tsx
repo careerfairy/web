@@ -7,7 +7,6 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
@@ -30,9 +29,12 @@ const styles = sxStyles({
       color: "text.primary",
       fontWeight: 600,
       fontSize: "16px !important",
-      whiteSpace: "nowrap",
+      whiteSpace: "break-spaces",
       overflow: "hidden",
       textOverflow: "ellipsis",
+      display: "-webkit-box",
+      WebkitLineClamp: 2,
+      WebkitBoxOrient: "vertical",
    },
    warningContainer: {
       display: "flex",
@@ -119,6 +121,7 @@ type Props = {
    titleSx?: SxProps<DefaultTheme>
    typographySx?: SxProps<DefaultTheme>
    companyName?: string
+   hideCompanyName?: boolean
 }
 
 const JobCardDetails = ({
@@ -129,12 +132,11 @@ const JobCardDetails = ({
    titleSx,
    typographySx,
    companyName,
+   hideCompanyName,
 }: Props) => {
    const { userData } = useAuth()
    const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
-
-   const { talentProfileV1 } = useFeatureFlags()
 
    const jobApplication = useUserJobApplication(userData?.id, job.id)
 
@@ -176,8 +178,7 @@ const JobCardDetails = ({
       jobIsPermanentlyExpired = job?.isPermanentlyExpired
    }
 
-   const published =
-      jobPublished || (talentProfileV1 && jobApplication.alreadyApplied)
+   const published = jobPublished || jobApplication.alreadyApplied
 
    return (
       <>
@@ -220,7 +221,7 @@ const JobCardDetails = ({
                />
             ) : null}
          </Box>
-         {companyName ? (
+         {companyName && !hideCompanyName ? (
             <Box
                sx={
                   isMobile
@@ -310,7 +311,8 @@ const JobCardDetails = ({
                         smallCard ? styles.smallExpiredDate : null,
                      ]}
                   >
-                     {talentProfileV1 && jobApplication.alreadyApplied
+                     {jobApplication.alreadyApplied &&
+                     jobApplication?.job?.appliedAt
                         ? getJobApplicationDateText(
                              jobApplication.job.appliedAt.toDate()
                           )

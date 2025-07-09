@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
-import { Group, GroupOption } from "../groups"
+import { GroupOption, PublicGroup } from "../groups"
 import { UserData } from "../users"
 import { CUSTOM_JOB_CONSTANTS } from "./constants"
 /**
@@ -40,7 +40,7 @@ export interface CustomJob extends Identifiable {
    isPermanentlyExpired: boolean
    disableUrlTracking?: boolean
 
-   group: Group
+   group: PublicGroup
 }
 
 export type PublicCustomJob = Pick<
@@ -85,6 +85,11 @@ export const jobTypeOptions = [
    },
    { value: "Internship", label: "Internship", id: "Internship" },
 ]
+
+export const jobTypeValueOptions = jobTypeOptions.map((jobType) => ({
+   value: jobType.value,
+   id: jobType.id,
+}))
 
 export type CustomJobWorkplace = "on-site" | "hybrid" | "remote"
 
@@ -170,6 +175,7 @@ export const CustomJobApplicationSourceTypes = {
    Profile: "profile",
    Notification: "notification",
    Levels: "levels",
+   JobSection: "jobSection",
 } as const
 
 export type JobApplicationSource =

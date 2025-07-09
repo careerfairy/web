@@ -36,12 +36,27 @@ export const deserializeGroup = (
 export const serializePublicGroup = (
    publicGroup: PublicGroup
 ): SerializedPublicGroup => {
-   const { plan, ...rest } = publicGroup
+   if (!publicGroup) {
+      return null
+   }
+
+   if (publicGroup?.plan) {
+      delete publicGroup.plan
+   }
+
    return {
-      ...rest,
-      planType: plan?.type ?? null,
-      planStartedAtString: plan?.startedAt?.toDate().toISOString() ?? null,
-      planExpiresAtString: plan?.expiresAt?.toDate().toISOString() ?? null,
+      ...publicGroup,
+      ...(publicGroup?.plan
+         ? {
+              planType: publicGroup?.plan?.type,
+              planStartedAtString: publicGroup?.plan?.startedAt
+                 ?.toDate()
+                 ?.toISOString(),
+              planExpiresAtString: publicGroup?.plan?.expiresAt
+                 ?.toDate()
+                 ?.toISOString(),
+           }
+         : {}),
    }
 }
 
@@ -49,18 +64,16 @@ export const deserializePublicGroup = (
    publicGroup: SerializedPublicGroup,
    fromDate: fromDateFirestoreFn
 ): PublicGroup => {
-   const { planType, planStartedAtString, planExpiresAtString, ...rest } =
-      publicGroup
    return {
-      ...rest,
-      plan: planType
+      ...publicGroup,
+      plan: publicGroup?.planType
          ? {
-              type: planType,
-              startedAt: planStartedAtString
-                 ? fromDate(new Date(planStartedAtString))
+              type: publicGroup.planType,
+              startedAt: publicGroup?.planStartedAtString
+                 ? fromDate(new Date(publicGroup.planStartedAtString))
                  : null,
-              expiresAt: planExpiresAtString
-                 ? fromDate(new Date(planExpiresAtString))
+              expiresAt: publicGroup?.planExpiresAtString
+                 ? fromDate(new Date(publicGroup.planExpiresAtString))
                  : null,
            }
          : null,

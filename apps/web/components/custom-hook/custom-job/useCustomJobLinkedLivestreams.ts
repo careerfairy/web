@@ -21,7 +21,9 @@ const useCustomJobLinkedLivestreams = (job: CustomJob) => {
    const { data: livestreamData } = useFirestoreCollection<LivestreamEvent>(
       livestreamsCollectionRef,
       {
-         idField: "id", // this field will be added to the firestore object
+         idField: "id", // this field will be added to the firestore object,
+         suspense: false,
+         initialData: [],
       }
    )
 
@@ -29,6 +31,8 @@ const useCustomJobLinkedLivestreams = (job: CustomJob) => {
       draftLivestreamsCollectionRef,
       {
          idField: "id", // this field will be added to the firestore object
+         suspense: false,
+         initialData: [],
       }
    )
 

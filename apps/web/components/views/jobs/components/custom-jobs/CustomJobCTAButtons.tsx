@@ -144,6 +144,9 @@ const CustomJobCTAButtons = (props: Props) => {
       levels: () => {
          return <SparkJobCTA {...props} alreadyApplied={alreadyApplied} />
       },
+      jobSection: () => (
+         <PortalJobCTA {...props} alreadyApplied={alreadyApplied} />
+      ),
    }
 
    return ctas[props.applicationSource.source](props)

@@ -10,6 +10,10 @@ import {
 } from "../../util/bulkWriter"
 import { logAction } from "../../util/logger"
 
+interface DefaultUpdateData {
+   migrationTrigger: number
+}
+
 /**
  * @param T - The type of the documents to update, defaults to unknown and useful when
  * applying a custom filter to the documents (when not possible via query).
@@ -31,6 +35,7 @@ interface UpdateDocumentsConfig<T = unknown> {
    updateData:
       | Partial<{ [K in keyof T]: T[K] }>
       | ((data: T) => Partial<{ [K in keyof T]: T[K] }>)
+      | DefaultUpdateData
    batchSize?: number
    waitTimeBetweenBatches?: number
    dryRun?: boolean
@@ -48,18 +53,15 @@ const config: UpdateDocumentsConfig<Group> = {
       // Keep this commented out for now as an example
       // .where(FIELD_TO_FILTER_BY, "!=", null)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
-   updateData: (group) => {
-      return {
-         ...group,
-         id: group.groupId,
-      }
+   updateData: {
+      migrationTrigger: Date.now(),
    },
-   batchSize: 25,
+   batchSize: 100,
    waitTimeBetweenBatches: 2_000,
    dryRun: false, // Set to false to run the migration
-   customDataFilter: (group) => {
-      return !group?.id?.length
-   },
+   // customDataFilter: (group) => {
+   //    return !group?.id?.length
+   // },
 }
 
 const getTotalDocumentCount = async (query: Query) => {
@@ -133,7 +135,10 @@ export async function run() {
                const updateData =
                   typeof config.updateData === "function"
                      ? config.updateData(doc.data() as Group)
-                     : config.updateData
+                     : {
+                          ...doc.data(),
+                          ...config.updateData,
+                       }
 
                bulkWriter
                   .update(doc.ref, updateData)

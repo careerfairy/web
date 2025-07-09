@@ -100,6 +100,7 @@ type Props = {
    hideHeader?: boolean
    hideDrawer?: boolean
    headerWidth?: string
+   transitionTimeout?: number
 }
 
 const AdminGenericLayout: React.FC<Props> = ({
@@ -116,6 +117,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    hideHeader = false,
    hideDrawer,
    headerWidth,
+   transitionTimeout = undefined,
 }) => {
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
@@ -156,7 +158,10 @@ const AdminGenericLayout: React.FC<Props> = ({
          >
             {/* header */}
             {hideHeader ? null : (
-               <HeaderComponent width={headerWidth}>
+               <HeaderComponent
+                  width={headerWidth}
+                  transitionTimeout={transitionTimeout}
+               >
                   {headerContent}
                </HeaderComponent>
             )}
@@ -218,8 +223,13 @@ type HeaderProps = {
    children: React.ReactNode
    headerBgColor?: string
    width?: string
+   transitionTimeout?: number
 }
-const HeaderComponent = ({ children, width }: HeaderProps) => {
+const HeaderComponent = ({
+   children,
+   width,
+   transitionTimeout = undefined,
+}: HeaderProps) => {
    const { headerScrollThreshold, headerFixed, headerType } =
       useGenericDashboard()
    const isMobile = useIsMobile()
@@ -243,6 +253,7 @@ const HeaderComponent = ({ children, width }: HeaderProps) => {
          appear={false}
          direction="down"
          in={isMobile ? headerFixed || !isScrolling : true}
+         timeout={transitionTimeout}
       >
          <AppBar
             enableColorOnDark
