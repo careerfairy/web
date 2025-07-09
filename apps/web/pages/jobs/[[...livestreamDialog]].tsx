@@ -1,10 +1,14 @@
 import { SearchResponse } from "@algolia/client-search"
+import { BusinessFunctionsTags } from "@careerfairy/shared-lib/constants/tags"
 import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import {
    CustomJobsPresenter,
    SerializedCustomJob,
 } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
-import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   jobTypeOptions,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
@@ -114,6 +118,64 @@ const JobsPage: NextPage<
    )
 }
 
+const getMetaContent = (
+   searchParams: SearchParams,
+   numberOfJobs: number,
+   locationNames: string[]
+) => {
+   // Helper to get job type labels
+   const getJobTypeLabels = (jobTypes?: string[]) => {
+      if (!jobTypes?.length) return []
+      return jobTypes
+         .map((type) => jobTypeOptions.find((opt) => opt.value === type)?.label)
+         .filter(Boolean)
+   }
+
+   // Helper to get business function tag labels
+   const getBusinessFunctionTagLabels = (tags?: string[]) => {
+      if (!tags?.length) return []
+      return tags.map((tag) => BusinessFunctionsTags[tag]?.name).filter(Boolean)
+   }
+
+   const locations = locationNames?.length ? locationNames.join(", ") : null
+   const jobTypes = getJobTypeLabels(searchParams.jobTypes)
+   const jobTypesStr = jobTypes.length ? jobTypes.join(", ") : null
+   const businessFunctions = getBusinessFunctionTagLabels(
+      searchParams.businessFunctionTags
+   )
+   const businessFunctionsStr = businessFunctions.length
+      ? businessFunctions.join(", ")
+      : null
+   const term = searchParams.term
+
+   // Compose dynamic description
+   let description = `Browse ${numberOfJobs} early-career jobs, internships and graduate programs across tech, consulting & engineering.`
+
+   const filters: string[] = []
+   if (locations)
+      filters.push(
+         `location${locationNames.length > 1 ? "s" : ""} in ${locations}`
+      )
+   if (jobTypesStr)
+      filters.push(`job type${jobTypes.length > 1 ? "s" : ""}: ${jobTypesStr}`)
+   if (businessFunctionsStr)
+      filters.push(
+         `job area${
+            businessFunctions.length > 1 ? "s" : ""
+         }: ${businessFunctionsStr}`
+      )
+   if (term) filters.push(`matching "${term}"`)
+
+   if (filters.length) {
+      description = `Browse ${numberOfJobs} early-career jobs${
+         filters.length ? " filtered by " + filters.join(", ") : ""
+      }. Apply directly on CareerFairy.`
+   }
+
+   console.log("🚀 ~ description:", description)
+   return description
+}
+
 const PageSEO = () => {
    const { searchParams, searchResultsCount, selectedLocationsNames } =
       useJobsOverviewContext()
@@ -122,7 +184,11 @@ const PageSEO = () => {
       <>
          <meta
             name="description"
-            content={`Browse ${searchResultsCount} early-career jobs, internships and graduate programs across tech, consulting & engineering. Filter by location, field and job type, and apply directly on CareerFairy.`}
+            content={getMetaContent(
+               searchParams,
+               searchResultsCount,
+               selectedLocationsNames
+            )}
          />
          <SEO
             id={"CareerFairy | Jobs | " + searchParams.term}
