@@ -7,7 +7,6 @@ import {
    StyledBenefitCard,
    StyledBenefitsGrid,
    StyledBenefitsSection,
-   StyledMockupContainer,
 } from "./styles"
 
 const BenefitsSection = () => {
@@ -22,113 +21,181 @@ const BenefitsSection = () => {
       {
          id: "students",
          mockupContent: (
-            <StyledMockupContainer>
-               {/* Student profiles mockup */}
+            <Box
+               sx={{
+                  backgroundColor: "#E6F3FB",
+                  borderRadius: "4px",
+                  height: "158px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "16px",
+                  position: "relative",
+               }}
+            >
+               {/* Student profiles mockup with overlapping cards */}
                <Box
-                  display="flex"
-                  gap="8px"
-                  flexWrap="wrap"
-                  justifyContent="center"
+                  sx={{
+                     position: "relative",
+                     width: "100%",
+                     maxWidth: "280px",
+                     height: "118px",
+                     margin: "0 auto",
+                  }}
                >
+                  {/* Anna Schmidt - Left card */}
                   <Box
                      sx={{
-                        width: "60px",
-                        height: "80px",
+                        position: "absolute",
+                        left: "5%",
+                        top: "5px",
+                        width: "80px",
+                        height: "100px",
                         backgroundColor: "white",
-                        borderRadius: "8px",
+                        borderRadius: "5px",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        padding: "8px",
-                        gap: "4px",
+                        padding: "10px 3px",
+                        gap: "3px",
+                        zIndex: 1,
                      }}
                   >
                      <Box
+                        component="img"
+                        src="/student-avatars/anna-schmidt-avatar.png"
+                        alt="Anna Schmidt"
                         sx={{
-                           width: "32px",
-                           height: "32px",
+                           width: "56px",
+                           height: "56px",
                            borderRadius: "50%",
-                           backgroundColor: "#9581EE",
+                           objectFit: "cover",
                         }}
                      />
                      <Typography
                         variant="caption"
-                        fontSize="8px"
+                        fontSize="10px"
+                        fontWeight={600}
                         textAlign="center"
+                        lineHeight="1.5"
                      >
                         Anna Schmidt
                      </Typography>
-                     <Typography variant="caption" fontSize="7px" color="grey">
+                     <Typography
+                        variant="caption"
+                        fontSize="8.5px"
+                        fontWeight={300}
+                        color="grey"
+                        textAlign="center"
+                        lineHeight="1.5"
+                     >
                         Finance
                      </Typography>
                   </Box>
+
+                  {/* Lukas Müller - Center card (elevated) */}
                   <Box
                      sx={{
-                        width: "60px",
-                        height: "80px",
+                        position: "absolute",
+                        left: "50%",
+                        top: "0px",
+                        transform: "translateX(-50%)",
+                        width: "76px",
+                        height: "96px",
                         backgroundColor: "white",
-                        borderRadius: "8px",
+                        borderRadius: "5px",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        padding: "8px",
-                        gap: "4px",
+                        padding: "10px 3px",
+                        gap: "3px",
+                        boxShadow: "0px 0px 35px 0px rgba(20, 20, 20, 0.08)",
+                        zIndex: 3,
                      }}
                   >
                      <Box
+                        component="img"
+                        src="/student-avatars/lukas-muller-avatar.png"
+                        alt="Lukas Müller"
                         sx={{
-                           width: "32px",
-                           height: "32px",
+                           width: "54px",
+                           height: "54px",
                            borderRadius: "50%",
-                           backgroundColor: "#FBD550",
+                           objectFit: "cover",
                         }}
                      />
                      <Typography
                         variant="caption"
-                        fontSize="8px"
+                        fontSize="10px"
+                        fontWeight={600}
                         textAlign="center"
+                        lineHeight="1.5"
                      >
                         Lukas Müller
                      </Typography>
-                     <Typography variant="caption" fontSize="7px" color="grey">
+                     <Typography
+                        variant="caption"
+                        fontSize="8.5px"
+                        fontWeight={300}
+                        color="grey"
+                        textAlign="center"
+                        lineHeight="1.5"
+                     >
                         Business
                      </Typography>
                   </Box>
+
+                  {/* Clara Müller - Right card */}
                   <Box
                      sx={{
-                        width: "60px",
-                        height: "80px",
+                        position: "absolute",
+                        right: "5%",
+                        top: "5px",
+                        width: "80px",
+                        height: "100px",
                         backgroundColor: "white",
-                        borderRadius: "8px",
+                        borderRadius: "5px",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        padding: "8px",
-                        gap: "4px",
-                        boxShadow: "0px 0px 42px 0px rgba(20, 20, 20, 0.08)",
+                        padding: "10px 3px",
+                        gap: "3px",
+                        zIndex: 2,
                      }}
                   >
                      <Box
+                        component="img"
+                        src="/student-avatars/clara-muller-avatar.png"
+                        alt="Clara Müller"
                         sx={{
-                           width: "32px",
-                           height: "32px",
+                           width: "56px",
+                           height: "56px",
                            borderRadius: "50%",
-                           backgroundColor: "#00D2AA",
+                           objectFit: "cover",
                         }}
                      />
                      <Typography
                         variant="caption"
-                        fontSize="8px"
+                        fontSize="10px"
+                        fontWeight={600}
                         textAlign="center"
+                        lineHeight="1.5"
                      >
                         Clara Müller
                      </Typography>
-                     <Typography variant="caption" fontSize="7px" color="grey">
+                     <Typography
+                        variant="caption"
+                        fontSize="8.5px"
+                        fontWeight={300}
+                        color="grey"
+                        textAlign="center"
+                        lineHeight="1.5"
+                     >
                         Computer science
                      </Typography>
                   </Box>
                </Box>
-            </StyledMockupContainer>
+            </Box>
          ),
          title: "Get in front of the right students",
          description:
