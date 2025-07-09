@@ -57,7 +57,7 @@ const JobsPage: NextPage<
    algoliaServerResponse,
 }) => {
    const router = useRouter()
-   const { jobId } = router.query
+   const { currentJobId } = router.query
    const { authenticatedUser } = useAuth()
 
    const serverCustomJobs =
@@ -81,7 +81,7 @@ const JobsPage: NextPage<
 
    return (
       <>
-         {serverJob && serverJob.id === jobId ? (
+         {serverJob && serverJob.id === currentJobId ? (
             <CustomJobSEOSchemaScriptTag job={serverJob} />
          ) : (
             serverCustomJobs.map((job) => (
@@ -101,6 +101,7 @@ const JobsPage: NextPage<
                   dialogOpen={dialogOpen}
                   locationNames={locationNames}
                   algoliaServerResponse={algoliaServerResponse}
+                  numberOfJobs={algoliaServerResponse?.nbHits}
                   userCountryCode={userCountryCode}
                >
                   <PageSEO />
@@ -118,15 +119,21 @@ const PageSEO = () => {
       useJobsOverviewContext()
 
    return (
-      <SEO
-         id={"CareerFairy | Jobs | " + searchParams.term}
-         description={"Find your dream job with CareerFairy."}
-         title={getSeoTitle(
-            searchParams,
-            searchResultsCount,
-            selectedLocationsNames
-         )}
-      />
+      <>
+         <meta
+            name="description"
+            content={`Browse ${searchResultsCount} early-career jobs, internships and graduate programs across tech, consulting & engineering. Filter by location, field and job type, and apply directly on CareerFairy.`}
+         />
+         <SEO
+            id={"CareerFairy | Jobs | " + searchParams.term}
+            description={"Find your dream job with CareerFairy."}
+            title={getSeoTitle(
+               searchParams,
+               searchResultsCount,
+               selectedLocationsNames
+            )}
+         />
+      </>
    )
 }
 
@@ -178,15 +185,16 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
    const userCountryCode =
       (context.req.headers["x-vercel-ip-country"] as string) || null
 
-   const { term: queryTerm = "", jobId: queryJobId } = context.query
+   const { term: queryTerm = "", currentJobId: queryCurrentJobId } =
+      context.query
 
    const token = getUserTokenFromCookie(context) as any
    const userAuthId = token?.user_id
 
    const term = queryTerm as string
-   const jobId = queryJobId as string
+   const currentJobId = queryCurrentJobId as string
 
-   const dialogOpen = Boolean(jobId)
+   const dialogOpen = Boolean(currentJobId)
 
    const queryLocations = getQueryStringArray(context.query.location)
    const locationNames = getLocationNames(queryLocations)
@@ -243,8 +251,8 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       ? algoliaCustomJobs?.at(0)
       : recommendedJobs?.at(0)
 
-   const customJob = jobId
-      ? await customJobRepo.getCustomJobById(jobId)
+   const customJob = currentJobId
+      ? await customJobRepo.getCustomJobById(currentJobId)
       : firstCustomJob
 
    const serializedCustomJob = customJob

@@ -200,7 +200,11 @@ const CustomJobHeader = ({
                         />
                      </Stack>
                   ) : null}
-                  <Typography variant={"brandedH5"} sx={styles.jobTitle}>
+                  <Typography
+                     variant={"brandedH5"}
+                     component={"h1"}
+                     sx={styles.jobTitle}
+                  >
                      {job.title}
                   </Typography>
 

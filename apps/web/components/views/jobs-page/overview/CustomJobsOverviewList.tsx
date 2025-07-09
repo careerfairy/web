@@ -42,7 +42,7 @@ export const CustomJobsOverviewList = () => {
 
    const filterParams = useMemo(() => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { jobId, ...rest } = searchParams
+      const { currentJobId, ...rest } = searchParams
       return JSON.stringify(rest)
    }, [searchParams])
 
