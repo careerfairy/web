@@ -1,5 +1,6 @@
 import { Box, styled, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import Autoplay from "embla-carousel-autoplay"
 import useEmblaCarousel from "embla-carousel-react"
 import { GenericCarousel } from "../../../../common/carousels/GenericCarousel"
 
@@ -111,13 +112,18 @@ const BenefitCard = ({ card }: BenefitCardProps) => (
    </StyledBenefitCard>
 )
 
+const autoplay = Autoplay({ playOnInit: true, delay: 7000 })
+
 export const BenefitsSection = () => {
    const isMobile = useIsMobile()
 
-   const [emblaRef, emblaApi] = useEmblaCarousel({
-      align: "start",
-      containScroll: "trimSnaps",
-   })
+   const [emblaRef, emblaApi] = useEmblaCarousel(
+      {
+         align: "start",
+         containScroll: "trimSnaps",
+      },
+      [autoplay]
+   )
 
    return (
       <StyledBenefitsSection>
