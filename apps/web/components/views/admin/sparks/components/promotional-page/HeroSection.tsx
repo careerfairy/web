@@ -1,17 +1,11 @@
-import {
-   Box,
-   Button,
-   CardContent,
-   LinearProgress,
-   Stack,
-   Typography,
-} from "@mui/material"
+import { Box, Button, CardContent, Stack, Typography } from "@mui/material"
 import { BarChart, Calendar, PlayCircle, Target } from "react-feather"
 import {
    StyledBrandAwarenessCard,
    StyledCardBenefits,
    StyledFullCard,
    StyledHeroContent,
+   StyledLinearProgress,
    StyledPricingSection,
    StyledProgressHeader,
    StyledProgressIcon,
@@ -64,19 +58,7 @@ export const HeroSection = () => {
                </StyledProgressHeader>
 
                <Stack spacing={0.5}>
-                  <LinearProgress
-                     variant="determinate"
-                     value={20}
-                     sx={{
-                        height: 14,
-                        borderRadius: 100,
-                        backgroundColor: "rgba(227, 233, 253, 0.56)",
-                        "& .MuiLinearProgress-bar": {
-                           backgroundColor: "#01AF3C",
-                           borderRadius: "100px",
-                        },
-                     }}
-                  />
+                  <StyledLinearProgress variant="determinate" value={20} />
                   <Typography
                      variant="xsmall"
                      component="span"
