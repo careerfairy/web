@@ -9,6 +9,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import { Box, IconButton } from "@mui/material"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import { CustomJobDetailsProvider } from "components/views/common/jobs/CustomJobDetailsProvider"
 import CustomJobApplyConfirmation from "components/views/jobs/components/custom-jobs/CustomJobApplyConfirmation"
 import CustomJobCTAButtons from "components/views/jobs/components/custom-jobs/CustomJobCTAButtons"
 import CustomJobDetailsView from "components/views/jobs/components/custom-jobs/CustomJobDetailsView"
@@ -78,16 +79,23 @@ const JobDetails = ({ job, spark }: Props) => {
             withActions
             hideCloseButton
          >
-            <CustomJobDetailsView
-               sx={styles.content}
-               job={job}
-               companyName={spark.group.universityName}
-               companyLogoUrl={spark.group.logoUrl}
-               context={applicationSource}
-               heroContent={<Hero />}
-               heroSx={styles.hero}
+            <CustomJobDetailsProvider
+               customJob={job}
+               source={applicationSource}
+               hideApplicationConfirmation
                hideCTAButtons
-            />
+            >
+               <CustomJobDetailsView
+                  sx={styles.content}
+                  job={job}
+                  companyName={spark.group.universityName}
+                  companyLogoUrl={spark.group.logoUrl}
+                  context={applicationSource}
+                  heroContent={<Hero />}
+                  heroSx={styles.hero}
+                  hideCTAButtons
+               />
+            </CustomJobDetailsProvider>
             {isApplyConfirmationOpen ? (
                <CustomJobApplyConfirmation
                   handleClose={handleConfirmationClose}

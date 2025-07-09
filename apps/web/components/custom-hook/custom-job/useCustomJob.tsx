@@ -3,16 +3,21 @@ import { useMemo } from "react"
 import { ReactFireOptions } from "reactfire"
 import { useFirestoreDocument } from "../utils/useFirestoreDocument"
 
+type Options = {
+   initialData?: CustomJob
+}
+
 /**
  * Fetch Custom Jobs
  *
  * @param jobId
  */
-const useCustomJob = (jobId: string, initialData?: CustomJob) => {
-   const options = useMemo(() => {
+const useCustomJob = (jobId: string, options?: Options) => {
+   const { initialData } = options || {}
+
+   const reactFireOptions = useMemo(() => {
       const opts: ReactFireOptions = {
          idField: "id",
-         suspense: true,
       }
 
       /**
@@ -31,7 +36,7 @@ const useCustomJob = (jobId: string, initialData?: CustomJob) => {
    const { data } = useFirestoreDocument<CustomJob>(
       "customJobs",
       [jobId],
-      options
+      reactFireOptions
    )
 
    return data

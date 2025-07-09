@@ -19,6 +19,7 @@ type IGenericDashboardContext = {
    headerType?: "sticky" | "fixed"
    drawerOpen: boolean
    isMobile: boolean
+   userCountryCode?: string
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
@@ -28,6 +29,7 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
    headerFixed: false,
    drawerOpen: false,
    isMobile: false,
+   userCountryCode: undefined,
 })
 
 type Props = {
@@ -63,6 +65,15 @@ type Props = {
     * If true, the header will be hidden
     */
    hideHeader?: boolean
+   /**
+    * The country code of the user, determined by the request header
+    * 'x-vercel-ip-country' during SSR
+    */
+   userCountryCode?: string
+   /**
+    * The timeout for the header transition, defaults to undefined
+    */
+   transitionTimeout?: number
 }
 
 const GenericDashboardLayout = ({
@@ -79,6 +90,8 @@ const GenericDashboardLayout = ({
    hideBottomNav,
    isBottomNavDark = false,
    hideHeader,
+   userCountryCode,
+   transitionTimeout = undefined,
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
 
@@ -99,6 +112,7 @@ const GenericDashboardLayout = ({
          headerType: headerType,
          drawerOpen,
          isMobile,
+         userCountryCode,
       }),
       [
          handleOpenCreditsDialog,
@@ -108,6 +122,7 @@ const GenericDashboardLayout = ({
          headerType,
          drawerOpen,
          isMobile,
+         userCountryCode,
       ]
    )
 
@@ -130,6 +145,7 @@ const GenericDashboardLayout = ({
                drawerOpen={drawerOpen}
                dropdownNav={isMobile ? <TabsNavigator /> : null}
                headerWidth={headerWidth}
+               transitionTimeout={transitionTimeout}
             >
                {children}
                {hideFooter ? null : (

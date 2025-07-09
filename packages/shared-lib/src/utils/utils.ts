@@ -582,3 +582,194 @@ export const arraySortByIndex = <T>(
    })
    return sortedItems
 }
+
+export const getQueryStringArray = (
+   queryString: string | string[] | undefined
+): string[] => {
+   const keyValues: string[] = []
+
+   if (!queryString) return []
+
+   if (Array.isArray(queryString)) {
+      keyValues.push(...queryString)
+   } else {
+      keyValues.push(queryString as string)
+   }
+
+   return keyValues
+}
+
+export type TruncationResult = {
+   truncatedText: string | null
+   plusCount: number | null
+   shouldShowTooltip: boolean
+}
+
+// The caller is responsible for setting the font on the context.
+let canvasContextSingleton: CanvasRenderingContext2D | null = null
+export const getCanvasContext = (): CanvasRenderingContext2D | null => {
+   if (!canvasContextSingleton) {
+      if (typeof document !== "undefined") {
+         const canvas = document.createElement("canvas")
+         canvasContextSingleton = canvas.getContext("2d")
+      } else {
+         return null
+      }
+   }
+   // Font is NOT set here. Caller must set it.
+   return canvasContextSingleton
+}
+
+/**
+ * @description
+ * Calculates the optimal truncation of a list of items to fit within a given container width.
+ * @param ctx - The canvas context to use for measuring text width.
+ * @param items - The list of items to truncate.
+ * @param containerWidth - The width of the container to fit the truncated text within.
+ * @param separator - The separator to use between items.
+ * @returns An object containing the truncated text, the number of items that were truncated, and a boolean indicating whether to show a tooltip.
+ */
+export const calculateOptimalTruncation = (
+   ctx: CanvasRenderingContext2D | null,
+   items: string[] | null | undefined,
+   containerWidth: number,
+   separator: string
+): TruncationResult => {
+   if (!ctx || !items || items.length === 0) {
+      const joinedItemsInitial = items?.join(separator) || ""
+      return {
+         truncatedText: joinedItemsInitial.trimEnd(),
+         plusCount: null,
+         shouldShowTooltip: false,
+      }
+   }
+
+   const fullTextOriginal = items.join(separator)
+   if (ctx.measureText(fullTextOriginal).width <= containerWidth) {
+      return {
+         truncatedText: fullTextOriginal.trimEnd(),
+         plusCount: null,
+         shouldShowTooltip: false,
+      }
+   }
+
+   for (let numTextItems = items.length; numTextItems >= 1; numTextItems--) {
+      const plusCount = items.length - numTextItems
+      const plusCountStringForMeasurement =
+         plusCount > 0 ? `, +${plusCount}` : ""
+
+      const currentTextItems = items.slice(0, numTextItems)
+      let textToRender = currentTextItems.join(separator)
+      if (
+         ctx.measureText(textToRender + plusCountStringForMeasurement).width <=
+         containerWidth
+      ) {
+         return {
+            truncatedText: textToRender.trimEnd(),
+            plusCount: plusCount > 0 ? plusCount : null,
+            shouldShowTooltip: true,
+         }
+      }
+
+      if (numTextItems >= 1) {
+         const prefixItems = items.slice(0, numTextItems - 1)
+         const itemToTruncate = items[numTextItems - 1]
+         const prefixText = prefixItems.join(separator)
+
+         if (itemToTruncate) {
+            for (let j = itemToTruncate.length; j >= 1; j--) {
+               const truncatedPart = itemToTruncate.substring(0, j) + "..."
+               textToRender =
+                  prefixItems.length > 0
+                     ? prefixText + separator + truncatedPart
+                     : truncatedPart
+
+               if (
+                  ctx.measureText(textToRender + plusCountStringForMeasurement)
+                     .width <= containerWidth
+               ) {
+                  return {
+                     truncatedText: textToRender.trimEnd(),
+                     plusCount: plusCount > 0 ? plusCount : null,
+                     shouldShowTooltip: true,
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   if (items.length > 0) {
+      const plusNOnlyText = `+${items.length}`
+      if (ctx.measureText(plusNOnlyText).width <= containerWidth) {
+         return {
+            truncatedText: plusNOnlyText,
+            plusCount: null,
+            shouldShowTooltip: true,
+         }
+      }
+   }
+   if (ctx.measureText("...").width <= containerWidth) {
+      return { truncatedText: "...", plusCount: null, shouldShowTooltip: true }
+   }
+   return {
+      truncatedText: "",
+      plusCount: null,
+      shouldShowTooltip: items.length > 0,
+   }
+}
+
+/**
+ * Shuffle items within windows and optionally swap between windows.
+ * @param items Sorted array (highest points first)
+ * @param windowSize Number of items per window to shuffle
+ * @param swapCount Number of swaps between adjacent windows
+ * @returns Shuffled array
+ */
+export const windowedShuffle = <T>(
+   items: T[],
+   windowSize = 10,
+   swapCount = 0,
+   options?: {
+      sortValueGetter?: (item: T) => number
+   }
+): T[] => {
+   // Split into windows using chunkArray
+   const windows = chunkArray(items, windowSize)
+
+   // Shuffle each window in place
+   windows.forEach((window) => {
+      shuffle(window)
+   })
+
+   // Optionally swap items between adjacent windows
+   for (let w = 0; w < windows.length - 1; w++) {
+      // For each pair of adjacent windows, perform 'swapCount' swaps
+      for (let s = 0; s < swapCount; s++) {
+         // Skip if either window is empty
+         if (windows[w].length === 0 || windows[w + 1].length === 0) continue
+         // Randomly select an index in the current window
+         const i = Math.floor(Math.random() * windows[w].length)
+         // Randomly select an index in the next window
+         const j = Math.floor(Math.random() * windows[w + 1].length)
+         // Swap the selected items between the two windows
+         // This allows some items to move up or down between windows, increasing variety
+         swapPositions(windows[w], i, j)
+      }
+   }
+
+   // Flatten back to a single array
+   let result = windows.flat()
+
+   // If a sortValueGetter is provided, sort the result accordingly
+   if (options?.sortValueGetter) {
+      result = result.sort((a, b) => {
+         const aValue = options.sortValueGetter(a)
+         const bValue = options.sortValueGetter(b)
+
+         return bValue - aValue
+      })
+   }
+
+   return result
+}

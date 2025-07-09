@@ -1,4 +1,5 @@
 import {
+   CustomJob,
    CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
@@ -30,25 +31,25 @@ const useCustomJobApply = (
    const dispatch = useAppDispatch()
    const { alreadyApplied, applicationInitiatedOnly } = useUserJobApplication(
       userData?.id,
-      job.id
+      job?.id
    )
 
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
-   const customJob = useCustomJob(job.id)
+   const customJob = useCustomJob(job?.id, { initialData: job as CustomJob })
 
    const { trigger: handleConfirmApply, isMutating: isApplying } =
       useSWRMutation(
-         `user-${userData?.id}-applyToCustomJob-${job.id}`,
+         `user-${userData?.id}-applyToCustomJob-${job?.id}`,
          async () => {
             if (userData) {
                return await customJobServiceInstance.confirmJobApplication(
-                  job.id,
+                  job?.id,
                   userData?.id
                )
             } else {
                return await customJobServiceInstance.confirmAnonymousJobApplication(
-                  job.id,
+                  job?.id,
                   fingerPrintId
                )
             }
@@ -77,8 +78,8 @@ const useCustomJobApply = (
                if (isInTalentGuide) {
                   dispatch(
                      trackLevelsJobApplied({
-                        jobId: job.id,
-                        jobName: job.title,
+                        jobId: job?.id,
+                        jobName: job?.title,
                      })
                   )
                }
@@ -95,7 +96,7 @@ const useCustomJobApply = (
 
    const { trigger: handleClickApplyBtn, isMutating: isClickingOnApplyBtn } =
       useSWRMutation(
-         `user-${userData?.id}-clicksOnCustomJob-${job.id}`,
+         `user-${userData?.id}-clicksOnCustomJob-${job?.id}`,
          async () => {
             const jobApplication = userData
                ? customJobRepo.applyUserToCustomJob(
@@ -110,7 +111,7 @@ const useCustomJobApply = (
                  )
 
             return await Promise.all([
-               customJobRepo.incrementCustomJobClicks(job.id),
+               customJobRepo.incrementCustomJobClicks(job?.id),
                jobApplication,
             ]).then(() => {
                dataLayerCustomJobEvent(

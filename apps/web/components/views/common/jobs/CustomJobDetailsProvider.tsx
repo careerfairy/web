@@ -3,6 +3,7 @@ import {
    CustomJobApplicationSource,
    PublicCustomJob,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { Group } from "@careerfairy/shared-lib/groups/groups"
 import useCustomJobApply from "components/custom-hook/custom-job/useCustomJobApply"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
@@ -32,6 +33,12 @@ interface CustomJobDetailsContextType {
    handleRemoveJobClose: () => void
    handleClickApplyBtn: () => void
    handleConfirmApply: () => void
+   group?: Group
+   suspense?: boolean
+   hideApplicationConfirmation?: boolean
+   hideLinkedLivestreams?: boolean
+   hideLinkedSparks?: boolean
+   hideCTAButtons?: boolean
 }
 
 const CustomJobDetailsContext = createContext<
@@ -42,22 +49,38 @@ interface CustomJobDetailsProviderProps {
    children: ReactNode
    customJob: CustomJob
    source: CustomJobApplicationSource
+   suspense?: boolean
+   hideApplicationConfirmation?: boolean
+   hideLinkedLivestreams?: boolean
+   hideLinkedSparks?: boolean
+   hideCTAButtons?: boolean
 }
 
 export const CustomJobDetailsProvider: React.FC<
    CustomJobDetailsProviderProps
-> = ({ children, customJob, source }) => {
+> = (props: CustomJobDetailsProviderProps) => {
+   const {
+      customJob,
+      source,
+      children,
+      suspense,
+      hideApplicationConfirmation,
+      hideLinkedLivestreams,
+      hideLinkedSparks,
+      hideCTAButtons,
+   } = props
    const { data: fingerPrintId } = useFingerPrint()
 
    const { userData } = useAuth()
 
    const { applicationInitiatedOnly: shouldOpenApplyConfirmation } =
-      useUserJobApplication(userData?.id || fingerPrintId, customJob.id)
+      useUserJobApplication(userData?.id || fingerPrintId, customJob?.id)
+
    const [
       isApplyConfirmationOpen,
       handleConfirmationOpen,
       handleConfirmationClose,
-   ] = useDialogStateHandler(false)
+   ] = useDialogStateHandler(shouldOpenApplyConfirmation)
 
    const [isRemoveConfirmationOpen, handleRemoveJobOpen, handleRemoveJobClose] =
       useDialogStateHandler(false)
@@ -65,10 +88,20 @@ export const CustomJobDetailsProvider: React.FC<
    const { applicationInitiatedOnly, handleClickApplyBtn, handleConfirmApply } =
       useCustomJobApply(customJob as PublicCustomJob, source)
 
+   const group = customJob?.group as Group
+
    useEffect(() => {
-      if (shouldOpenApplyConfirmation) handleConfirmationOpen()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [shouldOpenApplyConfirmation])
+      if (shouldOpenApplyConfirmation) {
+         handleConfirmationOpen()
+      } else {
+         handleConfirmationClose()
+      }
+   }, [
+      shouldOpenApplyConfirmation,
+      customJob,
+      handleConfirmationOpen,
+      handleConfirmationClose,
+   ])
 
    const autoActionType = useSelector(autoAction)
    const isAutoApply = autoActionType === AutomaticActions.APPLY
@@ -87,6 +120,12 @@ export const CustomJobDetailsProvider: React.FC<
          handleRemoveJobClose,
          handleClickApplyBtn,
          handleConfirmApply,
+         group,
+         suspense,
+         hideApplicationConfirmation,
+         hideLinkedLivestreams,
+         hideLinkedSparks,
+         hideCTAButtons,
       }),
       [
          customJob,
@@ -101,6 +140,12 @@ export const CustomJobDetailsProvider: React.FC<
          handleRemoveJobClose,
          handleClickApplyBtn,
          handleConfirmApply,
+         group,
+         suspense,
+         hideApplicationConfirmation,
+         hideLinkedLivestreams,
+         hideLinkedSparks,
+         hideCTAButtons,
       ]
    )
 

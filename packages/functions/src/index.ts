@@ -252,6 +252,8 @@ exports.periodicallyRemoveCachedDocument =
 exports[FUNCTION_NAMES.getRecommendedEvents] =
    recommendation.getRecommendedEvents
 
+exports[FUNCTION_NAMES.getRecommendedJobs] = recommendation.getRecommendedJobs
+
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
 exports.syncLivestreamStartNotifications =
@@ -385,6 +387,8 @@ exports[FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook] =
    customerio.customerIORecommendedLivestreamsWebhook
 exports[FUNCTION_NAMES.customerIORecommendedSparksWebhook] =
    customerio.customerIORecommendedSparksWebhook
+exports[FUNCTION_NAMES.customerIORecommendedJobsWebhook] =
+   customerio.customerIORecommendedJobsWebhook
 
 // Reminders
 exports.schedule5MinutesReminderEmails =

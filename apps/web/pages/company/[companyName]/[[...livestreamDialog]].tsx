@@ -1,5 +1,8 @@
 import { CustomJobsPresenter } from "@careerfairy/shared-lib/customJobs/CustomJobsPresenter"
-import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
+import {
+   CustomJob,
+   CustomJobApplicationSourceTypes,
+} from "@careerfairy/shared-lib/customJobs/customJobs"
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import {
    PublicCreator,
@@ -10,6 +13,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
+import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { TabValue } from "components/views/company-page"
 import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import { CustomJobDialogData } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
@@ -21,11 +25,13 @@ import {
    GetStaticPaths,
    GetStaticPathsContext,
    GetStaticProps,
+   GetStaticPropsContext,
    InferGetStaticPropsType,
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
 import React, { useEffect, useMemo } from "react"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
@@ -41,10 +47,10 @@ import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
 import {
    deserializeGroupClient,
    getLivestreamsAndDialogData,
+   getServerSideCustomJob,
    mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../util/serverUtil"
-import { serverCustomJobGetter } from "./jobs/[[...livestreamDialog]]"
 
 const PARAMETER_SOURCE = "livestreamDialog"
 
@@ -86,7 +92,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
          ),
    }) as unknown as React.RefObject<HTMLDivElement>
 
-   const serverCustomJob = useMemo(() => {
+   const serverCustomJob: CustomJob = useMemo(() => {
       const { serverSideCustomJob } = customJobDialogData || {}
       if (!serverSideCustomJob) return null
       return CustomJobsPresenter.parseDocument(
@@ -95,6 +101,10 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
       )
    }, [customJobDialogData])
 
+   const mappedServerCustomJobs = useMemo(() => {
+      return mapCustomJobsFromServerSide(serverSideCustomJobs)
+   }, [serverSideCustomJobs])
+
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
          <CustomJobDialogProvider
@@ -102,6 +112,9 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             serverSideCustomJob={serverCustomJob}
             customJobId={customJobId}
          >
+            {mappedServerCustomJobs?.map((job) => (
+               <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
+            ))}
             <SEO
                id={`CareerFairy | ${universityName}`}
                title={`CareerFairy | ${universityName}`}
@@ -121,9 +134,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                      pastLivestreams={mapFromServerSide(
                         serverSidePastLivestreams
                      )}
-                     customJobs={mapCustomJobsFromServerSide(
-                        serverSideCustomJobs
-                     )}
+                     customJobs={mappedServerCustomJobs}
                      editMode={false}
                      tab={TabValue.overview}
                   />
@@ -239,6 +250,33 @@ export async function getCompanyPageData({
       notFound: false,
       revalidate: 60,
    }
+}
+
+const serverCustomJobGetter = async (
+   ctx: GetServerSidePropsContext | GetStaticPropsContext
+) => {
+   try {
+      const customJobId = (ctx.params.dialogJobId as string) || null
+
+      if (customJobId) {
+         const customJob = await getServerSideCustomJob(customJobId)
+
+         return {
+            serverSideCustomJob: customJob
+               ? CustomJobsPresenter.serializeDocument(customJob)
+               : null,
+         }
+      }
+   } catch (e) {
+      errorLogAndNotify(e, {
+         message: "Error getting custom job dialog data",
+         context: "getCustomJobDialogData",
+         extra: {
+            ctx,
+         },
+      })
+   }
+   return null
 }
 
 export const getStaticProps = async (ctx) => {

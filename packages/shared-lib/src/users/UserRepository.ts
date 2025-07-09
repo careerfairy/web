@@ -33,6 +33,7 @@ import {
    UserData,
    UserDataPersonalInfo,
    UserJobApplicationDocument,
+   UserLastViewedJob,
    UserPublicData,
    UserReminderType,
    UserStats,
@@ -348,6 +349,15 @@ export interface IUserRepository {
       countryId: string,
       universityCode: string
    ): Promise<UserData[]>
+
+   updateUserLastViewedJob(job: CustomJob, userAuthId: string): Promise<void>
+
+   getUserLastViewedJobs(
+      userAuthId: string,
+      limit: number
+   ): Promise<UserLastViewedJob[]>
+
+   getSavedJobs(userId: string, limit: number): Promise<CustomJob[]>
 }
 
 export class FirebaseUserRepository
@@ -1297,6 +1307,53 @@ export class FirebaseUserRepository
          .get()
 
       return mapFirestoreDocuments<UserData>(snapshot)
+   }
+
+   async updateUserLastViewedJob(
+      job: CustomJob,
+      userAuthId: string
+   ): Promise<void> {
+      const ref = this.firestore
+         .collection("seenJobs")
+         .doc(`${userAuthId}_${job.id}`)
+
+      await ref.set(
+         {
+            id: `${userAuthId}_${job.id}`,
+            userAuthId,
+            job,
+            totalViews: this.fieldValue.increment(1),
+            lastViewedAt: this.timestamp.now(),
+         },
+         { merge: true }
+      )
+   }
+
+   async getUserLastViewedJobs(
+      userAuthId: string,
+      limit: number
+   ): Promise<UserLastViewedJob[]> {
+      const query = this.firestore
+         .collection("seenJobs")
+         .where("userAuthId", "==", userAuthId)
+         .orderBy("totalViews", "desc")
+         .orderBy("lastViewedAt", "desc")
+         .limit(limit)
+
+      const dataSnapshot = await query.get()
+      return mapFirestoreDocuments<UserLastViewedJob>(dataSnapshot)
+   }
+
+   async getSavedJobs(userId: string, limit = 10): Promise<CustomJob[]> {
+      const query = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("savedJobs")
+         .orderBy("deadline", "desc")
+         .limit(limit)
+
+      const dataSnapshot = await query.get()
+      return mapFirestoreDocuments<CustomJob>(dataSnapshot)
    }
 
    async createUserLink(userId: string, link: ProfileLink): Promise<void> {

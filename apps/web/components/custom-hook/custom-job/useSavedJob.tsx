@@ -14,11 +14,13 @@ export const useSavedJob = (customJob: CustomJob) => {
    const { userData, isLoggedOut } = useAuth()
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const { push, asPath } = useRouter()
+
    const { data, status } = useFirestoreDocument<CustomJob>(
       "userData",
       [userData?.id, "savedJobs", customJob.id],
       {
          idField: "id",
+         initialData: customJob,
       }
    )
    const isSaved = !!data && status === "success"
