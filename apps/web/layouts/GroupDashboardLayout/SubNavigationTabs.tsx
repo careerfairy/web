@@ -1,5 +1,6 @@
 import { Box, Tab, Tabs } from "@mui/material"
 import { styled } from "@mui/material/styles"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import Link from "components/views/common/Link"
 import { useRouter } from "next/router"
 import { Fragment, SyntheticEvent, useCallback, useMemo } from "react"
@@ -38,6 +39,10 @@ type Props = {
 export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
    const { pathname, push } = useRouter()
    const { group } = useGroup()
+   const featureFlags = useFeatureFlags()
+
+   const hasAccessToSparks =
+      featureFlags.sparksAdminPageFlag || group.sparksAdminPageFlag
 
    // Create navigation links based on showSubNavigationFor
    const currentSection = useMemo(() => {
@@ -110,7 +115,7 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
       }
 
       return navigationLookup[showSubNavigationFor]
-   }, [group.id, showSubNavigationFor])
+   }, [group.id, showSubNavigationFor, hasAccessToSparks])
 
    // Determine which tab should be active based on current pathname
    const activeTab = useMemo(() => {
