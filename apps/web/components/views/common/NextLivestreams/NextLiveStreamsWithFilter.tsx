@@ -59,6 +59,19 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
    },
+   mainContainer: {
+      display: "flex",
+   },
+   recentEventsContainer: {
+      mb: { xs: 2, md: 0 },
+   },
+   recentEventsWrapper: {
+      pt: { xs: 2, md: 3 },
+   },
+   divider: {
+      mx: { xs: 2, md: 3 },
+      height: "1px",
+   },
 })
 
 const getQueryVariables = (query: ParsedUrlQuery) => {
@@ -186,9 +199,8 @@ const NextLiveStreamsWithFilter = ({
       Object.values(filterOptions.arrayFilters).flat().length
    )
 
-   const infiniteLivestreams = useMemo(() => {
-      return data?.flatMap((page) => page.deserializedHits) || []
-   }, [data])
+   const infiniteLivestreams =
+      data?.flatMap((page) => page.deserializedHits) ?? []
 
    // Check if we should show recent livestreams (when there are < 6 upcoming and no filters/search)
    const shouldShowRecentLivestreams = useMemo(() => {
@@ -242,10 +254,14 @@ const NextLiveStreamsWithFilter = ({
    useEffect(() => {
       if (isValidatingRef.current) return
 
-      if (inView) {
+      if (
+         inView &&
+         infiniteLivestreams?.length &&
+         numberOfResults < infiniteLivestreams.length
+      ) {
          setSize((prevSize) => prevSize + 1)
       }
-   }, [inView, setSize])
+   }, [inView, setSize, infiniteLivestreams?.length, numberOfResults])
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -317,7 +333,7 @@ const NextLiveStreamsWithFilter = ({
 
    return (
       <>
-         <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
+         <Container maxWidth="xl" disableGutters sx={styles.mainContainer}>
             <Box sx={styles.root}>
                <Card sx={styles.search}>
                   <LivestreamSearch
@@ -353,11 +369,15 @@ const NextLiveStreamsWithFilter = ({
             wrapperSx={{ minHeight: "unset" }}
          />
 
-         <Divider sx={{ mx: { xs: 0, md: 2 }, height: "1px" }} />
+         <Divider sx={styles.divider} />
 
          {shouldShowRecentLivestreams ? (
-            <Container maxWidth="xl" disableGutters>
-               <Box sx={{ pt: { xs: 2, md: 3 } }}>
+            <Container
+               maxWidth="xl"
+               disableGutters
+               sx={styles.recentEventsContainer}
+            >
+               <Box sx={styles.recentEventsWrapper}>
                   <RecentLivestreamsSection
                      recentLivestreams={recentLivestreams}
                      isLoading={isLoadingRecentLivestreams}

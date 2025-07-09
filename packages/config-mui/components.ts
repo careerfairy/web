@@ -136,13 +136,11 @@ export const getComponents = (
             style: {
                color:
                   theme.palette.mode === "light"
-                     ? // @ts-ignore
-                       theme.palette.neutral[500]
+                     ? theme.palette.neutral[500]
                      : theme.palette.text.primary,
                borderColor:
                   theme.palette.mode === "light"
-                     ? // @ts-ignore
-                       theme.palette.neutral[200]
+                     ? theme.palette.neutral[200]
                      : "rgba(255, 255, 255, 0.23)",
                "&.Mui-disabled": {
                   border: `1px solid ${theme.palette.action.disabledBackground}`,
@@ -186,6 +184,25 @@ export const getComponents = (
                boxShadow: "none",
                backgroundColor: theme.palette.navyBlue.main,
                color: "#D5F6F1",
+            },
+         },
+         {
+            props: { color: "tertiary" },
+            style: {
+               borderRadius: "24px",
+               border: `1px solid ${theme.palette.neutral[200]}`,
+               color: theme.palette.neutral[600],
+               backgroundColor: "transparent",
+               padding: "12px 28px",
+               gap: "12px",
+               "& .MuiButton-endIcon": {
+                  marginLeft: 0,
+                  marginRight: 0,
+               },
+               "&:hover": {
+                  border: "1px solid rgba(0, 0, 0, 0.04)",
+                  backgroundColor: "rgba(0, 0, 0, 0.04)",
+               },
             },
          },
       ],

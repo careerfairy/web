@@ -12,7 +12,7 @@ const styles = sxStyles({
    },
    header: {
       mb: 3, // 24px spacing between title and cards to match design
-      pl: { xs: 2, md: 4 }, // 32px left padding on desktop to match other cards
+      pl: { xs: 2, md: 3 }, // 24px left padding on desktop to match other cards
    },
    title: {
       fontWeight: 600,
@@ -20,29 +20,13 @@ const styles = sxStyles({
       color: "text.primary",
    },
    cardsContainer: {
-      px: { xs: 2, md: 4 }, // 32px padding to match other sections
+      px: { xs: 2, md: 3 }, // 24px padding to match other sections
       width: "100%",
    },
    moreButton: {
-      display: "flex",
-      justifyContent: "center",
-      px: { xs: 2, md: 4 }, // Match container padding
-      pt: 4, // 32px top margin
-      pb: 2, // 16px bottom margin
-   },
-   button: {
-      borderRadius: "24px",
-      height: "48px",
-      maxWidth: "200px", // Limit button width as shown in design
-      textTransform: "none",
-      fontWeight: 600,
-      borderColor: "neutral.200",
-      color: "neutral.600",
-      backgroundColor: "transparent",
-      "&:hover": {
-         borderColor: "neutral.300",
-         backgroundColor: "rgba(0, 0, 0, 0.04)",
-      },
+      px: { xs: 2, md: 3 },
+      pt: 4,
+      pb: 2,
    },
    loader: {
       display: "flex",
@@ -103,10 +87,10 @@ const RecentLivestreamsSection = ({
 
          <Box sx={styles.moreButton}>
             <Button
-               variant="outlined"
+               color="tertiary"
                onClick={handleMoreToWatchClick}
-               endIcon={<ChevronRight size={16} />}
-               sx={styles.button}
+               endIcon={<ChevronRight />}
+               fullWidth
             >
                More to watch
             </Button>
