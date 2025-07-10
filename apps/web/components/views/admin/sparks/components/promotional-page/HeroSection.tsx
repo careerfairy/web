@@ -1,4 +1,8 @@
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { LoadingButton } from "@mui/lab"
 import { Box, Button, CardContent, Stack, Typography } from "@mui/material"
+import { useStartPlanMutation } from "components/custom-hook/group/useStartPlanMutation"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { BarChart, Calendar, PlayCircle, Target } from "react-feather"
 import {
    StyledBrandAwarenessCard,
@@ -16,6 +20,16 @@ import {
 } from "./hero-section-styles"
 
 export const HeroSection = () => {
+   const { group } = useGroup()
+   const { trigger, isMutating } = useStartPlanMutation(group.id)
+
+   const handleStartTrial = () => {
+      trigger({
+         planType: GroupPlanTypes.Trial,
+         groupId: group.id,
+      })
+   }
+
    return (
       <StyledHeroContent>
          {/* Header */}
@@ -114,14 +128,16 @@ export const HeroSection = () => {
                   </Box>
                </CardContent>
                <StyledTrialCardFreeTag>Free</StyledTrialCardFreeTag>
-               <Button
+               <LoadingButton
                   variant="contained"
                   fullWidth
                   color="secondary"
                   size="small"
+                  onClick={handleStartTrial}
+                  loading={isMutating}
                >
                   Start trial now!
-               </Button>
+               </LoadingButton>
             </StyledTrialCard>
 
             <StyledFullCard>
@@ -167,6 +183,8 @@ export const HeroSection = () => {
                   fullWidth
                   color="secondary"
                   size="small"
+                  href="https://library.careerfairy.io/meetings/kandeeban/sparks"
+                  target="_blank"
                >
                   Contact us
                </Button>
