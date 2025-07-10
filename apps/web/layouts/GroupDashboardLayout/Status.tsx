@@ -1,5 +1,6 @@
-import { Box, Tooltip } from "@mui/material"
+import { Box } from "@mui/material"
 import { styled, useTheme } from "@mui/styles"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 
 const StatusIcon = styled(Box)(({ theme }) => ({
    width: theme.spacing(2),
@@ -18,11 +19,11 @@ export const Status = ({ color, message }: StatusProps) => {
    const targetColor = theme.palette[color].main
 
    return (
-      <Tooltip arrow title={message}>
+      <BrandedTooltip arrow title={message}>
          <StatusIcon
             bgcolor={targetColor}
             border={`1px solid ${targetColor}`}
          />
-      </Tooltip>
+      </BrandedTooltip>
    )
 }

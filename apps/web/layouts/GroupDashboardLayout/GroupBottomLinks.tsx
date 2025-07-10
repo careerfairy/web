@@ -9,8 +9,10 @@ import { HelpCircle } from "react-feather"
 import { SettingsIcon } from "components/views/common/icons"
 import { Fragment } from "react"
 import { useGroup } from "."
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 import { supportPageLink } from "../../constants/links"
 import { NavLink } from "../common/NavList"
+import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 
 const Divider = styled(Box)({
    border: "1px solid #DDDDDD",
@@ -26,6 +28,14 @@ const LinksList = styled(Stack)(({ theme }) => ({
 
 export const GroupBottomLinks = () => {
    const { shrunkLeftMenuIsActive, group } = useGroup()
+   const { setLeftDrawer } = useGroupDashboard()
+   const isMobile = useIsMobile()
+
+   const handleMobileNavigate = () => {
+      if (isMobile) {
+         setLeftDrawer(false)
+      }
+   }
 
    return (
       <Fragment>
@@ -39,6 +49,8 @@ export const GroupBottomLinks = () => {
                baseTextColor={"text.primary"}
                title={shrunkLeftMenuIsActive ? "" : "Settings"}
                Icon={SettingsIcon}
+               shallow
+               onMobileNavigate={handleMobileNavigate}
             />
             <NavLink
                href={supportPageLink}
@@ -47,6 +59,7 @@ export const GroupBottomLinks = () => {
                title={shrunkLeftMenuIsActive ? "" : "Support"}
                Icon={HelpCircle}
                external
+               onMobileNavigate={handleMobileNavigate}
             />
          </LinksList>
       </Fragment>

@@ -14,11 +14,11 @@ import {
 import { groupRepo } from "data/RepositoryInstances"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
+import { ReactElement } from "react"
 import CompanyPageOverview, {
    TabValue,
 } from "../../../../../components/views/company-page"
-import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import { withGroupDashboardLayout } from "../../../../../layouts/GroupDashboardLayout/withGroupDashboardLayout"
 import {
    deserializeGroupClient,
    getLivestreamsAndDialogData,
@@ -26,7 +26,11 @@ import {
    mapFromServerSide,
 } from "../../../../../util/serverUtil"
 
-const CompanyPage: NextPage<
+type NextPageWithLayout<P = Record<string, never>, IP = P> = NextPage<P, IP> & {
+   getLayout?: (page: ReactElement) => ReactElement
+}
+
+const CompanyPage: NextPageWithLayout<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({
    serverSideGroup,
@@ -36,8 +40,14 @@ const CompanyPage: NextPage<
    groupCreators,
 }) => {
    const { query } = useRouter()
-   const { groupId, universityName } = serverSideGroup
    const customJobId = query.dialogJobId?.toString() || null
+
+   // Handle case where props might be undefined during shallow routing
+   if (!serverSideGroup) {
+      return <div>Loading...</div>
+   }
+
+   const { groupId } = serverSideGroup
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
@@ -48,25 +58,33 @@ const CompanyPage: NextPage<
             }}
             customJobId={customJobId}
          >
-            <GroupDashboardLayout titleComponent={"Company Page"}>
-               <DashboardHead title={`CareerFairy | ${universityName}`} />
+            <>
                <CompanyPageOverview
                   group={deserializeGroupClient(serverSideGroup)}
-                  groupCreators={groupCreators}
+                  groupCreators={groupCreators || []}
                   upcomingLivestreams={mapFromServerSide(
-                     serverSideUpcomingLivestreams
+                     serverSideUpcomingLivestreams || []
                   )}
-                  pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
+                  pastLivestreams={mapFromServerSide(
+                     serverSidePastLivestreams || []
+                  )}
                   customJobs={[]}
                   editMode={true}
                   tab={TabValue.overview}
                   tabMode
                />
                <SparkPreviewDialog />
-            </GroupDashboardLayout>
+            </>
          </CustomJobDialogProvider>
       </LivestreamDialogLayout>
    )
+}
+
+CompanyPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Company Page",
+      dashboardHeadTitle: "CareerFairy | Company Page",
+   })(page)
 }
 
 export const getServerSideProps: GetServerSideProps<{
