@@ -193,10 +193,6 @@ const getSeoTitle = (
    numberOfJobs: number,
    locationNames: string[]
 ) => {
-   const jobTypes = getJobTypeLabels(searchParams.jobTypes)
-   const businessFunctions = getBusinessFunctionTagLabels(
-      searchParams.businessFunctionTags
-   )
    const locations = locationNames?.length ? locationNames.join(", ") : null
    const term = searchParams.term
 
@@ -204,20 +200,7 @@ const getSeoTitle = (
    const titleParts: string[] = []
 
    // Start with number of jobs
-   titleParts.push(numberOfJobs.toString())
-
-   // Add job types (e.g., "Part-Time", "Full-Time")
-   if (jobTypes.length) {
-      titleParts.push(jobTypes.join(", "))
-   }
-
-   // Add business functions (e.g., "Accounting", "Engineering")
-   if (businessFunctions.length) {
-      titleParts.push(businessFunctions.join(", "))
-   }
-
-   // Add "Jobs"
-   titleParts.push("Jobs")
+   titleParts.push(numberOfJobs.toString() + " Jobs")
 
    // Build the base title
    let title = titleParts.join(" ")
@@ -229,7 +212,7 @@ const getSeoTitle = (
 
    // Add search term with "matching" prefix
    if (term) {
-      title += ` matching "${term}"`
+      title += ` - "${term}"`
    }
 
    // Add platform branding
