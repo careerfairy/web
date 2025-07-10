@@ -14,7 +14,7 @@ export const FUNCTION_NAMES = {
 
    // Group Admin functions
    sendNewlyPublishedEventEmail: "sendNewlyPublishedEventEmail",
-   startPlan: "startPlan_v4",
+   startPlan: "startPlan_v5",
    sendReminderToNearEndSparksTrialPlanCreationPeriod:
       "sendReminderToNearEndSparksTrialPlanCreationPeriod_v2",
    endOfSparksTrialEmails: "endOfSparksTrialEmails_v2",
@@ -51,7 +51,6 @@ export const FUNCTION_NAMES = {
       "createUserSparksFeedEventNotifications_v4",
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
    getSparksFeed: "getSparksFeed_v12",
-
 
    // Location functions
    searchLocations: "searchLocations",
