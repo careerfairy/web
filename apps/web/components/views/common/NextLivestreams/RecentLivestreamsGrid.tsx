@@ -83,6 +83,7 @@ const RecentLivestreamsSection = ({
                         location={ImpressionLocation.nextLivestreams}
                         index={index}
                         totalElements={recentLivestreams.length}
+                        disableAutoPlay={false}
                      />
                   </Grid>
                ))}
