@@ -59,6 +59,7 @@ const JobsPage: NextPage<
    dialogOpen,
    locationNames,
    algoliaServerResponse,
+   ipBasedLocationName,
 }) => {
    const router = useRouter()
    const { currentJobId } = router.query
@@ -108,7 +109,7 @@ const JobsPage: NextPage<
                   numberOfJobs={algoliaServerResponse?.nbHits}
                   userCountryCode={userCountryCode}
                >
-                  <PageSEO />
+                  <PageSEO ipBasedLocationName={ipBasedLocationName} />
                   <JobsPageOverview />
                </JobsOverviewContextProvider>
                <ScrollToTop hasBottomNavBar />
@@ -118,7 +119,7 @@ const JobsPage: NextPage<
    )
 }
 
-const PageSEO = () => {
+const PageSEO = ({ ipBasedLocationName }: { ipBasedLocationName: string }) => {
    const { searchParams, searchResultsCount, selectedLocationsNames } =
       useJobsOverviewContext()
 
@@ -138,7 +139,8 @@ const PageSEO = () => {
             title={getSeoTitle(
                searchParams,
                searchResultsCount,
-               selectedLocationsNames
+               selectedLocationsNames,
+               ipBasedLocationName
             )}
          />
       </>
@@ -191,7 +193,8 @@ const getMetaContent = (
 const getSeoTitle = (
    searchParams: SearchParams,
    numberOfJobs: number,
-   locationNames: string[]
+   locationNames: string[],
+   ipBasedLocationName: string
 ) => {
    // Get at most 2 location names
    const selectedLocations = locationNames?.slice(0, 2) ?? []
@@ -219,6 +222,8 @@ const getSeoTitle = (
    // Add location if available
    if (locationsText) {
       titleParts.push(`in ${locationsText}`)
+   } else if (ipBasedLocationName) {
+      titleParts.push(`in ${ipBasedLocationName}`)
    }
 
    // Join with spaces and add period
@@ -252,6 +257,7 @@ type JobsPageProps = {
       sparksData: SerializedSpark[]
    }
    locationNames: string[]
+   ipBasedLocationName: string
    searchParams: SearchParams
    userCountryCode: string
    algoliaServerResponse: SearchResponse<AlgoliaCustomJobResponse>
@@ -266,6 +272,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const { term: queryTerm = "", currentJobId: queryCurrentJobId } =
       context.query
+
+   const ipBasedLocationName = userCountryCode
+      ? getLocationNames([userCountryCode])?.at(0)
+      : null
 
    const token = getUserTokenFromCookie(context) as any
    const userAuthId = token?.user_id
@@ -380,6 +390,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          dialogOpen,
          userCountryCode,
          locationNames,
+         ipBasedLocationName,
          searchParams: {
             location: queryLocations,
             term: term as string,
