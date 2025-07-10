@@ -1,6 +1,6 @@
 import { Box } from "@mui/material"
 import { XCircleIcon } from "components/views/common/icons/XCircleIcon"
-import { ChangeEvent } from "react"
+import { ChangeEvent, KeyboardEvent } from "react"
 import { Search } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import BrandedTextField from "./BrandedTextField"
@@ -58,11 +58,18 @@ const styles = sxStyles({
    },
 })
 
+export type SearchSettings = {
+   submitOnEnter?: boolean
+   onSubmit?: (value: string) => void
+   submitOnBlur?: boolean
+}
+
 export interface BrandedSearchFieldProps {
    value: string
    onChange: (value: string) => void
    placeholder?: string
    fullWidth?: boolean
+   settings?: SearchSettings
 }
 
 export const BrandedSearchField = ({
@@ -70,7 +77,32 @@ export const BrandedSearchField = ({
    onChange,
    placeholder = "Search...",
    fullWidth = true,
+   settings,
 }: BrandedSearchFieldProps) => {
+   const {
+      submitOnEnter = false,
+      onSubmit,
+      submitOnBlur = false,
+   } = settings || {}
+
+   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+      if (submitOnEnter && event.key === "Enter" && onSubmit) {
+         event.preventDefault()
+         onSubmit(value)
+      }
+   }
+
+   const handleBlur = () => submitOnBlur && onSubmit?.(value)
+
+   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+      onChange(e.target.value)
+   }
+
+   const handleClear = () => {
+      onChange("")
+      onSubmit?.("")
+   }
+
    return (
       <BrandedTextField
          fullWidth={fullWidth}
@@ -82,14 +114,14 @@ export const BrandedSearchField = ({
                <Box
                   sx={styles.clearIcon}
                   component={XCircleIcon}
-                  onClick={() => onChange("")}
+                  onClick={handleClear}
                />
             ) : null,
          }}
          value={value}
-         onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            onChange(e.target.value)
-         }
+         onChange={handleChange}
+         onKeyDown={handleKeyDown}
+         onBlur={handleBlur}
       />
    )
 }
