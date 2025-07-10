@@ -325,12 +325,14 @@ const CompanyPageOverview = ({
    }, [contextGroup, editMode, presenter])
 
    useEffect(() => {
+      if (editMode) return
+
       if (tabMode && tabValue && tabSectionRefsMap[tabValue]?.current) {
          tabSectionRefsMap[tabValue].current.scrollIntoView({
             behavior: "smooth",
          })
       }
-   }, [tabValue, tabSectionRefsMap, tabMode])
+   }, [tabValue, tabSectionRefsMap, tabMode, editMode])
 
    const contextValue = useMemo<ICompanyPageContext>(
       () => ({

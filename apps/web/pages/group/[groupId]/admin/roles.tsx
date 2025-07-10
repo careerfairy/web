@@ -1,16 +1,17 @@
+import { ReactElement } from "react"
 import RolesOverview from "../../../../components/views/group/admin/roles"
-import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
-import { SubNavigationTabs } from "../../../../layouts/GroupDashboardLayout/SubNavigationTabs"
+import { withGroupDashboardLayout } from "../../../../layouts/GroupDashboardLayout/withGroupDashboardLayout"
 
 const RolesPage = () => {
-   return (
-      <GroupDashboardLayout titleComponent={"Settings"}>
-         <DashboardHead title="CareerFairy | Member Roles of" />
-         <SubNavigationTabs showSubNavigationFor="settings" />
-         <RolesOverview />
-      </GroupDashboardLayout>
-   )
+   return <RolesOverview />
+}
+
+RolesPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Settings",
+      dashboardHeadTitle: "CareerFairy | Member Roles of",
+      subNavigationFor: "settings",
+   })(page)
 }
 
 export default RolesPage

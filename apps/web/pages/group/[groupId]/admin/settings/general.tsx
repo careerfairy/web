@@ -1,17 +1,17 @@
-import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
-import { SubNavigationTabs } from "../../../../../layouts/GroupDashboardLayout/SubNavigationTabs"
-
 import CompanyInformationPageContent from "components/views/group/admin/company-information"
+import { ReactElement } from "react"
+import { withGroupDashboardLayout } from "../../../../../layouts/GroupDashboardLayout/withGroupDashboardLayout"
 
 const GeneralSettingsPage = () => {
-   return (
-      <GroupDashboardLayout titleComponent={"Settings"}>
-         <DashboardHead title="CareerFairy | Admin Edit Details of" />
-         <SubNavigationTabs showSubNavigationFor="settings" />
-         <CompanyInformationPageContent />
-      </GroupDashboardLayout>
-   )
+   return <CompanyInformationPageContent />
+}
+
+GeneralSettingsPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Settings",
+      dashboardHeadTitle: "CareerFairy | Admin Edit Details of",
+      subNavigationFor: "settings",
+   })(page)
 }
 
 export default GeneralSettingsPage

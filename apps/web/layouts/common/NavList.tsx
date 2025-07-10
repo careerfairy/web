@@ -17,6 +17,7 @@ import Link from "../../components/views/common/Link"
 // project imports
 import Collapse from "@mui/material/Collapse"
 import { LevelsNewChip } from "layouts/GenericDashboardLayout/GenericNavList"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 import { sxStyles } from "../../types/commonTypes"
 import type { INavLink } from "../types"
 
@@ -86,13 +87,18 @@ export const styles = sxStyles({
 
 type NavListProps = {
    links: INavLink[]
+   onMobileNavigate?: () => void
 }
-const NavList = ({ links }: NavListProps) => {
+const NavList = ({ links, onMobileNavigate }: NavListProps) => {
    return (
       <Box component={"nav"} sx={styles.list}>
          <Stack spacing={2} component={List}>
             {links.map((navItem) => (
-               <NavLink key={navItem.id} {...navItem} />
+               <NavLink
+                  key={navItem.id}
+                  {...navItem}
+                  onMobileNavigate={onMobileNavigate}
+               />
             ))}
          </Stack>
       </Box>
@@ -104,6 +110,7 @@ type NavLinkProps = INavLink & {
    external?: boolean
    isNested?: boolean
    shrunk?: boolean
+   onMobileNavigate?: () => void
 }
 export const NavLink = ({
    href,
@@ -118,8 +125,10 @@ export const NavLink = ({
    rightElement,
    isNested = false,
    wrapper,
+   onMobileNavigate,
 }: NavLinkProps) => {
    const { pathname: routerPathname } = useRouter()
+   const isMobile = useIsMobile()
 
    const isNavLinkGroup = Boolean(childLinks?.length)
 
@@ -137,6 +146,12 @@ export const NavLink = ({
 
    const Wrapper = wrapper || React.Fragment
 
+   const handleClick = () => {
+      if (isMobile && onMobileNavigate) {
+         onMobileNavigate()
+      }
+   }
+
    return (
       <Wrapper>
          <span>
@@ -152,6 +167,7 @@ export const NavLink = ({
                href={href}
                selected={isActivePath}
                disableRipple
+               onClick={handleClick}
             >
                <ListItemIcon
                   sx={[styles.iconWrapper, !Icon && styles.iconWrapperEmpty]}
@@ -192,7 +208,12 @@ export const NavLink = ({
                <Collapse in={isOpen} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding>
                      {childLinks?.map((link) => (
-                        <NavLink key={link.id} isNested {...link} />
+                        <NavLink
+                           key={link.id}
+                           isNested
+                           {...link}
+                           onMobileNavigate={onMobileNavigate}
+                        />
                      ))}
                   </List>
                </Collapse>

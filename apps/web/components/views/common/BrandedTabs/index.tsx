@@ -163,11 +163,17 @@ export const BrandedTabs = <T extends string | number = string | number>({
       const container = containerRef.current
 
       if (activeTabElement && container) {
-         // Scroll the active tab into view
-         activeTabElement.scrollIntoView({
+         // Calculate the position to center the tab within the container
+         const tabLeft = activeTabElement.offsetLeft
+         const tabWidth = activeTabElement.offsetWidth
+         const containerWidth = container.clientWidth
+
+         // Center the tab in the container
+         const scrollLeft = tabLeft - (containerWidth - tabWidth) / 2
+
+         container.scrollTo({
+            left: Math.max(0, scrollLeft),
             behavior: "smooth",
-            block: "nearest",
-            inline: "center",
          })
       }
    }, [activeValue])

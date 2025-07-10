@@ -1,18 +1,17 @@
 import AnalyticsGeneralPageContent from "components/views/group/admin/analytics-new/general"
-import { LivestreamAnalyticsNavigationTabs } from "components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
-import GroupDashboardLayout from "layouts/GroupDashboardLayout"
-import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
-import { SubNavigationTabs } from "layouts/GroupDashboardLayout/SubNavigationTabs"
+import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
+import { ReactElement } from "react"
 
 const LivestreamPage = () => {
-   return (
-      <GroupDashboardLayout titleComponent={"Analytics"}>
-         <DashboardHead title="CareerFairy | Live Stream Analytics of" />
-         <SubNavigationTabs showSubNavigationFor="analytics" />
-         <LivestreamAnalyticsNavigationTabs />
-         <AnalyticsGeneralPageContent />
-      </GroupDashboardLayout>
-   )
+   return <AnalyticsGeneralPageContent />
+}
+
+LivestreamPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Analytics",
+      dashboardHeadTitle: "CareerFairy | Live Stream Analytics of",
+      subNavigationFor: "analytics",
+   })(page)
 }
 
 export default LivestreamPage

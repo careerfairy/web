@@ -1,15 +1,16 @@
 import MainPageContent from "components/views/group/admin/main"
-import GroupDashboardLayout from "layouts/GroupDashboardLayout"
-import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
+import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
+import { ReactElement } from "react"
 
 const MainPage = () => {
-   return (
-      <GroupDashboardLayout titleComponent={"Dashboard"}>
-         <DashboardHead title="CareerFairy | Dashboard of" />
+   return <MainPageContent />
+}
 
-         <MainPageContent />
-      </GroupDashboardLayout>
-   )
+MainPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Dashboard",
+      dashboardHeadTitle: "CareerFairy | Dashboard of",
+   })(page)
 }
 
 export default MainPage

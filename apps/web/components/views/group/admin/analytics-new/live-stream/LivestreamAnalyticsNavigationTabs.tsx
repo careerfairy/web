@@ -7,6 +7,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
+      pt: 1.5,
       width: "100%",
    },
 })
