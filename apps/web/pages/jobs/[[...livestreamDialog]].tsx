@@ -193,12 +193,6 @@ const getSeoTitle = (
    numberOfJobs: number,
    locationNames: string[]
 ) => {
-   // Get first business function tag label
-   const businessFunctionLabels = getBusinessFunctionTagLabels(
-      searchParams.businessFunctionTags
-   )
-   const firstBusinessFunctionTag = businessFunctionLabels?.at(0)
-
    // Get at most 2 location names
    const selectedLocations = locationNames?.slice(0, 2) ?? []
    const locationsText = selectedLocations.join(
@@ -214,9 +208,9 @@ const getSeoTitle = (
    // Add number
    titleParts.push(numberOfJobs.toString())
 
-   // Add business function tag if available
-   if (firstBusinessFunctionTag) {
-      titleParts.push(firstBusinessFunctionTag)
+   // Add search term if available
+   if (searchParams.term) {
+      titleParts.push(searchParams.term)
    }
 
    // Add jobs text
