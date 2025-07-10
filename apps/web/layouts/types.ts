@@ -15,6 +15,12 @@ export type INavLink = {
    pathname?: string
    Icon?: IconComponent
    /**
+    * Path prefix pattern to match against router pathname for determining active state.
+    * Used for section-level navigation where the link should be active for multiple sub-paths.
+    * Example: "/group/[groupId]/admin/content" would match "/group/[groupId]/admin/content/live-streams"
+    */
+   activePathPrefix?: string
+   /**
     * The children of the link. If this is set, the link will also be a dropdown.
     * */
    childLinks?: INavLink[]

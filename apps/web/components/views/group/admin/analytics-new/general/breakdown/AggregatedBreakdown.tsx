@@ -1,24 +1,24 @@
+import { Box } from "@mui/material"
+import Stack from "@mui/material/Stack"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import {
-   LoadingSourcesProgress,
-   SourcesProgress,
-} from "../../../common/SourcesProgress"
-import { useAnalyticsPageContext } from "../GeneralPageProvider"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import useClientSidePagination from "../../../../../../custom-hook/utils/useClientSidePagination"
 import CardCustom, {
    StyledPagination,
    SubheaderLink,
 } from "../../../common/CardCustom"
-import Stack from "@mui/material/Stack"
-import { sxStyles } from "../../../../../../../types/commonTypes"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { Box } from "@mui/material"
+import {
+   LoadingSourcesProgress,
+   SourcesProgress,
+} from "../../../common/SourcesProgress"
 import { TabsComponent, TabsSkeleton } from "../../../common/Tabs"
 import {
    getBreakdowns,
    getBreakdownsTitle,
    getEmptySources,
 } from "../../../common/util"
-import useClientSidePagination from "../../../../../../custom-hook/utils/useClientSidePagination"
+import { useAnalyticsPageContext } from "../GeneralPageProvider"
 
 const styles = sxStyles({
    root: {
@@ -191,7 +191,7 @@ const AggregatedBreakdownChart = () => {
                />
                <SubheaderLink
                   title="Go to streams analytics"
-                  link={`/group/${group?.id}/admin/analytics/live-stream`}
+                  link={`/group/${group?.id}/admin/analytics/live-streams`}
                />
             </Stack>
          </Stack>

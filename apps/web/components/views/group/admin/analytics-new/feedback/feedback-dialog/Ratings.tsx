@@ -53,7 +53,7 @@ const Ratings: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
          <Stack spacing={2}>
             {ratings.map((rating) => (
                <Link
-                  href={`/group/${groupId}/admin/analytics/feedback/${livestreamStats.livestream.id}/question/${rating.id}`}
+                  href={`/group/${groupId}/admin/analytics/live-streams/feedback/${livestreamStats.livestream.id}/question/${rating.id}`}
                   key={rating.id}
                   noLinkStyle
                >

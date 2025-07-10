@@ -7,7 +7,6 @@ import Stack from "@mui/material/Stack"
 
 // project imports
 import { LoadingButton } from "@mui/lab"
-import { alpha } from "@mui/material"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
 import { ReactNode } from "react"
@@ -25,15 +24,13 @@ const getStyles = (hasNavigationBar?: boolean) =>
          flexWrap: "wrap",
          flex: 1,
          alignItems: "center",
-         borderBottom: (theme) =>
-            `2px solid ${alpha(theme.palette.divider, 0.03)}`,
          px: {
             xs: 2,
-            sm: 5,
+            sm: 3,
          },
          py: {
             xs: 0,
-            md: 3.2,
+            md: 2,
          },
          paddingBottom: hasNavigationBar ? "0 !important" : "initial",
          backdropFilter: "blur(8px)",
@@ -87,7 +84,7 @@ const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
          {/* toggler button */}
          {!drawerPresent ? <MobileToggleButton /> : null}
          <Box sx={styles.leftSection}>
-            <Typography fontWeight={600} sx={styles.title}>
+            <Typography role="heading" fontWeight={600} sx={styles.title}>
                {title}
             </Typography>
          </Box>
