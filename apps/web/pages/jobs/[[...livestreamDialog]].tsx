@@ -193,30 +193,42 @@ const getSeoTitle = (
    numberOfJobs: number,
    locationNames: string[]
 ) => {
-   const locations = locationNames?.length ? locationNames.join(", ") : null
-   const term = searchParams.term
+   // Get first business function tag label
+   const businessFunctionLabels = getBusinessFunctionTagLabels(
+      searchParams.businessFunctionTags
+   )
+   const firstBusinessFunctionTag = businessFunctionLabels?.at(0)
 
-   // Build title components
+   // Get at most 2 location names
+   const selectedLocations = locationNames?.slice(0, 2) ?? []
+   const locationsText = selectedLocations.join(
+      selectedLocations.length > 1 ? ", " : ""
+   )
+
+   // Handle singular/plural for jobs
+   const jobsText = numberOfJobs === 1 ? "Job" : "Jobs"
+
+   // Build title parts
    const titleParts: string[] = []
 
-   // Start with number of jobs
-   titleParts.push(numberOfJobs.toString() + " Jobs")
+   // Add number
+   titleParts.push(numberOfJobs.toString())
 
-   // Build the base title
-   let title = titleParts.join(" ")
-
-   // Add location with "in" prefix
-   if (locations) {
-      title += ` in ${locations}`
+   // Add business function tag if available
+   if (firstBusinessFunctionTag) {
+      titleParts.push(firstBusinessFunctionTag)
    }
 
-   // Add search term with "matching" prefix
-   if (term) {
-      title += ` - "${term}"`
+   // Add jobs text
+   titleParts.push(jobsText)
+
+   // Add location if available
+   if (locationsText) {
+      titleParts.push(`in ${locationsText}`)
    }
 
-   // Add platform branding
-   title += " on CareerFairy"
+   // Join with spaces and add period
+   const title = titleParts.join(" ")
 
    return title
 }
