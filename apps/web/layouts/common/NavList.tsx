@@ -128,16 +128,8 @@ export const NavLink = ({
       return childLinks.some((child) => child.pathname === routerPathname)
    }, [childLinks, isNavLinkGroup, routerPathname])
 
-   console.log("🚀 ~ childLinkActive ~ childLinkActive:", childLinkActive)
-
    const isActivePath = pathname === routerPathname
 
-   console.log(
-      "🚀 ~ childLinkActive ~ isActivePath, pathname, routerPathname:",
-      isActivePath,
-      pathname,
-      routerPathname
-   )
    const isOpen = childLinkActive || isActivePath
 
    const Wrapper = wrapper || React.Fragment
