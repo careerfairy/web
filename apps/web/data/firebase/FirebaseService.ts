@@ -646,20 +646,20 @@ class FirebaseService {
          } else {
             ratings = [
                {
-                  question: `How happy are you with the content shared by ${livestream.company}?`,
+                  question: `How satisfied are you with the content shared by ${livestream.company}?`,
                   id: "company",
                   appearAfter: 30,
                   hasText: false,
                   noStars: false,
-                  isSentimentRating: false,
+                  isSentimentRating: true,
                   isForEnd: false,
                },
                {
-                  question: `Help ${livestream.company} improve: How can we make the experience more useful to you?`,
+                  question: `How likely are you to apply to ${livestream.company}?`,
                   appearAfter: 40,
                   id: "companyFeedback",
-                  hasText: true,
-                  noStars: true,
+                  hasText: false,
+                  noStars: false,
                   isSentimentRating: false,
                   isForEnd: false,
                },
