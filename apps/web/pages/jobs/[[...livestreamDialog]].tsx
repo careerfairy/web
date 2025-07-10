@@ -59,6 +59,7 @@ const JobsPage: NextPage<
    dialogOpen,
    locationNames,
    algoliaServerResponse,
+   ipBasedLocationName,
 }) => {
    const router = useRouter()
    const { currentJobId } = router.query
@@ -108,7 +109,7 @@ const JobsPage: NextPage<
                   numberOfJobs={algoliaServerResponse?.nbHits}
                   userCountryCode={userCountryCode}
                >
-                  <PageSEO />
+                  <PageSEO ipBasedLocationName={ipBasedLocationName} />
                   <JobsPageOverview />
                </JobsOverviewContextProvider>
                <ScrollToTop hasBottomNavBar />
@@ -118,25 +119,39 @@ const JobsPage: NextPage<
    )
 }
 
+const PageSEO = ({ ipBasedLocationName }: { ipBasedLocationName: string }) => {
+   const { searchParams, searchResultsCount, selectedLocationsNames } =
+      useJobsOverviewContext()
+
+   return (
+      <>
+         <meta
+            name="description"
+            content={getMetaContent(
+               searchParams,
+               searchResultsCount,
+               selectedLocationsNames
+            )}
+         />
+         <SEO
+            id={"CareerFairy | Jobs | " + searchParams.term}
+            description={"Find your dream job with CareerFairy."}
+            title={getSeoTitle(
+               searchParams,
+               searchResultsCount,
+               selectedLocationsNames,
+               ipBasedLocationName
+            )}
+         />
+      </>
+   )
+}
+
 const getMetaContent = (
    searchParams: SearchParams,
    numberOfJobs: number,
    locationNames: string[]
 ) => {
-   // Helper to get job type labels
-   const getJobTypeLabels = (jobTypes?: string[]) => {
-      if (!jobTypes?.length) return []
-      return jobTypes
-         .map((type) => jobTypeOptions.find((opt) => opt.value === type)?.label)
-         .filter(Boolean)
-   }
-
-   // Helper to get business function tag labels
-   const getBusinessFunctionTagLabels = (tags?: string[]) => {
-      if (!tags?.length) return []
-      return tags.map((tag) => BusinessFunctionsTags[tag]?.name).filter(Boolean)
-   }
-
    const locations = locationNames?.length ? locationNames.join(", ") : null
    const jobTypes = getJobTypeLabels(searchParams.jobTypes)
    const jobTypesStr = jobTypes.length ? jobTypes.join(", ") : null
@@ -175,59 +190,63 @@ const getMetaContent = (
    return description
 }
 
-const PageSEO = () => {
-   const { searchParams, searchResultsCount, selectedLocationsNames } =
-      useJobsOverviewContext()
-
-   return (
-      <>
-         <meta
-            name="description"
-            content={getMetaContent(
-               searchParams,
-               searchResultsCount,
-               selectedLocationsNames
-            )}
-         />
-         <SEO
-            id={"CareerFairy | Jobs | " + searchParams.term}
-            description={"Find your dream job with CareerFairy."}
-            title={getSeoTitle(
-               searchParams,
-               searchResultsCount,
-               selectedLocationsNames
-            )}
-         />
-      </>
-   )
-}
-
 const getSeoTitle = (
    searchParams: SearchParams,
    numberOfJobs: number,
-   locationNames: string[]
+   locationNames: string[],
+   ipBasedLocationName: string
 ) => {
-   if (!searchParams.location.length && !searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs on CareerFairy`
+   // Get at most 2 location names
+   const selectedLocations = locationNames?.slice(0, 2) ?? []
+   const locationsText = selectedLocations.join(
+      selectedLocations.length > 1 ? ", " : ""
+   )
+
+   // Handle singular/plural for jobs
+   const jobsText = numberOfJobs === 1 ? "job" : "jobs"
+
+   // Build title parts
+   const titleParts: string[] = []
+
+   // Add number
+   titleParts.push(numberOfJobs.toString())
+
+   // Add search term if available
+   if (searchParams.term) {
+      titleParts.push(searchParams.term)
    }
 
-   if (searchParams.location.length && !searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs in ${locationNames.join(
-         ", "
-      )} on CareerFairy`
+   // Add jobs text
+   titleParts.push(jobsText)
+
+   // Add location if available
+   if (locationsText) {
+      titleParts.push(`in ${locationsText}`)
+   } else if (ipBasedLocationName) {
+      titleParts.push(`in ${ipBasedLocationName}`)
    }
 
-   if (!searchParams.location.length && searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs for ${searchParams.term} on CareerFairy`
-   }
+   // Join with spaces and add period
+   const title = titleParts.join(" ")
 
-   if (searchParams.location.length && searchParams.term && numberOfJobs) {
-      return `${numberOfJobs} Jobs for ${
-         searchParams.term
-      } in ${locationNames.join(", ")} on CareerFairy`
-   }
+   return title
+}
 
-   return `Jobs on CareerFairy`
+// Helper to get job type labels
+const getJobTypeLabels = (jobTypes?: string[]) => {
+   if (!jobTypes?.length) return []
+   return jobTypes
+      .map((type) => jobTypeOptions.find((opt) => opt.value === type)?.label)
+      .filter(Boolean)
+}
+
+// Helper to get business function tag labels
+const getBusinessFunctionTagLabels = (tags?: string[]) => {
+   if (!tags?.length) return []
+   return tags
+      .filter((tag) => tag !== "Other")
+      .map((tag) => BusinessFunctionsTags[tag]?.name)
+      .filter(Boolean)
 }
 
 type JobsPageProps = {
@@ -238,6 +257,7 @@ type JobsPageProps = {
       sparksData: SerializedSpark[]
    }
    locationNames: string[]
+   ipBasedLocationName: string
    searchParams: SearchParams
    userCountryCode: string
    algoliaServerResponse: SearchResponse<AlgoliaCustomJobResponse>
@@ -252,6 +272,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const { term: queryTerm = "", currentJobId: queryCurrentJobId } =
       context.query
+
+   const ipBasedLocationName = userCountryCode
+      ? getLocationNames([userCountryCode])?.at(0)
+      : null
 
    const token = getUserTokenFromCookie(context) as any
    const userAuthId = token?.user_id
@@ -366,6 +390,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          dialogOpen,
          userCountryCode,
          locationNames,
+         ipBasedLocationName,
          searchParams: {
             location: queryLocations,
             term: term as string,
