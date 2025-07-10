@@ -1,6 +1,7 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 import { useRouter } from "next/router"
+import { ReactElement } from "react"
 import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
 import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
 import CreateJobButton from "../../../../../components/views/admin/jobs/components/CreateJobButton"
@@ -8,8 +9,7 @@ import JobsContent from "../../../../../components/views/group/admin/jobs"
 import JobAdminDetails from "../../../../../components/views/group/admin/jobs/details/JobAdminDetails"
 import JobDialog from "../../../../../components/views/group/admin/jobs/dialog"
 import JobFetchWrapper from "../../../../../HOCs/job/JobFetchWrapper"
-import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import { withGroupDashboardLayout } from "../../../../../layouts/GroupDashboardLayout/withGroupDashboardLayout"
 
 const JobsPage = () => {
    const {
@@ -19,11 +19,7 @@ const JobsPage = () => {
    const jobId = queryJobId?.[0] || ""
 
    return (
-      <GroupDashboardLayout
-         titleComponent={"Jobs"}
-         topBarCta={<CreateJobButton />}
-      >
-         <DashboardHead title="CareerFairy | Jobs" />
+      <>
          <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
             {jobId ? (
                <JobFetchWrapper jobId={jobId}>
@@ -34,10 +30,17 @@ const JobsPage = () => {
             )}
          </SuspenseWithBoundary>
          <JobDialog />
-
          <SparkPreviewDialog />
-      </GroupDashboardLayout>
+      </>
    )
+}
+
+JobsPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Jobs",
+      topBarCta: <CreateJobButton />,
+      dashboardHeadTitle: "CareerFairy | Jobs",
+   })(page)
 }
 
 export default JobsPage

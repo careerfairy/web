@@ -1,18 +1,17 @@
-import { LivestreamAnalyticsNavigationTabs } from "components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
-import { SubNavigationTabs } from "layouts/GroupDashboardLayout/SubNavigationTabs"
-import AnalyticsFeedbackPageContent from "../../../../../../../components/views/group/admin/analytics-new/feedback"
-import GroupDashboardLayout from "../../../../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
+import { ReactElement } from "react"
+import FeedbackPageContent from "../../../../../../../components/views/group/admin/analytics-new/feedback"
 
 const FeedbackPage = () => {
-   return (
-      <GroupDashboardLayout titleComponent={"Analytics"}>
-         <DashboardHead title="CareerFairy | Feedback of" />
-         <SubNavigationTabs showSubNavigationFor="analytics" />
-         <LivestreamAnalyticsNavigationTabs />
-         <AnalyticsFeedbackPageContent />
-      </GroupDashboardLayout>
-   )
+   return <FeedbackPageContent />
+}
+
+FeedbackPage.getLayout = function getLayout(page: ReactElement) {
+   return withGroupDashboardLayout({
+      titleComponent: "Analytics",
+      dashboardHeadTitle: "CareerFairy | Feedback of",
+      subNavigationFor: "analytics",
+   })(page)
 }
 
 export default FeedbackPage

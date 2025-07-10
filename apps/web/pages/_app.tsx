@@ -83,6 +83,9 @@ function MyApp(props) {
 
    const webviewResumedCount = useTrackWebviewResumedCount()
 
+   // Use the layout defined at the page level, if available
+   const getLayout = Component.getLayout || ((page) => page)
+
    return (
       // Only re-render the entire app if its a webview, and the webview has resumed
       <Fragment key={MobileUtils.webViewPresence() ? webviewResumedCount : 0}>
@@ -116,9 +119,11 @@ function MyApp(props) {
                                              <UserRewardsNotifications>
                                                 <SparksFeedTrackerProvider>
                                                    <CompaniesTrackerProvider>
-                                                      <Component
-                                                         {...pageProps}
-                                                      />
+                                                      {getLayout(
+                                                         <Component
+                                                            {...pageProps}
+                                                         />
+                                                      )}
                                                    </CompaniesTrackerProvider>
                                                 </SparksFeedTrackerProvider>
                                              </UserRewardsNotifications>
