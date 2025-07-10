@@ -127,7 +127,7 @@ export const TalentPoolCard: FC<AggregationCardProps> = (props) => {
          link={
             group.universityCode // Do not show talent pool link for university groups
                ? undefined
-               : `/group/${group.id}/admin/analytics/talent-pool`
+               : `/group/${group.id}/admin/talent-pool`
          }
       />
    )

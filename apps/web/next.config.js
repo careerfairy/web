@@ -292,7 +292,6 @@ const moduleExports = {
       REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "993933306494",
    },
 
-   // Disabling landing pages for now (CF-701)
    redirects: async () => {
       return [
          {
@@ -303,6 +302,116 @@ const moduleExports = {
          {
             source: "/landing/:slug",
             destination: "/",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/events", // Moved events table to content
+            destination: "/group/:groupId/admin/content/live-streams",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/events/all",
+            destination: "/group/:groupId/admin/content/live-streams",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/events/:livestreamId",
+            destination:
+               "/group/:groupId/admin/content/live-streams/:livestreamId",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/sparks",
+            destination: "/group/:groupId/admin/content/sparks",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/analytics/talent-pool",
+            destination: "/group/:groupId/admin/talent-pool",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/sparks/analytics",
+            destination: "/group/:groupId/admin/analytics/sparks",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/analytics/live-stream",
+            destination: "/group/:groupId/admin/analytics/live-streams", // Page is not plural for consistency
+            permanent: false,
+         },
+         /**
+          * General analytics page has been renamed to live stream analytics page
+          */
+         {
+            source: "/group/:groupId/admin/analytics",
+            destination:
+               "/group/:groupId/admin/analytics/live-streams/overview",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/analytics/feedback",
+            destination:
+               "/group/:groupId/admin/analytics/live-streams/feedback",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/analytics/registration-sources",
+            destination:
+               "/group/:groupId/admin/analytics/live-streams/registration-sources",
+            permanent: false,
+         },
+         /**
+          * Redirect upcoming-livestreams page to content/live-streams
+          */
+         {
+            source: "/group/:groupId/admin/upcoming-livestreams",
+            destination:
+               "/group/:groupId/admin/content/live-streams?eventId=:livestreamId",
+            permanent: false,
+            has: [
+               {
+                  type: "query",
+                  key: "livestreamId",
+               },
+            ],
+         },
+         {
+            source: "/group/:groupId/admin/upcoming-livestreams",
+            destination: "/group/:groupId/admin/content/live-streams",
+            permanent: false,
+         },
+         /**
+          * Redirect old settings pages to new settings structure
+          */
+         {
+            source: "/group/:groupId/admin/edit",
+            destination: "/group/:groupId/admin/settings/general",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/roles",
+            destination: "/group/:groupId/admin/settings/team-members",
+            permanent: false,
+         },
+         /**
+          * Redirect past-livestreams page to content/live-streams
+          */
+         {
+            source: "/group/:groupId/admin/past-livestreams",
+            destination:
+               "/group/:groupId/admin/content/live-streams?eventId=:livestreamId",
+            permanent: false,
+            has: [
+               {
+                  type: "query",
+                  key: "livestreamId",
+               },
+            ],
+         },
+         {
+            source: "/group/:groupId/admin/past-livestreams",
+            destination: "/group/:groupId/admin/content/live-streams",
             permanent: false,
          },
       ]

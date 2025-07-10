@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { mainProductionDomainWithProtocol } from "@careerfairy/shared-lib/utils/urls"
-import isEmpty from "lodash/isEmpty"
+import { NextRouter } from "next/router"
 import { v4 as uuidv4 } from "uuid"
 import { LONG_NUMBER } from "../util/constants"
 
-var dayjs = require("dayjs")
-var relativeTime = require("dayjs/plugin/relativeTime")
-var localizedFormat = require("dayjs/plugin/localizedFormat")
-var advancedFormat = require("dayjs/plugin/advancedFormat")
-var utc = require("dayjs/plugin/utc") // dependent on utc plugin
-var timezone = require("dayjs/plugin/timezone")
+import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
+import FirebaseService from "data/firebase/FirebaseService"
+import dayjs from "dayjs"
+import advancedFormat from "dayjs/plugin/advancedFormat"
+import localizedFormat from "dayjs/plugin/localizedFormat"
+import relativeTime from "dayjs/plugin/relativeTime"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc" // dependent on utc plugin
+
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(advancedFormat)
@@ -25,24 +29,24 @@ dayjs.extend(relativeTime)
  * @param errorCallback
  */
 export const uploadLogo = (
-   location,
-   fileObject,
-   firebase,
-   callback,
-   progressCallback,
-   errorCallback = undefined
+   location: string,
+   fileObject: File,
+   firebase: FirebaseService,
+   callback: (downloadURL: string, fullPath: string) => void,
+   progressCallback: (progress: { state: string; progress: number }) => void,
+   errorCallback: (error: Error) => void = undefined
 ) => {
    const storageRef = firebase.getStorageRef()
-   let splitters = [" ", "(", ")", "-"]
-   let fileName = fileObject.name
+   const splitters = [" ", "(", ")", "-"]
+   const fileName = fileObject.name
    let imageName = splitters
       .reduce((old, c) => old.map((v) => v.split(c)).flat(), [fileName])
       .join("_")
    if (imageName.length > 10) {
       imageName = imageName.slice(-10)
    }
-   let fullPath = `${location}/${uuidv4()}_${imageName}`
-   let companyLogoRef = storageRef.child(fullPath)
+   const fullPath = `${location}/${uuidv4()}_${imageName}`
+   const companyLogoRef = storageRef.child(fullPath)
    const uploadTask = companyLogoRef.put(fileObject)
 
    uploadTask.on(
@@ -103,7 +107,7 @@ export const timeAgo = (date = new Date()) => {
    return dayjs(date).fromNow()
 }
 
-export function getTimeFromNow(firebaseTimestamp) {
+export function getTimeFromNow(firebaseTimestamp: Timestamp | null) {
    if (firebaseTimestamp) {
       const dateString = dayjs(firebaseTimestamp.toDate()).fromNow()
       if (dateString === "in a few seconds") {
@@ -116,14 +120,14 @@ export function getTimeFromNow(firebaseTimestamp) {
    }
 }
 
-export const prettyDate = (firebaseTimestamp) => {
+export const prettyDate = (firebaseTimestamp: Timestamp | null) => {
    if (firebaseTimestamp && firebaseTimestamp.toDate?.()) {
       return dayjs(firebaseTimestamp.toDate()).format("LL LT")
    } else {
       return ""
    }
 }
-export const prettyLocalizedDate = (javascriptDate) => {
+export const prettyLocalizedDate = (javascriptDate: Date | null) => {
    if (javascriptDate) {
       return dayjs(javascriptDate).format("LL LT zzz")
    } else {
@@ -131,32 +135,26 @@ export const prettyLocalizedDate = (javascriptDate) => {
    }
 }
 
-export const repositionElement = (arr, fromIndex, toIndex) => {
+export const repositionElement = (
+   arr: any[],
+   fromIndex: number,
+   toIndex: number
+) => {
    const element = arr[fromIndex]
    arr.splice(fromIndex, 1)
    arr.splice(toIndex, 0, element)
 }
 
-export const repositionElementInArray = (arr, fromIndex, toIndex) => {
+export const repositionElementInArray = (
+   arr: any[],
+   fromIndex: number,
+   toIndex: number
+) => {
    const newArray = [...arr]
    const element = arr[fromIndex]
    newArray.splice(fromIndex, 1)
    newArray.splice(toIndex, 0, element)
    return newArray
-}
-
-export const getLength = (arr, prop) => {
-   return arr.map((el) => {
-      return el?.[prop]?.length || 0
-   })
-}
-
-export const isEmptyObject = (obj) => {
-   return isEmpty(obj)
-}
-
-export const isNotEmptyString = (myString) => {
-   return myString && myString.match(/^\s+$/) === null
 }
 
 export const isServer = () => {
@@ -175,8 +173,8 @@ export const isInIframe = () => {
    }
 }
 
-export const convertCamelToSentence = (string) => {
-   if (typeof string === "string" || string instanceof String) {
+export const convertCamelToSentence = (string: string) => {
+   if (typeof string === "string") {
       return (
          string
             .replace(/([A-Z])/g, " $1")
@@ -187,7 +185,11 @@ export const convertCamelToSentence = (string) => {
       return ""
    }
 }
-export const getServerSideRouterQuery = (queryKey, router) => {
+
+export const getServerSideRouterQuery = (
+   queryKey: string,
+   router: NextRouter
+) => {
    if (router.query[queryKey]) {
       return router.query[queryKey]
    } else {
@@ -200,30 +202,7 @@ export const getServerSideRouterQuery = (queryKey, router) => {
    }
 }
 
-export const snapShotsToData = (snapShots) => {
-   let dataArray = []
-   snapShots.forEach((doc) => {
-      const data = doc.data()
-      data.id = doc.id
-      dataArray.push(data)
-   })
-   return dataArray
-}
-
-export const singleSnapToData = (snapShot) => {
-   let data = {}
-   if (snapShot.exists) {
-      data = snapShot.data()
-      data.id = snapShot.id
-   }
-   return data
-}
-
-export const MultilineText = ({ text }) => {
-   return text.split("\\n").map((item, i) => <p key={i}>{item}</p>)
-}
-
-export const copyStringToClipboard = (string) => {
+export const copyStringToClipboard = (string: string) => {
    try {
       navigator.clipboard.writeText(string)
    } catch (e) {
@@ -234,16 +213,7 @@ export const copyStringToClipboard = (string) => {
    }
 }
 
-export const mustBeNumber = (value, decimals = 2) => {
-   function round(value, decimals) {
-      return Number(Math.round(value + "e" + decimals) + "e-" + decimals)
-   }
-
-   // checks to see if value is an int or float, if not it will return zero
-   return Number.isFinite(value) ? round(value, decimals) : 0
-}
-
-export const convertStringToArray = (string, maxChars = 30) => {
+export const convertStringToArray = (string: string, maxChars = 30) => {
    // Split by spaces
    return (
       string
@@ -265,27 +235,16 @@ export const convertStringToArray = (string, maxChars = 30) => {
    )
 }
 
-export const mergeArrayOfObjects = (arr1, arr2, property) => {
-   let merged = []
-   for (let i = 0; i < arr1.length; i++) {
-      merged.push({
-         ...arr1[i],
-         ...arr2.find((itmInner) => itmInner[property] === arr1[i][property]),
-      })
-   }
-   return merged
-}
-
-export const getMinutes = (value) =>
+export const getMinutes = (value: number) =>
    value === LONG_NUMBER ? "stream Ends" : `${value} minutes`
 
-export const dynamicSort = (property, reverse) => {
+export const dynamicSort = (property: string, reverse: boolean) => {
    let sortOrder = reverse ? 1 : -1
    if (property[0] === "-") {
       sortOrder = -1
       property = property.substr(1)
    }
-   return function (a, b) {
+   return function (a: Record<string, unknown>, b: Record<string, unknown>) {
       /* next line works with strings and numbers,
        * and you may want to customize it to your needs
        */
@@ -294,13 +253,10 @@ export const dynamicSort = (property, reverse) => {
       return result * sortOrder
    }
 }
-export const truncate = (str, n) => {
-   return str.length > n ? str.substr(0, n - 1) + "..." : str
-}
 
 /**
  * Get the base url of the current environment.
- * @returns {string} The base url of the current environment.
+ * @returns The base url of the current environment.
  * Examples:
  *
  * • https://careerfairy.io - production
@@ -318,30 +274,26 @@ export const getBaseUrl = () => {
    return process.env.NEXT_PUBLIC_URL || mainProductionDomainWithProtocol
 }
 
-export const maybePluralize = (count, noun, suffix = "s") =>
+export const maybePluralize = (count: number, noun: string, suffix = "s") =>
    `${noun}${count !== 1 ? suffix : ""}`
 
-export const getMinutesPassed = (livestream) => {
+export const getMinutesPassed = (
+   livestream: Pick<LivestreamEvent, "start">
+) => {
    const now = new Date()
    if (livestream?.start?.toDate()) {
-      const diff = Math.abs(now - livestream.start.toDate())
+      const diff = Math.abs(now.getTime() - livestream.start.toDate().getTime())
       return Math.floor(diff / 1000 / 60)
    } else {
       return null
    }
 }
 
-export const addMinutes = (date, minutes) => {
+export const addMinutes = (date: Date, minutes: number) => {
    return new Date(date.getTime() + minutes * 60000)
 }
 
-export const toTitleCase = (str) => {
-   return str.replace(/\w\S*/g, function (txt) {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-   })
-}
-
-export const makeExternalLink = (url) => {
+export const makeExternalLink = (url: string) => {
    const urlPattern = new RegExp(
       /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w-._~:/?#[\]@!$&'(),;=.]+$/
    )
@@ -359,28 +311,30 @@ export const makeExternalLink = (url) => {
    return string
 }
 
-export const getRandomColor = () => {
-   const max = 0xffffff
-   return "#" + Math.round(Math.random() * max).toString(16)
-}
-
-export const getRandomInt = (min, max) => {
+export const getRandomInt = (min: number, max: number) => {
    min = Math.ceil(min)
    max = Math.floor(max)
    return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export const getRandomWeightedInt = (min, max, index) => {
+export const getRandomWeightedInt = (
+   min: number,
+   max: number,
+   index: number
+) => {
    return Math.floor((Math.random() * (max - min + 1) + min) / (index + 1))
 }
 
 /**
  * Get Resized Url.
- * @param {string} url – original url of image
- * @param {('xs'|'sm'|'md'|'lg')} size – size of the image
- * @return {string} Returns the image url with the correct size appended to it.
+ * @param url original url of image
+ * @param size size of the image
+ * @return Returns the image url with the correct size appended to it.
  */
-export const getResizedUrl = (url, size = "sm") => {
+export const getResizedUrl = (
+   url: string,
+   size: "xs" | "sm" | "md" | "lg" = "sm"
+) => {
    const imageSizes = {
       xs: "200x200",
       sm: "400x400",
@@ -421,23 +375,23 @@ export const getResizedUrl = (url, size = "sm") => {
 
 /**
  * Get Responsive Resized Url.
- * @param {string} url – original url of image
- * @param {boolean} isMobile – size of the image
- * @param {('xs'|'sm'|'md'|'lg')} mobileSize – size of the image on when mobile
- * @param {('xs'|'sm'|'md'|'lg')} desktopSize – size of the image on desktop
- * @return {string} Returns the image url with the correct size appended to it.
+ * @param url – original url of image
+ * @param isMobile – size of the image
+ * @param mobileSize – size of the image on when mobile
+ * @param desktopSize – size of the image on desktop
+ * @return Returns the image url with the correct size appended to it.
  */
 
 export const getResponsiveResizedUrl = (
-   url,
-   isMobile,
-   mobileSize = "sm",
-   desktopSize = "lg"
+   url: string,
+   isMobile: boolean,
+   mobileSize: "xs" | "sm" | "md" | "lg" = "sm",
+   desktopSize: "xs" | "sm" | "md" | "lg" = "lg"
 ) => {
    return getResizedUrl(url, isMobile ? mobileSize : desktopSize)
 }
 
-export const addQueryParam = (url, queryParam) => {
+export const addQueryParam = (url: string, queryParam: string) => {
    if (!queryParam) return url
    if (url.includes("?")) {
       return `${url}&${queryParam}`
@@ -445,26 +399,27 @@ export const addQueryParam = (url, queryParam) => {
    return `${url}?${queryParam}`
 }
 
-export const addMinutesToDate = (date, minutes) => {
+export const addMinutesToDate = (date: Date, minutes: number) => {
    const newDate = new Date(date)
    return new Date(newDate.getTime() + minutes * 60000)
 }
 
-export const shuffleArray = (array) =>
+export const shuffleArray = <T extends Array<unknown>>(array: T) =>
    array
       .map((value) => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
       .map(({ value }) => value)
 
 export const dataURLtoFile = (
-   dataUrl,
+   dataUrl: string,
    filename = new Date().getTime().toString()
 ) => {
-   let arr = dataUrl.split(","),
+   const arr = dataUrl.split(","),
       mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]),
-      n = bstr.length,
-      u8arr = new Uint8Array(n)
+      bstr = atob(arr[1])
+
+   let n = bstr.length
+   const u8arr = new Uint8Array(n)
 
    while (n--) {
       u8arr[n] = bstr.charCodeAt(n)
@@ -475,17 +430,16 @@ export const dataURLtoFile = (
    })
 }
 
-export const getMaxLineStyles = (maxLines = 2) => ({
-   display: "-webkit-box",
-   lineClamp: maxLines,
-   WebkitLineClamp: maxLines,
-   overflow: "hidden",
-   textOverflow: "ellipsis",
-   WebkitBoxOrient: "vertical",
-})
+export const getMaxLineStyles = (maxLines = 2) =>
+   ({
+      display: "-webkit-box",
+      lineClamp: maxLines,
+      WebkitLineClamp: maxLines,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      WebkitBoxOrient: "vertical",
+   } as const)
 
-export const sleep = (ms) => {
+export const sleep = (ms: number) => {
    return new Promise((resolve) => setTimeout(resolve, ms))
 }
-
-export const delay = (t) => new Promise((resolve) => setTimeout(resolve, t))

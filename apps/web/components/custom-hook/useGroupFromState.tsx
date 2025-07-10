@@ -1,7 +1,6 @@
-import { useSelector } from "react-redux"
-import { groupSelector } from "../../store/selectors/groupSelectors"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo } from "react"
 
 type Result = {
@@ -10,7 +9,7 @@ type Result = {
 }
 
 const useGroupFromState = (): Result => {
-   const group: Group = useSelector(groupSelector)
+   const { group } = useGroup()
 
    return useMemo(() => {
       const res: Result = {

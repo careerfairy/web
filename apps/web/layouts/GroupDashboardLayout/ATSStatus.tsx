@@ -1,25 +1,13 @@
-import React, { memo } from "react"
-
-// material-ui
-import { Box, Tooltip } from "@mui/material"
+import { memo } from "react"
 
 // project imports
-import { sxStyles } from "../../types/commonTypes"
-import { useTheme } from "@mui/styles"
 import useGroupATSAccounts from "../../components/custom-hook/useGroupATSAccounts"
-
-const styles = sxStyles({
-   statusRoot: (theme) => ({
-      width: theme.spacing(2),
-      height: theme.spacing(2),
-      borderRadius: "50%",
-      boxShadow: "inset 0 0 0 3.5px white",
-   }),
-})
+import { Status } from "./Status"
 
 type Props = {
    groupId: string
 }
+
 const ATSStatus = ({ groupId }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
 
@@ -58,25 +46,6 @@ const ATSStatus = ({ groupId }: Props) => {
    }
 
    return null
-}
-
-type StatusProps = {
-   message: string
-   color: "primary" | "secondary" | "success" | "error" | "warning" | "info"
-}
-export const Status = ({ color, message }: StatusProps) => {
-   const theme = useTheme()
-   const targetColor = theme.palette[color].main
-
-   return (
-      <Tooltip arrow title={message}>
-         <Box
-            bgcolor={targetColor}
-            border={`1px solid ${targetColor}`}
-            sx={styles.statusRoot}
-         />
-      </Tooltip>
-   )
 }
 
 export default memo(ATSStatus) // Memoize to prevent unnecessary re-renders

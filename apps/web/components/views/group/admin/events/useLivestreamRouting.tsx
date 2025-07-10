@@ -52,12 +52,11 @@ export const useLivestreamRouting = () => {
             draftLivestream,
             "draftLivestreams",
             author,
-            null,
             initialFeedbackQuestions
          )
 
          return router.push({
-            pathname: `/group/${group.id}/admin/events/${draftLiveStreamId}`,
+            pathname: `/group/${group.id}/admin/content/live-streams/${draftLiveStreamId}`,
          })
       } catch (error) {
          errorLogAndNotify(error, {
@@ -71,7 +70,7 @@ export const useLivestreamRouting = () => {
 
    const editLivestream = (livestreamId: string) => {
       return router.push({
-         pathname: `/group/${group.id}/admin/events/${livestreamId}`,
+         pathname: `/group/${group.id}/admin/content/live-streams/${livestreamId}`,
       })
    }
 
