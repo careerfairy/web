@@ -217,7 +217,6 @@ declare module "@mui/material/Button" {
       gold: true
       black: true
       navyBlue: true
-      tertiary: true
    }
 }
 
