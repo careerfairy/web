@@ -1,7 +1,6 @@
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material"
 import Link from "next/link"
-import { useRouter } from "next/router"
 import { ChevronRight } from "react-feather"
 import { LivestreamSearchResult } from "types/algolia"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -48,12 +47,6 @@ const RecentLivestreamsSection = ({
    recentLivestreams,
    isLoading,
 }: RecentLivestreamsSectionProps) => {
-   const router = useRouter()
-
-   const handleMoreToWatchClick = () => {
-      void router.push("/past-livestreams")
-   }
-
    if (isLoading) {
       return (
          <Box sx={styles.loader}>
@@ -94,7 +87,6 @@ const RecentLivestreamsSection = ({
             <Button
                variant={"outlined"}
                color={"grey"}
-               onClick={handleMoreToWatchClick}
                component={Link}
                href={"/past-livestreams"}
                sx={styles.noLinkStyle}
