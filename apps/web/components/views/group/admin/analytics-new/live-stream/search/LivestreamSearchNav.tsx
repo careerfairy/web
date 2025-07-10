@@ -37,7 +37,7 @@ const LivestreamSearchNav = () => {
    const handleChange = useCallback(
       (newValue: LivestreamSearchResult | null) => {
          void push(
-            `/group/${group.id}/admin/analytics/live-stream/${
+            `/group/${group.id}/admin/analytics/live-streams/${
                newValue?.id ?? ""
             }`,
             undefined,

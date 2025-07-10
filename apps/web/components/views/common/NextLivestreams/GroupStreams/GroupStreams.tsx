@@ -6,13 +6,13 @@ import {
 import { Box, Grid, LinearProgress, Typography } from "@mui/material"
 import { useAutoPlayGrid } from "components/custom-hook/utils/useAutoPlayGrid"
 import { isLivestreamDialogOpen } from "components/views/livestream-dialog/LivestreamDialogLayout"
+import isEmpty from "lodash/isEmpty"
 import { useRouter } from "next/router"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { InView } from "react-intersection-observer"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers"
 import useRegistrationModal from "../../../../custom-hook/useRegistrationModal"
-import { isEmptyObject } from "../../../../helperFunctions/HelperFunctions"
 import ShareLivestreamModal from "../../ShareLivestreamModal"
 import RegistrationModal from "../../registration-modal"
 import EventPreviewCard from "../../stream-cards/EventPreviewCard"
@@ -86,7 +86,7 @@ const GroupStreams = ({
    }, [setShareEventDialog])
 
    const location = useMemo(() => {
-      if (isEmptyObject(groupData)) {
+      if (isEmpty(groupData)) {
          return isPastLivestreams
             ? ImpressionLocation.pastLivestreams
             : ImpressionLocation.nextLivestreams

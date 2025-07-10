@@ -1,17 +1,17 @@
-import Stack from "@mui/material/Stack"
-import React, { FC } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { Box, Button, Skeleton, Typography } from "@mui/material"
-import { sxStyles } from "../../../../../../../types/commonTypes"
-import Link from "../../../../../common/Link"
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded"
+import { Box, Button, Skeleton, Typography } from "@mui/material"
+import Stack from "@mui/material/Stack"
+import { FC } from "react"
+import { sxStyles } from "../../../../../../../types/commonTypes"
 import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
-import RatingAnswers, { RatingAnswersSkeleton } from "./RatingAnswers"
-import useLivestreamRating from "./useLivestreamRating"
+import Link from "../../../../../common/Link"
 import {
    RatingWithLabel,
    RatingWithLabelSkeleton,
 } from "../../../common/inputs"
+import RatingAnswers, { RatingAnswersSkeleton } from "./RatingAnswers"
+import useLivestreamRating from "./useLivestreamRating"
 
 const styles = sxStyles({
    goBackButton: {
@@ -62,7 +62,7 @@ export const RatingOverviewTitle: FC<FeedbackAnswersTitleProps> = ({
             component={Link}
             color="grey"
             startIcon={<ArrowBackIosNewRoundedIcon />}
-            href={`/group/${groupId}/admin/analytics/feedback/${livestreamStats.livestream.id}`}
+            href={`/group/${groupId}/admin/analytics/live-streams/feedback/${livestreamStats.livestream.id}`}
             sx={styles.goBackButton}
             size={"small"}
          >
