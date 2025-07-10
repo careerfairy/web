@@ -148,7 +148,7 @@ export const getComponents = (
                "&:hover": {
                   borderColor:
                      theme.palette.mode === "light"
-                        ? "rgba(0, 0, 0, 0.23)"
+                        ? "rgba(0, 0, 0, 0.04)"
                         : "rgba(255, 255, 255, 0.23)",
                   backgroundColor: alpha(
                      theme.palette.text.primary,
@@ -184,25 +184,6 @@ export const getComponents = (
                boxShadow: "none",
                backgroundColor: theme.palette.navyBlue.main,
                color: "#D5F6F1",
-            },
-         },
-         {
-            props: { color: "tertiary" },
-            style: {
-               borderRadius: "24px",
-               border: `1px solid ${theme.palette.neutral[200]}`,
-               color: theme.palette.neutral[600],
-               backgroundColor: "transparent",
-               padding: "12px 28px",
-               gap: "12px",
-               "& .MuiButton-endIcon": {
-                  marginLeft: 0,
-                  marginRight: 0,
-               },
-               "&:hover": {
-                  border: "1px solid rgba(0, 0, 0, 0.04)",
-                  backgroundColor: "rgba(0, 0, 0, 0.04)",
-               },
             },
          },
       ],

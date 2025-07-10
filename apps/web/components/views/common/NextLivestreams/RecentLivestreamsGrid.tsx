@@ -1,5 +1,6 @@
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { ChevronRight } from "react-feather"
 import { LivestreamSearchResult } from "types/algolia"
@@ -32,6 +33,9 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       py: 4,
+   },
+   noLinkStyle: {
+      textDecoration: "none",
    },
 })
 
@@ -87,8 +91,12 @@ const RecentLivestreamsSection = ({
 
          <Box sx={styles.moreButton}>
             <Button
-               color="tertiary"
+               variant={"outlined"}
+               color={"grey"}
                onClick={handleMoreToWatchClick}
+               component={Link}
+               href={"/past-livestreams"}
+               sx={styles.noLinkStyle}
                endIcon={<ChevronRight />}
                fullWidth
             >
