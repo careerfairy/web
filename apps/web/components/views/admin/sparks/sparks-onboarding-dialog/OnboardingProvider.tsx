@@ -1,3 +1,6 @@
+import { useAuth } from "HOCs/AuthProvider"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { useRouter } from "next/router"
 import {
    ReactNode,
    createContext,
@@ -7,10 +10,9 @@ import {
    useState,
 } from "react"
 import useSparksB2BOnboardingCompletion from "./useSparksB2BOnboardingCompletion"
-import { useAuth } from "HOCs/AuthProvider"
-import Welcome from "./views/Welcome"
-import Tutorial from "./views/Tutorial"
 import FreeTrial from "./views/FreeTrial"
+import Tutorial from "./views/Tutorial"
+import Welcome from "./views/Welcome"
 
 export type OnboardingStep = {
    stepLabel: string
@@ -51,8 +53,9 @@ type OnboardingProviderProps = {
 
 export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
    const { userData } = useAuth()
-
+   const { push, pathname } = useRouter()
    const [activeStep, setActiveStep] = useState(0)
+   const { group } = useGroup()
 
    const handleNext = useCallback(() => {
       if (activeStep < steps.length - 1) {
@@ -69,20 +72,32 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
    const { trigger: completeOnboarding, isMutating: isCompletingOnboarding } =
       useSparksB2BOnboardingCompletion(userData.id)
 
+   const handleCompleteOnboarding = useCallback(() => {
+      completeOnboarding().then(() => {
+         // redirect to get started with sparks content creation onboarding only if they are not already on that page
+         if (pathname !== "/group/[groupId]/admin/content/sparks") {
+            push(`/group/${group.id}/admin/content/sparks`, undefined, {
+               shallow: true,
+               scroll: false,
+            })
+         }
+      })
+   }, [completeOnboarding, group?.id, pathname, push])
+
    const value = useMemo<OnboardingContextType>(
       () => ({
          activeStep,
          handleNext,
          handleBack,
          steps,
-         completeOnboarding,
+         completeOnboarding: handleCompleteOnboarding,
          isCompletingOnboarding,
       }),
       [
          activeStep,
          handleNext,
          handleBack,
-         completeOnboarding,
+         handleCompleteOnboarding,
          isCompletingOnboarding,
       ]
    )

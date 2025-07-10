@@ -1,5 +1,9 @@
-import { Button, styled, Typography } from "@mui/material"
+import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
+import { LoadingButton } from "@mui/lab"
+import { styled, Typography } from "@mui/material"
 import { Box } from "@mui/system"
+import { useStartPlanMutation } from "components/custom-hook/group/useStartPlanMutation"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 export const StyledCTATitle = styled(Typography)(({ theme }) => ({
    fontSize: 40,
@@ -28,19 +32,31 @@ export const StyledFinalCTA = styled(Box)(({ theme }) => ({
 }))
 
 export const FinalCTASection = () => {
+   const { group } = useGroup()
+   const { trigger, isMutating } = useStartPlanMutation(group.id)
+
+   const handleStartTrial = () => {
+      trigger({
+         planType: GroupPlanTypes.Trial,
+         groupId: group.id,
+      })
+   }
+
    return (
       <StyledFinalCTA>
          <StyledCTATitle>
             Get&nbsp;your&nbsp;brand seen&nbsp;now!
          </StyledCTATitle>
-         <Button
+         <LoadingButton
             variant="contained"
             size="medium"
             color="secondary"
+            loading={isMutating}
+            onClick={handleStartTrial}
             sx={{ width: 258 }}
          >
             Start your free trial!
-         </Button>
+         </LoadingButton>
       </StyledFinalCTA>
    )
 }
