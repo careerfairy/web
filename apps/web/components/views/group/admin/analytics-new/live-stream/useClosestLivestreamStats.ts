@@ -49,7 +49,7 @@ const useClosestLivestreamStats = (
          setIsRedirecting(true)
 
          replace(
-            `/group/${groupId}/admin/analytics/live-stream/${
+            `/group/${groupId}/admin/analytics/live-streams/${
                closestLivestreamId ?? ""
             }`
          ).then(() => setIsRedirecting(false))

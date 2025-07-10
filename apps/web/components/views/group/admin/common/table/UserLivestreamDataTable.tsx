@@ -1,4 +1,3 @@
-import React, { FC, ReactNode, useCallback, useMemo, MouseEvent } from "react"
 import MaterialTable, {
    Column,
    Components,
@@ -7,6 +6,12 @@ import MaterialTable, {
    MTableAction,
    Options,
 } from "@material-table/core"
+import DownloadIcon from "@mui/icons-material/CloudDownloadOutlined"
+import CopyIcon from "@mui/icons-material/ContentCopy"
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import ExportIcon from "@mui/icons-material/ListAltOutlined"
+import ResetFiltersIcon from "@mui/icons-material/RotateLeft"
+import { LoadingButton } from "@mui/lab"
 import {
    Box,
    Button,
@@ -19,33 +24,28 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { universityCountriesMap } from "../../../../../util/constants/universityCountries"
 import Stack from "@mui/material/Stack"
-import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import React, { FC, MouseEvent, ReactNode, useCallback, useMemo } from "react"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import { capitalizeFirstLetter } from "../../../../../../util/CommonUtil"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
+import { makeExternalLink } from "../../../../../helperFunctions/HelperFunctions"
 import { LINKEDIN_COLOR } from "../../../../../util/colors"
-import DownloadIcon from "@mui/icons-material/CloudDownloadOutlined"
-import { LoadingButton } from "@mui/lab"
+import { universityCountriesMap } from "../../../../../util/constants/universityCountries"
+import Link from "../../../../common/Link"
+import { CountriesSelect } from "./CountriesSelect"
+import FieldOfStudySelect from "./FieldOfStudySelect"
 import {
    useCopyAllEmails,
    useDownloadAllCVs,
    useDownloadCV,
    useExportUsers,
 } from "./hooks"
-import { CountriesSelect } from "./CountriesSelect"
-import UniversitySelect from "./UniversitySelect"
-import FieldOfStudySelect from "./FieldOfStudySelect"
 import LevelOfStudySelect from "./LevelOfStudySelect"
-import ResetFiltersIcon from "@mui/icons-material/RotateLeft"
-import CopyIcon from "@mui/icons-material/ContentCopy"
+import UniversitySelect from "./UniversitySelect"
 import { useUserDataTable } from "./UserDataTableProvider"
-import ExportIcon from "@mui/icons-material/ListAltOutlined"
-import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
-import { makeExternalLink } from "../../../../../helperFunctions/HelperFunctions"
-import Link from "../../../../common/Link"
-import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import { capitalizeFirstLetter } from "../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -591,7 +591,7 @@ export const DataPrivacyTable: FC = () => {
                   variant="outlined"
                   size="large"
                   color="secondary"
-                  href={`/group/${group.id}/admin/edit#privacy-policy`}
+                  href={`/group/${group.id}/admin/settings/general#privacy-policy`}
                >
                   ADD PRIVACY POLICY
                </Button>

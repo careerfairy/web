@@ -1,6 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import {
    AuthorInfo,
+   EventRating,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
@@ -40,7 +41,7 @@ export const useLivestreamDialog = (group: Group) => {
    }, [handleResetCurrentStream])
 
    const handleEditStream = useCallback(
-      (streamObj) => {
+      (streamObj: LivestreamEvent) => {
          if (streamObj) {
             setCurrentStream(streamObj)
             handleOpenNewStreamModal()
@@ -62,7 +63,7 @@ export const useLivestreamDialog = (group: Group) => {
    )
 
    const handlePublishStream = useCallback(
-      async (streamObj, promotion, ratings?) => {
+      async (streamObj: LivestreamEvent, ratings?: EventRating[]) => {
          try {
             setIsPublishing(true)
             const newStream = { ...streamObj }
@@ -72,7 +73,6 @@ export const useLivestreamDialog = (group: Group) => {
                newStream,
                "livestreams",
                author,
-               promotion,
                ratings
             )
             newStream.id = publishedStreamId
@@ -90,7 +90,7 @@ export const useLivestreamDialog = (group: Group) => {
 
             await deleteLivestream(streamObj.id, "draftLivestreams")
             await replace(
-               `/group/${group.id}/admin/events?eventId=${publishedStreamId}`
+               `/group/${group.id}/admin/content/live-streams?eventId=${publishedStreamId}`
             )
          } catch (e) {
             setIsPublishing(false)

@@ -6,12 +6,13 @@ import { Box, IconButton } from "@mui/material"
 import Stack from "@mui/material/Stack"
 
 // project imports
-import BottomLinks from "../common/BottomLinks"
-import { useGroup } from "./index"
-import EditGroupCard from "./EditGroupCard"
-import GroupNavList from "./GroupNavList"
-import { sxStyles } from "types/commonTypes"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { sxStyles } from "types/commonTypes"
+import { CareerFairyLogo } from "./CareerFairyLogo"
+import EditGroupCard from "./EditGroupCard"
+import { GroupBottomLinks } from "./GroupBottomLinks"
+import GroupNavList from "./GroupNavList"
+import { useGroup } from "./index"
 
 const styles = sxStyles({
    expandButtonContainer: {
@@ -34,10 +35,11 @@ const NavBar = () => {
    return (
       <Stack flex={1} alignItems={"center"} borderRight={"1px solid #EDE7FD"}>
          <ShrunkToggleButton />
+         <CareerFairyLogo />
          <EditGroupCard />
          <GroupNavList />
          <Box flexGrow={1} />
-         <BottomLinks />
+         <GroupBottomLinks />
       </Stack>
    )
 }
@@ -48,6 +50,7 @@ const ShrunkToggleButton = () => {
       shrunkLeftMenuState,
       setShrunkLeftMenuState,
    } = useGroup()
+
    const isMobile = useIsMobile()
 
    const onClick = useCallback(() => {
