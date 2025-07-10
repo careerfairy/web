@@ -206,7 +206,7 @@ const getSeoTitle = (
    )
 
    // Handle singular/plural for jobs
-   const jobsText = numberOfJobs === 1 ? "Job" : "Jobs"
+   const jobsText = numberOfJobs === 1 ? "job" : "jobs"
 
    // Build title parts
    const titleParts: string[] = []
