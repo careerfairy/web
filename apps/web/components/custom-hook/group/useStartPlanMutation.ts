@@ -13,34 +13,15 @@ const fetcher: MutationFetcher<GroupPlanType, string, StartPlanData> = async (
 }
 
 /**
- * Custom hook for starting a group plan using SWR mutation.
+ * Custom hook for starting a company's plan.
  *
- * This hook provides functionality to start a new plan for a group, handling
- * loading states and error notifications automatically. It uses SWR mutation
- * for optimistic updates and proper error handling.
+ * Handles loading state and error notifications automatically.
  *
  * @param groupId - The ID of the group for which to start the plan
  *
- * @returns Object containing:
- * - `trigger`: Function to trigger the plan start mutation. Accepts StartPlanData with planType and groupId
- * - `isMutating`: Boolean indicating if the mutation is currently in progress
- * - `updatedGroupPlanType`: The new plan type after successful mutation, undefined if not completed
- *
- * @example
- * ```tsx
- * const { trigger, isMutating, updatedGroupPlanType } = useStartPlanMutation(group.id)
- *
- * const handleStartTrial = () => {
- *    trigger({
- *       planType: GroupPlanTypes.Trial,
- *       groupId: group.id,
- *    })
- * }
- * ```
- *
- * @note Error notifications are automatically handled via snackbar notifications
- * @see {@link StartPlanData} for the required payload structure
- * @see {@link GroupPlanType} for available plan types
+ * @note Error notifications are handled via snackbar notifications.
+ * @see {@link StartPlanData} for payload structure.
+ * @see {@link GroupPlanType} for available plan types.
  */
 export const useStartPlanMutation = (groupId: string) => {
    const { errorNotification } = useSnackbarNotifications()
