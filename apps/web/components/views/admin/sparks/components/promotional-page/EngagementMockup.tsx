@@ -63,12 +63,15 @@ const TextLine2 = styled(Box)({
    backdropFilter: "blur(23px)",
 })
 
-const IconStack = styled(Stack)({
+const IconStack = styled(Stack)(({ theme }) => ({
    position: "absolute",
    right: -11,
    bottom: 45,
    alignItems: "center",
-})
+   "& svg": {
+      fill: theme.palette.warning["600"],
+   },
+}))
 
 export const EngagementMockup = () => {
    return (
@@ -88,28 +91,24 @@ export const EngagementMockup = () => {
             <IconStack spacing={1}>
                <ThumbsUp
                   size={12}
-                  fill="#FE9B0E"
                   stroke="#FBF5E6"
                   strokeWidth={1}
                   style={{ transform: "rotate(3.075deg)" }}
                />
                <ThumbsUp
                   size={16}
-                  fill="#FE9B0E"
                   stroke="#FBF5E6"
                   strokeWidth={1}
                   style={{ transform: "rotate(-7.496deg)" }}
                />
                <ThumbsUp
                   size={20}
-                  fill="#FE9B0E"
                   stroke="#FBF5E6"
                   strokeWidth={1}
                   style={{ transform: "rotate(14.115deg)" }}
                />
                <ThumbsUp
                   size={24}
-                  fill="#FE9B0E"
                   stroke="#FBF5E6"
                   strokeWidth={1}
                   style={{ transform: "rotate(-5.86deg)" }}

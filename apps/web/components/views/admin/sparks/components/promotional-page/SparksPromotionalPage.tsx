@@ -15,7 +15,7 @@ export const StyledContainer = styled(Container)(({ theme }) => ({
 }))
 
 export const StyledPageBackground = styled(Box)(({ theme }) => ({
-   background: `linear-gradient(180deg, rgba(147, 215, 208, 0.15) 6.95%, rgba(34, 117, 216, 0.15) 69.54%), #FCFCFE`,
+   background: `linear-gradient(180deg, rgba(147, 215, 208, 0.15) 6.95%, rgba(34, 117, 216, 0.15) 69.54%), ${theme.brand.white[200]}`,
    borderRadius: "16px 16px 0px 0px",
    border: `1px solid ${theme.brand.white[400]}`,
    padding: "32px 20px",

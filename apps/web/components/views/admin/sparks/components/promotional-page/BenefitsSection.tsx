@@ -11,7 +11,7 @@ import { LivestreamMockup } from "./LivestreamMockup"
 import { StudentMockup } from "./StudentMockup"
 
 export const StyledBenefitsSection = styled(Box)(({ theme }) => ({
-   backgroundColor: "#FAFAFE",
+   backgroundColor: theme.brand.white[300],
    borderRadius: "12px",
    padding: "24px",
    display: "flex",
@@ -38,7 +38,7 @@ export const StyledBenefitsGrid = styled(Box)(({ theme }) => ({
 }))
 
 export const StyledBenefitCard = styled(Box)(({ theme }) => ({
-   backgroundColor: "#FFFFFF",
+   backgroundColor: theme.brand.white[50],
    borderRadius: "8px",
    padding: "12px",
    display: "flex",
