@@ -3,6 +3,7 @@ import { LoadingButton } from "@mui/lab"
 import { Box, Button, CardContent, Stack, Typography } from "@mui/material"
 import { useStartPlanMutation } from "components/custom-hook/group/useStartPlanMutation"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { useRouter } from "next/router"
 import { BarChart, Calendar, PlayCircle, Target } from "react-feather"
 import {
    StyledBrandAwarenessCard,
@@ -21,7 +22,13 @@ import {
 
 export const HeroSection = () => {
    const { group } = useGroup()
-   const { trigger, isMutating } = useStartPlanMutation(group.id)
+   const { push } = useRouter()
+
+   const { trigger, isMutating } = useStartPlanMutation(group.id, {
+      onSuccess: () => {
+         push(`/group/${group.id}/admin/content/sparks`)
+      },
+   })
 
    const handleStartTrial = () => {
       trigger({
