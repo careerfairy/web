@@ -63,7 +63,7 @@ export async function validateUserIsGroupAdmin(
    group: Group
    role: GROUP_DASHBOARD_ROLE
    isCFAdmin?: boolean
-   userData?: UserData
+   userData: UserData | null
 }> {
    const response = await groupRepo.checkIfUserIsGroupAdmin(groupId, email)
 
@@ -124,22 +124,16 @@ export function validateUserAuthNotExistent(context: CallableContext) {
 }
 
 export function logAndThrow(message: string, ...context: any[]): never {
-   // Prepare the additional context for logging
-   const additionalContext = context?.map((item) => {
-      if (item instanceof Error) {
-         // Convert Error to a plain object including message and stack
-         return {
-            errorMessage: item.message,
-            errorStack: item.stack,
-         }
-      }
-      return item
-   })
+   functions.logger.error(message)
 
-   // Ensure the last argument is a plain object for the jsonPayload, functions logger will not log the error object, it will just show an empty object
-   const logObject = { additionalContext }
+   if (context.length > 0 && context[0] instanceof Error) {
+      functions.logger.error(context[0].message)
+   } else if (context.length > 0) {
+      context.forEach((item, index) => {
+         functions.logger.error(`Context ${index}:`, item)
+      })
+   }
 
-   functions.logger.error(message, logObject)
    throw new functions.https.HttpsError("failed-precondition", message)
 }
 
