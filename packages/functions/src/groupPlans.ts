@@ -72,11 +72,7 @@ export const startPlan = onCall(
                )
             }
          } catch (error) {
-            logAndThrow("Error in setting group plan", {
-               data: request.data,
-               error,
-               context: request,
-            })
+            logAndThrow("Error in setting group plan", error)
          }
       }
    )
