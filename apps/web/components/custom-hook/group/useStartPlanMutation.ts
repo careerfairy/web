@@ -2,7 +2,10 @@ import { GroupPlanType } from "@careerfairy/shared-lib/groups"
 import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { groupPlanService } from "data/firebase/GroupPlanService"
-import useSWRMutation, { MutationFetcher } from "swr/mutation"
+import useSWRMutation, {
+   MutationFetcher,
+   SWRMutationConfiguration,
+} from "swr/mutation"
 
 const fetcher: MutationFetcher<GroupPlanType, string, StartPlanData> = async (
    _,
@@ -23,16 +26,24 @@ const fetcher: MutationFetcher<GroupPlanType, string, StartPlanData> = async (
  * @see {@link StartPlanData} for payload structure.
  * @see {@link GroupPlanType} for available plan types.
  */
-export const useStartPlanMutation = (groupId: string) => {
+export const useStartPlanMutation = (
+   groupId: string,
+   options?: SWRMutationConfiguration<
+      GroupPlanType,
+      Error,
+      string,
+      StartPlanData
+   >
+) => {
    const { errorNotification } = useSnackbarNotifications()
 
-   const {
-      trigger,
-      isMutating,
-      data: updatedGroupPlanType,
-   } = useSWRMutation(`startPlan-${groupId}`, fetcher, {
-      onError: errorNotification,
+   return useSWRMutation(`startPlan-${groupId}`, fetcher, {
+      onError: (error) => {
+         errorNotification(
+            error,
+            "Failed to start plan, our team has been notified"
+         )
+      },
+      ...options,
    })
-
-   return { trigger, isMutating, updatedGroupPlanType }
 }

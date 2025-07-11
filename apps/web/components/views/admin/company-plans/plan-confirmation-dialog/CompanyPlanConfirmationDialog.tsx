@@ -104,9 +104,11 @@ const CompanyPlanConfirmationDialog = ({
 }: Props) => {
    const initialStep = getInitialStep(groupToManage)
 
-   const { trigger, isMutating, updatedGroupPlanType } = useStartPlanMutation(
-      groupToManage.id
-   )
+   const {
+      trigger,
+      isMutating,
+      data: updatedGroupPlanType,
+   } = useStartPlanMutation(groupToManage.id)
 
    const startPlan = useCallback(
       async (planType: GroupPlanType) => {

@@ -3,7 +3,6 @@ import { SparksAnalyticsProvider } from "components/views/admin/sparks/analytics
 import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
 import { SparksPromotionalPage } from "components/views/admin/sparks/components/promotional-page/SparksPromotionalPage"
 import SparksDialog from "components/views/admin/sparks/sparks-dialog/SparksDialog"
-import SparksOnboardingDialog from "components/views/admin/sparks/sparks-onboarding-dialog/SparksOnboardingDialog"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment, ReactElement } from "react"
@@ -32,7 +31,6 @@ const AdminSparksAnalyticsPage = () => {
          <SparksAnalyticsProvider>
             <GroupSparkAnalytics />
          </SparksAnalyticsProvider>
-         <SparksOnboardingDialog />
       </Fragment>
    )
 }
