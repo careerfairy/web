@@ -118,9 +118,9 @@ export const StyledCardBenefits = styled(Stack)(({ theme }) => ({
    },
 }))
 
-export const StyledFullCard = styled(StyledPricingCard)({
-   background: "linear-gradient(135deg, #7454FF 0%, #6749EA 100%)",
-})
+export const StyledFullCard = styled(StyledPricingCard)(({ theme }) => ({
+   background: `linear-gradient(135deg, #7454FF 0%, ${theme.palette.secondary["600"]} 100%)`,
+}))
 
 export const StyledLinearProgress = styled(LinearProgress)({
    height: 14,

@@ -2,15 +2,15 @@ import { Box, Typography, styled } from "@mui/material"
 import Image from "next/image"
 import { Eye } from "react-feather"
 
-const Container = styled(Box)({
-   backgroundColor: "#E6FBED",
+const Container = styled(Box)(({ theme }) => ({
+   backgroundColor: theme.palette.success[50],
    borderRadius: "4px",
    height: "158px",
    position: "relative",
    display: "flex",
    alignItems: "center",
    justifyContent: "center",
-})
+}))
 
 const AnalyticsPill = styled(Box)(({ theme }) => ({
    backgroundColor: theme.brand.white[100],
@@ -21,6 +21,9 @@ const AnalyticsPill = styled(Box)(({ theme }) => ({
    gap: "9.6px",
    border: `1.2px solid ${theme.palette.success.main}`,
    boxShadow: "0px 0px 60px 9px rgba(17, 226, 87, 0.22)",
+   "& svg": {
+      color: theme.palette.neutral[800],
+   },
 }))
 
 const AnalyticsText = styled(Typography)(({ theme }) => ({
@@ -75,7 +78,7 @@ export const AnalyticsMockup = () => {
       <Container>
          {/* Main analytics pill */}
          <AnalyticsPill>
-            <Eye size={24} color="#3D3D47" />
+            <Eye size={24} />
             <AnalyticsText variant="h6">1.328</AnalyticsText>
          </AnalyticsPill>
 
