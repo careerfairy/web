@@ -84,9 +84,16 @@ const RecentLivestreamsSection = ({
          </Box>
 
          <Box sx={styles.cardsContainer}>
-            <Grid container spacing={3}>
+            <Grid container spacing={2}>
                {recentLivestreams.map((livestream, index) => (
-                  <Grid key={livestream.id} xs={12} sm={6} md={4} item>
+                  <Grid
+                     key={livestream.id}
+                     xs={12}
+                     lsCardsGallery={6}
+                     lg={4}
+                     xl={3}
+                     item
+                  >
                      <InView triggerOnce>
                         {({ inView, ref }) =>
                            inView ? (
