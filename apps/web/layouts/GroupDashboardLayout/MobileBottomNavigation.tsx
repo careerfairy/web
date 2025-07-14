@@ -97,7 +97,7 @@ type NavItemData = {
    activePathPrefix?: string
 }
 
-export const BottomNavigation = () => {
+export const MobileBottomNavigation = () => {
    const router = useRouter()
    const [value, setValue] = useState<string>("")
    const {
