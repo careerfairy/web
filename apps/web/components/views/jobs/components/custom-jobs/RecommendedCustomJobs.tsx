@@ -22,6 +22,10 @@ const styles = sxStyles({
    carouselContainer: {
       px: { xs: 2, md: 2 },
       pb: { xs: 3, md: 3 },
+      pr: {
+         md: 0,
+         xs: 0,
+      },
    },
    jobListWrapper: {
       px: { xs: 2, md: 2 },
@@ -29,10 +33,8 @@ const styles = sxStyles({
       width: "100%",
       height: "250px",
    },
-   viewport: {
-      padding: "16px",
-      margin: "-16px",
-      width: "calc(100% + 16px)",
+   headerRight: {
+      pr: 2,
    },
 })
 
@@ -90,7 +92,7 @@ const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
                   skipSnaps: true,
                },
             }}
-            viewportSx={styles.viewport}
+            headerRightSx={styles.headerRight}
             disableArrows={false}
          >
             {customJobs.map((customJob) => (
