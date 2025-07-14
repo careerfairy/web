@@ -20,7 +20,6 @@ const styles = sxStyles({
    },
    title: {
       fontWeight: 600,
-      fontSize: "1.5rem", // Match design typography
       color: "text.primary",
    },
    cardsContainer: {
@@ -78,7 +77,7 @@ const RecentLivestreamsSection = ({
    return (
       <Box sx={styles.section} ref={autoPlayRef}>
          <Box sx={styles.header}>
-            <Typography variant="h4" sx={styles.title}>
+            <Typography variant="brandedH4" sx={styles.title}>
                Recent live streams
             </Typography>
          </Box>
