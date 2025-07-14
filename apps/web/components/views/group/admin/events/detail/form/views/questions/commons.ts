@@ -45,21 +45,6 @@ export type RegistrationQuestionFormValues = Omit<
 > &
    GroupQuestion
 
-export const feedbackQuestionFormInitialValues: FeedbackQuestionFormValues[] = [
-   {
-      id: uuid(),
-      question: "How satisfied are you with the content shared by {{company name}}?",
-      type: FeedbackQuestionType.SENTIMENT_RATING,
-      appearAfter: 30,
-   },
-   {
-      id: uuid(),
-      question: "How likely are you to apply to {{company name}}?",
-      type: FeedbackQuestionType.STAR_RATING,
-      appearAfter: 40,
-   },
-]
-
 export const getFeedbackQuestionFormInitialValues = (
    companyName?: string
 ): FeedbackQuestionFormValues[] => {
