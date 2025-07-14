@@ -23,6 +23,7 @@ import useTrackPageView from "components/custom-hook/useTrackDetailPageView"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerMentorEvent } from "util/analyticsUtils"
+import { checkIfPast } from "util/streamUtil"
 import useRegistrationHandler from "../../useRegistrationHandler"
 import ActionButton from "../livestream-details/action-button/ActionButton"
 import Speakers from "../livestream-details/main-content/Speakers"
@@ -216,6 +217,11 @@ const MentorDetails = ({ mentor }: { mentor: PublicCreator }) => {
       data: { livestreams, sparks, hasJobs },
    } = useCreatorPublicContent(mentor)
 
+   const upcomingLivestreams =
+      livestreams?.filter((livestream) => !checkIfPast(livestream)) || []
+   const pastLivestreams =
+      livestreams?.filter((livestream) => checkIfPast(livestream)) || []
+
    return (
       <Stack spacing={3} mb={3}>
          <MentorDetailLayout.Header mentor={mentor} group={group} fullWidth />
@@ -232,7 +238,8 @@ const MentorDetails = ({ mentor }: { mentor: PublicCreator }) => {
             />
          </Stack>
          <MentorDetailLayout.Content
-            livestreams={livestreams}
+            upcomingLivestreams={upcomingLivestreams}
+            pastLivestreams={pastLivestreams}
             sparks={sparks}
          />
       </Stack>

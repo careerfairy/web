@@ -268,11 +268,13 @@ const Description = ({
 }
 
 const Content = ({
-   livestreams,
+   upcomingLivestreams,
+   pastLivestreams,
    sparks,
    sx,
 }: {
-   livestreams: LivestreamEvent[]
+   upcomingLivestreams: LivestreamEvent[]
+   pastLivestreams: LivestreamEvent[]
    sparks: Spark[]
    sx?: SxProps
 }) => {
@@ -288,12 +290,22 @@ const Content = ({
                }
             />
          )}
-         {Boolean(livestreams.length) && (
+         {Boolean(upcomingLivestreams.length) && (
             <LivestreamsCarousel
-               livestreams={livestreams}
+               livestreams={upcomingLivestreams}
                title={
                   <Typography variant="brandedH5" sx={styles.contentTitle}>
                      Live streams
+                  </Typography>
+               }
+            />
+         )}
+         {Boolean(pastLivestreams.length) && (
+            <LivestreamsCarousel
+               livestreams={pastLivestreams}
+               title={
+                  <Typography variant="brandedH5" sx={styles.contentTitle}>
+                     Recordings
                   </Typography>
                }
             />
