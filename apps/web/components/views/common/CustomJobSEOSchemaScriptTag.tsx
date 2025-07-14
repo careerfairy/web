@@ -1,9 +1,11 @@
+import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import {
    CustomJob,
    jobTypeLookupMap,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { stripHtml } from "@careerfairy/shared-lib/utils"
 import { useMemo } from "react"
+import { PostalAddress } from "schema-dts"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import {
    getBaseUrl,
@@ -77,20 +79,36 @@ const getJobLocations = (job: CustomJob) => {
       "@type": "Place",
       address: {
          "@type": "PostalAddress",
-         addressCountry: group.companyCountry?.name,
+         addressCountry: group.companyCountry?.name || "Switzerland",
       },
    }
 
-   return job.jobLocation
-      ? job.jobLocation.map((loc) => ({
-           "@type": "Place",
-           address: {
-              "@type": "PostalAddress",
-              addressLocality: loc.name,
-              addressCountry: loc.name,
-           },
-        }))
-      : [defaultJobLocation]
+   if (!job.jobLocation || job.jobLocation.length === 0) {
+      return [defaultJobLocation]
+   }
+
+   return job.jobLocation.map((loc) => {
+      const { countryIsoCode, stateIsoCode } = getLocationIds(loc.id)
+
+      const address: PostalAddress = {
+         "@type": "PostalAddress",
+         addressCountry:
+            countryIsoCode || group.companyCountry?.name || "Switzerland",
+      }
+
+      if (stateIsoCode) {
+         // Quick and dirty way to get the state name from the location name
+         // TODO: improve this, could receive the job location names during SSR,
+         // containing state name and city name (when implemented)
+         // then pass it down to the schema script tag
+         address.addressRegion = loc.name.replace(/\s*\([^)]*\)\s*/g, "").trim()
+      }
+
+      return {
+         "@type": "Place",
+         address,
+      }
+   })
 }
 
 const getBaseSalaryData = (job: CustomJob) => {
