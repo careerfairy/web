@@ -15,7 +15,7 @@ const CreateJobButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
 
    return (
       <Button
-         onClick={openJobDialog}
+         onClick={() => openJobDialog()}
          color="secondary"
          sx={combineStyles(styles.root, sx)}
          variant="contained"
