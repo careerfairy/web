@@ -162,8 +162,21 @@ export const JobsOverviewContextProvider = ({
       })
 
    const infiniteJobs = useMemo(() => {
-      return data?.flatMap((page) => page.deserializedHits) ?? []
-   }, [data])
+      const jobs = data?.flatMap((page) => page.deserializedHits) ?? []
+
+      if (!router.query.currentJobId) {
+         return jobs
+      }
+
+      const currentJob = jobs.find(
+         (job) => job.id === router.query.currentJobId
+      )
+
+      // Re-sort jobs to put the current job at the top
+      return currentJob
+         ? [currentJob, ...jobs.filter((job) => job.id !== currentJob?.id)]
+         : jobs
+   }, [data, router.query.currentJobId])
 
    const handleCurrentJobIdChange = useCallback(
       async (currentJobId: string) => {
@@ -241,6 +254,10 @@ export const JobsOverviewContextProvider = ({
       const isLoadingJobs =
          isLoadingRecommendedJobs || isValidating || isLoading
 
+      const currentRecommendedJob = recommendedJobs?.find(
+         (job) => job.id === router.query.currentJobId
+      )
+
       return {
          selectedJob: effectiveJob,
          setSelectedJob: handleSelectedJobChange,
@@ -273,7 +290,14 @@ export const JobsOverviewContextProvider = ({
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
          selectedLocationsNames,
          userCountryCode,
-         recommendedJobs,
+         recommendedJobs: currentRecommendedJob
+            ? [
+                 currentRecommendedJob,
+                 ...recommendedJobs.filter(
+                    (job) => job.id !== currentRecommendedJob?.id
+                 ),
+              ]
+            : recommendedJobs,
          isLoadingRecommendedJobs,
          isLoadingJobs: isLoadingJobs,
       }
@@ -299,6 +323,7 @@ export const JobsOverviewContextProvider = ({
       isLoading,
       hasFilters,
       data,
+      router.query.currentJobId,
    ])
 
    useEffect(() => {
