@@ -1,8 +1,9 @@
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useUserRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
-import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
+import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import JobCard from "components/views/common/jobs/JobCard"
+import { SeeAllLink } from "components/views/company-page/Overview/SeeAllLink"
 import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
@@ -28,6 +29,11 @@ const styles = sxStyles({
       width: "100%",
       height: "250px",
    },
+   viewport: {
+      padding: "16px",
+      margin: "-16px",
+      width: "calc(100% + 16px)",
+   },
 })
 
 type RecommendedCustomJobsProps = {
@@ -39,13 +45,6 @@ export const RecommendedCustomJobs = ({
 }: RecommendedCustomJobsProps) => {
    return (
       <Stack spacing={0} sx={styles.wrapper} id="highlighted-jobs">
-         <Typography
-            variant="brandedH4"
-            sx={styles.heading}
-            color="neutral.800"
-         >
-            Recommended jobs
-         </Typography>
          <Content userCountryCode={userCountryCode} />
       </Stack>
    )
@@ -61,6 +60,8 @@ const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
       {
          loop: false,
          axis: "x",
+         dragFree: true,
+         skipSnaps: true,
       },
       [WheelGesturesPlugin()]
    )
@@ -75,41 +76,51 @@ const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
 
    return (
       <Box sx={styles.carouselContainer}>
-         <GenericCarousel
-            emblaRef={emblaRef}
-            emblaApi={emblaApi}
-            gap="12px"
-            preventEdgeTouch
+         <ContentCarousel
+            slideWidth={320}
+            headerTitle="Recommended jobs"
+            seeAll={<SeeAllLink href="/jobs" />}
+            emblaProps={{
+               emblaRef,
+               emblaApi,
+               emblaOptions: {
+                  loop: false,
+                  axis: "x",
+                  dragFree: true,
+                  skipSnaps: true,
+               },
+            }}
+            viewportSx={styles.viewport}
+            disableArrows={false}
          >
             {customJobs.map((customJob) => (
-               <GenericCarousel.Slide key={customJob.id} slideWidth="320px">
-                  <SuspenseWithBoundary
-                     fallback={
-                        <Box width="100%">
-                           <JobCardSkeleton />
-                        </Box>
-                     }
-                  >
-                     <Box
-                        maxWidth="320px"
-                        minWidth="320px"
-                        component={Link}
-                        href={`/jobs?currentJobId=${customJob.id}`}
-                     >
-                        <JobCard
-                           job={customJob}
-                           previewMode
-                           hideJobUrl
-                           smallCard
-                           showCompanyLogo
-                           companyLogoUrl={customJob.group?.logoUrl}
-                           companyName={customJob.group?.universityName}
-                        />
+               <SuspenseWithBoundary
+                  key={customJob.id}
+                  fallback={
+                     <Box width="100%">
+                        <JobCardSkeleton />
                      </Box>
-                  </SuspenseWithBoundary>
-               </GenericCarousel.Slide>
+                  }
+               >
+                  <Box
+                     maxWidth="320px"
+                     minWidth="320px"
+                     component={Link}
+                     href={`/jobs?currentJobId=${customJob.id}`}
+                  >
+                     <JobCard
+                        job={customJob}
+                        previewMode
+                        hideJobUrl
+                        smallCard
+                        showCompanyLogo
+                        companyLogoUrl={customJob.group?.logoUrl}
+                        companyName={customJob.group?.universityName}
+                     />
+                  </Box>
+               </SuspenseWithBoundary>
             ))}
-         </GenericCarousel>
+         </ContentCarousel>
       </Box>
    )
 }
