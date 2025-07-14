@@ -10,13 +10,6 @@ import {
    jobTypeOptions,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
-import {
-   SerializedSpark,
-   SparkPresenter,
-} from "@careerfairy/shared-lib/sparks/SparkPresenter"
-import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
 import { useAuth } from "HOCs/AuthProvider"
 import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
@@ -30,11 +23,7 @@ import {
 import JobsPageOverview from "components/views/jobs-page/JobsPageOverview"
 import { LivestreamDialogLayout } from "components/views/livestream-dialog/LivestreamDialogLayout"
 import { Country, State } from "country-state-city"
-import {
-   customJobRepo,
-   livestreamRepo,
-   sparkRepo,
-} from "data/RepositoryInstances"
+import { customJobRepo } from "data/RepositoryInstances"
 import algoliaRepo from "data/algolia/AlgoliaRepository"
 import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { Timestamp } from "firebase/firestore"
@@ -253,8 +242,6 @@ type JobsPageProps = {
    serializedCustomJobs: SerializedCustomJob[]
    customJobData?: {
       serializedCustomJob: SerializedCustomJob
-      livestreamsData: { [p: string]: any }[]
-      sparksData: SerializedSpark[]
    }
    locationNames: string[]
    ipBasedLocationName: string
@@ -353,39 +340,12 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          CustomJobsPresenter.serializeDocument(job)
       ) ?? []
 
-   const serializedSparks: SerializedSpark[] = []
-   const livestreamsData: { [p: string]: any }[] = []
-
-   // For SEO only
-   if (customJob) {
-      let jobEvents: LivestreamEvent[] = []
-      let jobSparks: Spark[] = []
-
-      if (customJob?.livestreams?.length) {
-         jobEvents = await livestreamRepo.getLivestreamsByIds(
-            customJob.livestreams
-         )
-      }
-      if (customJob?.sparks?.length) {
-         jobSparks = await sparkRepo.getSparksByIds(customJob.sparks)
-      }
-
-      jobSparks?.forEach((spark) => {
-         serializedSparks.push(SparkPresenter.serialize(spark))
-      })
-      jobEvents?.filter(Boolean)?.forEach((event) => {
-         livestreamsData.push(LivestreamPresenter.serializeDocument(event))
-      })
-   }
-
    return {
       props: {
          serializedCustomJobs: serializedCustomJobs,
          algoliaServerResponse: algoliaResponse,
          customJobData: {
             serializedCustomJob,
-            livestreamsData,
-            sparksData: serializedSparks,
          },
          dialogOpen,
          userCountryCode,
