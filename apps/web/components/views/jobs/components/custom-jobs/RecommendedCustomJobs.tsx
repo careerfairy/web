@@ -30,7 +30,13 @@ const styles = sxStyles({
    },
 })
 
-export const RecommendedCustomJobs = () => {
+type RecommendedCustomJobsProps = {
+   userCountryCode?: string
+}
+
+export const RecommendedCustomJobs = ({
+   userCountryCode,
+}: RecommendedCustomJobsProps) => {
    return (
       <Stack spacing={0} sx={styles.wrapper} id="highlighted-jobs">
          <Typography
@@ -40,14 +46,15 @@ export const RecommendedCustomJobs = () => {
          >
             Recommended jobs
          </Typography>
-         <Content />
+         <Content userCountryCode={userCountryCode} />
       </Stack>
    )
 }
 
-const Content = () => {
+const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
    const { data: customJobs, isLoading } = useUserRecommendedJobs({
       limit: 10,
+      countryCode: userCountryCode,
    })
 
    const [emblaRef, emblaApi] = useEmblaCarousel(
