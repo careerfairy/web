@@ -49,7 +49,8 @@ const styles = sxStyles({
 type MentorDetailPageProps = {
    group: Group
    mentor: PublicCreator
-   livestreams: LivestreamEvent[]
+   upcomingLivestreams: LivestreamEvent[]
+   pastLivestreams: LivestreamEvent[]
    sparks: Spark[]
    hasJobs: boolean
 }
@@ -57,10 +58,13 @@ type MentorDetailPageProps = {
 export const MentorDetailPage = ({
    group,
    mentor,
-   livestreams,
+   upcomingLivestreams,
+   pastLivestreams,
    sparks,
    hasJobs,
 }: MentorDetailPageProps) => {
+   const totalLivestreams = upcomingLivestreams.length + pastLivestreams.length
+
    return (
       <Stack sx={styles.root}>
          <Box sx={styles.mentorDetailsContainer}>
@@ -71,13 +75,14 @@ export const MentorDetailPage = ({
                   mentor={mentor}
                   group={group}
                   hasJobs={hasJobs}
-                  numLivestreams={livestreams.length}
+                  numLivestreams={totalLivestreams}
                   numSparks={sparks.length}
                />
             </MentorDetailLayout>
          </Box>
          <MentorDetailLayout.Content
-            livestreams={livestreams}
+            upcomingLivestreams={upcomingLivestreams}
+            pastLivestreams={pastLivestreams}
             sparks={sparks}
             sx={styles.mentorContentContainer}
          />

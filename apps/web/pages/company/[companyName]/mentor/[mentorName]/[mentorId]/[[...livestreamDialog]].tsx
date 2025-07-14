@@ -34,7 +34,8 @@ import { getLivestreamsAndDialogData, mapFromServerSide } from "util/serverUtil"
 
 const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
-   serverSideLivestreams,
+   serverSideUpcomingLivestreams,
+   serverSidePastLivestreams,
    livestreamDialogData,
    sparks,
    creator,
@@ -72,7 +73,10 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                <MentorDetailPage
                   group={serverSideGroup}
                   mentor={creator}
-                  livestreams={mapFromServerSide(serverSideLivestreams)}
+                  upcomingLivestreams={mapFromServerSide(
+                     serverSideUpcomingLivestreams
+                  )}
+                  pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
                   sparks={deseralizedSparks}
                   hasJobs={hasJobs}
                />
@@ -84,8 +88,8 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
 export const getStaticProps: GetStaticProps<{
    serverSideGroup: SerializedGroup
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   serverSideLivestreams: { [p: string]: any }[]
+   serverSideUpcomingLivestreams: { [p: string]: any }[]
+   serverSidePastLivestreams: { [p: string]: any }[]
    livestreamDialogData: LiveStreamDialogData
    sparks: SerializedSpark[]
    creator: PublicCreator
@@ -129,30 +133,32 @@ export const getStaticProps: GetStaticProps<{
                  )
                : []
 
-            const creatorLivestreams = {
-               upcoming: serverSideUpcomingLivestreams?.filter((livestream) => {
+            const creatorUpcomingLivestreams =
+               serverSideUpcomingLivestreams?.filter((livestream) => {
                   return livestream.speakers.some(
                      (speaker) => speaker.id === creator.id
                   )
-               }),
-               past: serverSidePastLivestreams?.filter((livestream) => {
+               })
+
+            const creatorPastLivestreams = serverSidePastLivestreams?.filter(
+               (livestream) => {
                   return livestream.speakers.some(
                      (speaker) => speaker.id === creator.id
                   )
-               }),
-            }
+               }
+            )
 
             return {
                props: {
                   serverSideGroup: serializeGroup(serverSideGroup),
-                  serverSideLivestreams: [
-                     ...(creatorLivestreams.upcoming?.map(
+                  serverSideUpcomingLivestreams:
+                     creatorUpcomingLivestreams?.map(
                         LivestreamPresenter.serializeDocument
-                     ) || []),
-                     ...(creatorLivestreams.past?.map(
+                     ) || [],
+                  serverSidePastLivestreams:
+                     creatorPastLivestreams?.map(
                         LivestreamPresenter.serializeDocument
-                     ) || []),
-                  ],
+                     ) || [],
                   livestreamDialogData,
                   sparks: sparks.map((spark) =>
                      SparkPresenter.serialize(spark)
