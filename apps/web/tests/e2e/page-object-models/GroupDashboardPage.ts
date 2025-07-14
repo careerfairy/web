@@ -84,7 +84,7 @@ export class GroupDashboardPage extends CommonPage {
    public topCreateLivestreamButton() {
       return this.page
          .getByRole("banner")
-         .getByRole("button", { name: "Create New Live Stream" })
+         .getByRole("button", { name: "Create" })
    }
 
    // Navigation
@@ -165,6 +165,9 @@ export class GroupDashboardPage extends CommonPage {
          .getByRole("banner")
          .getByRole("button", { name: "Create" })
          .click()
+
+      // After clicking Create, we need to select the livestream option from the menu
+      await this.page.getByRole("menuitem", { name: "Live stream" }).click()
    }
 
    public async fillLivestreamForm(
