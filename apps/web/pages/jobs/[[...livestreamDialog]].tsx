@@ -124,6 +124,11 @@ const PageSEO = ({ ipBasedLocationName }: { ipBasedLocationName: string }) => {
          />
          <SEO
             id={"CareerFairy | Jobs | " + searchParams.term}
+            canonical={`https://www.careerfairy.io/jobs${
+               searchParams.currentJobId
+                  ? `?currentJobId=${searchParams.currentJobId}`
+                  : ""
+            }`}
             description={"Find your dream job with CareerFairy."}
             title={getSeoTitle(
                searchParams,
