@@ -1,9 +1,9 @@
 import { useRouter } from "next/router"
 import { ReactElement, ReactNode } from "react"
 import { LivestreamAnalyticsNavigationTabs } from "../../components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
-import { BottomNavigation } from "./BottomNavigation"
 import DashboardHead from "./DashboardHead"
 import GroupDashboardLayout from "./index"
+import { MobileBottomNavigation } from "./MobileBottomNavigation"
 import { SubNavigationTabs } from "./SubNavigationTabs"
 import { CreateButton } from "./TopBar/CreateButton"
 
@@ -53,7 +53,9 @@ export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
             titleComponent={resolvedTitleComponent}
             topBarAction={topBarAction || <CreateButton />}
             topBarNavigation={topBarNavigation}
-            bottomBarNavigation={bottomBarNavigation || <BottomNavigation />}
+            bottomBarNavigation={
+               bottomBarNavigation || <MobileBottomNavigation />
+            }
             backgroundColor={backgroundColor}
          >
             {Boolean(dashboardHeadTitle) && (
