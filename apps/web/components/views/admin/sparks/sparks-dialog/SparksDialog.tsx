@@ -32,9 +32,9 @@ import {
 import {
    sparksConfirmCloseSparksDialogOpen,
    sparksDialogInitialStepSelector,
+   sparksDialogOpenSelector,
 } from "store/selectors/adminSparksSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
-import { useSparksDialogRouter } from "./hooks/useSparksDialogRouter"
 import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
 
 const actionsHeight = 87
@@ -202,7 +202,6 @@ export type SparkDialogStep = (typeof views)[number]["key"]
 export const useSparksForm = () => {
    const stepper = useStepper<SparkDialogStep>()
    const dispatch = useDispatch()
-   const { closeDialog } = useSparksDialogRouter()
 
    const setCreator = useCallback(
       (creator: PublicCreator) => {
@@ -219,8 +218,8 @@ export const useSparksForm = () => {
    )
 
    const handleClose = useCallback(() => {
-      closeDialog()
-   }, [closeDialog])
+      dispatch(closeSparkDialog())
+   }, [dispatch])
 
    const goToCreatorSelectedView = useCallback(
       (creator: PublicCreator) => {
@@ -288,7 +287,7 @@ export const useSparksForm = () => {
 
 const SparksDialog = () => {
    const initialStepKey = useSelector(sparksDialogInitialStepSelector)
-   const { isOpen: open, closeDialog } = useSparksDialogRouter()
+   const open = useSelector(sparksDialogOpenSelector)
    const confirmCloseDialogOpen = useSelector(
       sparksConfirmCloseSparksDialogOpen
    )
@@ -297,17 +296,13 @@ const SparksDialog = () => {
 
    const hanldeCloseSparksDialog = useCallback(
       (forceClose: boolean = false) => {
-         if (forceClose) {
-            closeDialog()
-         } else {
-            dispatch(
-               closeSparkDialog({
-                  forceClose,
-               })
-            )
-         }
+         dispatch(
+            closeSparkDialog({
+               forceClose,
+            })
+         )
       },
-      [dispatch, closeDialog]
+      [dispatch]
    )
 
    const handleCloseConfirmCloseDialog = useCallback(() => {
