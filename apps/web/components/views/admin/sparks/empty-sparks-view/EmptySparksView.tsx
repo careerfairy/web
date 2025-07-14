@@ -1,12 +1,13 @@
 import SparksIcon from "@mui/icons-material/PlayCircleOutlineRounded"
 import { Box, Button, Stack, Typography, TypographyProps } from "@mui/material"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { FC } from "react"
+import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
 import GetInspiredButton from "../components/GetInspiredButton"
 import SparksContainer from "../components/SparksContainer"
 import WatchTutorialButton from "../components/WatchTutorialButton"
-import { useSparksDialogRouter } from "../sparks-dialog/hooks/useSparksDialogRouter"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -57,9 +58,13 @@ const styles = sxStyles({
    },
 })
 
-const EmptySparksView: FC = () => {
+const EmptySparksView = () => {
+   const dispatch = useAppDispatch()
    const { groupPresenter } = useGroup()
-   const { openDialog } = useSparksDialogRouter()
+
+   const handleOpen = () => {
+      dispatch(openSparkDialog())
+   }
 
    return (
       <SparksContainer>
@@ -85,7 +90,7 @@ const EmptySparksView: FC = () => {
             <Stack spacing={1.5} mt={3} justifyContent="center" direction="row">
                <GetInspiredButton />
                <Button
-                  onClick={openDialog}
+                  onClick={handleOpen}
                   sx={styles.btn}
                   color="secondary"
                   variant="contained"
