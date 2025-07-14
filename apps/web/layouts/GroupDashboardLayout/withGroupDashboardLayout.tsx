@@ -1,14 +1,15 @@
 import { useRouter } from "next/router"
 import { ReactElement, ReactNode } from "react"
 import { LivestreamAnalyticsNavigationTabs } from "../../components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
+import { BottomNavigation } from "./BottomNavigation"
 import DashboardHead from "./DashboardHead"
 import GroupDashboardLayout from "./index"
 import { SubNavigationTabs } from "./SubNavigationTabs"
+import { CreateButton } from "./TopBar/CreateButton"
 
-interface GroupDashboardLayoutProps {
+type GroupDashboardLayoutProps = {
    titleComponent: ReactNode | ((router: any) => ReactNode)
-   topBarCta?: ReactNode
-   topBarMobileCta?: ReactNode
+   topBarAction?: ReactNode
    topBarNavigation?: ReactNode
    bottomBarNavigation?: ReactNode
    backgroundColor?: string
@@ -26,8 +27,7 @@ export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
    const LayoutWrapper = (page: ReactElement) => {
       const {
          titleComponent,
-         topBarCta,
-         topBarMobileCta,
+         topBarAction,
          topBarNavigation,
          bottomBarNavigation,
          backgroundColor,
@@ -51,10 +51,9 @@ export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
       const layoutContent = (
          <GroupDashboardLayout
             titleComponent={resolvedTitleComponent}
-            topBarCta={topBarCta}
-            topBarMobileCta={topBarMobileCta}
+            topBarAction={topBarAction || <CreateButton />}
             topBarNavigation={topBarNavigation}
-            bottomBarNavigation={bottomBarNavigation}
+            bottomBarNavigation={bottomBarNavigation || <BottomNavigation />}
             backgroundColor={backgroundColor}
          >
             {Boolean(dashboardHeadTitle) && (

@@ -1,0 +1,203 @@
+import {
+   BottomNavigationAction,
+   BottomNavigation as MuiBottomNavigation,
+   SvgIconProps,
+} from "@mui/material"
+import { styled } from "@mui/material/styles"
+import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useRouter } from "next/router"
+import { ComponentType, useCallback, useEffect, useState } from "react"
+import { PlusSquare as CreateIcon, IconProps } from "react-feather"
+import useMenuState from "../../components/custom-hook/useMenuState"
+import { ContentIcon } from "../../components/views/common/icons/ContentIcon"
+import { DashboardIcon } from "../../components/views/common/icons/DashboardIcon"
+import { JobsIcon } from "../../components/views/common/icons/JobsIcon"
+import { CreateMenu } from "./CreateMenu"
+
+const StyledBottomNavigation = styled(MuiBottomNavigation)(({ theme }) => ({
+   position: "fixed",
+   bottom: 0,
+   left: 0,
+   right: 0,
+   width: "100%",
+   height: "64px",
+   backgroundColor: "#FFFFFF",
+   borderTop: "1px solid #F3F3F5",
+   zIndex: 1000,
+   padding: "0 16px",
+   [theme.breakpoints.up("md")]: {
+      display: "none", // Hide on desktop
+   },
+   "& .MuiBottomNavigationAction-root": {
+      padding: "10px 4px",
+      minWidth: "auto",
+      "&.Mui-selected": {
+         color: theme.palette.neutral[800],
+         "& .MuiBottomNavigationAction-label": {
+            fontWeight: 600,
+         },
+      },
+      "&:not(.Mui-selected)": {
+         color: theme.brand.black[700],
+         "& .MuiBottomNavigationAction-label": {
+            fontWeight: 400,
+         },
+      },
+   },
+   "& .MuiBottomNavigationAction-label": {
+      fontSize: "10px",
+      lineHeight: 1.6,
+      "&.Mui-selected": {
+         fontSize: "10px", // Keep same size when selected
+      },
+   },
+   "& .MuiSvgIcon-root": {
+      width: "24px",
+      height: "24px",
+   },
+}))
+
+const MenuAvatar = styled(CircularLogo)(({ theme }) => ({
+   border: `1px solid ${theme.brand.white[400]}`,
+}))
+
+const navItems = [
+   {
+      id: "dashboard",
+      label: "Dashboard",
+      iconComponent: DashboardIcon,
+      pathname: `/group/[groupId]/admin`,
+   },
+   {
+      id: "content",
+      label: "Content",
+      iconComponent: ContentIcon,
+      pathname: `/group/[groupId]/admin/content/live-streams`,
+      activePathPrefix: `/group/[groupId]/admin/content`,
+   },
+   {
+      id: "create",
+      label: "Create",
+      iconComponent: CreateIcon,
+      pathname: `/group/[groupId]/admin/create-stream`,
+   },
+   {
+      id: "jobs",
+      label: "Jobs",
+      iconComponent: JobsIcon,
+      pathname: `/group/[groupId]/admin/jobs/[[...jobId]]`,
+   },
+] satisfies NavItemData[]
+
+type NavItemData = {
+   id: string
+   label: string
+   iconComponent: ComponentType<SvgIconProps> | ComponentType<IconProps>
+   pathname: string
+   activePathPrefix?: string
+}
+
+export const BottomNavigation = () => {
+   const router = useRouter()
+   const [value, setValue] = useState<string>("")
+   const {
+      anchorEl: createMenuAnchorEl,
+      open: createMenuOpen,
+      handleClick: handleCreateMenuOpen,
+      handleClose: handleCreateMenuClose,
+   } = useMenuState()
+
+   // Get group ID from router for navigation
+   const groupId = router.query.groupId as string
+
+   const getActiveValue = useCallback(() => {
+      const currentPath = router.pathname
+      for (const item of navItems) {
+         if (
+            item.activePathPrefix &&
+            currentPath.startsWith(item.activePathPrefix)
+         ) {
+            return item.id
+         }
+         if (currentPath === item.pathname) {
+            return item.id
+         }
+      }
+      return "dashboard"
+   }, [router.pathname])
+
+   useEffect(() => {
+      setValue(getActiveValue())
+   }, [getActiveValue, router.pathname])
+
+   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+      const selectedItem = navItems.find((item) => item.id === newValue)
+      if (selectedItem) {
+         switch (newValue) {
+            case "menu":
+               // Handle menu functionality here
+               console.log("Menu clicked")
+               break
+            case "create": {
+               handleCreateMenuOpen(event as React.MouseEvent<HTMLElement>)
+               break
+            }
+            default:
+               setValue(newValue)
+               router.push(
+                  {
+                     pathname: selectedItem.pathname,
+                     query: {
+                        groupId,
+                     },
+                  },
+                  undefined,
+                  { shallow: true }
+               )
+               break
+         }
+      }
+   }
+
+   const renderIcon = (item: NavItemData, isActive: boolean) => {
+      const IconComponent = item.iconComponent
+      return <IconComponent fill={isActive ? "currentColor" : "none"} />
+   }
+
+   return (
+      <>
+         <StyledBottomNavigation
+            value={value}
+            onChange={handleChange}
+            showLabels
+         >
+            {navItems.map((item) => {
+               const isActive = value === item.id
+               return (
+                  <BottomNavigationAction
+                     key={item.id}
+                     label={item.label}
+                     value={item.id}
+                     icon={renderIcon(item, isActive)}
+                  />
+               )
+            })}
+
+            {/* Menu item with avatar */}
+            <BottomNavigationAction
+               label="Menu"
+               value="menu"
+               icon={<MenuAvatar src="/logo-green.png" alt="logo" size={24} />}
+            />
+         </StyledBottomNavigation>
+
+         {/* Create Menu */}
+         <CreateMenu
+            open={createMenuOpen}
+            anchorEl={createMenuAnchorEl}
+            handleClose={handleCreateMenuClose}
+            isMobileOverride
+         />
+      </>
+   )
+}

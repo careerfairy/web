@@ -52,8 +52,7 @@ LivestreamAdminDetailsPage.getLayout = function getLayout(page: ReactElement) {
       titleComponent: (router) => (
          <BackToStreamsHeader groupId={router.query.groupId as string} />
       ),
-      topBarCta: <LivestreamTopActions />,
-      topBarMobileCta: <LivestreamTopActions />,
+      topBarAction: <LivestreamTopActions />,
       topBarNavigation: <LivestreamAdminDetailTopBarNavigation />,
       bottomBarNavigation: <LivestreamAdminDetailBottomBarNavigation />,
       backgroundColor: "#FDFDFD",
