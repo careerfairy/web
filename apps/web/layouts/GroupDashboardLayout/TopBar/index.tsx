@@ -6,8 +6,6 @@ import IconButton from "@mui/material/IconButton"
 import Stack from "@mui/material/Stack"
 
 // project imports
-import { LoadingButton } from "@mui/lab"
-import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
 import { ReactNode, useMemo } from "react"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
@@ -68,8 +66,7 @@ const getStyles = (hasNavigationBar?: boolean) =>
 
 type Props = {
    title: ReactNode
-   cta?: ReactNode
-   mobileCta?: ReactNode
+   topBarAction?: ReactNode
    navigation?: ReactNode
 }
 
@@ -79,10 +76,9 @@ const titleVariants = {
    exit: { opacity: 0, x: 10 },
 }
 
-const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
+const TopBar = ({ title, topBarAction, navigation }: Props) => {
    const isMobile = useIsMobile()
    const { layout } = useGroupDashboard()
-   const { createDraftLivestream, isCreating } = useLivestreamRouting()
    const { asPath } = useRouter()
 
    const drawerPresent = !isMobile && layout.leftDrawerOpen
@@ -96,7 +92,7 @@ const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
-         {!drawerPresent ? <MobileToggleButton /> : null}
+         {!drawerPresent && !isMobile ? <MobileToggleButton /> : null}
          <Box
             component={motion.div}
             key={titleKey}
@@ -120,19 +116,7 @@ const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
                md: 3,
             }}
          >
-            {isMobile
-               ? mobileCta
-               : cta || (
-                    <LoadingButton
-                       size={"large"}
-                       variant={"outlined"}
-                       color={"secondary"}
-                       loading={isCreating}
-                       onClick={() => createDraftLivestream()}
-                    >
-                       Create New Live Stream
-                    </LoadingButton>
-                 )}
+            {topBarAction}
             {/* notification & profile */}
             <UserAvatarWithDetails />
             <NotificationsButton />

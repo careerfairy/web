@@ -27,7 +27,7 @@ type Props = {
    children?: React.ReactNode
    sx?: AvatarProps["sx"]
    href?: string
-}
+} & AvatarProps
 
 const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
    (
@@ -41,6 +41,7 @@ const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
          children,
          sx,
          href,
+         ...avatarProps
       },
       ref
    ) => {
@@ -53,6 +54,7 @@ const CircularLogo = React.forwardRef<HTMLDivElement, Props>(
             variant="circular"
             sx={combineStyles(styles.root, sx)}
             ref={ref}
+            {...avatarProps}
          >
             <Box
                borderRadius={borderRadius}
