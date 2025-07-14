@@ -8,6 +8,7 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups/groups"
 import { yupResolver } from "@hookform/resolvers/yup"
+import { useJobDialogRouter } from "components/custom-hook/custom-job/useJobDialogRouter"
 import useGroupFromState from "components/custom-hook/useGroupFromState"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { customJobRepo } from "data/RepositoryInstances"
@@ -22,8 +23,6 @@ import {
    useState,
 } from "react"
 import { FormProvider, useForm } from "react-hook-form"
-import { useSelector } from "react-redux"
-import { jobsFormSelectedJobIdSelector } from "store/selectors/adminJobsSelectors"
 import DateUtil from "util/DateUtil"
 import { v4 as uuidv4 } from "uuid"
 import {
@@ -34,7 +33,7 @@ import {
 } from "./createJob/schemas"
 
 type Props = {
-   job: CustomJob
+   job: CustomJob | null
    children: ReactNode
    quillInputRef: MutableRefObject<any>
    afterCreateCustomJob?: (job: CustomJob) => void
@@ -52,7 +51,7 @@ const CustomJobFormContext = createContext<CustomJobFormContextType>({
 })
 
 export const getInitialValues = (
-   job: CustomJob,
+   job: CustomJob | null,
    group: Group
 ): JobFormValues => {
    // If the 'job' field is received, it indicates the intention to edit an existing job.
@@ -84,7 +83,10 @@ export const getInitialValues = (
          businessTags: [],
          workplace: workplaceOptionsMap["on-site"].id,
          jobLocation: [
-            { id: group.companyCountry?.id, value: group.companyCountry?.name },
+            {
+               id: group.companyCountry?.id || "",
+               value: group.companyCountry?.name || "",
+            },
          ],
       },
       additionalInfo: {
@@ -106,7 +108,7 @@ const CustomJobFormProvider = ({
    afterCreateCustomJob,
    afterUpdateCustomJob,
 }: Props) => {
-   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const { selectedJobId } = useJobDialogRouter()
    const { group } = useGroupFromState()
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const [isSubmitting, setIsSubmitting] = useState(false)

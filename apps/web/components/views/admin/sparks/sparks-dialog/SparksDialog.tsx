@@ -1,3 +1,4 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
@@ -8,9 +9,9 @@ import {
    IconButton,
    Container as MuiContainer,
    Stack,
+   StackProps,
    Typography,
    TypographyProps,
-   StackProps,
 } from "@mui/material"
 import SteppedDialog, {
    useStepper,
@@ -31,11 +32,10 @@ import {
 import {
    sparksConfirmCloseSparksDialogOpen,
    sparksDialogInitialStepSelector,
-   sparksDialogOpenSelector,
 } from "store/selectors/adminSparksSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
+import { useSparksDialogRouter } from "./hooks/useSparksDialogRouter"
 import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
-import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -202,6 +202,7 @@ export type SparkDialogStep = (typeof views)[number]["key"]
 export const useSparksForm = () => {
    const stepper = useStepper<SparkDialogStep>()
    const dispatch = useDispatch()
+   const { closeDialog } = useSparksDialogRouter()
 
    const setCreator = useCallback(
       (creator: PublicCreator) => {
@@ -218,8 +219,8 @@ export const useSparksForm = () => {
    )
 
    const handleClose = useCallback(() => {
-      dispatch(closeSparkDialog())
-   }, [dispatch])
+      closeDialog()
+   }, [closeDialog])
 
    const goToCreatorSelectedView = useCallback(
       (creator: PublicCreator) => {
@@ -287,8 +288,7 @@ export const useSparksForm = () => {
 
 const SparksDialog = () => {
    const initialStepKey = useSelector(sparksDialogInitialStepSelector)
-
-   const open = useSelector(sparksDialogOpenSelector)
+   const { isOpen: open, closeDialog } = useSparksDialogRouter()
    const confirmCloseDialogOpen = useSelector(
       sparksConfirmCloseSparksDialogOpen
    )
@@ -297,13 +297,17 @@ const SparksDialog = () => {
 
    const hanldeCloseSparksDialog = useCallback(
       (forceClose: boolean = false) => {
-         dispatch(
-            closeSparkDialog({
-               forceClose,
-            })
-         )
+         if (forceClose) {
+            closeDialog()
+         } else {
+            dispatch(
+               closeSparkDialog({
+                  forceClose,
+               })
+            )
+         }
       },
-      [dispatch]
+      [dispatch, closeDialog]
    )
 
    const handleCloseConfirmCloseDialog = useCallback(() => {

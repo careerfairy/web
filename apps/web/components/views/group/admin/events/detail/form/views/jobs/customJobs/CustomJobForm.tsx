@@ -5,11 +5,10 @@ import {
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Grid, Stack } from "@mui/material"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
+import { useJobDialogRouter } from "components/custom-hook/custom-job/useJobDialogRouter"
 import JobDialog from "components/views/group/admin/jobs/dialog"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
-import { useDispatch } from "react-redux"
-import { closeJobsDialog } from "store/reducers/adminJobsReducer"
 import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 import JobList from "../components/JobList"
 import SelectorCustomJobsDropDown from "./components/SelectorCustomJobsDropDown"
@@ -17,7 +16,7 @@ import SelectorCustomJobsDropDown from "./components/SelectorCustomJobsDropDown"
 const FIELD_ID = "jobs.customJobs"
 
 const CustomJobForm = () => {
-   const dispatch = useDispatch()
+   const { closeJobDialog } = useJobDialogRouter()
    const { group } = useGroup()
    const allCustomJobs = useGroupCustomJobs(group.id)
 
@@ -36,9 +35,9 @@ const CustomJobForm = () => {
    const handleCreateCustomJob = useCallback(
       (createdJob: PublicCustomJob) => {
          setFieldValue(FIELD_ID, [...customJobs, createdJob])
-         dispatch(closeJobsDialog())
+         closeJobDialog()
       },
-      [customJobs, dispatch, setFieldValue]
+      [customJobs, closeJobDialog, setFieldValue]
    )
 
    const handleUpdateCustomJob = useCallback(
@@ -53,9 +52,9 @@ const CustomJobForm = () => {
          ]
 
          setFieldValue(FIELD_ID, newValues)
-         dispatch(closeJobsDialog())
+         closeJobDialog()
       },
-      [customJobs, dispatch, setFieldValue]
+      [customJobs, closeJobDialog, setFieldValue]
    )
 
    return (

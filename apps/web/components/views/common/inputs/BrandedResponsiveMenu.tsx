@@ -39,6 +39,9 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[700],
       p: "10px 16px !important",
    },
+   list: {
+      py: 0,
+   },
    listItemLoading: {
       "& .MuiTypography-root": {
          opacity: 0.5,
@@ -52,7 +55,7 @@ const styles = sxStyles({
       borderColor: (theme) => theme.brand.black[300],
    },
    drawerMenuItem: {
-      p: "17px 20px !important",
+      p: "16px 20px !important",
       position: "relative",
       color: (theme) => theme.palette.neutral[700],
    },
@@ -106,7 +109,7 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
          open={open}
          sx={styles.mobileDrawer}
       >
-         <List>
+         <List sx={styles.list}>
             {options.map((option, index) => {
                const WrapperComponent = option.wrapperComponent || Fragment
                return (
