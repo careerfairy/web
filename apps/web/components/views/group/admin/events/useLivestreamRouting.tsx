@@ -11,7 +11,7 @@ import { useRouter } from "next/router"
 import { useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import {
-   feedbackQuestionFormInitialValues,
+   getFeedbackQuestionFormInitialValues,
    mapFeedbackQuestionToRatings,
 } from "./detail/form/views/questions/commons"
 
@@ -42,9 +42,10 @@ export const useLivestreamRouting = () => {
       draftLivestream.groupIds = [group.id]
       draftLivestream.speakers = []
 
-      const initialFeedbackQuestions = feedbackQuestionFormInitialValues.map(
-         (question) =>
-            mapFeedbackQuestionToRatings(question, draftLivestream.duration)
+      const initialFeedbackQuestions = getFeedbackQuestionFormInitialValues(
+         group.universityName
+      ).map((question) =>
+         mapFeedbackQuestionToRatings(question, draftLivestream.duration)
       )
 
       try {
