@@ -2,10 +2,11 @@ import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { Button, ButtonProps } from "@mui/material"
 import useGroupPlanIsValid from "components/custom-hook/group/useGroupPlanIsValid"
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { FC } from "react"
+import { FC, useCallback } from "react"
+import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { combineStyles, sxStyles } from "types/commonTypes"
-import { useSparksDialogRouter } from "../sparks-dialog/hooks/useSparksDialogRouter"
 
 const styles = sxStyles({
    root: {
@@ -14,8 +15,8 @@ const styles = sxStyles({
 })
 
 const CreateSparkButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
+   const dispatch = useAppDispatch()
    const { group, groupPresenter } = useGroup()
-   const { openDialog } = useSparksDialogRouter()
 
    const maxPublicSparks = groupPresenter.getMaxPublicSparks()
 
@@ -34,11 +35,14 @@ const CreateSparkButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
       publicSparks.length
    )
    const disableUploadSparks = !planStatus.valid || maxSparksReached
+   const handleOpen = useCallback(() => {
+      dispatch(openSparkDialog())
+   }, [dispatch])
 
    return (
       <Button
          disabled={disableUploadSparks}
-         onClick={openDialog}
+         onClick={handleOpen}
          color="secondary"
          sx={combineStyles(styles.root, sx)}
          variant="contained"

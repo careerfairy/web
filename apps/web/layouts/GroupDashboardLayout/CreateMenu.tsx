@@ -1,10 +1,11 @@
 import { CircularProgress } from "@mui/material"
 import { JOB_DIALOG_QUERY_KEYS } from "components/custom-hook/custom-job/useJobDialogRouter"
-import { SPARKS_DIALOG_QUERY_KEYS } from "components/views/admin/sparks/sparks-dialog/hooks/useSparksDialogRouter"
+import { useAppDispatch } from "components/custom-hook/store"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
+import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { JobsIcon } from "../../components/views/common/icons/JobsIcon"
 import { LiveStreamsIcon } from "../../components/views/common/icons/LiveStreamsIcon"
 import { SparksIcon } from "../../components/views/common/icons/SparksIcon"
@@ -26,9 +27,10 @@ export const CreateMenu = ({
    isMobileOverride = false,
 }: CreateMenuProps) => {
    const { createDraftLivestream, isCreating } = useLivestreamRouting()
-   const router = useRouter()
+   const { query, push } = useRouter()
    const hasAccessToSparks = useHasAccessToSparks()
-   const groupId = router.query.groupId as string
+   const groupId = query.groupId as string
+   const dispatch = useAppDispatch()
 
    const createMenuOptions = useMemo<MenuOption[]>(
       () => [
@@ -51,13 +53,9 @@ export const CreateMenu = ({
             icon: <SparksIcon />,
             handleClick: () => {
                if (hasAccessToSparks) {
-                  router.push(
-                     `/group/${groupId}/admin/content/sparks?${SPARKS_DIALOG_QUERY_KEYS.sparksDialog}=true`
-                  )
-               } else {
-                  // still get taken to the sparks content page and be prompted to upgrade/trial
-                  router.push(`/group/${groupId}/admin/content/sparks`)
+                  dispatch(openSparkDialog())
                }
+               push(`/group/${groupId}/admin/content/sparks`)
                handleClose()
             },
          },
@@ -65,7 +63,7 @@ export const CreateMenu = ({
             label: "Job opening",
             icon: <JobsIcon />,
             handleClick: () => {
-               router.push(
+               push(
                   `/group/${groupId}/admin/jobs?${JOB_DIALOG_QUERY_KEYS.jobDialog}=true`
                )
                handleClose()
@@ -77,8 +75,9 @@ export const CreateMenu = ({
          createDraftLivestream,
          handleClose,
          hasAccessToSparks,
-         router,
+         push,
          groupId,
+         dispatch,
       ]
    )
 
