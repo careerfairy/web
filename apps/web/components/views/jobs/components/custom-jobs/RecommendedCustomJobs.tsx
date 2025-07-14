@@ -1,4 +1,5 @@
-import { Box, Stack } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useUserRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
@@ -36,6 +37,10 @@ const styles = sxStyles({
    headerRight: {
       pr: 2,
    },
+   header: {
+      fontWeight: 600,
+      m: 2,
+   },
 })
 
 type RecommendedCustomJobsProps = {
@@ -53,6 +58,7 @@ export const RecommendedCustomJobs = ({
 }
 
 const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
+   const { isLoggedIn } = useAuth()
    const { data: customJobs, isLoading } = useUserRecommendedJobs({
       limit: 10,
       countryCode: userCountryCode,
@@ -80,7 +86,11 @@ const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
       <Box sx={styles.carouselContainer}>
          <ContentCarousel
             slideWidth={320}
-            headerTitle="Recommended jobs"
+            headerTitle={
+               <Typography variant="brandedH4" fontWeight={600}>
+                  {isLoggedIn ? "Recommended jobs" : "Trending jobs"}
+               </Typography>
+            }
             seeAll={<SeeAllLink href="/jobs" />}
             emblaProps={{
                emblaRef,
