@@ -26,6 +26,7 @@ const styles = sxStyles({
       px: { xs: 2, md: 2 },
       pb: { xs: 3, md: 3 },
       width: "100%",
+      height: "250px",
    },
 })
 
@@ -108,7 +109,7 @@ const Content = () => {
 
 export const RecommendedCustomJobsSkeleton = () => {
    return (
-      <Stack sx={styles.jobListWrapper} width={"100%"} spacing={1}>
+      <Stack sx={styles.jobListWrapper} spacing={1} direction="row">
          <JobCardSkeleton />
          <JobCardSkeleton />
          <JobCardSkeleton />
