@@ -6,15 +6,16 @@ import {
    Card,
    CircularProgress,
    Container,
+   Divider,
    Grid,
    Typography,
 } from "@mui/material"
+import { usePartnership } from "HOCs/PartnershipProvider"
 import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
 import { isInIframe } from "components/helperFunctions/HelperFunctions"
-import { usePartnership } from "HOCs/PartnershipProvider"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -31,6 +32,7 @@ import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
+import RecentLivestreamsSection from "./RecentLivestreamsGrid"
 import { StreamsSection } from "./StreamsSection"
 
 const styles = sxStyles({
@@ -56,6 +58,19 @@ const styles = sxStyles({
    loader: {
       display: "flex",
       justifyContent: "center",
+   },
+   mainContainer: {
+      display: "flex",
+   },
+   recentEventsContainer: {
+      mb: { xs: 2, md: 0 },
+   },
+   recentEventsWrapper: {
+      pt: { xs: 2, md: 3 },
+   },
+   divider: {
+      mx: { xs: 2, md: 3 },
+      height: "1px",
    },
 })
 
@@ -184,9 +199,54 @@ const NextLiveStreamsWithFilter = ({
       Object.values(filterOptions.arrayFilters).flat().length
    )
 
-   const infiniteLivestreams = useMemo(() => {
-      return data?.flatMap((page) => page.deserializedHits) || []
-   }, [data])
+   const infiniteLivestreams =
+      data?.flatMap((page) => page.deserializedHits) ?? []
+
+   // Check if we should show recent livestreams (when there are < 6 upcoming and no filters/search)
+   const shouldShowRecentLivestreams = useMemo(() => {
+      return (
+         initialTabValue === "upcomingEvents" &&
+         infiniteLivestreams.length < 6 &&
+         !hasAppliedFilters &&
+         !inputValue &&
+         !isValidating
+      )
+   }, [
+      initialTabValue,
+      infiniteLivestreams.length,
+      hasAppliedFilters,
+      inputValue,
+      isValidating,
+   ])
+
+   // Fetch recent past livestreams when needed
+   const recentLivestreamsFilterOptions = useMemo<FilterOptions>(
+      () => ({
+         arrayFilters: {},
+         booleanFilters: {
+            hidden: false,
+            test: false,
+            hasEnded: true,
+         },
+         dateFilter: "past",
+      }),
+      []
+   )
+
+   const {
+      data: recentLivestreamsData,
+      isValidating: isLoadingRecentLivestreams,
+   } = useLivestreamSearchAlgolia(
+      "",
+      recentLivestreamsFilterOptions,
+      LIVESTREAM_REPLICAS.START_DESC,
+      !shouldShowRecentLivestreams, // disable when not needed
+      9 // fetch exactly 9 items
+   )
+
+   const recentLivestreams = useMemo(() => {
+      return recentLivestreamsData?.[0]?.deserializedHits?.slice(0, 9) || []
+   }, [recentLivestreamsData])
 
    const isValidatingRef = useRef(isValidating)
    isValidatingRef.current = isValidating
@@ -194,10 +254,14 @@ const NextLiveStreamsWithFilter = ({
    useEffect(() => {
       if (isValidatingRef.current) return
 
-      if (inView) {
+      if (
+         inView &&
+         infiniteLivestreams?.length &&
+         numberOfResults < infiniteLivestreams.length
+      ) {
          setSize((prevSize) => prevSize + 1)
       }
-   }, [inView, setSize])
+   }, [inView, setSize, infiniteLivestreams?.length, numberOfResults])
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -269,7 +333,7 @@ const NextLiveStreamsWithFilter = ({
 
    return (
       <>
-         <Container maxWidth="xl" disableGutters sx={{ display: "flex" }}>
+         <Container maxWidth="xl" disableGutters sx={styles.mainContainer}>
             <Box sx={styles.root}>
                <Card sx={styles.search}>
                   <LivestreamSearch
@@ -299,14 +363,34 @@ const NextLiveStreamsWithFilter = ({
             upcomingLivestreams={infiniteLivestreams}
             listenToUpcoming
             pastLivestreams={infiniteLivestreams}
+            currentGroup={undefined}
             minimumUpcomingStreams={hasAppliedFilters || inputValue ? 0 : 4}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
+            wrapperSx={{ minHeight: "unset" }}
          />
-         {Boolean(isValidating) && (
+
+         <Divider sx={styles.divider} />
+
+         {shouldShowRecentLivestreams ? (
+            <Container
+               maxWidth="xl"
+               disableGutters
+               sx={styles.recentEventsContainer}
+            >
+               <Box sx={styles.recentEventsWrapper}>
+                  <RecentLivestreamsSection
+                     recentLivestreams={recentLivestreams}
+                     isLoading={isLoadingRecentLivestreams}
+                  />
+               </Box>
+            </Container>
+         ) : null}
+
+         {isValidating ? (
             <Box sx={styles.loader}>
                <CircularProgress />
             </Box>
-         )}
+         ) : null}
          <Box ref={ref} />
       </>
    )
