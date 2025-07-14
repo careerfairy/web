@@ -23,7 +23,7 @@ import {
    LivestreamFormValues,
 } from "./types"
 import { livestreamFormValidationSchema } from "./validationSchemas"
-import { FeedbackQuestionFormValues } from "./views/questions/commons"
+import { FeedbackQuestionFormValues, getFeedbackQuestionFormInitialValues } from "./views/questions/commons"
 import { useFeedbackQuestions } from "./views/questions/useFeedbackQuestions"
 
 const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
@@ -71,6 +71,24 @@ const formInitialValues: LivestreamFormValues = {
    speakers: { ...formSpeakersTabInitialValues },
    questions: { ...formQuestionsTabInitialValues },
    jobs: { ...formJobsTabInitialValues },
+}
+
+const getFormInitialValues = (group?: Group): LivestreamFormValues => {
+   const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
+      registrationQuestions: {
+         values: [],
+         options: [],
+      },
+      feedbackQuestions: getFeedbackQuestionFormInitialValues(group?.universityName),
+      hosts: [],
+   }
+
+   return {
+      general: { ...formGeneralTabInitialValues },
+      speakers: { ...formSpeakersTabInitialValues },
+      questions: { ...formQuestionsTabInitialValues },
+      jobs: { ...formJobsTabInitialValues },
+   }
 }
 
 const buildRegistrationQuestions = (
@@ -270,7 +288,7 @@ const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
            creators,
            userData,
         })
-      : formInitialValues
+      : getFormInitialValues(group)
 
    if (!questionsLoaded) {
       return <CircularProgress />
