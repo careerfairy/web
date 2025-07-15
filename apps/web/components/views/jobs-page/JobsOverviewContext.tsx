@@ -82,6 +82,7 @@ export type SearchParams = {
    businessFunctionTags?: string[]
    jobTypes?: string[]
    currentJobId?: string
+   first?: boolean
 }
 
 export const JobsOverviewContextProvider = ({
@@ -162,21 +163,8 @@ export const JobsOverviewContextProvider = ({
       })
 
    const infiniteJobs = useMemo(() => {
-      const jobs = data?.flatMap((page) => page.deserializedHits) ?? []
-
-      if (!router.query.currentJobId) {
-         return jobs
-      }
-
-      const currentJob = jobs.find(
-         (job) => job.id === router.query.currentJobId
-      )
-
-      // Re-sort jobs to put the current job at the top
-      return currentJob
-         ? [currentJob, ...jobs.filter((job) => job.id !== currentJob?.id)]
-         : jobs
-   }, [data, router.query.currentJobId])
+      return data?.flatMap((page) => page.deserializedHits) ?? []
+   }, [data])
 
    const handleCurrentJobIdChange = useCallback(
       async (currentJobId: string) => {
@@ -290,14 +278,15 @@ export const JobsOverviewContextProvider = ({
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
          selectedLocationsNames,
          userCountryCode,
-         recommendedJobs: currentRecommendedJob
-            ? [
-                 currentRecommendedJob,
-                 ...recommendedJobs.filter(
-                    (job) => job.id !== currentRecommendedJob?.id
-                 ),
-              ]
-            : recommendedJobs,
+         recommendedJobs:
+            searchParams.first && currentRecommendedJob
+               ? [
+                    currentRecommendedJob,
+                    ...recommendedJobs.filter(
+                       (job) => job.id !== currentRecommendedJob?.id
+                    ),
+                 ]
+               : recommendedJobs,
          isLoadingRecommendedJobs,
          isLoadingJobs: isLoadingJobs,
       }
@@ -371,6 +360,11 @@ const handleQueryChange = (
       delete query[param]
    }
 
+   // Always delete the 'first' parameter when any other parameter changes
+   if (param !== "first") {
+      delete query.first
+   }
+
    router.push(
       {
          pathname: router.pathname,
@@ -384,6 +378,7 @@ const handleQueryChange = (
 const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
    const term = (query.term as string) || ""
    const currentJobId = (query.currentJobId as string) || ""
+   const first = query.first === "true"
 
    const searchParamLocations = getQueryStringArray(query.location)
    const searchParamBusinessFunctionTags = getQueryStringArray(
@@ -397,6 +392,7 @@ const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
       businessFunctionTags: searchParamBusinessFunctionTags,
       jobTypes: searchParamJobTypes,
       currentJobId,
+      first,
    }
 }
 
