@@ -804,6 +804,7 @@ export enum ImpressionLocation {
    mentorPageCarousel = "mentor-page-carousel", // mentorPageCarousel
    nextLivestreamsSearchBar = "next-livestreams-search-bar", // nextLivestreamsSearchBar
    portalHeroContentCarousel = "portal-hero-content-carousel", // portalHeroContentCarousel
+   portalSearchResults = "portal-search-results", // portalSearchResults
    unknown = "unknown", // unknown
 }
 

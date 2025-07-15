@@ -1,11 +1,13 @@
-import { Box, Tab, Tabs } from "@mui/material"
+import { Box, Stack, Tab, Tabs, Typography, useTheme } from "@mui/material"
 import { useState } from "react"
+import { Frown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { AllTab } from "./results/AllTab"
 import { CompaniesTab } from "./results/CompaniesTab"
 import { JobsTab } from "./results/JobsTab"
 import { LivestreamsTab } from "./results/LivestreamsTab"
 import { RecordingsTab } from "./results/RecordingsTab"
+import { useSearchContext } from "./SearchContext"
 
 const TAB_VALUES = {
    all: {
@@ -52,6 +54,16 @@ const styles = sxStyles({
       borderBottom: "1px solid #EAEAEA",
    },
    resultsContainer: {
+      mt: { xs: 1.5, md: 2 },
+   },
+   notFoundRoot: {
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+      borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      background: (theme) => theme.brand.white[100],
+      p: "52px 12px",
       mt: 2,
    },
 })
@@ -95,3 +107,34 @@ export const SearchResults = () => {
       </Box>
    )
 }
+
+export const NoResultsFound = () => {
+   const theme = useTheme()
+   const { searchQuery } = useSearchContext()
+
+   return (
+      <Stack sx={styles.notFoundRoot} spacing={1}>
+         <Frown size={40} color={theme.palette.neutral[600]} />
+         <Typography
+            variant="brandedBody"
+            color="neutral.700"
+            textAlign="center"
+         >
+            No results found {searchQuery ? "for" : ""}{" "}
+            {searchQuery ? (
+               <Typography
+                  variant="brandedBody"
+                  color="neutral.700"
+                  fontWeight={600}
+               >
+                  &quot;{searchQuery}&quot;
+               </Typography>
+            ) : (
+               ""
+            )}
+         </Typography>
+      </Stack>
+   )
+}
+
+export default SearchResults

@@ -1,3 +1,4 @@
+import { queryParamToArr } from "@careerfairy/shared-lib/utils"
 import { useRouter } from "next/router"
 import {
    createContext,
@@ -18,6 +19,11 @@ type SearchContextType = {
    removeRecentSearch: (search: string) => void
    clearRecentSearches: () => void
    handleSearchSubmit: (query: string) => void
+   handleFilterSelect: (filter: string, value: string[]) => void
+   getFilterValues: (filter: string) => string[]
+   selectedLivestreamId: string | null
+   handleOpenLivestreamDialog: (livestreamId: string) => void
+   handleCloseLivestreamDialog: () => void
 }
 
 export const SearchContext = createContext<SearchContextType | undefined>(
@@ -30,7 +36,7 @@ type SearchContextProviderType = {
 
 export const SearchProvider = ({ children }: SearchContextProviderType) => {
    const [searchQuery, setSearchQuery] = useState("")
-   const router = useRouter()
+   const { query, push, pathname, isReady } = useRouter()
    const {
       recentSearches,
       addRecentSearch,
@@ -38,37 +44,96 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
       clearRecentSearches,
    } = useRecentSearches()
 
+   const selectedLivestreamId = (query.selectedLivestreamId as string) || null
+
    // Initialize search query from URL parameter
    useEffect(() => {
-      if (router.isReady && router.query.q) {
-         const queryFromUrl = Array.isArray(router.query.q)
-            ? router.query.q[0]
-            : router.query.q
+      if (query.q) {
+         const queryFromUrl = Array.isArray(query.q) ? query.q[0] : query.q
          if (queryFromUrl) {
             setSearchQuery(queryFromUrl)
          }
       }
-   }, [router.isReady, router.query.q])
+   }, [isReady, query.q])
 
    const handleSearchSubmit = useCallback(
       (query: string) => {
-         if (query.trim()) {
+         if (query.trim().length > 0) {
             const trimmedQuery = query.trim()
             addRecentSearch(trimmedQuery)
             // Redirect to search page with query as URL parameter
-            router.push(`/portal/search?q=${encodeURIComponent(trimmedQuery)}`)
+            push(`/portal/search?q=${encodeURIComponent(trimmedQuery)}`)
          }
       },
-      [router, addRecentSearch]
+      [push, addRecentSearch]
    )
 
    const handleDropdownSelect = useCallback(
       (option: string) => {
-         setSearchQuery(option)
-         handleSearchSubmit(option)
+         if (option.length > 0) {
+            setSearchQuery(option)
+            handleSearchSubmit(option)
+         }
       },
       [handleSearchSubmit]
    )
+
+   const handleFilterSelect = useCallback(
+      (filter: string, value: string[]) => {
+         const newQuery = { ...query }
+         if (value.length > 0) {
+            newQuery[filter] = value.join(",")
+         } else {
+            delete newQuery[filter]
+         }
+         void push(
+            {
+               pathname: pathname,
+               query: newQuery,
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
+   const getFilterValues = useCallback(
+      (filter: string) => {
+         return queryParamToArr(query[filter])
+      },
+      [query]
+   )
+
+   const handleOpenLivestreamDialog = useCallback(
+      (livestreamId: string) => {
+         void push(
+            {
+               pathname: pathname,
+               query: {
+                  ...query,
+                  selectedLivestreamId: livestreamId,
+               },
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
+   const handleCloseLivestreamDialog = useCallback(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { selectedLivestreamId: _, ...restOfQuery } = query
+      void push(
+         {
+            pathname: pathname,
+            query: restOfQuery,
+         },
+         undefined,
+         { shallow: true }
+      )
+   }, [query, push, pathname])
 
    const value: SearchContextType = useMemo(() => {
       return {
@@ -79,6 +144,11 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
          removeRecentSearch,
          clearRecentSearches,
          handleSearchSubmit,
+         handleFilterSelect,
+         getFilterValues,
+         selectedLivestreamId,
+         handleOpenLivestreamDialog,
+         handleCloseLivestreamDialog,
       }
    }, [
       searchQuery,
@@ -88,6 +158,11 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
       removeRecentSearch,
       clearRecentSearches,
       handleSearchSubmit,
+      handleFilterSelect,
+      getFilterValues,
+      selectedLivestreamId,
+      handleOpenLivestreamDialog,
+      handleCloseLivestreamDialog,
    ])
 
    return (
