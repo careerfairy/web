@@ -38,7 +38,7 @@ const EditGroupCard = () => {
          <CircularLogo
             src={group?.logoUrl}
             alt={`logo of company ${companyName}`}
-            size={80}
+            size={48}
          >
             <HoverOverlay
                href={`/group/${group.id}/admin/settings/general`}
