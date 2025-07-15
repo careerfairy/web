@@ -1,17 +1,15 @@
 import { Divider, MenuItem, Stack, Typography } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { useRouter } from "next/router"
-import { Fragment } from "react"
 
 // react-feather icons
 import { Home, LogOut, Repeat, User } from "react-feather"
 
 // project imports
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
 import BrandedMenu from "../../../components/views/common/inputs/BrandedMenu"
-import ManageCompaniesDialog from "../../../components/views/profile/my-groups/ManageCompaniesDialog"
+import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
 import { useGroup } from "../index"
 
 const ProfileSection = styled(MenuItem)({
@@ -71,12 +69,7 @@ export const ProfileMenu = ({ anchorEl, open, onClose }: ProfileMenuProps) => {
    const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { group } = useGroup()
    const { push } = useRouter()
-
-   const [
-      openManageCompaniesDialog,
-      handleOpenManageCompaniesDialog,
-      handleCloseManageCompaniesDialog,
-   ] = useDialogStateHandler()
+   const { openManageCompaniesDialog } = useGroupDashboard()
 
    const showSwitchButton =
       userData?.isAdmin || Object.keys(adminGroups).length > 1
@@ -87,7 +80,7 @@ export const ProfileMenu = ({ anchorEl, open, onClose }: ProfileMenuProps) => {
    }
 
    const handleSwitchCompanyClick = () => {
-      handleOpenManageCompaniesDialog()
+      openManageCompaniesDialog()
       onClose()
    }
 
@@ -138,65 +131,55 @@ export const ProfileMenu = ({ anchorEl, open, onClose }: ProfileMenuProps) => {
    ]
 
    return (
-      <Fragment>
-         <StyledBrandedMenu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={onClose}
-            anchorOrigin={{
-               vertical: "bottom",
-               horizontal: "right",
-            }}
-            transformOrigin={{
-               vertical: "top",
-               horizontal: "right",
-            }}
-         >
-            {/* Profile Section */}
-            <ProfileSection onClick={handleProfileClick}>
-               <UserAvatar
-                  imageUrl={userData?.avatar}
-                  lastName={userData?.lastName}
-                  firstName={userData?.firstName}
-               />
-               <Stack>
-                  <Typography
-                     variant="medium"
-                     color="neutral.800"
-                     fontWeight={600}
-                  >
-                     {userPresenter?.getDisplayName()}
-                  </Typography>
-                  <Typography variant="xsmall" color="neutral.600">
-                     {userPresenter?.getPosition()}
-                  </Typography>
-               </Stack>
-            </ProfileSection>
-
-            {/* Menu Items */}
-            {menuItems
-               .filter((item) => item.show)
-               .map(({ divider, key, label, icon, onClick }) =>
-                  divider ? (
-                     <StyledDivider key={key} />
-                  ) : (
-                     <StyledMenuItem key={key} onClick={onClick}>
-                        {icon}
-                        <Typography variant="small" color="neutral.700">
-                           {label}
-                        </Typography>
-                     </StyledMenuItem>
-                  )
-               )}
-         </StyledBrandedMenu>
-
-         {/* Manage Companies Dialog */}
-         {Boolean(openManageCompaniesDialog) && (
-            <ManageCompaniesDialog
-               open={openManageCompaniesDialog}
-               handleClose={handleCloseManageCompaniesDialog}
+      <StyledBrandedMenu
+         anchorEl={anchorEl}
+         open={open}
+         onClose={onClose}
+         anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+         }}
+         transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+         }}
+      >
+         {/* Profile Section */}
+         <ProfileSection onClick={handleProfileClick}>
+            <UserAvatar
+               imageUrl={userData?.avatar}
+               lastName={userData?.lastName}
+               firstName={userData?.firstName}
             />
-         )}
-      </Fragment>
+            <Stack>
+               <Typography
+                  variant="medium"
+                  color="neutral.800"
+                  fontWeight={600}
+               >
+                  {userPresenter?.getDisplayName()}
+               </Typography>
+               <Typography variant="xsmall" color="neutral.600">
+                  {userPresenter?.getPosition()}
+               </Typography>
+            </Stack>
+         </ProfileSection>
+
+         {/* Menu Items */}
+         {menuItems
+            .filter((item) => item.show)
+            .map(({ divider, key, label, icon, onClick }) =>
+               divider ? (
+                  <StyledDivider key={key} />
+               ) : (
+                  <StyledMenuItem key={key} onClick={onClick}>
+                     {icon}
+                     <Typography variant="small" color="neutral.700">
+                        {label}
+                     </Typography>
+                  </StyledMenuItem>
+               )
+            )}
+      </StyledBrandedMenu>
    )
 }
