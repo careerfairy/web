@@ -1,4 +1,4 @@
-import { Box, styled } from "@mui/material"
+import { Box, BoxProps, styled } from "@mui/material"
 import { MainLogo } from "components/logos"
 import { sxStyles } from "types/commonTypes"
 
@@ -15,12 +15,12 @@ const Root = styled(Box)(({ theme }) => ({
    display: "flex",
    width: "100%",
    marginTop: 20,
-   padding: theme.spacing(0.5, 3),
+   padding: theme.spacing(0.5, 1),
 }))
 
-export const CareerFairyLogo = () => {
+export const CareerFairyLogo = (props: BoxProps) => {
    return (
-      <Root>
+      <Root {...props}>
          <MainLogo sx={styles.logo} />
       </Root>
    )

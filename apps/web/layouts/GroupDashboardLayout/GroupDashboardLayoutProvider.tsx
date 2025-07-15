@@ -1,3 +1,4 @@
+import useIsMobile from "components/custom-hook/useIsMobile"
 import {
    createContext,
    ReactNode,
@@ -14,6 +15,7 @@ type IGroupDashboardState = {
    layout: {
       leftDrawerOpen: boolean
       mobileProfileDrawerOpen: boolean
+      mobileFullScreenMenuOpen: boolean
    }
 }
 
@@ -21,6 +23,7 @@ const initialState: IGroupDashboardState = {
    layout: {
       leftDrawerOpen: true,
       mobileProfileDrawerOpen: false,
+      mobileFullScreenMenuOpen: false,
    },
 }
 
@@ -28,22 +31,28 @@ type IGroupDashboardContext = {
    layout: {
       leftDrawerOpen: boolean
       mobileProfileDrawerOpen: boolean
+      mobileFullScreenMenuOpen: boolean
    }
    setLeftDrawer: (open: boolean) => void
    toggleLeftDrawer: () => void
    setMobileProfileDrawer: (open: boolean) => void
    toggleMobileProfileDrawer: () => void
+   setMobileFullScreenMenu: (open: boolean) => void
+   toggleMobileFullScreenMenu: () => void
 }
 
 const GroupDashboardContext = createContext<IGroupDashboardContext>({
    layout: {
       leftDrawerOpen: true,
       mobileProfileDrawerOpen: false,
+      mobileFullScreenMenuOpen: false,
    },
    toggleLeftDrawer: () => {},
    setLeftDrawer: () => {},
    setMobileProfileDrawer: () => {},
    toggleMobileProfileDrawer: () => {},
+   setMobileFullScreenMenu: () => {},
+   toggleMobileFullScreenMenu: () => {},
 })
 
 type Action = {
@@ -52,6 +61,8 @@ type Action = {
       | "TOGGLE_LAYOUT"
       | "SET_MOBILE_PROFILE_DRAWER"
       | "TOGGLE_MOBILE_PROFILE_DRAWER"
+      | "SET_MOBILE_FULLSCREEN_MENU"
+      | "TOGGLE_MOBILE_FULLSCREEN_MENU"
    payload?: boolean
 }
 
@@ -89,6 +100,22 @@ const reducer = (state: IGroupDashboardState, action: Action) => {
                mobileProfileDrawerOpen: !state.layout.mobileProfileDrawerOpen,
             },
          }
+      case "SET_MOBILE_FULLSCREEN_MENU":
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               mobileFullScreenMenuOpen: action.payload,
+            },
+         }
+      case "TOGGLE_MOBILE_FULLSCREEN_MENU":
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               mobileFullScreenMenuOpen: !state.layout.mobileFullScreenMenuOpen,
+            },
+         }
       default:
          return state
    }
@@ -119,6 +146,7 @@ const GroupDashboardLayoutProvider = ({
    backgroundColor,
 }: Props) => {
    const [state, dispatch] = useReducer(reducer, initialState)
+   const isMobile = useIsMobile()
 
    const toggleLeftDrawer = useCallback(
       () =>
@@ -154,12 +182,31 @@ const GroupDashboardLayoutProvider = ({
       [dispatch]
    )
 
+   const setMobileFullScreenMenu = useCallback(
+      (open: boolean) =>
+         dispatch({
+            type: "SET_MOBILE_FULLSCREEN_MENU",
+            payload: open,
+         }),
+      [dispatch]
+   )
+
+   const toggleMobileFullScreenMenu = useCallback(
+      () =>
+         dispatch({
+            type: "TOGGLE_MOBILE_FULLSCREEN_MENU",
+         }),
+      [dispatch]
+   )
+
    const value = useMemo<IGroupDashboardContext>(
       () => ({
          toggleLeftDrawer,
          setLeftDrawer,
          setMobileProfileDrawer,
          toggleMobileProfileDrawer,
+         setMobileFullScreenMenu,
+         toggleMobileFullScreenMenu,
          layout: state.layout,
       }),
       [
@@ -167,6 +214,8 @@ const GroupDashboardLayoutProvider = ({
          setLeftDrawer,
          setMobileProfileDrawer,
          toggleMobileProfileDrawer,
+         setMobileFullScreenMenu,
+         toggleMobileFullScreenMenu,
          state.layout,
       ]
    )
@@ -182,6 +231,7 @@ const GroupDashboardLayoutProvider = ({
                   title={titleComponent}
                />
             }
+            hideDrawer={isMobile}
             showBottomNavContent
             bottomNavContent={bottomBarNavigation}
             drawerContent={<NavBar />}

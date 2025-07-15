@@ -28,7 +28,11 @@ import { useGroup } from "./index"
 const BASE_HREF_PATH = "group"
 const BASE_PARAM = "[groupId]"
 
-const GroupNavList = () => {
+type Props = {
+   allowedLinkIds?: string[]
+}
+
+const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
    const { group, shrunkLeftMenuIsActive } = useGroup()
    const { setLeftDrawer } = useGroupDashboard()
    const isMobile = useIsMobile()
@@ -133,13 +137,28 @@ const GroupNavList = () => {
          })
       }
 
-      return links.map((link) => ({
+      let filteredLinks = links
+
+      // Filter links if allowedLinkIds is provided
+      if (allowedLinkIds && allowedLinkIds.length > 0) {
+         filteredLinks = links.filter((link) =>
+            allowedLinkIds.includes(link.id)
+         )
+      }
+
+      return filteredLinks.map((link) => ({
          ...link,
          shrunk: shrunkLeftMenuIsActive,
       }))
-   }, [group, hasAtsIntegration, shrunkLeftMenuIsActive])
+   }, [group, hasAtsIntegration, shrunkLeftMenuIsActive, allowedLinkIds])
 
-   return <NavList links={navLinks} onMobileNavigate={handleMobileNavigate} />
+   return (
+      <NavList
+         disablePadding
+         links={navLinks}
+         onMobileNavigate={handleMobileNavigate}
+      />
+   )
 }
 
 const SuspensefulATSStatus = ({ groupId }: { groupId: string }) => {
