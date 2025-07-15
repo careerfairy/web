@@ -361,9 +361,7 @@ const handleQueryChange = (
    }
 
    // Always delete the 'first' parameter when any other parameter changes
-   if (param !== "first") {
-      delete query.first
-   }
+   delete query["first"]
 
    router.push(
       {
