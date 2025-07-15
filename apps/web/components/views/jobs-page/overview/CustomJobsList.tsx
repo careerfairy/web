@@ -62,7 +62,8 @@ export const CustomJobsList = ({ customJobs }: Props) => {
                   href={{
                      pathname: router.pathname,
                      query: {
-                        ...router.query,
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        ...(({ first, ...rest }) => rest)(router.query),
                         currentJobId: customJob.id,
                      },
                   }}
