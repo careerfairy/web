@@ -88,6 +88,7 @@ export const CreateMenu = ({
          anchorEl={anchorEl}
          handleClose={handleClose}
          isMobileOverride={isMobileOverride}
+         disableSwipeToOpen
       />
    )
 }
