@@ -1,6 +1,6 @@
 // material-ui
 import EditGroupIcon from "@mui/icons-material/EditOutlined"
-import { Box, Stack, Typography, styled } from "@mui/material"
+import { Box, Stack, StackProps, Typography, styled } from "@mui/material"
 
 // project imports
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
@@ -28,13 +28,13 @@ const HoverIcon = styled(EditGroupIcon)({
    color: "white",
 })
 
-const EditGroupCard = () => {
+const EditGroupCard = (props: StackProps) => {
    const { group } = useGroup()
 
    const companyName = group?.universityName
 
    return (
-      <RootContainer spacing={0.5}>
+      <RootContainer spacing={0.5} {...props}>
          <CircularLogo
             src={group?.logoUrl}
             alt={`logo of company ${companyName}`}

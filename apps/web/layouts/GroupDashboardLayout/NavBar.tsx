@@ -33,13 +33,18 @@ const NavBar = () => {
    }
 
    return (
-      <Stack flex={1} alignItems={"center"} borderRight={"1px solid #EDE7FD"}>
+      <Stack
+         px={2}
+         flex={1}
+         alignItems={"center"}
+         borderRight={"1px solid #EDE7FD"}
+      >
          <ShrunkToggleButton />
          <CareerFairyLogo />
-         <EditGroupCard />
+         <EditGroupCard sx={{ px: 1 }} />
          <GroupNavList />
          <Box flexGrow={1} />
-         <GroupBottomLinks />
+         <GroupBottomLinks pb={3.625} pt={2} />
       </Stack>
    )
 }

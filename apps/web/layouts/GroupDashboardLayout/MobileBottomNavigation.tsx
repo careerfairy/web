@@ -6,13 +6,22 @@ import {
 import { styled } from "@mui/material/styles"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { useRouter } from "next/router"
-import { ComponentType, useCallback, useEffect, useState } from "react"
+import {
+   ComponentType,
+   Fragment,
+   useCallback,
+   useEffect,
+   useState,
+} from "react"
 import { PlusSquare as CreateIcon, IconProps } from "react-feather"
+import { useMeasure } from "react-use"
 import useMenuState from "../../components/custom-hook/useMenuState"
 import { ContentIcon } from "../../components/views/common/icons/ContentIcon"
 import { DashboardIcon } from "../../components/views/common/icons/DashboardIcon"
 import { JobsIcon } from "../../components/views/common/icons/JobsIcon"
 import { CreateMenu } from "./CreateMenu"
+import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
+import { MobileFullScreenMenu } from "./MobileFullScreenMenu"
 
 const StyledBottomNavigation = styled(MuiBottomNavigation)(({ theme }) => ({
    position: "fixed",
@@ -100,12 +109,14 @@ type NavItemData = {
 export const MobileBottomNavigation = () => {
    const router = useRouter()
    const [value, setValue] = useState<string>("")
+   const { toggleMobileFullScreenMenu } = useGroupDashboard()
    const {
       anchorEl: createMenuAnchorEl,
       open: createMenuOpen,
       handleClick: handleCreateMenuOpen,
       handleClose: handleCreateMenuClose,
    } = useMenuState()
+   const [bottomNavigationRef, { height }] = useMeasure<HTMLDivElement>()
 
    // Get group ID from router for navigation
    const groupId = router.query.groupId as string
@@ -134,10 +145,6 @@ export const MobileBottomNavigation = () => {
       const selectedItem = navItems.find((item) => item.id === newValue)
       if (selectedItem) {
          switch (newValue) {
-            case "menu":
-               // Handle menu functionality here
-               console.log("Menu clicked")
-               break
             case "create": {
                handleCreateMenuOpen(event as React.MouseEvent<HTMLElement>)
                break
@@ -165,11 +172,12 @@ export const MobileBottomNavigation = () => {
    }
 
    return (
-      <>
+      <Fragment>
          <StyledBottomNavigation
             value={value}
             onChange={handleChange}
             showLabels
+            ref={bottomNavigationRef}
          >
             {navItems.map((item) => {
                const isActive = value === item.id
@@ -187,6 +195,7 @@ export const MobileBottomNavigation = () => {
             <BottomNavigationAction
                label="Menu"
                value="menu"
+               onClick={() => toggleMobileFullScreenMenu()}
                icon={<MenuAvatar src="/logo-green.png" alt="logo" size={24} />}
             />
          </StyledBottomNavigation>
@@ -198,6 +207,7 @@ export const MobileBottomNavigation = () => {
             handleClose={handleCreateMenuClose}
             isMobileOverride
          />
-      </>
+         <MobileFullScreenMenu bottomNavigationHeight={height + 1} />
+      </Fragment>
    )
 }
