@@ -351,8 +351,8 @@ export const BrandedSearchField = ({
          setIsDropdownOpen(false)
          e.preventDefault()
       }
-      if (e.key === "Enter" && !isDropdownOpen) {
-         setIsDropdownOpen(true)
+      if (e.key === "Enter") {
+         setIsDropdownOpen((prev) => !prev)
          e.preventDefault()
       }
 

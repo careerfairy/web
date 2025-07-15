@@ -75,7 +75,7 @@ const styles = sxStyles({
       transformOrigin: "top",
       maxHeight: "500px",
       scrollbarWidth: "none",
-      "&::-webkit-scrollbar": {
+      "&::WebkitScrollbar": {
          display: "none",
       },
    },
