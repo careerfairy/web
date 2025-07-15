@@ -13,33 +13,45 @@ import TopBar from "./TopBar"
 type IGroupDashboardState = {
    layout: {
       leftDrawerOpen: boolean
+      mobileProfileDrawerOpen: boolean
    }
 }
 
 const initialState: IGroupDashboardState = {
    layout: {
       leftDrawerOpen: true,
+      mobileProfileDrawerOpen: false,
    },
 }
 
 type IGroupDashboardContext = {
    layout: {
       leftDrawerOpen: boolean
+      mobileProfileDrawerOpen: boolean
    }
    setLeftDrawer: (open: boolean) => void
    toggleLeftDrawer: () => void
+   setMobileProfileDrawer: (open: boolean) => void
+   toggleMobileProfileDrawer: () => void
 }
 
 const GroupDashboardContext = createContext<IGroupDashboardContext>({
    layout: {
       leftDrawerOpen: true,
+      mobileProfileDrawerOpen: false,
    },
    toggleLeftDrawer: () => {},
    setLeftDrawer: () => {},
+   setMobileProfileDrawer: () => {},
+   toggleMobileProfileDrawer: () => {},
 })
 
 type Action = {
-   type: "SET_LAYOUT" | "TOGGLE_LAYOUT"
+   type:
+      | "SET_LAYOUT"
+      | "TOGGLE_LAYOUT"
+      | "SET_MOBILE_PROFILE_DRAWER"
+      | "TOGGLE_MOBILE_PROFILE_DRAWER"
    payload?: boolean
 }
 
@@ -59,6 +71,22 @@ const reducer = (state: IGroupDashboardState, action: Action) => {
             layout: {
                ...state.layout,
                leftDrawerOpen: !state.layout.leftDrawerOpen,
+            },
+         }
+      case "SET_MOBILE_PROFILE_DRAWER":
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               mobileProfileDrawerOpen: action.payload,
+            },
+         }
+      case "TOGGLE_MOBILE_PROFILE_DRAWER":
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               mobileProfileDrawerOpen: !state.layout.mobileProfileDrawerOpen,
             },
          }
       default:
@@ -109,13 +137,38 @@ const GroupDashboardLayoutProvider = ({
       [dispatch]
    )
 
+   const setMobileProfileDrawer = useCallback(
+      (open: boolean) =>
+         dispatch({
+            type: "SET_MOBILE_PROFILE_DRAWER",
+            payload: open,
+         }),
+      [dispatch]
+   )
+
+   const toggleMobileProfileDrawer = useCallback(
+      () =>
+         dispatch({
+            type: "TOGGLE_MOBILE_PROFILE_DRAWER",
+         }),
+      [dispatch]
+   )
+
    const value = useMemo<IGroupDashboardContext>(
       () => ({
          toggleLeftDrawer,
          setLeftDrawer,
+         setMobileProfileDrawer,
+         toggleMobileProfileDrawer,
          layout: state.layout,
       }),
-      [toggleLeftDrawer, setLeftDrawer, state.layout]
+      [
+         toggleLeftDrawer,
+         setLeftDrawer,
+         setMobileProfileDrawer,
+         toggleMobileProfileDrawer,
+         state.layout,
+      ]
    )
 
    return (

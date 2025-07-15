@@ -7,13 +7,14 @@ import Stack from "@mui/material/Stack"
 
 // project imports
 import { useRouter } from "next/router"
-import { ReactNode, useMemo } from "react"
+import { Fragment, ReactNode, useMemo } from "react"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../types/commonTypes"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
+import { MobileProfileDrawer } from "./MobileProfileDrawer"
 import NotificationsButton from "./NotificationsButton"
-import UserAvatarWithDetails from "./UserAvatarWithDetails"
+import { ProfileAvatar } from "./ProfileAvatar"
 
 // framer motion
 import { motion } from "framer-motion"
@@ -90,39 +91,35 @@ const TopBar = ({ title, topBarAction, navigation }: Props) => {
    }, [asPath, title])
 
    return (
-      <Box sx={styles.root}>
-         {/* toggler button */}
-         {!drawerPresent && !isMobile ? <MobileToggleButton /> : null}
-         <Box
-            component={motion.div}
-            key={titleKey}
-            variants={titleVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            sx={styles.leftSection}
-         >
-            <Typography role="heading" fontWeight={600} sx={styles.title}>
-               {title}
-            </Typography>
+      <Fragment>
+         <Box sx={styles.root}>
+            {/* toggler button */}
+            {!drawerPresent && !isMobile ? <MobileToggleButton /> : null}
+            <Box
+               component={motion.div}
+               key={titleKey}
+               variants={titleVariants}
+               initial="initial"
+               animate="animate"
+               exit="exit"
+               transition={{ duration: 0.2, ease: "easeOut" }}
+               sx={styles.leftSection}
+            >
+               <Typography role="heading" fontWeight={600} sx={styles.title}>
+                  {title}
+               </Typography>
+            </Box>
+            <Box sx={{ flexGrow: 1 }} />
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+               {topBarAction}
+               {/* notification & profile */}
+               <NotificationsButton />
+               <ProfileAvatar />
+            </Stack>
+            {Boolean(navigation) && navigation}
          </Box>
-         <Box sx={{ flexGrow: 1 }} />
-         <Stack
-            direction="row"
-            alignItems="center"
-            spacing={{
-               xs: 1,
-               md: 3,
-            }}
-         >
-            {topBarAction}
-            {/* notification & profile */}
-            <UserAvatarWithDetails />
-            <NotificationsButton />
-         </Stack>
-         {Boolean(navigation) && navigation}
-      </Box>
+         {Boolean(isMobile) && <MobileProfileDrawer />}
+      </Fragment>
    )
 }
 
