@@ -118,7 +118,7 @@ const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
                      maxWidth="320px"
                      minWidth="320px"
                      component={Link}
-                     href={`/jobs?currentJobId=${customJob.id}`}
+                     href={`/jobs?currentJobId=${customJob.id}&first=true`}
                   >
                      <JobCard
                         job={customJob}
