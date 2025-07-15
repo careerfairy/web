@@ -254,12 +254,7 @@ const NextLiveStreamsWithFilter = ({
    useEffect(() => {
       if (isValidatingRef.current) return
 
-      if (
-         inView &&
-         !shouldShowRecentLivestreams &&
-         infiniteLivestreams?.length &&
-         numberOfResults < infiniteLivestreams.length
-      ) {
+      if (inView && !shouldShowRecentLivestreams) {
          setSize((prevSize) => prevSize + 1)
       }
    }, [
