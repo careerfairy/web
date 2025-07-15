@@ -32,9 +32,9 @@ type Props = {
    allowedLinkIds?: string[]
 }
 
-const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
+export const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
    const { group, shrunkLeftMenuIsActive } = useGroup()
-   const { setLeftDrawer } = useGroupDashboard()
+   const { setMobileFullScreenMenu } = useGroupDashboard()
    const isMobile = useIsMobile()
 
    const featureFlags = useFeatureFlags()
@@ -44,7 +44,8 @@ const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
 
    const handleMobileNavigate = () => {
       if (isMobile) {
-         setLeftDrawer(false)
+         // setLeftDrawer(false)
+         setMobileFullScreenMenu(false)
       }
    }
 
@@ -178,4 +179,3 @@ const SuspensefulATSStatus = ({ groupId }: { groupId: string }) => {
       </SuspenseWithBoundary>
    )
 }
-export default GroupNavList
