@@ -9,9 +9,9 @@ import Stack from "@mui/material/Stack"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 import { CareerFairyLogo } from "./CareerFairyLogo"
-import EditGroupCard from "./EditGroupCard"
+import { EditGroupCard } from "./EditGroupCard"
 import { GroupBottomLinks } from "./GroupBottomLinks"
-import GroupNavList from "./GroupNavList"
+import { GroupNavList } from "./GroupNavList"
 import { useGroup } from "./index"
 
 const styles = sxStyles({

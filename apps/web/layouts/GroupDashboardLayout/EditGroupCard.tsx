@@ -6,6 +6,7 @@ import { Box, Stack, StackProps, Typography, styled } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import HoverOverlay from "components/views/common/HoverOverlay"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 import { useGroup } from "./index"
 
 const RootContainer = styled(Stack)(({ theme }) => ({
@@ -28,8 +29,9 @@ const HoverIcon = styled(EditGroupIcon)({
    color: "white",
 })
 
-const EditGroupCard = (props: StackProps) => {
+export const EditGroupCard = (props: StackProps) => {
    const { group } = useGroup()
+   const { setMobileFullScreenMenu } = useGroupDashboard()
 
    const companyName = group?.universityName
 
@@ -41,6 +43,7 @@ const EditGroupCard = (props: StackProps) => {
             size={48}
          >
             <HoverOverlay
+               onClick={() => setMobileFullScreenMenu(false)}
                href={`/group/${group.id}/admin/settings/general`}
                icon={<HoverIcon fontSize="large" />}
             />
@@ -64,5 +67,3 @@ const EditGroupCard = (props: StackProps) => {
       </RootContainer>
    )
 }
-
-export default EditGroupCard

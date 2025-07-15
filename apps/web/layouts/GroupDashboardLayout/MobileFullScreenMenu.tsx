@@ -1,36 +1,30 @@
-import { Fragment, useEffect } from "react"
+import { useEffect } from "react"
 
 // material-ui
-import { Box } from "@mui/material"
+import { Box, Drawer, DrawerProps } from "@mui/material"
 import { styled } from "@mui/material/styles"
-
-// react-feather icons
 
 // project imports
 import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 
 // Reuse existing NavBar components
-import EditGroupCard from "./EditGroupCard"
+import { EditGroupCard } from "./EditGroupCard"
 import { GroupBottomLinks } from "./GroupBottomLinks"
-import GroupNavList from "./GroupNavList"
+import { GroupNavList } from "./GroupNavList"
 
-const FullScreenOverlay = styled(Box)<{ bottomNavigationHeight: number }>(
-   ({ theme, bottomNavigationHeight }) => ({
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: bottomNavigationHeight,
-      backgroundColor: "rgba(255, 255, 255, 0.95)",
-      backdropFilter: "blur(45.4px)",
-      zIndex: 1300,
-      display: "flex",
-      flexDirection: "column",
-      [theme.breakpoints.up("md")]: {
-         display: "none", // Hide on desktop
-      },
-   })
-)
+const DrawerContent = styled(Box, {
+   shouldForwardProp: (prop) => prop !== "bottomNavigationHeight",
+})<{ bottomNavigationHeight: number }>(({ theme, bottomNavigationHeight }) => ({
+   height: `calc(100vh - ${bottomNavigationHeight}px)`,
+   backgroundColor: "rgba(255, 255, 255, 0.95)",
+   backdropFilter: "blur(45.4px)",
+   display: "flex",
+   flexDirection: "column",
+   pointerEvents: "auto", // Re-enable pointer events for menu content
+   [theme.breakpoints.up("md")]: {
+      display: "none",
+   },
+}))
 
 const NavSection = styled(Box)({
    display: "flex",
@@ -46,8 +40,21 @@ const StyledEditGroupCard = styled(EditGroupCard)(({ theme }) => ({
    margin: 0,
 }))
 
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+   [theme.breakpoints.up("md")]: {
+      display: "none",
+   },
+   display: "block",
+   pointerEvents: "none",
+}))
+
 type Props = {
    bottomNavigationHeight: number
+}
+
+const ModalProps: DrawerProps["ModalProps"] = {
+   keepMounted: true,
+   disablePortal: true,
 }
 
 export const MobileFullScreenMenu = ({ bottomNavigationHeight }: Props) => {
@@ -67,14 +74,24 @@ export const MobileFullScreenMenu = ({ bottomNavigationHeight }: Props) => {
       }
    }, [layout.mobileFullScreenMenuOpen, toggleMobileFullScreenMenu])
 
-   if (!layout.mobileFullScreenMenuOpen) {
-      return null
-   }
-
    return (
-      <Fragment>
-         <FullScreenOverlay bottomNavigationHeight={bottomNavigationHeight}>
-            {/* Reuse existing NavBar components */}
+      <StyledDrawer
+         anchor="right"
+         open={layout.mobileFullScreenMenuOpen}
+         onClose={toggleMobileFullScreenMenu}
+         hideBackdrop
+         PaperProps={{
+            sx: {
+               top: 0,
+               bottom: `${bottomNavigationHeight}px`,
+               height: `calc(100vh - ${bottomNavigationHeight}px)`,
+               width: "100%",
+               boxShadow: "none",
+            },
+         }}
+         ModalProps={ModalProps}
+      >
+         <DrawerContent bottomNavigationHeight={bottomNavigationHeight}>
             <NavSection>
                <StyledEditGroupCard sx={{ pb: 1 }} />
                <GroupNavList
@@ -87,7 +104,7 @@ export const MobileFullScreenMenu = ({ bottomNavigationHeight }: Props) => {
                <Box flexGrow={1} />
                <GroupBottomLinks />
             </NavSection>
-         </FullScreenOverlay>
-      </Fragment>
+         </DrawerContent>
+      </StyledDrawer>
    )
 }
