@@ -1,4 +1,5 @@
-import { Box, type BoxProps, Link, alpha } from "@mui/material"
+import { Box, type BoxProps, alpha } from "@mui/material"
+import Link from "next/link"
 import { FC } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 
@@ -18,21 +19,21 @@ const styles = sxStyles({
       zIndex: 2,
       width: "100%",
       height: "100%",
+      "& a": {
+         textDecoration: "none !important",
+      },
    }),
 })
 
 type Props = {
    icon: React.ReactNode
    href: string
-   sx?: BoxProps["sx"]
-}
+} & BoxProps
 
-const HoverOverlay: FC<Props> = ({ icon, href, sx }) => {
+const HoverOverlay: FC<Props> = ({ icon, href, sx, ...props }) => {
    return (
-      <Box sx={combineStyles(styles.hoverOverlay, sx)}>
-         <Link href={href} underline="none">
-            {icon}
-         </Link>
+      <Box sx={combineStyles(styles.hoverOverlay, sx)} {...props}>
+         <Link href={href}>{icon}</Link>
       </Box>
    )
 }

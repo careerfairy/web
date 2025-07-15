@@ -1,5 +1,6 @@
 import {
    BottomNavigationAction,
+   Box,
    BottomNavigation as MuiBottomNavigation,
    SvgIconProps,
 } from "@mui/material"
@@ -15,6 +16,7 @@ import {
 } from "react"
 import { PlusSquare as CreateIcon, IconProps } from "react-feather"
 import { useMeasure } from "react-use"
+import { useGroup } from "."
 import useMenuState from "../../components/custom-hook/useMenuState"
 import { ContentIcon } from "../../components/views/common/icons/ContentIcon"
 import { DashboardIcon } from "../../components/views/common/icons/DashboardIcon"
@@ -109,7 +111,11 @@ type NavItemData = {
 export const MobileBottomNavigation = () => {
    const router = useRouter()
    const [value, setValue] = useState<string>("")
-   const { toggleMobileFullScreenMenu } = useGroupDashboard()
+   const { toggleMobileFullScreenMenu, setMobileFullScreenMenu } =
+      useGroupDashboard()
+
+   const { group } = useGroup()
+
    const {
       anchorEl: createMenuAnchorEl,
       open: createMenuOpen,
@@ -134,7 +140,7 @@ export const MobileBottomNavigation = () => {
             return item.id
          }
       }
-      return "dashboard"
+      return ""
    }, [router.pathname])
 
    useEffect(() => {
@@ -142,26 +148,33 @@ export const MobileBottomNavigation = () => {
    }, [getActiveValue, router.pathname])
 
    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-      const selectedItem = navItems.find((item) => item.id === newValue)
-      if (selectedItem) {
-         switch (newValue) {
-            case "create": {
-               handleCreateMenuOpen(event as React.MouseEvent<HTMLElement>)
-               break
-            }
-            default:
-               setValue(newValue)
-               router.push(
-                  {
-                     pathname: selectedItem.pathname,
-                     query: {
-                        groupId,
-                     },
+      switch (newValue) {
+         case "create": {
+            setMobileFullScreenMenu(false)
+            handleCreateMenuOpen(event as React.MouseEvent<HTMLElement>)
+            break
+         }
+         case "menu": {
+            toggleMobileFullScreenMenu()
+            return
+         }
+         default: {
+            const selectedItem = navItems.find((item) => item.id === newValue)
+            if (!selectedItem) return
+
+            setMobileFullScreenMenu(false)
+            setValue(newValue)
+            router.push(
+               {
+                  pathname: selectedItem.pathname,
+                  query: {
+                     groupId,
                   },
-                  undefined,
-                  { shallow: true }
-               )
-               break
+               },
+               undefined,
+               { shallow: true }
+            )
+            break
          }
       }
    }
@@ -173,6 +186,9 @@ export const MobileBottomNavigation = () => {
 
    return (
       <Fragment>
+         {/* Offset for the bottom navigation */}
+         <Box height={height} />
+
          <StyledBottomNavigation
             value={value}
             onChange={handleChange}
@@ -195,8 +211,7 @@ export const MobileBottomNavigation = () => {
             <BottomNavigationAction
                label="Menu"
                value="menu"
-               onClick={() => toggleMobileFullScreenMenu()}
-               icon={<MenuAvatar src="/logo-green.png" alt="logo" size={24} />}
+               icon={<MenuAvatar src={group?.logoUrl} alt="logo" size={24} />}
             />
          </StyledBottomNavigation>
 
