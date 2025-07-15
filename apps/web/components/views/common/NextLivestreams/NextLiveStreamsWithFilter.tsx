@@ -254,10 +254,21 @@ const NextLiveStreamsWithFilter = ({
    useEffect(() => {
       if (isValidatingRef.current) return
 
-      if (inView && !shouldShowRecentLivestreams) {
+      if (
+         inView &&
+         !shouldShowRecentLivestreams &&
+         infiniteLivestreams?.length &&
+         numberOfResults < infiniteLivestreams.length
+      ) {
          setSize((prevSize) => prevSize + 1)
       }
-   }, [inView, setSize, shouldShowRecentLivestreams])
+   }, [
+      inView,
+      setSize,
+      infiniteLivestreams?.length,
+      numberOfResults,
+      shouldShowRecentLivestreams,
+   ])
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
