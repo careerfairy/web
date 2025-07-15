@@ -257,13 +257,7 @@ const NextLiveStreamsWithFilter = ({
       if (inView && !shouldShowRecentLivestreams) {
          setSize((prevSize) => prevSize + 1)
       }
-   }, [
-      inView,
-      setSize,
-      infiniteLivestreams?.length,
-      numberOfResults,
-      shouldShowRecentLivestreams,
-   ])
+   }, [inView, setSize, shouldShowRecentLivestreams])
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
