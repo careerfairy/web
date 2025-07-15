@@ -92,8 +92,10 @@ export const SearchField = () => {
 
    const handleSubmit = useCallback(
       (option: string) => {
-         handleSearchSubmit(option)
-         handleBackClick()
+         if (option.trim().length > 0) {
+            handleSearchSubmit(option)
+            handleBackClick()
+         }
       },
       [handleSearchSubmit, handleBackClick]
    )
@@ -101,7 +103,9 @@ export const SearchField = () => {
    const handleEnterKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLInputElement>) => {
          if (e.key === "Enter") {
-            handleSubmit(searchQuery)
+            if (searchQuery.trim().length > 0) {
+               handleSubmit(searchQuery)
+            }
          }
       },
       [handleSubmit, searchQuery]
@@ -224,7 +228,6 @@ export const SearchField = () => {
             style={{
                position: "relative",
                width: "100%",
-               marginBottom: "12px",
             }}
             transition={{
                layout:
