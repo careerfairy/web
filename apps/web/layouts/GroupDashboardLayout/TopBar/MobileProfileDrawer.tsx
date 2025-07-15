@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import { Fragment, useCallback, useEffect } from "react"
+import { useCallback, useEffect } from "react"
 
 // material-ui
 import {
@@ -20,10 +20,8 @@ import { styled } from "@mui/material/styles"
 import { Home, LogOut, Repeat, User } from "react-feather"
 
 // project imports
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
-import ManageCompaniesDialog from "../../../components/views/profile/my-groups/ManageCompaniesDialog"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
 import { useGroup } from "../index"
 
@@ -91,16 +89,11 @@ const StyledDivider = styled(Divider)({
 })
 
 export const MobileProfileDrawer = () => {
-   const { layout, setMobileProfileDrawer } = useGroupDashboard()
+   const { layout, setMobileProfileDrawer, openManageCompaniesDialog } =
+      useGroupDashboard()
    const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { group } = useGroup()
    const { push } = useRouter()
-
-   const [
-      openManageCompaniesDialog,
-      handleOpenManageCompaniesDialog,
-      handleCloseManageCompaniesDialog,
-   ] = useDialogStateHandler()
 
    /**
     * Close the drawer when the component unmounts
@@ -125,7 +118,7 @@ export const MobileProfileDrawer = () => {
    }
 
    const handleSwitchCompanyClick = () => {
-      handleOpenManageCompaniesDialog()
+      openManageCompaniesDialog()
       handleClose()
    }
 
@@ -140,94 +133,84 @@ export const MobileProfileDrawer = () => {
    }
 
    return (
-      <Fragment>
-         <StyledDrawer
-            anchor="right"
-            open={layout.mobileProfileDrawerOpen}
-            onClose={handleClose}
-            onOpen={() => setMobileProfileDrawer(true)}
-         >
-            {/* Profile Section */}
-            <ProfileSection>
-               <UserAvatar
-                  imageUrl={userData?.avatar}
-                  lastName={userData?.lastName}
-                  firstName={userData?.firstName}
-               />
-               <Stack>
-                  <Typography
-                     variant="medium"
-                     color="neutral.800"
-                     fontWeight={600}
-                  >
-                     {userPresenter?.getDisplayName()}
-                  </Typography>
-                  <Typography variant="xsmall" color="neutral.600">
-                     {userPresenter?.getPosition()}
-                  </Typography>
-               </Stack>
-            </ProfileSection>
+      <StyledDrawer
+         anchor="right"
+         open={layout.mobileProfileDrawerOpen}
+         onClose={handleClose}
+         onOpen={() => setMobileProfileDrawer(true)}
+      >
+         {/* Profile Section */}
+         <ProfileSection>
+            <UserAvatar
+               imageUrl={userData?.avatar}
+               lastName={userData?.lastName}
+               firstName={userData?.firstName}
+            />
+            <Stack>
+               <Typography
+                  variant="medium"
+                  color="neutral.800"
+                  fontWeight={600}
+               >
+                  {userPresenter?.getDisplayName()}
+               </Typography>
+               <Typography variant="xsmall" color="neutral.600">
+                  {userPresenter?.getPosition()}
+               </Typography>
+            </Stack>
+         </ProfileSection>
 
-            {/* Menu Items */}
-            <Box gap={2} display="flex" flexDirection="column" flexGrow={1}>
-               <List sx={{ padding: 0 }}>
-                  {/* Profile */}
+         {/* Menu Items */}
+         <Box gap={2} display="flex" flexDirection="column" flexGrow={1}>
+            <List sx={{ padding: 0 }}>
+               {/* Profile */}
+               <ListItem disablePadding>
+                  <MenuItemButton onClick={handleProfileClick}>
+                     <StyledListItemIcon>
+                        <User size={20} />
+                     </StyledListItemIcon>
+                     <StyledListItemText primary="Profile" />
+                  </MenuItemButton>
+               </ListItem>
+
+               {/* Switch Company */}
+               {Boolean(showSwitchButton) && (
                   <ListItem disablePadding>
-                     <MenuItemButton onClick={handleProfileClick}>
+                     <MenuItemButton onClick={handleSwitchCompanyClick}>
                         <StyledListItemIcon>
-                           <User size={20} />
+                           <Repeat size={20} />
                         </StyledListItemIcon>
-                        <StyledListItemText primary="Profile" />
+                        <StyledListItemText primary="Switch company" />
                      </MenuItemButton>
                   </ListItem>
+               )}
 
-                  {/* Switch Company */}
-                  {Boolean(showSwitchButton) && (
-                     <ListItem disablePadding>
-                        <MenuItemButton onClick={handleSwitchCompanyClick}>
-                           <StyledListItemIcon>
-                              <Repeat size={20} />
-                           </StyledListItemIcon>
-                           <StyledListItemText primary="Switch company" />
-                        </MenuItemButton>
-                     </ListItem>
-                  )}
+               {/* Student Portal */}
+               <ListItem disablePadding>
+                  <MenuItemButton onClick={handlePortalClick}>
+                     <StyledListItemIcon>
+                        <Home size={20} />
+                     </StyledListItemIcon>
+                     <StyledListItemText primary="Student portal" />
+                  </MenuItemButton>
+               </ListItem>
+            </List>
 
-                  {/* Student Portal */}
+            {/* Bottom Section with Logout */}
+            <Box display="flex" flexDirection="column" mt="auto">
+               <StyledDivider />
+               <List sx={{ padding: 0 }}>
                   <ListItem disablePadding>
-                     <MenuItemButton onClick={handlePortalClick}>
+                     <LogoutButton onClick={handleLogoutClick}>
                         <StyledListItemIcon>
-                           <Home size={20} />
+                           <LogOut size={20} />
                         </StyledListItemIcon>
-                        <StyledListItemText primary="Student portal" />
-                     </MenuItemButton>
+                        <StyledListItemText primary="Log out" />
+                     </LogoutButton>
                   </ListItem>
                </List>
-
-               {/* Bottom Section with Logout */}
-               <Box display="flex" flexDirection="column" mt="auto">
-                  <StyledDivider />
-                  <List sx={{ padding: 0 }}>
-                     <ListItem disablePadding>
-                        <LogoutButton onClick={handleLogoutClick}>
-                           <StyledListItemIcon>
-                              <LogOut size={20} />
-                           </StyledListItemIcon>
-                           <StyledListItemText primary="Log out" />
-                        </LogoutButton>
-                     </ListItem>
-                  </List>
-               </Box>
             </Box>
-         </StyledDrawer>
-
-         {/* Manage Companies Dialog */}
-         {Boolean(openManageCompaniesDialog) && (
-            <ManageCompaniesDialog
-               open={openManageCompaniesDialog}
-               handleClose={handleCloseManageCompaniesDialog}
-            />
-         )}
-      </Fragment>
+         </Box>
+      </StyledDrawer>
    )
 }

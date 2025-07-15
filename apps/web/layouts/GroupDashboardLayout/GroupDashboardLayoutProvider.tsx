@@ -7,6 +7,7 @@ import {
    useMemo,
    useReducer,
 } from "react"
+import ManageCompaniesDialog from "../../components/views/profile/my-groups/ManageCompaniesDialog"
 import AdminGenericLayout from "../AdminGenericLayout"
 import NavBar from "./NavBar"
 import TopBar from "./TopBar"
@@ -17,6 +18,7 @@ type IGroupDashboardState = {
       mobileProfileDrawerOpen: boolean
       mobileFullScreenMenuOpen: boolean
    }
+   manageCompaniesDialogOpen: boolean
 }
 
 const initialState: IGroupDashboardState = {
@@ -25,6 +27,7 @@ const initialState: IGroupDashboardState = {
       mobileProfileDrawerOpen: false,
       mobileFullScreenMenuOpen: false,
    },
+   manageCompaniesDialogOpen: false,
 }
 
 type IGroupDashboardContext = {
@@ -33,12 +36,15 @@ type IGroupDashboardContext = {
       mobileProfileDrawerOpen: boolean
       mobileFullScreenMenuOpen: boolean
    }
+   manageCompaniesDialogOpen: boolean
    setLeftDrawer: (open: boolean) => void
    toggleLeftDrawer: () => void
    setMobileProfileDrawer: (open: boolean) => void
    toggleMobileProfileDrawer: () => void
    setMobileFullScreenMenu: (open: boolean) => void
    toggleMobileFullScreenMenu: () => void
+   openManageCompaniesDialog: () => void
+   closeManageCompaniesDialog: () => void
 }
 
 const GroupDashboardContext = createContext<IGroupDashboardContext>({
@@ -47,12 +53,15 @@ const GroupDashboardContext = createContext<IGroupDashboardContext>({
       mobileProfileDrawerOpen: false,
       mobileFullScreenMenuOpen: false,
    },
+   manageCompaniesDialogOpen: false,
    toggleLeftDrawer: () => {},
    setLeftDrawer: () => {},
    setMobileProfileDrawer: () => {},
    toggleMobileProfileDrawer: () => {},
    setMobileFullScreenMenu: () => {},
    toggleMobileFullScreenMenu: () => {},
+   openManageCompaniesDialog: () => {},
+   closeManageCompaniesDialog: () => {},
 })
 
 type Action = {
@@ -63,6 +72,8 @@ type Action = {
       | "TOGGLE_MOBILE_PROFILE_DRAWER"
       | "SET_MOBILE_FULLSCREEN_MENU"
       | "TOGGLE_MOBILE_FULLSCREEN_MENU"
+      | "OPEN_MANAGE_COMPANIES_DIALOG"
+      | "CLOSE_MANAGE_COMPANIES_DIALOG"
    payload?: boolean
 }
 
@@ -115,6 +126,16 @@ const reducer = (state: IGroupDashboardState, action: Action) => {
                ...state.layout,
                mobileFullScreenMenuOpen: !state.layout.mobileFullScreenMenuOpen,
             },
+         }
+      case "OPEN_MANAGE_COMPANIES_DIALOG":
+         return {
+            ...state,
+            manageCompaniesDialogOpen: true,
+         }
+      case "CLOSE_MANAGE_COMPANIES_DIALOG":
+         return {
+            ...state,
+            manageCompaniesDialogOpen: false,
          }
       default:
          return state
@@ -199,6 +220,22 @@ const GroupDashboardLayoutProvider = ({
       [dispatch]
    )
 
+   const openManageCompaniesDialog = useCallback(
+      () =>
+         dispatch({
+            type: "OPEN_MANAGE_COMPANIES_DIALOG",
+         }),
+      [dispatch]
+   )
+
+   const closeManageCompaniesDialog = useCallback(
+      () =>
+         dispatch({
+            type: "CLOSE_MANAGE_COMPANIES_DIALOG",
+         }),
+      [dispatch]
+   )
+
    const value = useMemo<IGroupDashboardContext>(
       () => ({
          toggleLeftDrawer,
@@ -207,7 +244,10 @@ const GroupDashboardLayoutProvider = ({
          toggleMobileProfileDrawer,
          setMobileFullScreenMenu,
          toggleMobileFullScreenMenu,
+         openManageCompaniesDialog,
+         closeManageCompaniesDialog,
          layout: state.layout,
+         manageCompaniesDialogOpen: state.manageCompaniesDialogOpen,
       }),
       [
          toggleLeftDrawer,
@@ -216,7 +256,10 @@ const GroupDashboardLayoutProvider = ({
          toggleMobileProfileDrawer,
          setMobileFullScreenMenu,
          toggleMobileFullScreenMenu,
+         openManageCompaniesDialog,
+         closeManageCompaniesDialog,
          state.layout,
+         state.manageCompaniesDialogOpen,
       ]
    )
 
@@ -241,6 +284,12 @@ const GroupDashboardLayoutProvider = ({
          >
             {children}
          </AdminGenericLayout>
+
+         {/* Manage Companies Dialog */}
+         <ManageCompaniesDialog
+            open={state.manageCompaniesDialogOpen}
+            handleClose={closeManageCompaniesDialog}
+         />
       </GroupDashboardContext.Provider>
    )
 }
