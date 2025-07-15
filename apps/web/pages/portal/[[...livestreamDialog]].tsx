@@ -257,7 +257,7 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
    }
 
    return (
-      <Box sx={{ mb: 3, minHeight: "100vh" }}>
+      <Box sx={{ mb: 3, mt: 1.5, minHeight: "100vh" }}>
          <TagsCarouselWithArrow
             selectedCategories={selectedCategoryId ? [selectedCategoryId] : []}
             tags={tags}

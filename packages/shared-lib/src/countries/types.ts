@@ -144,3 +144,31 @@ export const normalizeLocationId = (locationId: string): string[] => {
 export const normalizeLocationIds = (locationIds: string[]): string[] => {
    return removeDuplicates(locationIds?.map(normalizeLocationId)?.flat() ?? [])
 }
+
+/**
+ * Extracts the country code from a location ID.
+ * This function takes any location ID (country, state, or city) and returns the country code.
+ *
+ * @param locationId - A location id (country, state, or city id)
+ * @returns string - The country code (e.g., "US", "CH", "PT")
+ */
+export const extractCountryCode = (locationId: string): string => {
+   const { countryIsoCode } = getLocationIds(locationId)
+   return countryIsoCode || ""
+}
+
+/**
+ * Converts an array of location IDs to their corresponding country codes.
+ * This function is used to normalize location filtering to always filter by countries.
+ *
+ * @param locationIds - Array of location ids (country, state, or city ids)
+ * @returns string[] - Array of country codes
+ */
+export const convertLocationIdsToCountryCodes = (
+   locationIds: string[]
+): string[] => {
+   return locationIds
+      .map(extractCountryCode)
+      .filter(Boolean) // Remove empty strings
+      .filter((code, index, arr) => arr.indexOf(code) === index) // Remove duplicates
+}

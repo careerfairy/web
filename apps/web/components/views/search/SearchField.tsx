@@ -100,8 +100,10 @@ const SearchField = () => {
 
    const handleSubmit = useCallback(
       (option: string) => {
-         handleSearchSubmit(option)
-         handleBackClick()
+         if (option.trim().length > 0) {
+            handleSearchSubmit(option)
+            handleBackClick()
+         }
       },
       [handleSearchSubmit, handleBackClick]
    )
@@ -109,7 +111,9 @@ const SearchField = () => {
    const handleEnterKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLInputElement>) => {
          if (e.key === "Enter") {
-            handleSubmit(searchQuery)
+            if (searchQuery.trim().length > 0) {
+               handleSubmit(searchQuery)
+            }
          }
       },
       [handleSubmit, searchQuery]
@@ -198,7 +202,6 @@ const SearchField = () => {
                position: "relative",
                zIndex: originalFieldZIndex(),
                width: "100%",
-               marginBottom: "12px",
             }}
             animate={{
                opacity: showMobileDrawer ? 0 : 1,
