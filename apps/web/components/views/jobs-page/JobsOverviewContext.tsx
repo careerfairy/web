@@ -24,6 +24,7 @@ import {
    useContext,
    useEffect,
    useMemo,
+   useRef,
    useState,
 } from "react"
 import { AlgoliaCustomJobResponse } from "types/algolia"
@@ -98,6 +99,15 @@ export const JobsOverviewContextProvider = ({
 
    const searchParams = getSearchParams(router.query)
    const isMobile = useIsMobile()
+
+   // Store the initial currentJobId from the first render
+   const initialCurrentJobId = useRef<string | null>(null)
+
+   // Set the initial currentJobId only on first render
+   if (initialCurrentJobId.current === null) {
+      initialCurrentJobId.current = searchParams.currentJobId || null
+   }
+
    const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
       useState(dialogOpen)
    const [jobNotFound, setJobNotFound] = useState(
@@ -243,7 +253,7 @@ export const JobsOverviewContextProvider = ({
          isLoadingRecommendedJobs || isValidating || isLoading
 
       const currentRecommendedJob = recommendedJobs?.find(
-         (job) => job.id === router.query.currentJobId
+         (job) => job.id === initialCurrentJobId.current
       )
 
       return {
@@ -312,7 +322,6 @@ export const JobsOverviewContextProvider = ({
       isLoading,
       hasFilters,
       data,
-      router.query.currentJobId,
    ])
 
    useEffect(() => {
@@ -361,7 +370,7 @@ const handleQueryChange = (
    }
 
    // Always delete the 'first' parameter when any other parameter changes
-   delete query["first"]
+   // delete query["first"]
 
    router.push(
       {
