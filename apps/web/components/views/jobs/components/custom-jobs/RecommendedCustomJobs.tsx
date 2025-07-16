@@ -12,21 +12,12 @@ import Link from "next/link"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   heading: {
-      fontWeight: 600,
-      m: 2,
-   },
    wrapper: {
       m: 0,
       p: 0,
    },
    carouselContainer: {
-      px: { xs: 2, md: 2 },
       pb: { xs: 3, md: 3 },
-      pr: {
-         md: 0,
-         xs: 0,
-      },
    },
    jobListWrapper: {
       px: { xs: 2, md: 2 },
@@ -38,8 +29,10 @@ const styles = sxStyles({
       pr: 2,
    },
    header: {
-      fontWeight: 600,
-      m: 2,
+      pl: 2,
+   },
+   contentCarouselContainer: {
+      px: { xs: 2, md: 2 },
    },
 })
 
@@ -102,7 +95,9 @@ const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
                   skipSnaps: true,
                },
             }}
+            containerSx={styles.contentCarouselContainer}
             headerRightSx={styles.headerRight}
+            headerSx={styles.header}
             disableArrows={false}
          >
             {customJobs.map((customJob) => (
