@@ -32,6 +32,32 @@ const styles = sxStyles({
    liveHeroContent: {
       animation: `${boxShadowAnimation} 1s infinite alternate`,
    },
+   heroContentContainer: {
+      background:
+         "linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 100%)",
+      borderRadius: 3,
+      backdropFilter: "blur(10px)",
+      p: 3,
+   },
+   pastLivestreamHero: {
+      position: "relative",
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         top: 0,
+         left: 0,
+         right: 0,
+         bottom: 0,
+         background:
+            "linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.6) 100%)",
+         borderRadius: 3,
+         zIndex: 1,
+      },
+      "& > *": {
+         position: "relative",
+         zIndex: 2,
+      },
+   },
 })
 
 const LivestreamDetailsView = () => {
@@ -79,7 +105,10 @@ const LivestreamDetailsView = () => {
       <BaseDialogView
          heroContent={
             <HeroContent
-               sx={[livestreamPresenter.isLive() && styles.liveHeroContent]}
+               sx={[
+                  livestreamPresenter.isLive() && styles.liveHeroContent,
+                  livestreamPresenter.isPast() && styles.pastLivestreamHero,
+               ]}
                ref={heroRef}
                backgroundImg={getResizedUrl(
                   livestream.backgroundImageUrl,
@@ -100,6 +129,9 @@ const LivestreamDetailsView = () => {
                   justifyContent={"center"}
                   spacing={2.5}
                   width={"100%"}
+                  sx={
+                     livestreamPresenter.isPast() && styles.heroContentContainer
+                  }
                >
                   <HostInfo presenter={livestreamPresenter} />
                   <LivestreamTitle text={livestream.title} />
