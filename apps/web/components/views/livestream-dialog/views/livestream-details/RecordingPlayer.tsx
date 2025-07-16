@@ -231,7 +231,7 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
                onPlay={handleClickPlay}
                onPause={handlePause}
                onReady={handleReady}
-               playing={isLoggedIn}
+               playing={Boolean(isLoggedIn && !videoPaused)}
                config={{ file: { attributes: { controlsList: "nodownload" } } }}
                light={livestreamPresenter.backgroundImageUrl}
                onClickPreview={handlePreviewPlay}
