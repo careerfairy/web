@@ -17,6 +17,7 @@ import NotificationsButton from "./NotificationsButton"
 import { ProfileAvatar } from "./ProfileAvatar"
 
 // framer motion
+import { useAppSelector } from "components/custom-hook/store"
 import { motion } from "framer-motion"
 
 const getStyles = (hasNavigationBar?: boolean) =>
@@ -79,10 +80,12 @@ const titleVariants = {
 
 const TopBar = ({ title, topBarAction, navigation }: Props) => {
    const isMobile = useIsMobile()
-   const { layout } = useGroupDashboard()
    const { asPath } = useRouter()
+   const leftDrawerOpen = useAppSelector(
+      (state) => state.groupDashboardLayout.layout.leftDrawerOpen
+   )
 
-   const drawerPresent = !isMobile && layout.leftDrawerOpen
+   const drawerPresent = !isMobile && leftDrawerOpen
 
    const styles = getStyles(Boolean(navigation))
 

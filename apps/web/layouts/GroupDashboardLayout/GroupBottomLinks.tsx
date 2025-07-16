@@ -26,11 +26,12 @@ const LinksList = styled(Stack)(({ theme }) => ({
 
 export const GroupBottomLinks = (props: StackProps) => {
    const { shrunkLeftMenuIsActive, group } = useGroup()
-   const { setLeftDrawer } = useGroupDashboard()
+   const { setLeftDrawer, setMobileFullScreenMenu } = useGroupDashboard()
    const isMobile = useIsMobile()
 
    const handleMobileNavigate = () => {
       if (isMobile) {
+         setMobileFullScreenMenu(false)
          setLeftDrawer(false)
       }
    }

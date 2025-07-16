@@ -1,5 +1,3 @@
-import { useEffect } from "react"
-
 // material-ui
 import { Box, Drawer, DrawerProps } from "@mui/material"
 import { styled } from "@mui/material/styles"
@@ -8,6 +6,7 @@ import { styled } from "@mui/material/styles"
 import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 
 // Reuse existing NavBar components
+import { useAppSelector } from "components/custom-hook/store"
 import { EditGroupCard } from "./EditGroupCard"
 import { GroupBottomLinks } from "./GroupBottomLinks"
 import { GroupNavList } from "./GroupNavList"
@@ -48,36 +47,33 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
    pointerEvents: "none",
 }))
 
-type Props = {
-   bottomNavigationHeight: number
-}
-
 const ModalProps: DrawerProps["ModalProps"] = {
    keepMounted: true,
    disablePortal: true,
 }
 
-export const MobileFullScreenMenu = ({ bottomNavigationHeight }: Props) => {
-   const { layout, toggleMobileFullScreenMenu } = useGroupDashboard()
+type Props = {
+   /**
+    * The height of the bottom navigation bar, so the full screen menu can sit on top of it
+    */
+   bottomNavigationHeight: number
+}
 
-   useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-         if (e.key === "Escape") {
-            toggleMobileFullScreenMenu()
-         }
-      }
-      if (layout.mobileFullScreenMenuOpen) {
-         window.addEventListener("keydown", handleKeyDown)
-      }
-      return () => {
-         window.removeEventListener("keydown", handleKeyDown)
-      }
-   }, [layout.mobileFullScreenMenuOpen, toggleMobileFullScreenMenu])
+/**
+ * MobileFullScreenMenu displays a full-screen navigation drawer for mobile group dashboards,
+ * overlaying the main content and sitting above the bottom navigation bar.
+ */
+export const MobileFullScreenMenu = ({ bottomNavigationHeight }: Props) => {
+   const { toggleMobileFullScreenMenu } = useGroupDashboard()
+
+   const mobileFullScreenMenuOpen = useAppSelector(
+      (state) => state.groupDashboardLayout.layout.mobileFullScreenMenuOpen
+   )
 
    return (
       <StyledDrawer
          anchor="right"
-         open={layout.mobileFullScreenMenuOpen}
+         open={mobileFullScreenMenuOpen}
          onClose={toggleMobileFullScreenMenu}
          hideBackdrop
          PaperProps={{
