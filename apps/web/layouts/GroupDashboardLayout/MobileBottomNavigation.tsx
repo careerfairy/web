@@ -21,8 +21,8 @@ const StyledBottomNavigation = styled(MuiBottomNavigation)(({ theme }) => ({
    right: 0,
    width: "100%",
    height: "64px",
-   backgroundColor: "#FFFFFF",
-   borderTop: "1px solid #F3F3F5",
+   backgroundColor: theme.brand.white[50],
+   borderTop: `1px solid ${theme.brand.white[500]}`,
    zIndex: 1000,
    padding: "0 16px",
    [theme.breakpoints.up("md")]: {
