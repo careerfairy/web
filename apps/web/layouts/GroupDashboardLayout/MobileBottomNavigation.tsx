@@ -108,9 +108,11 @@ type NavItemData = {
    activePathPrefix?: string
 }
 
+const noLinkActiveValue = ""
+
 export const MobileBottomNavigation = () => {
    const router = useRouter()
-   const [value, setValue] = useState<string>("")
+   const [value, setValue] = useState<string>(noLinkActiveValue)
    const { toggleMobileFullScreenMenu, setMobileFullScreenMenu } =
       useGroupDashboard()
 
@@ -140,7 +142,7 @@ export const MobileBottomNavigation = () => {
             return item.id
          }
       }
-      return ""
+      return noLinkActiveValue
    }, [router.pathname])
 
    useEffect(() => {

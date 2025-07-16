@@ -61,7 +61,7 @@ const NotificationsButton = () => {
                   size="small"
                   aria-label="expand"
                >
-                  <Bell fontSize={"large"} />
+                  <Bell size={24} />
                </IconButton>
             </Badge>
          </Tooltip>

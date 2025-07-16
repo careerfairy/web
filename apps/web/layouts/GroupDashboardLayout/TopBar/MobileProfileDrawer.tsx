@@ -20,6 +20,7 @@ import { styled } from "@mui/material/styles"
 import { Home, LogOut, Repeat, User } from "react-feather"
 
 // project imports
+import { useAppSelector } from "components/custom-hook/store"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
@@ -88,12 +89,23 @@ const StyledDivider = styled(Divider)({
    color: "rgba(0, 0, 0, 0.1)",
 })
 
+/**
+ * MobileProfileDrawer
+ *
+ * A mobile-only drawer component that displays the current user's profile info and navigation actions.
+ * Allows users to view their profile, switch companies, access the portal, and log out.
+ * Used in the group dashboard layout for mobile navigation.
+ */
 export const MobileProfileDrawer = () => {
-   const { layout, setMobileProfileDrawer, openManageCompaniesDialog } =
+   const { setMobileProfileDrawer, openManageCompaniesDialog } =
       useGroupDashboard()
    const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { group } = useGroup()
    const { push } = useRouter()
+
+   const mobileProfileDrawerOpen = useAppSelector(
+      (state) => state.groupDashboardLayout.layout.mobileProfileDrawerOpen
+   )
 
    /**
     * Close the drawer when the component unmounts
@@ -135,7 +147,7 @@ export const MobileProfileDrawer = () => {
    return (
       <StyledDrawer
          anchor="right"
-         open={layout.mobileProfileDrawerOpen}
+         open={mobileProfileDrawerOpen}
          onClose={handleClose}
          onOpen={() => setMobileProfileDrawer(true)}
       >
