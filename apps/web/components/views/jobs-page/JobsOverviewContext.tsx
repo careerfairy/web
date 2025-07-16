@@ -104,7 +104,7 @@ export const JobsOverviewContextProvider = ({
    const initialCurrentJobId = useRef<string | null>(null)
 
    // Set the initial currentJobId only on first render
-   if (initialCurrentJobId.current === null) {
+   if (initialCurrentJobId.current === null && searchParams.first) {
       initialCurrentJobId.current = searchParams.currentJobId || null
    }
 
@@ -289,7 +289,7 @@ export const JobsOverviewContextProvider = ({
          selectedLocationsNames,
          userCountryCode,
          recommendedJobs:
-            searchParams.first && currentRecommendedJob
+            initialCurrentJobId.current && currentRecommendedJob
                ? [
                     currentRecommendedJob,
                     ...recommendedJobs.filter(
@@ -370,7 +370,7 @@ const handleQueryChange = (
    }
 
    // Always delete the 'first' parameter when any other parameter changes
-   // delete query["first"]
+   delete query["first"]
 
    router.push(
       {
