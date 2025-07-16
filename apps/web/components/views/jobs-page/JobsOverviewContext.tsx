@@ -288,15 +288,11 @@ export const JobsOverviewContextProvider = ({
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
          selectedLocationsNames,
          userCountryCode,
-         recommendedJobs:
-            initialCurrentJobId.current && currentRecommendedJob
-               ? [
-                    currentRecommendedJob,
-                    ...recommendedJobs.filter(
-                       (job) => job.id !== currentRecommendedJob?.id
-                    ),
-                 ]
-               : recommendedJobs,
+         recommendedJobs: prioritizeInitiallySelectedJob(
+            initialCurrentJobId.current,
+            currentRecommendedJob,
+            recommendedJobs
+         ),
          isLoadingRecommendedJobs,
          isLoadingJobs: isLoadingJobs,
       }
@@ -413,4 +409,26 @@ export const useJobsOverviewContext = () => {
    }
 
    return context
+}
+
+/**
+ * Reorders recommended jobs to prioritize the initially selected job from URL parameters.
+ * If there's a current job that was initially selected and it exists in the recommended jobs,
+ * that job will be moved to the front of the list to maintain consistency with the initial selection.
+ */
+const prioritizeInitiallySelectedJob = (
+   initialCurrentJobId: string | null,
+   currentRecommendedJob: CustomJob | undefined,
+   recommendedJobs: CustomJob[]
+): CustomJob[] => {
+   if (initialCurrentJobId && currentRecommendedJob) {
+      return [
+         currentRecommendedJob,
+         ...recommendedJobs.filter(
+            (job) => job.id !== currentRecommendedJob?.id
+         ),
+      ]
+   }
+
+   return recommendedJobs
 }
