@@ -45,6 +45,8 @@ export const ProfileAvatar = () => {
          <AvatarButton
             onClick={handleAvatarClick}
             aria-label="Open profile menu"
+            aria-describedby="profile-menu"
+            aria-haspopup="menu"
          >
             <Avatar
                imageUrl={userData?.avatar}

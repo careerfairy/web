@@ -44,7 +44,6 @@ export const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
 
    const handleMobileNavigate = () => {
       if (isMobile) {
-         // setLeftDrawer(false)
          setMobileFullScreenMenu(false)
       }
    }
