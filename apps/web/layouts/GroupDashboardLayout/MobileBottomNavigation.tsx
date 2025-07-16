@@ -224,7 +224,7 @@ export const MobileBottomNavigation = () => {
             handleClose={handleCreateMenuClose}
             isMobileOverride
          />
-         <MobileFullScreenMenu bottomNavigationHeight={height + 1} />
+         <MobileFullScreenMenu bottomNavigationHeight={height + 0.5} />
       </Fragment>
    )
 }
