@@ -37,19 +37,21 @@ const styles = sxStyles({
    icon: {
       zIndex: 2,
       width: {
-         xs: "45px",
-         md: "65px",
+         xs: "56px",
+         md: "72px",
       },
       height: {
-         xs: "45px",
-         md: "65px",
+         xs: "56px",
+         md: "72px",
       },
-      background: "rgba(33, 32, 32, 0.6)",
-      border: "2px solid white",
+      background: "rgba(33, 32, 32, 0.7)",
+      border: "3px solid white",
       borderRadius: "50%",
+      transition: "all 0.2s ease-in-out",
 
       "&:hover": {
-         border: (theme) => `3px solid ${theme.palette.primary.main}`,
+         border: (theme) => `4px solid ${theme.palette.primary.main}`,
+         transform: "scale(1.05)",
       },
    },
    backButton: {
@@ -68,13 +70,17 @@ const styles = sxStyles({
       position: "relative",
       aspectRatio: "16 / 9",
       "& .react-player": {
-         borderRadius: 2,
+         borderRadius: 3,
          overflow: "hidden",
          boxShadow: (theme) => theme.legacy.boxShadows.dark_8_25_10,
+         border: "1px solid rgba(255, 255, 255, 0.1)",
       },
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      background:
+         "linear-gradient(135deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.1) 100%)",
+      borderRadius: 3,
    },
    playSkeleton: {},
    countDown: {
@@ -85,8 +91,8 @@ const styles = sxStyles({
       transform: "translateX(-50%)",
       left: "50%",
       background: {
-         xs: "rgba(95, 95, 95, 0.85)",
-         md: "rgba(95, 95, 95, 0.75)",
+         xs: "rgba(95, 95, 95, 0.9)",
+         md: "rgba(95, 95, 95, 0.85)",
       },
       borderColor: "white",
       borderStyle: "solid",
@@ -100,6 +106,7 @@ const styles = sxStyles({
          md: 1.625,
       },
       width: "max-content",
+      backdropFilter: "blur(8px)",
    },
    recordingTitle: {
       fontWeight: 600,
@@ -112,6 +119,20 @@ const styles = sxStyles({
       backgroundColor: (theme) => alpha(theme.palette.common.white, 0.15),
       position: "absolute",
       inset: 0,
+   },
+   signUpButton: {
+      borderRadius: 2,
+      px: 3,
+      py: 1.5,
+      fontSize: "1rem",
+      fontWeight: 600,
+      textTransform: "none",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+      transition: "all 0.2s ease-in-out",
+      "&:hover": {
+         transform: "translateY(-2px)",
+         boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2)",
+      },
    },
 })
 
@@ -150,6 +171,7 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
    const router = useRouter()
    const playerRef = useRef<ReactPlayer | null>(null)
    const hasLoadedProgress = useRef(false)
+   const hasAutoPlayed = useRef(false)
    const { data: recordingToken } = useRecordingToken(stream.id)
    const { handlePreviewPlay, handlePause, handlePlay, videoPaused } =
       useRecordingControls(stream)
@@ -185,7 +207,13 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
          playerRef.current?.seekTo(videoStartPosition)
          hasLoadedProgress.current = true
       }
-   }, [videoStartPosition])
+
+      // Auto-play for logged-in users on page load
+      if (isLoggedIn && !hasAutoPlayed.current) {
+         hasAutoPlayed.current = true
+         handlePreviewPlay()
+      }
+   }, [videoStartPosition, isLoggedIn, handlePreviewPlay])
 
    const SignUpButton = () => {
       return (
@@ -194,6 +222,7 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
             color={"primary"}
             variant="contained"
             onClick={redirectToLogin}
+            sx={styles.signUpButton}
          >
             Sign up to watch
          </Button>
@@ -299,9 +328,19 @@ export const useRecordingControls = (
    const isMobile = useIsMobile()
    const { userData, isLoggedIn } = useAuth()
 
-   const [videoPaused, setVideoPaused] = useState(true)
+   // Auto-play for logged-in users on past livestream recordings
+   const [videoPaused, setVideoPaused] = useState(!isLoggedIn)
 
    const [showBigVideoPlayer, setShowBigVideoPlayer] = useState(false)
+
+   // Auto-play when user logs in
+   useEffect(() => {
+      if (isLoggedIn) {
+         setVideoPaused(false)
+      } else {
+         setVideoPaused(true)
+      }
+   }, [isLoggedIn])
 
    // handle play recording click
    const handleRecordingPlay = useCallback(() => {
