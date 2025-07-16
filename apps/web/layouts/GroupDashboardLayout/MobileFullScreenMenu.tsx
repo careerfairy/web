@@ -1,6 +1,8 @@
 // material-ui
-import { Box, Drawer, DrawerProps } from "@mui/material"
+import { Box } from "@mui/material"
 import { styled } from "@mui/material/styles"
+import { AnimatePresence, motion } from "framer-motion"
+import { useLockBodyScroll } from "react-use"
 
 // project imports
 import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
@@ -11,45 +13,62 @@ import { EditGroupCard } from "./EditGroupCard"
 import { GroupBottomLinks } from "./GroupBottomLinks"
 import { GroupNavList } from "./GroupNavList"
 
-const DrawerContent = styled(Box, {
+const MenuOverlay = styled(motion.div, {
    shouldForwardProp: (prop) => prop !== "bottomNavigationHeight",
-})<{ bottomNavigationHeight: number }>(({ theme, bottomNavigationHeight }) => ({
-   height: `calc(100vh - ${bottomNavigationHeight}px)`,
-   backgroundColor: "rgba(255, 255, 255, 0.95)",
-   backdropFilter: "blur(45.4px)",
-   display: "flex",
-   flexDirection: "column",
-   pointerEvents: "auto", // Re-enable pointer events for menu content
-   [theme.breakpoints.up("md")]: {
-      display: "none",
-   },
+})<{ bottomNavigationHeight: number }>(({ bottomNavigationHeight, theme }) => ({
+   position: "fixed",
+   top: 0,
+   left: 0,
+   right: 0,
+   bottom: `${bottomNavigationHeight}px`,
+   zIndex: theme.zIndex.modal,
 }))
 
-const NavSection = styled(Box)({
+const MenuContent = styled(motion.div, {
+   shouldForwardProp: (prop) => prop !== "bottomNavigationHeight",
+})<{ bottomNavigationHeight: number }>({
+   position: "absolute",
+   top: 0,
+   backdropFilter: "blur(45.4px)",
+   right: 0,
+   height: "100%",
+   width: "100%",
+   backgroundColor: "rgba(255, 255, 255, 0.95)",
    display: "flex",
    flexDirection: "column",
    alignItems: "center",
    alignSelf: "stretch",
    padding: "16px",
-   flex: 1,
+   overflow: "auto",
 })
 
 const StyledEditGroupCard = styled(EditGroupCard)(({ theme }) => ({
    padding: theme.spacing(0.5, 1),
    margin: 0,
+   marginBottom: theme.spacing(2),
 }))
 
-const StyledDrawer = styled(Drawer)(({ theme }) => ({
-   [theme.breakpoints.up("md")]: {
-      display: "none",
-   },
-   display: "block",
-   pointerEvents: "none",
-}))
+const overlayVariants = {
+   hidden: { opacity: 0 },
+   visible: { opacity: 1 },
+}
 
-const ModalProps: DrawerProps["ModalProps"] = {
-   keepMounted: true,
-   disablePortal: true,
+const menuVariants = {
+   hidden: { x: "100%" },
+   visible: { x: "0%" },
+}
+
+const allowedLinkIds = ["talent-pool", "analytics", "company-profile"]
+
+const overlayTransition = {
+   duration: 0.3,
+}
+
+const menuTransition = {
+   type: "spring",
+   stiffness: 400,
+   damping: 40,
+   mass: 1,
 }
 
 type Props = {
@@ -60,8 +79,8 @@ type Props = {
 }
 
 /**
- * MobileFullScreenMenu displays a full-screen navigation drawer for mobile group dashboards,
- * overlaying the main content and sitting above the bottom navigation bar.
+ * MobileFullScreenMenu displays a collapsible navigation menu for mobile group dashboards,
+ * overlaying the main content using MUI Collapse component.
  */
 export const MobileFullScreenMenu = ({ bottomNavigationHeight }: Props) => {
    const { toggleMobileFullScreenMenu } = useGroupDashboard()
@@ -70,37 +89,37 @@ export const MobileFullScreenMenu = ({ bottomNavigationHeight }: Props) => {
       (state) => state.groupDashboardLayout.layout.mobileFullScreenMenuOpen
    )
 
+   // Lock body scroll when menu is open
+   useLockBodyScroll(mobileFullScreenMenuOpen)
+
    return (
-      <StyledDrawer
-         anchor="right"
-         open={mobileFullScreenMenuOpen}
-         onClose={toggleMobileFullScreenMenu}
-         hideBackdrop
-         PaperProps={{
-            sx: {
-               top: 0,
-               bottom: `${bottomNavigationHeight}px`,
-               height: `calc(100vh - ${bottomNavigationHeight}px)`,
-               width: "100%",
-               boxShadow: "none",
-            },
-         }}
-         ModalProps={ModalProps}
-      >
-         <DrawerContent bottomNavigationHeight={bottomNavigationHeight}>
-            <NavSection>
-               <StyledEditGroupCard sx={{ pb: 1 }} />
-               <GroupNavList
-                  allowedLinkIds={[
-                     "talent-pool",
-                     "analytics",
-                     "company-profile",
-                  ]}
-               />
-               <Box flexGrow={1} />
-               <GroupBottomLinks />
-            </NavSection>
-         </DrawerContent>
-      </StyledDrawer>
+      <AnimatePresence>
+         {Boolean(mobileFullScreenMenuOpen) && (
+            <MenuOverlay
+               bottomNavigationHeight={bottomNavigationHeight}
+               initial="hidden"
+               animate="visible"
+               exit="hidden"
+               variants={overlayVariants}
+               transition={overlayTransition}
+               onClick={toggleMobileFullScreenMenu}
+            >
+               <MenuContent
+                  bottomNavigationHeight={bottomNavigationHeight}
+                  initial="hidden"
+                  animate="visible"
+                  exit="hidden"
+                  variants={menuVariants}
+                  transition={menuTransition}
+                  onClick={(e) => e.stopPropagation()}
+               >
+                  <StyledEditGroupCard />
+                  <GroupNavList allowedLinkIds={allowedLinkIds} />
+                  <Box flexGrow={1} />
+                  <GroupBottomLinks />
+               </MenuContent>
+            </MenuOverlay>
+         )}
+      </AnimatePresence>
    )
 }
