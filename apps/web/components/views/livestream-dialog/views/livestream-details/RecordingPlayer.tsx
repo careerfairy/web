@@ -300,8 +300,27 @@ export const useRecordingControls = (
    const { userData, isLoggedIn } = useAuth()
 
    const [videoPaused, setVideoPaused] = useState(true)
+   const [hasAutoPlayed, setHasAutoPlayed] = useState(false)
 
    const [showBigVideoPlayer, setShowBigVideoPlayer] = useState(false)
+
+   // Auto-play for logged-in users
+   useEffect(() => {
+      if (isLoggedIn && !hasAutoPlayed) {
+         setVideoPaused(false)
+         setHasAutoPlayed(true)
+
+         // Update recording stats for auto-play
+         void livestreamRepo.updateRecordingStats({
+            livestreamId: stream.id,
+            userId: userData?.userEmail,
+            livestreamStartDate: stream.start,
+         })
+
+         // Track recording_play event for auto-play
+         dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
+      }
+   }, [isLoggedIn, hasAutoPlayed, stream, userData?.userEmail])
 
    // handle play recording click
    const handleRecordingPlay = useCallback(() => {
