@@ -20,7 +20,6 @@ import {
 import { getPlanConstants } from "@careerfairy/shared-lib/groups/planConstants"
 import { createGroupStatsDoc } from "@careerfairy/shared-lib/groups/stats"
 import { GroupEventServer } from "@careerfairy/shared-lib/groups/telemetry"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
@@ -214,8 +213,6 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    ): Promise<void>
 
    trackGroupEvents(events: GroupEventServer[]): Promise<void>
-
-   getGroupLivestreams(groupId: string): Promise<LivestreamEvent[]>
 }
 
 export class GroupFunctionsRepository
@@ -750,16 +747,6 @@ export class GroupFunctionsRepository
       }
 
       return this.groupEventsHandler.insertData(groupEvents)
-   }
-
-   async getGroupLivestreams(groupId: string): Promise<LivestreamEvent[]> {
-      const livestreams = await this.firestore
-         .collection("livestreams")
-         .withConverter(createCompatGenericConverter<LivestreamEvent>())
-         .where("groupIds", "array-contains", groupId)
-         .get()
-
-      return livestreams.docs.map((doc) => doc.data())
    }
 }
 
