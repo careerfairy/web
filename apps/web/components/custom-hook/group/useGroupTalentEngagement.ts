@@ -1,13 +1,94 @@
 import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { GetGroupTalentEngagementFnArgs } from "@careerfairy/shared-lib/functions/types"
 import { Group } from "@careerfairy/shared-lib/groups"
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
+import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWRFetcher, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 
-interface GroupTalentEngagementResponse {
+type GroupTalentEngagementResponse = {
    count: number
+}
+
+type TotalUsersMatchingTargetingResponse = {
+   total: number
+}
+
+type CombinedResponse = {
+   count: number
+   total: number
+}
+
+const swrOptions: SWRConfiguration = {
+   ...reducedRemoteCallsOptions,
+   onError: (error, key) => {
+      errorLogAndNotify(error, {
+         message: "Error fetching group talent engagement",
+         key,
+      })
+   },
+}
+
+/**
+ * Custom hook to get group talent engagement count
+ * Returns the count of unique users who have engaged with the group's targeted livestreams
+ * and the total count of users matching the targeting criteria
+ *
+ * @param group - The group object containing targeting criteria
+ * @returns SWR response with combined data containing count, total, loading state, and error state
+ */
+export const useGroupTalentEngagement = (group: Group | undefined) => {
+   const fetcher = useFunctionsSWRFetcher<GroupTalentEngagementResponse>()
+   const totalFetcher =
+      useFunctionsSWRFetcher<TotalUsersMatchingTargetingResponse>()
+
+   const groupArgs = group ? extractTargetingFromGroup(group) : null
+
+   // Fetch engaged users count
+   const engagedUsersKey = groupArgs
+      ? [FUNCTION_NAMES.getGroupTalentEngagement, groupArgs]
+      : null
+
+   const engagedUsersResponse = useSWR<GroupTalentEngagementResponse>(
+      engagedUsersKey,
+      fetcher,
+      swrOptions
+   )
+
+   // Fetch total users matching targeting
+   const totalUsersKey = groupArgs
+      ? [FUNCTION_NAMES.getTotalUsersMatchingTargeting, groupArgs]
+      : null
+
+   const totalUsersResponse = useSWR<TotalUsersMatchingTargetingResponse>(
+      totalUsersKey,
+      totalFetcher,
+      swrOptions
+   )
+
+   // Combine the results
+   const isLoading =
+      engagedUsersResponse.isLoading || totalUsersResponse.isLoading
+   const error = engagedUsersResponse.error || totalUsersResponse.error
+
+   const combinedData: CombinedResponse | undefined =
+      engagedUsersResponse.data && totalUsersResponse.data
+         ? {
+              count: engagedUsersResponse.data.count,
+              total: totalUsersResponse.data.total,
+           }
+         : undefined
+
+   return {
+      data: combinedData,
+      isLoading,
+      error,
+      mutate: () => {
+         engagedUsersResponse.mutate()
+         totalUsersResponse.mutate()
+      },
+   }
 }
 
 /**
@@ -24,31 +105,4 @@ function extractTargetingFromGroup(
          fieldsOfStudy: group.targetedFieldsOfStudy?.map((f) => f.id) || [],
       },
    }
-}
-
-/**
- * Hook to get the count of unique users who have seen any livestreams of a group
- * This includes users who have registered, participated, or joined the talent pool
- * Results are cached for 1 day on the server side
- * Cache key includes targeting criteria so results update when targeting changes
- *
- * @param group - The group object containing targeting criteria
- * @param options - SWR options
- * @returns Object containing count, loading state, and error state
- */
-export const useGroupTalentEngagement = (group: Group | undefined) => {
-   const fetcher = useFunctionsSWRFetcher<GroupTalentEngagementResponse>()
-
-   const key = group
-      ? [
-           FUNCTION_NAMES.getGroupTalentEngagement,
-           extractTargetingFromGroup(group),
-        ]
-      : null
-
-   return useSWR<GroupTalentEngagementResponse>(
-      key,
-      fetcher,
-      reducedRemoteCallsOptions
-   )
 }
