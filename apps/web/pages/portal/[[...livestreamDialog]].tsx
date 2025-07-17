@@ -123,6 +123,7 @@ const PortalPage = ({
    serializedCarouselContent,
    serverUserStats,
    livestreamDialogData,
+   userCountryCode,
    customJobDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
@@ -207,7 +208,9 @@ const PortalPage = ({
                               serverSideEvents={comingUpNext}
                               limit={20}
                            />
-                           <RecommendedCustomJobs />
+                           <RecommendedCustomJobs
+                              userCountryCode={userCountryCode}
+                           />
                            <MyNextEvents />
                            <ConditionalWrapper
                               condition={Boolean(events?.length)}
@@ -272,6 +275,8 @@ const PortalTags = ({ children }: PortalTagsContentProps) => {
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const token = getUserTokenFromCookie(ctx)
+   const userCountryCode =
+      (ctx.req.headers["x-vercel-ip-country"] as string) || null
 
    const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
 
@@ -345,6 +350,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          }),
          customJobDialogData,
          livestreamDialogData,
+         userCountryCode,
       },
    }
 }
