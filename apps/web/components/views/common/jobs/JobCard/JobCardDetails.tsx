@@ -29,6 +29,8 @@ const styles = sxStyles({
       color: "text.primary",
       fontWeight: 600,
       fontSize: "16px !important",
+      lineHeight: "24px", // 1.5 line height for good readability
+      height: "48px", // Exactly 2 lines (24px * 2)
       whiteSpace: "break-spaces",
       overflow: "hidden",
       textOverflow: "ellipsis",
