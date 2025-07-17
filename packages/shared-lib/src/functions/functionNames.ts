@@ -61,4 +61,7 @@ export const FUNCTION_NAMES = {
 
    // Auth functions
    backfillUserData: "backfillUserData_v2",
+
+   // Group talent engagement functions
+   getGroupTalentEngagement: "getGroupTalentEngagement",
 } as const

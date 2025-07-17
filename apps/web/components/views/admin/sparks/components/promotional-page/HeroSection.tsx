@@ -1,6 +1,7 @@
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { LoadingButton } from "@mui/lab"
 import { Box, Button, CardContent, Stack, Typography } from "@mui/material"
+import { useGroupTalentEngagement } from "components/custom-hook/group/useGroupTalentEngagement"
 import { useStartPlanMutation } from "components/custom-hook/group/useStartPlanMutation"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
@@ -23,6 +24,8 @@ import {
 export const HeroSection = () => {
    const { group } = useGroup()
    const { push } = useRouter()
+   const { data: talentEngaged, isLoading: talentEngagementLoading } =
+      useGroupTalentEngagement(group)
 
    const { trigger, isMutating } = useStartPlanMutation(group.id, {
       onSuccess: () => {
@@ -85,7 +88,9 @@ export const HeroSection = () => {
                      component="span"
                      color="neutral.500"
                   >
-                     1200/9500 talent engaged
+                     {talentEngagementLoading
+                        ? "Loading..."
+                        : `${talentEngaged.count}/9500 talent engaged`}
                   </Typography>
                </Stack>
             </StyledProgressSection>

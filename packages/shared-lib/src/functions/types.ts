@@ -16,3 +16,12 @@ export type GetRecommendedJobsFnArgs = {
    userAuthId?: string
    userCountryCode?: string
 }
+
+export type GetGroupTalentEngagementFnArgs = {
+   groupId: string
+   targeting: {
+      countries: string[]
+      universities: string[]
+      fieldsOfStudy: string[]
+   }
+}
