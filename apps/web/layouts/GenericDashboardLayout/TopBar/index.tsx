@@ -54,9 +54,10 @@ const styles = sxStyles({
 
 type Props = {
    title: string
+   titleComponent?: React.ElementType
 }
 
-const TopBar = ({ title }: Props) => {
+const TopBar = ({ title, titleComponent = "h1" }: Props) => {
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
    const { asPath } = useRouter()
@@ -79,11 +80,16 @@ const TopBar = ({ title }: Props) => {
          <Box sx={styles.leftSection}>
             {isMobile ? (
                <MainLogo sx={{ maxWidth: "120px" }} />
-            ) : (
-               <Typography variant={"h1"} fontWeight={600} sx={styles.title}>
+            ) : title ? (
+               <Typography
+                  variant={"h1"}
+                  component={titleComponent}
+                  fontWeight={600}
+                  sx={styles.title}
+               >
                   {title}
                </Typography>
-            )}
+            ) : null}
          </Box>
          <Box sx={{ flexGrow: 1 }} />
          <Stack spacing={1} direction={"row"} sx={styles.rightSection}>
