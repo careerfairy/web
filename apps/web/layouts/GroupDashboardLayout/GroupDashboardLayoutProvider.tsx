@@ -153,7 +153,7 @@ const GroupDashboardLayoutProvider = ({
          {/* Manage Companies Dialog */}
          <ManageCompaniesDialog
             open={manageCompaniesDialogOpen}
-            handleClose={closeManageCompaniesDialog}
+            handleClose={() => dispatch(closeManageCompaniesDialog())}
          />
       </Fragment>
    )

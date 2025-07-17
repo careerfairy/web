@@ -158,6 +158,7 @@ export const MobileBottomNavigation = () => {
          }
          case "menu": {
             toggleMobileFullScreenMenu()
+            setValue(newValue)
             return
          }
          default: {
@@ -205,15 +206,31 @@ export const MobileBottomNavigation = () => {
                      label={item.label}
                      value={item.id}
                      icon={renderIcon(item, isActive)}
+                     disableRipple
                   />
                )
             })}
 
             {/* Menu item with avatar */}
             <BottomNavigationAction
+               disableRipple
                label="Menu"
                value="menu"
-               icon={<MenuAvatar src={group?.logoUrl} alt="logo" size={24} />}
+               icon={
+                  <MenuAvatar
+                     sx={
+                        value === "menu"
+                           ? {
+                                border: (theme) =>
+                                   `1.3px solid ${theme.palette.neutral[600]}`,
+                             }
+                           : undefined
+                     }
+                     src={group?.logoUrl}
+                     alt="logo"
+                     size={24}
+                  />
+               }
             />
          </StyledBottomNavigation>
 

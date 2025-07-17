@@ -74,7 +74,7 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
                   id: "live-stream-analytics",
                   href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/live-streams/overview`,
                   pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/live-streams/overview`,
-                  title: "Live stream",
+                  title: "Live streams",
                },
                {
                   id: "sparks-analytics",

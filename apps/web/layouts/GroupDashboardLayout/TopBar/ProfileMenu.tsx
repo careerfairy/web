@@ -6,6 +6,7 @@ import { useRouter } from "next/router"
 import { Home, LogOut, Repeat, User } from "react-feather"
 
 // project imports
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
 import BrandedMenu from "../../../components/views/common/inputs/BrandedMenu"
@@ -159,7 +160,11 @@ export const ProfileMenu = ({ anchorEl, open, onClose }: ProfileMenuProps) => {
                >
                   {userPresenter?.getDisplayName()}
                </Typography>
-               <Typography variant="xsmall" color="neutral.600">
+               <Typography
+                  sx={getMaxLineStyles(1)}
+                  variant="xsmall"
+                  color="neutral.600"
+               >
                   {userPresenter?.getPosition()}
                </Typography>
             </Stack>
