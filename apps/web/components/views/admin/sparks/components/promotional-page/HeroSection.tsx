@@ -40,6 +40,12 @@ export const HeroSection = () => {
       })
    }
 
+   // Calculate progress value before passing as prop
+   const progressValue =
+      talentEngagement?.total && talentEngagement.total > 0
+         ? (talentEngagement.count / talentEngagement.total) * 100
+         : 0
+
    return (
       <StyledHeroContent>
          {/* Header */}
@@ -82,7 +88,10 @@ export const HeroSection = () => {
                </StyledProgressHeader>
 
                <Stack spacing={0.5}>
-                  <StyledLinearProgress variant="determinate" value={20} />
+                  <StyledLinearProgress
+                     variant="determinate"
+                     value={progressValue}
+                  />
                   <Typography
                      variant="xsmall"
                      component="span"
