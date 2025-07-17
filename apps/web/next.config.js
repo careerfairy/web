@@ -294,6 +294,14 @@ const moduleExports = {
 
    redirects: async () => {
       return [
+         /**
+          * Redirect all traffic from this preview deployment to production
+          */
+         {
+            source: "/(.*)",
+            destination: "https://www.careerfairy.io/$1",
+            permanent: false,
+         },
          {
             source: "/landing",
             destination: "/",
@@ -426,19 +434,15 @@ const moduleExports = {
          /**
           * Prevent crawlers from indexing on non-production environments, eg preview, staging, etc.
           */
-         ...(process.env.VERCEL_ENV !== "production"
-            ? [
-                 {
-                    source: "/(.*)",
-                    headers: [
-                       {
-                          key: "X-Robots-Tag",
-                          value: "noindex, nofollow, noarchive",
-                       },
-                    ],
-                 },
-              ]
-            : []),
+         {
+            source: "/(.*)",
+            headers: [
+               {
+                  key: "X-Robots-Tag",
+                  value: "noindex, nofollow, noarchive",
+               },
+            ],
+         },
          {
             source: "/next-livestreams/:groupId/embed",
             // allow embedding iframes on this path
