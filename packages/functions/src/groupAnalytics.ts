@@ -5,7 +5,11 @@ import {
    RegistrationSourcesResponseItem,
 } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import { GetGroupTalentEngagementFnArgs } from "@careerfairy/shared-lib/functions/types"
-import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import { type Query } from "firebase-admin/firestore"
 import { CallableRequest, onCall } from "firebase-functions/https"
@@ -278,6 +282,7 @@ async function fetchAndFilterTargetedLivestreams(
    const livestreamsQuery = await firestore
       .collection("livestreams")
       .where("groupIds", "array-contains", groupId)
+      .withConverter(createAdminConverter<LivestreamEvent>())
       .get()
 
    if (livestreamsQuery.empty) {
@@ -295,42 +300,45 @@ async function fetchAndFilterTargetedLivestreams(
       }
 
       const livestream = doc.data()
-      let matches = false
+      let matches = true // Start with true for AND logic
 
-      // Check countries
-      if (
-         targeting.countries.length > 0 &&
-         livestream.companyTargetedCountries?.length > 0
-      ) {
-         matches =
-            matches ||
-            livestream.companyTargetedCountries.some((country) =>
-               targeting.countries.includes(country)
-            )
+      // Check countries - ALL must match if targeting is set
+      if (targeting.countries.length > 0) {
+         if (!livestream.companyTargetedCountries?.length) {
+            matches = false
+         } else {
+            matches =
+               matches &&
+               livestream.companyTargetedCountries.some((country) =>
+                  targeting.countries.includes(country)
+               )
+         }
       }
 
-      // Check universities
-      if (
-         targeting.universities.length > 0 &&
-         livestream.companyTargetedUniversities?.length > 0
-      ) {
-         matches =
-            matches ||
-            livestream.companyTargetedUniversities.some((university) =>
-               targeting.universities.includes(university)
-            )
+      // Check universities - ALL must match if targeting is set
+      if (targeting.universities.length > 0) {
+         if (!livestream.companyTargetedUniversities?.length) {
+            matches = false
+         } else {
+            matches =
+               matches &&
+               livestream.companyTargetedUniversities.some((university) =>
+                  targeting.universities.includes(university)
+               )
+         }
       }
 
-      // Check fields of study
-      if (
-         targeting.fieldsOfStudy.length > 0 &&
-         livestream.companyTargetedFieldsOfStudies?.length > 0
-      ) {
-         matches =
-            matches ||
-            livestream.companyTargetedFieldsOfStudies.some((field) =>
-               targeting.fieldsOfStudy.includes(field)
-            )
+      // Check fields of study - ALL must match if targeting is set
+      if (targeting.fieldsOfStudy.length > 0) {
+         if (!livestream.companyTargetedFieldsOfStudies?.length) {
+            matches = false
+         } else {
+            matches =
+               matches &&
+               livestream.companyTargetedFieldsOfStudies.some((field) =>
+                  targeting.fieldsOfStudy.includes(field)
+               )
+         }
       }
 
       return matches
@@ -345,6 +353,7 @@ async function fetchAndFilterTargetedLivestreams(
 
 /**
  * Counts unique users from the provided livestream IDs
+ * Only counts users who have registered for the livestreams (registered.date is truthy)
  */
 async function countUniqueUsersFromLivestreams(
    livestreamIds: string[]
@@ -353,28 +362,34 @@ async function countUniqueUsersFromLivestreams(
       return { uniqueUsers: 0, totalInteractions: 0 }
    }
 
-   const chunks = chunkArray(livestreamIds, 10)
-   const allUserData: Pick<UserLivestreamData, "userId">[] = []
+   // We can only have 30 "in" clauses
+   const chunks = chunkArray(livestreamIds, 30)
+   const allUserIds: string[] = []
 
    for (const chunk of chunks) {
       const userDataQuery = await firestore
          .collectionGroup("userLivestreamData")
-         .withConverter(createAdminConverter<UserLivestreamData>())
          .where("livestreamId", "in", chunk)
-         .select("userId")
+         .select("userId", "registered")
          .get()
 
-      const userData = userDataQuery.docs.map((doc) => ({
-         userId: doc.data().userId,
-      }))
-      allUserData.push(...userData)
+      // Filter for only registered users (registered.date is truthy)
+      const registeredUserData = userDataQuery.docs
+         .map(
+            (doc) =>
+               doc.data() as Pick<UserLivestreamData, "userId" | "registered">
+         )
+         .filter((data) => data.registered?.date)
+         .map((data) => data.userId)
+
+      allUserIds.push(...registeredUserData)
    }
 
-   const uniqueUserIds = new Set(allUserData.map((data) => data.userId))
+   const uniqueUserIds = new Set(allUserIds)
 
    return {
       uniqueUsers: uniqueUserIds.size,
-      totalInteractions: allUserData.length,
+      totalInteractions: allUserIds.length,
    }
 }
 
@@ -418,7 +433,11 @@ async function countTotalUsersMatchingTargeting(
 
    // Filter in memory for ALL targeting criteria (AND logic)
    const matchingUsers = snapshot.docs.filter((doc) => {
-      const userData = doc.data()
+      const userData = doc.data() as Pick<
+         UserData,
+         "universityCountryCode" | "university" | "fieldOfStudy"
+      >
+
       let matches = true
 
       // Check ALL targeting criteria - user must match all of them
