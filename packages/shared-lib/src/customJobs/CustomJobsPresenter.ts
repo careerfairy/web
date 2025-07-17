@@ -141,7 +141,8 @@ export class CustomJobsPresenter extends BaseModel {
          serializedCustomJob.isPermanentlyExpired,
          serializedCustomJob.disableUrlTracking,
          deserializePublicGroup(serializedCustomJob.group, Timestamp.fromDate),
-         serializedCustomJob.jobLocation
+         serializedCustomJob.jobLocation,
+         serializedCustomJob.workplace
       )
    }
 
