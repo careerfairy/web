@@ -46,8 +46,8 @@ export const useGroupTalentEngagement = (group: Group | undefined) => {
    const groupArgs = group ? extractTargetingFromGroup(group) : null
 
    // Fetch engaged users count
-   const engagedUsersKey = groupArgs
-      ? [FUNCTION_NAMES.getGroupTalentEngagement, groupArgs]
+   const engagedUsersKey = group
+      ? [FUNCTION_NAMES.getGroupTalentEngagement, { groupId: group.id }]
       : null
 
    const engagedUsersResponse = useSWR<GroupTalentEngagementResponse>(

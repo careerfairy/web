@@ -55,24 +55,21 @@ export const getGroupTalentEngagement = onCall(
    {
       memory: "512MiB",
    },
-   middlewares<GetGroupTalentEngagementFnArgs>(
+   middlewares<{
+      groupId: string
+   }>(
       dataValidation({
          groupId: string().required(),
-         targeting: object({
-            countries: array(string()).default([]),
-            universities: array(string()).default([]),
-            fieldsOfStudy: array(string()).default([]),
-         }).required(),
       }),
       userShouldBeGroupAdmin(),
       talentEngagementCache(createTalentEngagementCacheKey),
       async (request) => {
          try {
-            const { groupId, targeting } = request.data
+            const { groupId } = request.data
 
             // Step 1: Find livestreams that match the group's targeting
-            const { livestreamIds, totalLivestreams, targetedLivestreams } =
-               await fetchAndFilterTargetedLivestreams(groupId, targeting)
+            const { livestreamIds, totalLivestreams } =
+               await fetchAndFilterTargetedLivestreams(groupId)
 
             // Step 2: Count unique users from targeted livestreams
             const { uniqueUsers, totalInteractions } =
@@ -84,8 +81,7 @@ export const getGroupTalentEngagement = onCall(
                {
                   groupId,
                   totalLivestreams,
-                  targetedLivestreams,
-                  livestreamCount: targetedLivestreams,
+                  livestreamCount: livestreamIds.length,
                   totalInteractions,
                   uniqueUsers,
                }
@@ -275,10 +271,7 @@ function createTotalUsersCacheKey(request: {
 /**
  * Fetches all group livestreams and filters them by targeting criteria
  */
-async function fetchAndFilterTargetedLivestreams(
-   groupId: string,
-   targeting: GetGroupTalentEngagementFnArgs["targeting"]
-) {
+async function fetchAndFilterTargetedLivestreams(groupId: string) {
    const livestreamsQuery = await firestore
       .collection("livestreams")
       .where("groupIds", "array-contains", groupId)
@@ -289,65 +282,11 @@ async function fetchAndFilterTargetedLivestreams(
       return { livestreamIds: [], totalLivestreams: 0, targetedLivestreams: 0 }
    }
 
-   const hasTargeting =
-      targeting.countries.length > 0 ||
-      targeting.universities.length > 0 ||
-      targeting.fieldsOfStudy.length > 0
-
-   const targetedLivestreams = livestreamsQuery.docs.filter((doc) => {
-      if (!hasTargeting) {
-         return true // Include all livestreams if no targeting criteria
-      }
-
-      const livestream = doc.data()
-      let matches = true // Start with true for AND logic
-
-      // Check countries - ALL must match if targeting is set
-      if (targeting.countries.length > 0) {
-         if (!livestream.companyTargetedCountries?.length) {
-            matches = false
-         } else {
-            matches =
-               matches &&
-               livestream.companyTargetedCountries.some((country) =>
-                  targeting.countries.includes(country)
-               )
-         }
-      }
-
-      // Check universities - ALL must match if targeting is set
-      if (targeting.universities.length > 0) {
-         if (!livestream.companyTargetedUniversities?.length) {
-            matches = false
-         } else {
-            matches =
-               matches &&
-               livestream.companyTargetedUniversities.some((university) =>
-                  targeting.universities.includes(university)
-               )
-         }
-      }
-
-      // Check fields of study - ALL must match if targeting is set
-      if (targeting.fieldsOfStudy.length > 0) {
-         if (!livestream.companyTargetedFieldsOfStudies?.length) {
-            matches = false
-         } else {
-            matches =
-               matches &&
-               livestream.companyTargetedFieldsOfStudies.some((field) =>
-                  targeting.fieldsOfStudy.includes(field)
-               )
-         }
-      }
-
-      return matches
-   })
+   const livestreams = livestreamsQuery.docs.map((doc) => doc.data())
 
    return {
-      livestreamIds: targetedLivestreams.map((doc) => doc.id),
+      livestreamIds: livestreams.map((doc) => doc.id),
       totalLivestreams: livestreamsQuery.docs.length,
-      targetedLivestreams: targetedLivestreams.length,
    }
 }
 
