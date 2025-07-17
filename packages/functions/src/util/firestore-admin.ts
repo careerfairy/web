@@ -1,7 +1,7 @@
 import { type FirestoreDataConverter } from "@google-cloud/firestore"
 import { Query } from "firebase-admin/firestore"
 
-export const createAdminConverter = <T>(): FirestoreDataConverter<T> => ({
+export const createAdminConverter = <T>(): FirestoreDataConverter<T, T> => ({
    toFirestore: (modelObject: T) => modelObject,
    fromFirestore: (snapshot) => {
       return {
