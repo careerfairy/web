@@ -74,6 +74,10 @@ type Props = {
     * The timeout for the header transition, defaults to undefined
     */
    transitionTimeout?: number
+   /**
+    * The component to use for the title
+    */
+   titleComponent?: React.ElementType
 }
 
 const GenericDashboardLayout = ({
@@ -92,6 +96,7 @@ const GenericDashboardLayout = ({
    hideHeader,
    userCountryCode,
    transitionTimeout = undefined,
+   titleComponent = "h1",
 }: Props) => {
    const isMobile = useIsMobile(989, { defaultMatches: true })
 
@@ -133,7 +138,12 @@ const GenericDashboardLayout = ({
                bgColor={bgColor || "#F7F8FC"}
                hideHeader={hideHeader}
                headerContent={
-                  hideHeader ? null : <TopBar title={pageDisplayName} />
+                  hideHeader ? null : (
+                     <TopBar
+                        title={pageDisplayName}
+                        titleComponent={titleComponent}
+                     />
+                  )
                }
                drawerContent={<NavBar />}
                hideDrawer={hideDrawer}
