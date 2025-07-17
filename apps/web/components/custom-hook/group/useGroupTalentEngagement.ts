@@ -43,11 +43,11 @@ export const useGroupTalentEngagement = (group: Group | undefined) => {
    const totalFetcher =
       useFunctionsSWRFetcher<TotalUsersMatchingTargetingResponse>()
 
-   const groupArgs = group ? extractTargetingFromGroup(group) : null
+   const functionArgs = group ? extractTargetingFromGroup(group) : null
 
    // Fetch engaged users count
    const engagedUsersKey = group
-      ? [FUNCTION_NAMES.getGroupTalentEngagement, { groupId: group.id }]
+      ? [FUNCTION_NAMES.getGroupTalentEngagement, functionArgs]
       : null
 
    const engagedUsersResponse = useSWR<GroupTalentEngagementResponse>(
@@ -57,8 +57,8 @@ export const useGroupTalentEngagement = (group: Group | undefined) => {
    )
 
    // Fetch total users matching targeting
-   const totalUsersKey = groupArgs
-      ? [FUNCTION_NAMES.getTotalUsersMatchingTargeting, groupArgs]
+   const totalUsersKey = functionArgs
+      ? [FUNCTION_NAMES.getTotalUsersMatchingTargeting, functionArgs]
       : null
 
    const totalUsersResponse = useSWR<TotalUsersMatchingTargetingResponse>(
