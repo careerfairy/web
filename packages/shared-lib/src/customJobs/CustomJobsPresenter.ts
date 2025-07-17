@@ -6,12 +6,13 @@ import {
    toDate,
 } from "../firebaseTypes"
 import {
+   GroupOption,
    PublicGroup,
    deserializePublicGroup,
    serializePublicGroup,
 } from "../groups"
 import { SerializedPublicGroup } from "../groups/groups"
-import { CustomJob, JobType } from "./customJobs"
+import { CustomJob, CustomJobWorkplace, JobType } from "./customJobs"
 
 export interface SerializedCustomJob
    extends Omit<CustomJob, "createdAt" | "updatedAt" | "deadline" | "group"> {
@@ -41,7 +42,9 @@ export class CustomJobsPresenter extends BaseModel {
       public readonly businessFunctionsTagIds?: string[],
       public readonly isPermanentlyExpired?: boolean,
       public readonly disableUrlTracking?: boolean,
-      public readonly group?: PublicGroup
+      public readonly group?: PublicGroup,
+      public readonly jobLocation?: GroupOption[],
+      public readonly workplace?: CustomJobWorkplace
    ) {
       super()
    }
@@ -66,7 +69,9 @@ export class CustomJobsPresenter extends BaseModel {
          customJob.businessFunctionsTagIds,
          customJob.isPermanentlyExpired,
          customJob.disableUrlTracking,
-         customJob.group
+         customJob.group,
+         customJob.jobLocation,
+         customJob.workplace
       )
    }
 
@@ -98,7 +103,9 @@ export class CustomJobsPresenter extends BaseModel {
          doc.businessFunctionsTagIds,
          doc.isPermanentlyExpired,
          doc.disableUrlTracking,
-         doc.group
+         doc.group,
+         doc.jobLocation,
+         doc.workplace
       )
    }
    static serializeDocument(doc: CustomJob) {
@@ -133,7 +140,8 @@ export class CustomJobsPresenter extends BaseModel {
          serializedCustomJob.businessFunctionsTagIds,
          serializedCustomJob.isPermanentlyExpired,
          serializedCustomJob.disableUrlTracking,
-         deserializePublicGroup(serializedCustomJob.group, Timestamp.fromDate)
+         deserializePublicGroup(serializedCustomJob.group, Timestamp.fromDate),
+         serializedCustomJob.jobLocation
       )
    }
 
@@ -158,6 +166,8 @@ export class CustomJobsPresenter extends BaseModel {
          isPermanentlyExpired: this.isPermanentlyExpired,
          disableUrlTracking: this.disableUrlTracking,
          group: this.group,
+         jobLocation: this.jobLocation,
+         workplace: this.workplace,
       }
    }
 }

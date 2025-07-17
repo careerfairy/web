@@ -86,6 +86,40 @@ export const jobTypeOptions = [
    { value: "Internship", label: "Internship", id: "Internship" },
 ]
 
+// Standardized job type constants
+export const JOB_TYPE_CONSTANTS = {
+   FULL_TIME: "FULL_TIME",
+   PART_TIME: "PART_TIME",
+   INTERN: "INTERN",
+} as const
+
+// Lookup map for JobType - maps existing options by id to standardized constants
+export const jobTypeLookupMap: Record<
+   JobType,
+   keyof typeof JOB_TYPE_CONSTANTS
+> = {
+   "Full-time": "FULL_TIME",
+   "Part-time": "PART_TIME",
+   "Graduate Programme": "INTERN",
+   Internship: "INTERN",
+}
+
+export const JOB_WORKPLACE_CONSTANTS = {
+   ON_SITE: "ON_SITE",
+   HYBRID: "HYBRID",
+   TELECOMMUTE: "TELECOMMUTE",
+} as const
+
+// Lookup map for CustomJobWorkplace - maps existing options to schema.org constants
+export const workplaceLookupMap: Record<
+   CustomJobWorkplace,
+   keyof typeof JOB_WORKPLACE_CONSTANTS
+> = {
+   "on-site": "ON_SITE",
+   hybrid: "HYBRID",
+   remote: "TELECOMMUTE",
+}
+
 export const jobTypeValueOptions = jobTypeOptions.map((jobType) => ({
    value: jobType.value,
    id: jobType.id,
