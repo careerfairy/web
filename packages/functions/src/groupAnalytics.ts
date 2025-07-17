@@ -9,11 +9,11 @@ import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import { type Query } from "firebase-admin/firestore"
-import { CallableRequest, onCall } from "firebase-functions/https"
+import { CallableRequest, HttpsError, onCall } from "firebase-functions/https"
 import { array, object, string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
 import { groupRepo, livestreamsRepo } from "./api/repositories"
-import { logAndThrow } from "./lib/validations"
+import { logError } from "./lib/validations"
 import {
    CacheKeyOnCallFn,
    cacheOnCallValues,
@@ -90,11 +90,12 @@ export const getGroupTalentEngagement = onCall(
 
             return { count: uniqueUsers }
          } catch (error) {
-            functions.logger.error("Error in getGroupTalentEngagement:", error)
-            logAndThrow("Error counting group talent engagement", {
-               request,
-               error,
-            })
+            logError(error, request)
+
+            throw new HttpsError(
+               "internal",
+               "Error counting group talent engagement"
+            )
          }
       }
    )
@@ -148,14 +149,11 @@ export const getTotalUsersMatchingTargeting = onCall(
 
             return { total: totalMatchingUsers }
          } catch (error) {
-            functions.logger.error(
-               "Error in getTotalUsersMatchingTargeting:",
-               error
+            logError(error, request)
+            throw new HttpsError(
+               "internal",
+               "Error counting total users matching targeting"
             )
-            logAndThrow("Error counting total users matching targeting", {
-               request,
-               error,
-            })
          }
       }
    )
