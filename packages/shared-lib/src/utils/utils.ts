@@ -148,6 +148,28 @@ export const sortDocumentByPopularity = <T extends { popularity?: number }>(
 }
 
 /**
+ * Strips HTML tags and entities from a string for use in structured data
+ * Uses the same approach as the Job class descriptionStripped property
+ * @param html HTML string to clean
+ * @returns Plain text string
+ */
+export const stripHtml = (html: string): string => {
+   if (!html) return ""
+
+   return html
+      .replace(/<[^>]*>?/gm, "") // Remove HTML tags
+      .replace(/&nbsp;/g, " ") // Replace non-breaking spaces
+      .replace(/&amp;/g, "&") // Replace HTML entities
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&apos;/g, "'")
+      .replace(/\s+/g, " ") // Replace multiple whitespace with single space
+      .trim()
+}
+
+/**
  * To slugify any string
  */
 export const slugify = (text: string): string => {
