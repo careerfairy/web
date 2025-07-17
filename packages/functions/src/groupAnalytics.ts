@@ -7,6 +7,7 @@ import {
 import { GetGroupTalentEngagementFnArgs } from "@careerfairy/shared-lib/functions/types"
 import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
+import { type Query } from "firebase-admin/firestore"
 import { CallableRequest, onCall } from "firebase-functions/https"
 import { array, object, string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
@@ -44,7 +45,7 @@ const talentEngagementCache = (cacheKeyFn: CacheKeyOnCallFn) =>
  * Cache key includes targeting criteria so results update when targeting changes
  *
  * @param data - { groupId: string, targeting: TargetingCriteria } - The group ID and targeting criteria
- * @returns { count: number } - The count of unique users
+ * @returns { count: number } - The count of unique users who engaged
  */
 export const getGroupTalentEngagement = onCall(
    {
@@ -74,23 +75,83 @@ export const getGroupTalentEngagement = onCall(
                await countUniqueUsersFromLivestreams(livestreamIds)
 
             // Step 3: Log results and return count
-            logTalentEngagementResults({
-               groupId,
-               totalLivestreams,
-               targetedLivestreams,
-               uniqueUsers,
-               totalInteractions,
-               targeting: {
-                  countries: targeting.countries.length,
-                  universities: targeting.universities.length,
-                  fieldsOfStudy: targeting.fieldsOfStudy.length,
-               },
-            })
+            functions.logger.info(
+               `Group ${groupId} talent engagement count: ${uniqueUsers}`,
+               {
+                  groupId,
+                  totalLivestreams,
+                  targetedLivestreams,
+                  livestreamCount: targetedLivestreams,
+                  totalInteractions,
+                  uniqueUsers,
+               }
+            )
 
             return { count: uniqueUsers }
          } catch (error) {
             functions.logger.error("Error in getGroupTalentEngagement:", error)
             logAndThrow("Error counting group talent engagement", {
+               request,
+               error,
+            })
+         }
+      }
+   )
+)
+
+/**
+ * Count total users in the database who match the given targeting criteria
+ * This is independent of any specific group and only looks at user demographics
+ * Cache key only includes targeting criteria for better cache hit rates
+ *
+ * @param data - { groupId: string, targeting: TargetingCriteria } - The group ID (for auth) and targeting criteria
+ * @returns { total: number } - The total count of users matching the criteria
+ */
+export const getTotalUsersMatchingTargeting = onCall(
+   {
+      memory: "512MiB",
+   },
+   middlewares<{
+      groupId: string
+      targeting: GetGroupTalentEngagementFnArgs["targeting"]
+   }>(
+      dataValidation({
+         groupId: string().required(),
+         targeting: object({
+            countries: array(string()).default([]),
+            universities: array(string()).default([]),
+            fieldsOfStudy: array(string()).default([]),
+         }).required(),
+      }),
+      userShouldBeGroupAdmin(),
+      talentEngagementCache(createTotalUsersCacheKey),
+      async (request) => {
+         try {
+            const { targeting } = request.data
+
+            const totalMatchingUsers = await countTotalUsersMatchingTargeting(
+               targeting
+            )
+
+            functions.logger.info(
+               `Total users matching targeting criteria: ${totalMatchingUsers}`,
+               {
+                  totalMatchingUsers,
+                  targeting: {
+                     countries: targeting.countries.length,
+                     universities: targeting.universities.length,
+                     fieldsOfStudy: targeting.fieldsOfStudy.length,
+                  },
+               }
+            )
+
+            return { total: totalMatchingUsers }
+         } catch (error) {
+            functions.logger.error(
+               "Error in getTotalUsersMatchingTargeting:",
+               error
+            )
+            logAndThrow("Error counting total users matching targeting", {
                request,
                error,
             })
@@ -184,6 +245,27 @@ function createTalentEngagementCacheKey(request: {
    ].join("|")
 
    return ["groupTalentEngagement", groupId, targetingSignature]
+}
+
+/**
+ * Creates a cache key for total users matching targeting criteria
+ */
+function createTotalUsersCacheKey(request: {
+   data: {
+      groupId: string
+      targeting: GetGroupTalentEngagementFnArgs["targeting"]
+   }
+}): string[] {
+   const { targeting } = request.data
+
+   // Create a deterministic string from targeting arrays
+   const targetingSignature = [
+      `countries:${targeting.countries.sort().join(",")}`,
+      `universities:${targeting.universities.sort().join(",")}`,
+      `fields:${targeting.fieldsOfStudy.sort().join(",")}`,
+   ].join("|")
+
+   return ["totalUsersMatchingTargeting", targetingSignature]
 }
 
 /**
@@ -297,41 +379,73 @@ async function countUniqueUsersFromLivestreams(
 }
 
 /**
- * Logs the talent engagement results with detailed metrics
+ * Counts total users in the database who match the given targeting criteria.
+ * This queries the userData collection based on user's university country, field of study, and university.
+ * Users must match ALL targeting criteria (AND logic), not just one.
  */
-function logTalentEngagementResults(metrics: {
-   groupId: string
-   totalLivestreams: number
-   targetedLivestreams: number
-   uniqueUsers: number
-   totalInteractions: number
-   targeting: {
-      countries: number
-      universities: number
-      fieldsOfStudy: number
+async function countTotalUsersMatchingTargeting(
+   targeting: GetGroupTalentEngagementFnArgs["targeting"]
+): Promise<number> {
+   const hasTargeting =
+      targeting.countries.length > 0 ||
+      targeting.universities.length > 0 ||
+      targeting.fieldsOfStudy.length > 0
+
+   if (!hasTargeting) {
+      // If no targeting criteria, count all users
+      const countQuery = await firestore.collection("userData").count().get()
+      return countQuery.data().count
    }
-}): void {
-   if (metrics.targetedLivestreams === 0) {
-      functions.logger.info(
-         `No targeted livestreams found for group ${metrics.groupId}`,
-         {
-            groupId: metrics.groupId,
-            totalLivestreams: metrics.totalLivestreams,
-            targetedLivestreams: 0,
-         }
-      )
-   } else {
-      functions.logger.info(
-         `Group ${metrics.groupId} talent engagement count: ${metrics.uniqueUsers}`,
-         {
-            groupId: metrics.groupId,
-            totalLivestreams: metrics.totalLivestreams,
-            targetedLivestreams: metrics.targetedLivestreams,
-            livestreamCount: metrics.targetedLivestreams,
-            totalInteractions: metrics.totalInteractions,
-            uniqueUsers: metrics.uniqueUsers,
-            targeting: metrics.targeting,
-         }
-      )
+
+   // Since Firestore doesn't support multiple "in" queries in a single query,
+   // we'll use one criteria for the query and filter ALL others in memory
+   let query: Query = firestore.collection("userData")
+
+   // Choose the most selective targeting criteria for the Firestore query
+   // Priority: universities > countries > fieldsOfStudy (most to least selective)
+   if (targeting.universities.length > 0) {
+      query = query.where("university.code", "in", targeting.universities)
+   } else if (targeting.countries.length > 0) {
+      query = query.where("universityCountryCode", "in", targeting.countries)
+   } else if (targeting.fieldsOfStudy.length > 0) {
+      query = query.where("fieldOfStudy.id", "in", targeting.fieldsOfStudy)
    }
+
+   // Only select the fields we need for filtering
+   const snapshot = await query
+      .select("universityCountryCode", "university", "fieldOfStudy")
+      .get()
+
+   // Filter in memory for ALL targeting criteria (AND logic)
+   const matchingUsers = snapshot.docs.filter((doc) => {
+      const userData = doc.data()
+      let matches = true
+
+      // Check ALL targeting criteria - user must match all of them
+
+      // Check countries
+      if (targeting.countries.length > 0) {
+         matches =
+            matches &&
+            targeting.countries.includes(userData.universityCountryCode)
+      }
+
+      // Check universities
+      if (targeting.universities.length > 0) {
+         matches =
+            matches &&
+            targeting.universities.includes(userData.university?.code)
+      }
+
+      // Check fields of study
+      if (targeting.fieldsOfStudy.length > 0) {
+         matches =
+            matches &&
+            targeting.fieldsOfStudy.includes(userData.fieldOfStudy?.id)
+      }
+
+      return matches
+   })
+
+   return matchingUsers.length
 }

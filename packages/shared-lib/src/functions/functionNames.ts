@@ -64,4 +64,5 @@ export const FUNCTION_NAMES = {
 
    // Group talent engagement functions
    getGroupTalentEngagement: "getGroupTalentEngagement",
+   getTotalUsersMatchingTargeting: "getTotalUsersMatchingTargeting",
 } as const

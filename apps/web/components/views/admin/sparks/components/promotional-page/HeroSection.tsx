@@ -24,7 +24,7 @@ import {
 export const HeroSection = () => {
    const { group } = useGroup()
    const { push } = useRouter()
-   const { data: talentEngaged, isLoading: talentEngagementLoading } =
+   const { data: talentEngagement, isLoading: talentEngagementLoading } =
       useGroupTalentEngagement(group)
 
    const { trigger, isMutating } = useStartPlanMutation(group.id, {
@@ -90,7 +90,9 @@ export const HeroSection = () => {
                   >
                      {talentEngagementLoading
                         ? "Loading..."
-                        : `${talentEngaged.count}/9500 talent engaged`}
+                        : `${talentEngagement?.count || 0}/${
+                             talentEngagement?.total || 0
+                          } talent engaged`}
                   </Typography>
                </Stack>
             </StyledProgressSection>
