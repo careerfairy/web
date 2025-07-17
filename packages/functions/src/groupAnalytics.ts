@@ -67,7 +67,7 @@ export const getGroupTalentEngagement = onCall(
             const { groupId, targeting } = request.data
 
             // Step 1: Get all livestreams for the group
-            const livestreams = await groupRepo.getGroupLivestreams(groupId)
+            const livestreams = await groupRepo.getEventsOfGroup(groupId)
             const livestreamIds = livestreams.map((l) => l.id)
 
             // Step 2: Count registered users who match targeting criteria
