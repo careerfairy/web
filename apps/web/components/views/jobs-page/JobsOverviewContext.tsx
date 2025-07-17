@@ -24,6 +24,7 @@ import {
    useContext,
    useEffect,
    useMemo,
+   useRef,
    useState,
 } from "react"
 import { AlgoliaCustomJobResponse } from "types/algolia"
@@ -82,6 +83,7 @@ export type SearchParams = {
    businessFunctionTags?: string[]
    jobTypes?: string[]
    currentJobId?: string
+   first?: boolean
 }
 
 export const JobsOverviewContextProvider = ({
@@ -97,6 +99,15 @@ export const JobsOverviewContextProvider = ({
 
    const searchParams = getSearchParams(router.query)
    const isMobile = useIsMobile()
+
+   // Store the initial currentJobId from the first render
+   const initialCurrentJobId = useRef<string | null>(null)
+
+   // Set the initial currentJobId only on first render
+   if (initialCurrentJobId.current === null && searchParams.first) {
+      initialCurrentJobId.current = searchParams.currentJobId || null
+   }
+
    const [isJobDetailsDialogOpen, setIsJobDetailsDialogOpen] =
       useState(dialogOpen)
    const [jobNotFound, setJobNotFound] = useState(
@@ -241,6 +252,10 @@ export const JobsOverviewContextProvider = ({
       const isLoadingJobs =
          isLoadingRecommendedJobs || isValidating || isLoading
 
+      const currentRecommendedJob = recommendedJobs?.find(
+         (job) => job.id === initialCurrentJobId.current
+      )
+
       return {
          selectedJob: effectiveJob,
          setSelectedJob: handleSelectedJobChange,
@@ -273,7 +288,11 @@ export const JobsOverviewContextProvider = ({
          setJobDetailsDialogOpen: setIsJobDetailsDialogOpen,
          selectedLocationsNames,
          userCountryCode,
-         recommendedJobs,
+         recommendedJobs: prioritizeInitiallySelectedJob(
+            initialCurrentJobId.current,
+            currentRecommendedJob,
+            recommendedJobs
+         ),
          isLoadingRecommendedJobs,
          isLoadingJobs: isLoadingJobs,
       }
@@ -346,6 +365,9 @@ const handleQueryChange = (
       delete query[param]
    }
 
+   // Always delete the 'first' parameter when any other parameter changes
+   delete query["first"]
+
    router.push(
       {
          pathname: router.pathname,
@@ -359,6 +381,7 @@ const handleQueryChange = (
 const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
    const term = (query.term as string) || ""
    const currentJobId = (query.currentJobId as string) || ""
+   const first = query.first === "true"
 
    const searchParamLocations = getQueryStringArray(query.location)
    const searchParamBusinessFunctionTags = getQueryStringArray(
@@ -372,6 +395,7 @@ const getSearchParams = (query: ParsedUrlQuery): SearchParams => {
       businessFunctionTags: searchParamBusinessFunctionTags,
       jobTypes: searchParamJobTypes,
       currentJobId,
+      first,
    }
 }
 
@@ -385,4 +409,26 @@ export const useJobsOverviewContext = () => {
    }
 
    return context
+}
+
+/**
+ * Reorders recommended jobs to prioritize the initially selected job from URL parameters.
+ * If there's a current job that was initially selected and it exists in the recommended jobs,
+ * that job will be moved to the front of the list to maintain consistency with the initial selection.
+ */
+const prioritizeInitiallySelectedJob = (
+   initialCurrentJobId: string | null,
+   currentRecommendedJob: CustomJob | undefined,
+   recommendedJobs: CustomJob[]
+): CustomJob[] => {
+   if (initialCurrentJobId && currentRecommendedJob) {
+      return [
+         currentRecommendedJob,
+         ...recommendedJobs.filter(
+            (job) => job.id !== currentRecommendedJob?.id
+         ),
+      ]
+   }
+
+   return recommendedJobs
 }

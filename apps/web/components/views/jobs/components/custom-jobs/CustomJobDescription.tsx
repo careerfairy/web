@@ -53,7 +53,11 @@ const CustomJobDescription: FC<Props> = ({ job, jobDeadlineWrapperSx }) => {
    return (
       <Stack spacing={"24px"}>
          <Box sx={styles.wrapper} mt={0}>
-            <SanitizedHTML sx={styles.html} htmlString={job.description} />
+            <SanitizedHTML
+               sx={styles.html}
+               htmlString={job.description}
+               openLinksInNewTab
+            />
          </Box>
 
          {jobDeadline ? (
