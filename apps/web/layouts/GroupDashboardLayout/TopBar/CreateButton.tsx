@@ -21,6 +21,11 @@ export const CreateButton = () => {
             color="secondary"
             variant="outlined"
             endIcon={<PlusCircle />}
+            sx={[
+               open && {
+                  backgroundColor: "secondary.100",
+               },
+            ]}
          >
             Create
          </Button>
