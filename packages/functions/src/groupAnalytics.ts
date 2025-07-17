@@ -12,7 +12,7 @@ import { type Query } from "firebase-admin/firestore"
 import { CallableRequest, HttpsError, onCall } from "firebase-functions/https"
 import { array, object, string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
-import { groupRepo, livestreamsRepo } from "./api/repositories"
+import { livestreamsRepo } from "./api/repositories"
 import { logError } from "./lib/validations"
 import {
    CacheKeyOnCallFn,
@@ -67,7 +67,7 @@ export const getGroupTalentEngagement = onCall(
             const { groupId, targeting } = request.data
 
             // Step 1: Get all livestreams for the group
-            const livestreams = await groupRepo.getEventsOfGroup(groupId)
+            const livestreams = await livestreamsRepo.getEventsOfGroup(groupId)
             const livestreamIds = livestreams.map((l) => l.id)
 
             // Step 2: Count registered users who match targeting criteria
