@@ -5,17 +5,14 @@ import {
    RegistrationSourcesResponseItem,
 } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import { GetGroupTalentEngagementFnArgs } from "@careerfairy/shared-lib/functions/types"
-import {
-   LivestreamEvent,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
 import { type Query } from "firebase-admin/firestore"
 import { CallableRequest, onCall } from "firebase-functions/https"
 import { array, object, string } from "yup"
 import { firestore } from "./api/firestoreAdmin"
-import { livestreamsRepo } from "./api/repositories"
+import { groupRepo, livestreamsRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
 import {
    CacheKeyOnCallFn,
@@ -26,7 +23,6 @@ import {
    dataValidation,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
-import { createAdminConverter } from "./util/firestore-admin"
 
 /*
 |--------------------------------------------------------------------------
@@ -43,44 +39,49 @@ const talentEngagementCache = (cacheKeyFn: CacheKeyOnCallFn) =>
    cacheOnCallValues("analytics", cacheKeyFn, 24 * 60 * 60) // 1 day
 
 /**
- * Count unique users who have seen any livestreams of a group that match the group's targeting criteria
- * This includes users who have registered, participated, or joined the talent pool
+ * Count unique users who have registered for the group's livestreams AND match the targeting criteria
+ * This takes ALL group livestreams and filters the registered users based on targeting
  * Only accessible by group admins
  * Cache key includes targeting criteria so results update when targeting changes
  *
  * @param data - { groupId: string, targeting: TargetingCriteria } - The group ID and targeting criteria
- * @returns { count: number } - The count of unique users who engaged
+ * @returns { count: number } - The count of unique users who registered and match targeting
  */
 export const getGroupTalentEngagement = onCall(
    {
       memory: "512MiB",
    },
-   middlewares<{
-      groupId: string
-   }>(
+   middlewares<GetGroupTalentEngagementFnArgs>(
       dataValidation({
          groupId: string().required(),
+         targeting: object({
+            countries: array(string()).default([]),
+            universities: array(string()).default([]),
+            fieldsOfStudy: array(string()).default([]),
+         }).required(),
       }),
       userShouldBeGroupAdmin(),
       talentEngagementCache(createTalentEngagementCacheKey),
       async (request) => {
          try {
-            const { groupId } = request.data
+            const { groupId, targeting } = request.data
 
-            // Step 1: Find livestreams that match the group's targeting
-            const { livestreamIds, totalLivestreams } =
-               await fetchAndFilterTargetedLivestreams(groupId)
+            // Step 1: Get all livestreams for the group
+            const livestreams = await groupRepo.getGroupLivestreams(groupId)
+            const livestreamIds = livestreams.map((l) => l.id)
 
-            // Step 2: Count unique users from targeted livestreams
+            // Step 2: Count registered users who match targeting criteria
             const { uniqueUsers, totalInteractions } =
-               await countUniqueUsersFromLivestreams(livestreamIds)
+               await countRegisteredUsersMatchingTargeting(
+                  livestreamIds,
+                  targeting
+               )
 
             // Step 3: Log results and return count
             functions.logger.info(
                `Group ${groupId} talent engagement count: ${uniqueUsers}`,
                {
                   groupId,
-                  totalLivestreams,
                   livestreamCount: livestreamIds.length,
                   totalInteractions,
                   uniqueUsers,
@@ -230,6 +231,51 @@ export const getRegistrationSources = onCall(
 */
 
 /**
+ * Helper function to check if a user matches the targeting criteria
+ * @param user - User data with targeting-related fields
+ * @param targeting - The targeting criteria to match against
+ * @returns true if user matches ALL targeting criteria (AND logic)
+ */
+export function userMatchesTargeting(
+   user: {
+      universityCountryCode?: string
+      university?: { code?: string; name?: string }
+      fieldOfStudy?: { id?: string; name?: string }
+   },
+   targeting: GetGroupTalentEngagementFnArgs["targeting"]
+): boolean {
+   let matches = true
+
+   // Check ALL targeting criteria - user must match all of them
+
+   // Check countries
+   if (targeting.countries.length > 0) {
+      matches =
+         matches &&
+         !!user.universityCountryCode &&
+         targeting.countries.includes(user.universityCountryCode)
+   }
+
+   // Check universities
+   if (targeting.universities.length > 0) {
+      matches =
+         matches &&
+         !!user.university?.code &&
+         targeting.universities.includes(user.university.code)
+   }
+
+   // Check fields of study
+   if (targeting.fieldsOfStudy.length > 0) {
+      matches =
+         matches &&
+         !!user.fieldOfStudy?.id &&
+         targeting.fieldsOfStudy.includes(user.fieldOfStudy.id)
+   }
+
+   return matches
+}
+
+/**
  * Creates a cache key that includes targeting criteria
  */
 function createTalentEngagementCacheKey(request: {
@@ -269,33 +315,13 @@ function createTotalUsersCacheKey(request: {
 }
 
 /**
- * Fetches all group livestreams and filters them by targeting criteria
- */
-async function fetchAndFilterTargetedLivestreams(groupId: string) {
-   const livestreamsQuery = await firestore
-      .collection("livestreams")
-      .where("groupIds", "array-contains", groupId)
-      .withConverter(createAdminConverter<LivestreamEvent>())
-      .get()
-
-   if (livestreamsQuery.empty) {
-      return { livestreamIds: [], totalLivestreams: 0, targetedLivestreams: 0 }
-   }
-
-   const livestreams = livestreamsQuery.docs.map((doc) => doc.data())
-
-   return {
-      livestreamIds: livestreams.map((doc) => doc.id),
-      totalLivestreams: livestreamsQuery.docs.length,
-   }
-}
-
-/**
- * Counts unique users from the provided livestream IDs
+ * Counts unique users who registered for the group's livestreams AND also match the targeting criteria
+ * This filters registered users (not livestreams) based on the targeting criteria
  * Only counts users who have registered for the livestreams (registered.date is truthy)
  */
-async function countUniqueUsersFromLivestreams(
-   livestreamIds: string[]
+async function countRegisteredUsersMatchingTargeting(
+   livestreamIds: string[],
+   targeting: GetGroupTalentEngagementFnArgs["targeting"]
 ): Promise<{ uniqueUsers: number; totalInteractions: number }> {
    if (livestreamIds.length === 0) {
       return { uniqueUsers: 0, totalInteractions: 0 }
@@ -303,32 +329,42 @@ async function countUniqueUsersFromLivestreams(
 
    // We can only have 30 "in" clauses
    const chunks = chunkArray(livestreamIds, 30)
-   const allUserIds: string[] = []
+   const allUserData: Array<{ userId: string; user: UserData }> = []
 
    for (const chunk of chunks) {
       const userDataQuery = await firestore
          .collectionGroup("userLivestreamData")
          .where("livestreamId", "in", chunk)
-         .select("userId", "registered")
+         .select("userId", "registered", "user")
          .get()
 
       // Filter for only registered users (registered.date is truthy)
       const registeredUserData = userDataQuery.docs
          .map(
             (doc) =>
-               doc.data() as Pick<UserLivestreamData, "userId" | "registered">
+               doc.data() as Pick<
+                  UserLivestreamData,
+                  "userId" | "registered" | "user"
+               >
          )
          .filter((data) => data.registered?.date)
-         .map((data) => data.userId)
+         .map((data) => ({ userId: data.userId, user: data.user }))
 
-      allUserIds.push(...registeredUserData)
+      allUserData.push(...registeredUserData)
    }
 
-   const uniqueUserIds = new Set(allUserIds)
+   // Filter users based on targeting criteria
+   const targetedUsers = allUserData.filter((userData) => {
+      return userMatchesTargeting(userData.user, targeting)
+   })
+
+   const uniqueUserIds = new Set(
+      targetedUsers.map((userData) => userData.userId)
+   )
 
    return {
       uniqueUsers: uniqueUserIds.size,
-      totalInteractions: allUserIds.length,
+      totalInteractions: targetedUsers.length,
    }
 }
 
@@ -377,32 +413,7 @@ async function countTotalUsersMatchingTargeting(
          "universityCountryCode" | "university" | "fieldOfStudy"
       >
 
-      let matches = true
-
-      // Check ALL targeting criteria - user must match all of them
-
-      // Check countries
-      if (targeting.countries.length > 0) {
-         matches =
-            matches &&
-            targeting.countries.includes(userData.universityCountryCode)
-      }
-
-      // Check universities
-      if (targeting.universities.length > 0) {
-         matches =
-            matches &&
-            targeting.universities.includes(userData.university?.code)
-      }
-
-      // Check fields of study
-      if (targeting.fieldsOfStudy.length > 0) {
-         matches =
-            matches &&
-            targeting.fieldsOfStudy.includes(userData.fieldOfStudy?.id)
-      }
-
-      return matches
+      return userMatchesTargeting(userData, targeting)
    })
 
    return matchingUsers.length
