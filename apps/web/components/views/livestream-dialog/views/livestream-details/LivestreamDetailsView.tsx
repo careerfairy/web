@@ -17,7 +17,10 @@ import HostInfo from "./HostInfo"
 import LivestreamTagsContainer from "./LivestreamTagsContainer"
 import LivestreamTitle from "./LivestreamTitle"
 import MainContentNavigation from "./MainContentNavigation"
-import PastLivestreamHostInfo from "./PastLivestreamHostInfo"
+import {
+   PastLivestreamTopOverlay,
+   PastLivestreamBottomOverlay,
+} from "./PastLivestreamOverlays"
 import RecordingPlayer from "./RecordingPlayer"
 import ShareButton from "./ShareButton"
 import ActionButton from "./action-button/ActionButton"
@@ -35,6 +38,7 @@ const styles = sxStyles({
    pastLivestreamHeroContent: {
       color: "text.primary",
       backgroundColor: "background.paper",
+      padding: "0 !important", // Remove padding for full-width video
    },
 })
 
@@ -96,51 +100,56 @@ const LivestreamDetailsView = () => {
                onBackClick={handleBackClick}
                isPastLivestream={showRecording}
             >
-               <HeroTags />
-               <ShareButton
-                  livestream={livestream}
-                  isPastLivestream={showRecording}
-               />
-               <Stack
-                  ref={viewRef}
-                  alignItems="center"
-                  justifyContent={"center"}
-                  spacing={2.5}
-                  width={"100%"}
-               >
-                  {showRecording ? (
-                     <RecordingPlayer
-                        stream={livestream}
-                        livestreamPresenter={livestreamPresenter}
+               {!showRecording && <HeroTags />}
+               {!showRecording && (
+                  <ShareButton
+                     livestream={livestream}
+                     isPastLivestream={showRecording}
+                  />
+               )}
+               {showRecording ? (
+                  <RecordingPlayer
+                     stream={livestream}
+                     livestreamPresenter={livestreamPresenter}
+                     fullWidth={true}
+                  >
+                     <PastLivestreamTopOverlay
+                        livestream={livestream}
+                        onClose={handleBackClick}
                      />
-                  ) : (
-                     <CountDownTimer presenter={livestreamPresenter} />
-                  )}
-                  {showRecording ? (
-                     <PastLivestreamHostInfo
+                     <PastLivestreamBottomOverlay
                         presenter={livestreamPresenter}
                         livestreamTitle={livestream.title}
                      />
-                  ) : (
-                     <>
-                        <HostInfo presenter={livestreamPresenter} />
-                        <LivestreamTitle text={livestream.title} />
-                     </>
-                  )}
-                  {!showRecording && (
-                     <LivestreamTagsContainer presenter={livestreamPresenter} />
-                  )}
-                  {!isFloatingActionButton && (
-                     <ActionButton
-                        livestreamPresenter={livestreamPresenter}
-                        onRegisterClick={handleRegisterClick}
-                        canWatchRecording={showRecording}
-                        isFloating={isFloatingActionButton}
-                        userEmailFromServer={serverUserEmail}
-                        heroVisible={heroInView}
-                     />
-                  )}
-               </Stack>
+                  </RecordingPlayer>
+               ) : (
+                  <Stack
+                     ref={viewRef}
+                     alignItems="center"
+                     justifyContent={"center"}
+                     spacing={2.5}
+                     width={"100%"}
+                  >
+                     <CountDownTimer presenter={livestreamPresenter} />
+                     <HostInfo presenter={livestreamPresenter} />
+                     <LivestreamTitle text={livestream.title} />
+                     {!showRecording && (
+                        <LivestreamTagsContainer
+                           presenter={livestreamPresenter}
+                        />
+                     )}
+                     {!isFloatingActionButton && (
+                        <ActionButton
+                           livestreamPresenter={livestreamPresenter}
+                           onRegisterClick={handleRegisterClick}
+                           canWatchRecording={showRecording}
+                           isFloating={isFloatingActionButton}
+                           userEmailFromServer={serverUserEmail}
+                           heroVisible={heroInView}
+                        />
+                     )}
+                  </Stack>
+               )}
             </HeroContent>
          }
          mainContent={

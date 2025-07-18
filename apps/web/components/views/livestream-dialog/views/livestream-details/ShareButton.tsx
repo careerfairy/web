@@ -1,5 +1,6 @@
 import { FC, useCallback } from "react"
 import { IconButton, Tooltip } from "@mui/material"
+import CloseIcon from "@mui/icons-material/CloseRounded"
 import ShareIcon from "@mui/icons-material/ShareOutlined"
 import { useCopyToClipboard } from "react-use"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
@@ -65,7 +66,7 @@ const ShareButton: FC<Props> = ({ livestream, isPastLivestream = false }) => {
       >
          <Tooltip title="Share">
             <IconButton onClick={handleClick}>
-               <ShareIcon />
+               {isPastLivestream ? <ShareIcon /> : <CloseIcon />}
             </IconButton>
          </Tooltip>
       </Box>
