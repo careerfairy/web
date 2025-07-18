@@ -2,6 +2,8 @@ import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { LinkedInIcon } from "components/views/common/icons/LinkedInIcon"
+import { useIsTargetedUser } from "components/views/sparks/components/spark-card/Notifications/linkedin/useIsTargetedUser"
 import Image from "next/image"
 import Link from "next/link"
 import { ReactNode, SyntheticEvent } from "react"
@@ -80,6 +82,20 @@ const styles = sxStyles({
       top: 4,
       zIndex: 1,
    },
+   linkedInContainer: (theme) => ({
+      position: "absolute",
+      top: 8,
+      right: 8,
+      width: "32px",
+      height: "32px",
+      backgroundColor: theme.brand.info[600],
+      border: `2px solid ${theme.brand.white[100]}`,
+      borderRadius: "50%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 2,
+   }),
    logoOverlay: {
       position: "absolute",
       bottom: 1,
@@ -132,12 +148,17 @@ export const MentorCard = ({
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
    const { group } = useCompanyPage()
+   const isUserFromTargetedCountry = useIsTargetedUser(group)
 
    const _handleEdit = (ev: SyntheticEvent) => {
       ev.preventDefault()
       ev.stopPropagation()
       handleEdit?.()
    }
+
+   const shouldShowLinkedInIcon = Boolean(
+      isUserFromTargetedCountry && creator.linkedInUrl && !isEditMode
+   )
 
    return (
       <Container creator={creator}>
@@ -162,6 +183,11 @@ export const MentorCard = ({
             <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.brand.white[100]} />
             </IconButton>
+         ) : null}
+         {shouldShowLinkedInIcon ? (
+            <Box sx={styles.linkedInContainer}>
+               <LinkedInIcon fill="white" sx={{ width: "18px", height: "18px" }} />
+            </Box>
          ) : null}
          <Box sx={styles.avatarContainer}>
             <CircularLogo
