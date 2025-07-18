@@ -7,6 +7,7 @@ import { Home, LogOut, Repeat, User } from "react-feather"
 
 // project imports
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { useCallback, useMemo } from "react"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
 import BrandedMenu from "../../../components/views/common/inputs/BrandedMenu"
@@ -75,61 +76,66 @@ export const ProfileMenu = ({ anchorEl, open, onClose }: ProfileMenuProps) => {
    const showSwitchButton =
       userData?.isAdmin || Object.keys(adminGroups).length > 1
 
-   const handleProfileClick = () => {
+   const handleProfileClick = useCallback(() => {
       push(`/group/${group?.id}/admin/profile`)
       onClose()
-   }
+   }, [push, group?.id, onClose])
 
-   const handleSwitchCompanyClick = () => {
-      openManageCompaniesDialog()
-      onClose()
-   }
-
-   const handlePortalClick = () => {
-      push("/portal")
-      onClose()
-   }
-
-   const handleLogoutClick = () => {
-      signOut()
-      onClose()
-   }
-
-   const menuItems = [
-      {
-         key: "profile",
-         label: "Profile",
-         icon: <User size={16} />,
-         onClick: handleProfileClick,
-         show: true,
-      },
-      {
-         key: "switchCompany",
-         label: "Switch company",
-         icon: <Repeat size={16} />,
-         onClick: handleSwitchCompanyClick,
-         show: Boolean(showSwitchButton),
-      },
-      {
-         key: "portal",
-         label: "Student portal",
-         icon: <Home size={16} />,
-         onClick: handlePortalClick,
-         show: true,
-      },
-      {
-         key: "divider",
-         divider: true,
-         show: true,
-      },
-      {
-         key: "logout",
-         label: "Log out",
-         icon: <LogOut size={16} />,
-         onClick: handleLogoutClick,
-         show: true,
-      },
-   ]
+   const menuItems = useMemo(
+      () =>
+         [
+            {
+               key: "profile",
+               label: "Profile",
+               icon: <User size={16} />,
+               onClick: handleProfileClick,
+               show: true,
+            },
+            {
+               key: "switchCompany",
+               label: "Switch company",
+               icon: <Repeat size={16} />,
+               onClick: () => {
+                  openManageCompaniesDialog()
+                  onClose()
+               },
+               show: Boolean(showSwitchButton),
+            },
+            {
+               key: "portal",
+               label: "Student portal",
+               icon: <Home size={16} />,
+               onClick: () => {
+                  push("/portal")
+                  onClose()
+               },
+               show: true,
+            },
+            {
+               key: "divider",
+               divider: true,
+               show: true,
+            },
+            {
+               key: "logout",
+               label: "Log out",
+               icon: <LogOut size={16} />,
+               onClick: () => {
+                  signOut()
+                  onClose()
+               },
+               show: true,
+            },
+         ].filter((item) => item.show),
+      [
+         handleProfileClick,
+         showSwitchButton,
+         openManageCompaniesDialog,
+         onClose,
+         push,
+         signOut,
+      ]
+   )
 
    return (
       <StyledBrandedMenu
@@ -171,20 +177,18 @@ export const ProfileMenu = ({ anchorEl, open, onClose }: ProfileMenuProps) => {
          </ProfileSection>
 
          {/* Menu Items */}
-         {menuItems
-            .filter((item) => item.show)
-            .map(({ divider, key, label, icon, onClick }) =>
-               divider ? (
-                  <StyledDivider key={key} />
-               ) : (
-                  <StyledMenuItem key={key} onClick={onClick}>
-                     {icon}
-                     <Typography variant="small" color="neutral.700">
-                        {label}
-                     </Typography>
-                  </StyledMenuItem>
-               )
-            )}
+         {menuItems.map(({ divider, key, label, icon, onClick }) =>
+            divider ? (
+               <StyledDivider key={key} />
+            ) : (
+               <StyledMenuItem key={key} onClick={onClick}>
+                  {icon}
+                  <Typography variant="small" color="neutral.700">
+                     {label}
+                  </Typography>
+               </StyledMenuItem>
+            )
+         )}
       </StyledBrandedMenu>
    )
 }
