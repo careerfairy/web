@@ -2,12 +2,11 @@ import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { LinkedInIcon } from "components/views/common/icons/LinkedInIcon"
 import { useIsTargetedUser } from "components/views/sparks/components/spark-card/Notifications/linkedin/useIsTargetedUser"
 import Image from "next/image"
 import Link from "next/link"
 import { ReactNode, SyntheticEvent } from "react"
-import { Edit2 } from "react-feather"
+import { Edit2, Linkedin } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { buildMentorPageLink } from "util/routes"
 import { useCompanyPage } from ".."
@@ -89,7 +88,6 @@ const styles = sxStyles({
       width: "26px",
       height: "26px",
       backgroundColor: "#F3F3F5",
-      border: `2px solid ${theme.brand.white[100]}`,
       borderRadius: "50%",
       display: "flex",
       alignItems: "center",
@@ -186,7 +184,7 @@ export const MentorCard = ({
          ) : null}
          {shouldShowLinkedInIcon ? (
             <Box sx={styles.linkedInContainer}>
-               <LinkedInIcon fill={theme.brand.info[700]} sx={{ width: "14px", height: "14px" }} />
+               <Linkedin size={14} color={theme.brand.info[700]} />
             </Box>
          ) : null}
          <Box sx={styles.avatarContainer}>
