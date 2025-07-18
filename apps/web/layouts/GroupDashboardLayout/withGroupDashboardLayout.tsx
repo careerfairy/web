@@ -1,5 +1,7 @@
+import { AdminContainer } from "components/views/group/admin/common/Container"
 import { useRouter } from "next/router"
 import { ReactElement, ReactNode } from "react"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 import { LivestreamAnalyticsNavigationTabs } from "../../components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
 import DashboardHead from "./DashboardHead"
 import GroupDashboardLayout from "./index"
@@ -37,6 +39,7 @@ export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
       } = props
 
       const router = useRouter()
+      const isMobile = useIsMobile()
 
       const resolvedTitleComponent =
          typeof titleComponent === "function"
@@ -65,7 +68,9 @@ export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
                <SubNavigationTabs showSubNavigationFor={subNavigationFor} />
             )}
             {Boolean(isAnalyticsLiveStreamPage) && (
-               <LivestreamAnalyticsNavigationTabs />
+               <AdminContainer disableGutters={isMobile}>
+                  <LivestreamAnalyticsNavigationTabs />
+               </AdminContainer>
             )}
             {page}
          </GroupDashboardLayout>

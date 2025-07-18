@@ -151,6 +151,7 @@ type PopoverMenuProps = {
    anchorEl: HTMLElement | null
    open: boolean
    placement?: MenuPlacement
+   menuSx?: SxProps
 }
 
 type MenuPlacement = "top" | "bottom"
@@ -161,6 +162,7 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
    anchorEl,
    open,
    placement = "bottom",
+   menuSx,
 }) => {
    return (
       <BrandedMenu
@@ -178,6 +180,7 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
          TransitionProps={{
             unmountOnExit: true,
          }}
+         sx={menuSx}
       >
          {options.map((option, index) => {
             const WrapperComponent = option.wrapperComponent || Fragment
@@ -206,6 +209,7 @@ export type MoreMenuProps = {
    enableDrawerCancelButton?: boolean
    placement?: MenuPlacement
    disableSwipeToOpen?: boolean
+   menuSx?: SxProps
 }
 
 const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
@@ -217,6 +221,7 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
    enableDrawerCancelButton,
    placement,
    disableSwipeToOpen,
+   menuSx,
 }) => {
    const defaultIsMobile = useIsMobile()
    const isMobile = isMobileOverride ?? defaultIsMobile
@@ -238,6 +243,7 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
                anchorEl={anchorEl}
                open={open}
                placement={placement}
+               menuSx={menuSx}
             />
          )}
       </Fragment>

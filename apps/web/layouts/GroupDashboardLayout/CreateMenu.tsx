@@ -1,4 +1,4 @@
-import { CircularProgress } from "@mui/material"
+import { CircularProgress, SxProps } from "@mui/material"
 import { JOB_DIALOG_QUERY_KEYS } from "components/custom-hook/custom-job/useJobDialogRouter"
 import { useAppDispatch } from "components/custom-hook/store"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
@@ -18,6 +18,7 @@ type CreateMenuProps = {
    anchorEl: HTMLElement | null
    handleClose: () => void
    isMobileOverride?: boolean
+   menuSx?: SxProps
 }
 
 export const CreateMenu = ({
@@ -25,6 +26,7 @@ export const CreateMenu = ({
    anchorEl,
    handleClose,
    isMobileOverride = false,
+   menuSx,
 }: CreateMenuProps) => {
    const { createDraftLivestream, isCreating } = useLivestreamRouting()
    const { query, push } = useRouter()
@@ -89,6 +91,7 @@ export const CreateMenu = ({
          handleClose={handleClose}
          isMobileOverride={isMobileOverride}
          disableSwipeToOpen
+         menuSx={menuSx}
       />
    )
 }

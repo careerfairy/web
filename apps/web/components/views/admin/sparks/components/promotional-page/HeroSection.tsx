@@ -40,11 +40,10 @@ export const HeroSection = () => {
       })
    }
 
-   // Calculate progress value before passing as prop
-   const progressValue =
-      talentEngagement?.total && talentEngagement.total > 0
-         ? (talentEngagement.count / talentEngagement.total) * 100
-         : 0
+   const progressValue = calculateProgressValue(
+      talentEngagement?.total || 0,
+      talentEngagement?.count || 0
+   )
 
    return (
       <StyledHeroContent>
@@ -219,4 +218,8 @@ export const HeroSection = () => {
          </StyledPricingSection>
       </StyledHeroContent>
    )
+}
+
+const calculateProgressValue = (total: number, count: number) => {
+   return total > 0 ? (count / total) * 100 : 0
 }
