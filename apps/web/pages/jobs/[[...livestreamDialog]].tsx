@@ -87,6 +87,7 @@ const JobsPage: NextPage<
             hideFooter
             headerFixed={false}
             transitionTimeout={HEADER_TRANSITION_TIMEOUT}
+            titleComponent="title"
          >
             <LivestreamDialogLayout>
                <JobsOverviewContextProvider
