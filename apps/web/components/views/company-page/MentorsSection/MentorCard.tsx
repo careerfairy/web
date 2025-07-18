@@ -86,9 +86,9 @@ const styles = sxStyles({
       position: "absolute",
       top: 8,
       right: 8,
-      width: "32px",
-      height: "32px",
-      backgroundColor: theme.brand.info[600],
+      width: "26px",
+      height: "26px",
+      backgroundColor: "#F3F3F5",
       border: `2px solid ${theme.brand.white[100]}`,
       borderRadius: "50%",
       display: "flex",
@@ -186,7 +186,7 @@ export const MentorCard = ({
          ) : null}
          {shouldShowLinkedInIcon ? (
             <Box sx={styles.linkedInContainer}>
-               <LinkedInIcon fill="white" sx={{ width: "18px", height: "18px" }} />
+               <LinkedInIcon fill={theme.brand.info[700]} sx={{ width: "14px", height: "14px" }} />
             </Box>
          ) : null}
          <Box sx={styles.avatarContainer}>
