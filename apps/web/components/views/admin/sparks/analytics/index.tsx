@@ -1,6 +1,7 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import { Box, Button, Container, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { AdminContainer } from "components/views/group/admin/common/Container"
 import { useRouter } from "next/router"
 import { RefreshCw } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -26,23 +27,17 @@ const styles = sxStyles({
       },
       marginBottom: { md: "20px" },
       pt: {
-         xs: 1,
-         md: 1.5,
+         xs: 2.5,
+         md: 3,
       },
    },
    tabs: {
-      marginLeft: {
-         xs: -0.5,
-         md: 0,
-      },
       marginRight: {
          xs: -2,
          md: 0,
       },
-      pl: {
-         xs: 0,
-         md: 1.5,
-      },
+      pb: 1,
+
       width: {
          xs: "calc(100% + 16px)",
          md: "auto",
@@ -164,44 +159,46 @@ const GroupSparkAnalytics = () => {
    ]
 
    return (
-      <Container sx={styles.root} maxWidth="xl">
+      <Box sx={styles.root}>
          <Box sx={styles.controlHeader}>
             <SparksAnalyticsTabs sx={styles.tabs} />
-            <Box component="span" sx={styles.mobileLimiter} />
-            <Box sx={styles.controlsWrapper}>
-               <Box sx={styles.updateControlsWrapper}>
-                  <UpdatedAtLabel />
-                  <Button
-                     onClick={updateAnalytics}
-                     sx={styles.updateButton}
-                     disabled={isLoading}
-                  >
-                     <Box
-                        sx={[
-                           isLoading ? styles.spinningAnimation : {},
-                           styles.updateIcon,
-                        ]}
+            <AdminContainer>
+               <Box component="span" sx={styles.mobileLimiter} />
+               <Box sx={styles.controlsWrapper}>
+                  <Box sx={styles.updateControlsWrapper}>
+                     <UpdatedAtLabel />
+                     <Button
+                        onClick={updateAnalytics}
+                        sx={styles.updateButton}
+                        disabled={isLoading}
                      >
-                        <RefreshCw size={UPDATE_ICON_SIZE} />
-                     </Box>
-                  </Button>
+                        <Box
+                           sx={[
+                              isLoading ? styles.spinningAnimation : {},
+                              styles.updateIcon,
+                           ]}
+                        >
+                           <RefreshCw size={UPDATE_ICON_SIZE} />
+                        </Box>
+                     </Button>
+                  </Box>
+                  <ResponsiveSelectWithDrawer
+                     selectValue={selectTimeFilter}
+                     setSelectValue={setSelectTimeFilter}
+                     options={options}
+                     selectContainerProps={{
+                        sx: styles.selectDrawer,
+                     }}
+                  />
                </Box>
-               <ResponsiveSelectWithDrawer
-                  selectValue={selectTimeFilter}
-                  setSelectValue={setSelectTimeFilter}
-                  options={options}
-                  selectContainerProps={{
-                     sx: styles.selectDrawer,
-                  }}
-               />
-            </Box>
+            </AdminContainer>
          </Box>
          <Box>
             {tabValue === "overview" && <SparksOverviewTab />}
             {tabValue === "audience" && <SparksAudienceTab />}
             {tabValue === "competitor" && <SparksCompetitorTab />}
          </Box>
-      </Container>
+      </Box>
    )
 }
 

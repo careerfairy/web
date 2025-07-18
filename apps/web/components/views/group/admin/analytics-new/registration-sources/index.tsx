@@ -1,9 +1,9 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Grid } from "@mui/material"
-import { Box, Container } from "@mui/system"
 import { memo, useEffect, useMemo } from "react"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import Sources from "../../analytics/RegistrationSources"
+import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
 import {
    GeneralPageProvider,
    useAnalyticsPageContext,
@@ -42,20 +42,18 @@ const PageContent = () => {
    )
 
    return (
-      <Container maxWidth="xl">
-         <Box py={2} px={1.5}>
-            <Grid container spacing={spacing}>
-               <Grid xs={12} item>
-                  <GeneralSearchFilter />
-               </Grid>
-               <Sources
-                  group={group}
-                  loading={isLoading}
-                  streamsFromTimeFrameAndFuture={mappedEvents}
-               />
+      <LivestreamAnalyticsContainer>
+         <Grid container spacing={spacing}>
+            <Grid xs={12} item>
+               <GeneralSearchFilter />
             </Grid>
-         </Box>
-      </Container>
+            <Sources
+               group={group}
+               loading={isLoading}
+               streamsFromTimeFrameAndFuture={mappedEvents}
+            />
+         </Grid>
+      </LivestreamAnalyticsContainer>
    )
 }
 

@@ -17,7 +17,6 @@ const TabsContainer = styled(Box)({
    flexDirection: "row",
    alignItems: "center",
    gap: 16,
-   padding: 12,
    width: "100%",
    overflowX: "auto",
    // Custom scrollbar styling

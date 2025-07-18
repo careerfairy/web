@@ -2,8 +2,9 @@ import GroupSparkAnalytics from "components/views/admin/sparks/analytics"
 import { SparksAnalyticsProvider } from "components/views/admin/sparks/analytics/SparksAnalyticsContext"
 import { SparksPromotionalPage } from "components/views/admin/sparks/components/promotional-page/SparksPromotionalPage"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
+import { AdminContainer } from "components/views/group/admin/common/Container"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { Fragment, ReactElement } from "react"
+import { ReactElement } from "react"
 import { withGroupDashboardLayout } from "../../../../../../layouts/GroupDashboardLayout/withGroupDashboardLayout"
 
 const AdminSparksAnalyticsPage = () => {
@@ -14,11 +15,11 @@ const AdminSparksAnalyticsPage = () => {
    if (!hasAccessToSparks) return <SparksPromotionalPage />
 
    return (
-      <Fragment>
+      <AdminContainer>
          <SparksAnalyticsProvider>
             <GroupSparkAnalytics />
          </SparksAnalyticsProvider>
-      </Fragment>
+      </AdminContainer>
    )
 }
 
