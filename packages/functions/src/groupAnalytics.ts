@@ -94,7 +94,6 @@ export const getGroupTalentEngagement = onCall(
 
             const response: GetGroupTalentEngagementFnResponse = {
                count: uniqueUsers,
-               total: totalInteractions,
             }
 
             return response
