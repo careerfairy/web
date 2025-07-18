@@ -37,8 +37,11 @@ const swrOptions: SWRConfiguration = {
  * Returns the count of unique users who registered to the group's targeted livestreams
  * and match the targeting criteria, plus the total count of users matching the targeting criteria
  *
- * @param group - The group object containing targeting criteria
- * @returns SWR response with combined data containing count, total, loading state, and error state
+ * Fetches:
+ * - The number of unique users who registered for the group's targeted livestreams and match the targeting criteria.
+ * - The total number of users matching the group's targeting criteria.
+ *
+ * If the group has no targeting criteria, the total is set to 5 times the actual count.
  */
 export const useGroupTalentEngagement = (group: Group | undefined) => {
    const fetcher = useFunctionsSWRFetcher<GroupTalentEngagementResponse>()
@@ -58,10 +61,18 @@ export const useGroupTalentEngagement = (group: Group | undefined) => {
       swrOptions
    )
 
-   // Fetch total users matching targeting
-   const totalUsersKey = functionArgs
-      ? [FUNCTION_NAMES.getTotalUsersMatchingTargeting, functionArgs]
-      : null
+   // Check if group has no targeting criteria
+   const hasNoTargeting =
+      group &&
+      isEmpty(group.targetedCountries) &&
+      isEmpty(group.targetedUniversities) &&
+      isEmpty(group.targetedFieldsOfStudy)
+
+   // Fetch total users matching targeting (skip if no targeting to save costs)
+   const totalUsersKey =
+      functionArgs && !hasNoTargeting
+         ? [FUNCTION_NAMES.getTotalUsersMatchingTargeting, functionArgs]
+         : null
 
    const totalUsersResponse = useSWR<TotalUsersMatchingTargetingResponse>(
       totalUsersKey,
@@ -74,21 +85,15 @@ export const useGroupTalentEngagement = (group: Group | undefined) => {
       registeredUsersResponse.isLoading || totalUsersResponse.isLoading
    const error = registeredUsersResponse.error || totalUsersResponse.error
 
-   // Check if group has no targeting criteria
-   const hasNoTargeting =
-      group &&
-      isEmpty(group.targetedCountries) &&
-      isEmpty(group.targetedUniversities) &&
-      isEmpty(group.targetedFieldsOfStudy)
-
    const combinedData: CombinedResponse | undefined =
-      registeredUsersResponse.data && totalUsersResponse.data
+      registeredUsersResponse.data &&
+      (hasNoTargeting || totalUsersResponse.data)
          ? {
-              // Return adjusted count as the main count (20% of total if no targeting)
-              count: hasNoTargeting
-                 ? Math.round(totalUsersResponse.data.total * 0.2)
-                 : registeredUsersResponse.data.count,
-              total: totalUsersResponse.data.total,
+              // If no targeting, set total to 5x the count, otherwise use actual values
+              count: registeredUsersResponse.data.count,
+              total: hasNoTargeting
+                 ? registeredUsersResponse.data.count * 5
+                 : totalUsersResponse.data!.total,
            }
          : undefined
 

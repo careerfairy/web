@@ -20,6 +20,23 @@ const TabsContainer = styled(Box)({
    padding: 12,
    width: "100%",
    overflowX: "auto",
+   // Custom scrollbar styling
+   "&::-webkit-scrollbar": {
+      height: 4,
+   },
+   "&::-webkit-scrollbar-track": {
+      background: "transparent",
+   },
+   "&::-webkit-scrollbar-thumb": {
+      background: "#E0E0E0",
+      borderRadius: 2,
+      "&:hover": {
+         background: "#BDBDBD",
+      },
+   },
+   // Firefox scrollbar styling
+   scrollbarWidth: "thin",
+   scrollbarColor: "#E0E0E0 transparent",
 })
 
 const TabButton = styled(Box, {

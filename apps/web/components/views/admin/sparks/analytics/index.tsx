@@ -24,10 +24,17 @@ const styles = sxStyles({
          xs: "column",
          md: "row",
       },
-      marginTop: { sm: 1, md: 1.5 },
       marginBottom: { md: "20px" },
+      pt: {
+         xs: 1,
+         md: 1.5,
+      },
    },
    tabs: {
+      marginLeft: {
+         xs: -0.5,
+         md: 0,
+      },
       marginRight: {
          xs: -2,
          md: 0,

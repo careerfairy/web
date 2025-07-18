@@ -2,13 +2,13 @@ import { Container, Grid, Typography } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
+import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
+import AggregatedUniversitySources from "./analytics/AggregatedUniversitySources"
 import {
    LivestreamAnalyticsPageProvider,
    useLivestreamsAnalyticsPageContext,
 } from "./LivestreamAnalyticsPageProvider"
 import LivestreamSearchNav from "./search/LivestreamSearchNav"
-import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
-import AggregatedUniversitySources from "./analytics/AggregatedUniversitySources"
 import UsersTable from "./users/UsersTable"
 
 const styles = sxStyles({
@@ -31,8 +31,8 @@ const PageContent = () => {
    const noStreams = currentStreamStats === null
 
    return (
-      <Box py={2}>
-         <Container maxWidth={false}>
+      <Container maxWidth="xl">
+         <Box py={2} px={1.5}>
             <Grid container spacing={spacing}>
                <Grid xs={12} item style={styles.gridItem}>
                   <LivestreamSearchNav />
@@ -55,8 +55,8 @@ const PageContent = () => {
                   </>
                )}
             </Grid>
-         </Container>
-      </Box>
+         </Box>
+      </Container>
    )
 }
 

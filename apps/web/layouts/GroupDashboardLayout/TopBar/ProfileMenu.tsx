@@ -152,7 +152,7 @@ export const ProfileMenu = ({ anchorEl, open, onClose }: ProfileMenuProps) => {
                lastName={userData?.lastName}
                firstName={userData?.firstName}
             />
-            <Stack>
+            <Stack minWidth={0} flex={1}>
                <Typography
                   variant="medium"
                   color="neutral.800"
