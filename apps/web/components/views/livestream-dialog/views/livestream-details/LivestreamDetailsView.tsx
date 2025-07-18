@@ -7,7 +7,6 @@ import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import useTrackLivestreamView from "../../../../custom-hook/live-stream/useTrackLivestreamView"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import useRecordingAccess from "../../../upcoming-livestream/HeroSection/useRecordingAccess"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
@@ -31,6 +30,10 @@ import Speakers from "./main-content/Speakers"
 const styles = sxStyles({
    liveHeroContent: {
       animation: `${boxShadowAnimation} 1s infinite alternate`,
+   },
+   heroContentWithoutBg: {
+      color: "text.primary",
+      backgroundColor: "background.paper",
    },
 })
 
@@ -79,12 +82,11 @@ const LivestreamDetailsView = () => {
       <BaseDialogView
          heroContent={
             <HeroContent
-               sx={[livestreamPresenter.isLive() && styles.liveHeroContent]}
+               sx={[
+                  livestreamPresenter.isLive() && styles.liveHeroContent,
+                  styles.heroContentWithoutBg,
+               ]}
                ref={heroRef}
-               backgroundImg={getResizedUrl(
-                  livestream.backgroundImageUrl,
-                  "lg"
-               )}
                onBackPosition={
                   isMobile || previousView === "recommendations"
                      ? "top-left"
@@ -101,9 +103,6 @@ const LivestreamDetailsView = () => {
                   spacing={2.5}
                   width={"100%"}
                >
-                  <HostInfo presenter={livestreamPresenter} />
-                  <LivestreamTitle text={livestream.title} />
-                  <LivestreamTagsContainer presenter={livestreamPresenter} />
                   {showRecording ? (
                      <RecordingPlayer
                         stream={livestream}
@@ -112,6 +111,9 @@ const LivestreamDetailsView = () => {
                   ) : (
                      <CountDownTimer presenter={livestreamPresenter} />
                   )}
+                  <HostInfo presenter={livestreamPresenter} />
+                  <LivestreamTitle text={livestream.title} />
+                  <LivestreamTagsContainer presenter={livestreamPresenter} />
                   {!isFloatingActionButton && (
                      <ActionButton
                         livestreamPresenter={livestreamPresenter}
