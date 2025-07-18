@@ -94,9 +94,13 @@ const LivestreamDetailsView = () => {
                      : "top-right"
                }
                onBackClick={handleBackClick}
+               isPastLivestream={showRecording}
             >
                <HeroTags />
-               <ShareButton livestream={livestream} />
+               <ShareButton
+                  livestream={livestream}
+                  isPastLivestream={showRecording}
+               />
                <Stack
                   ref={viewRef}
                   alignItems="center"
@@ -123,7 +127,9 @@ const LivestreamDetailsView = () => {
                         <LivestreamTitle text={livestream.title} />
                      </>
                   )}
-                  <LivestreamTagsContainer presenter={livestreamPresenter} />
+                  {!showRecording && (
+                     <LivestreamTagsContainer presenter={livestreamPresenter} />
+                  )}
                   {!isFloatingActionButton && (
                      <ActionButton
                         livestreamPresenter={livestreamPresenter}

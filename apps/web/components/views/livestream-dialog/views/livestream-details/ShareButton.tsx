@@ -15,22 +15,28 @@ const styles = sxStyles({
       position: "absolute",
       top: 0,
       right: (theme) => ({ xs: 0, md: theme.spacing(4.5) }),
-      color: "white",
       p: 1,
       "& svg": {
          fontSize: "24px",
       },
    },
+   whiteIcon: {
+      color: "white",
+   },
+   neutralIcon: {
+      color: "neutral.800",
+   },
 })
 
 type Props = {
    livestream: LivestreamEvent
+   isPastLivestream?: boolean
 }
 
-const ShareButton: FC<Props> = ({ livestream }) => {
+const ShareButton: FC<Props> = ({ livestream, isPastLivestream = false }) => {
    const { userData } = useAuth()
    const { successNotification } = useSnackbarNotifications()
-   const [_, copyEventLinkToClipboard] = useCopyToClipboard()
+   const [, copyEventLinkToClipboard] = useCopyToClipboard()
 
    const handleClick = useCallback(() => {
       const eventUrl = makeLivestreamEventDetailsInviteUrl(
@@ -48,18 +54,18 @@ const ShareButton: FC<Props> = ({ livestream }) => {
          "Live stream link has been copied to your clipboard",
          "Copied"
       )
-   }, [
-      copyEventLinkToClipboard,
-      livestream,
-      successNotification,
-      userData?.referralCode,
-   ])
+   }, [copyEventLinkToClipboard, livestream, successNotification, userData])
 
    return (
-      <Box sx={styles.root}>
+      <Box
+         sx={[
+            styles.root,
+            isPastLivestream ? styles.neutralIcon : styles.whiteIcon,
+         ]}
+      >
          <Tooltip title="Share">
-            <IconButton color="info" onClick={handleClick}>
-               <ShareIcon fontSize="inherit" />
+            <IconButton onClick={handleClick}>
+               <ShareIcon />
             </IconButton>
          </Tooltip>
       </Box>
