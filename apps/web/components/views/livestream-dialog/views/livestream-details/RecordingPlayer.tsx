@@ -34,6 +34,11 @@ const styles = sxStyles({
    root: {
       width: "100%",
    },
+   fullWidthRoot: {
+      width: "100%",
+      margin: "-2.25rem", // Negative margin to extend beyond hero padding
+      marginBottom: "2.25rem", // Keep bottom margin for spacing
+   },
    icon: {
       zIndex: 2,
       width: "65px",
@@ -66,6 +71,17 @@ const styles = sxStyles({
          borderRadius: 2,
          overflow: "hidden",
          boxShadow: (theme) => theme.legacy.boxShadows.dark_8_25_10,
+      },
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+   },
+   fullWidthPlayerWrapper: {
+      position: "relative",
+      aspectRatio: "16 / 9",
+      "& .react-player": {
+         borderRadius: 0,
+         overflow: "hidden",
       },
       display: "flex",
       justifyContent: "center",
@@ -113,6 +129,8 @@ const styles = sxStyles({
 type Props = {
    stream: LivestreamEvent
    livestreamPresenter: LivestreamPresenter
+   fullWidth?: boolean
+   children?: React.ReactNode
 }
 
 const RecordingPlayer: FC<Props> = (props) => {
@@ -140,7 +158,12 @@ export const PlayerSkeleton: FC = () => {
    )
 }
 
-const Player = ({ stream, livestreamPresenter }: Props) => {
+const Player = ({
+   stream,
+   livestreamPresenter,
+   fullWidth = false,
+   children,
+}: Props) => {
    const { isLoggedIn } = useAuth()
    const router = useRouter()
    const playerRef = useRef<ReactPlayer | null>(null)
@@ -209,8 +232,13 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
    }
 
    return (
-      <Box sx={styles.root}>
-         <Box sx={styles.playerWrapper} mt={1}>
+      <Box sx={fullWidth ? styles.fullWidthRoot : styles.root}>
+         <Box
+            sx={
+               fullWidth ? styles.fullWidthPlayerWrapper : styles.playerWrapper
+            }
+            mt={fullWidth ? 0 : 1}
+         >
             <ReactPlayer
                ref={playerRef}
                className="react-player"
@@ -233,6 +261,7 @@ const Player = ({ stream, livestreamPresenter }: Props) => {
                onProgress={handleProgress}
                progressInterval={1000}
             />
+            {children}
          </Box>
       </Box>
    )
