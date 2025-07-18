@@ -1,10 +1,10 @@
-import { Container, Grid } from "@mui/material"
-import { Box } from "@mui/system"
+import { Grid } from "@mui/material"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import useGroupCompanyPageProgress from "../../../../../custom-hook/useGroupCompanyPageProgress"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
 import AggregatedAnalytics, {
    SkeletonAggregatedAnalytics,
 } from "./analytics/AggregatedAnalytics"
@@ -34,8 +34,8 @@ const PageContent = () => {
    const progress = useGroupCompanyPageProgress(group)
 
    return (
-      <Container maxWidth="xl">
-         <Box py={2} px={1.5}>
+      <LivestreamAnalyticsContainer>
+         <Grid container>
             <Grid container spacing={spacing}>
                <Grid xs={12} item style={styles.gridItem}>
                   <GeneralSearchFilter />
@@ -71,8 +71,8 @@ const PageContent = () => {
                   <AggregatedBreakdown />
                </Grid>
             </Grid>
-         </Box>
-      </Container>
+         </Grid>
+      </LivestreamAnalyticsContainer>
    )
 }
 

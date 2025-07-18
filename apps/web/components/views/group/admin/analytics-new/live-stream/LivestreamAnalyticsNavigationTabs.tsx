@@ -8,8 +8,8 @@ import { sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    root: {
       pt: {
-         xs: 1,
-         md: 1.5,
+         xs: 2.5,
+         md: 3,
       },
       width: "100%",
    },
@@ -64,8 +64,14 @@ export const LivestreamAnalyticsNavigationTabs = () => {
    }
 
    return (
-      <Box sx={styles.root}>
-         <BrandedTabs activeValue={activeTab} onChange={handleTabChange}>
+      <Box id="livestream-analytics-navigation-tabs" sx={styles.root}>
+         <BrandedTabs
+            sx={{
+               pb: 1,
+            }}
+            activeValue={activeTab}
+            onChange={handleTabChange}
+         >
             {tabs.map((tab) => (
                <BrandedTabs.Tab
                   key={tab.pathname}
