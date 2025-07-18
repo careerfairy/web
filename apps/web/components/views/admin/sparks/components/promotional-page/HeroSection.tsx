@@ -89,7 +89,11 @@ export const HeroSection = () => {
 
                <Stack spacing={0.5}>
                   <StyledLinearProgress
-                     variant="determinate"
+                     variant={
+                        talentEngagementLoading
+                           ? "indeterminate"
+                           : "determinate"
+                     }
                      value={progressValue}
                   />
                   <Typography
@@ -98,7 +102,7 @@ export const HeroSection = () => {
                      color="neutral.500"
                   >
                      {talentEngagementLoading
-                        ? "Loading..."
+                        ? "Crunching the numbers..."
                         : `${talentEngagement?.count || 0}/${
                              talentEngagement?.total || 0
                           } talent engaged`}
