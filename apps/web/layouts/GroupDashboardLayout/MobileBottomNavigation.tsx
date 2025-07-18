@@ -100,6 +100,16 @@ const navItems = [
    },
 ] satisfies NavItemData[]
 
+const renderIcon = (item: NavItemData, isActive: boolean, id: string) => {
+   const IconComponent = item.iconComponent
+   return (
+      <IconComponent
+         strokeWidth={id === "create" ? 1.5 : undefined} // Create icon is less thicker according to figma
+         fill={isActive ? "currentColor" : "none"}
+      />
+   )
+}
+
 type NavItemData = {
    id: string
    label: string
@@ -182,11 +192,6 @@ export const MobileBottomNavigation = () => {
       }
    }
 
-   const renderIcon = (item: NavItemData, isActive: boolean) => {
-      const IconComponent = item.iconComponent
-      return <IconComponent fill={isActive ? "currentColor" : "none"} />
-   }
-
    return (
       <Fragment>
          {/* Offset for the bottom navigation */}
@@ -205,7 +210,7 @@ export const MobileBottomNavigation = () => {
                      key={item.id}
                      label={item.label}
                      value={item.id}
-                     icon={renderIcon(item, isActive)}
+                     icon={renderIcon(item, isActive, item.id)}
                      disableRipple
                   />
                )
