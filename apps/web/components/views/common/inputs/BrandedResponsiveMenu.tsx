@@ -5,6 +5,7 @@ import {
    List,
    ListItemButton,
    MenuItem,
+   MenuProps,
    SwipeableDrawerProps,
    SxProps,
    Typography,
@@ -14,6 +15,7 @@ import {
    ComponentType,
    FC,
    Fragment,
+   MouseEvent,
    ReactElement,
    ReactEventHandler,
 } from "react"
@@ -145,30 +147,24 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
    )
 }
 
-type PopoverMenuProps = {
+export type PopoverMenuProps = {
    options: MenuOption[]
-   handleClose: () => void
-   anchorEl: HTMLElement | null
-   open: boolean
    placement?: MenuPlacement
-   menuSx?: SxProps
-}
+} & MenuProps
 
 type MenuPlacement = "top" | "bottom"
 
-const DesktopMenu: FC<PopoverMenuProps> = ({
+const DesktopMenu = ({
    options,
-   handleClose,
-   anchorEl,
-   open,
    placement = "bottom",
-   menuSx,
-}) => {
+   sx,
+   TransitionComponent,
+   onClose,
+   ...props
+}: PopoverMenuProps) => {
    return (
       <BrandedMenu
-         onClose={handleClose}
-         anchorEl={anchorEl}
-         open={open}
+         onClose={onClose}
          anchorOrigin={{
             vertical: placement == "bottom" ? "bottom" : "top",
             horizontal: placement == "bottom" ? "right" : "left",
@@ -180,7 +176,9 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
          TransitionProps={{
             unmountOnExit: true,
          }}
-         sx={menuSx}
+         TransitionComponent={TransitionComponent}
+         sx={sx}
+         {...props}
       >
          {options.map((option, index) => {
             const WrapperComponent = option.wrapperComponent || Fragment
@@ -189,7 +187,7 @@ const DesktopMenu: FC<PopoverMenuProps> = ({
                   <WrapperComponent>
                      <DesktopMenuItem
                         option={option}
-                        handleClose={handleClose}
+                        handleClose={(e) => onClose(e, "backdropClick")}
                         hasDivider={index !== options.length - 1}
                      />
                   </WrapperComponent>
@@ -209,7 +207,7 @@ export type MoreMenuProps = {
    enableDrawerCancelButton?: boolean
    placement?: MenuPlacement
    disableSwipeToOpen?: boolean
-   menuSx?: SxProps
+   menuProps?: Pick<PopoverMenuProps, "sx" | "TransitionComponent">
 }
 
 const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
@@ -221,7 +219,7 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
    enableDrawerCancelButton,
    placement,
    disableSwipeToOpen,
-   menuSx,
+   menuProps,
 }) => {
    const defaultIsMobile = useIsMobile()
    const isMobile = isMobileOverride ?? defaultIsMobile
@@ -239,11 +237,11 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
          ) : (
             <DesktopMenu
                options={options}
-               handleClose={handleClose}
+               onClose={handleClose}
                anchorEl={anchorEl}
                open={open}
                placement={placement}
-               menuSx={menuSx}
+               {...menuProps}
             />
          )}
       </Fragment>
@@ -289,7 +287,7 @@ const MobileMenuItem: FC<MobileMenuItemProps> = ({ option, handleClose }) => {
 
 type DesktopMenuItemProps = {
    option: MenuOption
-   handleClose: () => void
+   handleClose: (e?: MouseEvent<HTMLElement>) => void
    hasDivider: boolean
 }
 

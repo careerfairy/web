@@ -1,5 +1,9 @@
 import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
-import { GetGroupTalentEngagementFnArgs } from "@careerfairy/shared-lib/functions/types"
+import {
+   GetGroupTalentEngagementFnArgs,
+   GetGroupTalentEngagementFnResponse,
+   GetTotalUsersMatchingTargetingResponse,
+} from "@careerfairy/shared-lib/functions/types"
 import { Group } from "@careerfairy/shared-lib/groups"
 import isEmpty from "lodash/isEmpty"
 import useSWR, { SWRConfiguration } from "swr"
@@ -8,18 +12,8 @@ import useFunctionsSWRFetcher, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
 
-type GroupTalentEngagementResponse = {
-   count: number
-}
-
-type TotalUsersMatchingTargetingResponse = {
-   total: number
-}
-
-type CombinedResponse = {
-   count: number
-   total: number
-}
+type CombinedResponse = GetGroupTalentEngagementFnResponse &
+   GetTotalUsersMatchingTargetingResponse
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -44,9 +38,9 @@ const swrOptions: SWRConfiguration = {
  * If the group has no targeting criteria, the total is set to 5 times the actual count.
  */
 export const useGroupTalentEngagement = (group: Group | undefined) => {
-   const fetcher = useFunctionsSWRFetcher<GroupTalentEngagementResponse>()
+   const fetcher = useFunctionsSWRFetcher<GetGroupTalentEngagementFnResponse>()
    const totalFetcher =
-      useFunctionsSWRFetcher<TotalUsersMatchingTargetingResponse>()
+      useFunctionsSWRFetcher<GetTotalUsersMatchingTargetingResponse>()
 
    const functionArgs = group ? extractTargetingFromGroup(group) : null
 
@@ -55,7 +49,7 @@ export const useGroupTalentEngagement = (group: Group | undefined) => {
       ? [FUNCTION_NAMES.getGroupTalentEngagement, functionArgs]
       : null
 
-   const registeredUsersResponse = useSWR<GroupTalentEngagementResponse>(
+   const registeredUsersResponse = useSWR<GetGroupTalentEngagementFnResponse>(
       registeredUsersKey,
       fetcher,
       swrOptions
@@ -74,7 +68,7 @@ export const useGroupTalentEngagement = (group: Group | undefined) => {
          ? [FUNCTION_NAMES.getTotalUsersMatchingTargeting, functionArgs]
          : null
 
-   const totalUsersResponse = useSWR<TotalUsersMatchingTargetingResponse>(
+   const totalUsersResponse = useSWR<GetTotalUsersMatchingTargetingResponse>(
       totalUsersKey,
       totalFetcher,
       swrOptions

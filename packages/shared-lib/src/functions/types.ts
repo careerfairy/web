@@ -25,3 +25,11 @@ export type GetGroupTalentEngagementFnArgs = {
       fieldsOfStudy: string[]
    }
 }
+
+export type GetGroupTalentEngagementFnResponse = {
+   count: number
+}
+
+export type GetTotalUsersMatchingTargetingResponse = {
+   total: number
+}

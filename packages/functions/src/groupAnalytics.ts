@@ -4,7 +4,11 @@ import {
    registrationSourcesCacheKey,
    RegistrationSourcesResponseItem,
 } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
-import { GetGroupTalentEngagementFnArgs } from "@careerfairy/shared-lib/functions/types"
+import {
+   GetGroupTalentEngagementFnArgs,
+   GetGroupTalentEngagementFnResponse,
+   GetTotalUsersMatchingTargetingResponse,
+} from "@careerfairy/shared-lib/functions/types"
 import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
@@ -88,7 +92,12 @@ export const getGroupTalentEngagement = onCall(
                }
             )
 
-            return { count: uniqueUsers }
+            const response: GetGroupTalentEngagementFnResponse = {
+               count: uniqueUsers,
+               total: totalInteractions,
+            }
+
+            return response
          } catch (error) {
             logError(error, request)
 
@@ -113,10 +122,7 @@ export const getTotalUsersMatchingTargeting = onCall(
    {
       memory: "512MiB",
    },
-   middlewares<{
-      groupId: string
-      targeting: GetGroupTalentEngagementFnArgs["targeting"]
-   }>(
+   middlewares<GetGroupTalentEngagementFnArgs>(
       dataValidation({
          groupId: string().required(),
          targeting: object({
@@ -147,7 +153,11 @@ export const getTotalUsersMatchingTargeting = onCall(
                }
             )
 
-            return { total: totalMatchingUsers }
+            const response: GetTotalUsersMatchingTargetingResponse = {
+               total: totalMatchingUsers,
+            }
+
+            return response
          } catch (error) {
             logError(error, request)
             throw new HttpsError(
