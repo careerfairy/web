@@ -20,7 +20,7 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       background: `${theme.brand.white[100]}`,
-      borderRadius: "10px",
+      borderRadius: "16px",
       border: `1px solid ${theme.palette.secondary.light}`,
       boxShadow: "0px 0px 8px 0px #1414140F",
       minWidth: `${CARD_WIDTH}px`,
@@ -184,7 +184,7 @@ export const MentorCard = ({
          ) : null}
          {shouldShowLinkedInIcon ? (
             <Box sx={styles.linkedInContainer}>
-               <Linkedin size={14} color={theme.brand.info[700]} />
+               <Linkedin size={14} color={theme.brand.info[700]} fill={theme.brand.info[700]} />
             </Box>
          ) : null}
          <Box sx={styles.avatarContainer}>
