@@ -17,6 +17,7 @@ import HostInfo from "./HostInfo"
 import LivestreamTagsContainer from "./LivestreamTagsContainer"
 import LivestreamTitle from "./LivestreamTitle"
 import MainContentNavigation from "./MainContentNavigation"
+import PastLivestreamHostInfo from "./PastLivestreamHostInfo"
 import RecordingPlayer from "./RecordingPlayer"
 import ShareButton from "./ShareButton"
 import ActionButton from "./action-button/ActionButton"
@@ -31,7 +32,7 @@ const styles = sxStyles({
    liveHeroContent: {
       animation: `${boxShadowAnimation} 1s infinite alternate`,
    },
-   heroContentWithoutBg: {
+   pastLivestreamHeroContent: {
       color: "text.primary",
       backgroundColor: "background.paper",
    },
@@ -84,7 +85,7 @@ const LivestreamDetailsView = () => {
             <HeroContent
                sx={[
                   livestreamPresenter.isLive() && styles.liveHeroContent,
-                  styles.heroContentWithoutBg,
+                  showRecording && styles.pastLivestreamHeroContent,
                ]}
                ref={heroRef}
                onBackPosition={
@@ -111,8 +112,17 @@ const LivestreamDetailsView = () => {
                   ) : (
                      <CountDownTimer presenter={livestreamPresenter} />
                   )}
-                  <HostInfo presenter={livestreamPresenter} />
-                  <LivestreamTitle text={livestream.title} />
+                  {showRecording ? (
+                     <PastLivestreamHostInfo
+                        presenter={livestreamPresenter}
+                        livestreamTitle={livestream.title}
+                     />
+                  ) : (
+                     <>
+                        <HostInfo presenter={livestreamPresenter} />
+                        <LivestreamTitle text={livestream.title} />
+                     </>
+                  )}
                   <LivestreamTagsContainer presenter={livestreamPresenter} />
                   {!isFloatingActionButton && (
                      <ActionButton
