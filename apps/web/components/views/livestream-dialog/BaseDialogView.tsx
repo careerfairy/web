@@ -173,7 +173,14 @@ const BackAndCloseButton: FC<BackAndCloseButtonProps> = ({
    onBackPosition,
    color,
 }) => {
-   const colorStyle = color ? { color } : {}
+   const getColorStyle = (color: string) => {
+      if (color === "neutral.800") {
+         return { color: (theme) => theme.palette.neutral[800] }
+      }
+      return { color }
+   }
+
+   const colorStyle = color ? getColorStyle(color) : {}
 
    if (!onBackClick) return null
 
@@ -207,11 +214,20 @@ type LeftContentProps = {
    children: ReactNode
    noMinHeight?: boolean
    sx?: SxProps<DefaultTheme>
+   isPastLivestream?: boolean
 } & BackAndCloseButtonProps
 
 export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
    function HeroContent(
-      { backgroundImg, children, onBackClick, onBackPosition, noMinHeight, sx },
+      {
+         backgroundImg,
+         children,
+         onBackClick,
+         onBackPosition,
+         noMinHeight,
+         sx,
+         isPastLivestream = false,
+      },
       ref
    ) {
       return (
@@ -246,7 +262,7 @@ export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
             <BackAndCloseButton
                onBackClick={onBackClick}
                onBackPosition={onBackPosition}
-               color={"white"}
+               color={isPastLivestream ? "neutral.800" : "white"}
             />
          </Box>
       )

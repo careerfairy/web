@@ -36,17 +36,12 @@ const styles = sxStyles({
    },
    icon: {
       zIndex: 2,
-      width: {
-         xs: "45px",
-         md: "65px",
-      },
-      height: {
-         xs: "45px",
-         md: "65px",
-      },
-      background: "rgba(33, 32, 32, 0.6)",
-      border: "2px solid white",
+      width: "65px",
+      height: "65px",
+      background: "rgba(0, 0, 0, 0.5)",
+      border: "1px solid rgba(255, 255, 255, 0.5)",
       borderRadius: "50%",
+      color: "rgba(255, 255, 255, 0.5)",
 
       "&:hover": {
          border: (theme) => `3px solid ${theme.palette.primary.main}`,
