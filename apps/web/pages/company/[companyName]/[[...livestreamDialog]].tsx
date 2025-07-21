@@ -37,6 +37,7 @@ import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
 import SEO from "../../../components/util/SEO"
 import CompanyPageOverview from "../../../components/views/company-page"
+import { getResizedUrl } from "../../../components/helperFunctions/HelperFunctions"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
@@ -118,6 +119,29 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             <SEO
                id={`CareerFairy | ${universityName}`}
                title={`CareerFairy | ${universityName}`}
+               description={serverSideGroup.extraInfo || serverSideGroup.description || `Discover career opportunities and events at ${universityName}.`}
+               image={{
+                  url: getResizedUrl(serverSideGroup.logoUrl, 1200, 630),
+                  width: 1200,
+                  height: 630,
+                  alt: `${universityName} logo`,
+               }}
+               openGraph={{
+                  type: "website",
+                  title: `${universityName} Company Page | CareerFairy`,
+                  description: serverSideGroup.extraInfo || serverSideGroup.description || `Discover career opportunities and events at ${universityName}.`,
+                  images: [
+                     {
+                        url: getResizedUrl(serverSideGroup.logoUrl, 1200, 630),
+                        width: 1200,
+                        height: 630,
+                        alt: `${universityName} logo`,
+                     },
+                  ],
+               }}
+               twitter={{
+                  cardType: "summary_large_image",
+               }}
             />
 
             <GenericDashboardLayout pageDisplayName={""}>
