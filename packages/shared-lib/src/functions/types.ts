@@ -21,7 +21,11 @@ export type GetGroupTalentEngagementFnArgs = {
    groupId: string
    targeting: {
       countries: string[]
-      universities: string[]
+      universities: Array<{
+         id: string
+         name: string
+         country: string
+      }>
       fieldsOfStudy: string[]
    }
 }
