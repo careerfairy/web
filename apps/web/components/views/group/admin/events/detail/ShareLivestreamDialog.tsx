@@ -2,7 +2,7 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Button, Stack } from "@mui/material"
 import { Copy, Linkedin } from "react-feather"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, useEffect } from "react"
 import { useCopyToClipboard } from "react-use"
 import { useSnackbar } from "notistack"
 import { makeLivestreamEventDetailsInviteUrl } from "util/makeUrls"
@@ -54,11 +54,11 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "row",
       justifyContent: "center",
-      gap: 2,
+      gap: 1.5,
       mt: 3,
    },
    actionBtn: {
-      width: "160px",
+      width: "140px",
       height: "40px",
       textTransform: "none",
       fontWeight: 600,
@@ -101,6 +101,15 @@ export const ShareLivestreamDialog = ({
       )
    }, [livestreamId, userData?.referralCode])
 
+   // Auto-dismiss dialog after 10 seconds to not block E2E tests or user flow
+   useEffect(() => {
+      const timer = setTimeout(() => {
+         handleClose()
+      }, 10000) // 10 seconds
+
+      return () => clearTimeout(timer)
+   }, [handleClose])
+
    const handleCopyClick = useCallback(() => {
       copyToClipboard(livestreamLink)
       enqueueSnackbar("Link copied to clipboard!", {
@@ -131,7 +140,8 @@ export const ShareLivestreamDialog = ({
       <SteppedDialog.Container
          containerSx={styles.content}
          sx={styles.wrapContainer}
-         hideCloseButton
+         hideCloseButton={false}
+         handleCloseIconClick={handleClose}
       >
          <SteppedDialog.Content sx={styles.container}>
             <Stack spacing={3} sx={styles.info}>
@@ -157,6 +167,14 @@ export const ShareLivestreamDialog = ({
                />
 
                <Box sx={styles.actions}>
+                  <Button
+                     variant="outlined"
+                     onClick={handleClose}
+                     sx={[styles.actionBtn, styles.copyBtn]}
+                  >
+                     Skip
+                  </Button>
+
                   <Button
                      variant="outlined"
                      onClick={handleCopyClick}
