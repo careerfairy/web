@@ -238,6 +238,17 @@ describe("userMatchesTargeting", () => {
    })
 
    describe("Edge cases with missing user data", () => {
+      it("should return false when user is null or undefined", () => {
+         const targeting = {
+            countries: ["CH"],
+            universities: [],
+            fieldsOfStudy: [],
+         }
+
+         expect(userMatchesTargeting(null as any, targeting)).toBe(false)
+         expect(userMatchesTargeting(undefined as any, targeting)).toBe(false)
+      })
+
       it("should not match when user has no country but targeting requires country", () => {
          const userWithoutCountry = {
             university: { code: "ethz_code", name: "ETH Zurich" },
