@@ -35,9 +35,9 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
+import { getResizedUrl } from "../../../components/helperFunctions/HelperFunctions"
 import SEO from "../../../components/util/SEO"
 import CompanyPageOverview from "../../../components/views/company-page"
-import { getResizedUrl } from "../../../components/helperFunctions/HelperFunctions"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
@@ -72,7 +72,8 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    const { query, isReady } = useRouter()
    const { trackCompanyPageView } = useFirebaseService()
    const { trackEvent } = useCompaniesTracker()
-   const { universityName, id } = deserializeGroupClient(serverSideGroup)
+   const { universityName, id, description, extraInfo, logoUrl } =
+      deserializeGroupClient(serverSideGroup)
 
    const customJobId = query.dialogJobId?.toString() || null
    const interactionSource = query.interactionSource?.toString() || null
@@ -119,9 +120,13 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             <SEO
                id={`CareerFairy | ${universityName}`}
                title={`CareerFairy | ${universityName}`}
-               description={serverSideGroup.extraInfo || serverSideGroup.description || `Discover career opportunities and events at ${universityName}.`}
+               description={
+                  extraInfo ||
+                  description ||
+                  `Discover career opportunities and events at ${universityName}.`
+               }
                image={{
-                  url: getResizedUrl(serverSideGroup.logoUrl, "lg"),
+                  url: getResizedUrl(logoUrl, "lg"),
                   width: 1200,
                   height: 900,
                   alt: `${universityName} logo`,
@@ -129,10 +134,13 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                openGraph={{
                   type: "website",
                   title: `${universityName} Company Page | CareerFairy`,
-                  description: serverSideGroup.extraInfo || serverSideGroup.description || `Discover career opportunities and events at ${universityName}.`,
+                  description:
+                     extraInfo ||
+                     description ||
+                     `Discover career opportunities and events at ${universityName}.`,
                   images: [
                      {
-                        url: getResizedUrl(serverSideGroup.logoUrl, "lg"),
+                        url: getResizedUrl(logoUrl, "lg"),
                         width: 1200,
                         height: 900,
                         alt: `${universityName} logo`,
