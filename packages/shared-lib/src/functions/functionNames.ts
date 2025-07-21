@@ -52,13 +52,13 @@ export const FUNCTION_NAMES = {
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
    getSparksFeed: "getSparksFeed_v12",
 
-
    // Location functions
    searchLocations: "searchLocations",
    getLocation: "getLocation",
 
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",
+   keepOnCallFunctionsWarm: "keepOnCallFunctionsWarm",
 
    // Auth functions
    backfillUserData: "backfillUserData_v2",
