@@ -17,6 +17,10 @@ import useSocials, {
 import { copyStringToClipboard } from "components/helperFunctions/HelperFunctions"
 import ReferralWidget from "components/views/common/ReferralWidget"
 import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
+import WhatsAppRoundedIcon from "components/views/common/icons/WhatsAppRoundedIcon"
+import LinkedInRoundedIcon from "components/views/common/icons/LinkedInRoundedIcon"
+import FacebookRoundedIcon from "components/views/common/icons/FacebookRoundedIcon"
+import XRoundedIcon from "components/views/common/icons/XRoundedIcon"
 import { FC, useCallback, useMemo, useState } from "react"
 import {
    CheckCircle as CheckIcon,
@@ -28,6 +32,7 @@ import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerEvent } from "util/analyticsUtils"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { facebookAppId } from "constants/links"
 
 const styles = sxStyles({
    titleContainer: {
@@ -111,23 +116,83 @@ const ShareCompanyPageDialog: FC<Props> = ({
       })
    }, [group.universityName])
 
-   const socials = useSocials({
-      title: group.universityName,
-      url: companyPageUrl,
-      dataLayerEntityName: datalayerEntityName,
-      message: `Check out ${group.universityName}'s company page on CareerFairy!`,
-      platforms: [
-         SocialPlatformObject.Whatsapp,
-         SocialPlatformObject.Linkedin,
-         SocialPlatformObject.Facebook,
-         SocialPlatformObject.X,
-      ],
-   })
+   const socials = useMemo(() => {
+      const buildUrlWithUtm = (medium: string) => {
+         const utmParams = new URLSearchParams({
+            utm_source: 'careerfairy',
+            utm_medium: medium,
+            utm_campaign: 'company-page',
+            utm_content: group.universityName
+         })
+         return `${companyPageUrl}?${utmParams.toString()}`
+      }
+
+      const message = `Check out ${group.universityName}'s company page on CareerFairy!`
+      const encodedMessage = encodeURIComponent(message)
+
+      return [
+         {
+            icon: null,
+            roundedIcon: WhatsAppRoundedIcon,
+            name: "WhatsApp",
+            onClick: () => {
+               const whatsappUrl = buildUrlWithUtm('whatsapp')
+               const encodedUrl = encodeURIComponent(whatsappUrl)
+               window.open(`https://api.whatsapp.com/send?text=${encodedMessage}%20${encodedUrl}`, "_blank")?.focus()
+            },
+            type: SocialPlatformObject.Whatsapp,
+         },
+         {
+            icon: null,
+            roundedIcon: LinkedInRoundedIcon,
+            name: "LinkedIn",
+            onClick: () => {
+               const linkedinUrl = buildUrlWithUtm('linkedin')
+               const encodedUrl = encodeURIComponent(linkedinUrl)
+               window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`, "_blank")?.focus()
+            },
+            type: SocialPlatformObject.Linkedin,
+         },
+         {
+            icon: null,
+            roundedIcon: FacebookRoundedIcon,
+            name: "Facebook",
+            onClick: () => {
+               const facebookUrl = buildUrlWithUtm('facebook')
+               const encodedUrl = encodeURIComponent(facebookUrl)
+               window.open(`https://www.facebook.com/dialog/share?app_id=${facebookAppId}&display=page&href=${encodedUrl}`, "_blank")?.focus()
+            },
+            type: SocialPlatformObject.Facebook,
+         },
+         {
+            icon: null,
+            roundedIcon: XRoundedIcon,
+            name: "X",
+            onClick: () => {
+               const xUrl = buildUrlWithUtm('x')
+               const encodedUrl = encodeURIComponent(xUrl)
+               window.open(`https://twitter.com/intent/tweet?url=${encodedUrl}&via=CareerFairy&related=CareerFairy&text=${encodedMessage}`, "_blank")?.focus()
+            },
+            type: SocialPlatformObject.X,
+         },
+      ]
+   }, [companyPageUrl, group.universityName])
 
    const handleShareOptionClick = useCallback((type: SocialPlatformType) => {
+      // Map social platform types to UTM medium values for consistent tracking
+      const mediumMapping = {
+         [SocialPlatformObject.Whatsapp]: 'whatsapp',
+         [SocialPlatformObject.Linkedin]: 'linkedin', 
+         [SocialPlatformObject.Facebook]: 'facebook',
+         [SocialPlatformObject.X]: 'x',
+         [SocialPlatformObject.Copy]: 'copy',
+      }
+      
+      const medium = mediumMapping[type] || type
+      
       // Track the share action
       dataLayerEvent(AnalyticsEvents.CompanyPageShare, {
-         medium: type,
+         medium: medium,
       })
       
       // Call parent callback if provided
@@ -139,9 +204,18 @@ const ShareCompanyPageDialog: FC<Props> = ({
    const copyCompanyPageLinkToClipboard = useCallback(() => {
       handleShareOptionClick(SocialPlatformObject.Copy)
       setIsCopied(true)
-      const sourceLink = companyPageUrl + "?utm_source=careerfairy"
+      
+      // Build URL with new UTM structure
+      const utmParams = new URLSearchParams({
+         utm_source: 'careerfairy',
+         utm_medium: 'copy',
+         utm_campaign: 'company-page',
+         utm_content: group.universityName
+      })
+      const sourceLink = `${companyPageUrl}?${utmParams.toString()}`
+      
       copyStringToClipboard(sourceLink)
-   }, [handleShareOptionClick, companyPageUrl])
+   }, [handleShareOptionClick, companyPageUrl, group.universityName])
 
    return (
       <Dialog
@@ -187,7 +261,7 @@ const ShareCompanyPageDialog: FC<Props> = ({
                   <>
                      <CopyIcon />
                      <Typography sx={styles.copyText}>
-                        Copy company page link
+                        Copy company link
                      </Typography>
                   </>
                )}

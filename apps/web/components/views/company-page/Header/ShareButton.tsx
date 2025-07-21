@@ -31,21 +31,41 @@ const ShareButton = () => {
    }, [group.universityName])
 
    const shareData = useMemo(() => {
+      // Build URL with new UTM structure for mobile share
+      const utmParams = new URLSearchParams({
+         utm_source: 'careerfairy',
+         utm_medium: 'mobile',
+         utm_campaign: 'company-page',
+         utm_content: group.universityName
+      })
+      const urlWithUtm = `${companyPageUrl}?${utmParams.toString()}`
+      
       return {
          title: group.universityName,
          text: `Check out ${group.universityName}'s company page on CareerFairy!`,
-         url: companyPageUrl,
+         url: urlWithUtm,
       }
    }, [group.universityName, companyPageUrl])
 
    const handleTrackShare = useCallback(
-      (type: SocialPlatformType) => {
+      (type: SocialPlatformType, customMedium?: string) => {
          if (!clickedComponents.has(type)) {
             setClickedComponents((prevState) => new Set([...prevState, type]))
 
+            // Use custom medium name if provided (for mobile shares)
+            const mediumMapping = {
+               [SocialPlatformObject.Whatsapp]: 'whatsapp',
+               [SocialPlatformObject.Linkedin]: 'linkedin', 
+               [SocialPlatformObject.Facebook]: 'facebook',
+               [SocialPlatformObject.X]: 'x',
+               [SocialPlatformObject.Copy]: 'copy',
+            }
+            
+            const medium = customMedium || mediumMapping[type] || type
+            
             // Track the share action
             dataLayerEvent(AnalyticsEvents.CompanyPageShare, {
-               medium: type,
+               medium: medium,
             })
          }
       },
@@ -56,7 +76,7 @@ const ShareButton = () => {
       if (isMobile && navigator?.share) {
          try {
             await navigator.share(shareData)
-            handleTrackShare(SocialPlatformObject.Copy) // Track as mobile share
+            handleTrackShare(SocialPlatformObject.Copy, 'mobile') // Track as mobile share
          } catch (error) {
             // If native share fails or is cancelled, fallback to dialog
             if (error.name !== 'AbortError') {
