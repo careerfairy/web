@@ -375,7 +375,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
  */
 const getLocationNames = (locationIds: string[]) => {
    const locations = locationIds?.map((id) => {
-      const { countryIsoCode, stateIsoCode } = getLocationIds(id)
+      const { countryIsoCode, stateIsoCode, cityName } = getLocationIds(id)
 
       if (!countryIsoCode) return null
 
@@ -385,6 +385,13 @@ const getLocationNames = (locationIds: string[]) => {
             stateIsoCode,
             countryIsoCode
          )
+
+         if (cityName) {
+            return {
+               id,
+               name: `${cityName} (${state.name}, ${country.name})`,
+            }
+         }
 
          return {
             id,

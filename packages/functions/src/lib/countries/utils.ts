@@ -2,7 +2,7 @@ import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
 import { Country, State } from "country-state-city"
 
 export const getLocationById = (locationId: string) => {
-   const { countryIsoCode, stateIsoCode } = getLocationIds(locationId)
+   const { countryIsoCode, stateIsoCode, cityName } = getLocationIds(locationId)
 
    if (!countryIsoCode) return null
 
@@ -14,6 +14,13 @@ export const getLocationById = (locationId: string) => {
       const state = State.getStateByCodeAndCountry(stateIsoCode, countryIsoCode)
 
       if (state) {
+         if (cityName) {
+            return {
+               id: locationId,
+               name: `${cityName} (${state.name}, ${country.name})`,
+            }
+         }
+
          return {
             id: locationId,
             name: `${state.name} (${country.name})`,
