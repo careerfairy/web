@@ -121,9 +121,9 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                title={`CareerFairy | ${universityName}`}
                description={serverSideGroup.extraInfo || serverSideGroup.description || `Discover career opportunities and events at ${universityName}.`}
                image={{
-                  url: getResizedUrl(serverSideGroup.logoUrl, 1200, 630),
+                  url: getResizedUrl(serverSideGroup.logoUrl, "lg"),
                   width: 1200,
-                  height: 630,
+                  height: 900,
                   alt: `${universityName} logo`,
                }}
                openGraph={{
@@ -132,9 +132,9 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                   description: serverSideGroup.extraInfo || serverSideGroup.description || `Discover career opportunities and events at ${universityName}.`,
                   images: [
                      {
-                        url: getResizedUrl(serverSideGroup.logoUrl, 1200, 630),
+                        url: getResizedUrl(serverSideGroup.logoUrl, "lg"),
                         width: 1200,
-                        height: 630,
+                        height: 900,
                         alt: `${universityName} logo`,
                      },
                   ],
