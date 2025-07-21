@@ -138,7 +138,7 @@ export const ShareLivestreamDialog = ({
                </SteppedDialog.Title>
 
                <SteppedDialog.Subtitle sx={styles.subtitle}>
-                  Use these link to share your stream with your talent community!
+                  Use this link to share your stream with your talent community!
                </SteppedDialog.Subtitle>
 
                <BrandedTextField
