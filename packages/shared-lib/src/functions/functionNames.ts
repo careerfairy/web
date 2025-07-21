@@ -53,8 +53,8 @@ export const FUNCTION_NAMES = {
    getSparksFeed: "getSparksFeed_v12",
 
    // Location functions
-   searchLocations: "searchLocations_v2",
-   getLocation: "getLocation",
+   searchLocations: "searchLocations_v3",
+   getLocation: "getLocation_v2",
 
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",
