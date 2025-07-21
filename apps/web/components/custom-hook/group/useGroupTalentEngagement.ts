@@ -112,7 +112,12 @@ export function extractTargetingFromGroup(
       groupId: group.id,
       targeting: {
          countries: group.targetedCountries?.map((c) => c.id) || [],
-         universities: group.targetedUniversities?.map((u) => u.id) || [],
+         universities:
+            group.targetedUniversities?.map((u) => ({
+               id: u.id,
+               name: u.name,
+               country: u.country,
+            })) || [],
          fieldsOfStudy: group.targetedFieldsOfStudy?.map((f) => f.id) || [],
       },
    }

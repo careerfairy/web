@@ -27,6 +27,7 @@ import {
    dataValidation,
    userShouldBeGroupAdmin,
 } from "./middlewares/validations"
+import { paginateQuery } from "./util/firestore-admin"
 
 /*
 |--------------------------------------------------------------------------
@@ -60,7 +61,13 @@ export const getGroupTalentEngagement = onCall(
          groupId: string().required(),
          targeting: object({
             countries: array(string()).default([]),
-            universities: array(string()).default([]),
+            universities: array(
+               object({
+                  id: string().required(),
+                  name: string().required(),
+                  country: string().required(),
+               })
+            ).default([]),
             fieldsOfStudy: array(string()).default([]),
          }).required(),
       }),
@@ -126,12 +133,18 @@ export const getTotalUsersMatchingTargeting = onCall(
          groupId: string().required(),
          targeting: object({
             countries: array(string()).default([]),
-            universities: array(string()).default([]),
+            universities: array(
+               object({
+                  id: string().required(),
+                  name: string().required(),
+                  country: string().required(),
+               })
+            ).default([]),
             fieldsOfStudy: array(string()).default([]),
          }).required(),
       }),
       userShouldBeGroupAdmin(),
-      talentEngagementCache(createTotalUsersCacheKey),
+      talentEngagementCache(createTotalUsersMatchingTargetingCacheKey),
       async (request) => {
          try {
             const { targeting } = request.data
@@ -238,10 +251,12 @@ export const getRegistrationSources = onCall(
 */
 
 /**
- * Helper function to check if a user matches the targeting criteria
- * @param user - User data with targeting-related fields
- * @param targeting - The targeting criteria to match against
- * @returns true if user matches ALL targeting criteria (AND logic)
+ * Checks if a user matches the given targeting criteria
+ * Enhanced logic to support country-specific university targeting:
+ * - For each country in the targeting, if no universities are specified for that country, any university in that country matches
+ * - If universities are specified for a country, only users from those specific universities match
+ * - If universities are specified but none for the user's country, the user doesn't match
+ * - This allows targeting all universities in some countries while targeting specific universities in others
  */
 export function userMatchesTargeting(
    user: {
@@ -251,80 +266,95 @@ export function userMatchesTargeting(
    },
    targeting: GetGroupTalentEngagementFnArgs["targeting"]
 ): boolean {
-   let matches = true
-
-   // Check ALL targeting criteria - user must match all of them
-
-   // Check countries
-   if (targeting.countries.length > 0) {
-      matches =
-         matches &&
-         !!user.universityCountryCode &&
-         targeting.countries.includes(user.universityCountryCode)
-   }
-
-   // Check universities
-   if (targeting.universities.length > 0) {
-      matches =
-         matches &&
-         !!user.university?.code &&
-         targeting.universities.includes(user.university.code)
-   }
-
-   // Check fields of study
+   // Check field of study first (applies globally)
    if (targeting.fieldsOfStudy.length > 0) {
-      matches =
-         matches &&
-         !!user.fieldOfStudy?.id &&
-         targeting.fieldsOfStudy.includes(user.fieldOfStudy.id)
+      if (
+         !user.fieldOfStudy?.id ||
+         !targeting.fieldsOfStudy.includes(user.fieldOfStudy.id)
+      ) {
+         return false
+      }
    }
 
-   return matches
+   // If no countries specified, match any user (with field of study check above)
+   if (targeting.countries.length === 0) {
+      return true
+   }
+
+   // User must be from a targeted country
+   if (
+      !user.universityCountryCode ||
+      !targeting.countries.includes(user.universityCountryCode)
+   ) {
+      return false
+   }
+
+   // If no universities specified at all, any university in the targeted countries matches
+   if (targeting.universities.length === 0) {
+      return true
+   }
+
+   // Check if there are any universities specified for the user's country
+   const universitiesInUserCountry = targeting.universities.filter(
+      (uni) => uni.country === user.universityCountryCode
+   )
+
+   // If no universities specified for this country, any university in the country matches
+   if (universitiesInUserCountry.length === 0) {
+      return true
+   }
+
+   // If universities are specified for this country, user must have a university and it must be in the list
+   if (!user.university?.code) {
+      return false
+   }
+
+   return universitiesInUserCountry.some(
+      (uni) => uni.id === user.university?.code
+   )
 }
 
-/**
- * Creates a cache key that includes targeting criteria
- */
-function createTalentEngagementCacheKey(request: {
-   data: GetGroupTalentEngagementFnArgs
-}): string[] {
-   const { groupId, targeting } = request.data
-
-   // Create a deterministic string from targeting arrays
-   const targetingSignature = [
+function createTargetingSignature(
+   targeting: GetGroupTalentEngagementFnArgs["targeting"]
+): string {
+   return [
       `countries:${targeting.countries.sort().join(",")}`,
-      `universities:${targeting.universities.sort().join(",")}`,
+      `universities:${targeting.universities
+         .map((u) => `${u.id}:${u.country}`)
+         .sort()
+         .join(",")}`,
       `fields:${targeting.fieldsOfStudy.sort().join(",")}`,
    ].join("|")
+}
 
-   return ["groupTalentEngagement", groupId, targetingSignature]
+function createTalentEngagementCacheKey(
+   request: CallableRequest<GetGroupTalentEngagementFnArgs>
+): string[] {
+   const { groupId, targeting } = request.data
+
+   return [
+      "groupTalentEngagement",
+      groupId,
+      createTargetingSignature(targeting),
+   ]
 }
 
 /**
- * Creates a cache key for total users matching targeting criteria
+ * Creates a cache key for getTotalUsersMatchingTargeting function
  */
-function createTotalUsersCacheKey(request: {
-   data: {
-      groupId: string
-      targeting: GetGroupTalentEngagementFnArgs["targeting"]
-   }
+function createTotalUsersMatchingTargetingCacheKey(request: {
+   data: { targeting: GetGroupTalentEngagementFnArgs["targeting"] }
 }): string[] {
    const { targeting } = request.data
 
-   // Create a deterministic string from targeting arrays
-   const targetingSignature = [
-      `countries:${targeting.countries.sort().join(",")}`,
-      `universities:${targeting.universities.sort().join(",")}`,
-      `fields:${targeting.fieldsOfStudy.sort().join(",")}`,
-   ].join("|")
-
-   return ["totalUsersMatchingTargeting", targetingSignature]
+   return ["totalUsersMatchingTargeting", createTargetingSignature(targeting)]
 }
 
 /**
  * Counts unique users who registered for the group's livestreams AND also match the targeting criteria
  * This filters registered users (not livestreams) based on the targeting criteria
  * Only counts users who have registered for the livestreams (registered.date is truthy)
+ * OPTIMIZED for memory efficiency by processing chunks independently and selecting minimal fields
  */
 async function countRegisteredUsersMatchingTargeting(
    livestreamIds: string[],
@@ -336,42 +366,61 @@ async function countRegisteredUsersMatchingTargeting(
 
    // We can only have 30 "in" clauses
    const chunks = chunkArray(livestreamIds, 30)
-   const allUserData: Array<{ userId: string; user: UserData }> = []
 
+   // Use a Set to track unique users across all chunks
+   const uniqueUserIds = new Set<string>()
+   let totalInteractions = 0
+
+   // Process each chunk independently to reduce memory usage
    for (const chunk of chunks) {
+      // Only select the minimal fields needed for filtering
+      // This dramatically reduces memory usage compared to selecting entire 'user' object
       const userDataQuery = await firestore
          .collectionGroup("userLivestreamData")
          .where("livestreamId", "in", chunk)
-         .select("userId", "registered", "user")
+         .select(
+            "userId",
+            "registered",
+            "user.universityCountryCode",
+            "user.university",
+            "user.fieldOfStudy"
+         )
          .get()
 
-      // Filter for only registered users (registered.date is truthy)
-      const registeredUserData = userDataQuery.docs
-         .map(
-            (doc) =>
-               doc.data() as Pick<
-                  UserLivestreamData,
-                  "userId" | "registered" | "user"
-               >
-         )
-         .filter((data) => data.registered?.date)
-         .map((data) => ({ userId: data.userId, user: data.user }))
+      // Process documents in this chunk
+      for (const doc of userDataQuery.docs) {
+         const data = doc.data() as {
+            userId: string
+            registered?: { date?: any }
+            user: {
+               universityCountryCode?: string
+               university?: { code?: string; name?: string }
+               fieldOfStudy?: { id?: string; name?: string }
+            }
+         }
 
-      allUserData.push(...registeredUserData)
+         // Skip if not registered
+         if (!data.registered?.date) {
+            continue
+         }
+
+         // Check if user matches targeting criteria
+         if (userMatchesTargeting(data.user, targeting)) {
+            uniqueUserIds.add(data.userId)
+            totalInteractions++
+         }
+      }
+
+      // Log progress for large datasets
+      functions.logger.info(
+         `Processed chunk ${chunks.indexOf(chunk) + 1}/${chunks.length}, ` +
+            `current unique users: ${uniqueUserIds.size}, interactions: ${totalInteractions}`
+      )
    }
-
-   // Filter users based on targeting criteria
-   const targetedUsers = allUserData.filter((userData) => {
-      return userMatchesTargeting(userData.user, targeting)
-   })
-
-   const uniqueUserIds = new Set(
-      targetedUsers.map((userData) => userData.userId)
-   )
 
    return {
       uniqueUsers: uniqueUserIds.size,
-      totalInteractions: targetedUsers.length,
+      totalInteractions,
    }
 }
 
@@ -379,19 +428,19 @@ async function countRegisteredUsersMatchingTargeting(
  * Counts total users in the database who match the given targeting criteria.
  * This queries the userData collection based on user's university country, field of study, and university.
  * Users must match ALL targeting criteria (AND logic), not just one.
+ * OPTIMIZED for memory efficiency by processing users in batches with pagination
  */
 async function countTotalUsersMatchingTargeting(
    targeting: GetGroupTalentEngagementFnArgs["targeting"]
 ): Promise<number> {
+   // Check if we have any targeting criteria to apply
    const hasTargeting =
       targeting.countries.length > 0 ||
       targeting.universities.length > 0 ||
       targeting.fieldsOfStudy.length > 0
 
    if (!hasTargeting) {
-      // If no targeting criteria, count all users
-      const countQuery = await firestore.collection("userData").count().get()
-      return countQuery.data().count
+      return 0
    }
 
    // Since Firestore doesn't support multiple "in" queries in a single query,
@@ -400,28 +449,43 @@ async function countTotalUsersMatchingTargeting(
 
    // Choose the most selective targeting criteria for the Firestore query
    // Priority: universities > countries > fieldsOfStudy (most to least selective)
-   if (targeting.universities.length > 0) {
-      query = query.where("university.code", "in", targeting.universities)
-   } else if (targeting.countries.length > 0) {
+   if (targeting.countries.length > 0) {
       query = query.where("universityCountryCode", "in", targeting.countries)
    } else if (targeting.fieldsOfStudy.length > 0) {
       query = query.where("fieldOfStudy.id", "in", targeting.fieldsOfStudy)
    }
 
-   // Only select the fields we need for filtering
-   const snapshot = await query
-      .select("universityCountryCode", "university", "fieldOfStudy")
-      .get()
+   // Only select the fields we need for filtering to reduce memory usage
+   query = query.select("universityCountryCode", "university", "fieldOfStudy")
 
-   // Filter in memory for ALL targeting criteria (AND logic)
-   const matchingUsers = snapshot.docs.filter((doc) => {
-      const userData = doc.data() as Pick<
-         UserData,
-         "universityCountryCode" | "university" | "fieldOfStudy"
-      >
+   // Use pagination utility to process users in batches
+   return await paginateQuery(
+      query,
+      500, // batch size
+      // Processor: filter and count matching users in each batch
+      (docs) => {
+         let batchCount = 0
+         for (const doc of docs) {
+            const userData = doc.data() as Pick<
+               UserData,
+               "universityCountryCode" | "university" | "fieldOfStudy"
+            >
 
-      return userMatchesTargeting(userData, targeting)
-   })
-
-   return matchingUsers.length
+            if (userMatchesTargeting(userData, targeting)) {
+               batchCount++
+            }
+         }
+         return batchCount
+      },
+      // Accumulator: sum up counts from all batches
+      (totalCount, batchCount, { batchNumber, batchSize }) => {
+         const newTotal = totalCount + batchCount
+         functions.logger.info(
+            `Batch ${batchNumber}: ${batchCount}/${batchSize} users matched targeting, ` +
+               `total so far: ${newTotal}`
+         )
+         return newTotal
+      },
+      0 // initial value
+   )
 }
