@@ -3,12 +3,13 @@ import { Stack } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useSnackbar } from "notistack"
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { CheckCircle } from "react-feather"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useLivestreamCreationContext } from "./LivestreamCreationContext"
 import { useLivestreamFormValues } from "./form/useLivestreamFormValues"
 import { usePublishLivestream } from "./form/usePublishLivestream"
+import { ShareLivestreamDialog } from "./ShareLivestreamDialog"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -81,10 +82,15 @@ export const PublishConfirmation = ({
    const { livestream } = useLivestreamCreationContext()
    const { isPublishing, publishLivestream } = usePublishLivestream()
    const { enqueueSnackbar } = useSnackbar()
+   const [showShareDialog, setShowShareDialog] = useState(false)
+   const [publishedLivestreamId, setPublishedLivestreamId] = useState<string | null>(null)
 
    const handlePublishClick = useCallback(async () => {
       try {
          await publishLivestream()
+         // On successful publish, show the share dialog instead of closing
+         setPublishedLivestreamId(livestream.id)
+         setShowShareDialog(true)
       } catch (error) {
          errorLogAndNotify(error, {
             message: "Failed to publish stream",
@@ -94,7 +100,6 @@ export const PublishConfirmation = ({
          enqueueSnackbar("Failed to publish stream", {
             variant: "error",
          })
-      } finally {
          handleCancelClick()
       }
    }, [
@@ -105,6 +110,23 @@ export const PublishConfirmation = ({
       publishLivestream,
    ])
 
+   const handleShareDialogClose = useCallback(() => {
+      setShowShareDialog(false)
+      setPublishedLivestreamId(null)
+      handleCancelClick()
+   }, [handleCancelClick])
+
+   // Show share dialog after successful publishing
+   if (showShareDialog && publishedLivestreamId) {
+      return (
+         <ShareLivestreamDialog
+            handleClose={handleShareDialogClose}
+            livestreamId={publishedLivestreamId}
+         />
+      )
+   }
+
+   // Show publish confirmation dialog by default
    return (
       <SteppedDialog.Container
          containerSx={styles.content}
