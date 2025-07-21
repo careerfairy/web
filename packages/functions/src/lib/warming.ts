@@ -2,6 +2,7 @@ import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { logger } from "firebase-functions/v2"
 import { onSchedule } from "firebase-functions/v2/scheduler"
 import functionsAxios from "../api/axios"
+import { KEEP_WARM_ONCALL_KEY } from "../middlewares-gen2/onCall/validations"
 import { KEEP_WARM_HEADER } from "../middlewares-gen2/onRequest/validations"
 
 const functionsToWarm = [
@@ -9,6 +10,23 @@ const functionsToWarm = [
    FUNCTION_NAMES.customerIORecommendedSparksWebhook,
    FUNCTION_NAMES.searchLocations,
    // Add more functions as needed
+]
+
+type OnCallFunctionToWarm = {
+   functionName: string
+   payload: Record<string, any>
+}
+
+const onCallFunctionsToWarm: OnCallFunctionToWarm[] = [
+   {
+      functionName: FUNCTION_NAMES.getRecommendedJobs,
+      payload: {
+         [KEEP_WARM_ONCALL_KEY]: true,
+         limit: 1,
+         bypassCache: true,
+      },
+   },
+   // Add more onCall functions with their dummy payloads as needed
 ]
 
 /**
@@ -44,6 +62,49 @@ export const keepFunctionsWarm = onSchedule(
                (r) => r.status === "fulfilled" && (r.value as any).success
             ).length
          }/${functionsToWarm.length} functions successfully warmed`
+      )
+   }
+)
+
+/**
+ * Scheduled function that POSTs to all onCall functions in the list every 5 minutes
+ */
+export const keepOnCallFunctionsWarm = onSchedule(
+   {
+      schedule: "every 5 minutes",
+   },
+   async () => {
+      logger.info("Starting keep-warm cycle for onCall functions")
+
+      const requests = onCallFunctionsToWarm.map(
+         async ({ functionName, payload }) => {
+            try {
+               await functionsAxios.post(
+                  `/${functionName}`,
+                  { data: payload },
+                  { timeout: 10000 }
+               )
+               logger.info(
+                  `Successfully warmed onCall function: ${functionName}`
+               )
+               return { function: functionName, success: true }
+            } catch (error) {
+               logger.error(
+                  `Failed to warm onCall function: ${functionName}`,
+                  error
+               )
+               return { function: functionName, success: false }
+            }
+         }
+      )
+
+      const results = await Promise.allSettled(requests)
+      logger.info(
+         `Completed keep-warm cycle for onCall. ${
+            results.filter(
+               (r) => r.status === "fulfilled" && (r.value as any).success
+            ).length
+         }/${onCallFunctionsToWarm.length} onCall functions successfully warmed`
       )
    }
 )

@@ -414,3 +414,5 @@ exports[FUNCTION_NAMES.sendLivestreamNoShowReminder] =
 
 // Keep-warm function
 exports[FUNCTION_NAMES.keepFunctionsWarm] = warming.keepFunctionsWarm
+exports[FUNCTION_NAMES.keepOnCallFunctionsWarm] =
+   warming.keepOnCallFunctionsWarm
