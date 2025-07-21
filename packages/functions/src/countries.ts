@@ -13,12 +13,29 @@ import { onCall } from "firebase-functions/https"
 import Fuse from "fuse.js"
 import { InferType, array, number, object, string } from "yup"
 import { getLocationById } from "./lib/countries/utils"
+import { warmingMiddleware } from "./middlewares-gen2/onCall/validations"
+import { middlewares } from "./middlewares/middlewares"
 
 const SEARCH_LOCATION_LIMIT = 10
 
 // Countries for which cities are included in location search
 // This list can be easily expanded by adding more ISO country codes
-const SEARCHABLE_CITIES_COUNTRIES = ["CH", "PT", "DE"] // Switzerland, Portugal, Germany
+const SEARCHABLE_CITIES_COUNTRIES = [
+   "AT", // Austria
+   "BE", // Belgium
+   "FR", // France
+   "DE", // Germany
+   "LI", // Liechtenstein
+   "LU", // Luxembourg
+   "IE", // Ireland
+   "IT", // Italy
+   "NL", // Netherlands
+   "PL", // Poland
+   "ES", // Spain
+   "SE", // Sweden
+   "CH", // Switzerland
+   "GB", // United Kingdom
+]
 
 // Cache for cities to avoid regenerating them on every search
 let cachedSearchableCities: { id: string; name: string }[] | null = null
@@ -317,82 +334,89 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
    return countryResult
 })
 
-export const searchLocations = onCall<SearchLocationOptions>((request) => {
-   const { searchValue, limit, initialLocationIds } = request.data
+export const searchLocations = onCall<SearchLocationOptions>(
+   middlewares<SearchLocationOptions>(warmingMiddleware(), async (request) => {
+      const { searchValue, limit, initialLocationIds } = request.data
 
-   let locations: { id: string; name: string }[] = []
+      let locations: { id: string; name: string }[] = []
 
-   if (searchValue?.length > 2) {
-      const countries = Country.getAllCountries()
-         .map((country) => ({
-            name: country.name,
-            id: generateCountryId(country),
-         }))
-         .sort((countryA, countryB) =>
-            countryA.name.localeCompare(countryB.name)
+      if (searchValue?.length > 2) {
+         const countries = Country.getAllCountries()
+            .map((country) => ({
+               name: country.name,
+               id: generateCountryId(country),
+            }))
+            .sort((countryA, countryB) =>
+               countryA.name.localeCompare(countryB.name)
+            )
+
+         const states = countries
+            .map((country) => {
+               const states = State.getStatesOfCountry(country.id)
+               return states.map((state) => ({
+                  name: `${state.name} (${country.name})`,
+                  id: generateStateId(state),
+               }))
+            })
+            .flat()
+
+         // Get cities from specified countries for search
+         const cities = getSearchableCities()
+
+         locations = performFuzzySearch(
+            [...countries, ...states, ...cities],
+            searchValue,
+            limit
+         )
+      }
+
+      const locationsMap: Record<string, boolean> = Object.fromEntries(
+         locations.map((location) => [location.id, true])
+      )
+
+      initialLocationIds?.forEach((locationId) => {
+         const location = getLocationById(locationId)
+
+         if (!location) return
+
+         location && !locationsMap[locationId] && locations.push(location)
+      })
+
+      return locations
+   })
+)
+
+export const getLocation = onCall<GetLocationOptions>(
+   middlewares<GetLocationOptions>(warmingMiddleware(), async (request) => {
+      const { searchValue } = request.data
+
+      const { countryIsoCode, stateIsoCode, cityName } =
+         getLocationIds(searchValue)
+
+      if (!countryIsoCode) return null
+
+      const country = Country.getCountryByCode(countryIsoCode)
+      if (stateIsoCode) {
+         const state = State.getStateByCodeAndCountry(
+            stateIsoCode,
+            countryIsoCode
          )
 
-      const states = countries
-         .map((country) => {
-            const states = State.getStatesOfCountry(country.id)
-            return states.map((state) => ({
-               name: `${state.name} (${country.name})`,
-               id: generateStateId(state),
-            }))
-         })
-         .flat()
-
-      // Get cities from specified countries for search
-      const cities = getSearchableCities()
-
-      locations = performFuzzySearch(
-         [...countries, ...states, ...cities],
-         searchValue,
-         limit
-      )
-   }
-
-   const locationsMap: Record<string, boolean> = Object.fromEntries(
-      locations.map((location) => [location.id, true])
-   )
-
-   initialLocationIds?.forEach((locationId) => {
-      const location = getLocationById(locationId)
-
-      if (!location) return
-
-      location && !locationsMap[locationId] && locations.push(location)
-   })
-
-   return locations
-})
-
-export const getLocation = onCall<GetLocationOptions>((request) => {
-   const { searchValue } = request.data
-
-   const { countryIsoCode, stateIsoCode, cityName } =
-      getLocationIds(searchValue)
-
-   if (!countryIsoCode) return null
-
-   const country = Country.getCountryByCode(countryIsoCode)
-   if (stateIsoCode) {
-      const state = State.getStateByCodeAndCountry(stateIsoCode, countryIsoCode)
-
-      if (cityName) {
+         if (cityName) {
+            return {
+               id: searchValue,
+               name: `${cityName} (${state.name}, ${country.name})`,
+            }
+         }
          return {
             id: searchValue,
-            name: `${cityName} (${state.name}, ${country.name})`,
+            name: `${state.name} (${country.name})`,
          }
       }
+
       return {
          id: searchValue,
-         name: `${state.name} (${country.name})`,
+         name: country.name,
       }
-   }
-
-   return {
-      id: searchValue,
-      name: country.name,
-   }
-})
+   })
+)
