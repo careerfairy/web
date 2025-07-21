@@ -92,7 +92,7 @@ export const ShareLivestreamDialog = ({
 }: ShareLivestreamDialogProps) => {
    const { userData } = useAuth()
    const { enqueueSnackbar } = useSnackbar()
-   const [_, copyToClipboard] = useCopyToClipboard()
+   const [, copyToClipboard] = useCopyToClipboard()
 
    const livestreamLink = useMemo(() => {
       return makeLivestreamEventDetailsInviteUrl(
@@ -110,7 +110,9 @@ export const ShareLivestreamDialog = ({
          medium: "Copy Link",
          livestreamId,
       })
-   }, [copyToClipboard, enqueueSnackbar, livestreamId, livestreamLink])
+      // Close dialog after copying
+      handleClose()
+   }, [copyToClipboard, enqueueSnackbar, handleClose, livestreamId, livestreamLink])
 
    const handleLinkedInClick = useCallback(() => {
       const encodedUrl = encodeURIComponent(livestreamLink)
@@ -121,7 +123,9 @@ export const ShareLivestreamDialog = ({
          medium: "LinkedIn",
          livestreamId,
       })
-   }, [livestreamId, livestreamLink])
+      // Close dialog after opening LinkedIn
+      handleClose()
+   }, [handleClose, livestreamId, livestreamLink])
 
    return (
       <SteppedDialog.Container
