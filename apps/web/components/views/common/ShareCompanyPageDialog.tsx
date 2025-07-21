@@ -86,6 +86,7 @@ type Props = {
    group: Group
    handleClose: () => void
    isGroupAdmin?: boolean
+   onShareOptionClick?: (type: SocialPlatformType) => void
 }
 
 const datalayerEntityName = "company_page"
@@ -94,6 +95,7 @@ const ShareCompanyPageDialog: FC<Props> = ({
    group,
    handleClose,
    isGroupAdmin,
+   onShareOptionClick,
 }) => {
    const [isCopied, setIsCopied] = useState(false)
    const theme = useTheme()
@@ -127,7 +129,12 @@ const ShareCompanyPageDialog: FC<Props> = ({
       dataLayerEvent(AnalyticsEvents.CompanyPageShare, {
          medium: type,
       })
-   }, [])
+      
+      // Call parent callback if provided
+      if (onShareOptionClick) {
+         onShareOptionClick(type)
+      }
+   }, [onShareOptionClick])
 
    const copyCompanyPageLinkToClipboard = useCallback(() => {
       handleShareOptionClick(SocialPlatformObject.Copy)
