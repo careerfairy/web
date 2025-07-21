@@ -266,6 +266,11 @@ export function userMatchesTargeting(
    },
    targeting: GetGroupTalentEngagementFnArgs["targeting"]
 ): boolean {
+   // Defensive check: if user is null/undefined, return false
+   if (!user) {
+      return false
+   }
+
    // Check field of study first (applies globally)
    if (targeting.fieldsOfStudy.length > 0) {
       if (
@@ -404,6 +409,11 @@ async function countRegisteredUsersMatchingTargeting(
             continue
          }
 
+         // Skip if user data is missing
+         if (!data.user) {
+            continue
+         }
+
          // Check if user matches targeting criteria
          if (userMatchesTargeting(data.user, targeting)) {
             uniqueUserIds.add(data.userId)
@@ -470,6 +480,11 @@ async function countTotalUsersMatchingTargeting(
                UserData,
                "universityCountryCode" | "university" | "fieldOfStudy"
             >
+
+            // Skip if user data is missing
+            if (!userData) {
+               continue
+            }
 
             if (userMatchesTargeting(userData, targeting)) {
                batchCount++
