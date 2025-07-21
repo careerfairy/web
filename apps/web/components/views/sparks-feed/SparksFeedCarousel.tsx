@@ -78,7 +78,7 @@ const styles = sxStyles({
       height: "calc(100dvh - 67px)",
       position: "fixed",
       width: "100%",
-      zIndex: (theme) => theme.zIndex.drawer + 1,
+      zIndex: (theme) => theme.zIndex.appBar - 1,
       padding: 0,
    },
    container: {
@@ -112,7 +112,7 @@ const styles = sxStyles({
       position: "fixed",
       top: 0,
       right: 0,
-      zIndex: (theme) => theme.zIndex.drawer + 1,
+      zIndex: (theme) => theme.zIndex.appBar - 1, // 1099
       p: 1.5,
    },
    companyPageBtn: {
@@ -120,7 +120,7 @@ const styles = sxStyles({
       top: 0,
       left: 0,
       p: 5,
-      zIndex: (theme) => theme.zIndex.drawer + 1,
+      zIndex: (theme) => theme.zIndex.appBar - 1, // 1099
       "& .MuiIconButton-root": {
          background: "#DEDEDE",
          color: "#5C5C5C",
