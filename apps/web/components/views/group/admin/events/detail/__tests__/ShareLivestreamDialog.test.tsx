@@ -1,27 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { ShareLivestreamDialog } from "../ShareLivestreamDialog"
 
-// Mock external dependencies
-jest.mock("HOCs/AuthProvider", () => ({
-   useAuth: () => ({ userData: { referralCode: "test123" } }),
-}))
-
-jest.mock("notistack", () => ({
-   useSnackbar: () => ({ enqueueSnackbar: jest.fn() }),
-}))
-
-jest.mock("react-use", () => ({
-   useCopyToClipboard: () => [null, jest.fn()],
-}))
-
-jest.mock("util/makeUrls", () => ({
-   makeLivestreamEventDetailsInviteUrl: () => "https://test-url.com",
-}))
-
-jest.mock("util/analyticsUtils", () => ({
-   dataLayerEvent: jest.fn(),
-}))
-
 describe("ShareLivestreamDialog", () => {
    const defaultProps = {
       handleClose: jest.fn(),
@@ -41,6 +20,6 @@ describe("ShareLivestreamDialog", () => {
    it("displays the livestream link in the text field", () => {
       render(<ShareLivestreamDialog {...defaultProps} />)
       
-      expect(screen.getByDisplayValue("https://test-url.com")).toBeInTheDocument()
+      expect(screen.getByDisplayValue("https://www.careerfairy.io/livestream/test-livestream-id")).toBeInTheDocument()
    })
 })

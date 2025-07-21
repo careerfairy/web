@@ -1,85 +1,6 @@
-import { sxStyles } from "@careerfairy/shared-ui"
-import { Box, Button, Stack } from "@mui/material"
-import { Copy, Linkedin } from "react-feather"
-import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
-import { useCallback, useMemo, useEffect } from "react"
-import { useCopyToClipboard } from "react-use"
-import { useSnackbar } from "notistack"
-import { makeLivestreamEventDetailsInviteUrl } from "util/makeUrls"
-import { useAuth } from "HOCs/AuthProvider"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
-import { dataLayerEvent } from "util/analyticsUtils"
-
-const styles = sxStyles({
-   wrapContainer: {
-      height: "489px",
-      width: "517px",
-   },
-   container: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      height: "100%",
-      width: "100%",
-      px: 2,
-   },
-   content: {
-      my: 1,
-   },
-   info: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      textAlign: "center",
-   },
-   title: {
-      fontSize: "1.28571rem", // 18px - Desktop Heading 5
-      fontWeight: 700,
-      color: "neutral.800",
-      lineHeight: 1.55556,
-   },
-   subtitle: {
-      fontSize: "1.14286rem", // 16px - Desktop body regular
-      fontWeight: 400,
-      color: "neutral.700",
-      lineHeight: 1.5,
-      textAlign: "center",
-      mt: 1,
-   },
-   linkField: {
-      width: "100%",
-      mt: 2,
-   },
-   actions: {
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "center",
-      gap: 1.5,
-      mt: 3,
-   },
-   actionBtn: {
-      width: "140px",
-      height: "40px",
-      textTransform: "none",
-      fontWeight: 600,
-   },
-   copyBtn: {
-      backgroundColor: (theme) => theme.brand.white[50],
-      color: "neutral.800",
-      border: "1px solid",
-      borderColor: "neutral.200",
-      "&:hover": {
-         backgroundColor: (theme) => theme.brand.white[200],
-      },
-   },
-   linkedinBtn: {
-      backgroundColor: "#0077B5",
-      color: "white",
-      "&:hover": {
-         backgroundColor: "#005885",
-      },
-   },
-})
+import React from "react"
+import { Box, Button, Stack, TextField, Typography } from "@mui/material"
+import { Dialog, DialogContent } from "@mui/material"
 
 export type ShareLivestreamDialogProps = {
    handleClose: () => void
@@ -90,87 +11,73 @@ export const ShareLivestreamDialog = ({
    handleClose,
    livestreamId,
 }: ShareLivestreamDialogProps) => {
-   const { userData } = useAuth()
-   const { enqueueSnackbar } = useSnackbar()
-   const [, copyToClipboard] = useCopyToClipboard()
+   const livestreamLink = `https://www.careerfairy.io/livestream/${livestreamId}`
 
-   const livestreamLink = useMemo(() => {
-      return makeLivestreamEventDetailsInviteUrl(
-         livestreamId,
-         userData?.referralCode || ""
-      )
-   }, [livestreamId, userData?.referralCode])
-
-   // Auto-dismiss dialog after 10 seconds to not block E2E tests or user flow
-   useEffect(() => {
-      const timer = setTimeout(() => {
-         handleClose()
-      }, 10000) // 10 seconds
-
-      return () => clearTimeout(timer)
-   }, [handleClose])
-
-   const handleCopyClick = useCallback(() => {
-      copyToClipboard(livestreamLink)
-      enqueueSnackbar("Link copied to clipboard!", {
-         variant: "success",
-      })
-      dataLayerEvent("livestream_share", {
-         medium: "Copy Link",
-         livestreamId,
-      })
-      // Close dialog after copying
+   const handleCopyClick = () => {
+      navigator.clipboard.writeText(livestreamLink)
       handleClose()
-   }, [copyToClipboard, enqueueSnackbar, handleClose, livestreamId, livestreamLink])
+   }
 
-   const handleLinkedInClick = useCallback(() => {
+   const handleLinkedInClick = () => {
       const encodedUrl = encodeURIComponent(livestreamLink)
       const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`
       window.open(linkedInUrl, "_blank")
-      
-      dataLayerEvent("livestream_share", {
-         medium: "LinkedIn",
-         livestreamId,
-      })
-      // Close dialog after opening LinkedIn
       handleClose()
-   }, [handleClose, livestreamId, livestreamLink])
+   }
 
    return (
-      <SteppedDialog.Container
-         containerSx={styles.content}
-         sx={styles.wrapContainer}
-         hideCloseButton={false}
-         handleCloseIconClick={handleClose}
+      <Dialog 
+         open={true} 
+         onClose={handleClose}
+         maxWidth="sm"
+         fullWidth
       >
-         <SteppedDialog.Content sx={styles.container}>
-            <Stack spacing={3} sx={styles.info}>
-               <SteppedDialog.Title sx={styles.title}>
+         <DialogContent
+            sx={{
+               p: 4,
+               textAlign: "center",
+               minHeight: "400px",
+               display: "flex",
+               flexDirection: "column",
+               justifyContent: "center",
+            }}
+         >
+            <Stack spacing={3} alignItems="center">
+               <Typography 
+                  variant="h5" 
+                  fontWeight="bold"
+                  sx={{ color: "#3D3D47" }}
+               >
                   Share it with your audience!
-               </SteppedDialog.Title>
+               </Typography>
 
-               <SteppedDialog.Subtitle sx={styles.subtitle}>
+               <Typography 
+                  variant="body1"
+                  sx={{ color: "#5C5C6A" }}
+               >
                   Use this link to share your stream with your talent community!
-               </SteppedDialog.Subtitle>
+               </Typography>
 
-               <BrandedTextField
+               <TextField
                   label="Live stream link"
                   value={livestreamLink}
-                  InputProps={{
-                     readOnly: true,
-                     sx: {
-                        fontSize: "14px",
-                        color: "neutral.600",
-                     },
-                  }}
-                  sx={styles.linkField}
+                  fullWidth
+                  InputProps={{ readOnly: true }}
+                  sx={{ mt: 2 }}
                />
 
-               <Box sx={styles.actions}>
+               <Box 
+                  sx={{ 
+                     display: "flex", 
+                     gap: 1.5, 
+                     mt: 3,
+                     justifyContent: "center"
+                  }}
+               >
                   <Button
                      variant="outlined"
                      onClick={handleClose}
-                     sx={[styles.actionBtn, styles.copyBtn]}
+                     sx={{ width: "140px", height: "40px" }}
                   >
                      Skip
                   </Button>
@@ -178,8 +85,7 @@ export const ShareLivestreamDialog = ({
                   <Button
                      variant="outlined"
                      onClick={handleCopyClick}
-                     startIcon={<Copy size={16} />}
-                     sx={[styles.actionBtn, styles.copyBtn]}
+                     sx={{ width: "140px", height: "40px" }}
                   >
                      Copy
                   </Button>
@@ -187,14 +93,18 @@ export const ShareLivestreamDialog = ({
                   <Button
                      variant="contained"
                      onClick={handleLinkedInClick}
-                     startIcon={<Linkedin size={16} />}
-                     sx={[styles.actionBtn, styles.linkedinBtn]}
+                     sx={{ 
+                        width: "140px", 
+                        height: "40px",
+                        backgroundColor: "#0077B5",
+                        "&:hover": { backgroundColor: "#005885" }
+                     }}
                   >
                      LinkedIn
                   </Button>
                </Box>
             </Stack>
-         </SteppedDialog.Content>
-      </SteppedDialog.Container>
+         </DialogContent>
+      </Dialog>
    )
 }
