@@ -5,10 +5,10 @@ import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { useCallback, useMemo } from "react"
 import { useCopyToClipboard } from "react-use"
 import { useSnackbar } from "notistack"
-import { makeLivestreamEventDetailsInviteUrl } from "../../../../../../util/makeUrls"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import BrandedTextField from "../../../../../common/inputs/BrandedTextField"
-import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
+import { makeLivestreamEventDetailsInviteUrl } from "util/makeUrls"
+import { useAuth } from "HOCs/AuthProvider"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { dataLayerEvent } from "util/analyticsUtils"
 
 const styles = sxStyles({
    wrapContainer: {
@@ -31,7 +31,6 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       textAlign: "center",
-      spacing: 3,
    },
    title: {
       fontSize: "1.28571rem", // 18px - Desktop Heading 5
