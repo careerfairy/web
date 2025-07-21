@@ -31,6 +31,7 @@ export const SearchByLocation = () => {
    const locationOptions = useMemo(() => {
       return locations?.map(dropdownValueMapper) ?? []
    }, [locations])
+   console.log("🚀 ~ locationOptions ~ locationOptions:", locationOptions)
 
    const handleCleanup = () => {
       setLocationSearchValue("")

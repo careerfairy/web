@@ -16,6 +16,13 @@ import { getLocationById } from "./lib/countries/utils"
 
 const SEARCH_LOCATION_LIMIT = 10
 
+// Countries for which cities are included in location search
+// This list can be easily expanded by adding more ISO country codes
+const SEARCHABLE_CITIES_COUNTRIES = ["CH", "PT", "DE"] // Switzerland, Portugal, Germany
+
+// Cache for cities to avoid regenerating them on every search
+let cachedSearchableCities: { id: string; name: string }[] | null = null
+
 const CountryCitiesOptionsSchema = {
    countryCode: string().required(),
 }
@@ -99,6 +106,37 @@ const performFuzzySearch = <T>(
    const searchResults = fuse.search(searchValue)
 
    return searchResults.map((result) => result.item).slice(0, limit)
+}
+
+const generateSearchableCities = (): { id: string; name: string }[] => {
+   const cities: { id: string; name: string }[] = []
+
+   SEARCHABLE_CITIES_COUNTRIES.forEach((countryCode) => {
+      const country = Country.getCountryByCode(countryCode)
+      if (!country) return
+
+      const states = State.getStatesOfCountry(countryCode)
+
+      states.forEach((state) => {
+         const stateCities = City.getCitiesOfState(countryCode, state.isoCode)
+
+         stateCities?.forEach((city) => {
+            cities.push({
+               id: generateCityId(city),
+               name: `${city.name} (${state.name}, ${country.name})`,
+            })
+         })
+      })
+   })
+
+   return cities.sort((cityA, cityB) => cityA.name.localeCompare(cityB.name))
+}
+
+const getSearchableCities = (): { id: string; name: string }[] => {
+   if (!cachedSearchableCities) {
+      cachedSearchableCities = generateSearchableCities()
+   }
+   return cachedSearchableCities
 }
 
 export const searchCountries = onCall<SearchCountryOptions>((request) => {
@@ -304,8 +342,11 @@ export const searchLocations = onCall<SearchLocationOptions>((request) => {
          })
          .flat()
 
+      // Get cities from specified countries for search
+      const cities = getSearchableCities()
+
       locations = performFuzzySearch(
-         [...countries, ...states],
+         [...countries, ...states, ...cities],
          searchValue,
          limit
       )
@@ -329,7 +370,8 @@ export const searchLocations = onCall<SearchLocationOptions>((request) => {
 export const getLocation = onCall<GetLocationOptions>((request) => {
    const { searchValue } = request.data
 
-   const { countryIsoCode, stateIsoCode } = getLocationIds(searchValue)
+   const { countryIsoCode, stateIsoCode, cityName } =
+      getLocationIds(searchValue)
 
    if (!countryIsoCode) return null
 
@@ -337,6 +379,12 @@ export const getLocation = onCall<GetLocationOptions>((request) => {
    if (stateIsoCode) {
       const state = State.getStateByCodeAndCountry(stateIsoCode, countryIsoCode)
 
+      if (cityName) {
+         return {
+            id: searchValue,
+            name: `${cityName} (${state.name}, ${country.name})`,
+         }
+      }
       return {
          id: searchValue,
          name: `${state.name} (${country.name})`,
