@@ -166,12 +166,17 @@ export const MobileBottomNavigation = () => {
             break
          }
          case "menu": {
-            const isOpen = value === "menu"
-            /**
-             * Toggle the mobile full screen menu if already open.
-             */
-            setMobileFullScreenMenu(!isOpen)
-            setValue(isOpen ? noLinkActiveValue : newValue)
+            const menuIsCurrentlyOpen = value === "menu"
+
+            // Toggle the mobile full screen menu
+            setMobileFullScreenMenu(!menuIsCurrentlyOpen)
+
+            // Restore previous value if closing, otherwise set to "menu"
+            if (menuIsCurrentlyOpen) {
+               setValue(getActiveValue())
+            } else {
+               setValue(newValue)
+            }
             return
          }
          default: {
