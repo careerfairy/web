@@ -97,7 +97,7 @@ export const ShareLivestreamDialog = ({
    const livestreamLink = useMemo(() => {
       return makeLivestreamEventDetailsInviteUrl(
          livestreamId,
-         userData?.referralCode
+         userData?.referralCode || ""
       )
    }, [livestreamId, userData?.referralCode])
 
