@@ -14,7 +14,9 @@ const functionsToWarm = [
 
 type OnCallFunctionToWarm = {
    functionName: string
-   payload: Record<string, any>
+   payload: {
+      [KEEP_WARM_ONCALL_KEY]: true
+   }
 }
 
 const onCallFunctionsToWarm: OnCallFunctionToWarm[] = [
@@ -22,8 +24,6 @@ const onCallFunctionsToWarm: OnCallFunctionToWarm[] = [
       functionName: FUNCTION_NAMES.getRecommendedJobs,
       payload: {
          [KEEP_WARM_ONCALL_KEY]: true,
-         limit: 1,
-         bypassCache: true,
       },
    },
    // Add more onCall functions with their dummy payloads as needed

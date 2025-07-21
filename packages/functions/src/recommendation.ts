@@ -19,6 +19,7 @@ import {
    UserDataFetcher,
 } from "./lib/recommendation/services/DataFetcherRecommendations"
 import { logAndThrow } from "./lib/validations"
+import { warmingMiddleware } from "./middlewares-gen2/onCall/validations"
 import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
 import { middlewares } from "./middlewares/middlewares"
 import { dataValidation, userAuthExists } from "./middlewares/validations"
@@ -88,6 +89,7 @@ export const getRecommendedJobs = onCall(
       memory: "512MiB",
    },
    middlewares<GetRecommendedJobsFnArgs>(
+      warmingMiddleware(),
       dataValidation({
          userAuthId: string().optional().nullable(),
          limit: number().default(10).max(30),
