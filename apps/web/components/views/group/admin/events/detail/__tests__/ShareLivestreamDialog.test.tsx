@@ -20,6 +20,6 @@ describe("ShareLivestreamDialog", () => {
    it("displays the livestream link in the text field", () => {
       render(<ShareLivestreamDialog {...defaultProps} />)
       
-      expect(screen.getByDisplayValue("https://www.careerfairy.io/livestream/test-livestream-id")).toBeInTheDocument()
+      expect(screen.getByDisplayValue("https://www.careerfairy.io/next-livestreams?livestreamId=test-livestream-id")).toBeInTheDocument()
    })
 })
