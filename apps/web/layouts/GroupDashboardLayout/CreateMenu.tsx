@@ -5,9 +5,9 @@ import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesT
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
+import { Radio as LiveStreamsIcon } from "react-feather"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { JobsIcon } from "../../components/views/common/icons/JobsIcon"
-import { LiveStreamsIcon } from "../../components/views/common/icons/LiveStreamsIcon"
 import { SparksIcon } from "../../components/views/common/icons/SparksIcon"
 import BrandedResponsiveMenu, {
    type MenuOption,
@@ -42,7 +42,7 @@ export const CreateMenu = ({
             icon: isCreating ? (
                <CircularProgress size={16} />
             ) : (
-               <LiveStreamsIcon />
+               <LiveStreamsIcon strokeWidth={1.5} />
             ),
             handleClick: () => {
                if (isCreating) return

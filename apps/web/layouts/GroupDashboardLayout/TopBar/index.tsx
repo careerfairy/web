@@ -23,7 +23,7 @@ import { motion } from "framer-motion"
 const getStyles = (hasNavigationBar?: boolean) =>
    sxStyles({
       root: {
-         height: "fill-available",
+         height: "100%",
          display: "flex",
          flexWrap: "wrap",
          flex: 1,

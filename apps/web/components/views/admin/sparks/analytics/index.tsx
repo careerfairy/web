@@ -1,7 +1,6 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box, Button, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { AdminContainer } from "components/views/group/admin/common/Container"
 import { useRouter } from "next/router"
 import { RefreshCw } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -162,36 +161,34 @@ const GroupSparkAnalytics = () => {
       <Box sx={styles.root}>
          <Box sx={styles.controlHeader}>
             <SparksAnalyticsTabs sx={styles.tabs} />
-            <AdminContainer>
-               <Box component="span" sx={styles.mobileLimiter} />
-               <Box sx={styles.controlsWrapper}>
-                  <Box sx={styles.updateControlsWrapper}>
-                     <UpdatedAtLabel />
-                     <Button
-                        onClick={updateAnalytics}
-                        sx={styles.updateButton}
-                        disabled={isLoading}
+            <Box component="span" sx={styles.mobileLimiter} />
+            <Box sx={styles.controlsWrapper}>
+               <Box sx={styles.updateControlsWrapper}>
+                  <UpdatedAtLabel />
+                  <Button
+                     onClick={updateAnalytics}
+                     sx={styles.updateButton}
+                     disabled={isLoading}
+                  >
+                     <Box
+                        sx={[
+                           isLoading ? styles.spinningAnimation : {},
+                           styles.updateIcon,
+                        ]}
                      >
-                        <Box
-                           sx={[
-                              isLoading ? styles.spinningAnimation : {},
-                              styles.updateIcon,
-                           ]}
-                        >
-                           <RefreshCw size={UPDATE_ICON_SIZE} />
-                        </Box>
-                     </Button>
-                  </Box>
-                  <ResponsiveSelectWithDrawer
-                     selectValue={selectTimeFilter}
-                     setSelectValue={setSelectTimeFilter}
-                     options={options}
-                     selectContainerProps={{
-                        sx: styles.selectDrawer,
-                     }}
-                  />
+                        <RefreshCw size={UPDATE_ICON_SIZE} />
+                     </Box>
+                  </Button>
                </Box>
-            </AdminContainer>
+               <ResponsiveSelectWithDrawer
+                  selectValue={selectTimeFilter}
+                  setSelectValue={setSelectTimeFilter}
+                  options={options}
+                  selectContainerProps={{
+                     sx: styles.selectDrawer,
+                  }}
+               />
+            </Box>
          </Box>
          <Box>
             {tabValue === "overview" && <SparksOverviewTab />}

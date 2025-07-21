@@ -123,8 +123,7 @@ const noLinkActiveValue = ""
 export const MobileBottomNavigation = () => {
    const router = useRouter()
    const [value, setValue] = useState<string>(noLinkActiveValue)
-   const { toggleMobileFullScreenMenu, setMobileFullScreenMenu } =
-      useGroupDashboard()
+   const { setMobileFullScreenMenu } = useGroupDashboard()
 
    const { group } = useGroup()
 
@@ -167,26 +166,34 @@ export const MobileBottomNavigation = () => {
             break
          }
          case "menu": {
-            toggleMobileFullScreenMenu()
-            setValue(newValue)
+            const isOpen = value === "menu"
+            /**
+             * Toggle the mobile full screen menu if already open.
+             */
+            setMobileFullScreenMenu(!isOpen)
+            setValue(isOpen ? noLinkActiveValue : newValue)
             return
          }
          default: {
             const selectedItem = navItems.find((item) => item.id === newValue)
             if (!selectedItem) return
 
-            setMobileFullScreenMenu(false)
             setValue(newValue)
-            router.push(
-               {
-                  pathname: selectedItem.pathname,
-                  query: {
-                     groupId,
+            router
+               .push(
+                  {
+                     pathname: selectedItem.pathname,
+                     query: {
+                        groupId,
+                     },
                   },
-               },
-               undefined,
-               { shallow: true }
-            )
+                  undefined,
+                  { shallow: true }
+               )
+               .then(() => {
+                  // Always close the mobile full screen menu after navigating to a new page
+                  setMobileFullScreenMenu(false)
+               })
             break
          }
       }
