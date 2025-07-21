@@ -12,21 +12,9 @@ const functionsToWarm = [
    // Add more functions as needed
 ]
 
-type OnCallFunctionToWarm = {
-   functionName: string
-   payload: {
-      [KEEP_WARM_ONCALL_KEY]: true
-   }
-}
-
-const onCallFunctionsToWarm: OnCallFunctionToWarm[] = [
-   {
-      functionName: FUNCTION_NAMES.getRecommendedJobs,
-      payload: {
-         [KEEP_WARM_ONCALL_KEY]: true,
-      },
-   },
-   // Add more onCall functions with their dummy payloads as needed
+const onCallFunctionsToWarm: string[] = [
+   FUNCTION_NAMES.getRecommendedJobs,
+   // Add more onCall functions as needed
 ]
 
 /**
@@ -76,27 +64,23 @@ export const keepOnCallFunctionsWarm = onSchedule(
    async () => {
       logger.info("Starting keep-warm cycle for onCall functions")
 
-      const requests = onCallFunctionsToWarm.map(
-         async ({ functionName, payload }) => {
-            try {
-               await functionsAxios.post(
-                  `/${functionName}`,
-                  { data: payload },
-                  { timeout: 10000 }
-               )
-               logger.info(
-                  `Successfully warmed onCall function: ${functionName}`
-               )
-               return { function: functionName, success: true }
-            } catch (error) {
-               logger.error(
-                  `Failed to warm onCall function: ${functionName}`,
-                  error
-               )
-               return { function: functionName, success: false }
-            }
+      const requests = onCallFunctionsToWarm.map(async (functionName) => {
+         try {
+            await functionsAxios.post(
+               `/${functionName}`,
+               { data: { [KEEP_WARM_ONCALL_KEY]: true } },
+               { timeout: 10000 }
+            )
+            logger.info(`Successfully warmed onCall function: ${functionName}`)
+            return { function: functionName, success: true }
+         } catch (error) {
+            logger.error(
+               `Failed to warm onCall function: ${functionName}`,
+               error
+            )
+            return { function: functionName, success: false }
          }
-      )
+      })
 
       const results = await Promise.allSettled(requests)
       logger.info(
