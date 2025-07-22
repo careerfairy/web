@@ -35,6 +35,7 @@ const styles = sxStyles({
          p: "0px",
          "&::placeholder": {
             color: (theme) => theme.palette.neutral[600],
+            opacity: 1,
             fontSize: {
                xs: "14px",
                sm: "14px",
@@ -57,6 +58,10 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[600],
       width: "24px",
       height: "24px",
+      flexShrink: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
    },
    optionIcon: {
       width: "16px",
@@ -65,6 +70,10 @@ const styles = sxStyles({
    clearIcon: {
       width: "24px",
       height: "24px",
+      flexShrink: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
       "&:hover": {
          cursor: "pointer",
       },
