@@ -2,10 +2,11 @@ import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { Box, IconButton, Typography, useTheme } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useIsTargetedUser } from "components/views/sparks/components/spark-card/Notifications/linkedin/useIsTargetedUser"
 import Image from "next/image"
 import Link from "next/link"
 import { ReactNode, SyntheticEvent } from "react"
-import { Edit2 } from "react-feather"
+import { Edit2, Linkedin } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { buildMentorPageLink } from "util/routes"
 import { useCompanyPage } from ".."
@@ -19,7 +20,7 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       background: `${theme.brand.white[100]}`,
-      borderRadius: "10px",
+      borderRadius: "16px",
       border: `1px solid ${theme.palette.secondary.light}`,
       boxShadow: "0px 0px 8px 0px #1414140F",
       minWidth: `${CARD_WIDTH}px`,
@@ -80,6 +81,19 @@ const styles = sxStyles({
       top: 4,
       zIndex: 1,
    },
+   linkedInContainer: (theme) => ({
+      position: "absolute",
+      top: 8,
+      right: 8,
+      width: "26px",
+      height: "26px",
+      backgroundColor: "#F3F3F5",
+      borderRadius: "50%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 2,
+   }),
    logoOverlay: {
       position: "absolute",
       bottom: 1,
@@ -132,12 +146,17 @@ export const MentorCard = ({
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
    const { group } = useCompanyPage()
+   const isUserFromTargetedCountry = useIsTargetedUser(group)
 
    const _handleEdit = (ev: SyntheticEvent) => {
       ev.preventDefault()
       ev.stopPropagation()
       handleEdit?.()
    }
+
+   const shouldShowLinkedInIcon = Boolean(
+      isUserFromTargetedCountry && creator.linkedInUrl && !isEditMode
+   )
 
    return (
       <Container creator={creator}>
@@ -162,6 +181,11 @@ export const MentorCard = ({
             <IconButton sx={styles.edit} onClick={_handleEdit}>
                <Edit2 size={20} color={theme.brand.white[100]} />
             </IconButton>
+         ) : null}
+         {shouldShowLinkedInIcon ? (
+            <Box sx={styles.linkedInContainer}>
+               <Linkedin size={14} color={theme.brand.info[700]} fill={theme.brand.info[700]} />
+            </Box>
          ) : null}
          <Box sx={styles.avatarContainer}>
             <CircularLogo
