@@ -26,6 +26,7 @@ import AboutLivestream from "./main-content/AboutLivestream"
 import Jobs from "./main-content/Jobs"
 import Questions from "./main-content/Questions"
 import Section from "./main-content/Section"
+import SimilarLivestreamsCarousel from "./main-content/SimilarLivestreamsCarousel"
 import Speakers from "./main-content/Speakers"
 
 const styles = sxStyles({
@@ -161,6 +162,9 @@ const LivestreamDetailsView = () => {
                               <Questions livestream={livestream} />
                            </Section>
                         )}
+                        <Section>
+                           <SimilarLivestreamsCarousel currentLivestream={livestream} />
+                        </Section>
                         {isFloatingActionButton ? (
                            <FloatingButtonOffset />
                         ) : null}
