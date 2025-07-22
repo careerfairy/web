@@ -5,11 +5,18 @@ import {
    List,
    ListItemButton,
    MenuItem,
+   SwipeableDrawerProps,
    SxProps,
    Typography,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { ComponentType, FC, Fragment, ReactElement } from "react"
+import {
+   ComponentType,
+   FC,
+   Fragment,
+   ReactElement,
+   ReactEventHandler,
+} from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import BrandedMenu from "./BrandedMenu"
 import BrandedSwipeableDrawer from "./BrandedSwipeableDrawer"
@@ -39,6 +46,9 @@ const styles = sxStyles({
       color: (theme) => theme.palette.neutral[700],
       p: "10px 16px !important",
    },
+   list: {
+      py: 0,
+   },
    listItemLoading: {
       "& .MuiTypography-root": {
          opacity: 0.5,
@@ -52,7 +62,7 @@ const styles = sxStyles({
       borderColor: (theme) => theme.brand.black[300],
    },
    drawerMenuItem: {
-      p: "17px 20px !important",
+      p: "16px 20px !important",
       position: "relative",
       color: (theme) => theme.palette.neutral[700],
    },
@@ -88,35 +98,33 @@ export type MenuOption = {
 
 type MobileDrawerProps = {
    open: boolean
-   handleClose: () => void
    options: MenuOption[]
    enableDrawerCancelButton?: boolean
-}
+} & Omit<SwipeableDrawerProps, "onOpen">
 
 const MobileDrawer: FC<MobileDrawerProps> = ({
    open,
-   handleClose,
    options,
    enableDrawerCancelButton,
+   onClose,
+   ...swipeableDrawerProps
 }) => {
    return (
       <BrandedSwipeableDrawer
-         onClose={handleClose}
          onOpen={() => null}
+         onClose={onClose}
          open={open}
          sx={styles.mobileDrawer}
+         {...swipeableDrawerProps}
       >
-         <List>
+         <List sx={styles.list}>
             {options.map((option, index) => {
                const WrapperComponent = option.wrapperComponent || Fragment
                return (
                   <Fragment key={index}>
                      {index !== 0 && <Divider sx={styles.listItemDivider} />}
                      <WrapperComponent>
-                        <MobileMenuItem
-                           option={option}
-                           handleClose={handleClose}
-                        />
+                        <MobileMenuItem option={option} handleClose={onClose} />
                      </WrapperComponent>
                   </Fragment>
                )
@@ -125,7 +133,7 @@ const MobileDrawer: FC<MobileDrawerProps> = ({
                <Fragment>
                   <Divider sx={styles.listItemDivider} />
                   <ListItemButton
-                     onClick={handleClose}
+                     onClick={onClose}
                      sx={[styles.drawerMenuItem]}
                   >
                      <Typography variant="medium">Cancel</Typography>
@@ -197,6 +205,7 @@ export type MoreMenuProps = {
    handleClose: () => void
    enableDrawerCancelButton?: boolean
    placement?: MenuPlacement
+   disableSwipeToOpen?: boolean
 }
 
 const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
@@ -207,6 +216,7 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
    handleClose,
    enableDrawerCancelButton,
    placement,
+   disableSwipeToOpen,
 }) => {
    const defaultIsMobile = useIsMobile()
    const isMobile = isMobileOverride ?? defaultIsMobile
@@ -217,8 +227,9 @@ const BrandedResponsiveMenu: FC<MoreMenuProps> = ({
             <MobileDrawer
                options={options}
                open={open}
-               handleClose={handleClose}
+               onClose={handleClose}
                enableDrawerCancelButton={enableDrawerCancelButton}
+               disableSwipeToOpen={disableSwipeToOpen}
             />
          ) : (
             <DesktopMenu
@@ -239,7 +250,7 @@ const Loader = () => {
 
 type MobileMenuItemProps = {
    option: MenuOption
-   handleClose: () => void
+   handleClose: ReactEventHandler
 }
 
 const MobileMenuItem: FC<MobileMenuItemProps> = ({ option, handleClose }) => {
@@ -251,7 +262,7 @@ const MobileMenuItem: FC<MobileMenuItemProps> = ({ option, handleClose }) => {
             } catch (error) {
                console.error(error)
             }
-            !option.keepOpen && handleClose()
+            !option.keepOpen && handleClose(args)
          }}
          sx={combineStyles(
             [

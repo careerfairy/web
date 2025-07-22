@@ -1,9 +1,8 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
+import { useJobDialogRouter } from "components/custom-hook/custom-job/useJobDialogRouter"
 import { FC, useCallback, useEffect, useState } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
-import { useSelector } from "react-redux"
-import { jobsFormSelectedJobIdSelector } from "../../../../../../../store/selectors/adminJobsSelectors"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useCustomJobDelete from "../../../../../../custom-hook/custom-job/useCustomJobDelete"
 import SteppedDialog, {
@@ -66,7 +65,7 @@ type Props = {
 }
 
 const DeleteJobDialog: FC<Props> = ({ job }) => {
-   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const { selectedJobId } = useJobDialogRouter()
    const { handleClose } = useStepper<JobDialogStep>()
    const { isDeleting, handleDelete } = useCustomJobDelete(selectedJobId)
    const [hasLinkedContent, setHasLinkedContent] = useState(false)

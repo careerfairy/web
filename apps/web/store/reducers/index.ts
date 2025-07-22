@@ -1,7 +1,6 @@
 import { combineReducers } from "redux"
 import { firestoreReducer } from "redux-firestore"
 
-import adminJobsReducer from "./adminJobsReducer"
 import adminSparksReducer from "./adminSparksReducer"
 import authReducer from "./authReducer"
 import emotesReducer from "./emotesReducer"
@@ -38,7 +37,6 @@ const reducers = {
    adminSparks: adminSparksReducer,
    groupPlan: groupPlanReducer,
    sparksFeed: sparksFeedReducer,
-   adminJobs: adminJobsReducer,
    streamingApp: streamingAppReducer,
    talentProfile: talentProfileReducer,
    talentGuide: talentGuideReducer,

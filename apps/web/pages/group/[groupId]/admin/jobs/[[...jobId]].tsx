@@ -4,7 +4,6 @@ import { useRouter } from "next/router"
 import { ReactElement } from "react"
 import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
 import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
-import CreateJobButton from "../../../../../components/views/admin/jobs/components/CreateJobButton"
 import JobsContent from "../../../../../components/views/group/admin/jobs"
 import JobAdminDetails from "../../../../../components/views/group/admin/jobs/details/JobAdminDetails"
 import JobDialog from "../../../../../components/views/group/admin/jobs/dialog"
@@ -38,7 +37,6 @@ const JobsPage = () => {
 JobsPage.getLayout = function getLayout(page: ReactElement) {
    return withGroupDashboardLayout({
       titleComponent: "Jobs",
-      topBarCta: <CreateJobButton />,
       dashboardHeadTitle: "CareerFairy | Jobs",
    })(page)
 }

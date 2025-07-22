@@ -1,12 +1,11 @@
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { useTheme } from "@mui/material"
+import { useJobDialogRouter } from "components/custom-hook/custom-job/useJobDialogRouter"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
 import { Briefcase } from "react-feather"
-import { useDispatch } from "react-redux"
-import { openJobsDialog } from "store/reducers/adminJobsReducer"
 import EmptyFormSection from "../../../EmptyFormSection"
 import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
 import JobCardPreview from "./JobCardPreview"
@@ -16,7 +15,7 @@ type Props = {
 }
 const JobList = ({ fieldId }: Props) => {
    const theme = useTheme()
-   const dispatch = useDispatch()
+   const { openJobDialog } = useJobDialogRouter()
    const featureFlags = useFeatureFlags()
    const { group } = useGroup()
 
@@ -45,9 +44,9 @@ const JobList = ({ fieldId }: Props) => {
 
    const handleEditJob = useCallback(
       (updatedJob: PublicCustomJob) => {
-         dispatch(openJobsDialog(updatedJob.id))
+         openJobDialog(updatedJob.id)
       },
-      [dispatch]
+      [openJobDialog]
    )
 
    if (selectedJobs.length === 0) {

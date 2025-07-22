@@ -69,8 +69,7 @@ const reducer = (state: IGroupDashboardState, action: Action) => {
 type Props = {
    children: ReactNode
    titleComponent: ReactNode
-   topBarCta?: ReactNode
-   topBarMobileCta?: ReactNode
+   topBarAction?: ReactNode
    topBarNavigation?: ReactNode
    bottomBarNavigation?: ReactNode
    backgroundColor?: string
@@ -86,8 +85,7 @@ type Props = {
 const GroupDashboardLayoutProvider = ({
    children,
    titleComponent,
-   topBarCta,
-   topBarMobileCta,
+   topBarAction,
    topBarNavigation,
    bottomBarNavigation,
    backgroundColor,
@@ -126,8 +124,7 @@ const GroupDashboardLayoutProvider = ({
             bgColor={backgroundColor ?? "#F7F8FC"}
             headerContent={
                <TopBar
-                  cta={topBarCta}
-                  mobileCta={topBarMobileCta}
+                  topBarAction={topBarAction}
                   navigation={topBarNavigation}
                   title={titleComponent}
                />

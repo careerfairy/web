@@ -5,6 +5,7 @@ import {
 import { CircularProgress } from "@mui/material"
 import JobFetchWrapper from "HOCs/job/JobFetchWrapper"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useJobDialogRouter } from "components/custom-hook/custom-job/useJobDialogRouter"
 import dynamic from "next/dynamic"
 import {
    MutableRefObject,
@@ -14,13 +15,6 @@ import {
    useRef,
 } from "react"
 import { useFormContext } from "react-hook-form"
-import { useDispatch, useSelector } from "react-redux"
-import { closeJobsDialog } from "../../../../../../store/reducers/adminJobsReducer"
-import {
-   deleteJobsDialogOpenSelector,
-   jobsDialogOpenSelector,
-   jobsFormSelectedJobIdSelector,
-} from "../../../../../../store/selectors/adminJobsSelectors"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useGroupFromState from "../../../../../custom-hook/useGroupFromState"
 import { SlideUpTransition } from "../../../../common/transitions"
@@ -98,7 +92,7 @@ const JobAdditionalDetails = dynamic(
 
 type ViewsProps = {
    quillInputRef: any
-   job?: CustomJob
+   job?: CustomJob | null
 }
 
 const getViews = ({ quillInputRef, job }: ViewsProps) =>
@@ -161,14 +155,13 @@ type Props = {
 }
 
 const JobDialog = ({ afterCreateCustomJob, afterUpdateCustomJob }: Props) => {
-   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const { selectedJobId, closeJobDialog } = useJobDialogRouter()
    const quillInputRef = useRef()
-   const dispatch = useDispatch()
 
    // This function is a default callback that closes the jobs dialog after the action has been completed
    const defaultAfterAction = useCallback(() => {
-      dispatch(closeJobsDialog())
-   }, [dispatch])
+      closeJobDialog()
+   }, [closeJobDialog])
 
    return (
       <SuspenseWithBoundary fallback={<CircularProgress />}>
@@ -193,27 +186,29 @@ const JobDialog = ({ afterCreateCustomJob, afterUpdateCustomJob }: Props) => {
 }
 
 type ContentProps = {
-   job: CustomJob
+   job: CustomJob | null
    quillInputRef: MutableRefObject<any>
 }
 
 const Content = ({ job, quillInputRef }: ContentProps) => {
    const { group } = useGroupFromState()
-   const dispatch = useDispatch()
-   const isJobFormDialogOpen = useSelector(jobsDialogOpenSelector)
-   const isDeleteJobDialogOpen = useSelector(deleteJobsDialogOpenSelector)
-   const selectedJobId = useSelector(jobsFormSelectedJobIdSelector)
+   const {
+      isJobDialogOpen,
+      isDeleteJobDialogOpen,
+      selectedJobId,
+      closeJobDialog,
+   } = useJobDialogRouter()
    const { reset } = useFormContext()
 
    useEffect(() => {
       const updatedDefaultValues = getInitialValues(job, group)
       reset(updatedDefaultValues)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [isJobFormDialogOpen])
+   }, [isJobDialogOpen])
 
    const handleCloseDialog = useCallback(() => {
-      dispatch(closeJobsDialog())
-   }, [dispatch])
+      closeJobDialog()
+   }, [closeJobDialog])
 
    const initialStep = useMemo(() => {
       if (isDeleteJobDialogOpen) {
@@ -232,10 +227,10 @@ const Content = ({ job, quillInputRef }: ContentProps) => {
 
    return (
       <SteppedDialog
-         key={isJobFormDialogOpen || isDeleteJobDialogOpen ? "open" : "closed"}
+         key={isJobDialogOpen || isDeleteJobDialogOpen ? "open" : "closed"}
          bgcolor="#FCFCFC"
          handleClose={handleCloseDialog}
-         open={isJobFormDialogOpen || isDeleteJobDialogOpen}
+         open={isJobDialogOpen || isDeleteJobDialogOpen}
          views={views}
          initialStep={initialStep}
          transition={SlideUpTransition}
