@@ -1,6 +1,7 @@
 import {
    CityOption,
    CountryOption,
+   LocationOption,
    generateCityId,
    generateCountryId,
    generateStateId,
@@ -37,8 +38,32 @@ const SEARCHABLE_CITIES_COUNTRIES = [
    "GB", // United Kingdom
 ]
 
-// Cache for cities to avoid regenerating them on every search
-let cachedSearchableCities: { id: string; name: string }[] | null = null
+// Cache for all searchable data to avoid regeneration
+// This cache significantly improves performance by avoiding repeated data generation
+let cachedSearchableCountries: LocationOption[] | null = null
+let cachedSearchableStates: LocationOption[] | null = null
+let cachedSearchableCities: LocationOption[] | null = null
+
+// Cache management function for memory optimization
+const clearLocationCaches = () => {
+   cachedSearchableCountries = null
+   cachedSearchableStates = null
+   cachedSearchableCities = null
+}
+
+// Function to get cache statistics for performance monitoring
+const getCacheStats = () => {
+   return {
+      countriesCached: cachedSearchableCountries?.length || 0,
+      statesCached: cachedSearchableStates?.length || 0,
+      citiesCached: cachedSearchableCities?.length || 0,
+      memoryCacheStatus: {
+         countries: !!cachedSearchableCountries,
+         states: !!cachedSearchableStates,
+         cities: !!cachedSearchableCities,
+      },
+   }
+}
 
 const CountryCitiesOptionsSchema = {
    countryCode: string().required(),
@@ -113,20 +138,29 @@ const performFuzzySearch = <T>(
    searchValue: string,
    limit?: number
 ): T[] => {
-   // Configure Fuse options
+   // Early return for short search values
+   if (searchValue.length < 2) return []
+
+   // Configure Fuse options for better performance
    const fuseOptions = {
       keys: ["name"],
-      threshold: 0.5, // Adjust this value to control fuzzy matching sensitivity
+      threshold: 0.4, // More strict matching for better performance
+      distance: 100, // Limit search distance
+      maxPatternLength: 32, // Limit pattern length
+      minMatchCharLength: 2, // Minimum match length
+      includeScore: false, // Don't include scores to save memory
+      shouldSort: true, // Sort results by relevance
+      findAllMatches: false, // Stop at first good match per item
    }
 
    const fuse = new Fuse(items, fuseOptions)
-   const searchResults = fuse.search(searchValue)
+   const searchResults = fuse.search(searchValue, { limit: limit || 10 })
 
-   return searchResults.map((result) => result.item).slice(0, limit)
+   return searchResults.map((result) => result.item)
 }
 
-const generateSearchableCities = (): { id: string; name: string }[] => {
-   const cities: { id: string; name: string }[] = []
+const generateSearchableCities = (): LocationOption[] => {
+   const cities: LocationOption[] = []
 
    SEARCHABLE_CITIES_COUNTRIES.forEach((countryCode) => {
       const country = Country.getCountryByCode(countryCode)
@@ -149,11 +183,135 @@ const generateSearchableCities = (): { id: string; name: string }[] => {
    return cities.sort((cityA, cityB) => cityA.name.localeCompare(cityB.name))
 }
 
-const getSearchableCities = (): { id: string; name: string }[] => {
+const generateSearchableCountries = (): LocationOption[] => {
+   const countries: LocationOption[] = []
+
+   SEARCHABLE_CITIES_COUNTRIES.forEach((countryCode) => {
+      const country = Country.getCountryByCode(countryCode)
+      if (!country) return
+
+      countries.push({
+         name: country.name,
+         id: generateCountryId(country),
+      })
+   })
+
+   return countries.sort((countryA, countryB) =>
+      countryA.name.localeCompare(countryB.name)
+   )
+}
+
+const generateSearchableStates = (): LocationOption[] => {
+   const states: LocationOption[] = []
+
+   SEARCHABLE_CITIES_COUNTRIES.forEach((countryCode) => {
+      const country = Country.getCountryByCode(countryCode)
+      if (!country) return
+
+      const countryStates = State.getStatesOfCountry(countryCode)
+
+      countryStates.forEach((state) => {
+         states.push({
+            id: generateStateId(state),
+            name: `${state.name} (${country.name})`,
+         })
+      })
+   })
+
+   return states.sort((stateA, stateB) =>
+      stateA.name.localeCompare(stateB.name)
+   )
+}
+
+const getSearchableCities = (): LocationOption[] => {
    if (!cachedSearchableCities) {
       cachedSearchableCities = generateSearchableCities()
    }
    return cachedSearchableCities
+}
+
+const getSearchableCountries = (): LocationOption[] => {
+   if (!cachedSearchableCountries) {
+      cachedSearchableCountries = generateSearchableCountries()
+   }
+   return cachedSearchableCountries
+}
+
+const getSearchableStates = (): LocationOption[] => {
+   if (!cachedSearchableStates) {
+      cachedSearchableStates = generateSearchableStates()
+   }
+   return cachedSearchableStates
+}
+
+const performTieredLocationSearch = (
+   searchValue: string,
+   limit: number
+): LocationOption[] => {
+   // Separate result arrays to control final ordering
+   const countryResults: LocationOption[] = []
+   const stateResults: LocationOption[] = []
+   const cityResults: LocationOption[] = []
+   const seen = new Set<string>()
+
+   // 1. Search countries first (computational priority)
+   const countries = getSearchableCountries()
+   const countryMatches = performFuzzySearch(
+      countries,
+      searchValue,
+      Math.ceil(limit * 0.3)
+   )
+
+   countryMatches.forEach((location) => {
+      if (
+         !seen.has(location.id) &&
+         countryResults.length < Math.ceil(limit * 0.3)
+      ) {
+         countryResults.push(location)
+         seen.add(location.id)
+      }
+   })
+
+   // 2. Search states (computational priority)
+   const states = getSearchableStates()
+   const stateMatches = performFuzzySearch(
+      states,
+      searchValue,
+      Math.ceil(limit * 0.4)
+   )
+
+   stateMatches.forEach((location) => {
+      if (
+         !seen.has(location.id) &&
+         stateResults.length < Math.ceil(limit * 0.4)
+      ) {
+         stateResults.push(location)
+         seen.add(location.id)
+      }
+   })
+
+   // 3. Search cities (lowest computational priority, only if we need more results)
+   const currentResultsCount = countryResults.length + stateResults.length
+   const remainingLimit = limit - currentResultsCount
+
+   if (remainingLimit > 0) {
+      const cities = getSearchableCities()
+      const cityMatches = performFuzzySearch(
+         cities,
+         searchValue,
+         remainingLimit
+      )
+
+      cityMatches.forEach((location) => {
+         if (!seen.has(location.id) && cityResults.length < remainingLimit) {
+            cityResults.push(location)
+            seen.add(location.id)
+         }
+      })
+   }
+
+   // Return results with cities first (user experience priority)
+   return [...cityResults, ...stateResults, ...countryResults].slice(0, limit)
 }
 
 export const searchCountries = onCall<SearchCountryOptions>((request) => {
@@ -335,38 +493,19 @@ export const fetchCountryData = onCall<CountryDataOptions>((request) => {
 })
 
 export const searchLocations = onCall<SearchLocationOptions>(
+   {
+      memory: "2GiB",
+   },
    middlewares<SearchLocationOptions>(warmingMiddleware(), async (request) => {
       const { searchValue, limit, initialLocationIds } = request.data
 
-      let locations: { id: string; name: string }[] = []
+      let locations: LocationOption[] = []
 
       if (searchValue?.length > 2) {
-         const countries = Country.getAllCountries()
-            .map((country) => ({
-               name: country.name,
-               id: generateCountryId(country),
-            }))
-            .sort((countryA, countryB) =>
-               countryA.name.localeCompare(countryB.name)
-            )
-
-         const states = countries
-            .map((country) => {
-               const states = State.getStatesOfCountry(country.id)
-               return states.map((state) => ({
-                  name: `${state.name} (${country.name})`,
-                  id: generateStateId(state),
-               }))
-            })
-            .flat()
-
-         // Get cities from specified countries for search
-         const cities = getSearchableCities()
-
-         locations = performFuzzySearch(
-            [...countries, ...states, ...cities],
+         // Use tiered search for better performance and relevance
+         locations = performTieredLocationSearch(
             searchValue,
-            limit
+            limit || SEARCH_LOCATION_LIMIT
          )
       }
 
@@ -420,3 +559,7 @@ export const getLocation = onCall<GetLocationOptions>(
       }
    })
 )
+
+// Export cache management functions for maintenance
+export const clearLocationSearchCaches = clearLocationCaches
+export const getLocationCacheStats = getCacheStats

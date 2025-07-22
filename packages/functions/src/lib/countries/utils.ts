@@ -1,7 +1,10 @@
-import { getLocationIds } from "@careerfairy/shared-lib/countries/types"
+import {
+   getLocationIds,
+   LocationOption,
+} from "@careerfairy/shared-lib/countries/types"
 import { Country, State } from "country-state-city"
 
-export const getLocationById = (locationId: string) => {
+export const getLocationById = (locationId: string): LocationOption | null => {
    const { countryIsoCode, stateIsoCode, cityName } = getLocationIds(locationId)
 
    if (!countryIsoCode) return null
