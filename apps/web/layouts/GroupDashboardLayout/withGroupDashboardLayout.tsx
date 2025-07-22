@@ -1,3 +1,4 @@
+import { AdminContainer } from "components/views/group/admin/common/Container"
 import { useRouter } from "next/router"
 import { ReactElement, ReactNode } from "react"
 import { LivestreamAnalyticsNavigationTabs } from "../../components/views/group/admin/analytics-new/live-stream/LivestreamAnalyticsNavigationTabs"
@@ -65,7 +66,9 @@ export const withGroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
                <SubNavigationTabs showSubNavigationFor={subNavigationFor} />
             )}
             {Boolean(isAnalyticsLiveStreamPage) && (
-               <LivestreamAnalyticsNavigationTabs />
+               <AdminContainer>
+                  <LivestreamAnalyticsNavigationTabs />
+               </AdminContainer>
             )}
             {page}
          </GroupDashboardLayout>

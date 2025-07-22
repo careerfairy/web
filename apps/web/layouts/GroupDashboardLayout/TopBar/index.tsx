@@ -23,6 +23,7 @@ import { motion } from "framer-motion"
 const getStyles = (hasNavigationBar?: boolean) =>
    sxStyles({
       root: {
+         height: "100%",
          display: "flex",
          flexWrap: "wrap",
          flex: 1,
@@ -95,7 +96,7 @@ const TopBar = ({ title, topBarAction, navigation }: Props) => {
 
    return (
       <Fragment>
-         <Box sx={styles.root}>
+         <Box sx={styles.root} id="group-dashboard-top-bar">
             {/* toggler button */}
             {!drawerPresent && !isMobile ? <MobileToggleButton /> : null}
             <Box

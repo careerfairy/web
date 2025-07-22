@@ -121,6 +121,10 @@ exports.joinGroupDashboard_eu = groupAdmin.joinGroupDashboard
 exports.createGroup_eu = groupAdmin.createGroup
 exports.changeRole_eu = groupAdmin.changeRole
 exports.kickFromDashboard_eu = groupAdmin.kickFromDashboard
+exports[FUNCTION_NAMES.getGroupTalentEngagement] =
+   groupAnalytics.getGroupTalentEngagement
+exports[FUNCTION_NAMES.getTotalUsersMatchingTargeting] =
+   groupAnalytics.getTotalUsersMatchingTargeting
 
 // Reminders (Old) TODO: delete functions in file after testing new reminders
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails

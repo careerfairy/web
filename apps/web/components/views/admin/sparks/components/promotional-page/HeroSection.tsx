@@ -1,6 +1,7 @@
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { LoadingButton } from "@mui/lab"
 import { Box, Button, CardContent, Stack, Typography } from "@mui/material"
+import { useGroupTalentEngagement } from "components/custom-hook/group/useGroupTalentEngagement"
 import { useStartPlanMutation } from "components/custom-hook/group/useStartPlanMutation"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
@@ -23,6 +24,8 @@ import {
 export const HeroSection = () => {
    const { group } = useGroup()
    const { push } = useRouter()
+   const { data: talentEngagement, isLoading: talentEngagementLoading } =
+      useGroupTalentEngagement(group)
 
    const { trigger, isMutating } = useStartPlanMutation(group.id, {
       onSuccess: () => {
@@ -36,6 +39,11 @@ export const HeroSection = () => {
          groupId: group.id,
       })
    }
+
+   const progressValue = calculateProgressValue(
+      talentEngagement?.total || 0,
+      talentEngagement?.count || 0
+   )
 
    return (
       <StyledHeroContent>
@@ -79,13 +87,24 @@ export const HeroSection = () => {
                </StyledProgressHeader>
 
                <Stack spacing={0.5}>
-                  <StyledLinearProgress variant="determinate" value={20} />
+                  <StyledLinearProgress
+                     variant={
+                        talentEngagementLoading
+                           ? "indeterminate"
+                           : "determinate"
+                     }
+                     value={progressValue}
+                  />
                   <Typography
                      variant="xsmall"
                      component="span"
                      color="neutral.500"
                   >
-                     1200/9500 talent engaged
+                     {talentEngagementLoading
+                        ? "Crunching the numbers..."
+                        : `${talentEngagement?.count || 0}/${
+                             talentEngagement?.total || 0
+                          } talent engaged`}
                   </Typography>
                </Stack>
             </StyledProgressSection>
@@ -199,4 +218,8 @@ export const HeroSection = () => {
          </StyledPricingSection>
       </StyledHeroContent>
    )
+}
+
+const calculateProgressValue = (total: number, count: number) => {
+   return total > 0 ? (count / total) * 100 : 0
 }

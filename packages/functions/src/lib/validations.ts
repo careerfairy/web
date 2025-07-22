@@ -5,7 +5,10 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
-import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import {
+   CallableContext,
+   CallableRequest,
+} from "firebase-functions/lib/common/providers/https"
 import { InferType } from "yup"
 import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import { groupRepo, livestreamsRepo, userRepo } from "../api/repositories"
@@ -224,4 +227,29 @@ export async function validateCTAExists(
       logAndThrow("CTA does not exist", livestreamId, ctaId)
    }
    return livestreamCTA
+}
+
+// Helper to log errors properly with context
+export function logError(error: any, request: CallableRequest) {
+   const message = error instanceof Error ? error.message : String(error)
+   const code = error?.code || error?.status || "unknown"
+   const isIndexError =
+      message.includes("FAILED_PRECONDITION") || message.includes("index")
+
+   functions.logger.error("Function error:", {
+      error: {
+         message,
+         code,
+         isIndexError,
+      },
+      request: {
+         data: request.data,
+         auth: request.auth
+            ? {
+                 uid: request.auth.uid,
+                 email: request.auth.token?.email,
+              }
+            : null,
+      },
+   })
 }

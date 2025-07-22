@@ -100,6 +100,16 @@ const navItems = [
    },
 ] satisfies NavItemData[]
 
+const renderIcon = (item: NavItemData, isActive: boolean, id: string) => {
+   const IconComponent = item.iconComponent
+   return (
+      <IconComponent
+         strokeWidth={id === "create" ? 1.5 : undefined} // Create icon is less thicker according to figma
+         fill={isActive ? "currentColor" : "none"}
+      />
+   )
+}
+
 type NavItemData = {
    id: string
    label: string
@@ -113,8 +123,7 @@ const noLinkActiveValue = ""
 export const MobileBottomNavigation = () => {
    const router = useRouter()
    const [value, setValue] = useState<string>(noLinkActiveValue)
-   const { toggleMobileFullScreenMenu, setMobileFullScreenMenu } =
-      useGroupDashboard()
+   const { setMobileFullScreenMenu } = useGroupDashboard()
 
    const { group } = useGroup()
 
@@ -157,33 +166,42 @@ export const MobileBottomNavigation = () => {
             break
          }
          case "menu": {
-            toggleMobileFullScreenMenu()
+            const menuIsCurrentlyOpen = value === "menu"
+
+            // Toggle the mobile full screen menu
+            setMobileFullScreenMenu(!menuIsCurrentlyOpen)
+
+            // Restore previous value if closing, otherwise set to "menu"
+            if (menuIsCurrentlyOpen) {
+               setValue(getActiveValue())
+            } else {
+               setValue(newValue)
+            }
             return
          }
          default: {
             const selectedItem = navItems.find((item) => item.id === newValue)
             if (!selectedItem) return
 
-            setMobileFullScreenMenu(false)
             setValue(newValue)
-            router.push(
-               {
-                  pathname: selectedItem.pathname,
-                  query: {
-                     groupId,
+            router
+               .push(
+                  {
+                     pathname: selectedItem.pathname,
+                     query: {
+                        groupId,
+                     },
                   },
-               },
-               undefined,
-               { shallow: true }
-            )
+                  undefined,
+                  { shallow: true }
+               )
+               .then(() => {
+                  // Always close the mobile full screen menu after navigating to a new page
+                  setMobileFullScreenMenu(false)
+               })
             break
          }
       }
-   }
-
-   const renderIcon = (item: NavItemData, isActive: boolean) => {
-      const IconComponent = item.iconComponent
-      return <IconComponent fill={isActive ? "currentColor" : "none"} />
    }
 
    return (
@@ -204,16 +222,32 @@ export const MobileBottomNavigation = () => {
                      key={item.id}
                      label={item.label}
                      value={item.id}
-                     icon={renderIcon(item, isActive)}
+                     icon={renderIcon(item, isActive, item.id)}
+                     disableRipple
                   />
                )
             })}
 
             {/* Menu item with avatar */}
             <BottomNavigationAction
+               disableRipple
                label="Menu"
                value="menu"
-               icon={<MenuAvatar src={group?.logoUrl} alt="logo" size={24} />}
+               icon={
+                  <MenuAvatar
+                     sx={
+                        value === "menu"
+                           ? {
+                                border: (theme) =>
+                                   `1.3px solid ${theme.palette.neutral[600]}`,
+                             }
+                           : undefined
+                     }
+                     src={group?.logoUrl}
+                     alt="logo"
+                     size={24}
+                  />
+               }
             />
          </StyledBottomNavigation>
 

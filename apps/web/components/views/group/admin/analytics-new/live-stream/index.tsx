@@ -1,14 +1,15 @@
-import { Container, Grid, Typography } from "@mui/material"
+import { Grid, Typography } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
+import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
+import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
+import AggregatedUniversitySources from "./analytics/AggregatedUniversitySources"
 import {
    LivestreamAnalyticsPageProvider,
    useLivestreamsAnalyticsPageContext,
 } from "./LivestreamAnalyticsPageProvider"
 import LivestreamSearchNav from "./search/LivestreamSearchNav"
-import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
-import AggregatedUniversitySources from "./analytics/AggregatedUniversitySources"
 import UsersTable from "./users/UsersTable"
 
 const styles = sxStyles({
@@ -31,32 +32,30 @@ const PageContent = () => {
    const noStreams = currentStreamStats === null
 
    return (
-      <Box py={2}>
-         <Container maxWidth={false}>
-            <Grid container spacing={spacing}>
-               <Grid xs={12} item style={styles.gridItem}>
-                  <LivestreamSearchNav />
-               </Grid>
-               {noStreams ? ( // we don't fetch the document if we are not on the details page
-                  <Grid xs={12} item style={styles.gridItem}>
-                     <SearchPageContent />
-                  </Grid>
-               ) : (
-                  <>
-                     <Grid xs={12} item style={styles.gridItem}>
-                        <AggregatedAnalytics />
-                     </Grid>
-                     <Grid xs={12} item style={styles.gridItem}>
-                        <AggregatedUniversitySources />
-                     </Grid>
-                     <Grid xs={12} item style={styles.gridItem}>
-                        <UsersTable />
-                     </Grid>
-                  </>
-               )}
+      <LivestreamAnalyticsContainer>
+         <Grid container spacing={spacing}>
+            <Grid xs={12} item style={styles.gridItem}>
+               <LivestreamSearchNav />
             </Grid>
-         </Container>
-      </Box>
+            {noStreams ? ( // we don't fetch the document if we are not on the details page
+               <Grid xs={12} item style={styles.gridItem}>
+                  <SearchPageContent />
+               </Grid>
+            ) : (
+               <>
+                  <Grid xs={12} item style={styles.gridItem}>
+                     <AggregatedAnalytics />
+                  </Grid>
+                  <Grid xs={12} item style={styles.gridItem}>
+                     <AggregatedUniversitySources />
+                  </Grid>
+                  <Grid xs={12} item style={styles.gridItem}>
+                     <UsersTable />
+                  </Grid>
+               </>
+            )}
+         </Grid>
+      </LivestreamAnalyticsContainer>
    )
 }
 
