@@ -25,6 +25,7 @@ import { store, wrapper } from "../store"
 
 import { useTrackWebviewResumedCount } from "components/custom-hook/utils/useTrackWebviewResumed"
 import { useWebviewConsoleProxy } from "components/custom-hook/utils/useWebviewConsoleProxy"
+import { LoginNudgeProvider } from "components/views/login-nudge/LoginNudgeProvider"
 import CompaniesTrackerProvider from "context/group/CompaniesTrackerProvider"
 import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 import { Fragment } from "react"
@@ -119,11 +120,13 @@ function MyApp(props) {
                                              <UserRewardsNotifications>
                                                 <SparksFeedTrackerProvider>
                                                    <CompaniesTrackerProvider>
-                                                      {getLayout(
-                                                         <Component
-                                                            {...pageProps}
-                                                         />
-                                                      )}
+                                                      <LoginNudgeProvider>
+                                                         {getLayout(
+                                                            <Component
+                                                               {...pageProps}
+                                                            />
+                                                         )}
+                                                      </LoginNudgeProvider>
                                                    </CompaniesTrackerProvider>
                                                 </SparksFeedTrackerProvider>
                                              </UserRewardsNotifications>
