@@ -1,4 +1,8 @@
 import { CallableRequest } from "firebase-functions/https"
+import {
+   KEEP_WARM_ONCALL_KEY,
+   warmingMiddleware,
+} from "../../middlewares-gen2/onCall/validations"
 import { middlewares, OnCallMiddleware } from "../middlewares"
 
 test("First middleware should return result instance", async () => {
@@ -65,6 +69,38 @@ test("Use context value from previous middleware", async () => {
    })
 
    expect(await chain({ data: {} } as CallableRequest)).toBe(true)
+})
+
+test("Warming middleware should short-circuit when x-keepwarm-oncall is true", async () => {
+   const chain = middlewares(warmingMiddleware(), handler("should not reach"))
+
+   const result = await chain({
+      data: { [KEEP_WARM_ONCALL_KEY]: true },
+   } as CallableRequest)
+
+   expect(result).toEqual({ warm: true })
+})
+
+test("Warming middleware should continue when x-keepwarm-oncall is false", async () => {
+   const expected = "reached final handler"
+   const chain = middlewares(warmingMiddleware(), handler(expected))
+
+   const result = await chain({
+      data: { [KEEP_WARM_ONCALL_KEY]: false },
+   } as CallableRequest)
+
+   expect(result).toBe(expected)
+})
+
+test("Warming middleware should continue when x-keepwarm-oncall is not present", async () => {
+   const expected = "reached final handler"
+   const chain = middlewares(warmingMiddleware(), handler(expected))
+
+   const result = await chain({
+      data: { someOtherField: "value" },
+   } as CallableRequest)
+
+   expect(result).toBe(expected)
 })
 
 /*
