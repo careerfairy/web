@@ -88,7 +88,7 @@ export const getComponents = (
          {
             props: { variant: "outlined", size: "small" },
             style: {
-               padding: "3px 15px",
+               padding: "7px 15px",
             },
          },
          {

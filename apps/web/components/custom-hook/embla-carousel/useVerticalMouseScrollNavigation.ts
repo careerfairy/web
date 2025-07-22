@@ -1,4 +1,4 @@
-import { EmblaCarouselType } from "embla-carousel-react"
+import { type EmblaCarouselType } from "embla-carousel"
 import { useEffect } from "react"
 
 type Options = {
@@ -69,10 +69,13 @@ const useVerticalMouseScrollNavigation = (
  * // Usage
  * throttledFunc();
  */
+// eslint-disable-next-line @typescript-eslint/ban-types
 const throttle = (func: Function, limit: number) => {
    let inThrottle: boolean
    return function () {
+      // eslint-disable-next-line prefer-rest-params
       const args = arguments
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       const context = this
       if (!inThrottle) {
          func.apply(context, args)
