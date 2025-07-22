@@ -1,22 +1,22 @@
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
 import { TabValue } from "components/views/company-page"
+import { CompanyPageSEO } from "components/views/company-page/CompanyPageSEO"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
-import { GetStaticPaths, InferGetStaticPropsType, NextPage } from "next"
-import SEO from "../../../../components/util/SEO"
+import { LivestreamDialogLayout } from "components/views/livestream-dialog"
+import { GetStaticPaths, NextPage } from "next"
 import CompanyPageOverview from "../../../../components/views/company-page"
-import { LivestreamDialogLayout } from "../../../../components/views/livestream-dialog"
 import GenericDashboardLayout from "../../../../layouts/GenericDashboardLayout"
 import {
    deserializeGroupClient,
    mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../../util/serverUtil"
-import { getCompanyPageData } from "../[[...livestreamDialog]]"
+import { CompanyPageData, getCompanyPageData } from "../[[...livestreamDialog]]"
 
 const PARAMETER_SOURCE = "livestreamDialog"
 
-const MentorsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+const MentorsPage: NextPage<CompanyPageData> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -25,7 +25,7 @@ const MentorsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    customJobDialogData,
    groupCreators,
 }) => {
-   const { universityName, id } = deserializeGroupClient(serverSideGroup)
+   const { id } = deserializeGroupClient(serverSideGroup)
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
@@ -34,10 +34,9 @@ const MentorsPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             source={{ source: CustomJobApplicationSourceTypes.Group, id: id }}
             dialogSource={PARAMETER_SOURCE}
          >
-            <SEO
-               id={`CareerFairy | ${universityName} | Mentors`}
-               title={`CareerFairy | ${universityName} | Mentors`}
-               description={`Meet mentors of ${universityName} with CareerFairy`}
+            <CompanyPageSEO
+               serverSideGroup={serverSideGroup}
+               pageType="mentors"
             />
 
             <GenericDashboardLayout pageDisplayName={""}>

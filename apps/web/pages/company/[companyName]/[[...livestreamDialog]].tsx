@@ -26,7 +26,6 @@ import {
    GetStaticPathsContext,
    GetStaticProps,
    GetStaticPropsContext,
-   InferGetStaticPropsType,
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
@@ -35,9 +34,8 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
-import { getResizedUrl } from "../../../components/helperFunctions/HelperFunctions"
-import SEO from "../../../components/util/SEO"
 import CompanyPageOverview from "../../../components/views/company-page"
+import { CompanyPageSEO } from "../../../components/views/company-page/CompanyPageSEO"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
@@ -60,7 +58,7 @@ type TrackProps = {
    visitorId: string
 }
 
-const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+const CompanyPage: NextPage<CompanyPageData> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -72,8 +70,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    const { query, isReady } = useRouter()
    const { trackCompanyPageView } = useFirebaseService()
    const { trackEvent } = useCompaniesTracker()
-   const { universityName, id, description, extraInfo, logoUrl } =
-      deserializeGroupClient(serverSideGroup)
+   const { id } = deserializeGroupClient(serverSideGroup)
 
    const customJobId = query.dialogJobId?.toString() || null
    const interactionSource = query.interactionSource?.toString() || null
@@ -117,39 +114,9 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             {mappedServerCustomJobs?.map((job) => (
                <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
             ))}
-            <SEO
-               id={`CareerFairy | ${universityName}`}
-               title={`CareerFairy | ${universityName}`}
-               description={
-                  extraInfo ||
-                  description ||
-                  `Discover career opportunities and events at ${universityName}.`
-               }
-               image={{
-                  url: getResizedUrl(logoUrl, "lg"),
-                  width: 1200,
-                  height: 900,
-                  alt: `${universityName} logo`,
-               }}
-               openGraph={{
-                  type: "website",
-                  title: `${universityName} Company Page | CareerFairy`,
-                  description:
-                     extraInfo ||
-                     description ||
-                     `Discover career opportunities and events at ${universityName}.`,
-                  images: [
-                     {
-                        url: getResizedUrl(logoUrl, "lg"),
-                        width: 1200,
-                        height: 900,
-                        alt: `${universityName} logo`,
-                     },
-                  ],
-               }}
-               twitter={{
-                  cardType: "summary_large_image",
-               }}
+            <CompanyPageSEO
+               serverSideGroup={serverSideGroup}
+               pageType="overview"
             />
 
             <GenericDashboardLayout pageDisplayName={""}>
@@ -177,7 +144,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    )
 }
 
-type CompanyPageData = {
+export type CompanyPageData = {
    serverSideGroup: SerializedGroup
    serverSideUpcomingLivestreams: ReturnType<
       typeof LivestreamPresenter.serializeDocument
