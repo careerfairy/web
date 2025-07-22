@@ -19,6 +19,7 @@ import useLivestreamQuestionHandlers from "../../../../../custom-hook/live-strea
 import useCountQuery from "../../../../../custom-hook/useCountQuery"
 import CustomInfiniteScroll from "../../../../common/CustomInfiniteScroll"
 import SectionTitle from "./SectionTitle"
+import SimilarLivestreamsCarousel from "./SimilarLivestreamsCarousel"
 
 const styles = sxStyles({
    greyBorder: {
@@ -121,6 +122,7 @@ const Questions: FC<Props> = ({ livestream }) => {
       <Box>
          <SectionTitle>Upcoming questions</SectionTitle>
          <QuestionsComponent livestream={livestream} hideQuestionsText />
+         <SimilarLivestreamsCarousel currentLivestream={livestream} />
       </Box>
    )
 }
