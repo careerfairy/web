@@ -59,7 +59,12 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    checkIfUserIsGroupAdmin(
       groupId: string,
       userEmail: string
-   ): Promise<{ isAdmin: boolean; group: Group; role: GROUP_DASHBOARD_ROLE }>
+   ): Promise<{
+      isAdmin: boolean
+      group: Group
+      role: GROUP_DASHBOARD_ROLE
+      userData: UserData | null
+   }>
 
    /**
     * Grants or removes a user admin access to a group and a role
@@ -233,18 +238,28 @@ export class GroupFunctionsRepository
    async checkIfUserIsGroupAdmin(
       groupId: string,
       userEmail: string
-   ): Promise<{ isAdmin: boolean; group: Group; role: GROUP_DASHBOARD_ROLE }> {
+   ): Promise<{
+      isAdmin: boolean
+      group: Group
+      role: GROUP_DASHBOARD_ROLE
+      userData: UserData | null
+   }> {
       const groupDoc = await this.firestore
          .collection("careerCenterData")
          .doc(groupId)
          .get()
 
       if (!groupDoc.exists) {
-         return { isAdmin: false, group: null, role: null }
+         return { isAdmin: false, group: null, role: null, userData: null }
       }
 
       const group = this.addIdToDoc<Group>(groupDoc)
       const user = await auth.getUserByEmail(userEmail)
+      const userData = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .get()
+         .then((snap) => this.addIdToDoc<UserData>(snap))
 
       const userRole = user.customClaims?.adminGroups?.[group.id]?.role
 
@@ -252,6 +267,7 @@ export class GroupFunctionsRepository
          isAdmin: Object.values(GROUP_DASHBOARD_ROLE).includes(userRole),
          group,
          role: userRole,
+         userData,
       }
    }
 

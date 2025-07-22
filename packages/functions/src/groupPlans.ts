@@ -13,7 +13,7 @@ import { groupRepo, notificationService } from "./api/repositories"
 import { withMiddlewares } from "./middlewares-gen2/onCall"
 import {
    dataValidationMiddleware,
-   userIsCFAdminMiddleware,
+   userIsGroupAdminMiddleware,
 } from "./middlewares-gen2/onCall/validations"
 import { validateGroupSparks } from "./util/sparks"
 
@@ -33,10 +33,22 @@ export const startPlan = onCall(
    withMiddlewares(
       [
          dataValidationMiddleware<StartPlanData>(setGroupPlanSchema),
-         userIsCFAdminMiddleware<StartPlanData>(),
+         userIsGroupAdminMiddleware<StartPlanData>(),
       ],
       async (request) => {
          try {
+            // Check if user is CF admin or if they're trying to start a trial plan
+            if (
+               !request.data.userData.isAdmin &&
+               request.data.planType !== GroupPlanTypes.Trial
+            ) {
+               logAndThrow("Regular group admins can only start trial plans", {
+                  planType: request.data.planType,
+                  groupId: request.data.groupId,
+                  userEmail: request.data.userData.userEmail,
+               })
+            }
+
             const group = await groupRepo.getGroupById(request.data.groupId)
 
             const adminName = request.data.userData.firstName
@@ -60,11 +72,7 @@ export const startPlan = onCall(
                )
             }
          } catch (error) {
-            logAndThrow("Error in setting group plan", {
-               data: request.data,
-               error,
-               context: request,
-            })
+            logAndThrow("Error in setting group plan", error)
          }
       }
    )
