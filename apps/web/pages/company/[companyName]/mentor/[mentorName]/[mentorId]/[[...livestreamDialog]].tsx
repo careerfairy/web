@@ -12,7 +12,7 @@ import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import * as Sentry from "@sentry/nextjs"
 import useTrackPageView from "components/custom-hook/useTrackDetailPageView"
-import SEO from "components/util/SEO"
+import { CompanyPageSEO } from "components/views/company-page/CompanyPageSEO"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
@@ -58,11 +58,14 @@ const MentorPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
       ?.map(SparkPresenter.deserialize)
       .map(SparkPresenter.toFirebaseObject)
 
+   const mentorName = `${creator.firstName} ${creator.lastName}`
+
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
-         <SEO
-            id={`CareerFairy | ${serverSideGroup.universityName} | ${creator.firstName} ${creator.lastName}`}
-            title={`CareerFairy | ${serverSideGroup.universityName} | ${creator.firstName} ${creator.lastName}`}
+         <CompanyPageSEO
+            serverSideGroup={serverSideGroup}
+            pageType="mentor-detail"
+            mentorName={mentorName}
          />
 
          <GenericDashboardLayout>

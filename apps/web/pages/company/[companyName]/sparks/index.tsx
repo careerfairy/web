@@ -1,32 +1,25 @@
 import { Box } from "@mui/material"
 import { TabValue } from "components/views/company-page"
-import { GetStaticPaths, InferGetStaticPropsType, NextPage } from "next"
-import SEO from "../../../../components/util/SEO"
+import { CompanyPageSEO } from "components/views/company-page/CompanyPageSEO"
+import { GetStaticPaths, NextPage } from "next"
 import CompanyPageOverview from "../../../../components/views/company-page"
 import GenericDashboardLayout from "../../../../layouts/GenericDashboardLayout"
 import {
-   deserializeGroupClient,
    mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../../util/serverUtil"
-import { getCompanyPageData } from "../[[...livestreamDialog]]"
+import { CompanyPageData, getCompanyPageData } from "../[[...livestreamDialog]]"
 
-const SparksPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+const SparksPage: NextPage<CompanyPageData> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
    serverSideCustomJobs,
    groupCreators,
 }) => {
-   const { universityName } = deserializeGroupClient(serverSideGroup)
-
    return (
       <>
-         <SEO
-            id={`CareerFairy | ${universityName} | Sparks`}
-            title={`CareerFairy | ${universityName} | Sparks`}
-            description={`Discover ${universityName} with CareerFairy sparks`}
-         />
+         <CompanyPageSEO serverSideGroup={serverSideGroup} pageType="sparks" />
 
          <GenericDashboardLayout pageDisplayName={""}>
             <Box sx={{ backgroundColor: "inherit", minHeight: "100vh" }}>
