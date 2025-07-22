@@ -1,18 +1,29 @@
 import {
    BottomNavigationAction,
+   Box,
    BottomNavigation as MuiBottomNavigation,
    SvgIconProps,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { useRouter } from "next/router"
-import { ComponentType, useCallback, useEffect, useState } from "react"
+import {
+   ComponentType,
+   Fragment,
+   useCallback,
+   useEffect,
+   useState,
+} from "react"
 import { PlusSquare as CreateIcon, IconProps } from "react-feather"
+import { useMeasure } from "react-use"
+import { useGroup } from "."
 import useMenuState from "../../components/custom-hook/useMenuState"
 import { ContentIcon } from "../../components/views/common/icons/ContentIcon"
 import { DashboardIcon } from "../../components/views/common/icons/DashboardIcon"
 import { JobsIcon } from "../../components/views/common/icons/JobsIcon"
 import { CreateMenu } from "./CreateMenu"
+import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
+import { MobileFullScreenMenu } from "./MobileFullScreenMenu"
 
 const StyledBottomNavigation = styled(MuiBottomNavigation)(({ theme }) => ({
    position: "fixed",
@@ -97,15 +108,23 @@ type NavItemData = {
    activePathPrefix?: string
 }
 
+const noLinkActiveValue = ""
+
 export const MobileBottomNavigation = () => {
    const router = useRouter()
-   const [value, setValue] = useState<string>("")
+   const [value, setValue] = useState<string>(noLinkActiveValue)
+   const { toggleMobileFullScreenMenu, setMobileFullScreenMenu } =
+      useGroupDashboard()
+
+   const { group } = useGroup()
+
    const {
       anchorEl: createMenuAnchorEl,
       open: createMenuOpen,
       handleClick: handleCreateMenuOpen,
       handleClose: handleCreateMenuClose,
    } = useMenuState()
+   const [bottomNavigationRef, { height }] = useMeasure<HTMLDivElement>()
 
    // Get group ID from router for navigation
    const groupId = router.query.groupId as string
@@ -123,7 +142,7 @@ export const MobileBottomNavigation = () => {
             return item.id
          }
       }
-      return "dashboard"
+      return noLinkActiveValue
    }, [router.pathname])
 
    useEffect(() => {
@@ -131,30 +150,33 @@ export const MobileBottomNavigation = () => {
    }, [getActiveValue, router.pathname])
 
    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-      const selectedItem = navItems.find((item) => item.id === newValue)
-      if (selectedItem) {
-         switch (newValue) {
-            case "menu":
-               // Handle menu functionality here
-               console.log("Menu clicked")
-               break
-            case "create": {
-               handleCreateMenuOpen(event as React.MouseEvent<HTMLElement>)
-               break
-            }
-            default:
-               setValue(newValue)
-               router.push(
-                  {
-                     pathname: selectedItem.pathname,
-                     query: {
-                        groupId,
-                     },
+      switch (newValue) {
+         case "create": {
+            setMobileFullScreenMenu(false)
+            handleCreateMenuOpen(event as React.MouseEvent<HTMLElement>)
+            break
+         }
+         case "menu": {
+            toggleMobileFullScreenMenu()
+            return
+         }
+         default: {
+            const selectedItem = navItems.find((item) => item.id === newValue)
+            if (!selectedItem) return
+
+            setMobileFullScreenMenu(false)
+            setValue(newValue)
+            router.push(
+               {
+                  pathname: selectedItem.pathname,
+                  query: {
+                     groupId,
                   },
-                  undefined,
-                  { shallow: true }
-               )
-               break
+               },
+               undefined,
+               { shallow: true }
+            )
+            break
          }
       }
    }
@@ -165,11 +187,15 @@ export const MobileBottomNavigation = () => {
    }
 
    return (
-      <>
+      <Fragment>
+         {/* Offset for the bottom navigation */}
+         <Box height={height} />
+
          <StyledBottomNavigation
             value={value}
             onChange={handleChange}
             showLabels
+            ref={bottomNavigationRef}
          >
             {navItems.map((item) => {
                const isActive = value === item.id
@@ -187,7 +213,7 @@ export const MobileBottomNavigation = () => {
             <BottomNavigationAction
                label="Menu"
                value="menu"
-               icon={<MenuAvatar src="/logo-green.png" alt="logo" size={24} />}
+               icon={<MenuAvatar src={group?.logoUrl} alt="logo" size={24} />}
             />
          </StyledBottomNavigation>
 
@@ -198,6 +224,7 @@ export const MobileBottomNavigation = () => {
             handleClose={handleCreateMenuClose}
             isMobileOverride
          />
-      </>
+         <MobileFullScreenMenu bottomNavigationHeight={height + 0.5} />
+      </Fragment>
    )
 }

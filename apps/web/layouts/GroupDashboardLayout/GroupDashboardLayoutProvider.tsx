@@ -1,69 +1,86 @@
+import { useAppDispatch, useAppSelector } from "components/custom-hook/store"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { Fragment, ReactNode, useCallback, useMemo } from "react"
+import ManageCompaniesDialog from "../../components/views/profile/my-groups/ManageCompaniesDialog"
 import {
-   createContext,
-   ReactNode,
-   useCallback,
-   useContext,
-   useMemo,
-   useReducer,
-} from "react"
+   closeManageCompaniesDialog,
+   openManageCompaniesDialog,
+   setLeftDrawer,
+   setMobileFullScreenMenu,
+   setMobileProfileDrawer,
+   toggleLeftDrawer,
+   toggleMobileFullScreenMenu,
+   toggleMobileProfileDrawer,
+} from "../../store/reducers/groupDashboardLayoutReducer"
 import AdminGenericLayout from "../AdminGenericLayout"
 import NavBar from "./NavBar"
 import TopBar from "./TopBar"
 
-type IGroupDashboardState = {
-   layout: {
-      leftDrawerOpen: boolean
-   }
-}
-
-const initialState: IGroupDashboardState = {
-   layout: {
-      leftDrawerOpen: true,
-   },
-}
-
 type IGroupDashboardContext = {
-   layout: {
-      leftDrawerOpen: boolean
-   }
    setLeftDrawer: (open: boolean) => void
    toggleLeftDrawer: () => void
+   setMobileProfileDrawer: (open: boolean) => void
+   toggleMobileProfileDrawer: () => void
+   setMobileFullScreenMenu: (open: boolean) => void
+   toggleMobileFullScreenMenu: () => void
+   openManageCompaniesDialog: () => void
+   closeManageCompaniesDialog: () => void
 }
 
-const GroupDashboardContext = createContext<IGroupDashboardContext>({
-   layout: {
-      leftDrawerOpen: true,
-   },
-   toggleLeftDrawer: () => {},
-   setLeftDrawer: () => {},
-})
+export const useGroupDashboard = (): IGroupDashboardContext => {
+   const dispatch = useAppDispatch()
 
-type Action = {
-   type: "SET_LAYOUT" | "TOGGLE_LAYOUT"
-   payload?: boolean
-}
+   return useMemo(
+      () => ({
+         /**
+          * Toggle the visibility of the left drawer in the group dashboard layout.
+          */
+         toggleLeftDrawer: () => dispatch(toggleLeftDrawer()),
 
-const reducer = (state: IGroupDashboardState, action: Action) => {
-   switch (action.type) {
-      case "SET_LAYOUT":
-         return {
-            ...state,
-            layout: {
-               ...state.layout,
-               leftDrawerOpen: action.payload,
-            },
-         }
-      case "TOGGLE_LAYOUT":
-         return {
-            ...state,
-            layout: {
-               ...state.layout,
-               leftDrawerOpen: !state.layout.leftDrawerOpen,
-            },
-         }
-      default:
-         return state
-   }
+         /**
+          * Set the open state of the left drawer.
+          * @param open - Whether the left drawer should be open.
+          */
+         setLeftDrawer: (open: boolean) => dispatch(setLeftDrawer(open)),
+
+         /**
+          * Set the open state of the mobile profile drawer.
+          * @param open - Whether the mobile profile drawer should be open.
+          */
+         setMobileProfileDrawer: (open: boolean) =>
+            dispatch(setMobileProfileDrawer(open)),
+
+         /**
+          * Toggle the visibility of the mobile profile drawer.
+          */
+         toggleMobileProfileDrawer: () => dispatch(toggleMobileProfileDrawer()),
+
+         /**
+          * Set the open state of the mobile full screen menu.
+          * @param open - Whether the mobile full screen menu should be open.
+          */
+         setMobileFullScreenMenu: (open: boolean) =>
+            dispatch(setMobileFullScreenMenu(open)),
+
+         /**
+          * Toggle the visibility of the mobile full screen menu.
+          */
+         toggleMobileFullScreenMenu: () =>
+            dispatch(toggleMobileFullScreenMenu()),
+
+         /**
+          * Open the manage companies dialog.
+          */
+         openManageCompaniesDialog: () => dispatch(openManageCompaniesDialog()),
+
+         /**
+          * Close the manage companies dialog.
+          */
+         closeManageCompaniesDialog: () =>
+            dispatch(closeManageCompaniesDialog()),
+      }),
+      [dispatch]
+   )
 }
 
 type Props = {
@@ -90,36 +107,29 @@ const GroupDashboardLayoutProvider = ({
    bottomBarNavigation,
    backgroundColor,
 }: Props) => {
-   const [state, dispatch] = useReducer(reducer, initialState)
+   const dispatch = useAppDispatch()
 
-   const toggleLeftDrawer = useCallback(
-      () =>
-         dispatch({
-            type: "TOGGLE_LAYOUT",
-         }),
+   const leftDrawerOpen = useAppSelector(
+      (state) => state.groupDashboardLayout.layout.leftDrawerOpen
+   )
+   const manageCompaniesDialogOpen = useAppSelector(
+      (state) => state.groupDashboardLayout.manageCompaniesDialogOpen
+   )
+
+   const isMobile = useIsMobile()
+
+   const handleSetLeftDrawer = useCallback(
+      (open: boolean) => dispatch(setLeftDrawer(open)),
       [dispatch]
    )
 
-   const setLeftDrawer = useCallback(
-      (open: boolean) =>
-         dispatch({
-            type: "SET_LAYOUT",
-            payload: open,
-         }),
+   const handleToggleLeftDrawer = useCallback(
+      () => dispatch(toggleLeftDrawer()),
       [dispatch]
-   )
-
-   const value = useMemo<IGroupDashboardContext>(
-      () => ({
-         toggleLeftDrawer,
-         setLeftDrawer,
-         layout: state.layout,
-      }),
-      [toggleLeftDrawer, setLeftDrawer, state.layout]
    )
 
    return (
-      <GroupDashboardContext.Provider value={value}>
+      <Fragment>
          <AdminGenericLayout
             bgColor={backgroundColor ?? "#F7F8FC"}
             headerContent={
@@ -129,26 +139,24 @@ const GroupDashboardLayoutProvider = ({
                   title={titleComponent}
                />
             }
+            hideDrawer={isMobile}
             showBottomNavContent
             bottomNavContent={bottomBarNavigation}
             drawerContent={<NavBar />}
-            drawerOpen={state.layout.leftDrawerOpen}
-            setDrawer={setLeftDrawer}
-            toggleDrawer={toggleLeftDrawer}
+            drawerOpen={leftDrawerOpen}
+            setDrawer={handleSetLeftDrawer}
+            toggleDrawer={handleToggleLeftDrawer}
          >
             {children}
          </AdminGenericLayout>
-      </GroupDashboardContext.Provider>
+
+         {/* Manage Companies Dialog */}
+         <ManageCompaniesDialog
+            open={manageCompaniesDialogOpen}
+            handleClose={closeManageCompaniesDialog}
+         />
+      </Fragment>
    )
 }
 
-export const useGroupDashboard = () => {
-   const context = useContext(GroupDashboardContext)
-   if (context === undefined) {
-      throw new Error(
-         "useGroupDashboard must be used within a GroupDashboardContextProvider"
-      )
-   }
-   return context
-}
 export default GroupDashboardLayoutProvider

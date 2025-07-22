@@ -1,25 +1,25 @@
 import { useSelector } from "react-redux"
 
 // material-ui
-import { Badge, Fab } from "@mui/material"
+import { Badge, IconButton } from "@mui/material"
 import Tooltip from "@mui/material/Tooltip"
-import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneRounded"
+import { Bell } from "react-feather"
 
 // project imports
-import Notifications from "./Notifications"
 import useMenuState from "../../../components/custom-hook/useMenuState"
-import { notificationsSelector } from "../../../store/selectors/groupSelectors"
 import { maybePluralize } from "../../../components/helperFunctions/HelperFunctions"
+import { notificationsSelector } from "../../../store/selectors/groupSelectors"
 import { sxStyles } from "../../../types/commonTypes"
+import Notifications from "./Notifications"
 
 const styles = sxStyles({
    root: {
       borderRadius: 6,
    },
    notificationBtn: {
-      zIndex: 0,
-      color: "text.primary",
-      backgroundColor: "background.paper",
+      "& svg": {
+         color: "neutral.800",
+      },
    },
    badge: {
       "& .MuiBadge-dot": {
@@ -55,14 +55,14 @@ const NotificationsButton = () => {
                invisible={notifications.length < 1}
                badgeContent=" "
             >
-               <Fab
+               <IconButton
                   onClick={handleClick}
                   sx={styles.notificationBtn}
                   size="small"
                   aria-label="expand"
                >
-                  <NotificationsNoneRoundedIcon fontSize={"large"} />
-               </Fab>
+                  <Bell size={24} />
+               </IconButton>
             </Badge>
          </Tooltip>
          <Notifications

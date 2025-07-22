@@ -9,9 +9,9 @@ import Stack from "@mui/material/Stack"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { sxStyles } from "types/commonTypes"
 import { CareerFairyLogo } from "./CareerFairyLogo"
-import EditGroupCard from "./EditGroupCard"
+import { EditGroupCard } from "./EditGroupCard"
 import { GroupBottomLinks } from "./GroupBottomLinks"
-import GroupNavList from "./GroupNavList"
+import { GroupNavList } from "./GroupNavList"
 import { useGroup } from "./index"
 
 const styles = sxStyles({
@@ -33,13 +33,18 @@ const NavBar = () => {
    }
 
    return (
-      <Stack flex={1} alignItems={"center"} borderRight={"1px solid #EDE7FD"}>
+      <Stack
+         px={2}
+         flex={1}
+         alignItems={"center"}
+         borderRight={"1px solid #EDE7FD"}
+      >
          <ShrunkToggleButton />
          <CareerFairyLogo />
-         <EditGroupCard />
+         <EditGroupCard sx={{ px: 1 }} />
          <GroupNavList />
          <Box flexGrow={1} />
-         <GroupBottomLinks />
+         <GroupBottomLinks pb={3.625} pt={2} />
       </Stack>
    )
 }

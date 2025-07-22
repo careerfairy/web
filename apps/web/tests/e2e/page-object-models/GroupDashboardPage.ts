@@ -365,7 +365,7 @@ export class GroupDashboardPage extends CommonPage {
    public async createSpeakers(speakers: Speaker[]) {
       if (speakers?.length) {
          for (const speaker of speakers) {
-            await this.page.getByLabel("Open").click()
+            await this.page.getByLabel("Open", { exact: true }).click()
 
             const existingSpeaker = await this.page
                .getByLabel("Speakers of this event")
