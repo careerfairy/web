@@ -38,7 +38,7 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
    currentLivestream,
 }) => {
    const { events: similarEvents, loading } = useRecommendedEvents({
-      limit: 10,
+      limit: 4,
       referenceLivestreamId: currentLivestream.id,
       suspense: true,
    })
