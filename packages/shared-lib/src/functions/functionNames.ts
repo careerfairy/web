@@ -40,7 +40,7 @@ export const FUNCTION_NAMES = {
    sendPhysicalEventRegistrationConfirmationEmail:
       "sendPhysicalEventRegistrationConfirmationEmail",
    getRecommendedEvents: "getRecommendedEvents_v7",
-   getRecommendedJobs: "getRecommendedJobs",
+   getRecommendedJobs: "getRecommendedJobs_v2",
 
    // Recording functions
    getRecordingViews: "getRecordingViews",
@@ -52,13 +52,13 @@ export const FUNCTION_NAMES = {
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
    getSparksFeed: "getSparksFeed_v12",
 
-
    // Location functions
    searchLocations: "searchLocations",
    getLocation: "getLocation",
 
    // Utility functions
    keepFunctionsWarm: "keepFunctionsWarm",
+   keepOnCallFunctionsWarm: "keepOnCallFunctionsWarm_v2",
 
    // Auth functions
    backfillUserData: "backfillUserData_v2",
