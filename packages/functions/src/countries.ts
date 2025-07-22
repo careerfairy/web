@@ -44,27 +44,6 @@ let cachedSearchableCountries: LocationOption[] | null = null
 let cachedSearchableStates: LocationOption[] | null = null
 let cachedSearchableCities: LocationOption[] | null = null
 
-// Cache management function for memory optimization
-const clearLocationCaches = () => {
-   cachedSearchableCountries = null
-   cachedSearchableStates = null
-   cachedSearchableCities = null
-}
-
-// Function to get cache statistics for performance monitoring
-const getCacheStats = () => {
-   return {
-      countriesCached: cachedSearchableCountries?.length || 0,
-      statesCached: cachedSearchableStates?.length || 0,
-      citiesCached: cachedSearchableCities?.length || 0,
-      memoryCacheStatus: {
-         countries: !!cachedSearchableCountries,
-         states: !!cachedSearchableStates,
-         cities: !!cachedSearchableCities,
-      },
-   }
-}
-
 const CountryCitiesOptionsSchema = {
    countryCode: string().required(),
 }
@@ -559,7 +538,3 @@ export const getLocation = onCall<GetLocationOptions>(
       }
    })
 )
-
-// Export cache management functions for maintenance
-export const clearLocationSearchCaches = clearLocationCaches
-export const getLocationCacheStats = getCacheStats
