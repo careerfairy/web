@@ -7,8 +7,10 @@ import {
    IconButton,
    Stack,
 } from "@mui/material"
-import { type EmblaCarouselType, type EmblaOptionsType } from "embla-carousel"
-import useEmblaCarousel from "embla-carousel-react"
+import useEmblaCarousel, {
+   type EmblaCarouselType,
+   type EmblaOptionsType,
+} from "embla-carousel-react"
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react"
 import { combineStyles, sxStyles } from "types/commonTypes"
 

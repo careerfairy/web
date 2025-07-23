@@ -1,4 +1,4 @@
-import { type EmblaCarouselType } from "embla-carousel"
+import { type EmblaCarouselType } from "embla-carousel-react"
 import { useCallback, useEffect, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import useIsMobile from "../useIsMobile"
