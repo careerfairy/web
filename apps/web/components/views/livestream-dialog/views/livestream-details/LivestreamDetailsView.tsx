@@ -165,9 +165,6 @@ const LivestreamDetailsView = () => {
                         <Section>
                            <SimilarLivestreamsCarousel currentLivestream={livestream} />
                         </Section>
-                        {isFloatingActionButton ? (
-                           <FloatingButtonOffset />
-                        ) : null}
                      </MainContent>
                   )}
                </MainContentNavigation>
