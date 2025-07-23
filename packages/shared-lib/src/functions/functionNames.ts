@@ -14,7 +14,7 @@ export const FUNCTION_NAMES = {
 
    // Group Admin functions
    sendNewlyPublishedEventEmail: "sendNewlyPublishedEventEmail",
-   startPlan: "startPlan_v4",
+   startPlan: "startPlan_v5",
    sendReminderToNearEndSparksTrialPlanCreationPeriod:
       "sendReminderToNearEndSparksTrialPlanCreationPeriod_v2",
    endOfSparksTrialEmails: "endOfSparksTrialEmails_v2",
@@ -62,4 +62,8 @@ export const FUNCTION_NAMES = {
 
    // Auth functions
    backfillUserData: "backfillUserData_v2",
+
+   // Group talent engagement functions
+   getGroupTalentEngagement: "getGroupTalentEngagement",
+   getTotalUsersMatchingTargeting: "getTotalUsersMatchingTargeting",
 } as const

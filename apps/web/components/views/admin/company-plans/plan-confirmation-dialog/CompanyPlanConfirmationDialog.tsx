@@ -1,19 +1,19 @@
 import { GroupPlanType, GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { StartPlanData } from "@careerfairy/shared-lib/groups/planConstants"
+import { useStartPlanMutation } from "components/custom-hook/group/useStartPlanMutation"
+import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
+import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
+import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
+import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
 import SteppedDialog, {
    View,
    useStepper,
 } from "components/views/stepped-dialog/SteppedDialog"
 import React, { createContext, useCallback, useMemo } from "react"
+import ConfirmPlanView from "./ConfirmPlanView"
 import SelectPlanView from "./SelectPlanView"
 import SuccessView from "./SuccessView"
-import { useStartPlanMutation } from "./useStartPlanMutation"
-import ConfirmPlanView from "./ConfirmPlanView"
-import EssentialPlanIcon from "components/views/common/icons/EssentialPlanIcon"
-import AdvancedPlanIcon from "components/views/common/icons/AdvancedPlanIcon"
-import PremiumPlanIcon from "components/views/common/icons/PremiumPlanIcon"
-import TrialPlanIcon from "components/views/common/icons/TrialPlanIcon"
 
 type Props = {
    open: boolean
@@ -104,9 +104,11 @@ const CompanyPlanConfirmationDialog = ({
 }: Props) => {
    const initialStep = getInitialStep(groupToManage)
 
-   const { trigger, isMutating, updatedGroupPlanType } = useStartPlanMutation(
-      groupToManage.id
-   )
+   const {
+      trigger,
+      isMutating,
+      data: updatedGroupPlanType,
+   } = useStartPlanMutation(groupToManage.id)
 
    const startPlan = useCallback(
       async (planType: GroupPlanType) => {

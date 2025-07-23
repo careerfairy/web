@@ -1,11 +1,12 @@
 // material-ui
 import EditGroupIcon from "@mui/icons-material/EditOutlined"
-import { Box, Stack, Typography, styled } from "@mui/material"
+import { Box, Stack, StackProps, Typography, styled } from "@mui/material"
 
 // project imports
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import HoverOverlay from "components/views/common/HoverOverlay"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 import { useGroup } from "./index"
 
 const RootContainer = styled(Stack)(({ theme }) => ({
@@ -28,19 +29,21 @@ const HoverIcon = styled(EditGroupIcon)({
    color: "white",
 })
 
-const EditGroupCard = () => {
+export const EditGroupCard = (props: StackProps) => {
    const { group } = useGroup()
+   const { setMobileFullScreenMenu } = useGroupDashboard()
 
    const companyName = group?.universityName
 
    return (
-      <RootContainer spacing={0.5}>
+      <RootContainer spacing={0.5} {...props}>
          <CircularLogo
             src={group?.logoUrl}
             alt={`logo of company ${companyName}`}
             size={48}
          >
             <HoverOverlay
+               onClick={() => setMobileFullScreenMenu(false)}
                href={`/group/${group.id}/admin/settings/general`}
                icon={<HoverIcon fontSize="large" />}
             />
@@ -64,5 +67,3 @@ const EditGroupCard = () => {
       </RootContainer>
    )
 }
-
-export default EditGroupCard

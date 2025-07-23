@@ -4,11 +4,9 @@ import { Box, IconButton, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import { ChildRefType } from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { type EmblaOptionsType, type EmblaPluginType } from "embla-carousel"
 import AutoHeight from "embla-carousel-auto-height"
-import useEmblaCarousel, {
-   EmblaOptionsType,
-   EmblaPluginType,
-} from "embla-carousel-react"
+import useEmblaCarousel from "embla-carousel-react"
 import React, { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"

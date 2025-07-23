@@ -6,23 +6,24 @@ import IconButton from "@mui/material/IconButton"
 import Stack from "@mui/material/Stack"
 
 // project imports
-import { LoadingButton } from "@mui/lab"
-import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useRouter } from "next/router"
-import { ReactNode, useMemo } from "react"
+import { Fragment, ReactNode, useMemo } from "react"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../types/commonTypes"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
+import { MobileProfileDrawer } from "./MobileProfileDrawer"
 import NotificationsButton from "./NotificationsButton"
-import UserAvatarWithDetails from "./UserAvatarWithDetails"
+import { ProfileAvatar } from "./ProfileAvatar"
 
 // framer motion
+import { useAppSelector } from "components/custom-hook/store"
 import { motion } from "framer-motion"
 
 const getStyles = (hasNavigationBar?: boolean) =>
    sxStyles({
       root: {
+         height: "100%",
          display: "flex",
          flexWrap: "wrap",
          flex: 1,
@@ -68,8 +69,7 @@ const getStyles = (hasNavigationBar?: boolean) =>
 
 type Props = {
    title: ReactNode
-   cta?: ReactNode
-   mobileCta?: ReactNode
+   topBarAction?: ReactNode
    navigation?: ReactNode
 }
 
@@ -79,13 +79,14 @@ const titleVariants = {
    exit: { opacity: 0, x: 10 },
 }
 
-const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
+const TopBar = ({ title, topBarAction, navigation }: Props) => {
    const isMobile = useIsMobile()
-   const { layout } = useGroupDashboard()
-   const { createDraftLivestream, isCreating } = useLivestreamRouting()
    const { asPath } = useRouter()
+   const leftDrawerOpen = useAppSelector(
+      (state) => state.groupDashboardLayout.layout.leftDrawerOpen
+   )
 
-   const drawerPresent = !isMobile && layout.leftDrawerOpen
+   const drawerPresent = !isMobile && leftDrawerOpen
 
    const styles = getStyles(Boolean(navigation))
 
@@ -94,51 +95,35 @@ const TopBar = ({ title, cta, mobileCta, navigation }: Props) => {
    }, [asPath, title])
 
    return (
-      <Box sx={styles.root}>
-         {/* toggler button */}
-         {!drawerPresent ? <MobileToggleButton /> : null}
-         <Box
-            component={motion.div}
-            key={titleKey}
-            variants={titleVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            sx={styles.leftSection}
-         >
-            <Typography role="heading" fontWeight={600} sx={styles.title}>
-               {title}
-            </Typography>
+      <Fragment>
+         <Box sx={styles.root} id="group-dashboard-top-bar">
+            {/* toggler button */}
+            {!drawerPresent && !isMobile ? <MobileToggleButton /> : null}
+            <Box
+               component={motion.div}
+               key={titleKey}
+               variants={titleVariants}
+               initial="initial"
+               animate="animate"
+               exit="exit"
+               transition={{ duration: 0.2, ease: "easeOut" }}
+               sx={styles.leftSection}
+            >
+               <Typography role="heading" fontWeight={600} sx={styles.title}>
+                  {title}
+               </Typography>
+            </Box>
+            <Box sx={{ flexGrow: 1 }} />
+            <Stack direction="row" alignItems="center" spacing={1.5}>
+               {topBarAction}
+               {/* notification & profile */}
+               <NotificationsButton />
+               <ProfileAvatar />
+            </Stack>
+            {Boolean(navigation) && navigation}
          </Box>
-         <Box sx={{ flexGrow: 1 }} />
-         <Stack
-            direction="row"
-            alignItems="center"
-            spacing={{
-               xs: 1,
-               md: 3,
-            }}
-         >
-            {isMobile
-               ? mobileCta
-               : cta || (
-                    <LoadingButton
-                       size={"large"}
-                       variant={"outlined"}
-                       color={"secondary"}
-                       loading={isCreating}
-                       onClick={() => createDraftLivestream()}
-                    >
-                       Create New Live Stream
-                    </LoadingButton>
-                 )}
-            {/* notification & profile */}
-            <UserAvatarWithDetails />
-            <NotificationsButton />
-         </Stack>
-         {Boolean(navigation) && navigation}
-      </Box>
+         {Boolean(isMobile) && <MobileProfileDrawer />}
+      </Fragment>
    )
 }
 

@@ -1,9 +1,5 @@
 import { FC, MouseEvent, useCallback } from "react"
-import { useDispatch } from "react-redux"
-import {
-   openDeleteJobDialogOpen,
-   openJobsDialog,
-} from "../../../../../store/reducers/adminJobsReducer"
+import { useJobDialogRouter } from "../../../../custom-hook/custom-job/useJobDialogRouter"
 import useMenuState from "../../../../custom-hook/useMenuState"
 import MoreMenuWithEditAndRemoveOptions from "../events/detail/form/views/questions/components/MoreMenu"
 
@@ -13,24 +9,24 @@ type Props = {
 }
 const JobMenu: FC<Props> = ({ jobId, editable = true }) => {
    const { handleClose } = useMenuState()
-   const dispatch = useDispatch()
+   const { openJobDialog, openDeleteJobDialog } = useJobDialogRouter()
 
    const handleRemoveJob = useCallback(
       (event: MouseEvent<HTMLElement>) => {
          event.stopPropagation()
-         dispatch(openDeleteJobDialogOpen(jobId))
+         openDeleteJobDialog(jobId)
          handleClose()
       },
-      [dispatch, handleClose, jobId]
+      [openDeleteJobDialog, handleClose, jobId]
    )
 
    const handleEditJob = useCallback(
       (event: MouseEvent<HTMLElement>) => {
          event.stopPropagation()
-         dispatch(openJobsDialog(jobId))
+         openJobDialog(jobId)
          handleClose()
       },
-      [dispatch, handleClose, jobId]
+      [openJobDialog, handleClose, jobId]
    )
    return (
       <MoreMenuWithEditAndRemoveOptions

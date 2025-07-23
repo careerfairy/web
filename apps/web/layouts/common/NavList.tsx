@@ -88,10 +88,14 @@ export const styles = sxStyles({
 type NavListProps = {
    links: INavLink[]
    onMobileNavigate?: () => void
+   disablePadding?: boolean
 }
-const NavList = ({ links, onMobileNavigate }: NavListProps) => {
+const NavList = ({ links, onMobileNavigate, disablePadding }: NavListProps) => {
    return (
-      <Box component={"nav"} sx={styles.list}>
+      <Box
+         component={"nav"}
+         sx={[styles.list, disablePadding && { padding: 0 }]}
+      >
          <Stack spacing={2} component={List}>
             {links.map((navItem) => (
                <NavLink

@@ -13,12 +13,11 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import { useJobDialogRouter } from "components/custom-hook/custom-job/useJobDialogRouter"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BaseStyles from "components/views/admin/company-information/BaseStyles"
 import { FormBrandedAutocomplete } from "components/views/common/inputs/BrandedAutocomplete"
 import { useCallback, useMemo } from "react"
-import { useDispatch } from "react-redux"
-import { openJobsDialog } from "store/reducers/adminJobsReducer"
 import { sxStyles } from "types/commonTypes"
 import { useLivestreamFormValues } from "../../../../useLivestreamFormValues"
 
@@ -87,16 +86,13 @@ const SelectorCustomJobsDropDown = ({
    values,
 }: Props) => {
    const { setFieldValue, isSubmitting } = useLivestreamFormValues()
-   const dispatch = useDispatch()
+   const { openJobDialog } = useJobDialogRouter()
    const isMobile = useIsMobile()
 
    const renderCreateNewJobOption = useMemo(
       () => (
          <>
-            <MenuItem
-               sx={styles.menuItem}
-               onMouseDown={() => dispatch(openJobsDialog())}
-            >
+            <MenuItem sx={styles.menuItem} onMouseDown={() => openJobDialog()}>
                <ListItemIcon sx={styles.listIcon}>
                   <Avatar sx={styles.addNewJobAvatar}>
                      <AddRoundedIcon />
@@ -107,7 +103,7 @@ const SelectorCustomJobsDropDown = ({
             {options?.length ? <Divider /> : null}
          </>
       ),
-      [dispatch, options?.length]
+      [openJobDialog, options?.length]
    )
 
    const onChangeHandler = async (_, selectedOptions: PublicCustomJob[]) => {

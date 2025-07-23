@@ -1,14 +1,14 @@
-import { Container, Grid } from "@mui/material"
-import { Box } from "@mui/system"
-import React, { memo, useEffect, useMemo } from "react"
-import Sources from "../../analytics/RegistrationSources"
-import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import GeneralSearchFilter from "../general/search-filter/GeneralSearchFilter"
+import { Grid } from "@mui/material"
+import { memo, useEffect, useMemo } from "react"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import Sources from "../../analytics/RegistrationSources"
+import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
 import {
    GeneralPageProvider,
    useAnalyticsPageContext,
 } from "../general/GeneralPageProvider"
+import GeneralSearchFilter from "../general/search-filter/GeneralSearchFilter"
 
 const AnalyticsRegistrationSourcesPageContent = () => {
    return (
@@ -26,6 +26,7 @@ const PageContent = () => {
    useEffect(() => {
       // start with last 1 year as the default time frame
       setLivestreamStatsTimeFrame("Last 1 year")
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    const isLoading = useMemo(
@@ -41,20 +42,18 @@ const PageContent = () => {
    )
 
    return (
-      <Box py={2}>
-         <Container maxWidth={false}>
-            <Grid container spacing={spacing}>
-               <Grid xs={12} item>
-                  <GeneralSearchFilter />
-               </Grid>
-               <Sources
-                  group={group}
-                  loading={isLoading}
-                  streamsFromTimeFrameAndFuture={mappedEvents}
-               />
+      <LivestreamAnalyticsContainer>
+         <Grid container spacing={spacing}>
+            <Grid xs={12} item>
+               <GeneralSearchFilter />
             </Grid>
-         </Container>
-      </Box>
+            <Sources
+               group={group}
+               loading={isLoading}
+               streamsFromTimeFrameAndFuture={mappedEvents}
+            />
+         </Grid>
+      </LivestreamAnalyticsContainer>
    )
 }
 

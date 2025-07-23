@@ -3,8 +3,8 @@ import { combineStyles, sxStyles } from "types/commonTypes"
 // import { Collapse } from "@mui/material"
 import Box, { BoxProps } from "@mui/material/Box"
 // import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
-import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
-import { EngineType } from "embla-carousel/components/Engine"
+import { type EmblaOptionsType, type EngineType } from "embla-carousel"
+import useEmblaCarousel from "embla-carousel-react"
 import {
    FC,
    Ref,
