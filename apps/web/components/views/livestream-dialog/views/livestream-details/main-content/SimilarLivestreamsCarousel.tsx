@@ -62,7 +62,7 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
                isEmbedded={true}
                styling={{
                   mainWrapperBoxSx: {
-                     mt: 2, // Keep 16px space between title and carousel as requested
+                     // Remove margin-top as requested
                   },
                   // Remove all default padding since we're in a dialog
                   padding: false,
