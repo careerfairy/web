@@ -87,18 +87,25 @@ const styles = sxStyles({
       // gap: "12px",
    },
    carouselViewport: {
+      // width: "100%",
+      borderRadius: "12px",
       // width: "327px",
       // height: "100%",
    },
    slideImageWrapper: {
-      height: "100%",
+      // height: "100%",
    },
    slideImage: {
-      // width: "100%",
-      // maxWidth: "400px",
-      height: "400px",
-      borderRadius: "12px",
-      // objectFit: "cover",
+      // width: "400px",
+      width: "100dvw",
+      // maxWidth: "327px",
+      minHeight: "337px",
+      display: "flex",
+      // height: "100%",
+      // borderRadius: "12px",
+      objectFit: "cover",
+      objectPosition: "center",
+      alignSelf: "center",
    },
    dotsContainer: {
       display: "flex",
@@ -144,7 +151,8 @@ const styles = sxStyles({
       textAlign: "left",
    },
    ctaSection: {
-      // height: "100%",
+      height: "100%",
+      mt: 2,
       backgroundColor: "rgba(255, 255, 255, 0.93)",
       borderRadius: "16px 16px 0 0",
       padding: "25px 24px",
@@ -338,7 +346,13 @@ export const LoginNudgeOverlay = () => {
                   // gap="12px"
                >
                   {SLIDES.map((slide, idx) => (
-                     <GenericCarousel.Slide key={idx} slideWidth="400px">
+                     <GenericCarousel.Slide
+                        key={idx}
+                        sx={{
+                           // width: "100%",
+                           height: "327px",
+                        }}
+                     >
                         <Box
                            component="img"
                            src={slide.imageUrl}
@@ -347,7 +361,7 @@ export const LoginNudgeOverlay = () => {
                               styles.slideImage,
                               {
                                  opacity: currentSlide === idx ? 1 : 0,
-                                 transition: "opacity 0.6s ease-in-out",
+                                 transition: "opacity 0.3s ease-in-out",
                               },
                            ]}
                         />
@@ -389,27 +403,26 @@ export const LoginNudgeOverlay = () => {
                   </AnimatePresence>
                </Box>
             </Stack>
-
-            {/* CTA Section */}
-            <Box sx={styles.ctaSection}>
-               <Button
-                  onClick={handleGetStarted}
-                  sx={styles.primaryButton}
-                  variant="contained"
-                  fullWidth
-               >
-                  Get started!
-               </Button>
-               <Button
-                  onClick={handleExploreApp}
-                  sx={styles.secondaryButton}
-                  variant="text"
-                  fullWidth
-               >
-                  Explore the app
-               </Button>
-            </Box>
          </Stack>
+         {/* CTA Section */}
+         <Box sx={styles.ctaSection}>
+            <Button
+               onClick={handleGetStarted}
+               sx={styles.primaryButton}
+               variant="contained"
+               fullWidth
+            >
+               Get started!
+            </Button>
+            <Button
+               onClick={handleExploreApp}
+               sx={styles.secondaryButton}
+               variant="text"
+               fullWidth
+            >
+               Explore the app
+            </Button>
+         </Box>
       </Dialog>
    )
 }
