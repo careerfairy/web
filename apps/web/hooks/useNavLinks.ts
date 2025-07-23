@@ -34,6 +34,7 @@ export const PastLivestreamsPath: INavLink = {
 /**
  * Hook that provides filtered navigation links based on user permissions and country
  * @param isMobile - Whether the screen is mobile
+ * @param serverUserCountryCode - Optional server-side country code (takes precedence)
  * @returns Array of filtered navigation links
  */
 export const useNavLinks = (
@@ -49,19 +50,19 @@ export const useNavLinks = (
       serverUserCountryCode ||
       userData?.countryIsoCode ||
       ipBasedUserCountryCode
+
    return useMemo(() => {
+      const userCountry = userData
+         ? userData.countryIsoCode || userData.universityCountryCode
+         : userCountryCode
+
       const disabledLevels = !(userData
          ? userIsTargetedLevels(userData)
-         : swissGermanCountryFilters.includes(userCountryCode))
+         : swissGermanCountryFilters.includes(userCountry))
 
-      const disabledCompanies = !(
-         !userCountryCode ||
-         !(
-            isMobile &&
-            userCountryCode &&
-            swissGermanCountryFilters.includes(userCountryCode)
-         )
-      )
+      const disabledCompanies =
+         isMobile &&
+         (!userCountry || swissGermanCountryFilters.includes(userCountry))
 
       // Define base navigation links
       const links: INavLink[] = [

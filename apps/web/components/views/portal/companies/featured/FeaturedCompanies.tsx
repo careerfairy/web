@@ -135,7 +135,6 @@ const FeaturedCompaniesComponent = ({ fieldOfStudyId, countryCode }: Props) => {
                         ? FieldOfStudyCategoryMap[fieldOfStudyId]
                         : ""
                   }`}
-                  target="_blank"
                >
                   <Stack direction="row" spacing={0.5}>
                      <Typography variant="small" sx={styles.exploreMore}>
