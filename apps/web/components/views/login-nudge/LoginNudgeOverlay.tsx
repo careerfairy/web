@@ -102,7 +102,7 @@ const styles = sxStyles({
       minHeight: "337px",
       display: "flex",
       // height: "100%",
-      // borderRadius: "12px",
+      borderRadius: "12px",
       objectFit: "cover",
       objectPosition: "center",
       alignSelf: "center",
@@ -188,23 +188,26 @@ const styles = sxStyles({
 
 // Animation variants for text transitions
 const textAnimationVariants = {
-   initial: { opacity: 0, y: 20 },
+   initial: {
+      opacity: 0,
+      // y: 20
+   },
    animate: {
       opacity: 1,
-      y: 0,
+      // y: 0,
       transition: {
          duration: 0.4,
-         ease: "easeOut",
+         ease: "easeInOut",
       },
    },
-   exit: {
-      opacity: 0,
-      y: -20,
-      transition: {
-         duration: 0.4,
-         ease: "easeOut",
-      },
-   },
+   // exit: {
+   //    opacity: 0,
+   //    // y: -20,
+   //    transition: {
+   //       duration: 0.2,
+   //       ease: "easeOut",
+   //    },
+   // },
 }
 
 export const LoginNudgeOverlay = () => {
