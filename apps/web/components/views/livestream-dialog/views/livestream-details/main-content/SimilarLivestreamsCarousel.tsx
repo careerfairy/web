@@ -58,16 +58,16 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
                location={`livestream-dialog-similar-events-carousel-${currentLivestream.id}`}
                isRecommended={true}
                isEmbedded={true}
-               styling={{
-                  mainWrapperBoxSx: {
-                     mt: 1.5, // Small space between title and carousel
-                  },
-                  // Remove default padding since we're in a dialog
-                  padding: false,
-                  viewportSx: {
-                     py: 1.5, // Add some vertical padding for the cards
-                  },
-               }}
+                           styling={{
+               mainWrapperBoxSx: {
+                  mt: 2, // 16px space between title and carousel
+               },
+               // Remove default padding since we're in a dialog
+               padding: false,
+               viewportSx: {
+                  py: 1.5, // Add some vertical padding for the cards
+               },
+            }}
             />
          </Box>
       </Box>
