@@ -7,6 +7,7 @@ export type FeatureFlagKey =
    | "mentorsV1"
    | "talentProfileV1"
    | "levelsV1"
+   | "newEventsTableFlag"
 
 export type FeatureFlag = {
    /**
