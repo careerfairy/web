@@ -149,7 +149,7 @@ const LivestreamDetailsView = () => {
                            </Section>
                         </Section>
                         {hasJobs ? (
-                           <Section navOffset={44} ref={jobsRef}>
+                           <Section ref={jobsRef}>
                               <Jobs presenter={livestreamPresenter} />
                            </Section>
                         ) : null}
