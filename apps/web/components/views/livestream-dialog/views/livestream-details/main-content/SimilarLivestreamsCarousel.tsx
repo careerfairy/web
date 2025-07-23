@@ -9,13 +9,15 @@ import SectionTitle from "./SectionTitle"
 
 const styles = sxStyles({
    carouselContainer: {
-      mt: 4, // Add space above the carousel
+      // Remove unnecessary margin since Section component provides spacing
    },
    carouselWrapper: {
       "& > div": {
-         // Target the carousel wrapper to remove default margins
+         // Target the carousel wrapper to remove default margins and padding
          marginLeft: 0,
          marginRight: 0,
+         paddingLeft: 0,
+         paddingRight: 0,
       },
    },
 })
@@ -58,16 +60,16 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
                location={`livestream-dialog-similar-events-carousel-${currentLivestream.id}`}
                isRecommended={true}
                isEmbedded={true}
-                           styling={{
-               mainWrapperBoxSx: {
-                  mt: 2, // 16px space between title and carousel
-               },
-               // Remove default padding since we're in a dialog
-               padding: false,
-               viewportSx: {
-                  py: 1.5, // Add some vertical padding for the cards
-               },
-            }}
+               styling={{
+                  mainWrapperBoxSx: {
+                     mt: 2, // Keep 16px space between title and carousel as requested
+                  },
+                  // Remove all default padding since we're in a dialog
+                  padding: false,
+                  viewportSx: {
+                     // Remove vertical padding from carousel
+                  },
+               }}
             />
          </Box>
       </Box>
