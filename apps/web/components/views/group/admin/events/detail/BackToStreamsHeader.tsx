@@ -1,5 +1,5 @@
 import { Box } from "@mui/material"
-import Link from "next/link"
+import { useRouter } from "next/router"
 import { ChevronLeft } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -23,13 +23,18 @@ type Props = {
 }
 
 export const BackToStreamsHeader = ({ groupId }: Props) => {
+   const router = useRouter()
+
+   const handleClick = () => {
+      if (window.history.length > 2) {
+         router.back()
+      } else {
+         router.push(`/group/${groupId}/admin/content/live-streams`)
+      }
+   }
+
    return (
-      <Box
-         sx={styles.root}
-         component={Link}
-         href={`/group/${groupId}/admin/content/live-streams`}
-         shallow
-      >
+      <Box sx={styles.root} onClick={handleClick}>
          <Box component={ChevronLeft} />
          {"Live stream details"}
       </Box>

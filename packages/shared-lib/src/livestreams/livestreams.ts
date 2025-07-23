@@ -205,13 +205,31 @@ export interface LivestreamEvent extends Identifiable {
    popularity?: number
 
    /**
-    * Metadata for the livestream based on hosts
+    * The live stream's host actual company size
     */
    companySizes?: string[] // ["1-20", "21-100", "101-1000", "1001+"]
+   /**
+    * The industries that the livestream's host is actually based in
+    */
    companyIndustries?: string[] // ["Technology", "Finance", "Education", "Healthcare", "Other"]
+
+   /**
+    * The countries that the livestream's host is actually based in
+    */
    companyCountries?: string[] // ["United States", "United Kingdom", "Canada", "Australia", "Other"]
+
+   /**
+    * The countries that the livestream's organizers would like to target
+    */
    companyTargetedCountries?: string[] // ["United States", "United Kingdom", "Canada", "Australia", "Other"]
+   /**
+    * The universities that the livestream's organizers would like to target
+    */
    companyTargetedUniversities?: string[] // ["f306ab68-d243-4bb1-860a-0a2b4a1625e5", "5132cea1-0232-4b09-bb57-0193dee94647"]
+
+   /**
+    * The fields of study that the livestream's organizers would like to target
+    */
    companyTargetedFieldsOfStudies?: string[] // ["business_engineering", "electrical_engineering", "computer_science"]
    /**
     * Flag to distinguish between a draft and a livestream
@@ -308,6 +326,9 @@ export const FALLBACK_DATE = "March 17, 2020 03:24:00"
  * Collection Path: livestreams/{livestreamId}/userLivestreamData/{userEmail}
  * */
 export interface UserLivestreamData extends Identifiable {
+   /**
+    * User's Auth UID
+    */
    userId: string
    livestreamId: LivestreamEvent["id"]
    user: UserData

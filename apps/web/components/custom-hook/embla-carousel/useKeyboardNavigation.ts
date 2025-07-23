@@ -1,4 +1,4 @@
-import { EmblaCarouselType } from "embla-carousel-react"
+import { type EmblaCarouselType } from "embla-carousel"
 import { useEffect } from "react"
 
 type NavigationMode = "upDown" | "leftRight"

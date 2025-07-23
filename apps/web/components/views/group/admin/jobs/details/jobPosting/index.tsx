@@ -2,8 +2,7 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Paper } from "@mui/material"
 import { FC, useCallback } from "react"
-import { useDispatch } from "react-redux"
-import { openJobsDialog } from "../../../../../../../store/reducers/adminJobsReducer"
+import { useJobDialogRouter } from "../../../../../../custom-hook/custom-job/useJobDialogRouter"
 import CustomJobAdminDetails from "../../../../../jobs/components/b2b/CustomJobAdminDetails"
 
 type Props = {
@@ -11,11 +10,13 @@ type Props = {
    group: Group
 }
 const JobPosting: FC<Props> = ({ job, group }) => {
-   const dispatch = useDispatch()
+   const { openJobDialog } = useJobDialogRouter()
 
-   const handleClick = useCallback(() => {
-      dispatch(openJobsDialog(job.id))
-   }, [dispatch, job.id])
+   const handleEdit = useCallback(() => {
+      if (job.isPermanentlyExpired) return
+
+      openJobDialog(job.id)
+   }, [job.isPermanentlyExpired, job.id, openJobDialog])
 
    return (
       <Paper>
@@ -23,7 +24,7 @@ const JobPosting: FC<Props> = ({ job, group }) => {
             job={job}
             companyName={group.universityName}
             companyLogoUrl={group.logoUrl}
-            handleEdit={job.isPermanentlyExpired ? null : handleClick}
+            handleEdit={handleEdit}
          />
       </Paper>
    )

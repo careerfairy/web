@@ -12,7 +12,7 @@ import JobSearch from "./JobSearch"
 
 const styles = sxStyles({
    wrapper: {
-      mx: { xs: 2, md: 5 },
+      mx: { xs: 2, sm: 3 },
       my: 2,
    },
    createButton: {

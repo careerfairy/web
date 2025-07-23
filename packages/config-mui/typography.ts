@@ -77,7 +77,7 @@ export const getTypography = (
       },
       small: {
          fontSize: "1rem", // 14px
-         lineHeight: 1.71429,
+         lineHeight: "20px",
       },
       xsmall: {
          fontSize: "0.85714rem", // 12px

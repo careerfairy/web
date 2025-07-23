@@ -1,9 +1,9 @@
-import { Container, Grid } from "@mui/material"
-import { Box } from "@mui/system"
+import { Grid } from "@mui/material"
 import { memo } from "react"
+import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
+import { FeedbackPageProvider } from "./FeedbackPageProvider"
 import PaginatedFeedbacks from "./livestream-feedbacks/PaginatedFeedbacks"
 import FeedbackSearch from "./search/FeedbackSearch"
-import { FeedbackPageProvider } from "./FeedbackPageProvider"
 
 const AnalyticsFeedbackPageContent = () => {
    return (
@@ -15,18 +15,16 @@ const AnalyticsFeedbackPageContent = () => {
 
 const PageContent = () => {
    return (
-      <Box py={2}>
-         <Container maxWidth="xl">
-            <Grid container spacing={spacing}>
-               <Grid xs={12} item>
-                  <FeedbackSearch />
-               </Grid>
-               <Grid xs={12} item>
-                  <PaginatedFeedbacks />
-               </Grid>
+      <LivestreamAnalyticsContainer>
+         <Grid container spacing={spacing}>
+            <Grid xs={12} item>
+               <FeedbackSearch />
             </Grid>
-         </Container>
-      </Box>
+            <Grid xs={12} item>
+               <PaginatedFeedbacks />
+            </Grid>
+         </Grid>
+      </LivestreamAnalyticsContainer>
    )
 }
 

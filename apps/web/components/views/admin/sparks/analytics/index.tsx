@@ -1,5 +1,5 @@
 import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
-import { Box, Button, Container, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useRouter } from "next/router"
 import { RefreshCw } from "react-feather"
@@ -24,18 +24,19 @@ const styles = sxStyles({
          xs: "column",
          md: "row",
       },
-      marginTop: { sm: 1, md: 1.5 },
       marginBottom: { md: "20px" },
+      pt: {
+         xs: 2.5,
+         md: 3,
+      },
    },
    tabs: {
       marginRight: {
          xs: -2,
          md: 0,
       },
-      pl: {
-         xs: 0,
-         md: 1.5,
-      },
+      pb: 1,
+
       width: {
          xs: "calc(100% + 16px)",
          md: "auto",
@@ -157,7 +158,7 @@ const GroupSparkAnalytics = () => {
    ]
 
    return (
-      <Container sx={styles.root} maxWidth="xl">
+      <Box sx={styles.root}>
          <Box sx={styles.controlHeader}>
             <SparksAnalyticsTabs sx={styles.tabs} />
             <Box component="span" sx={styles.mobileLimiter} />
@@ -194,7 +195,7 @@ const GroupSparkAnalytics = () => {
             {tabValue === "audience" && <SparksAudienceTab />}
             {tabValue === "competitor" && <SparksCompetitorTab />}
          </Box>
-      </Container>
+      </Box>
    )
 }
 
