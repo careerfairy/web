@@ -1,17 +1,16 @@
-import React, { useCallback, useMemo, useState } from "react"
-import Button from "@mui/material/Button"
-import { useCompanyPage } from "../"
 import ShareIcon from "@mui/icons-material/ShareOutlined"
-import ShareCompanyPageDialog from "../../common/ShareCompanyPageDialog"
-import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import useIsMobile from "../../../custom-hook/useIsMobile"
-import { SocialPlatformType, SocialPlatformObject } from "../../../custom-hook/useSocials"
-import { makeGroupCompanyPageUrl } from "../../../../util/makeUrls"
+import Button from "@mui/material/Button"
+import { Fragment } from "react"
+import { useCompanyPage } from "../"
 import { AnalyticsEvents } from "../../../../util/analyticsConstants"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { makeGroupCompanyPageUrl } from "../../../../util/makeUrls"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import useIsMobile from "../../../custom-hook/useIsMobile"
+import { ShareCompanyPageDialog } from "../../common/ShareCompanyPageDialog"
 
 const ShareButton = () => {
-   const { group, editMode } = useCompanyPage()
+   const { group } = useCompanyPage()
    const isMobile = useIsMobile()
 
    const [
@@ -20,81 +19,48 @@ const ShareButton = () => {
       handleCloseShareCompanyDialog,
    ] = useDialogStateHandler()
 
-   const [clickedComponents, setClickedComponents] = useState(
-      new Set<SocialPlatformType>()
-   )
-
-   const companyPageUrl = useMemo(() => {
-      return makeGroupCompanyPageUrl(group.universityName, {
-         absoluteUrl: true,
-      })
-   }, [group.universityName])
-
-   const shareData = useMemo(() => {
-      // Build URL with new UTM structure for mobile share
-      const utmParams = new URLSearchParams({
-         utm_source: 'careerfairy',
-         utm_medium: 'mobile',
-         utm_campaign: 'company-page',
-         utm_content: group.universityName
-      })
-      const urlWithUtm = `${companyPageUrl}?${utmParams.toString()}`
-      
-      return {
-         title: group.universityName,
-         text: `Check out ${group.universityName}'s company page on CareerFairy!`,
-         url: urlWithUtm,
-      }
-   }, [group.universityName, companyPageUrl])
-
-   const handleTrackShare = useCallback(
-      (type: SocialPlatformType, customMedium?: string) => {
-         if (!clickedComponents.has(type)) {
-            setClickedComponents((prevState) => new Set([...prevState, type]))
-
-            // Use custom medium name if provided (for mobile shares)
-            const mediumMapping = {
-               [SocialPlatformObject.Whatsapp]: 'whatsapp',
-               [SocialPlatformObject.Linkedin]: 'linkedin', 
-               [SocialPlatformObject.Facebook]: 'facebook',
-               [SocialPlatformObject.X]: 'x',
-               [SocialPlatformObject.Copy]: 'copy',
-            }
-            
-            const medium = customMedium || mediumMapping[type] || type
-            
-            // Track the share action
-            dataLayerEvent(AnalyticsEvents.CompanyPageShare, {
-               medium: medium,
-            })
-         }
-      },
-      [clickedComponents]
-   )
-
-   const handleShare = useCallback(async () => {
+   const handleShare = async () => {
       if (isMobile && navigator?.share) {
          try {
-            await navigator.share(shareData)
-            handleTrackShare(SocialPlatformObject.Copy, 'mobile') // Track as mobile share
+            const companyPageUrl = makeGroupCompanyPageUrl(
+               group.universityName,
+               {
+                  absoluteUrl: true,
+               }
+            )
+
+            const utmParams = new URLSearchParams({
+               utm_source: "careerfairy",
+               utm_medium: "mobile",
+               utm_campaign: "company-page",
+               utm_content: group.universityName,
+            })
+
+            const urlWithUtm = `${companyPageUrl}?${utmParams.toString()}`
+
+            await navigator.share({
+               title: group.universityName,
+               text: `Check out ${group.universityName}'s company page on CareerFairy!`,
+               url: urlWithUtm,
+            })
+
+            // Track mobile share directly since it doesn't go through the hook
+            dataLayerEvent(AnalyticsEvents.CompanyPageShare, {
+               medium: "mobile",
+            })
          } catch (error) {
             // If native share fails or is cancelled, fallback to dialog
-            if (error.name !== 'AbortError') {
+            if (error.name !== "AbortError") {
                handleOpenShareCompanyDialog()
             }
          }
       } else {
          handleOpenShareCompanyDialog()
       }
-   }, [handleOpenShareCompanyDialog, isMobile, shareData, handleTrackShare])
-
-   const handleClose = useCallback(() => {
-      handleCloseShareCompanyDialog()
-      setClickedComponents(new Set())
-   }, [handleCloseShareCompanyDialog])
+   }
 
    return (
-      <>
+      <Fragment>
          <Button
             onClick={handleShare}
             variant={"outlined"}
@@ -107,12 +73,10 @@ const ShareButton = () => {
          {shareCompanyDialogOpen ? (
             <ShareCompanyPageDialog
                group={group}
-               handleClose={handleClose}
-               isGroupAdmin={editMode}
-               onShareOptionClick={handleTrackShare}
+               handleClose={handleCloseShareCompanyDialog}
             />
          ) : null}
-      </>
+      </Fragment>
    )
 }
 
