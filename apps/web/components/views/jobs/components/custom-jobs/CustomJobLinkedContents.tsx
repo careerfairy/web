@@ -7,7 +7,7 @@ import useCustomJobLinkedLivestreams from "components/custom-hook/custom-job/use
 import useGroupSparks from "components/custom-hook/spark/useGroupSparks"
 import SparksCarousel from "components/views/admin/sparks/general-sparks-view/SparksCarousel"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { EmblaOptionsType } from "embla-carousel-react"
+import { type EmblaOptionsType } from "embla-carousel"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"

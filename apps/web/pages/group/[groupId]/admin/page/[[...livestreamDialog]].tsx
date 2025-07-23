@@ -5,6 +5,7 @@ import {
    pickPublicDataFromCreator,
 } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { Box } from "@mui/material"
 import SparkPreviewDialog from "components/views/admin/sparks/general-sparks-view/SparkPreviewDialog"
 import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import {
@@ -58,7 +59,7 @@ const CompanyPage: NextPageWithLayout<
             }}
             customJobId={customJobId}
          >
-            <>
+            <Box px={{ xs: 2, md: 0 }}>
                <CompanyPageOverview
                   group={deserializeGroupClient(serverSideGroup)}
                   groupCreators={groupCreators || []}
@@ -74,7 +75,7 @@ const CompanyPage: NextPageWithLayout<
                   tabMode
                />
                <SparkPreviewDialog />
-            </>
+            </Box>
          </CustomJobDialogProvider>
       </LivestreamDialogLayout>
    )

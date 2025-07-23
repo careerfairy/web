@@ -1,13 +1,13 @@
 import SparksIcon from "@mui/icons-material/PlayCircleOutlineRounded"
 import { Box, Button, Stack, Typography, TypographyProps } from "@mui/material"
-import { FC, useCallback } from "react"
-import { useDispatch } from "react-redux"
+import { useAppDispatch } from "components/custom-hook/store"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { FC } from "react"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
 import GetInspiredButton from "../components/GetInspiredButton"
 import SparksContainer from "../components/SparksContainer"
 import WatchTutorialButton from "../components/WatchTutorialButton"
-import { useGroup } from "layouts/GroupDashboardLayout"
 
 const sparkIconSize = 61
 const sparkIconWrapperSize = 98
@@ -58,13 +58,13 @@ const styles = sxStyles({
    },
 })
 
-const EmptySparksView: FC = () => {
-   const dispatch = useDispatch()
+const EmptySparksView = () => {
+   const dispatch = useAppDispatch()
    const { groupPresenter } = useGroup()
 
-   const handleOpen = useCallback(() => {
-      dispatch(openSparkDialog(null))
-   }, [dispatch])
+   const handleOpen = () => {
+      dispatch(openSparkDialog())
+   }
 
    return (
       <SparksContainer>

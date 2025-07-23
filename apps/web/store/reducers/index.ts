@@ -1,13 +1,13 @@
 import { combineReducers } from "redux"
 import { firestoreReducer } from "redux-firestore"
 
-import adminJobsReducer from "./adminJobsReducer"
 import adminSparksReducer from "./adminSparksReducer"
 import authReducer from "./authReducer"
 import emotesReducer from "./emotesReducer"
 import firebaseReducer from "./firebaseReducer"
 import generalLayoutReducer from "./generalLayoutReducer"
 import groupAnalyticsReducer from "./groupAnalyticsReducer"
+import groupDashboardLayoutReducer from "./groupDashboardLayoutReducer"
 import groupPlanReducer from "./groupPlanReducer"
 import nextLivestreamsReducer from "./nextLivestreamsReducer"
 import profileSettingsReducer from "./profileSettingsReducer"
@@ -33,12 +33,12 @@ const reducers = {
    nextLivestreams: nextLivestreamsReducer,
    generalLayout: generalLayoutReducer,
    analyticsReducer: groupAnalyticsReducer,
+   groupDashboardLayout: groupDashboardLayoutReducer,
    stream: streamReducer,
    streamAdmin: streamAdminReducer,
    adminSparks: adminSparksReducer,
    groupPlan: groupPlanReducer,
    sparksFeed: sparksFeedReducer,
-   adminJobs: adminJobsReducer,
    streamingApp: streamingAppReducer,
    talentProfile: talentProfileReducer,
    talentGuide: talentGuideReducer,

@@ -1,34 +1,31 @@
 import GroupSparkAnalytics from "components/views/admin/sparks/analytics"
 import { SparksAnalyticsProvider } from "components/views/admin/sparks/analytics/SparksAnalyticsContext"
-import CreateSparkButton from "components/views/admin/sparks/components/CreateSparkButton"
-import SparksDialog from "components/views/admin/sparks/sparks-dialog/SparksDialog"
-import { HasAccessToSparksWrapper } from "layouts/GroupDashboardLayout/HasAccessToSparksWrapper"
-import { Fragment, ReactElement } from "react"
+import { SparksPromotionalPage } from "components/views/admin/sparks/components/promotional-page/SparksPromotionalPage"
+import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
+import { AdminContainer } from "components/views/group/admin/common/Container"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { ReactElement } from "react"
 import { withGroupDashboardLayout } from "../../../../../../layouts/GroupDashboardLayout/withGroupDashboardLayout"
 
-const CreateSparkButtonWrapper = () => {
-   return (
-      <Fragment>
-         <CreateSparkButton />
-         <SparksDialog />
-      </Fragment>
-   )
-}
-
 const AdminSparksAnalyticsPage = () => {
+   const hasAccessToSparks = useHasAccessToSparks()
+   const { group } = useGroup()
+
+   if (!group) return null
+   if (!hasAccessToSparks) return <SparksPromotionalPage />
+
    return (
-      <HasAccessToSparksWrapper>
+      <AdminContainer>
          <SparksAnalyticsProvider>
             <GroupSparkAnalytics />
          </SparksAnalyticsProvider>
-      </HasAccessToSparksWrapper>
+      </AdminContainer>
    )
 }
 
 AdminSparksAnalyticsPage.getLayout = function getLayout(page: ReactElement) {
    return withGroupDashboardLayout({
       titleComponent: "Analytics",
-      topBarCta: <CreateSparkButtonWrapper />,
       dashboardHeadTitle: "CareerFairy | My Sparks Analytics",
       subNavigationFor: "analytics",
    })(page)

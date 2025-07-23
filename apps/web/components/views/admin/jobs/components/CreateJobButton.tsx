@@ -1,9 +1,8 @@
 import { Button, ButtonProps } from "@mui/material"
-import { FC, useCallback } from "react"
-import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
-import { useDispatch } from "react-redux"
-import { openJobsDialog } from "../../../../../store/reducers/adminJobsReducer"
+import { FC } from "react"
 import { PlusCircle } from "react-feather"
+import { combineStyles, sxStyles } from "../../../../../types/commonTypes"
+import { useJobDialogRouter } from "../../../../custom-hook/custom-job/useJobDialogRouter"
 
 const styles = sxStyles({
    root: {
@@ -12,15 +11,11 @@ const styles = sxStyles({
 })
 
 const CreateJobButton: FC<ButtonProps> = ({ sx, children, ...props }) => {
-   const dispatch = useDispatch()
-
-   const handleCreateJob = useCallback(() => {
-      dispatch(openJobsDialog())
-   }, [dispatch])
+   const { openJobDialog } = useJobDialogRouter()
 
    return (
       <Button
-         onClick={handleCreateJob}
+         onClick={() => openJobDialog()}
          color="secondary"
          sx={combineStyles(styles.root, sx)}
          variant="contained"

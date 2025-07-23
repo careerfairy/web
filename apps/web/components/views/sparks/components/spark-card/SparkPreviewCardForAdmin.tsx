@@ -1,6 +1,7 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Stack } from "@mui/material"
 import Box from "@mui/material/Box"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -34,6 +35,8 @@ const SparkPreviewCardForAdmin: FC<Props> = ({
    type = "carousel",
    preview = true,
 }) => {
+   const isMobile = useIsMobile()
+
    return (
       <SparkPreviewCardContainer
          componentHeader={<HiddenStatus sparkPublished={spark.published} />}
@@ -45,6 +48,9 @@ const SparkPreviewCardForAdmin: FC<Props> = ({
             muted: false,
          }}
          autoPlaying={type === "fullScreen"}
+         overrideCarouselCardWidth={
+            isMobile && type !== "fullScreen" ? 200 : undefined
+         }
       >
          <Box px={cardPadding} pt={cardPadding}>
             <SparkHeader showAdminOptions={preview} spark={spark} />

@@ -1,3 +1,4 @@
+import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded"
 import { LoadingButton, LoadingButtonProps } from "@mui/lab"
@@ -8,9 +9,9 @@ import {
    IconButton,
    Container as MuiContainer,
    Stack,
+   StackProps,
    Typography,
    TypographyProps,
-   StackProps,
 } from "@mui/material"
 import SteppedDialog, {
    useStepper,
@@ -35,7 +36,6 @@ import {
 } from "store/selectors/adminSparksSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { SparkFormValues } from "./views/hooks/useSparkFormSubmit"
-import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 
 const actionsHeight = 87
 const mobileTopPadding = 20
@@ -287,7 +287,6 @@ export const useSparksForm = () => {
 
 const SparksDialog = () => {
    const initialStepKey = useSelector(sparksDialogInitialStepSelector)
-
    const open = useSelector(sparksDialogOpenSelector)
    const confirmCloseDialogOpen = useSelector(
       sparksConfirmCloseSparksDialogOpen

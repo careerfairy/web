@@ -94,7 +94,12 @@ export const EventsOverview = () => {
 
    return (
       <Fragment>
-         <BrandedTabs mt={1.5} activeValue={tabValue} onChange={handleChange}>
+         <BrandedTabs
+            p={1.5}
+            mt={1.5}
+            activeValue={tabValue}
+            onChange={handleChange}
+         >
             {tabs.map((tab) => (
                <BrandedTabs.Tab
                   key={tab.value}

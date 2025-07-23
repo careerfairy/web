@@ -16,3 +16,26 @@ export type GetRecommendedJobsFnArgs = {
    userAuthId?: string
    userCountryCode?: string
 }
+
+export type GetGroupTalentEngagementFnArgs = {
+   groupId: string
+   targeting: {
+      countries: string[]
+      universities: Array<{
+         id: string
+         name: string
+         country: string
+      }>
+      fieldsOfStudy: string[]
+   }
+}
+
+export type GetGroupTalentEngagementFnResponse = {
+   count: number
+}
+
+export type GetTotalUsersMatchingTargetingResponse = {
+   total: number
+}
+
+// trigger commit
