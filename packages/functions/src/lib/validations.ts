@@ -5,7 +5,10 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
-import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import {
+   CallableContext,
+   CallableRequest,
+} from "firebase-functions/lib/common/providers/https"
 import { InferType } from "yup"
 import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import { groupRepo, livestreamsRepo, userRepo } from "../api/repositories"
@@ -63,7 +66,7 @@ export async function validateUserIsGroupAdmin(
    group: Group
    role: GROUP_DASHBOARD_ROLE
    isCFAdmin?: boolean
-   userData?: UserData
+   userData: UserData | null
 }> {
    const response = await groupRepo.checkIfUserIsGroupAdmin(groupId, email)
 
@@ -124,22 +127,16 @@ export function validateUserAuthNotExistent(context: CallableContext) {
 }
 
 export function logAndThrow(message: string, ...context: any[]): never {
-   // Prepare the additional context for logging
-   const additionalContext = context?.map((item) => {
-      if (item instanceof Error) {
-         // Convert Error to a plain object including message and stack
-         return {
-            errorMessage: item.message,
-            errorStack: item.stack,
-         }
-      }
-      return item
-   })
+   functions.logger.error(message)
 
-   // Ensure the last argument is a plain object for the jsonPayload, functions logger will not log the error object, it will just show an empty object
-   const logObject = { additionalContext }
+   if (context.length > 0 && context[0] instanceof Error) {
+      functions.logger.error(context[0].message)
+   } else if (context.length > 0) {
+      context.forEach((item, index) => {
+         functions.logger.error(`Context ${index}:`, item)
+      })
+   }
 
-   functions.logger.error(message, logObject)
    throw new functions.https.HttpsError("failed-precondition", message)
 }
 
@@ -230,4 +227,29 @@ export async function validateCTAExists(
       logAndThrow("CTA does not exist", livestreamId, ctaId)
    }
    return livestreamCTA
+}
+
+// Helper to log errors properly with context
+export function logError(error: any, request: CallableRequest) {
+   const message = error instanceof Error ? error.message : String(error)
+   const code = error?.code || error?.status || "unknown"
+   const isIndexError =
+      message.includes("FAILED_PRECONDITION") || message.includes("index")
+
+   functions.logger.error("Function error:", {
+      error: {
+         message,
+         code,
+         isIndexError,
+      },
+      request: {
+         data: request.data,
+         auth: request.auth
+            ? {
+                 uid: request.auth.uid,
+                 email: request.auth.token?.email,
+              }
+            : null,
+      },
+   })
 }

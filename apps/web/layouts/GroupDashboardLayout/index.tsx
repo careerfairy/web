@@ -70,8 +70,7 @@ const GroupContext = createContext<GroupAdminContext>({
 type GroupDashboardLayoutProps = {
    titleComponent: ReactNode
    children: ReactNode
-   topBarCta?: ReactNode
-   topBarMobileCta?: ReactNode
+   topBarAction?: ReactNode
    topBarNavigation?: ReactNode
    bottomBarNavigation?: ReactNode
    backgroundColor?: string
@@ -239,8 +238,7 @@ const GroupDashboardLayout = (props: GroupDashboardLayoutProps) => {
       <Outlet empty={empty} loading={loading}>
          <GroupContext.Provider value={contextValues}>
             <GroupDashboardLayoutProvider
-               topBarCta={props.topBarCta}
-               topBarMobileCta={props.topBarMobileCta}
+               topBarAction={props.topBarAction}
                topBarNavigation={props.topBarNavigation}
                bottomBarNavigation={props.bottomBarNavigation}
                titleComponent={titleComponent}

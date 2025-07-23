@@ -64,6 +64,7 @@ type Props = {
    containerRef?: (node?: Element | null) => void
    selected?: boolean
    type?: SparkPreviewCardType
+   overrideCarouselCardWidth?: number
 }
 
 const SparkPreviewCardContainer: FC<Props> = ({
@@ -77,6 +78,7 @@ const SparkPreviewCardContainer: FC<Props> = ({
    containerRef,
    selected,
    type = "carousel",
+   overrideCarouselCardWidth,
 }) => {
    const isMobile = useIsMobile()
 
@@ -94,7 +96,12 @@ const SparkPreviewCardContainer: FC<Props> = ({
    return (
       <Box
          ref={containerRef}
-         sx={[styles.root, selected && styles.cardSelected, cardStyles]}
+         sx={[
+            styles.root,
+            selected && styles.cardSelected,
+            cardStyles,
+            overrideCarouselCardWidth && { width: overrideCarouselCardWidth },
+         ]}
          onMouseEnter={onMouseEnter}
          onMouseLeave={onMouseLeave}
          className="spark-preview-card-container"

@@ -1,7 +1,4 @@
-import {
-   IUserReminder,
-   UserReminderType,
-} from "@careerfairy/shared-lib/dist/users"
+import { IUserReminder, UserReminderType } from "@careerfairy/shared-lib/users"
 import CloseIcon from "@mui/icons-material/Close"
 import {
    Button,

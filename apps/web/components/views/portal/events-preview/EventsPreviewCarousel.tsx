@@ -16,7 +16,8 @@ import { GenericCarousel } from "components/views/common/carousels/GenericCarous
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { isLivestreamDialogOpen } from "components/views/livestream-dialog/LivestreamDialogLayout"
-import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react"
+import { type EmblaOptionsType } from "embla-carousel"
+import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
 import Link from "next/link"
 

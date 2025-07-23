@@ -1,18 +1,18 @@
-import { Container, Grid } from "@mui/material"
-import { Box } from "@mui/system"
+import { Grid } from "@mui/material"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { GeneralPageProvider } from "./GeneralPageProvider"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import GeneralSearchFilter from "./search-filter/GeneralSearchFilter"
-import CompanyPageCTA from "./company-page/CompanyPageCTA"
-import LivestreamsKPIs from "./livestreams-kpis/LivestreamsKPIs"
+import useGroupCompanyPageProgress from "../../../../../custom-hook/useGroupCompanyPageProgress"
+import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
 import AggregatedAnalytics, {
    SkeletonAggregatedAnalytics,
 } from "./analytics/AggregatedAnalytics"
 import AggregatedBreakdown from "./breakdown/AggregatedBreakdown"
-import useGroupCompanyPageProgress from "../../../../../custom-hook/useGroupCompanyPageProgress"
-import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import CompanyPageCTA from "./company-page/CompanyPageCTA"
+import { GeneralPageProvider } from "./GeneralPageProvider"
+import LivestreamsKPIs from "./livestreams-kpis/LivestreamsKPIs"
+import GeneralSearchFilter from "./search-filter/GeneralSearchFilter"
 
 const styles = sxStyles({
    gridItem: {
@@ -34,8 +34,8 @@ const PageContent = () => {
    const progress = useGroupCompanyPageProgress(group)
 
    return (
-      <Box py={2}>
-         <Container maxWidth={false}>
+      <LivestreamAnalyticsContainer>
+         <Grid container>
             <Grid container spacing={spacing}>
                <Grid xs={12} item style={styles.gridItem}>
                   <GeneralSearchFilter />
@@ -71,8 +71,8 @@ const PageContent = () => {
                   <AggregatedBreakdown />
                </Grid>
             </Grid>
-         </Container>
-      </Box>
+         </Grid>
+      </LivestreamAnalyticsContainer>
    )
 }
 

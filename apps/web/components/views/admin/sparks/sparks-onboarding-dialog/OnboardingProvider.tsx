@@ -1,3 +1,4 @@
+import { useAuth } from "HOCs/AuthProvider"
 import {
    ReactNode,
    createContext,
@@ -7,10 +8,9 @@ import {
    useState,
 } from "react"
 import useSparksB2BOnboardingCompletion from "./useSparksB2BOnboardingCompletion"
-import { useAuth } from "HOCs/AuthProvider"
-import Welcome from "./views/Welcome"
-import Tutorial from "./views/Tutorial"
 import FreeTrial from "./views/FreeTrial"
+import Tutorial from "./views/Tutorial"
+import Welcome from "./views/Welcome"
 
 export type OnboardingStep = {
    stepLabel: string
@@ -51,7 +51,6 @@ type OnboardingProviderProps = {
 
 export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
    const { userData } = useAuth()
-
    const [activeStep, setActiveStep] = useState(0)
 
    const handleNext = useCallback(() => {

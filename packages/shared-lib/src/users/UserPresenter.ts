@@ -114,6 +114,10 @@ export default class UserPresenter extends BasePresenter<UserData> {
          .join(" - ")
    }
 
+   getPosition(): string {
+      return this.model.position || this.getBackground()
+   }
+
    getFieldOfStudyDisplayName(talentProfileV1?: boolean): string {
       const filedOfStudy = this.model?.fieldOfStudy?.name
       return filedOfStudy
