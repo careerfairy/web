@@ -3,7 +3,7 @@ import { combineStyles, sxStyles } from "types/commonTypes"
 // import { Collapse } from "@mui/material"
 import Box, { BoxProps } from "@mui/material/Box"
 // import CircularProgress from "@mui/material/CircularProgress" // Import CircularProgress for the loader
-import { type EmblaOptionsType, type EngineType } from "embla-carousel"
+import { type EmblaOptionsType } from "embla-carousel"
 import useEmblaCarousel from "embla-carousel-react"
 import {
    FC,
@@ -147,8 +147,6 @@ const SparksFeedCarousel: FC = () => {
    const isOnEdge = useSelector(isOnEdgeSelector)
    const videoIsMuted = useSelector(videosMuttedSelector)
 
-   const noSparks = sparks.length === 0
-
    const options = useMemo<EmblaOptionsType>(
       () => ({
          axis: "y",
@@ -156,42 +154,10 @@ const SparksFeedCarousel: FC = () => {
          align: "center",
          duration: 15,
          dragThreshold: 0.5,
-         asdsa: "dsfs",
-         // dragFree: false,
          dragFree: false,
          inViewThreshold: 0,
-         /**
-          * Custom function to watch for changes to the slides.
-          * Reloads the Embla Carousel whenever the slides (sparks) are updated,
-          * to prevent flickering.
-          */
-         watchSlides: (emblaApi) => {
-            const reloadEmbla = (): void => {
-               const oldEngine = emblaApi.internalEngine()
-               emblaApi.reInit()
-               const newEngine = emblaApi.internalEngine()
-               const copyEngineModules: (keyof EngineType)[] = [
-                  "location",
-                  "target",
-                  "scrollBody",
-               ]
-               copyEngineModules.forEach((engineModule) => {
-                  Object.assign(
-                     newEngine[engineModule],
-                     oldEngine[engineModule]
-                  )
-               })
-               if (noSparks) return
-               newEngine.translate.to(oldEngine.location.get())
-               const { index } = newEngine.scrollTarget.byDistance(0, false)
-               newEngine.index.set(index)
-               newEngine.animation.start()
-            }
-
-            reloadEmbla()
-         },
       }),
-      [noSparks]
+      []
    )
 
    const [emblaRef, emblaApi] = useEmblaCarousel(options)
