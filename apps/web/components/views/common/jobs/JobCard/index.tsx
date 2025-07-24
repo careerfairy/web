@@ -58,7 +58,7 @@ const styles = sxStyles({
       },
    },
    selectedJobCard: {
-      border: (theme) => `1px solid ${theme.brand.tq[200]}`,
+      outline: (theme) => `1px solid ${theme.brand.tq[200]}`,
       borderRadius: "8px",
       background:
          "linear-gradient(0deg, rgba(42, 186, 165, 0.03) 0%, rgba(42, 186, 165, 0.03) 100%), #FFF",
