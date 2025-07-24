@@ -109,11 +109,7 @@ export const BrandedSearchField = ({
          placeholder={placeholder}
          sx={styles.searchField}
          InputProps={{
-            startAdornment: (
-               <Box sx={styles.searchIcon}>
-                  <Search />
-               </Box>
-            ),
+            startAdornment: <Box component={Search} sx={styles.searchIcon} />,
             endAdornment: value?.length ? (
                <Box
                   sx={styles.clearIcon}
