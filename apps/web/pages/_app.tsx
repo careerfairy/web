@@ -109,32 +109,32 @@ function MyApp(props) {
                         <TutorialProvider>
                            <ThemeProviderWrapper>
                               <AuthProvider>
-                                 <FirebaseServiceContext.Provider
-                                    value={firebaseServiceInstance}
-                                 >
-                                    <LocalizationProvider
-                                       dateAdapter={AdapterDateFns}
+                                 <LoginNudgeProvider>
+                                    <FirebaseServiceContext.Provider
+                                       value={firebaseServiceInstance}
                                     >
-                                       <UserReminderProvider>
-                                          <ErrorProvider>
-                                             <UserRewardsNotifications>
-                                                <SparksFeedTrackerProvider>
-                                                   <CompaniesTrackerProvider>
-                                                      <LoginNudgeProvider>
+                                       <LocalizationProvider
+                                          dateAdapter={AdapterDateFns}
+                                       >
+                                          <UserReminderProvider>
+                                             <ErrorProvider>
+                                                <UserRewardsNotifications>
+                                                   <SparksFeedTrackerProvider>
+                                                      <CompaniesTrackerProvider>
                                                          {getLayout(
                                                             <Component
                                                                {...pageProps}
                                                             />
                                                          )}
-                                                      </LoginNudgeProvider>
-                                                   </CompaniesTrackerProvider>
-                                                </SparksFeedTrackerProvider>
-                                             </UserRewardsNotifications>
-                                             <Notifier />
-                                          </ErrorProvider>
-                                       </UserReminderProvider>
-                                    </LocalizationProvider>
-                                 </FirebaseServiceContext.Provider>
+                                                      </CompaniesTrackerProvider>
+                                                   </SparksFeedTrackerProvider>
+                                                </UserRewardsNotifications>
+                                                <Notifier />
+                                             </ErrorProvider>
+                                          </UserReminderProvider>
+                                       </LocalizationProvider>
+                                    </FirebaseServiceContext.Provider>
+                                 </LoginNudgeProvider>
                               </AuthProvider>
                            </ThemeProviderWrapper>
                         </TutorialProvider>
