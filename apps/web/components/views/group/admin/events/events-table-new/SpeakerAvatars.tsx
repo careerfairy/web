@@ -1,116 +1,143 @@
 import { Speaker } from "@careerfairy/shared-lib/livestreams/livestreams"
-import { Avatar, AvatarGroup, Box, Typography } from "@mui/material"
+import {
+   Avatar,
+   avatarClasses,
+   AvatarGroup,
+   Box,
+   Typography,
+} from "@mui/material"
+import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
-import BrandedTooltip from "../../../../common/tooltips/BrandedTooltip"
+import { BrandedTooltip } from "../../../../streaming-page/components/BrandedTooltip"
+
+const AVATAR_SIZE = 36
 
 const styles = sxStyles({
+   avatar: {
+      width: AVATAR_SIZE,
+      height: AVATAR_SIZE,
+      border: "none",
+      backgroundColor: "transparent",
+   },
    avatarGroup: {
-      "& .MuiAvatar-root": {
-         width: 36,
-         height: 36,
-         fontSize: "14px",
-         fontWeight: 500,
-         border: "2px solid",
-         borderColor: "background.paper",
-      },
-      "& .MuiAvatarGroup-avatar": {
-         backgroundColor: "neutral.700",
-         color: "background.paper",
-         fontSize: "14px",
-         fontWeight: 500,
+      [`& .${avatarClasses.root}`]: {
+         width: AVATAR_SIZE,
+         height: AVATAR_SIZE,
+         border: "none",
+         backgroundColor: "transparent",
       },
    },
-   tooltip: {
-      maxWidth: 300,
-   },
-   speakerName: {
+   surplusText: {
+      color: (theme) => theme.brand.white[100],
+      textAlign: "center",
+      fontSize: "14px",
       fontWeight: 500,
-      mb: 0.5,
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
    },
-   speakerPosition: {
-      fontSize: "11px",
-      color: "neutral.600",
+   overlay: {
+      position: "absolute",
+      background:
+         "linear-gradient(0deg, rgba(47, 63, 61, 0.40) 0%, rgba(47, 63, 61, 0.40) 100%)",
+      inset: 0,
+   },
+   surplusContainer: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+   },
+   surplusAvatar: {
+      objectFit: "cover",
+      borderRadius: "50%",
+   },
+   avatarImage: {
+      objectFit: "cover",
+   },
+   tooltipWrapper: {
+      display: "inline-flex",
    },
 })
 
-interface SpeakerAvatarsProps {
+type Props = {
    speakers: Speaker[]
    maxVisible?: number
-   showTooltip?: boolean
 }
 
-export const SpeakerAvatars = ({
-   speakers,
-   maxVisible = 3,
-   showTooltip = true,
-}: SpeakerAvatarsProps) => {
+export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
    if (!speakers || speakers.length === 0) {
-      return null
+      return (
+         <Avatar sx={styles.avatar}>
+            <Image
+               src="/illustrations/user.png"
+               alt="Default user"
+               width={AVATAR_SIZE}
+               height={AVATAR_SIZE}
+               style={styles.avatarImage}
+            />
+         </Avatar>
+      )
    }
 
-   const renderTooltipContent = () => {
-      if (!showTooltip || speakers.length === 0) {
-         return null
-      }
-
+   const renderSurplus = (surplus: number) => {
+      const nextSpeaker = speakers[maxVisible - 1] // Get the first hidden speaker
       return (
-         <Box sx={styles.tooltip}>
-            {speakers.slice(0, 5).map((speaker, index) => (
-               <Box
-                  key={speaker.id || index}
-                  sx={{ mb: index < Math.min(speakers.length, 5) - 1 ? 1 : 0 }}
-               >
-                  <Typography variant="small" sx={styles.speakerName}>
-                     {speaker.firstName} {speaker.lastName}
-                  </Typography>
-                  {Boolean(speaker.position) && (
-                     <Typography variant="xsmall" sx={styles.speakerPosition}>
-                        {speaker.position}
-                     </Typography>
-                  )}
-               </Box>
-            ))}
-            {speakers.length > 5 && (
-               <Typography
-                  variant="xsmall"
-                  sx={{ color: "neutral.600", mt: 0.5 }}
-               >
-                  +{speakers.length - 5} more speakers
-               </Typography>
-            )}
+         <Box sx={styles.surplusContainer}>
+            {/* overlay */}
+            <Box sx={styles.overlay} />
+            <Image
+               src={nextSpeaker?.avatar || "/illustrations/user.png"}
+               alt={`${nextSpeaker?.firstName} ${nextSpeaker?.lastName} and ${surplus} more`}
+               width={AVATAR_SIZE}
+               height={AVATAR_SIZE}
+               style={styles.surplusAvatar}
+            />
+            <Typography color="background.paper" sx={styles.surplusText}>
+               +{surplus}
+            </Typography>
          </Box>
       )
    }
 
    const avatarGroup = (
       <AvatarGroup
-         max={maxVisible + 1}
+         max={maxVisible}
          sx={styles.avatarGroup}
          spacing="medium"
+         renderSurplus={renderSurplus}
       >
          {speakers.map((speaker) => (
             <Avatar
                key={speaker.id}
-               src={speaker.avatar || undefined}
                alt={`${speaker.firstName} ${speaker.lastName}`}
             >
-               {!speaker.avatar && speaker.firstName && speaker.lastName
-                  ? `${speaker.firstName[0]}${speaker.lastName[0]}`
-                  : "?"}
+               {speaker.avatar ? (
+                  <Image
+                     src={speaker.avatar}
+                     alt={`${speaker.firstName} ${speaker.lastName}`}
+                     width={AVATAR_SIZE}
+                     height={AVATAR_SIZE}
+                     style={styles.avatarImage}
+                  />
+               ) : speaker.firstName && speaker.lastName ? (
+                  `${speaker.firstName[0]}${speaker.lastName[0]}`
+               ) : (
+                  "?"
+               )}
             </Avatar>
          ))}
       </AvatarGroup>
    )
 
-   if (!showTooltip) {
-      return avatarGroup
-   }
-
    return (
-      <BrandedTooltip title={renderTooltipContent()} placement="top" arrow>
-         <Box sx={{ display: "inline-flex", cursor: "pointer" }}>
-            {avatarGroup}
-         </Box>
+      <BrandedTooltip
+         title={`Speaker${speakers.length > 1 ? "s" : ""}`}
+         placement="top"
+         arrow
+         wrapperStyles={styles.tooltipWrapper}
+      >
+         {avatarGroup}
       </BrandedTooltip>
    )
 }

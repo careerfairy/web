@@ -1,14 +1,90 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { Stack } from "@mui/material"
+import {
+   Box,
+   Stack,
+   Table,
+   TableBody,
+   TableCell,
+   TableContainer,
+   TableHead,
+   TableRow,
+   TableSortLabel,
+   Typography,
+} from "@mui/material"
+import { Calendar, Eye, User } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
+import { useEventsView } from "./context/EventsViewContext"
+import { CardNameTitle } from "./events-table-new/CardNameTitle"
+import { QuickActionIcon } from "./events-table-new/QuickActionIcon"
+import { SpeakerAvatars } from "./events-table-new/SpeakerAvatars"
+import { StatusIcon } from "./events-table-new/StatusIcon"
+import { TableColumn } from "./events-table-new/TableColumn"
 import { getEventStatsKey } from "./util"
+
+const styles = sxStyles({
+   tableContainer: {
+      backgroundColor: (theme) => theme.brand.white[100],
+      borderRadius: "16px",
+      border: "1px solid",
+      borderColor: "secondary.50",
+      overflow: "hidden",
+   },
+   table: {
+      borderCollapse: "separate",
+      borderSpacing: "0px 8px",
+   },
+   tableHead: {
+      backgroundColor: (theme) => theme.brand.white[100],
+   },
+   headerCell: {
+      borderBottom: "none",
+      py: 1,
+      px: 2,
+      backgroundColor: "transparent",
+   },
+   headerText: {
+      fontWeight: 400,
+      fontSize: "12px",
+      lineHeight: "16px",
+      color: "text.primary",
+   },
+   bodyRow: {
+      backgroundColor: (theme) => theme.brand.white[200],
+      border: "1px solid",
+      borderColor: "neutral.50",
+      borderRadius: "8px",
+      "& .MuiTableCell-root": {
+         borderBottom: "none",
+         py: 1,
+         px: 2,
+         "&:first-of-type": {
+            borderTopLeftRadius: "8px",
+            borderBottomLeftRadius: "8px",
+         },
+         "&:last-child": {
+            borderTopRightRadius: "8px",
+            borderBottomRightRadius: "8px",
+         },
+      },
+   },
+   infoText: {
+      fontSize: "14px",
+      lineHeight: "20px",
+      fontWeight: 400,
+      color: "neutral.600",
+      whiteSpace: "nowrap",
+   },
+})
 
 type Props = {
    stats: LiveStreamStats[]
 }
 
 export const DesktopEventsView = ({ stats }: Props) => {
+   const { handleTableSort, getSortDirection, isActiveSort } = useEventsView()
+
    const { currentPageData, currentPage, totalPages, goToPage } =
       useClientSidePagination({
          data: stats,
@@ -16,94 +92,141 @@ export const DesktopEventsView = ({ stats }: Props) => {
       })
 
    return (
-      <div>
-         <p>
-            Showing {(currentPage - 1) * 10 + 1}-
-            {Math.min(currentPage * 10, stats.length)} of {stats.length}{" "}
-            livestream stats
-         </p>
+      <Box>
+         <TableContainer sx={styles.tableContainer}>
+            <Table sx={styles.table}>
+               <TableHead sx={styles.tableHead}>
+                  <TableRow>
+                     <TableCell sx={styles.headerCell}>
+                        <TableSortLabel
+                           active={isActiveSort("title")}
+                           direction={getSortDirection("title")}
+                           onClick={() => handleTableSort("title")}
+                        >
+                           <Typography sx={styles.headerText}>
+                              Live stream title
+                           </Typography>
+                        </TableSortLabel>
+                     </TableCell>
+                     <TableCell sx={styles.headerCell}>
+                        <Typography sx={styles.headerText}>Speakers</Typography>
+                     </TableCell>
+                     <TableCell sx={styles.headerCell}>
+                        <TableSortLabel
+                           active={isActiveSort("date")}
+                           direction={getSortDirection("date")}
+                           onClick={() => handleTableSort("date")}
+                        >
+                           <Typography sx={styles.headerText}>Date</Typography>
+                        </TableSortLabel>
+                     </TableCell>
+                     <TableCell sx={styles.headerCell}>
+                        <TableSortLabel
+                           active={isActiveSort("registrations")}
+                           direction={getSortDirection("registrations")}
+                           onClick={() => handleTableSort("registrations")}
+                        >
+                           <Typography sx={styles.headerText}>
+                              Registrations
+                           </Typography>
+                        </TableSortLabel>
+                     </TableCell>
+                     <TableCell sx={styles.headerCell}>
+                        <Typography sx={styles.headerText}>Views</Typography>
+                     </TableCell>
+                     <TableCell sx={styles.headerCell}>
+                        <Typography sx={styles.headerText}>Status</Typography>
+                     </TableCell>
+                     <TableCell sx={styles.headerCell} width={48}>
+                        {/* Actions column */}
+                     </TableCell>
+                  </TableRow>
+               </TableHead>
+               <TableBody>
+                  {currentPageData.map((stat) => (
+                     <TableRow key={getEventStatsKey(stat)} sx={styles.bodyRow}>
+                        {/* Title Column */}
+                        <TableCell
+                           id="title-column"
+                           sx={{ minWidth: 300, pl: "8px !important" }}
+                        >
+                           <CardNameTitle
+                              title={stat.livestream.title}
+                              backgroundImageUrl={
+                                 stat.livestream.backgroundImageUrl
+                              }
+                           />
+                        </TableCell>
 
-         <ul style={{ listStyle: "none", padding: 0 }}>
-            {currentPageData.map((stat, index) => {
-               const globalIndex = (currentPage - 1) * 10 + index + 1
-               return (
-                  <li
-                     key={getEventStatsKey(stat)}
-                     style={{
-                        marginBottom: "10px",
-                        padding: "15px",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        backgroundColor: stat.livestream.isDraft
-                           ? "#fff3cd"
-                           : "#f8f9fa",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                     }}
-                  >
-                     <div
-                        style={{
-                           fontWeight: "bold",
-                           fontSize: "18px",
-                           marginBottom: "8px",
-                        }}
-                     >
-                        #{globalIndex} - {stat.livestream.title || "Untitled"}
-                     </div>
-                     <div
-                        style={{
-                           color: "#666",
-                           fontSize: "14px",
-                           marginBottom: "8px",
-                        }}
-                     >
-                        <strong>Company:</strong>{" "}
-                        {stat.livestream.company || "No company"}
-                        {Boolean(stat.livestream.isDraft) && (
-                           <span
-                              style={{
-                                 color: "#856404",
-                                 fontWeight: "bold",
-                                 marginLeft: "10px",
-                                 padding: "2px 8px",
-                                 backgroundColor: "#ffeaa7",
-                                 borderRadius: "4px",
-                                 fontSize: "12px",
-                              }}
-                           >
-                              DRAFT
-                           </span>
-                        )}
-                     </div>
-                     <div
-                        style={{
-                           fontSize: "13px",
-                           display: "flex",
-                           gap: "15px",
-                           flexWrap: "wrap",
-                        }}
-                     >
-                        <span>
-                           <strong>Registrations:</strong>{" "}
-                           {stat.generalStats.numberOfRegistrations}
-                        </span>
-                        <span>
-                           <strong>Participants:</strong>{" "}
-                           {stat.generalStats.numberOfParticipants}
-                        </span>
-                        <span>
-                           <strong>Views:</strong> (not implemented)
-                        </span>
-                        <span>
-                           <strong>Start:</strong>{" "}
-                           {stat.livestream.start
-                              ?.toDate?.()
-                              ?.toLocaleDateString() || "No date"}
-                        </span>
-                     </div>
-                  </li>
-               )
-            })}
-         </ul>
+                        {/* Speakers Column */}
+                        <TableCell sx={{ width: 120 }}>
+                           <SpeakerAvatars
+                              speakers={stat.livestream.speakers}
+                              maxVisible={3}
+                           />
+                        </TableCell>
+
+                        {/* Date Column */}
+                        <TableCell sx={{ width: 170 }}>
+                           <TableColumn
+                              icon={<Calendar size={16} color="#6B6B7F" />}
+                              text={
+                                 stat.livestream.start
+                                    ? stat.livestream.start
+                                         .toDate()
+                                         .toLocaleDateString("en-US", {
+                                            day: "2-digit",
+                                            month: "short",
+                                            year: "2-digit",
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                            hour12: true,
+                                         })
+                                    : "No date"
+                              }
+                              width={170}
+                           />
+                        </TableCell>
+
+                        {/* Registrations Column */}
+                        <TableCell sx={{ width: 100 }}>
+                           <TableColumn
+                              icon={<User size={16} color="#6B6B7F" />}
+                              text={
+                                 stat.generalStats.numberOfRegistrations || 0
+                              }
+                              width={100}
+                           />
+                        </TableCell>
+
+                        {/* Views Column */}
+                        <TableCell sx={{ width: 100 }}>
+                           <TableColumn
+                              icon={<Eye size={16} color="#6B6B7F" />}
+                              text={
+                                 stat.generalStats.numberOfPeopleReached || "-"
+                              }
+                              width={100}
+                           />
+                        </TableCell>
+
+                        {/* Status Column */}
+                        <TableCell sx={{ width: 80 }}>
+                           <StatusIcon
+                              isDraft={stat.livestream.isDraft}
+                              start={stat.livestream.start}
+                           />
+                        </TableCell>
+
+                        {/* Actions Column */}
+                        <TableCell sx={{ width: 48 }}>
+                           <QuickActionIcon />
+                        </TableCell>
+                     </TableRow>
+                  ))}
+               </TableBody>
+            </Table>
+         </TableContainer>
 
          {totalPages > 1 && (
             <Stack
@@ -122,6 +245,6 @@ export const DesktopEventsView = ({ stats }: Props) => {
                />
             </Stack>
          )}
-      </div>
+      </Box>
    )
 }

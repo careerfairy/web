@@ -178,11 +178,21 @@ const filterStatsBySearchTerm = (
    return stats.filter((stat) => {
       const title = stat.livestream.title?.toLowerCase() || ""
       const company = stat.livestream.company?.toLowerCase() || ""
+      const speakers = stat.livestream.speakers || []
 
       const titleMatch = title.includes(normalizedSearchTerm)
       const companyMatch = company.includes(normalizedSearchTerm)
 
-      return titleMatch || companyMatch
+      // Check if any speaker name contains the search term
+      const speakerMatch = speakers.some((speaker) => {
+         const fullName = `${speaker.firstName || ""} ${
+            speaker.lastName || ""
+         }`.toLowerCase()
+
+         return fullName.includes(normalizedSearchTerm)
+      })
+
+      return titleMatch || companyMatch || speakerMatch
    })
 }
 
