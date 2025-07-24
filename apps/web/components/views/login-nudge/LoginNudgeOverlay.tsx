@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, Stack, Theme, Typography } from "@mui/material"
+import { Box, Button, Stack, Theme, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useTrackWebviewResumedCount } from "components/custom-hook/utils/useTrackWebviewResumed"
 import { MainLogo } from "components/logos"
@@ -107,7 +107,7 @@ const styles = sxStyles({
       flexDirection: "column",
       gap: "4px",
       width: "100%",
-      minHeight: "115px",
+      minHeight: "145px",
    },
    slideTitle: {
       color: (theme) => theme.brand.white[200],
@@ -484,190 +484,188 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
    if (!shouldShow) return children
 
    return (
-      <Dialog open fullScreen sx={{ maxHeight: "100dvh" }}>
-         <AnimatePresence>
+      <AnimatePresence>
+         <FramerBox
+            initial="initial"
+            animate={isDismissing ? "exit" : "animate"}
+            exit="exit"
+            variants={getBackgroundVariants(isInitialLoad)}
+            sx={{
+               position: "relative",
+               width: "100%",
+               height: "100%",
+               backgroundColor: (theme) => {
+                  if (isInitialLoad && showInitialTransition) {
+                     return "#FFFFFF" // Start with white
+                  }
+                  // After initial transition starts OR after initial load, use slide colors
+                  return SLIDES[backgroundColorIndex].backgroundColor(theme)
+               },
+               transition: isInitialLoad
+                  ? "background-color 0.1s ease-in-out 0.2s" // Fast transition during circle animation
+                  : "background-color 0.6s ease-in-out", // Normal transition for slide changes
+            }}
+         >
+            {/* Expanding Circle - only show during initial load */}
+            {isInitialLoad ? (
+               <FramerBox
+                  initial="initial"
+                  animate="animate"
+                  variants={circleExpandVariants}
+                  sx={{
+                     position: "fixed",
+                     top: "50%",
+                     left: "50%",
+                     width: "40px",
+                     height: "40px",
+                     backgroundColor: (theme) =>
+                        SLIDES[0].backgroundColor(theme), // Use first slide color
+                     borderRadius: "50%",
+                     transform: "translate(-50%, -50%)",
+                     transformOrigin: "center",
+                     zIndex: 1,
+                  }}
+               />
+            ) : null}
+
+            {/* Dialog Content */}
             <FramerBox
                initial="initial"
                animate={isDismissing ? "exit" : "animate"}
                exit="exit"
-               variants={getBackgroundVariants(isInitialLoad)}
+               variants={contentVariants}
+               onAnimationComplete={() => {
+                  if (isDismissing) {
+                     handleAnimationComplete()
+                  }
+               }}
                sx={{
                   position: "relative",
-                  width: "100%",
+                  zIndex: 2,
                   height: "100%",
-                  backgroundColor: (theme) => {
-                     if (isInitialLoad && showInitialTransition) {
-                        return "#FFFFFF" // Start with white
-                     }
-                     // After initial transition starts OR after initial load, use slide colors
-                     return SLIDES[backgroundColorIndex].backgroundColor(theme)
-                  },
-                  transition: isInitialLoad
-                     ? "background-color 0.1s ease-in-out 0.2s" // Fast transition during circle animation
-                     : "background-color 0.6s ease-in-out", // Normal transition for slide changes
+                  display: "flex",
+                  flexDirection: "column",
                }}
             >
-               {/* Expanding Circle - only show during initial load */}
-               {isInitialLoad ? (
-                  <FramerBox
-                     initial="initial"
-                     animate="animate"
-                     variants={circleExpandVariants}
-                     sx={{
-                        position: "fixed",
-                        top: "50%",
-                        left: "50%",
-                        width: "40px",
-                        height: "40px",
-                        backgroundColor: (theme) =>
-                           SLIDES[0].backgroundColor(theme), // Use first slide color
-                        borderRadius: "50%",
-                        transform: "translate(-50%, -50%)",
-                        transformOrigin: "center",
-                        zIndex: 1,
-                     }}
-                  />
-               ) : null}
+               {/* Header */}
+               <Stack sx={styles.header} direction={"row"}>
+                  <MainLogo white />
+                  <Button onClick={handleLogin} sx={styles.loginButton}>
+                     Login
+                  </Button>
+               </Stack>
 
-               {/* Dialog Content */}
-               <FramerBox
-                  initial="initial"
-                  animate={isDismissing ? "exit" : "animate"}
-                  exit="exit"
-                  variants={contentVariants}
-                  onAnimationComplete={() => {
-                     if (isDismissing) {
-                        handleAnimationComplete()
-                     }
-                  }}
-                  sx={{
-                     position: "relative",
-                     zIndex: 2,
-                     height: "100%",
-                     display: "flex",
-                     flexDirection: "column",
-                  }}
-               >
-                  {/* Header */}
-                  <Stack sx={styles.header} direction={"row"}>
-                     <MainLogo white />
-                     <Button onClick={handleLogin} sx={styles.loginButton}>
-                        Login
-                     </Button>
-                  </Stack>
-
-                  {/* Content */}
-                  <Stack sx={styles.content} alignItems={"space-between"}>
-                     <Stack spacing={"12px"}>
-                        {/* Carousel Container with Touch Events */}
-                        <Box
-                           sx={styles.carouselContainer}
-                           onTouchStart={handleTouchStart}
-                           onTouchMove={handleTouchMove}
-                           onTouchEnd={handleTouchEnd}
-                        >
-                           <AnimatePresence>
-                              <FramerBox
-                                 key={currentSlide}
-                                 initial="initial"
-                                 animate="animate"
-                                 exit="exit"
-                                 variants={slideAnimationVariants}
-                                 sx={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    height: "100%",
-                                    zIndex: currentSlide + 1, // Ensure new slide appears on top
+               {/* Content */}
+               <Stack sx={styles.content} alignItems={"space-between"}>
+                  <Stack spacing={"12px"}>
+                     {/* Carousel Container with Touch Events */}
+                     <Box
+                        sx={styles.carouselContainer}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                     >
+                        <AnimatePresence>
+                           <FramerBox
+                              key={currentSlide}
+                              initial="initial"
+                              animate="animate"
+                              exit="exit"
+                              variants={slideAnimationVariants}
+                              sx={{
+                                 position: "absolute",
+                                 top: 0,
+                                 left: 0,
+                                 width: "100%",
+                                 height: "100%",
+                                 zIndex: currentSlide + 1, // Ensure new slide appears on top
+                              }}
+                           >
+                              <Image
+                                 src={SLIDES[currentSlide].imageUrl}
+                                 alt={SLIDES[currentSlide].title}
+                                 fill
+                                 priority
+                                 style={{
+                                    borderRadius: "12px",
+                                    objectFit: "cover",
+                                    objectPosition: "center",
                                  }}
-                              >
-                                 <Image
-                                    src={SLIDES[currentSlide].imageUrl}
-                                    alt={SLIDES[currentSlide].title}
-                                    fill
-                                    priority
-                                    style={{
-                                       borderRadius: "12px",
-                                       objectFit: "cover",
-                                       objectPosition: "center",
-                                    }}
-                                 />
-                              </FramerBox>
-                           </AnimatePresence>
-                        </Box>
-
-                        {/* Dots */}
-                        <Box sx={styles.dotsContainer}>
-                           {SLIDES.map((_, index) => (
-                              <Box
-                                 key={index}
-                                 sx={[
-                                    styles.dot,
-                                    index === currentSlide && styles.dotActive,
-                                 ]}
-                                 onClick={() => handleDotClick(index)}
                               />
-                           ))}
-                        </Box>
+                           </FramerBox>
+                        </AnimatePresence>
+                     </Box>
 
-                        {/* Animated Slide Text */}
-                        <Box sx={styles.slideText}>
-                           <AnimatePresence>
-                              <FramerBox
-                                 key={currentSlide}
-                                 initial="initial"
-                                 animate="animate"
-                                 exit="exit"
-                                 variants={textAnimationVariants}
-                                 sx={{
-                                    position: "absolute",
-                                    width: "100%",
-                                    zIndex: currentSlide + 1, // Ensure new text appears on top
-                                 }}
+                     {/* Dots */}
+                     <Box sx={styles.dotsContainer}>
+                        {SLIDES.map((_, index) => (
+                           <Box
+                              key={index}
+                              sx={[
+                                 styles.dot,
+                                 index === currentSlide && styles.dotActive,
+                              ]}
+                              onClick={() => handleDotClick(index)}
+                           />
+                        ))}
+                     </Box>
+
+                     {/* Animated Slide Text */}
+                     <Box sx={styles.slideText}>
+                        <AnimatePresence>
+                           <FramerBox
+                              key={currentSlide}
+                              initial="initial"
+                              animate="animate"
+                              exit="exit"
+                              variants={textAnimationVariants}
+                              sx={{
+                                 position: "absolute",
+                                 width: "100%",
+                                 zIndex: currentSlide + 1, // Ensure new text appears on top
+                              }}
+                           >
+                              <Typography sx={styles.slideTitle}>
+                                 {SLIDES[currentSlide].title}
+                              </Typography>
+                              <Typography
+                                 variant="medium"
+                                 sx={styles.slideDescription}
                               >
-                                 <Typography sx={styles.slideTitle}>
-                                    {SLIDES[currentSlide].title}
-                                 </Typography>
-                                 <Typography
-                                    variant="medium"
-                                    sx={styles.slideDescription}
-                                 >
-                                    {SLIDES[currentSlide].description}
-                                 </Typography>
-                              </FramerBox>
-                           </AnimatePresence>
-                        </Box>
-                     </Stack>
+                                 {SLIDES[currentSlide].description}
+                              </Typography>
+                           </FramerBox>
+                        </AnimatePresence>
+                     </Box>
                   </Stack>
-                  {/* CTA Section */}
-                  <Box
-                     sx={styles.ctaSection}
-                     position={"relative"}
-                     bottom={0}
-                     left={0}
-                     right={0}
+               </Stack>
+               {/* CTA Section */}
+               <Box
+                  sx={styles.ctaSection}
+                  // position={"relative"}
+                  // bottom={0}
+                  // left={0}
+                  // right={0}
+               >
+                  <Button
+                     onClick={handleGetStarted}
+                     sx={styles.primaryButton}
+                     variant="contained"
+                     fullWidth
                   >
-                     <Button
-                        onClick={handleGetStarted}
-                        sx={styles.primaryButton}
-                        variant="contained"
-                        fullWidth
-                     >
-                        Get started!
-                     </Button>
-                     <Button
-                        onClick={handleExploreApp}
-                        variant="text"
-                        color="grey"
-                        fullWidth
-                     >
-                        Explore the app
-                     </Button>
-                  </Box>
-               </FramerBox>
+                     Get started!
+                  </Button>
+                  <Button
+                     onClick={handleExploreApp}
+                     variant="text"
+                     color="grey"
+                     fullWidth
+                  >
+                     Explore the app
+                  </Button>
+               </Box>
             </FramerBox>
-         </AnimatePresence>
-      </Dialog>
+         </FramerBox>
+      </AnimatePresence>
    )
 }
