@@ -41,6 +41,9 @@ export const FUNCTION_NAMES = {
       "sendPhysicalEventRegistrationConfirmationEmail",
    getRecommendedEvents: "getRecommendedEvents_v7",
    getRecommendedJobs: "getRecommendedJobs_v2",
+   // New trigger function required for Cloud Functions Gen 2 upgrade:
+   // Gen 1 triggers can't be upgraded in place, so deploy with a new name, as soon as deployment is complete, delete the old trigger function.
+   syncLivestreams: "syncLivestreams_v2",
 
    // Recording functions
    getRecordingViews: "getRecordingViews",

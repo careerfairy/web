@@ -259,7 +259,7 @@ exports[FUNCTION_NAMES.getRecommendedEvents] =
 exports[FUNCTION_NAMES.getRecommendedJobs] = recommendation.getRecommendedJobs
 
 // On Write Triggers for all collections
-exports.syncLivestreams = onWriteTriggers.syncLivestreams
+exports[FUNCTION_NAMES.syncLivestreams] = onWriteTriggers.syncLivestreams
 exports.syncLivestreamStartNotifications =
    onWriteTriggers.syncLivestreamStartNotifications
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
