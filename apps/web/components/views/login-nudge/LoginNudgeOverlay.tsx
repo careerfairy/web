@@ -178,7 +178,6 @@ const slideAnimationVariants = {
       transition: {
          duration: 0.4,
          ease: "easeOut",
-         // delay: 0.2,
       },
    },
    exit: {
@@ -258,13 +257,6 @@ export const useLoginNudgeOverlay = () => {
    // eslint-disable-next-line react/hook-use-state
    const [initialWebviewCount] = useState(() => webviewResumedCount)
 
-   // Hide overlay when webview resumes (user switches back to app)
-   useEffect(() => {
-      if (webviewResumedCount > initialWebviewCount) {
-         setHasBeenDismissed(true)
-      }
-   }, [webviewResumedCount, initialWebviewCount])
-
    const shouldShow = useMemo(() => {
       // Don't show on ignored paths
       if (IGNORE_PATHS.includes(pathname)) return false
@@ -297,6 +289,38 @@ export const useLoginNudgeOverlay = () => {
          setIsDismissing(false)
       }
    }, [isDismissing])
+
+   // Hide overlay when webview resumes (user switches back to app)
+   useEffect(() => {
+      if (webviewResumedCount > initialWebviewCount) {
+         handleDismissWithAnimation()
+      }
+   }, [webviewResumedCount, initialWebviewCount, handleDismissWithAnimation])
+
+   // Dismiss overlay when page visibility changes (simulates app backgrounding)
+   useEffect(() => {
+      const handleVisibilityChange = () => {
+         // Only dismiss if page becomes visible AND overlay is currently showing
+         if (
+            !document.hidden &&
+            shouldShow &&
+            !hasBeenDismissed &&
+            !isDismissing
+         ) {
+            setTimeout(() => {
+               handleDismissWithAnimation()
+            }, 100) // Small delay to simulate realistic behavior
+         }
+      }
+
+      document.addEventListener("visibilitychange", handleVisibilityChange)
+      return () => {
+         document.removeEventListener(
+            "visibilitychange",
+            handleVisibilityChange
+         )
+      }
+   }, [handleDismissWithAnimation, shouldShow, hasBeenDismissed, isDismissing])
 
    return {
       shouldShow,
