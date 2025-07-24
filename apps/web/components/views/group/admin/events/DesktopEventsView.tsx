@@ -10,8 +10,10 @@ import {
    TableRow,
    TableSortLabel,
    Typography,
+   TypographyProps,
 } from "@mui/material"
-import { Calendar, Eye, User } from "react-feather"
+import { forwardRef } from "react"
+import { Calendar, ChevronDown, Eye, IconProps, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
@@ -30,42 +32,58 @@ const styles = sxStyles({
       border: "1px solid",
       borderColor: "secondary.50",
       overflow: "hidden",
+      px: 1, // 8px horizontal padding to match Figma design
    },
    table: {
       borderCollapse: "separate",
       borderSpacing: "0px 8px",
+      "& .MuiTableHead-root": {
+         "& .MuiTableRow-root": {
+            "& .MuiTableCell-root": {
+               paddingBottom: 0, // 8px gap between header and body to match Figma
+            },
+         },
+      },
    },
    tableHead: {
       backgroundColor: (theme) => theme.brand.white[100],
    },
    headerCell: {
       borderBottom: "none",
-      py: 1,
+      py: 0,
       px: 2,
       backgroundColor: "transparent",
+      height: 28,
    },
-   headerText: {
+   headerText: (theme) => ({
       fontWeight: 400,
-      fontSize: "12px",
-      lineHeight: "16px",
-      color: "text.primary",
+      ...theme.typography.xsmall,
+      color: "common.black",
+   }),
+   headerTextActive: {
+      fontWeight: 600,
    },
    bodyRow: {
-      backgroundColor: (theme) => theme.brand.white[200],
-      border: "1px solid",
-      borderColor: "neutral.50",
-      borderRadius: "8px",
       "& .MuiTableCell-root": {
          borderBottom: "none",
          py: 1,
          px: 2,
+         border: "1px solid",
+         borderColor: (theme) => theme.brand.white[400],
+         backgroundColor: (theme) => theme.brand.white[200],
          "&:first-of-type": {
             borderTopLeftRadius: "8px",
             borderBottomLeftRadius: "8px",
+            borderRight: "none",
+         },
+         "&:not(:first-of-type):not(:last-child)": {
+            borderLeft: "none",
+            borderRight: "none",
          },
          "&:last-child": {
             borderTopRightRadius: "8px",
             borderBottomRightRadius: "8px",
+            borderLeft: "none",
          },
       },
    },
@@ -81,6 +99,28 @@ const styles = sxStyles({
 type Props = {
    stats: LiveStreamStats[]
 }
+
+const HeaderText = ({
+   children,
+   active,
+}: TypographyProps & { active?: boolean }) => {
+   return (
+      <Typography sx={[styles.headerText, active && styles.headerTextActive]}>
+         {children}
+      </Typography>
+   )
+}
+
+const HeaderIcon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => (
+   <Box
+      component="span"
+      ref={ref}
+      sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+   >
+      <ChevronDown strokeWidth={3} size={16} {...props} />
+   </Box>
+))
+HeaderIcon.displayName = "HeaderIcon"
 
 export const DesktopEventsView = ({ stats }: Props) => {
    const { handleTableSort, getSortDirection, isActiveSort } = useEventsView()
@@ -102,22 +142,26 @@ export const DesktopEventsView = ({ stats }: Props) => {
                            active={isActiveSort("title")}
                            direction={getSortDirection("title")}
                            onClick={() => handleTableSort("title")}
+                           IconComponent={HeaderIcon}
                         >
-                           <Typography sx={styles.headerText}>
+                           <HeaderText active={isActiveSort("title")}>
                               Live stream title
-                           </Typography>
+                           </HeaderText>
                         </TableSortLabel>
                      </TableCell>
                      <TableCell sx={styles.headerCell}>
-                        <Typography sx={styles.headerText}>Speakers</Typography>
+                        <HeaderText>Speakers</HeaderText>
                      </TableCell>
                      <TableCell sx={styles.headerCell}>
                         <TableSortLabel
                            active={isActiveSort("date")}
                            direction={getSortDirection("date")}
                            onClick={() => handleTableSort("date")}
+                           IconComponent={HeaderIcon}
                         >
-                           <Typography sx={styles.headerText}>Date</Typography>
+                           <HeaderText active={isActiveSort("date")}>
+                              Date
+                           </HeaderText>
                         </TableSortLabel>
                      </TableCell>
                      <TableCell sx={styles.headerCell}>
@@ -125,17 +169,18 @@ export const DesktopEventsView = ({ stats }: Props) => {
                            active={isActiveSort("registrations")}
                            direction={getSortDirection("registrations")}
                            onClick={() => handleTableSort("registrations")}
+                           IconComponent={HeaderIcon}
                         >
-                           <Typography sx={styles.headerText}>
+                           <HeaderText active={isActiveSort("registrations")}>
                               Registrations
-                           </Typography>
+                           </HeaderText>
                         </TableSortLabel>
                      </TableCell>
                      <TableCell sx={styles.headerCell}>
-                        <Typography sx={styles.headerText}>Views</Typography>
+                        <HeaderText>Views</HeaderText>
                      </TableCell>
                      <TableCell sx={styles.headerCell}>
-                        <Typography sx={styles.headerText}>Status</Typography>
+                        <HeaderText>Status</HeaderText>
                      </TableCell>
                      <TableCell sx={styles.headerCell} width={48}>
                         {/* Actions column */}
@@ -147,8 +192,9 @@ export const DesktopEventsView = ({ stats }: Props) => {
                      <TableRow key={getEventStatsKey(stat)} sx={styles.bodyRow}>
                         {/* Title Column */}
                         <TableCell
+                           variant="head"
                            id="title-column"
-                           sx={{ minWidth: 300, pl: "8px !important" }}
+                           sx={{ minWidth: 300 }}
                         >
                            <CardNameTitle
                               title={stat.livestream.title}
