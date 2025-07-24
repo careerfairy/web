@@ -24,6 +24,9 @@ type SearchContextType = {
    selectedLivestreamId: string | null
    handleOpenLivestreamDialog: (livestreamId: string) => void
    handleCloseLivestreamDialog: () => void
+   selectedJobId: string | null
+   handleOpenJobDialog: (jobId: string) => void
+   handleCloseJobDialog: () => void
 }
 
 export const SearchContext = createContext<SearchContextType | undefined>(
@@ -45,6 +48,7 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
    } = useRecentSearches()
 
    const selectedLivestreamId = (query.selectedLivestreamId as string) || null
+   const selectedJobId = (query.selectedJobId as string) || null
 
    // Initialize search query from URL parameter
    useEffect(() => {
@@ -135,6 +139,36 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
       )
    }, [query, push, pathname])
 
+   const handleOpenJobDialog = useCallback(
+      (jobId: string) => {
+         void push(
+            {
+               pathname: pathname,
+               query: {
+                  ...query,
+                  selectedJobId: jobId,
+               },
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
+   const handleCloseJobDialog = useCallback(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { selectedJobId: _, ...restOfQuery } = query
+      void push(
+         {
+            pathname: pathname,
+            query: restOfQuery,
+         },
+         undefined,
+         { shallow: true }
+      )
+   }, [query, push, pathname])
+
    const value: SearchContextType = useMemo(() => {
       return {
          searchQuery,
@@ -149,6 +183,9 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
          selectedLivestreamId,
          handleOpenLivestreamDialog,
          handleCloseLivestreamDialog,
+         selectedJobId,
+         handleOpenJobDialog,
+         handleCloseJobDialog,
       }
    }, [
       searchQuery,
@@ -163,6 +200,9 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
       selectedLivestreamId,
       handleOpenLivestreamDialog,
       handleCloseLivestreamDialog,
+      selectedJobId,
+      handleOpenJobDialog,
+      handleCloseJobDialog,
    ])
 
    return (

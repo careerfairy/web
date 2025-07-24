@@ -1326,20 +1326,20 @@ export const countriesAndRegionsOptionCodes: OptionGroup[] = [
 
 export const languageOptionCodes: OptionGroup[] = [
    {
-      id: "nl",
-      name: "Dutch",
-   },
-   {
       id: "en",
       name: "English",
    },
    {
-      id: "fr",
-      name: "French",
-   },
-   {
       id: "de",
       name: "German",
+   },
+   {
+      id: "nl",
+      name: "Dutch",
+   },
+   {
+      id: "fr",
+      name: "French",
    },
    {
       id: "it",
@@ -1552,10 +1552,6 @@ export const CompanyIndustryValues: OptionGroup[] = [
       name: "Non-profit & Charity",
    },
    {
-      id: "Other",
-      name: "Other",
-   },
-   {
       id: "Pharmaceutical",
       name: "Pharmaceutical",
    },
@@ -1582,6 +1578,10 @@ export const CompanyIndustryValues: OptionGroup[] = [
    {
       id: "VentureCapital&PrivateEquity",
       name: "Venture Capital & Private Equity",
+   },
+   {
+      id: "Other",
+      name: "Other",
    },
 ]
 
