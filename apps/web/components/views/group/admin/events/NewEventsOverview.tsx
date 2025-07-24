@@ -1,3 +1,4 @@
+import { MenuItem } from "@mui/material"
 import { useRouter } from "next/router"
 import { Fragment, useState } from "react"
 import {
@@ -5,6 +6,8 @@ import {
    useGroupLivestreamsWithStats,
 } from "../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { BrandedSearchField } from "../../../common/inputs/BrandedSearchBar"
+import BrandedTextField from "../../../common/inputs/BrandedTextField"
 import { DesktopEventsView } from "./DesktopEventsView"
 import { MobileEventsView } from "./MobileEventsView"
 
@@ -64,63 +67,43 @@ export const NewEventsOverview = () => {
                alignItems: isMobile ? "stretch" : "center",
             }}
          >
-            <div
-               style={{ display: "flex", flexDirection: "column", gap: "5px" }}
-            >
-               <label
-                  htmlFor="search"
-                  style={{ fontSize: isMobile ? "14px" : "16px" }}
-               >
-                  Search by title or company:
-               </label>
-               <input
-                  id="search"
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Enter search term..."
-                  style={{
-                     padding: "8px",
-                     width: isMobile ? "100%" : "300px",
-                     fontSize: "14px",
-                  }}
-               />
-            </div>
+            <BrandedSearchField
+               value={searchTerm}
+               onChange={setSearchTerm}
+               placeholder="Enter search term..."
+               fullWidth
+               settings={{
+                  submitOnEnter: false,
+                  submitOnBlur: false,
+               }}
+            />
 
-            <div
-               style={{ display: "flex", flexDirection: "column", gap: "5px" }}
+            <BrandedTextField
+               label="Sort by"
+               select
+               value={sortBy}
+               onChange={(e) =>
+                  setSortBy(
+                     e.target.value as unknown as LivestreamStatsSortOption
+                  )
+               }
+               fullWidth={isMobile}
+               sx={{
+                  minWidth: isMobile ? "100%" : "200px",
+               }}
             >
-               <label
-                  htmlFor="sort"
-                  style={{ fontSize: isMobile ? "14px" : "16px" }}
-               >
-                  Sort by:
-               </label>
-               <select
-                  id="sort"
-                  value={sortBy}
-                  onChange={(e) =>
-                     setSortBy(e.target.value as LivestreamStatsSortOption)
-                  }
-                  style={{
-                     padding: "8px",
-                     width: isMobile ? "100%" : "auto",
-                     fontSize: "14px",
-                  }}
-               >
-                  {SORT_OPTIONS.map((option) => (
-                     <option key={option.value} value={option.value}>
-                        {option.label}
-                     </option>
-                  ))}
-               </select>
-            </div>
+               {SORT_OPTIONS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                     {option.label}
+                  </MenuItem>
+               ))}
+            </BrandedTextField>
          </div>
 
          {Boolean(isLoading) && <p>Loading stats...</p>}
          {Boolean(error) && <p>Error loading stats: {error.message}</p>}
 
-         {Boolean(stats) && (
+         {stats.length > 0 ? (
             <Fragment>
                {isMobile ? (
                   <MobileEventsView stats={stats} />
@@ -128,6 +111,8 @@ export const NewEventsOverview = () => {
                   <DesktopEventsView stats={stats} />
                )}
             </Fragment>
+         ) : (
+            <p>No events found matching your search criteria.</p>
          )}
       </div>
    )

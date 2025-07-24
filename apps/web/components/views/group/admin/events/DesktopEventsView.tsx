@@ -2,6 +2,7 @@ import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Stack } from "@mui/material"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
+import { getEventStatsKey } from "./util"
 
 type Props = {
    stats: LiveStreamStats[]
@@ -27,7 +28,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                const globalIndex = (currentPage - 1) * 10 + index + 1
                return (
                   <li
-                     key={stat.id}
+                     key={getEventStatsKey(stat)}
                      style={{
                         marginBottom: "10px",
                         padding: "15px",

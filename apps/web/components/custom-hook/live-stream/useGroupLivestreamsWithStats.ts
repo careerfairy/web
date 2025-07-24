@@ -179,10 +179,10 @@ const filterStatsBySearchTerm = (
       const title = stat.livestream.title?.toLowerCase() || ""
       const company = stat.livestream.company?.toLowerCase() || ""
 
-      return (
-         title.includes(normalizedSearchTerm) ||
-         company.includes(normalizedSearchTerm)
-      )
+      const titleMatch = title.includes(normalizedSearchTerm)
+      const companyMatch = company.includes(normalizedSearchTerm)
+
+      return titleMatch || companyMatch
    })
 }
 

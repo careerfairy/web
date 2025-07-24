@@ -2,6 +2,7 @@ import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Box, CircularProgress } from "@mui/material"
 import { Fragment } from "react"
 import useClientSideInfiniteScroll from "../../../../custom-hook/utils/useClientSideInfiniteScroll"
+import { getEventStatsKey } from "./util"
 
 type Props = {
    stats: LiveStreamStats[]
@@ -27,7 +28,7 @@ export const MobileEventsView = ({ stats }: Props) => {
             <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                {visibleData.map((stat) => (
                   <li
-                     key={stat.id}
+                     key={getEventStatsKey(stat)}
                      style={{
                         marginBottom: "12px",
                         padding: "12px",
