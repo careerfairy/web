@@ -9,21 +9,35 @@ import { DesktopEventsView } from "./DesktopEventsView"
 import { MobileEventsView } from "./MobileEventsView"
 
 const SORT_OPTIONS: { value: LivestreamStatsSortOption; label: string }[] = [
-   { value: "start-desc", label: "Most Recent First" },
-   { value: "start-asc", label: "Oldest First" },
-   { value: "title-asc", label: "Title A-Z" },
-   { value: "title-desc", label: "Title Z-A" },
-   { value: "registrations-desc", label: "Most Registrations" },
-   { value: "registrations-asc", label: "Least Registrations" },
-   { value: "participants-desc", label: "Most Participants" },
-   { value: "participants-asc", label: "Least Participants" },
+   { value: LivestreamStatsSortOption.START_DESC, label: "Most Recent First" },
+   { value: LivestreamStatsSortOption.START_ASC, label: "Oldest First" },
+   { value: LivestreamStatsSortOption.TITLE_ASC, label: "Title A-Z" },
+   { value: LivestreamStatsSortOption.TITLE_DESC, label: "Title Z-A" },
+   {
+      value: LivestreamStatsSortOption.REGISTRATIONS_DESC,
+      label: "Most Registrations",
+   },
+   {
+      value: LivestreamStatsSortOption.REGISTRATIONS_ASC,
+      label: "Least Registrations",
+   },
+   {
+      value: LivestreamStatsSortOption.PARTICIPANTS_DESC,
+      label: "Most Participants",
+   },
+   {
+      value: LivestreamStatsSortOption.PARTICIPANTS_ASC,
+      label: "Least Participants",
+   },
 ]
 
 export const NewEventsOverview = () => {
    const router = useRouter()
    const groupId = router.query.groupId as string
    const [searchTerm, setSearchTerm] = useState("")
-   const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>("start-desc")
+   const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(
+      LivestreamStatsSortOption.START_DESC
+   )
    const isMobile = useIsMobile()
 
    const {

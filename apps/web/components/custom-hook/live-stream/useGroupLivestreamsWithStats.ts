@@ -23,120 +23,56 @@ import { errorLogAndNotify } from "util/CommonUtil"
 /**
  * Sort options for livestream stats
  */
-export type LivestreamStatsSortOption =
-   | "start-desc" // Most recent first (default)
-   | "start-asc" // Oldest first
-   | "title-asc" // Title A-Z
-   | "title-desc" // Title Z-A
-   | "registrations-desc" // Most registrations first
-   | "registrations-asc" // Least registrations first
-   | "participants-desc" // Most participants first
-   | "participants-asc" // Least participants first
+export enum LivestreamStatsSortOption {
+   /** Most recent first (default) */
+   START_DESC,
+   /** Oldest first */
+   START_ASC,
+   /** Title A-Z */
+   TITLE_ASC,
+   /** Title Z-A */
+   TITLE_DESC,
+   /** Most registrations first */
+   REGISTRATIONS_DESC,
+   /** Least registrations first */
+   REGISTRATIONS_ASC,
+   /** Most participants first */
+   PARTICIPANTS_DESC,
+   /** Least participants first */
+   PARTICIPANTS_ASC,
+}
 
 interface UseGroupLivestreamsWithStatsOptions {
+   /** Sort results by */
    sortBy?: LivestreamStatsSortOption
+   /** Search term to filter by */
    searchTerm?: string
-}
-
-const filterStatsBySearchTerm = (
-   stats: LiveStreamStats[],
-   searchTerm: string
-): LiveStreamStats[] => {
-   if (!searchTerm.trim()) return stats
-
-   const normalizedSearchTerm = searchTerm.toLowerCase().trim()
-
-   return stats.filter((stat) => {
-      const title = stat.livestream.title?.toLowerCase() || ""
-      const company = stat.livestream.company?.toLowerCase() || ""
-
-      return (
-         title.includes(normalizedSearchTerm) ||
-         company.includes(normalizedSearchTerm)
-      )
-   })
-}
-
-const sortStatsArray = (
-   stats: LiveStreamStats[],
-   sortBy: LivestreamStatsSortOption
-): LiveStreamStats[] => {
-   return [...stats].sort((a, b) => {
-      switch (sortBy) {
-         case "start-asc": {
-            const aStartAsc = a.livestream.start?.toDate?.() || new Date(0)
-            const bStartAsc = b.livestream.start?.toDate?.() || new Date(0)
-            return aStartAsc.getTime() - bStartAsc.getTime()
-         }
-
-         case "start-desc":
-         default: {
-            const aStartDesc = a.livestream.start?.toDate?.() || new Date(0)
-            const bStartDesc = b.livestream.start?.toDate?.() || new Date(0)
-            return bStartDesc.getTime() - aStartDesc.getTime()
-         }
-
-         case "title-asc": {
-            const aTitleAsc = a.livestream.title || ""
-            const bTitleAsc = b.livestream.title || ""
-            return aTitleAsc.localeCompare(bTitleAsc)
-         }
-
-         case "title-desc": {
-            const aTitleDesc = a.livestream.title || ""
-            const bTitleDesc = b.livestream.title || ""
-            return bTitleDesc.localeCompare(aTitleDesc)
-         }
-
-         case "registrations-desc":
-            return (
-               b.generalStats.numberOfRegistrations -
-               a.generalStats.numberOfRegistrations
-            )
-
-         case "registrations-asc":
-            return (
-               a.generalStats.numberOfRegistrations -
-               b.generalStats.numberOfRegistrations
-            )
-
-         case "participants-desc":
-            return (
-               b.generalStats.numberOfParticipants -
-               a.generalStats.numberOfParticipants
-            )
-
-         case "participants-asc":
-            return (
-               a.generalStats.numberOfParticipants -
-               b.generalStats.numberOfParticipants
-            )
-      }
-   })
 }
 
 /**
  * Fetches and processes livestream stats for a group with optional filtering and sorting.
  *
+ * This hook performs the following operations:
+ * 1. Fetches published livestream stats using a collection group query on "stats" documents
+ * 2. Fetches draft livestreams from the "draftLivestreams" collection
+ * 3. Transforms draft livestreams into stats format with empty statistics
+ * 4. Combines published and draft data into a unified array
+ * 5. Applies client-side search filtering by title or company name
+ * 6. Sorts the results on the client side according to the specified criteria
+ *
+ * The hook handles both published livestreams (with real stats) and draft livestreams
+ * (with mock stats) to provide a complete view of all livestreams associated with the group.
+ *
  * @param groupId - The ID of the group to fetch livestreams for
- * @param options - Configuration options:
- *    - sortBy: The sorting criteria. Supported values:
- *      - "start-desc": Sort by start date descending (most recent first)
- *      - "start-asc": Sort by start date ascending (oldest first)
- *      - "title-asc": Sort by livestream title A-Z
- *      - "title-desc": Sort by livestream title Z-A
- *      - "registrations-desc": Sort by number of registrations descending
- *      - "registrations-asc": Sort by number of registrations ascending
- *      - "participants-desc": Sort by number of participants descending
- *      - "participants-asc": Sort by number of participants ascending
- *    - searchTerm: Optional text to filter livestreams by title or company name
- * @returns SWR response with processed LiveStreamStats array
+ * @param options - Configuration options for filtering and sorting
+ * @returns SWR response with processed LiveStreamStats array containing both published and draft livestreams
  */
 export const useGroupLivestreamsWithStats = (
    groupId: string,
    options: UseGroupLivestreamsWithStatsOptions = {}
 ) => {
-   const { sortBy = "start-desc", searchTerm = "" } = options
+   const { sortBy = LivestreamStatsSortOption.START_DESC, searchTerm = "" } =
+      options
    const firestore = useFirestore()
 
    const fetchGroupLivestreamsWithStats = async (): Promise<
@@ -176,7 +112,7 @@ export const useGroupLivestreamsWithStats = (
             (doc) => {
                const livestreamData = doc.data()
 
-               // Create mock stats for draft
+               // Create empty stats for draft livestreams
                const mockStats = createLiveStreamStatsDoc(
                   livestreamData,
                   doc.id
@@ -193,7 +129,7 @@ export const useGroupLivestreamsWithStats = (
          )
 
          // Combine all stats
-         return [...publishedStats, ...draftStats]
+         return publishedStats.concat(draftStats)
       } catch (error) {
          console.error("Error fetching group livestreams with stats:", error)
          throw error
@@ -227,4 +163,83 @@ export const useGroupLivestreamsWithStats = (
       isLoading,
       error,
    }
+}
+
+// --- Helpers ---
+
+const filterStatsBySearchTerm = (
+   stats: LiveStreamStats[],
+   searchTerm: string
+): LiveStreamStats[] => {
+   if (!searchTerm.trim()) return stats
+
+   const normalizedSearchTerm = searchTerm.toLowerCase().trim()
+
+   return stats.filter((stat) => {
+      const title = stat.livestream.title?.toLowerCase() || ""
+      const company = stat.livestream.company?.toLowerCase() || ""
+
+      return (
+         title.includes(normalizedSearchTerm) ||
+         company.includes(normalizedSearchTerm)
+      )
+   })
+}
+
+const sortStatsArray = (
+   stats: LiveStreamStats[],
+   sortBy: LivestreamStatsSortOption
+): LiveStreamStats[] => {
+   return [...stats].sort((a, b) => {
+      switch (sortBy) {
+         case LivestreamStatsSortOption.START_ASC: {
+            const aStartAsc = a.livestream.start?.toDate?.() || new Date(0)
+            const bStartAsc = b.livestream.start?.toDate?.() || new Date(0)
+            return aStartAsc.getTime() - bStartAsc.getTime()
+         }
+
+         case LivestreamStatsSortOption.START_DESC:
+         default: {
+            const aStartDesc = a.livestream.start?.toDate?.() || new Date(0)
+            const bStartDesc = b.livestream.start?.toDate?.() || new Date(0)
+            return bStartDesc.getTime() - aStartDesc.getTime()
+         }
+
+         case LivestreamStatsSortOption.TITLE_ASC: {
+            const aTitleAsc = a.livestream.title || ""
+            const bTitleAsc = b.livestream.title || ""
+            return aTitleAsc.localeCompare(bTitleAsc)
+         }
+
+         case LivestreamStatsSortOption.TITLE_DESC: {
+            const aTitleDesc = a.livestream.title || ""
+            const bTitleDesc = b.livestream.title || ""
+            return bTitleDesc.localeCompare(aTitleDesc)
+         }
+
+         case LivestreamStatsSortOption.REGISTRATIONS_DESC:
+            return (
+               b.generalStats.numberOfRegistrations -
+               a.generalStats.numberOfRegistrations
+            )
+
+         case LivestreamStatsSortOption.REGISTRATIONS_ASC:
+            return (
+               a.generalStats.numberOfRegistrations -
+               b.generalStats.numberOfRegistrations
+            )
+
+         case LivestreamStatsSortOption.PARTICIPANTS_DESC:
+            return (
+               b.generalStats.numberOfParticipants -
+               a.generalStats.numberOfParticipants
+            )
+
+         case LivestreamStatsSortOption.PARTICIPANTS_ASC:
+            return (
+               a.generalStats.numberOfParticipants -
+               b.generalStats.numberOfParticipants
+            )
+      }
+   })
 }
