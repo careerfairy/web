@@ -41,9 +41,6 @@ export const FUNCTION_NAMES = {
       "sendPhysicalEventRegistrationConfirmationEmail",
    getRecommendedEvents: "getRecommendedEvents_v7",
    getRecommendedJobs: "getRecommendedJobs_v2",
-   // New trigger function required for Cloud Functions Gen 2 upgrade:
-   // Gen 1 triggers can't be upgraded in place, so deploy with a new name, as soon as deployment is complete, delete the old trigger function.
-   syncLivestreams: "syncLivestreams_v2",
 
    // Recording functions
    getRecordingViews: "getRecordingViews",
@@ -69,4 +66,16 @@ export const FUNCTION_NAMES = {
    // Group talent engagement functions
    getGroupTalentEngagement: "getGroupTalentEngagement",
    getTotalUsersMatchingTargeting: "getTotalUsersMatchingTargeting",
+
+   // -- Trigger functions -- //
+   /**
+    * Note:
+    * New trigger function required for Cloud Functions Gen 2 upgrade.
+    * Gen 1 triggers can't be upgraded in place, so deploy with a new name.
+    * As soon as deployment is complete, delete the old trigger function.
+    */
+   syncLivestreams: "syncLivestreams_v2",
+   syncUserLivestreamData: "syncUserLivestreamData_v2",
+   onCreateLivestreamRatingAnswer: "onCreateLivestreamRatingAnswer_v2",
+   syncLivestreamStats: "syncLivestreamStats_v2",
 } as const
