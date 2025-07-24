@@ -31,7 +31,7 @@ const styles = sxStyles({
       borderRadius: "16px",
       border: "1px solid",
       borderColor: "secondary.50",
-      overflow: "hidden",
+      overflowX: "auto",
       px: 1, // 8px horizontal padding to match Figma design
    },
    table: {
@@ -71,6 +71,7 @@ const styles = sxStyles({
          border: "1px solid",
          borderColor: (theme) => theme.brand.white[400],
          backgroundColor: (theme) => theme.brand.white[200],
+         boxSizing: "border-box",
          "&:first-of-type": {
             borderTopLeftRadius: "8px",
             borderBottomLeftRadius: "8px",
