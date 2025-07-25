@@ -15,7 +15,6 @@ const styles = sxStyles({
          theme.transitions.create(["background-color", "box-shadow"], {
             duration: theme.transitions.duration.short,
          }),
-      border: "none",
       background: "transparent",
       p: 1,
       "&:hover": {
@@ -51,12 +50,7 @@ export const TableHighlighter = ({
 
    if (title) {
       return (
-         <BrandedTooltip
-            placement="top"
-            wrapperStyles={{ width: "100%" }}
-            title={title}
-            offset={[0, -10]}
-         >
+         <BrandedTooltip placement="top" title={title} offset={[0, -10]}>
             {content}
          </BrandedTooltip>
       )

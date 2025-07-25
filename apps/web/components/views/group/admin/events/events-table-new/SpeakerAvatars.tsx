@@ -83,7 +83,13 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
    const renderSurplus = (surplus: number) => {
       const nextSpeaker = speakers[maxVisible - 1] // Get the first hidden speaker
       return (
-         <Box sx={styles.surplusContainer}>
+         <Box
+            sx={styles.surplusContainer}
+            zIndex={
+               // Always on top of the other avatars
+               speakers.length
+            }
+         >
             {/* overlay */}
             <Box sx={styles.overlay} />
             <Image
@@ -107,10 +113,12 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
          spacing={14}
          renderSurplus={renderSurplus}
       >
-         {speakers.map((speaker) => (
+         {speakers.map((speaker, index) => (
             <Avatar
                key={speaker.id}
                alt={`${speaker.firstName} ${speaker.lastName}`}
+               //    Reverse the stacking order according to figma
+               sx={{ zIndex: index }}
             >
                {speaker.avatar ? (
                   <Image

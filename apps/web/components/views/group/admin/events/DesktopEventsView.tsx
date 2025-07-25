@@ -140,7 +140,7 @@ HeaderIcon.displayName = "HeaderIcon"
 
 const COLUMN_WIDTHS = {
    title: 350,
-   date: 170,
+   date: 190,
    registrations: 92,
    views: 92,
    status: 40,
@@ -346,13 +346,15 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
                            {/* Date Column */}
                            <TableCell>
-                              <CentredBox>
+                              <CentredBox
+                                 flexShrink={0}
+                                 width={COLUMN_WIDTHS.date}
+                              >
                                  <TableHighlighter
                                     title="Live stream date"
                                     direction="row"
                                     alignItems="center"
                                     spacing={1}
-                                    width="100%"
                                     color="neutral.600"
                                  >
                                     <Box component={Calendar} size={16} />
@@ -368,13 +370,13 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
                            {/* Registrations Column */}
                            <TableCell>
-                              <CentredBox width={COLUMN_WIDTHS.registrations}>
+                              <CentredBox>
                                  <TableHighlighter
                                     title="Registrations"
                                     direction="row"
                                     alignItems="center"
                                     spacing={1}
-                                    width="100%"
+                                    width={COLUMN_WIDTHS.registrations}
                                     color="neutral.600"
                                  >
                                     <Box component={User} size={16} />
@@ -387,36 +389,27 @@ export const DesktopEventsView = ({ stats }: Props) => {
                            </TableCell>
 
                            {/* Views Column */}
-                           <TableCell
-                              padding="none"
-                              sx={[{ minWidth: COLUMN_WIDTHS.views }]}
-                           >
+                           <TableCell>
                               <CentredBox>
                                  <TableHighlighter
                                     title="Views"
                                     direction="row"
                                     alignItems="center"
                                     spacing={1}
-                                    width="100%"
+                                    width={COLUMN_WIDTHS.views}
                                     color="neutral.600"
                                  >
                                     <Box component={Eye} size={16} />
                                     <Typography variant="small">
-                                       {stat.generalStats
-                                          .numberOfPeopleReached || "-"}
+                                       {"-"}
                                     </Typography>
                                  </TableHighlighter>
                               </CentredBox>
                            </TableCell>
 
                            {/* Status Column */}
-                           <TableCell
-                              sx={[
-                                 styles.bodyCell,
-                                 { maxWidth: COLUMN_WIDTHS.status },
-                              ]}
-                           >
-                              <CentredBox>
+                           <TableCell>
+                              <CentredBox width={COLUMN_WIDTHS.status}>
                                  <StatusIcon
                                     isDraft={stat.livestream.isDraft}
                                     isPastEvent={isPastEvent}
