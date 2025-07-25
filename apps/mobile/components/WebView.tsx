@@ -43,30 +43,6 @@ import { customerIO } from "../utils/customerio-tracking"
 import { SECURE_STORE_KEYS } from "../utils/secure-store-constants"
 import { sendToWebView } from "../utils/webview.utils"
 
-/**
- * WebView Component with fullscreen support for iOS and Android
- *
- * Uses Expo APIs for proper system-level fullscreen control:
- * - expo-status-bar: setStatusBarHidden() for cross-platform status bar control
- * - expo-navigation-bar: NavigationBar APIs for Android navigation bar control
- *
- * iOS Fullscreen Behavior:
- * - Status bar: Hidden/shown using setStatusBarHidden() with slide animation
- * - Home indicator (iPhone X+): Automatically managed by iOS system
- *   - When content extends to screen edges, home indicator auto-hides after ~3 seconds
- *   - Swiping up from bottom edge will temporarily show it
- *   - System ensures it's always accessible for navigation
- * - Notch area: Content can extend behind the notch safely
- * - Safe areas: Handled by removing SafeAreaView padding in fullscreen mode
- *
- * Android Fullscreen Behavior:
- * - Status bar: Hidden/shown using setStatusBarHidden() with slide animation
- * - Navigation bar: Controlled via expo-navigation-bar APIs
- *   - overlay-swipe behavior allows content behind nav bar while keeping swipe access
- *   - Hidden/visible state toggleable via setVisibilityAsync()
- * - Edge-to-edge content supported with proper system bar overlay
- */
-
 const injectedCSS = `
     body :not(input):not(textarea) {
       -webkit-user-select: none;
