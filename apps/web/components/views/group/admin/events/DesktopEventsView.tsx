@@ -12,7 +12,7 @@ import {
    Typography,
    TypographyProps,
 } from "@mui/material"
-import { forwardRef } from "react"
+import { forwardRef, useState } from "react"
 import { Calendar, ChevronDown, Eye, IconProps, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
@@ -64,6 +64,9 @@ const styles = sxStyles({
       fontWeight: 600,
    },
    bodyRow: {
+      cursor: "pointer",
+      transition: "all 0.2s ease-in-out",
+      height: 80, // Fixed row height
       "& .MuiTableCell-root": {
          borderBottom: "none",
          py: 1,
@@ -72,6 +75,9 @@ const styles = sxStyles({
          borderColor: (theme) => theme.brand.white[400],
          backgroundColor: (theme) => theme.brand.white[200],
          boxSizing: "border-box",
+         transition: "all 0.2s ease-in-out",
+         height: 80, // Fixed cell height
+         verticalAlign: "top", // Align content to top
          "&:first-of-type": {
             borderTopLeftRadius: "8px",
             borderBottomLeftRadius: "8px",
@@ -85,6 +91,12 @@ const styles = sxStyles({
             borderTopRightRadius: "8px",
             borderBottomRightRadius: "8px",
             borderLeft: "none",
+         },
+      },
+      "&:hover": {
+         "& .MuiTableCell-root": {
+            borderColor: "secondary.100", // Light purple border
+            backgroundColor: (theme) => theme.brand.white[400], // Light background
          },
       },
    },
@@ -125,12 +137,47 @@ HeaderIcon.displayName = "HeaderIcon"
 
 export const DesktopEventsView = ({ stats }: Props) => {
    const { handleTableSort, getSortDirection, isActiveSort } = useEventsView()
+   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
 
    const { currentPageData, currentPage, totalPages, goToPage } =
       useClientSidePagination({
          data: stats,
          itemsPerPage: 10,
       })
+
+   const handleRowMouseEnter = (statKey: string) => {
+      setHoveredRow(statKey)
+   }
+
+   const handleRowMouseLeave = () => {
+      setHoveredRow(null)
+   }
+
+   // Placeholder handlers for action buttons - these would be implemented based on requirements
+   const handleExternalLink = (stat: LiveStreamStats) => {
+      // Navigate to external view of the livestream
+      console.log("External link for:", stat.livestream.title)
+   }
+
+   const handleCopy = (stat: LiveStreamStats) => {
+      // Copy livestream link or duplicate functionality
+      console.log("Copy/duplicate:", stat.livestream.title)
+   }
+
+   const handleAnalytics = (stat: LiveStreamStats) => {
+      // Navigate to analytics view
+      console.log("Analytics for:", stat.livestream.title)
+   }
+
+   const handleMessage = (stat: LiveStreamStats) => {
+      // Open messaging/feedback feature
+      console.log("Message for:", stat.livestream.title)
+   }
+
+   const handleFeedback = (stat: LiveStreamStats) => {
+      // Open feedback/review feature for past livestreams
+      console.log("Feedback for:", stat.livestream.title)
+   }
 
    return (
       <Box>
@@ -189,88 +236,115 @@ export const DesktopEventsView = ({ stats }: Props) => {
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {currentPageData.map((stat) => (
-                     <TableRow key={getEventStatsKey(stat)} sx={styles.bodyRow}>
-                        {/* Title Column */}
-                        <TableCell
-                           variant="head"
-                           id="title-column"
-                           sx={{ minWidth: 300 }}
+                  {currentPageData.map((stat) => {
+                     const statKey = getEventStatsKey(stat)
+                     const isHovered = hoveredRow === statKey
+
+                     return (
+                        <TableRow
+                           key={statKey}
+                           sx={styles.bodyRow}
+                           onMouseEnter={() => handleRowMouseEnter(statKey)}
+                           onMouseLeave={handleRowMouseLeave}
                         >
-                           <CardNameTitle
-                              title={stat.livestream.title}
-                              backgroundImageUrl={
-                                 stat.livestream.backgroundImageUrl
-                              }
-                           />
-                        </TableCell>
+                           {/* Title Column */}
+                           <TableCell
+                              variant="head"
+                              id="title-column"
+                              sx={{ minWidth: 300 }}
+                           >
+                              <CardNameTitle
+                                 title={stat.livestream.title}
+                                 backgroundImageUrl={
+                                    stat.livestream.backgroundImageUrl
+                                 }
+                                 showHoverActions={isHovered}
+                                 isDraft={stat.livestream.isDraft}
+                                 isPastEvent={
+                                    stat.livestream.start
+                                       ? stat.livestream.start.toDate() <
+                                         new Date()
+                                       : false
+                                 }
+                                 isNotRecorded={
+                                    !stat.generalStats.numberOfPeopleReached
+                                 }
+                                 onExternalLink={() => handleExternalLink(stat)}
+                                 onCopy={() => handleCopy(stat)}
+                                 onAnalytics={() => handleAnalytics(stat)}
+                                 onMessage={() => handleMessage(stat)}
+                                 onFeedback={() => handleFeedback(stat)}
+                              />
+                           </TableCell>
 
-                        {/* Speakers Column */}
-                        <TableCell sx={{ minWidth: 124 }}>
-                           <SpeakerAvatars
-                              speakers={stat.livestream.speakers}
-                              maxVisible={3}
-                           />
-                        </TableCell>
+                           {/* Speakers Column */}
+                           <TableCell sx={{ minWidth: 124 }}>
+                              <SpeakerAvatars
+                                 speakers={stat.livestream.speakers}
+                                 maxVisible={3}
+                              />
+                           </TableCell>
 
-                        {/* Date Column */}
-                        <TableCell sx={{ width: 170 }}>
-                           <TableColumn
-                              icon={<Calendar size={16} color="#6B6B7F" />}
-                              text={
-                                 stat.livestream.start
-                                    ? stat.livestream.start
-                                         .toDate()
-                                         .toLocaleDateString("en-US", {
-                                            day: "2-digit",
-                                            month: "short",
-                                            year: "2-digit",
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                            hour12: true,
-                                         })
-                                    : "No date"
-                              }
-                              width={170}
-                           />
-                        </TableCell>
+                           {/* Date Column */}
+                           <TableCell sx={{ width: 170 }}>
+                              <TableColumn
+                                 icon={<Calendar size={16} color="#6B6B7F" />}
+                                 text={
+                                    stat.livestream.start
+                                       ? stat.livestream.start
+                                            .toDate()
+                                            .toLocaleDateString("en-US", {
+                                               day: "2-digit",
+                                               month: "short",
+                                               year: "2-digit",
+                                               hour: "2-digit",
+                                               minute: "2-digit",
+                                               hour12: true,
+                                            })
+                                       : "No date"
+                                 }
+                                 width={170}
+                              />
+                           </TableCell>
 
-                        {/* Registrations Column */}
-                        <TableCell sx={{ minWidth: 139 }}>
-                           <TableColumn
-                              icon={<User size={16} color="#6B6B7F" />}
-                              text={
-                                 stat.generalStats.numberOfRegistrations || 0
-                              }
-                              width={100}
-                           />
-                        </TableCell>
+                           {/* Registrations Column */}
+                           <TableCell sx={{ minWidth: 139 }}>
+                              <TableColumn
+                                 icon={<User size={16} color="#6B6B7F" />}
+                                 text={
+                                    stat.generalStats.numberOfRegistrations || 0
+                                 }
+                                 width={100}
+                              />
+                           </TableCell>
 
-                        {/* Views Column */}
-                        <TableCell sx={{ width: 100 }}>
-                           <TableColumn
-                              icon={<Eye size={16} color="#6B6B7F" />}
-                              text={
-                                 stat.generalStats.numberOfPeopleReached || "-"
-                              }
-                              width={100}
-                           />
-                        </TableCell>
+                           {/* Views Column */}
+                           <TableCell sx={{ width: 100 }}>
+                              <TableColumn
+                                 icon={<Eye size={16} color="#6B6B7F" />}
+                                 text={
+                                    stat.generalStats.numberOfPeopleReached ||
+                                    "-"
+                                 }
+                                 width={100}
+                              />
+                           </TableCell>
 
-                        {/* Status Column */}
-                        <TableCell sx={{ width: 80 }}>
-                           <StatusIcon
-                              isDraft={stat.livestream.isDraft}
-                              start={stat.livestream.start}
-                           />
-                        </TableCell>
+                           {/* Status Column */}
+                           <TableCell sx={{ width: 80 }}>
+                              <StatusIcon
+                                 isDraft={stat.livestream.isDraft}
+                                 start={stat.livestream.start}
+                              />
+                           </TableCell>
 
-                        {/* Actions Column */}
-                        <TableCell sx={{ width: 48 }}>
-                           <QuickActionIcon />
-                        </TableCell>
-                     </TableRow>
-                  ))}
+                           {/* Actions Column */}
+                           <TableCell sx={{ width: 48 }}>
+                              <QuickActionIcon />
+                           </TableCell>
+                        </TableRow>
+                     )
+                  })}
                </TableBody>
             </Table>
          </TableContainer>
