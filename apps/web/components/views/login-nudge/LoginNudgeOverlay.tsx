@@ -267,8 +267,8 @@ export const useLoginNudgeOverlay = () => {
       // Don't show if we're not in a webview
       if (!MobileUtils.webViewPresence()) return false
 
-      // If auth is still loading, show the overlay to prevent flash
-      if (isLoadingAuth) return true
+      // Don't show if auth is still loading
+      if (isLoadingAuth) return false
 
       // Once auth has loaded, only show if user is logged out
       return isLoggedOut
@@ -351,6 +351,7 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
       isDismissing,
    } = useLoginNudgeOverlay()
    const router = useRouter()
+   const { isLoadingAuth, isLoadingUserData } = useAuth()
    const [currentSlide, setCurrentSlide] = useState(0)
    const [isInitialLoad, setIsInitialLoad] = useState(true)
    const [showInitialTransition, setShowInitialTransition] = useState(true)
@@ -497,6 +498,8 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
    useEffect(() => {
       resetTimer()
    }, [currentSlide, resetTimer])
+
+   if (isLoadingAuth || isLoadingUserData) return null
 
    if (!shouldShow) return children
 
