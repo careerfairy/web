@@ -17,7 +17,6 @@ import {
 import { sxStyles } from "types/commonTypes"
 import { MobileUtils } from "util/mobile.utils"
 
-const IGNORE_PATHS = ["/login", "/signup", "/"]
 const SLIDE_DURATION = 5000
 const DISABLE_AUTO_ADVANCE = false
 
@@ -258,8 +257,8 @@ export const useLoginNudgeOverlay = () => {
    const [initialWebviewCount] = useState(() => webviewResumedCount)
 
    const shouldShow = useMemo(() => {
-      // Don't show on ignored paths
-      if (IGNORE_PATHS.includes(pathname)) return false
+      // Only show on portal paths (including subpaths)
+      if (!pathname.startsWith("/portal")) return false
 
       // Don't show if manually dismissed (but keep showing while dismissing for animation)
       if (hasBeenDismissed && !isDismissing) return false
