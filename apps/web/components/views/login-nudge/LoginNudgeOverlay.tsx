@@ -77,7 +77,7 @@ const styles = sxStyles({
    carouselContainer: {
       position: "relative",
       width: "100%",
-      height: "327px",
+      aspectRatio: "9/10",
       borderRadius: "12px",
       overflow: "hidden",
    },
