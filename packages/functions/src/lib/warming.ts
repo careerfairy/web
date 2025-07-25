@@ -14,6 +14,8 @@ const functionsToWarm = [
 
 const onCallFunctionsToWarm: string[] = [
    FUNCTION_NAMES.getRecommendedJobs,
+   FUNCTION_NAMES.getLocation,
+   FUNCTION_NAMES.searchLocations,
    // Add more onCall functions as needed
 ]
 
