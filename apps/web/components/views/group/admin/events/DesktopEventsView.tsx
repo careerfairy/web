@@ -175,7 +175,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
    // Placeholder handlers for action buttons - these would be implemented based on requirements
    const handleEnterLiveStreamRoom = (stat: LiveStreamStats) => {
       // Navigate to external view of the livestream
-      console.log(
+      alert(
          `Enter live stream room for ${
             stat.livestream.isDraft ? "draft" : "live stream"
          }: ${stat.livestream.id}`
@@ -184,7 +184,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
    const handleShareLiveStream = (stat: LiveStreamStats) => {
       // Copy livestream link or duplicate functionality
-      console.log(
+      alert(
          `Share live stream for ${
             stat.livestream.isDraft ? "draft" : "live stream"
          }: ${stat.livestream.id}`
@@ -193,7 +193,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
    const handleAnalytics = (stat: LiveStreamStats) => {
       // Navigate to analytics view
-      console.log(
+      alert(
          `Analytics for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
             stat.livestream.id
          }`
@@ -202,7 +202,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
    const handleQuestions = (stat: LiveStreamStats) => {
       // Open messaging/feedback feature
-      console.log(
+      alert(
          `Questions for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
             stat.livestream.id
          }`
@@ -211,7 +211,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
    const handleFeedback = (stat: LiveStreamStats) => {
       // Open feedback/review feature for past livestreams
-      console.log(
+      alert(
          `Feedback for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
             stat.livestream.id
          }`
@@ -220,7 +220,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
    const handleEdit = (stat: LiveStreamStats) => {
       // Navigate to edit page
-      console.log(
+      alert(
          `Edit for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
             stat.livestream.id
          }`
@@ -229,7 +229,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
    const handleShareRecording = (stat: LiveStreamStats) => {
       // Navigate to recording view
-      console.log(
+      alert(
          `Share recording for ${
             stat.livestream.isDraft ? "draft" : "live stream"
          }: ${stat.livestream.id}`
