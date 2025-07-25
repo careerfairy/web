@@ -53,7 +53,7 @@ const styles = sxStyles({
       alignItems: "center",
       width: "100%",
       px: "24px",
-      pt: "34px",
+      pt: "56px",
       pb: "24px",
    },
    loginButton: {
@@ -265,7 +265,6 @@ export const useLoginNudgeOverlay = () => {
       if (hasBeenDismissed && !isDismissing) return false
 
       // Don't show if we're not in a webview
-      // Commented out for testing
       if (!MobileUtils.webViewPresence()) return false
 
       // If auth is still loading, show the overlay to prevent flash
@@ -354,38 +353,10 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
    const router = useRouter()
    const [currentSlide, setCurrentSlide] = useState(0)
    const [isInitialLoad, setIsInitialLoad] = useState(true)
-   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0)
    const [showInitialTransition, setShowInitialTransition] = useState(true)
    const timerRef = useRef<NodeJS.Timeout | null>(null)
    const touchStartX = useRef<number | null>(null)
    const touchEndX = useRef<number | null>(null)
-
-   // Handle initial load completion
-   useEffect(() => {
-      if (isInitialLoad && shouldShow) {
-         // Start transitioning background to purple during circle animation
-         const initialTransitionTimer = setTimeout(() => {
-            setShowInitialTransition(false) // This triggers the white->purple transition
-         }, 200) // Start transition when circle animation starts
-
-         const completeTimer = setTimeout(() => {
-            setIsInitialLoad(false)
-            // Background is already purple at this point, no additional transition needed
-         }, 1000) // Wait for initial circle animation to complete
-
-         return () => {
-            clearTimeout(initialTransitionTimer)
-            clearTimeout(completeTimer)
-         }
-      }
-   }, [isInitialLoad, shouldShow])
-
-   // Update background color when slide changes (but only after initial load)
-   useEffect(() => {
-      if (!isInitialLoad) {
-         setBackgroundColorIndex(currentSlide)
-      }
-   }, [currentSlide, isInitialLoad])
 
    // Auto-advance slides every 5 seconds with timer reset
    const startAutoAdvance = useCallback(() => {
@@ -405,24 +376,6 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
       }
       startAutoAdvance()
    }, [startAutoAdvance])
-
-   // Start auto-advance when component mounts
-   useEffect(() => {
-      if (shouldShow) {
-         startAutoAdvance()
-      }
-
-      return () => {
-         if (timerRef.current) {
-            clearTimeout(timerRef.current)
-         }
-      }
-   }, [shouldShow, startAutoAdvance])
-
-   // Reset timer when slide changes
-   useEffect(() => {
-      resetTimer()
-   }, [currentSlide, resetTimer])
 
    // Touch event handlers for swipe detection
    const handleTouchStart = useCallback((e: React.TouchEvent) => {
@@ -457,18 +410,30 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
    }, [resetTimer])
 
    const handleLogin = useCallback(() => {
+      // Reset fullscreen immediately before navigation
+      if (MobileUtils.webViewPresence()) {
+         MobileUtils.toggleFullscreen(false)
+      }
       router.push("/login").then(() => {
          handleDismiss()
       })
    }, [handleDismiss, router])
 
    const handleGetStarted = useCallback(() => {
+      // Reset fullscreen immediately before navigation
+      if (MobileUtils.webViewPresence()) {
+         MobileUtils.toggleFullscreen(false)
+      }
       router.push("/signup").then(() => {
          handleDismiss()
       })
    }, [handleDismiss, router])
 
    const handleExploreApp = useCallback(() => {
+      // Reset fullscreen immediately before dismissal
+      if (MobileUtils.webViewPresence()) {
+         MobileUtils.toggleFullscreen(false)
+      }
       handleDismissWithAnimation()
       // Continue as logged out user
    }, [handleDismissWithAnimation])
@@ -481,6 +446,58 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
       [resetTimer]
    )
 
+   // Control fullscreen mode directly in the overlay component
+   useEffect(() => {
+      if (MobileUtils.webViewPresence()) {
+         MobileUtils.toggleFullscreen(shouldShow)
+      }
+
+      // Cleanup: ensure fullscreen is disabled when component unmounts
+      return () => {
+         if (MobileUtils.webViewPresence()) {
+            MobileUtils.toggleFullscreen(false)
+         }
+      }
+   }, [shouldShow])
+
+   // Handle initial load completion
+   useEffect(() => {
+      if (isInitialLoad && shouldShow) {
+         // Start transitioning background to purple during circle animation
+         const initialTransitionTimer = setTimeout(() => {
+            setShowInitialTransition(false) // This triggers the white->purple transition
+         }, 200) // Start transition when circle animation starts
+
+         const completeTimer = setTimeout(() => {
+            setIsInitialLoad(false)
+            // Background is already purple at this point, no additional transition needed
+         }, 1000) // Wait for initial circle animation to complete
+
+         return () => {
+            clearTimeout(initialTransitionTimer)
+            clearTimeout(completeTimer)
+         }
+      }
+   }, [isInitialLoad, shouldShow])
+
+   // Start auto-advance when component mounts
+   useEffect(() => {
+      if (shouldShow) {
+         startAutoAdvance()
+      }
+
+      return () => {
+         if (timerRef.current) {
+            clearTimeout(timerRef.current)
+         }
+      }
+   }, [shouldShow, startAutoAdvance])
+
+   // Reset timer when slide changes
+   useEffect(() => {
+      resetTimer()
+   }, [currentSlide, resetTimer])
+
    if (!shouldShow) return children
 
    return (
@@ -491,15 +508,14 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
             exit="exit"
             variants={getBackgroundVariants(isInitialLoad)}
             sx={{
-               position: "relative",
-               width: "100%",
-               height: "100%",
                backgroundColor: (theme) => {
                   if (isInitialLoad && showInitialTransition) {
                      return "#FFFFFF" // Start with white
                   }
-                  // After initial transition starts OR after initial load, use slide colors
-                  return SLIDES[backgroundColorIndex].backgroundColor(theme)
+                  // After first render, use slide show colors
+                  return SLIDES.length > 0 && currentSlide >= 0
+                     ? SLIDES[currentSlide].backgroundColor(theme)
+                     : theme.palette.primary.main
                },
                transition: isInitialLoad
                   ? "background-color 0.1s ease-in-out 0.2s" // Fast transition during circle animation
@@ -547,123 +563,122 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
                   flexDirection: "column",
                }}
             >
-               {/* Header */}
-               <Stack sx={styles.header} direction={"row"}>
-                  <MainLogo white />
-                  <Button onClick={handleLogin} sx={styles.loginButton}>
-                     Login
-                  </Button>
-               </Stack>
+               <Stack minHeight={"100dvh"} justifyContent={"space-between"}>
+                  <Box m={0} p={0}>
+                     {/* Header */}
+                     <Stack sx={styles.header} direction={"row"}>
+                        <MainLogo white />
+                        <Button onClick={handleLogin} sx={styles.loginButton}>
+                           Login
+                        </Button>
+                     </Stack>
 
-               {/* Content */}
-               <Stack sx={styles.content} alignItems={"space-between"}>
-                  <Stack spacing={"12px"}>
-                     {/* Carousel Container with Touch Events */}
-                     <Box
-                        sx={styles.carouselContainer}
-                        onTouchStart={handleTouchStart}
-                        onTouchMove={handleTouchMove}
-                        onTouchEnd={handleTouchEnd}
-                     >
-                        <AnimatePresence>
-                           <FramerBox
-                              key={currentSlide}
-                              initial="initial"
-                              animate="animate"
-                              exit="exit"
-                              variants={slideAnimationVariants}
-                              sx={{
-                                 position: "absolute",
-                                 top: 0,
-                                 left: 0,
-                                 width: "100%",
-                                 height: "100%",
-                                 zIndex: currentSlide + 1, // Ensure new slide appears on top
-                              }}
-                           >
-                              <Image
-                                 src={SLIDES[currentSlide].imageUrl}
-                                 alt={SLIDES[currentSlide].title}
-                                 fill
-                                 priority
-                                 style={{
-                                    borderRadius: "12px",
-                                    objectFit: "cover",
-                                    objectPosition: "center",
-                                 }}
-                              />
-                           </FramerBox>
-                        </AnimatePresence>
-                     </Box>
-
-                     {/* Dots */}
-                     <Box sx={styles.dotsContainer}>
-                        {SLIDES.map((_, index) => (
+                     {/* Content */}
+                     <Stack sx={styles.content} alignItems={"space-between"}>
+                        <Stack spacing={"12px"}>
+                           {/* Carousel Container with Touch Events */}
                            <Box
-                              key={index}
-                              sx={[
-                                 styles.dot,
-                                 index === currentSlide && styles.dotActive,
-                              ]}
-                              onClick={() => handleDotClick(index)}
-                           />
-                        ))}
-                     </Box>
-
-                     {/* Animated Slide Text */}
-                     <Box sx={styles.slideText}>
-                        <AnimatePresence>
-                           <FramerBox
-                              key={currentSlide}
-                              initial="initial"
-                              animate="animate"
-                              exit="exit"
-                              variants={textAnimationVariants}
-                              sx={{
-                                 position: "absolute",
-                                 width: "100%",
-                                 zIndex: currentSlide + 1, // Ensure new text appears on top
-                              }}
+                              sx={styles.carouselContainer}
+                              onTouchStart={handleTouchStart}
+                              onTouchMove={handleTouchMove}
+                              onTouchEnd={handleTouchEnd}
                            >
-                              <Typography sx={styles.slideTitle}>
-                                 {SLIDES[currentSlide].title}
-                              </Typography>
-                              <Typography
-                                 variant="medium"
-                                 sx={styles.slideDescription}
-                              >
-                                 {SLIDES[currentSlide].description}
-                              </Typography>
-                           </FramerBox>
-                        </AnimatePresence>
-                     </Box>
-                  </Stack>
+                              <AnimatePresence>
+                                 <FramerBox
+                                    key={currentSlide}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    variants={slideAnimationVariants}
+                                    sx={{
+                                       position: "absolute",
+                                       top: 0,
+                                       left: 0,
+                                       width: "100%",
+                                       height: "100%",
+                                       zIndex: currentSlide + 1, // Ensure new slide appears on top
+                                    }}
+                                 >
+                                    <Image
+                                       src={SLIDES[currentSlide].imageUrl}
+                                       alt={SLIDES[currentSlide].title}
+                                       fill
+                                       priority
+                                       style={{
+                                          borderRadius: "12px",
+                                          objectFit: "cover",
+                                          objectPosition: "center",
+                                       }}
+                                    />
+                                 </FramerBox>
+                              </AnimatePresence>
+                           </Box>
+
+                           {/* Dots */}
+                           <Box sx={styles.dotsContainer}>
+                              {SLIDES.map((_, index) => (
+                                 <Box
+                                    key={index}
+                                    sx={[
+                                       styles.dot,
+                                       index === currentSlide &&
+                                          styles.dotActive,
+                                    ]}
+                                    onClick={() => handleDotClick(index)}
+                                 />
+                              ))}
+                           </Box>
+
+                           {/* Animated Slide Text */}
+                           <Box sx={styles.slideText}>
+                              <AnimatePresence>
+                                 <FramerBox
+                                    key={currentSlide}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    variants={textAnimationVariants}
+                                    sx={{
+                                       position: "absolute",
+                                       width: "100%",
+                                       zIndex: currentSlide + 1, // Ensure new text appears on top
+                                    }}
+                                 >
+                                    <Typography sx={styles.slideTitle}>
+                                       {SLIDES[currentSlide].title}
+                                    </Typography>
+                                    <Typography
+                                       variant="medium"
+                                       sx={styles.slideDescription}
+                                    >
+                                       {SLIDES[currentSlide].description}
+                                    </Typography>
+                                 </FramerBox>
+                              </AnimatePresence>
+                           </Box>
+                        </Stack>
+                     </Stack>
+                  </Box>
+                  {/* CTA Section */}
+                  <Box sx={styles.ctaSection}>
+                     <Button
+                        onClick={handleGetStarted}
+                        sx={styles.primaryButton}
+                        variant="contained"
+                        fullWidth
+                     >
+                        Get started!
+                     </Button>
+                     <Button
+                        onClick={handleExploreApp}
+                        variant="text"
+                        color="grey"
+                        fullWidth
+                     >
+                        Explore the app
+                     </Button>
+                  </Box>
                </Stack>
-               {/* CTA Section */}
-               <Box
-                  sx={styles.ctaSection}
-                  // position={"relative"}
-                  // bottom={0}
-                  // left={0}
-                  // right={0}
-               >
-                  <Button
-                     onClick={handleGetStarted}
-                     sx={styles.primaryButton}
-                     variant="contained"
-                     fullWidth
-                  >
-                     Get started!
-                  </Button>
-                  <Button
-                     onClick={handleExploreApp}
-                     variant="text"
-                     color="grey"
-                     fullWidth
-                  >
-                     Explore the app
-                  </Button>
-               </Box>
             </FramerBox>
          </FramerBox>
       </AnimatePresence>

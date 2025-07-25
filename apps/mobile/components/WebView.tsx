@@ -7,15 +7,18 @@ import {
    NativeEventStringified,
    ON_AUTH_MOUNTED,
    PERMISSIONS,
+   SET_FULLSCREEN,
    TRACK_EVENT,
    TRACK_SCREEN,
 } from "@careerfairy/shared-lib/src/messaging"
 import { BASE_URL, INCLUDES_PERMISSIONS, SEARCH_CRITERIA } from "@env"
 import { Audio } from "expo-av"
 import { Camera } from "expo-camera"
+import * as NavigationBar from "expo-navigation-bar"
 import * as Notifications from "expo-notifications"
 import * as ScreenOrientation from "expo-screen-orientation"
 import * as SecureStore from "expo-secure-store"
+import { setStatusBarHidden } from "expo-status-bar"
 import * as StoreReview from "expo-store-review"
 import * as WebBrowser from "expo-web-browser"
 import React, {
@@ -31,15 +34,38 @@ import {
    BackHandler,
    Linking,
    Platform,
-   SafeAreaView,
-   StatusBar,
    StyleSheet,
 } from "react-native"
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { WebView } from "react-native-webview"
 import { branchTracking } from "../utils/branch-tracking"
 import { customerIO } from "../utils/customerio-tracking"
 import { SECURE_STORE_KEYS } from "../utils/secure-store-constants"
 import { sendToWebView } from "../utils/webview.utils"
+
+/**
+ * WebView Component with fullscreen support for iOS and Android
+ *
+ * Uses Expo APIs for proper system-level fullscreen control:
+ * - expo-status-bar: setStatusBarHidden() for cross-platform status bar control
+ * - expo-navigation-bar: NavigationBar APIs for Android navigation bar control
+ *
+ * iOS Fullscreen Behavior:
+ * - Status bar: Hidden/shown using setStatusBarHidden() with slide animation
+ * - Home indicator (iPhone X+): Automatically managed by iOS system
+ *   - When content extends to screen edges, home indicator auto-hides after ~3 seconds
+ *   - Swiping up from bottom edge will temporarily show it
+ *   - System ensures it's always accessible for navigation
+ * - Notch area: Content can extend behind the notch safely
+ * - Safe areas: Handled by removing SafeAreaView padding in fullscreen mode
+ *
+ * Android Fullscreen Behavior:
+ * - Status bar: Hidden/shown using setStatusBarHidden() with slide animation
+ * - Navigation bar: Controlled via expo-navigation-bar APIs
+ *   - overlay-swipe behavior allows content behind nav bar while keeping swipe access
+ *   - Hidden/visible state toggleable via setVisibilityAsync()
+ * - Edge-to-edge content supported with proper system bar overlay
+ */
 
 const injectedCSS = `
     body :not(input):not(textarea) {
@@ -128,7 +154,11 @@ const WebViewComponent = ({
    const [hasAudioPermissions, setHasAudioPermissions] = useState(false)
    const [hasVideoPermissions, setHasVideoPermissions] = useState(false)
    const [refreshKey, setRefreshKey] = useState(0)
+   const [isFullscreen, setIsFullscreen] = useState(false)
    const refreshAfterExternalActivityRef = useRef(false)
+
+   // Get safe area insets for proper fullscreen handling
+   const insets = useSafeAreaInsets()
 
    useEffect(() => {
       checkPermissions()
@@ -281,6 +311,45 @@ const WebViewComponent = ({
       }
    }
 
+   const handleSetFullscreen = useCallback(async (data: SET_FULLSCREEN) => {
+      try {
+         console.log(`[WebView] Setting fullscreen to: ${data.enabled}`)
+
+         // Update state immediately for smoother transition
+         setIsFullscreen(data.enabled)
+
+         if (Platform.OS === "ios") {
+            // iOS-specific handling
+            setStatusBarHidden(data.enabled, "slide")
+
+            // For iOS devices with notches (iPhone X and later), we want to ensure
+            // the content can extend into the safe areas when in fullscreen mode
+            // iOS automatically handles home indicator visibility based on user interaction
+            // when content extends to screen edges. The system will auto-hide it after
+            // a few seconds of inactivity when content draws behind it.
+         } else if (Platform.OS === "android") {
+            // Android-specific handling
+            setStatusBarHidden(data.enabled, "slide")
+
+            if (data.enabled) {
+               // Enable fullscreen mode
+               await NavigationBar.setBehaviorAsync("overlay-swipe")
+               await NavigationBar.setVisibilityAsync("hidden")
+            } else {
+               // Disable fullscreen mode - return to normal behavior
+               await NavigationBar.setVisibilityAsync("visible")
+               await NavigationBar.setBehaviorAsync("inset-swipe")
+            }
+         }
+
+         console.log(
+            `[WebView] Fullscreen mode ${data.enabled ? "enabled" : "disabled"}`
+         )
+      } catch (error) {
+         console.error("Failed to set fullscreen mode:", error)
+      }
+   }, [])
+
    const handleMessage = (event: NativeEventStringified) => {
       try {
          const receivedData = JSON.parse(event.nativeEvent.data)
@@ -306,6 +375,8 @@ const WebViewComponent = ({
                return handleTrackScreen(data)
             case MESSAGING_TYPE.ON_AUTH_MOUNTED:
                return handleOnAuthMounted(data)
+            case MESSAGING_TYPE.SET_FULLSCREEN:
+               return handleSetFullscreen(data)
             case MESSAGING_TYPE.FEEDBACK_PROMPT:
                return handleFeedbackPrompt()
             default:
@@ -626,7 +697,16 @@ const WebViewComponent = ({
    }
 
    return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView
+         style={styles.container}
+         edges={isFullscreen ? [] : ["top", "bottom", "left", "right"]}
+         onLayout={(event) => {
+            const { width, height } = event.nativeEvent.layout
+            console.log(
+               `[WebView] SafeAreaView layout - fullscreen: ${isFullscreen}, size: ${width}x${height}, insets: top=${insets.top}, bottom=${insets.bottom}`
+            )
+         }}
+      >
          <WebView
             key={refreshKey + 1}
             style={styles.flex}
@@ -686,7 +766,6 @@ const WebViewComponent = ({
 const styles = StyleSheet.create({
    container: {
       flex: 1,
-      paddingTop: StatusBar.currentHeight,
    },
    flex: {
       flex: 1,

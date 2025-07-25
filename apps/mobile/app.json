@@ -33,6 +33,7 @@
       "android": {
          "package": "com.admin_product_team.careerfairymobileapp",
          "googleServicesFile": "./google-services.json",
+         "edgeToEdgeEnabled": true,
          "permissions": [
             "AD_ID",
             "NOTIFICATIONS",
