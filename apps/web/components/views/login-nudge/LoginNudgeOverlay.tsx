@@ -32,7 +32,7 @@ const SLIDES = [
    {
       title: "Startup hoodie, suit or a lab coat?",
       description:
-         "Show us what you’re into to meet companies that match your energy",
+         "Show us what you're into to meet companies that match your energy",
       imageUrl: "/illustrations/nudge-image-2-icons.png",
       backgroundColor: (theme: Theme) => theme.palette.warning[600],
    },
