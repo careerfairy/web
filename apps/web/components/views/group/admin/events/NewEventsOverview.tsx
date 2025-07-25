@@ -3,6 +3,7 @@ import { Fragment, useState } from "react"
 import { useGroupLivestreamsWithStats } from "../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { BrandedSearchField } from "../../../common/inputs/BrandedSearchBar"
+import { AdminContainer } from "../common/Container"
 import { EventsViewProvider, useEventsView } from "./context/EventsViewContext"
 import { DesktopEventsView } from "./DesktopEventsView"
 import { MobileEventsView } from "./MobileEventsView"
@@ -66,8 +67,10 @@ const NewEventsOverviewContent = () => {
 
 export const NewEventsOverview = () => {
    return (
-      <EventsViewProvider>
-         <NewEventsOverviewContent />
-      </EventsViewProvider>
+      <AdminContainer>
+         <EventsViewProvider>
+            <NewEventsOverviewContent />
+         </EventsViewProvider>
+      </AdminContainer>
    )
 }

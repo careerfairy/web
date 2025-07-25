@@ -206,7 +206,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         </TableCell>
 
                         {/* Speakers Column */}
-                        <TableCell sx={{ width: 120 }}>
+                        <TableCell sx={{ minWidth: 124 }}>
                            <SpeakerAvatars
                               speakers={stat.livestream.speakers}
                               maxVisible={3}
@@ -236,7 +236,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         </TableCell>
 
                         {/* Registrations Column */}
-                        <TableCell sx={{ width: 100 }}>
+                        <TableCell sx={{ minWidth: 139 }}>
                            <TableColumn
                               icon={<User size={16} color="#6B6B7F" />}
                               text={
