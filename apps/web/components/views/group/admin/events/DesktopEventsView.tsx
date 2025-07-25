@@ -332,20 +332,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                            <TableCell sx={{ width: 170 }}>
                               <TableColumn
                                  icon={<Calendar size={16} color="#6B6B7F" />}
-                                 text={
-                                    stat.livestream.start
-                                       ? stat.livestream.start
-                                            .toDate()
-                                            .toLocaleDateString("en-US", {
-                                               day: "2-digit",
-                                               month: "short",
-                                               year: "2-digit",
-                                               hour: "2-digit",
-                                               minute: "2-digit",
-                                               hour12: true,
-                                            })
-                                       : "No date"
-                                 }
+                                 text={getEventDate(stat)}
                                  width={170}
                               />
                            </TableCell>
@@ -411,4 +398,22 @@ export const DesktopEventsView = ({ stats }: Props) => {
          )}
       </Box>
    )
+}
+
+const getEventDate = (stat: LiveStreamStats) => {
+   if (!stat.livestream.start) {
+      return "No date"
+   }
+
+   const date = stat.livestream.start.toDate()
+   const formattedDate = date.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+      year: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+   })
+
+   return formattedDate
 }

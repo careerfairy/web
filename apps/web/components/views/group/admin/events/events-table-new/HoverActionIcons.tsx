@@ -1,5 +1,5 @@
 import { IconButton } from "@mui/material"
-import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
+import { ShareArrowIconOutlined } from "components/views/common/icons/ShareArrowIconOutlined"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { motion } from "framer-motion"
 import {
@@ -34,6 +34,7 @@ const styles = sxStyles({
       "& svg": {
          width: 20,
          height: 20,
+         fontSize: 20,
       },
    },
    motionContainer: {
@@ -91,7 +92,7 @@ export const HoverActionIcons = ({
          {Boolean(onEdit) && (
             <BrandedTooltip title="Edit" placement="top">
                <IconButton sx={styles.iconButton} onClick={onEdit}>
-                  <Edit2 size={20} />
+                  <Edit2 />
                </IconButton>
             </BrandedTooltip>
          )}
@@ -101,42 +102,42 @@ export const HoverActionIcons = ({
                   sx={styles.iconButton}
                   onClick={onEnterLiveStreamRoom}
                >
-                  <ExternalLink size={20} />
+                  <ExternalLink />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onShareLiveStream) && (
             <BrandedTooltip title="Share Live stream" placement="top">
                <IconButton sx={styles.iconButton} onClick={onShareLiveStream}>
-                  <Copy size={20} />
+                  <Copy />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onShareRecording) && (
             <BrandedTooltip title="Share recording" placement="top">
                <IconButton sx={styles.iconButton} onClick={onShareRecording}>
-                  <ShareArrowIcon />
+                  <ShareArrowIconOutlined />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onAnalytics) && (
             <BrandedTooltip title="Analytics" placement="top">
                <IconButton sx={styles.iconButton} onClick={onAnalytics}>
-                  <BarChart2 size={20} />
+                  <BarChart2 />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onQuestions) && (
             <BrandedTooltip title="Questions" placement="top">
                <IconButton sx={styles.iconButton} onClick={onQuestions}>
-                  <MessageSquare size={20} />
+                  <MessageSquare />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onFeedback) && (
             <BrandedTooltip title="Feedback" placement="top">
                <IconButton sx={styles.iconButton} onClick={onFeedback}>
-                  <ThumbsUp size={20} />
+                  <ThumbsUp />
                </IconButton>
             </BrandedTooltip>
          )}

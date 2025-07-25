@@ -24,13 +24,6 @@ const styles = sxStyles({
       height: 64, // Fixed height to prevent expansion
       overflow: "hidden", // Prevent overflow
    },
-   titleText: {
-      fontSize: "16px",
-      lineHeight: "24px",
-      fontWeight: 400,
-      color: "neutral.800",
-      mb: 0,
-   },
    titleTextDefault: {
       ...getMaxLineStyles(2), // 2 lines by default
    },
@@ -106,8 +99,10 @@ export const CardNameTitle = ({
             pt={showHoverActions ? 1 : undefined}
          >
             <Typography
+               variant="medium"
+               color="neutral.800"
+               fontWeight={400}
                sx={[
-                  styles.titleText,
                   showHoverActions
                      ? styles.titleTextHovered
                      : styles.titleTextDefault,
