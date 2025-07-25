@@ -216,14 +216,14 @@ const sortStatsArray = (
          }
 
          case LivestreamStatsSortOption.TITLE_ASC: {
-            const aTitleAsc = a.livestream.title || ""
-            const bTitleAsc = b.livestream.title || ""
+            const aTitleAsc = a.livestream.title?.trim()?.toLowerCase() || ""
+            const bTitleAsc = b.livestream.title?.trim()?.toLowerCase() || ""
             return aTitleAsc.localeCompare(bTitleAsc)
          }
 
          case LivestreamStatsSortOption.TITLE_DESC: {
-            const aTitleDesc = a.livestream.title || ""
-            const bTitleDesc = b.livestream.title || ""
+            const aTitleDesc = a.livestream.title?.trim()?.toLowerCase() || ""
+            const bTitleDesc = b.livestream.title?.trim()?.toLowerCase() || ""
             return bTitleDesc.localeCompare(aTitleDesc)
          }
 
