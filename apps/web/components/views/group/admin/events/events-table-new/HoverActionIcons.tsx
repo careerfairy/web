@@ -57,8 +57,9 @@ const containerVariants = {
       y: 0,
       transition: {
          type: "spring",
-         stiffness: 300,
-         damping: 20,
+         stiffness: 800,
+         damping: 30,
+         duration: 0.1,
       },
    },
 }
