@@ -25,6 +25,15 @@ export type CityOption = {
    stateIsoCode?: string
 }
 
+/**
+ * Location option type for search results
+ * Based on GroupOption but keeping only id and name
+ */
+export type LocationOption = {
+   id: string
+   name: string
+}
+
 export const generateCityId = (city: ICity) => {
    return `${city.countryCode}${LOCATION_ID_SEPARATOR}${city.stateCode}${LOCATION_ID_SEPARATOR}${city.name}`
 }
