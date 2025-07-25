@@ -1,3 +1,4 @@
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
    createContext,
    ReactNode,
@@ -16,6 +17,14 @@ type EventsViewContextValue = {
       field: "title" | "date" | "registrations"
    ) => "asc" | "desc"
    isActiveSort: (field: "title" | "date" | "registrations") => boolean
+   // Event action handlers
+   handleEnterLiveStreamRoom: (stat: LiveStreamStats) => void
+   handleShareLiveStream: (stat: LiveStreamStats) => void
+   handleAnalytics: (stat: LiveStreamStats) => void
+   handleQuestions: (stat: LiveStreamStats) => void
+   handleFeedback: (stat: LiveStreamStats) => void
+   handleEdit: (stat: LiveStreamStats) => void
+   handleShareRecording: (stat: LiveStreamStats) => void
 }
 
 const EventsViewContext = createContext<EventsViewContextValue | null>(null)
@@ -114,6 +123,70 @@ export const EventsViewProvider = ({
       [sortBy]
    )
 
+   // Event action handlers
+   const handleEnterLiveStreamRoom = useCallback((stat: LiveStreamStats) => {
+      // Navigate to external view of the livestream
+      alert(
+         `Enter live stream room for ${
+            stat.livestream.isDraft ? "draft" : "live stream"
+         }: ${stat.livestream.id}`
+      )
+   }, [])
+
+   const handleShareLiveStream = useCallback((stat: LiveStreamStats) => {
+      // Copy livestream link or duplicate functionality
+      alert(
+         `Share live stream for ${
+            stat.livestream.isDraft ? "draft" : "live stream"
+         }: ${stat.livestream.id}`
+      )
+   }, [])
+
+   const handleAnalytics = useCallback((stat: LiveStreamStats) => {
+      // Navigate to analytics view
+      alert(
+         `Analytics for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
+   }, [])
+
+   const handleQuestions = useCallback((stat: LiveStreamStats) => {
+      // Open messaging/feedback feature
+      alert(
+         `Questions for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
+   }, [])
+
+   const handleFeedback = useCallback((stat: LiveStreamStats) => {
+      // Open feedback/review feature for past livestreams
+      alert(
+         `Feedback for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
+   }, [])
+
+   const handleEdit = useCallback((stat: LiveStreamStats) => {
+      // Navigate to edit page
+      alert(
+         `Edit for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
+   }, [])
+
+   const handleShareRecording = useCallback((stat: LiveStreamStats) => {
+      // Navigate to recording view
+      alert(
+         `Share recording for ${
+            stat.livestream.isDraft ? "draft" : "live stream"
+         }: ${stat.livestream.id}`
+      )
+   }, [])
+
    const value = useMemo<EventsViewContextValue>(
       () => ({
          sortBy,
@@ -121,8 +194,28 @@ export const EventsViewProvider = ({
          handleTableSort,
          getSortDirection,
          isActiveSort,
+         handleEnterLiveStreamRoom,
+         handleShareLiveStream,
+         handleAnalytics,
+         handleQuestions,
+         handleFeedback,
+         handleEdit,
+         handleShareRecording,
       }),
-      [sortBy, setSortBy, handleTableSort, getSortDirection, isActiveSort]
+      [
+         sortBy,
+         setSortBy,
+         handleTableSort,
+         getSortDirection,
+         isActiveSort,
+         handleEnterLiveStreamRoom,
+         handleShareLiveStream,
+         handleAnalytics,
+         handleQuestions,
+         handleFeedback,
+         handleEdit,
+         handleShareRecording,
+      ]
    )
 
    return (

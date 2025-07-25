@@ -210,7 +210,18 @@ const HeaderColumnWrapper = ({ children, title }: HeaderColumnWrapperProps) => {
 }
 
 export const DesktopEventsView = ({ stats }: Props) => {
-   const { handleTableSort, getSortDirection, isActiveSort } = useEventsView()
+   const {
+      handleTableSort,
+      getSortDirection,
+      isActiveSort,
+      handleEnterLiveStreamRoom,
+      handleShareLiveStream,
+      handleAnalytics,
+      handleQuestions,
+      handleFeedback,
+      handleEdit,
+      handleShareRecording,
+   } = useEventsView()
    const [hoveredRow, setHoveredRow] = useState<string | null>(null)
 
    const { currentPageData, currentPage, totalPages, goToPage } =
@@ -225,70 +236,6 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
    const handleRowMouseLeave = () => {
       setHoveredRow(null)
-   }
-
-   // Placeholder handlers for action buttons - these would be implemented based on requirements
-   const handleEnterLiveStreamRoom = (stat: LiveStreamStats) => {
-      // Navigate to external view of the livestream
-      alert(
-         `Enter live stream room for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
-   }
-
-   const handleShareLiveStream = (stat: LiveStreamStats) => {
-      // Copy livestream link or duplicate functionality
-      alert(
-         `Share live stream for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
-   }
-
-   const handleAnalytics = (stat: LiveStreamStats) => {
-      // Navigate to analytics view
-      alert(
-         `Analytics for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
-      )
-   }
-
-   const handleQuestions = (stat: LiveStreamStats) => {
-      // Open messaging/feedback feature
-      alert(
-         `Questions for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
-      )
-   }
-
-   const handleFeedback = (stat: LiveStreamStats) => {
-      // Open feedback/review feature for past livestreams
-      alert(
-         `Feedback for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
-      )
-   }
-
-   const handleEdit = (stat: LiveStreamStats) => {
-      // Navigate to edit page
-      alert(
-         `Edit for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
-      )
-   }
-
-   const handleShareRecording = (stat: LiveStreamStats) => {
-      // Navigate to recording view
-      alert(
-         `Share recording for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
    }
 
    return (
