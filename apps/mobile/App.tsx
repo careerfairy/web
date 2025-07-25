@@ -16,6 +16,7 @@ import {
    Text,
    TouchableOpacity,
 } from "react-native"
+import { SafeAreaProvider } from "react-native-safe-area-context"
 import WebView from "react-native-webview"
 import WebViewComponent from "./components/WebView"
 import { app, auth, db } from "./firebase"
@@ -302,11 +303,13 @@ function Native() {
    }
 
    return (
-      <WebViewComponent
-         onTokenInjected={getPushToken}
-         onLogout={onLogout}
-         webViewRef={webViewRef}
-      />
+      <SafeAreaProvider>
+         <WebViewComponent
+            onTokenInjected={getPushToken}
+            onLogout={onLogout}
+            webViewRef={webViewRef}
+         />
+      </SafeAreaProvider>
    )
 }
 
