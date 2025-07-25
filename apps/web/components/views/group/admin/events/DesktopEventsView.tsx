@@ -1,6 +1,7 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
    Box,
+   ButtonBase,
    Stack,
    styled,
    Table,
@@ -162,7 +163,6 @@ const COLUMN_WIDTHS = {
    registrations: 92,
    views: 92,
    status: 40,
-   actions: 38,
 } as const
 
 const CentredBox = styled(Box)({
@@ -193,7 +193,8 @@ const HeaderColumnWrapper = ({ children, title }: HeaderColumnWrapperProps) => {
          placement="bottom"
       >
          <Box
-            component="span"
+            component={ButtonBase}
+            disableRipple
             sx={{
                px: 1,
                py: 0.5,
@@ -295,12 +296,6 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         <HeaderColumnWrapper title="Shows if your live stream is published, still a draft, or available as a recording.">
                            <HeaderText>Status</HeaderText>
                         </HeaderColumnWrapper>
-                     </TableCell>
-                     <TableCell
-                        sx={styles.headerCell}
-                        width={COLUMN_WIDTHS.actions}
-                     >
-                        {/* Actions column */}
                      </TableCell>
                   </TableRow>
                </TableHead>
@@ -421,20 +416,14 @@ export const DesktopEventsView = ({ stats }: Props) => {
 
                            {/* Status Column */}
                            <TableCell>
-                              <CentredBox width={COLUMN_WIDTHS.status}>
+                              <CentredBox
+                                 gap={0.5}
+                                 width={COLUMN_WIDTHS.status}
+                              >
                                  <StatusIcon
                                     isDraft={stat.livestream.isDraft}
                                     isPastEvent={isPastEvent}
                                  />
-                              </CentredBox>
-                           </TableCell>
-
-                           {/* Actions Column */}
-                           <TableCell
-                              padding="none"
-                              sx={[{ maxWidth: COLUMN_WIDTHS.actions }]}
-                           >
-                              <CentredBox>
                                  <QuickActionIcon />
                               </CentredBox>
                            </TableCell>
