@@ -23,7 +23,7 @@ import { useEventsView } from "./context/EventsViewContext"
 import { EventCardPreview } from "./events-table-new/EventCardPreview"
 import { QuickActionIcon } from "./events-table-new/QuickActionIcon"
 import { StatusIcon } from "./events-table-new/StatusIcon"
-import { TableColumn } from "./events-table-new/TableColumn"
+import { TableHighlighter } from "./events-table-new/TableHighlighter"
 import { getEventStatsKey } from "./util"
 
 const styles = sxStyles({
@@ -141,8 +141,8 @@ HeaderIcon.displayName = "HeaderIcon"
 const COLUMN_WIDTHS = {
    title: 350,
    date: 170,
-   registrations: 139,
-   views: 100,
+   registrations: 92,
+   views: 92,
    status: 40,
    actions: 38,
 } as const
@@ -345,58 +345,67 @@ export const DesktopEventsView = ({ stats }: Props) => {
                            </TableCell>
 
                            {/* Date Column */}
-                           <TableCell
-                              sx={[
-                                 styles.bodyCell,
-                                 { width: COLUMN_WIDTHS.date },
-                              ]}
-                           >
+                           <TableCell>
                               <CentredBox>
-                                 <TableColumn
-                                    icon={
-                                       <Calendar size={16} color="#6B6B7F" />
-                                    }
-                                    text={getEventDate(stat)}
-                                    width={170}
-                                 />
+                                 <TableHighlighter
+                                    title="Live stream date"
+                                    direction="row"
+                                    alignItems="center"
+                                    spacing={1}
+                                    width="100%"
+                                    color="neutral.600"
+                                 >
+                                    <Box component={Calendar} size={16} />
+                                    <Typography
+                                       variant="small"
+                                       whiteSpace="nowrap"
+                                    >
+                                       {getEventDate(stat)}
+                                    </Typography>
+                                 </TableHighlighter>
                               </CentredBox>
                            </TableCell>
 
                            {/* Registrations Column */}
-                           <TableCell
-                              sx={[
-                                 styles.bodyCell,
-                                 { minWidth: COLUMN_WIDTHS.registrations },
-                              ]}
-                           >
-                              <CentredBox>
-                                 <TableColumn
-                                    icon={<User size={16} color="#6B6B7F" />}
-                                    text={
-                                       stat.generalStats
-                                          .numberOfRegistrations || 0
-                                    }
-                                    width={100}
-                                 />
+                           <TableCell>
+                              <CentredBox width={COLUMN_WIDTHS.registrations}>
+                                 <TableHighlighter
+                                    title="Registrations"
+                                    direction="row"
+                                    alignItems="center"
+                                    spacing={1}
+                                    width="100%"
+                                    color="neutral.600"
+                                 >
+                                    <Box component={User} size={16} />
+                                    <Typography variant="small">
+                                       {stat.generalStats
+                                          .numberOfRegistrations || 0}
+                                    </Typography>
+                                 </TableHighlighter>
                               </CentredBox>
                            </TableCell>
 
                            {/* Views Column */}
                            <TableCell
-                              sx={[
-                                 styles.bodyCell,
-                                 { width: COLUMN_WIDTHS.views },
-                              ]}
+                              padding="none"
+                              sx={[{ minWidth: COLUMN_WIDTHS.views }]}
                            >
                               <CentredBox>
-                                 <TableColumn
-                                    icon={<Eye size={16} color="#6B6B7F" />}
-                                    text={
-                                       stat.generalStats
-                                          .numberOfPeopleReached || "-"
-                                    }
-                                    width={100}
-                                 />
+                                 <TableHighlighter
+                                    title="Views"
+                                    direction="row"
+                                    alignItems="center"
+                                    spacing={1}
+                                    width="100%"
+                                    color="neutral.600"
+                                 >
+                                    <Box component={Eye} size={16} />
+                                    <Typography variant="small">
+                                       {stat.generalStats
+                                          .numberOfPeopleReached || "-"}
+                                    </Typography>
+                                 </TableHighlighter>
                               </CentredBox>
                            </TableCell>
 
@@ -458,14 +467,14 @@ const getEventDate = (stat: LiveStreamStats) => {
    }
 
    const date = stat.livestream.start.toDate()
-   const formattedDate = date.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "2-digit",
+   const day = date.getDate().toString().padStart(2, "0")
+   const month = date.toLocaleDateString("en-US", { month: "short" })
+   const year = date.getFullYear().toString().slice(-2)
+   const time = date.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: true,
    })
 
-   return formattedDate
+   return `${day} ${month} ${year}, ${time}`
 }

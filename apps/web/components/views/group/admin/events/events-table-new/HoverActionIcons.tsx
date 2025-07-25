@@ -73,6 +73,8 @@ type Props = {
    onEdit?: () => void
 }
 
+const offset = [0, -12] as const
+
 export const HoverActionIcons = ({
    onEnterLiveStreamRoom,
    onShareLiveStream,
@@ -90,14 +92,18 @@ export const HoverActionIcons = ({
          style={styles.motionContainer}
       >
          {Boolean(onEdit) && (
-            <BrandedTooltip title="Edit" placement="top">
+            <BrandedTooltip title="Edit" placement="top" offset={offset}>
                <IconButton sx={styles.iconButton} onClick={onEdit}>
                   <Edit2 />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onEnterLiveStreamRoom) && (
-            <BrandedTooltip title="Enter live stream room" placement="top">
+            <BrandedTooltip
+               title="Enter live stream room"
+               placement="top"
+               offset={offset}
+            >
                <IconButton
                   sx={styles.iconButton}
                   onClick={onEnterLiveStreamRoom}
@@ -107,35 +113,43 @@ export const HoverActionIcons = ({
             </BrandedTooltip>
          )}
          {Boolean(onShareLiveStream) && (
-            <BrandedTooltip title="Share Live stream" placement="top">
+            <BrandedTooltip
+               title="Share Live stream"
+               placement="top"
+               offset={offset}
+            >
                <IconButton sx={styles.iconButton} onClick={onShareLiveStream}>
                   <Copy />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onShareRecording) && (
-            <BrandedTooltip title="Share recording" placement="top">
+            <BrandedTooltip
+               title="Share recording"
+               placement="top"
+               offset={offset}
+            >
                <IconButton sx={styles.iconButton} onClick={onShareRecording}>
                   <ShareArrowIconOutlined />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onAnalytics) && (
-            <BrandedTooltip title="Analytics" placement="top">
+            <BrandedTooltip title="Analytics" placement="top" offset={offset}>
                <IconButton sx={styles.iconButton} onClick={onAnalytics}>
                   <BarChart2 />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onQuestions) && (
-            <BrandedTooltip title="Questions" placement="top">
+            <BrandedTooltip title="Questions" placement="top" offset={offset}>
                <IconButton sx={styles.iconButton} onClick={onQuestions}>
                   <MessageSquare />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onFeedback) && (
-            <BrandedTooltip title="Feedback" placement="top">
+            <BrandedTooltip title="Feedback" placement="top" offset={offset}>
                <IconButton sx={styles.iconButton} onClick={onFeedback}>
                   <ThumbsUp />
                </IconButton>

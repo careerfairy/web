@@ -136,6 +136,7 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
          placement="top"
          arrow
          wrapperStyles={styles.tooltipWrapper}
+         offset={[0, -5]}
       >
          {avatarGroup}
       </BrandedTooltip>
