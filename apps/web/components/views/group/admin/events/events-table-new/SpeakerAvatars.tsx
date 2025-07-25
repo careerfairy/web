@@ -104,7 +104,7 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
       <AvatarGroup
          max={maxVisible}
          sx={styles.avatarGroup}
-         spacing="medium"
+         spacing={14}
          renderSurplus={renderSurplus}
       >
          {speakers.map((speaker) => (

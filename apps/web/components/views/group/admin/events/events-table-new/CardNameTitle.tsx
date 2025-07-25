@@ -1,9 +1,11 @@
+import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import { Box, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { placeholderBanner } from "constants/images"
 import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
 import { HoverActionIcons } from "./HoverActionIcons"
+import { SpeakerAvatars } from "./SpeakerAvatars"
 
 const styles = sxStyles({
    container: {
@@ -36,6 +38,7 @@ const styles = sxStyles({
 type Props = {
    title?: string
    backgroundImageUrl?: string
+   speakers?: Speaker[]
    showHoverActions?: boolean
    isDraft?: boolean
    isPastEvent?: boolean
@@ -52,6 +55,7 @@ type Props = {
 export const CardNameTitle = ({
    title,
    backgroundImageUrl,
+   speakers,
    showHoverActions,
    isDraft,
    isPastEvent,
@@ -83,53 +87,65 @@ export const CardNameTitle = ({
    const shouldShowShareRecording = !isDraft && isPastEvent && !isNotRecorded // Only for Past and Not-recorded
 
    return (
-      <Box sx={styles.container}>
-         <Image
-            src={backgroundImageUrl || placeholderBanner}
-            alt={title || "Livestream thumbnail"}
-            width={116}
-            height={64}
-            style={styles.thumbnailImage}
-            quality={100}
-         />
-         <Stack
-            spacing={0.75}
-            sx={styles.contentContainer}
-            py={showHoverActions ? undefined : 1}
-            pt={showHoverActions ? 1 : undefined}
-         >
-            <Typography
-               variant="medium"
-               color="neutral.800"
-               fontWeight={400}
-               sx={[
-                  showHoverActions
-                     ? styles.titleTextHovered
-                     : styles.titleTextDefault,
-               ]}
+      <Stack
+         direction="row"
+         spacing={4}
+         width="100%"
+         justifyContent="space-between"
+      >
+         <Box sx={styles.container}>
+            <Image
+               src={backgroundImageUrl || placeholderBanner}
+               alt={title || "Livestream thumbnail"}
+               width={116}
+               height={64}
+               style={styles.thumbnailImage}
+               quality={100}
+            />
+            <Stack
+               spacing={0.75}
+               sx={styles.contentContainer}
+               py={showHoverActions ? undefined : 1}
+               pt={showHoverActions ? 1 : undefined}
             >
-               {title || "Untitled"}
-            </Typography>
-            {Boolean(showHoverActions) && (
-               <HoverActionIcons
-                  onEdit={shouldShowEdit ? onEdit : undefined}
-                  onEnterLiveStreamRoom={
-                     shouldShowEnterLiveStreamRoom
-                        ? onEnterLiveStreamRoom
-                        : undefined
-                  }
-                  onShareLiveStream={
-                     shouldShowShareLiveStream ? onShareLiveStream : undefined
-                  }
-                  onAnalytics={shouldShowAnalytics ? onAnalytics : undefined}
-                  onQuestions={shouldShowQuestions ? onQuestions : undefined}
-                  onFeedback={shouldShowFeedback ? onFeedback : undefined}
-                  onShareRecording={
-                     shouldShowShareRecording ? onShareRecording : undefined
-                  }
-               />
-            )}
-         </Stack>
-      </Box>
+               <Typography
+                  variant="medium"
+                  color="neutral.800"
+                  fontWeight={400}
+                  sx={[
+                     showHoverActions
+                        ? styles.titleTextHovered
+                        : styles.titleTextDefault,
+                  ]}
+               >
+                  {title || "Untitled"}
+               </Typography>
+               {Boolean(showHoverActions) && (
+                  <HoverActionIcons
+                     onEdit={shouldShowEdit ? onEdit : undefined}
+                     onEnterLiveStreamRoom={
+                        shouldShowEnterLiveStreamRoom
+                           ? onEnterLiveStreamRoom
+                           : undefined
+                     }
+                     onShareLiveStream={
+                        shouldShowShareLiveStream
+                           ? onShareLiveStream
+                           : undefined
+                     }
+                     onAnalytics={shouldShowAnalytics ? onAnalytics : undefined}
+                     onQuestions={shouldShowQuestions ? onQuestions : undefined}
+                     onFeedback={shouldShowFeedback ? onFeedback : undefined}
+                     onShareRecording={
+                        shouldShowShareRecording ? onShareRecording : undefined
+                     }
+                  />
+               )}
+            </Stack>
+         </Box>
+         <Box flexShrink={0} display="flex" alignItems="center">
+            <SpeakerAvatars maxVisible={3} speakers={speakers} />
+         </Box>
+      </Stack>
    )
 }

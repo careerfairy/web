@@ -2,6 +2,7 @@ import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
    Box,
    Stack,
+   styled,
    Table,
    TableBody,
    TableCell,
@@ -21,7 +22,6 @@ import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
 import { CardNameTitle } from "./events-table-new/CardNameTitle"
 import { QuickActionIcon } from "./events-table-new/QuickActionIcon"
-import { SpeakerAvatars } from "./events-table-new/SpeakerAvatars"
 import { StatusIcon } from "./events-table-new/StatusIcon"
 import { TableColumn } from "./events-table-new/TableColumn"
 import { getEventStatsKey } from "./util"
@@ -71,7 +71,6 @@ const styles = sxStyles({
       "& .MuiTableCell-root": {
          borderBottom: "none",
          py: 1,
-         px: 2,
          border: "1px solid",
          borderColor: (theme) => theme.brand.white[400],
          backgroundColor: (theme) => theme.brand.white[200],
@@ -100,6 +99,9 @@ const styles = sxStyles({
             backgroundColor: (theme) => theme.brand.white[400], // Light background
          },
       },
+   },
+   bodyCell: {
+      px: 2,
    },
    infoText: {
       fontSize: "14px",
@@ -135,6 +137,22 @@ const HeaderIcon = forwardRef<HTMLSpanElement, IconProps>((props, ref) => (
    </Box>
 ))
 HeaderIcon.displayName = "HeaderIcon"
+
+const COLUMN_WIDTHS = {
+   title: 350,
+   date: 170,
+   registrations: 139,
+   views: 100,
+   status: 40,
+   actions: 38,
+} as const
+
+const CentredBox = styled(Box)({
+   display: "flex",
+   alignItems: "center",
+   width: "100%",
+   height: "100%",
+})
 
 export const DesktopEventsView = ({ stats }: Props) => {
    const { handleTableSort, getSortDirection, isActiveSort } = useEventsView()
@@ -237,9 +255,6 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         </TableSortLabel>
                      </TableCell>
                      <TableCell sx={styles.headerCell}>
-                        <HeaderText>Speakers</HeaderText>
-                     </TableCell>
-                     <TableCell sx={styles.headerCell}>
                         <TableSortLabel
                            active={isActiveSort("date")}
                            direction={getSortDirection("date")}
@@ -269,7 +284,10 @@ export const DesktopEventsView = ({ stats }: Props) => {
                      <TableCell sx={styles.headerCell}>
                         <HeaderText>Status</HeaderText>
                      </TableCell>
-                     <TableCell sx={styles.headerCell} width={48}>
+                     <TableCell
+                        sx={styles.headerCell}
+                        width={COLUMN_WIDTHS.actions}
+                     >
                         {/* Actions column */}
                      </TableCell>
                   </TableRow>
@@ -291,86 +309,120 @@ export const DesktopEventsView = ({ stats }: Props) => {
                            <TableCell
                               variant="head"
                               id="title-column"
-                              sx={{ minWidth: 300 }}
+                              sx={[
+                                 styles.bodyCell,
+                                 { minWidth: COLUMN_WIDTHS.title },
+                              ]}
                            >
-                              <CardNameTitle
-                                 title={stat.livestream.title}
-                                 backgroundImageUrl={
-                                    stat.livestream.backgroundImageUrl
-                                 }
-                                 showHoverActions={isHovered}
-                                 isDraft={stat.livestream.isDraft}
-                                 isPastEvent={isPastEvent}
-                                 isNotRecorded={
-                                    stat.livestream.denyRecordingAccess
-                                 }
-                                 onEnterLiveStreamRoom={() =>
-                                    handleEnterLiveStreamRoom(stat)
-                                 }
-                                 onShareLiveStream={() =>
-                                    handleShareLiveStream(stat)
-                                 }
-                                 onShareRecording={() =>
-                                    handleShareRecording(stat)
-                                 }
-                                 onAnalytics={() => handleAnalytics(stat)}
-                                 onQuestions={() => handleQuestions(stat)}
-                                 onFeedback={() => handleFeedback(stat)}
-                                 onEdit={() => handleEdit(stat)}
-                              />
-                           </TableCell>
-
-                           {/* Speakers Column */}
-                           <TableCell sx={{ minWidth: 124 }}>
-                              <SpeakerAvatars
-                                 speakers={stat.livestream.speakers}
-                                 maxVisible={3}
-                              />
+                              <CentredBox>
+                                 <CardNameTitle
+                                    title={stat.livestream.title}
+                                    speakers={stat.livestream.speakers}
+                                    backgroundImageUrl={
+                                       stat.livestream.backgroundImageUrl
+                                    }
+                                    showHoverActions={isHovered}
+                                    isDraft={stat.livestream.isDraft}
+                                    isPastEvent={isPastEvent}
+                                    isNotRecorded={
+                                       stat.livestream.denyRecordingAccess
+                                    }
+                                    onEnterLiveStreamRoom={() =>
+                                       handleEnterLiveStreamRoom(stat)
+                                    }
+                                    onShareLiveStream={() =>
+                                       handleShareLiveStream(stat)
+                                    }
+                                    onShareRecording={() =>
+                                       handleShareRecording(stat)
+                                    }
+                                    onAnalytics={() => handleAnalytics(stat)}
+                                    onQuestions={() => handleQuestions(stat)}
+                                    onFeedback={() => handleFeedback(stat)}
+                                    onEdit={() => handleEdit(stat)}
+                                 />
+                              </CentredBox>
                            </TableCell>
 
                            {/* Date Column */}
-                           <TableCell sx={{ width: 170 }}>
-                              <TableColumn
-                                 icon={<Calendar size={16} color="#6B6B7F" />}
-                                 text={getEventDate(stat)}
-                                 width={170}
-                              />
+                           <TableCell
+                              sx={[
+                                 styles.bodyCell,
+                                 { width: COLUMN_WIDTHS.date },
+                              ]}
+                           >
+                              <CentredBox>
+                                 <TableColumn
+                                    icon={
+                                       <Calendar size={16} color="#6B6B7F" />
+                                    }
+                                    text={getEventDate(stat)}
+                                    width={170}
+                                 />
+                              </CentredBox>
                            </TableCell>
 
                            {/* Registrations Column */}
-                           <TableCell sx={{ minWidth: 139 }}>
-                              <TableColumn
-                                 icon={<User size={16} color="#6B6B7F" />}
-                                 text={
-                                    stat.generalStats.numberOfRegistrations || 0
-                                 }
-                                 width={100}
-                              />
+                           <TableCell
+                              sx={[
+                                 styles.bodyCell,
+                                 { minWidth: COLUMN_WIDTHS.registrations },
+                              ]}
+                           >
+                              <CentredBox>
+                                 <TableColumn
+                                    icon={<User size={16} color="#6B6B7F" />}
+                                    text={
+                                       stat.generalStats
+                                          .numberOfRegistrations || 0
+                                    }
+                                    width={100}
+                                 />
+                              </CentredBox>
                            </TableCell>
 
                            {/* Views Column */}
-                           <TableCell sx={{ width: 100 }}>
-                              <TableColumn
-                                 icon={<Eye size={16} color="#6B6B7F" />}
-                                 text={
-                                    stat.generalStats.numberOfPeopleReached ||
-                                    "-"
-                                 }
-                                 width={100}
-                              />
+                           <TableCell
+                              sx={[
+                                 styles.bodyCell,
+                                 { width: COLUMN_WIDTHS.views },
+                              ]}
+                           >
+                              <CentredBox>
+                                 <TableColumn
+                                    icon={<Eye size={16} color="#6B6B7F" />}
+                                    text={
+                                       stat.generalStats
+                                          .numberOfPeopleReached || "-"
+                                    }
+                                    width={100}
+                                 />
+                              </CentredBox>
                            </TableCell>
 
                            {/* Status Column */}
-                           <TableCell sx={{ width: 80 }}>
-                              <StatusIcon
-                                 isDraft={stat.livestream.isDraft}
-                                 start={stat.livestream.start}
-                              />
+                           <TableCell
+                              sx={[
+                                 styles.bodyCell,
+                                 { maxWidth: COLUMN_WIDTHS.status },
+                              ]}
+                           >
+                              <CentredBox>
+                                 <StatusIcon
+                                    isDraft={stat.livestream.isDraft}
+                                    isPastEvent={isPastEvent}
+                                 />
+                              </CentredBox>
                            </TableCell>
 
                            {/* Actions Column */}
-                           <TableCell sx={{ width: 48 }}>
-                              <QuickActionIcon />
+                           <TableCell
+                              padding="none"
+                              sx={[{ maxWidth: COLUMN_WIDTHS.actions }]}
+                           >
+                              <CentredBox>
+                                 <QuickActionIcon />
+                              </CentredBox>
                            </TableCell>
                         </TableRow>
                      )
