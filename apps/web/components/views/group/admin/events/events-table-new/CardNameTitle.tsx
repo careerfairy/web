@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { placeholderBanner } from "constants/images"
 import Image from "next/image"
@@ -21,9 +21,6 @@ const styles = sxStyles({
    contentContainer: {
       flex: 1,
       minWidth: 0,
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-between", // Always top-aligned
       height: 64, // Fixed height to prevent expansion
       overflow: "hidden", // Prevent overflow
    },
@@ -50,30 +47,47 @@ type Props = {
    isDraft?: boolean
    isPastEvent?: boolean
    isNotRecorded?: boolean
-   onExternalLink?: () => void
-   onCopy?: () => void
+   onEnterLiveStreamRoom?: () => void
+   onShareLiveStream?: () => void
    onAnalytics?: () => void
-   onMessage?: () => void
+   onQuestions?: () => void
    onFeedback?: () => void
+   onEdit?: () => void
+   onShareRecording?: () => void
 }
 
 export const CardNameTitle = ({
    title,
    backgroundImageUrl,
-   // showHoverActions,
+   showHoverActions,
    isDraft,
    isPastEvent,
    isNotRecorded,
-   onExternalLink,
-   onCopy,
+   onEnterLiveStreamRoom,
+   onShareLiveStream,
    onAnalytics,
-   onMessage,
+   onQuestions,
    onFeedback,
+   onEdit,
+   onShareRecording,
 }: Props) => {
-   const showHoverActions = true
-   // Determine which actions to show based on status
-   const shouldShowExternalLink = !isDraft
-   const shouldShowFeedback = isPastEvent && !isNotRecorded
+   // const showHoverActions = true
+
+   // Action icon visibility logic:
+   // - Edit: Only visible for Draft events
+   // - Enter Live Stream Room: Only for Published (not Draft, not Past)
+   // - Share Live Stream: Only for Published (not Draft, not Past)
+   // - Analytics: Visible for all except Draft
+   // - Questions: Visible for all except Draft
+   // - Feedback: Only for Past (not Draft)
+   // - Share Recording: Only for Past events that are not recorded (not Draft)
+   const shouldShowEdit = isDraft // Only for Draft
+   const shouldShowEnterLiveStreamRoom = !isDraft && !isPastEvent // Only for Published
+   const shouldShowShareLiveStream = !isDraft && !isPastEvent // Only for Published
+   const shouldShowAnalytics = !isDraft // All except Draft
+   const shouldShowQuestions = !isDraft // All except Draft
+   const shouldShowFeedback = !isDraft && isPastEvent // Only for Past
+   const shouldShowShareRecording = !isDraft && isPastEvent && !isNotRecorded // Only for Past and Not-recorded
 
    return (
       <Box sx={styles.container}>
@@ -85,7 +99,12 @@ export const CardNameTitle = ({
             style={styles.thumbnailImage}
             quality={100}
          />
-         <Box sx={styles.contentContainer}>
+         <Stack
+            spacing={0.75}
+            sx={styles.contentContainer}
+            py={showHoverActions ? undefined : 1}
+            pt={showHoverActions ? 1 : undefined}
+         >
             <Typography
                sx={[
                   styles.titleText,
@@ -94,21 +113,28 @@ export const CardNameTitle = ({
                      : styles.titleTextDefault,
                ]}
             >
-               {title || (isDraft ? "Untitled draft" : "Untitled")}
+               {title || "Untitled"}
             </Typography>
             {Boolean(showHoverActions) && (
                <HoverActionIcons
-                  onExternalLink={
-                     shouldShowExternalLink ? onExternalLink : undefined
+                  onEdit={shouldShowEdit ? onEdit : undefined}
+                  onEnterLiveStreamRoom={
+                     shouldShowEnterLiveStreamRoom
+                        ? onEnterLiveStreamRoom
+                        : undefined
                   }
-                  onCopy={onCopy}
-                  onAnalytics={onAnalytics}
-                  onMessage={onMessage}
-                  onFeedback={onFeedback}
-                  showFeedback={shouldShowFeedback}
+                  onShareLiveStream={
+                     shouldShowShareLiveStream ? onShareLiveStream : undefined
+                  }
+                  onAnalytics={shouldShowAnalytics ? onAnalytics : undefined}
+                  onQuestions={shouldShowQuestions ? onQuestions : undefined}
+                  onFeedback={shouldShowFeedback ? onFeedback : undefined}
+                  onShareRecording={
+                     shouldShowShareRecording ? onShareRecording : undefined
+                  }
                />
             )}
-         </Box>
+         </Stack>
       </Box>
    )
 }

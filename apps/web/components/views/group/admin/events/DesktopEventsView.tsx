@@ -15,6 +15,7 @@ import {
 import { forwardRef, useState } from "react"
 import { Calendar, ChevronDown, Eye, IconProps, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { checkIfPast } from "util/streamUtil"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
@@ -154,29 +155,67 @@ export const DesktopEventsView = ({ stats }: Props) => {
    }
 
    // Placeholder handlers for action buttons - these would be implemented based on requirements
-   const handleExternalLink = (stat: LiveStreamStats) => {
+   const handleEnterLiveStreamRoom = (stat: LiveStreamStats) => {
       // Navigate to external view of the livestream
-      console.log("External link for:", stat.livestream.title)
+      console.log(
+         `Enter live stream room for ${
+            stat.livestream.isDraft ? "draft" : "live stream"
+         }: ${stat.livestream.id}`
+      )
    }
 
-   const handleCopy = (stat: LiveStreamStats) => {
+   const handleShareLiveStream = (stat: LiveStreamStats) => {
       // Copy livestream link or duplicate functionality
-      console.log("Copy/duplicate:", stat.livestream.title)
+      console.log(
+         `Share live stream for ${
+            stat.livestream.isDraft ? "draft" : "live stream"
+         }: ${stat.livestream.id}`
+      )
    }
 
    const handleAnalytics = (stat: LiveStreamStats) => {
       // Navigate to analytics view
-      console.log("Analytics for:", stat.livestream.title)
+      console.log(
+         `Analytics for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
    }
 
-   const handleMessage = (stat: LiveStreamStats) => {
+   const handleQuestions = (stat: LiveStreamStats) => {
       // Open messaging/feedback feature
-      console.log("Message for:", stat.livestream.title)
+      console.log(
+         `Questions for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
    }
 
    const handleFeedback = (stat: LiveStreamStats) => {
       // Open feedback/review feature for past livestreams
-      console.log("Feedback for:", stat.livestream.title)
+      console.log(
+         `Feedback for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
+   }
+
+   const handleEdit = (stat: LiveStreamStats) => {
+      // Navigate to edit page
+      console.log(
+         `Edit for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
+   }
+
+   const handleShareRecording = (stat: LiveStreamStats) => {
+      // Navigate to recording view
+      console.log(
+         `Share recording for ${
+            stat.livestream.isDraft ? "draft" : "live stream"
+         }: ${stat.livestream.id}`
+      )
    }
 
    return (
@@ -238,6 +277,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                <TableBody>
                   {currentPageData.map((stat) => {
                      const statKey = getEventStatsKey(stat)
+                     const isPastEvent = checkIfPast(stat.livestream)
                      const isHovered = hoveredRow === statKey
 
                      return (
@@ -260,20 +300,23 @@ export const DesktopEventsView = ({ stats }: Props) => {
                                  }
                                  showHoverActions={isHovered}
                                  isDraft={stat.livestream.isDraft}
-                                 isPastEvent={
-                                    stat.livestream.start
-                                       ? stat.livestream.start.toDate() <
-                                         new Date()
-                                       : false
-                                 }
+                                 isPastEvent={isPastEvent}
                                  isNotRecorded={
-                                    !stat.generalStats.numberOfPeopleReached
+                                    stat.livestream.denyRecordingAccess
                                  }
-                                 onExternalLink={() => handleExternalLink(stat)}
-                                 onCopy={() => handleCopy(stat)}
+                                 onEnterLiveStreamRoom={() =>
+                                    handleEnterLiveStreamRoom(stat)
+                                 }
+                                 onShareLiveStream={() =>
+                                    handleShareLiveStream(stat)
+                                 }
+                                 onShareRecording={() =>
+                                    handleShareRecording(stat)
+                                 }
                                  onAnalytics={() => handleAnalytics(stat)}
-                                 onMessage={() => handleMessage(stat)}
+                                 onQuestions={() => handleQuestions(stat)}
                                  onFeedback={() => handleFeedback(stat)}
+                                 onEdit={() => handleEdit(stat)}
                               />
                            </TableCell>
 

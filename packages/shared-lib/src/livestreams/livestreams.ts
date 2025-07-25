@@ -553,6 +553,7 @@ export type LivestreamEventPublicData = Partial<
       | "isDraft"
       | "speakers"
       | "creatorsIds"
+      | "denyRecordingAccess"
    >
 > & {
    id: LivestreamEvent["id"]
