@@ -23,7 +23,6 @@ const DISABLE_AUTO_ADVANCE = false
 // Slide data constants
 const SLIDES = [
    {
-      id: 1,
       title: "Money, Flexibility or Purpose?",
       description:
          "Tell us who you are to discover companies that offer what you want",
