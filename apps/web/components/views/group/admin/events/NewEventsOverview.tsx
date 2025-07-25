@@ -12,8 +12,8 @@ const NewEventsOverviewContent = () => {
    const router = useRouter()
    const groupId = router.query.groupId as string
    const [searchTerm, setSearchTerm] = useState("")
-   const { sortBy } = useEventsView()
    const isMobile = useIsMobile()
+   const { sortBy } = useEventsView()
 
    const {
       data: stats,
