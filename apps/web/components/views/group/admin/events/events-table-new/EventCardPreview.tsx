@@ -52,7 +52,7 @@ type Props = {
    onShareRecording?: () => void
 }
 
-export const CardNameTitle = ({
+export const EventCardPreview = ({
    title,
    backgroundImageUrl,
    speakers,
@@ -143,7 +143,13 @@ export const CardNameTitle = ({
                )}
             </Stack>
          </Box>
-         <Box flexShrink={0} display="flex" alignItems="center">
+         <Box
+            width={80}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            flexShrink={0}
+         >
             <SpeakerAvatars maxVisible={3} speakers={speakers} />
          </Box>
       </Stack>

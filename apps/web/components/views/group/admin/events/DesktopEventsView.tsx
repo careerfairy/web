@@ -20,7 +20,7 @@ import { checkIfPast } from "util/streamUtil"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
-import { CardNameTitle } from "./events-table-new/CardNameTitle"
+import { EventCardPreview } from "./events-table-new/EventCardPreview"
 import { QuickActionIcon } from "./events-table-new/QuickActionIcon"
 import { StatusIcon } from "./events-table-new/StatusIcon"
 import { TableColumn } from "./events-table-new/TableColumn"
@@ -315,7 +315,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                               ]}
                            >
                               <CentredBox>
-                                 <CardNameTitle
+                                 <EventCardPreview
                                     title={stat.livestream.title}
                                     speakers={stat.livestream.speakers}
                                     backgroundImageUrl={
