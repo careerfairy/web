@@ -1,5 +1,5 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { Fragment } from "react"
 import useClientSideInfiniteScroll from "../../../../custom-hook/utils/useClientSideInfiniteScroll"
 import { getEventStatsKey } from "./util"
@@ -9,12 +9,10 @@ type Props = {
 }
 
 export const MobileEventsView = ({ stats }: Props) => {
-   const { visibleData, hasMore, isLoading, ref } = useClientSideInfiniteScroll(
-      {
-         data: stats,
-         itemsPerPage: 5,
-      }
-   )
+   const { visibleData, hasMore, ref } = useClientSideInfiniteScroll({
+      data: stats,
+      itemsPerPage: 10,
+   })
 
    return (
       <Fragment>
@@ -113,18 +111,6 @@ export const MobileEventsView = ({ stats }: Props) => {
                   </li>
                ))}
             </ul>
-
-            {Boolean(isLoading) && (
-               <Box
-                  sx={{
-                     display: "flex",
-                     justifyContent: "center",
-                     py: 2,
-                  }}
-               >
-                  <CircularProgress size={24} />
-               </Box>
-            )}
 
             {Boolean(hasMore) && <Box height={100} ref={ref} />}
 
