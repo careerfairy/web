@@ -42,7 +42,7 @@ type Props = {
    showHoverActions?: boolean
    isDraft?: boolean
    isPastEvent?: boolean
-   isNotRecorded?: boolean
+   hasRecordingAvailable?: boolean
    onEnterLiveStreamRoom?: () => void
    onShareLiveStream?: () => void
    onAnalytics?: () => void
@@ -59,7 +59,7 @@ export const EventCardPreview = ({
    showHoverActions,
    isDraft,
    isPastEvent,
-   isNotRecorded,
+   hasRecordingAvailable,
    onEnterLiveStreamRoom,
    onShareLiveStream,
    onAnalytics,
@@ -77,14 +77,15 @@ export const EventCardPreview = ({
    // - Analytics: Visible for all except Draft
    // - Questions: Visible for all except Draft
    // - Feedback: Only for Past (not Draft)
-   // - Share Recording: Only for Past events that are not recorded (not Draft)
+   // - Share Recording: Only for Past events with recording available (not Draft)
    const shouldShowEdit = isDraft // Only for Draft
    const shouldShowEnterLiveStreamRoom = !isDraft && !isPastEvent // Only for Published
    const shouldShowShareLiveStream = !isDraft && !isPastEvent // Only for Published
    const shouldShowAnalytics = !isDraft // All except Draft
    const shouldShowQuestions = !isDraft // All except Draft
    const shouldShowFeedback = !isDraft && isPastEvent // Only for Past
-   const shouldShowShareRecording = !isDraft && isPastEvent && !isNotRecorded // Only for Past and Not-recorded
+   const shouldShowShareRecording =
+      !isDraft && isPastEvent && hasRecordingAvailable // Only for past events with recordings
 
    return (
       <Stack

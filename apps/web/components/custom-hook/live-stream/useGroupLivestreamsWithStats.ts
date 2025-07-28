@@ -185,6 +185,8 @@ const filterStatsBySearchTerm = (
 
       // Check if any speaker name contains the search term
       const speakerMatch = speakers.some((speaker) => {
+         if (!speaker) return false
+
          const fullName = `${speaker.firstName || ""} ${
             speaker.lastName || ""
          }`.toLowerCase()

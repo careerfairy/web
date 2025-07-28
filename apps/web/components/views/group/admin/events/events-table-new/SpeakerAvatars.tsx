@@ -81,7 +81,7 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
    }
 
    const renderSurplus = (surplus: number) => {
-      const nextSpeaker = speakers[maxVisible - 1] // Get the first hidden speaker
+      const nextSpeaker = speakers[maxVisible] // Get the first hidden speaker
       return (
          <Box
             sx={styles.surplusContainer}
@@ -128,7 +128,8 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
                      height={AVATAR_SIZE}
                      style={styles.avatarImage}
                   />
-               ) : speaker.firstName && speaker.lastName ? (
+               ) : speaker.firstName?.length > 0 &&
+                 speaker.lastName?.length > 0 ? (
                   `${speaker.firstName[0]}${speaker.lastName[0]}`
                ) : (
                   "?"
