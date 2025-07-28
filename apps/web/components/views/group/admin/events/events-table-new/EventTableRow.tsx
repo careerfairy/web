@@ -48,7 +48,7 @@ const styles = sxStyles({
       },
    },
    bodyCell: {
-      px: 2,
+      px: 1,
    },
 })
 
@@ -97,6 +97,7 @@ export const EventTableRow = ({
          sx={styles.bodyRow}
          onMouseEnter={onMouseEnter}
          onMouseLeave={onMouseLeave}
+         id="event-table-row"
       >
          {/* Title Column */}
          <TableCell

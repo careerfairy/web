@@ -7,14 +7,6 @@ import { BarChart2, Edit2, ExternalLink, MessageSquare } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   container: {
-      display: "flex",
-      gap: 1.5,
-      p: 0,
-      height: 32, // Fixed height to prevent expansion
-      alignItems: "center",
-      maxWidth: 318, // Match Figma width
-   },
    iconButton: {
       p: 0.75,
       borderRadius: "83px", // Fully rounded as shown in Figma
