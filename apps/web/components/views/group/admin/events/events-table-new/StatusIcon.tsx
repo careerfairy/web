@@ -5,20 +5,23 @@ import { LivestreamEventStatus } from "./utils"
 
 type Props = {
    status: LivestreamEventStatus
+   size: number
 }
 
-export const StatusIcon = ({ status }: Props) => {
+export const StatusIcon = ({ status, size }: Props) => {
    const getIcon = () => {
       switch (status) {
          case LivestreamEventStatus.DRAFT:
-            return <Box component={File} size={20} color="warning.600" />
+            return <Box component={File} size={size} color="warning.600" />
          case LivestreamEventStatus.NOT_RECORDED:
-            return <Box component={VideoOff} size={20} color="neutral.300" />
+            return <Box component={VideoOff} size={size} color="neutral.300" />
          case LivestreamEventStatus.RECORDING:
-            return <Box component={Video} size={20} color="neutral.500" />
+            return <Box component={Video} size={size} color="neutral.500" />
          default:
             // Published/upcoming event
-            return <Box component={CheckCircle} size={20} color="success.700" />
+            return (
+               <Box component={CheckCircle} size={size} color="success.700" />
+            )
       }
    }
 
@@ -38,14 +41,12 @@ export const StatusIcon = ({ status }: Props) => {
    }
 
    return (
-      <Box p={1}>
-         <BrandedTooltip
-            title={getTooltipTitle()}
-            placement="top"
-            offset={[0, -5]}
-         >
-            {getIcon()}
-         </BrandedTooltip>
-      </Box>
+      <BrandedTooltip
+         title={getTooltipTitle()}
+         placement="top"
+         offset={[0, -5]}
+      >
+         {getIcon()}
+      </BrandedTooltip>
    )
 }

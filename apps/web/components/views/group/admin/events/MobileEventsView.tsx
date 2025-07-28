@@ -1,12 +1,52 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { Box } from "@mui/material"
+import { Box, ButtonBase, Stack, Typography } from "@mui/material"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { placeholderBanner } from "constants/images"
+import Image from "next/image"
 import { Fragment } from "react"
+import { Calendar, Eye, User } from "react-feather"
+import { sxStyles } from "types/commonTypes"
+import { checkIfPast } from "util/streamUtil"
 import useClientSideInfiniteScroll from "../../../../custom-hook/utils/useClientSideInfiniteScroll"
+import { getEventDate } from "./events-table-new/EventsTableUtils"
+import { StatusIcon } from "./events-table-new/StatusIcon"
 import { getEventStatsKey } from "./util"
 
 type Props = {
    stats: LiveStreamStats[]
 }
+
+const styles = sxStyles({
+   eventCard: {
+      height: 109,
+      p: 1,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
+      backgroundColor: (theme) => theme.brand.white[100],
+      textAlign: "left",
+      verticalAlign: "top",
+      alignItems: "flex-start",
+   },
+   image: {
+      borderRadius: "8px",
+      objectFit: "cover",
+      flexShrink: 0,
+   },
+   loadMoreTrigger: {
+      height: 300,
+   },
+   statsRow: {
+      color: "neutral.600",
+      width: "100%",
+      "& svg": {
+         width: 14,
+         height: 14,
+      },
+   },
+})
 
 export const MobileEventsView = ({ stats }: Props) => {
    const { visibleData, hasMore, ref } = useClientSideInfiniteScroll({
@@ -14,120 +54,89 @@ export const MobileEventsView = ({ stats }: Props) => {
       itemsPerPage: 10,
    })
 
+   const handleCardClick = () => {
+      alert("card clicked")
+   }
+
    return (
       <Fragment>
-         <div>
-            <p
-               style={{ fontSize: "14px", color: "#666", marginBottom: "15px" }}
-            >
-               Showing {visibleData.length} of {stats.length} events
-            </p>
-
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-               {visibleData.map((stat) => (
-                  <li
+         <Stack spacing={0.5}>
+            {visibleData.map((stat) => {
+               const isPastEvent = checkIfPast(stat.livestream)
+               return (
+                  <ButtonBase
                      key={getEventStatsKey(stat)}
-                     style={{
-                        marginBottom: "12px",
-                        padding: "12px",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        backgroundColor: stat.livestream.isDraft
-                           ? "#fff3cd"
-                           : "#f8f9fa",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                     }}
+                     sx={styles.eventCard}
+                     onClick={handleCardClick}
+                     disableRipple
                   >
-                     <div
-                        style={{
-                           fontWeight: "bold",
-                           fontSize: "16px",
-                           marginBottom: "6px",
-                           lineHeight: "1.3",
-                        }}
-                     >
-                        {stat.livestream.title || "Untitled"}
-                     </div>
-
-                     <div
-                        style={{
-                           color: "#666",
-                           fontSize: "13px",
-                           marginBottom: "8px",
-                        }}
-                     >
-                        {stat.livestream.company || "No company"}
-                        {Boolean(stat.livestream.isDraft) && (
-                           <span
-                              style={{
-                                 color: "#856404",
-                                 fontWeight: "bold",
-                                 marginLeft: "8px",
-                                 padding: "1px 6px",
-                                 backgroundColor: "#ffeaa7",
-                                 borderRadius: "3px",
-                                 fontSize: "11px",
-                              }}
+                     <Stack direction="row" alignItems="center" spacing={1}>
+                        <Image
+                           src={
+                              stat.livestream.backgroundImageUrl ||
+                              placeholderBanner
+                           }
+                           alt={stat.livestream.title || "Livestream thumbnail"}
+                           width={96}
+                           height={53}
+                           style={styles.image}
+                        />
+                        <Stack spacing={0.5}>
+                           <Typography
+                              variant="medium"
+                              sx={getMaxLineStyles(2)}
+                              color="neutral.800"
                            >
-                              DRAFT
-                           </span>
-                        )}
-                     </div>
+                              {stat.livestream.title || "Untitled"}
+                           </Typography>
+                           <Stack
+                              direction="row"
+                              alignItems="center"
+                              spacing={1}
+                              color="neutral.600"
+                           >
+                              <Calendar size={14} />
+                              <Typography variant="xsmall">
+                                 {getEventDate(stat)}
+                              </Typography>
+                           </Stack>
+                        </Stack>
+                     </Stack>
 
-                     <div
-                        style={{
-                           fontSize: "12px",
-                           display: "flex",
-                           flexDirection: "column",
-                           gap: "4px",
-                        }}
+                     <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        spacing={1}
+                        sx={styles.statsRow}
                      >
-                        <div
-                           style={{
-                              display: "flex",
-                              gap: "12px",
-                              flexWrap: "wrap",
-                           }}
-                        >
-                           <span>
-                              <strong>Reg:</strong>{" "}
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                           <User size={14} />
+                           <Typography variant="xsmall">
                               {stat.generalStats.numberOfRegistrations}
-                           </span>
-                           <span>
-                              <strong>Part:</strong>{" "}
-                              {stat.generalStats.numberOfParticipants}
-                           </span>
-                           <span>
-                              <strong>Views:</strong> (not implemented)
-                           </span>
-                        </div>
-                        <span style={{ color: "#888" }}>
-                           <strong>Start:</strong>{" "}
-                           {stat.livestream.start
-                              ?.toDate?.()
-                              ?.toLocaleDateString() || "No date"}
-                        </span>
-                     </div>
-                  </li>
-               ))}
-            </ul>
+                           </Typography>
+                        </Stack>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                           <Eye size={14} />
+                           <Typography variant="xsmall">
+                              {stat.generalStats.numberOfParticipants || "-"}
+                           </Typography>
+                        </Stack>
+                        <StatusIcon
+                           isDraft={stat.livestream.isDraft}
+                           isPastEvent={isPastEvent}
+                           hasRecordingAvailable={
+                              !stat.livestream.denyRecordingAccess
+                           }
+                           size={14}
+                        />
+                     </Stack>
+                  </ButtonBase>
+               )
+            })}
 
-            {Boolean(hasMore) && <Box height={100} ref={ref} />}
-
-            {!hasMore && visibleData.length > 0 && (
-               <p
-                  style={{
-                     textAlign: "center",
-                     color: "#666",
-                     fontSize: "14px",
-                     marginTop: "20px",
-                     fontStyle: "italic",
-                  }}
-               >
-                  All events loaded
-               </p>
-            )}
-         </div>
+            {Boolean(hasMore) && <Box sx={styles.loadMoreTrigger} ref={ref} />}
+         </Stack>
       </Fragment>
    )
 }
