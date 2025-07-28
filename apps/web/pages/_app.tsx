@@ -25,6 +25,7 @@ import { store, wrapper } from "../store"
 
 import { useTrackWebviewResumedCount } from "components/custom-hook/utils/useTrackWebviewResumed"
 import { useWebviewConsoleProxy } from "components/custom-hook/utils/useWebviewConsoleProxy"
+import { LoginNudgeProvider } from "components/views/login-nudge/LoginNudgeProvider"
 import CompaniesTrackerProvider from "context/group/CompaniesTrackerProvider"
 import SparksFeedTrackerProvider from "context/spark/SparksFeedTrackerProvider"
 import { Fragment } from "react"
@@ -108,30 +109,32 @@ function MyApp(props) {
                         <TutorialProvider>
                            <ThemeProviderWrapper>
                               <AuthProvider>
-                                 <FirebaseServiceContext.Provider
-                                    value={firebaseServiceInstance}
-                                 >
-                                    <LocalizationProvider
-                                       dateAdapter={AdapterDateFns}
+                                 <LoginNudgeProvider>
+                                    <FirebaseServiceContext.Provider
+                                       value={firebaseServiceInstance}
                                     >
-                                       <UserReminderProvider>
-                                          <ErrorProvider>
-                                             <UserRewardsNotifications>
-                                                <SparksFeedTrackerProvider>
-                                                   <CompaniesTrackerProvider>
-                                                      {getLayout(
-                                                         <Component
-                                                            {...pageProps}
-                                                         />
-                                                      )}
-                                                   </CompaniesTrackerProvider>
-                                                </SparksFeedTrackerProvider>
-                                             </UserRewardsNotifications>
-                                             <Notifier />
-                                          </ErrorProvider>
-                                       </UserReminderProvider>
-                                    </LocalizationProvider>
-                                 </FirebaseServiceContext.Provider>
+                                       <LocalizationProvider
+                                          dateAdapter={AdapterDateFns}
+                                       >
+                                          <UserReminderProvider>
+                                             <ErrorProvider>
+                                                <UserRewardsNotifications>
+                                                   <SparksFeedTrackerProvider>
+                                                      <CompaniesTrackerProvider>
+                                                         {getLayout(
+                                                            <Component
+                                                               {...pageProps}
+                                                            />
+                                                         )}
+                                                      </CompaniesTrackerProvider>
+                                                   </SparksFeedTrackerProvider>
+                                                </UserRewardsNotifications>
+                                                <Notifier />
+                                             </ErrorProvider>
+                                          </UserReminderProvider>
+                                       </LocalizationProvider>
+                                    </FirebaseServiceContext.Provider>
+                                 </LoginNudgeProvider>
                               </AuthProvider>
                            </ThemeProviderWrapper>
                         </TutorialProvider>

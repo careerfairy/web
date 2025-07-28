@@ -15,6 +15,7 @@ export enum MESSAGING_TYPE {
    "IDENTIFY_CUSTOMER" = "IDENTIFY_CUSTOMER",
    "ON_AUTH_MOUNTED" = "ON_AUTH_MOUNTED",
    "FEEDBACK_PROMPT" = "FEEDBACK_PROMPT",
+   "SET_FULLSCREEN" = "SET_FULLSCREEN",
 
    /**
     * ------------------------------------------------------------
@@ -63,6 +64,10 @@ export type IDENTIFY_CUSTOMER = {
    userAuthId: string
 }
 
+export type SET_FULLSCREEN = {
+   enabled: boolean
+}
+
 export type NativeEventStringified = { nativeEvent: { data: string } }
 
 export type NativeEvent =
@@ -76,6 +81,7 @@ export type NativeEvent =
    | { type: MESSAGING_TYPE.ON_AUTH_MOUNTED; data: ON_AUTH_MOUNTED }
    | { type: MESSAGING_TYPE.IDENTIFY_CUSTOMER; data: IDENTIFY_CUSTOMER }
    | { type: MESSAGING_TYPE.FEEDBACK_PROMPT; data: null }
+   | { type: MESSAGING_TYPE.SET_FULLSCREEN; data: SET_FULLSCREEN }
 
 export type WebEvent =
    | { type: MESSAGING_TYPE.LOGOUT_WEB_VIEW; data: null }
