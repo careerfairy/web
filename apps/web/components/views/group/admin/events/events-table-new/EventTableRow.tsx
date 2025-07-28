@@ -71,6 +71,8 @@ type EventTableRowProps = {
    onQuestions: () => void
    onFeedback: () => void
    onEdit: () => void
+   onRegistrationsClick: () => void
+   onViewsClick: () => void
 }
 
 export const EventTableRow = ({
@@ -85,6 +87,8 @@ export const EventTableRow = ({
    onQuestions,
    onFeedback,
    onEdit,
+   onRegistrationsClick,
+   onViewsClick,
 }: EventTableRowProps) => {
    const isPastEvent = checkIfPast(stat.livestream)
 
@@ -139,7 +143,7 @@ export const EventTableRow = ({
          </TableCell>
 
          {/* Registrations Column */}
-         <TableCell>
+         <TableCell onClick={onRegistrationsClick} sx={{ cursor: "pointer" }}>
             <CentredBox>
                <TableHighlighter
                   title="Registrations"
@@ -158,7 +162,7 @@ export const EventTableRow = ({
          </TableCell>
 
          {/* Views Column */}
-         <TableCell>
+         <TableCell onClick={onViewsClick} sx={{ cursor: "pointer" }}>
             <CentredBox>
                <TableHighlighter
                   title="Views"

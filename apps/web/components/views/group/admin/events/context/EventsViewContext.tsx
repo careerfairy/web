@@ -25,6 +25,8 @@ type EventsViewContextValue = {
    handleFeedback: (stat: LiveStreamStats) => void
    handleEdit: (stat: LiveStreamStats) => void
    handleShareRecording: (stat: LiveStreamStats) => void
+   handleRegistrationsClick: (stat: LiveStreamStats) => void
+   handleViewsClick: (stat: LiveStreamStats) => void
 }
 
 const EventsViewContext = createContext<EventsViewContextValue | null>(null)
@@ -187,6 +189,24 @@ export const EventsViewProvider = ({
       )
    }, [])
 
+   const handleRegistrationsClick = useCallback((stat: LiveStreamStats) => {
+      // Navigate to registrations view
+      alert(
+         `Registrations for ${
+            stat.livestream.isDraft ? "draft" : "live stream"
+         }: ${stat.livestream.id}`
+      )
+   }, [])
+
+   const handleViewsClick = useCallback((stat: LiveStreamStats) => {
+      // Navigate to views view
+      alert(
+         `Views for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
+   }, [])
+
    const value = useMemo<EventsViewContextValue>(
       () => ({
          sortBy,
@@ -201,6 +221,8 @@ export const EventsViewProvider = ({
          handleFeedback,
          handleEdit,
          handleShareRecording,
+         handleRegistrationsClick,
+         handleViewsClick,
       }),
       [
          sortBy,
@@ -215,6 +237,8 @@ export const EventsViewProvider = ({
          handleFeedback,
          handleEdit,
          handleShareRecording,
+         handleRegistrationsClick,
+         handleViewsClick,
       ]
    )
 

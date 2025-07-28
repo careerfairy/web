@@ -36,6 +36,8 @@ export const DesktopEventsView = ({ stats }: Props) => {
       handleFeedback,
       handleEdit,
       handleShareRecording,
+      handleRegistrationsClick,
+      handleViewsClick,
    } = useEventsView()
    const [hoveredRow, setHoveredRow] = useState<string | null>(null)
 
@@ -111,6 +113,10 @@ export const DesktopEventsView = ({ stats }: Props) => {
                            onQuestions={() => handleQuestions(stat)}
                            onFeedback={() => handleFeedback(stat)}
                            onEdit={() => handleEdit(stat)}
+                           onRegistrationsClick={() =>
+                              handleRegistrationsClick(stat)
+                           }
+                           onViewsClick={() => handleViewsClick(stat)}
                         />
                      )
                   })}

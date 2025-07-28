@@ -88,7 +88,8 @@ export const useGroupLivestreamsWithStats = (
          const statsQuery = query(
             collectionGroup(firestore, "stats"),
             where("id", "==", "livestreamStats"),
-            where("livestream.groupIds", "array-contains", groupId)
+            where("livestream.groupIds", "array-contains", groupId),
+            where("livestream.test", "==", false)
          ).withConverter(createGenericConverter<LiveStreamStats>())
 
          const statsSnapshot = await getDocs(statsQuery)
