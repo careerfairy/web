@@ -711,6 +711,7 @@ export const pickPublicDataFromLivestream = (
       backgroundImageUrl: livestreamData.backgroundImageUrl ?? null,
       creatorsIds: livestreamData.creatorsIds ?? [],
       speakers: livestreamData.speakers ?? [],
+      denyRecordingAccess: livestreamData.denyRecordingAccess ?? false,
    }
 }
 
