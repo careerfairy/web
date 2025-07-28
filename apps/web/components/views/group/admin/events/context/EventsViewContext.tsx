@@ -68,7 +68,7 @@ type EventsViewProviderProps = {
 
 export const EventsViewProvider = ({
    children,
-   initialSort = LivestreamStatsSortOption.START_DESC,
+   initialSort = LivestreamStatsSortOption.STATUS_WITH_DATE,
 }: EventsViewProviderProps) => {
    const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(initialSort)
 

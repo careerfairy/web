@@ -1,15 +1,9 @@
 import { IconButton } from "@mui/material"
+import { FeedbackIcon } from "components/views/common/icons/FeedbackIcon"
 import { ShareArrowIconOutlined } from "components/views/common/icons/ShareArrowIconOutlined"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { motion } from "framer-motion"
-import {
-   BarChart2,
-   Copy,
-   Edit2,
-   ExternalLink,
-   MessageSquare,
-   ThumbsUp,
-} from "react-feather"
+import { BarChart2, Edit2, ExternalLink, MessageSquare } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -120,7 +114,7 @@ export const HoverActionIcons = ({
                offset={offset}
             >
                <IconButton sx={styles.iconButton} onClick={onShareLiveStream}>
-                  <Copy />
+                  <ShareArrowIconOutlined />
                </IconButton>
             </BrandedTooltip>
          )}
@@ -152,7 +146,7 @@ export const HoverActionIcons = ({
          {Boolean(onFeedback) && (
             <BrandedTooltip title="Feedback" placement="top" offset={offset}>
                <IconButton sx={styles.iconButton} onClick={onFeedback}>
-                  <ThumbsUp />
+                  <FeedbackIcon />
                </IconButton>
             </BrandedTooltip>
          )}

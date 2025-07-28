@@ -12,9 +12,9 @@ import { TableHighlighter } from "./TableHighlighter"
 
 const styles = sxStyles({
    bodyRow: {
-      cursor: "pointer",
       transition: "all 0.2s ease-in-out",
       height: 80,
+      cursor: "default",
       "& .MuiTableCell-root": {
          borderBottom: "none",
          py: 1,

@@ -19,6 +19,7 @@ import { useMemo } from "react"
 import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { checkIfPast } from "util/streamUtil"
 
 /**
  * Sort options for livestream stats
@@ -40,6 +41,8 @@ export enum LivestreamStatsSortOption {
    PARTICIPANTS_DESC,
    /** Least participants first */
    PARTICIPANTS_ASC,
+   /** Status-based: upcoming, draft, past (with date as secondary sort) */
+   STATUS_WITH_DATE,
 }
 
 interface UseGroupLivestreamsWithStatsOptions {
@@ -167,6 +170,24 @@ export const useGroupLivestreamsWithStats = (
 
 // --- Helpers ---
 
+/**
+ * Compares two livestream stats by their start date
+ * @param a First livestream stat
+ * @param b Second livestream stat
+ * @param ascending Whether to sort in ascending order (true) or descending order (false)
+ * @returns Comparison result for sorting
+ */
+const compareByDate = (
+   a: LiveStreamStats,
+   b: LiveStreamStats,
+   ascending: boolean = false
+): number => {
+   const aDate = a.livestream.start?.toDate?.() || new Date(0)
+   const bDate = b.livestream.start?.toDate?.() || new Date(0)
+   const comparison = aDate.getTime() - bDate.getTime()
+   return ascending ? comparison : -comparison
+}
+
 const filterStatsBySearchTerm = (
    stats: LiveStreamStats[],
    searchTerm: string
@@ -204,18 +225,12 @@ const sortStatsArray = (
 ): LiveStreamStats[] => {
    return [...stats].sort((a, b) => {
       switch (sortBy) {
-         case LivestreamStatsSortOption.START_ASC: {
-            const aStartAsc = a.livestream.start?.toDate?.() || new Date(0)
-            const bStartAsc = b.livestream.start?.toDate?.() || new Date(0)
-            return aStartAsc.getTime() - bStartAsc.getTime()
-         }
+         case LivestreamStatsSortOption.START_ASC:
+            return compareByDate(a, b, true)
 
          case LivestreamStatsSortOption.START_DESC:
-         default: {
-            const aStartDesc = a.livestream.start?.toDate?.() || new Date(0)
-            const bStartDesc = b.livestream.start?.toDate?.() || new Date(0)
-            return bStartDesc.getTime() - aStartDesc.getTime()
-         }
+         default:
+            return compareByDate(a, b, false)
 
          case LivestreamStatsSortOption.TITLE_ASC: {
             const aTitleAsc = a.livestream.title?.trim()?.toLowerCase() || ""
@@ -252,6 +267,36 @@ const sortStatsArray = (
                a.generalStats.numberOfParticipants -
                b.generalStats.numberOfParticipants
             )
+
+         case LivestreamStatsSortOption.STATUS_WITH_DATE: {
+            // Get status priority: upcoming (0), draft (1), past (2)
+            const getStatusPriority = (stat: LiveStreamStats): number => {
+               if (stat.livestream.isDraft) return 1
+               if (checkIfPast(stat.livestream)) return 2
+               return 0 // upcoming
+            }
+
+            const aStatusPriority = getStatusPriority(a)
+            const bStatusPriority = getStatusPriority(b)
+
+            // First sort by status priority
+            if (aStatusPriority !== bStatusPriority) {
+               return aStatusPriority - bStatusPriority
+            }
+
+            // For past events, prioritize those with accessible recordings (denyRecordingAccess = false)
+            if (aStatusPriority === 2 && bStatusPriority === 2) {
+               const aHasAccessibleRecording = !a.livestream.denyRecordingAccess
+               const bHasAccessibleRecording = !b.livestream.denyRecordingAccess
+
+               if (aHasAccessibleRecording !== bHasAccessibleRecording) {
+                  return aHasAccessibleRecording ? -1 : 1 // Accessible recordings first
+               }
+            }
+
+            // Then sort by date within each status category
+            return compareByDate(a, b, false)
+         }
       }
    })
 }

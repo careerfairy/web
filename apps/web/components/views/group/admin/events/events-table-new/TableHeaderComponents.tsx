@@ -7,7 +7,7 @@ import {
    Typography,
    TypographyProps,
 } from "@mui/material"
-import { forwardRef } from "react"
+import { forwardRef, ReactNode } from "react"
 import { ChevronDown, IconProps } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { BrandedTooltip } from "../../../../streaming-page/components/BrandedTooltip"
@@ -29,7 +29,7 @@ const styles = sxStyles({
    headerText: (theme) => ({
       fontWeight: 400,
       ...theme.typography.xsmall,
-      color: "common.black",
+      color: "neutral.900",
    }),
    headerTextActive: {
       fontWeight: 600,
@@ -85,7 +85,7 @@ export const HeaderIcon = forwardRef<HTMLSpanElement, IconProps>(
 HeaderIcon.displayName = "HeaderIcon"
 
 type HeaderColumnWrapperProps = {
-   children: React.ReactNode
+   children: ReactNode
    title: string
 }
 
@@ -112,7 +112,7 @@ export const HeaderColumnWrapper = ({
 }
 
 type SortableHeaderCellProps = {
-   children: React.ReactNode
+   children: ReactNode
    active: boolean
    direction: "asc" | "desc"
    onSort: () => void
@@ -149,7 +149,8 @@ export const SortableHeaderCell = ({
 }
 
 type NonSortableHeaderCellProps = {
-   children: React.ReactNode
+   children: ReactNode
+
    tooltip?: string
 }
 

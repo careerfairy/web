@@ -20,9 +20,6 @@ export const eventsTableStyles = sxStyles({
          },
       },
    },
-   tableHead: {
-      backgroundColor: (theme) => theme.brand.white[100],
-   },
 })
 
 export const COLUMN_WIDTHS = {

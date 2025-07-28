@@ -57,7 +57,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
       <Box>
          <TableContainer sx={eventsTableStyles.tableContainer}>
             <Table sx={eventsTableStyles.table}>
-               <TableHead sx={eventsTableStyles.tableHead}>
+               <TableHead>
                   <TableRow>
                      <SortableHeaderCell
                         active={isActiveSort("title")}
