@@ -5,13 +5,13 @@ import { CheckCircle, File, Video, VideoOff } from "react-feather"
 type Props = {
    isDraft?: boolean
    isPastEvent?: boolean
-   denyRecordingAccess?: boolean
+   hasRecordingAvailable?: boolean
 }
 
 export const StatusIcon = ({
    isDraft,
    isPastEvent,
-   denyRecordingAccess,
+   hasRecordingAvailable,
 }: Props) => {
    const getIcon = () => {
       if (isDraft) {
@@ -21,7 +21,7 @@ export const StatusIcon = ({
       // Check if it's a past event
       if (isPastEvent) {
          // Check if recording is available
-         if (denyRecordingAccess) {
+         if (!hasRecordingAvailable) {
             return <Box component={VideoOff} size={20} color="neutral.300" />
          }
          return <Box component={Video} size={20} color="neutral.500" />
@@ -37,7 +37,7 @@ export const StatusIcon = ({
       }
 
       if (isPastEvent) {
-         if (denyRecordingAccess) {
+         if (!hasRecordingAvailable) {
             return "Recording not available"
          }
 

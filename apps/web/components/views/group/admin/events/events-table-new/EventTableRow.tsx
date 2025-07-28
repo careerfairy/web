@@ -179,6 +179,7 @@ export const EventTableRow = ({
             <CentredBox gap={0.5} width={COLUMN_WIDTHS.status}>
                <StatusIcon
                   isDraft={stat.livestream.isDraft}
+                  hasRecordingAvailable={!stat.livestream.denyRecordingAccess}
                   isPastEvent={isPastEvent}
                />
                <QuickActionIcon />
