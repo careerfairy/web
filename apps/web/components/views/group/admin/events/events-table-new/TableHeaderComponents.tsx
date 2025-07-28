@@ -34,6 +34,32 @@ const styles = sxStyles({
    headerTextActive: {
       fontWeight: 600,
    },
+   headerIcon: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: "4px",
+      "& svg": {
+         mr: 0,
+      },
+   },
+   tooltipWrapper: {
+      display: "inline-flex",
+   },
+   tooltip: {
+      [`& .${tooltipClasses.tooltip}`]: {
+         maxWidth: 294,
+         textAlign: "start",
+      },
+   },
+   headerColumnButton: {
+      px: 1,
+      py: 0.5,
+      borderRadius: "4px",
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.white[500],
+      },
+   },
 })
 
 type HeaderTextProps = TypographyProps & { active?: boolean }
@@ -51,20 +77,7 @@ export const HeaderText = ({ children, active, ...props }: HeaderTextProps) => {
 
 export const HeaderIcon = forwardRef<HTMLSpanElement, IconProps>(
    (props, ref) => (
-      <Box
-         component="span"
-         id="header-icon"
-         ref={ref}
-         sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: "4px",
-            "& svg": {
-               mr: 0,
-            },
-         }}
-      >
+      <Box component="span" id="header-icon" ref={ref} sx={styles.headerIcon}>
          <ChevronDown size={16} {...props} />
       </Box>
    )
@@ -82,29 +95,15 @@ export const HeaderColumnWrapper = ({
 }: HeaderColumnWrapperProps) => {
    return (
       <BrandedTooltip
-         wrapperStyles={{
-            display: "inline-flex",
-         }}
+         wrapperStyles={styles.tooltipWrapper}
          title={title}
-         sx={{
-            [`& .${tooltipClasses.tooltip}`]: {
-               maxWidth: 294,
-               textAlign: "start",
-            },
-         }}
+         sx={styles.tooltip}
          placement="bottom"
       >
          <Box
             component={ButtonBase}
             disableRipple
-            sx={{
-               px: 1,
-               py: 0.5,
-               borderRadius: "4px",
-               "&:hover": {
-                  backgroundColor: (theme) => theme.brand.white[500],
-               },
-            }}
+            sx={styles.headerColumnButton}
          >
             {children}
          </Box>
