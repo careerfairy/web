@@ -18,10 +18,10 @@ const styles = sxStyles({
       background: "transparent",
       p: 1,
       "&:hover": {
-         backgroundColor: "neutral.100",
+         backgroundColor: "neutral.50",
       },
       "&:active": {
-         backgroundColor: "neutral.200",
+         backgroundColor: "neutral.100",
       },
       "&:focus": {
          outline: "none",

@@ -25,13 +25,38 @@ const styles = sxStyles({
       minWidth: 0,
       height: 64, // Fixed height to prevent expansion
       overflow: "hidden", // Prevent overflow
+      position: "relative",
    },
    titleTextDefault: {
       ...getMaxLineStyles(2), // 2 lines by default
    },
    titleTextHovered: {
       ...getMaxLineStyles(1), // 1 line when hovered
-      height: 20, // Fixed height when hovered
+      overflow: "visible",
+   },
+   hoverActionsBackground: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: 32,
+      backgroundColor: (theme) => theme.brand.white[200],
+      animation: "fadeInBackground 0.2s ease-in-out forwards",
+      "@keyframes fadeInBackground": {
+         "0%": {
+            backgroundColor: (theme) => theme.brand.white[200],
+         },
+         "100%": {
+            backgroundColor: (theme) => theme.brand.white[400],
+         },
+      },
+   },
+   speakerAvatarsContainer: {
+      width: 80,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
    },
 })
 
@@ -68,8 +93,6 @@ export const EventCardPreview = ({
    onEdit,
    onShareRecording,
 }: Props) => {
-   // const showHoverActions = true
-
    // Action icon visibility logic:
    // - Edit: Only visible for Draft events
    // - Enter Live Stream Room: Only for Published (not Draft, not Past)
@@ -104,10 +127,10 @@ export const EventCardPreview = ({
                quality={100}
             />
             <Stack
-               spacing={0.75}
                sx={styles.contentContainer}
                py={showHoverActions ? undefined : 1}
                pt={showHoverActions ? 1 : undefined}
+               justifyContent="space-between"
             >
                <Typography
                   variant="medium"
@@ -122,35 +145,37 @@ export const EventCardPreview = ({
                   {title || "Untitled"}
                </Typography>
                {Boolean(showHoverActions) && (
-                  <HoverActionIcons
-                     onEdit={shouldShowEdit ? onEdit : undefined}
-                     onEnterLiveStreamRoom={
-                        shouldShowEnterLiveStreamRoom
-                           ? onEnterLiveStreamRoom
-                           : undefined
-                     }
-                     onShareLiveStream={
-                        shouldShowShareLiveStream
-                           ? onShareLiveStream
-                           : undefined
-                     }
-                     onAnalytics={shouldShowAnalytics ? onAnalytics : undefined}
-                     onQuestions={shouldShowQuestions ? onQuestions : undefined}
-                     onFeedback={shouldShowFeedback ? onFeedback : undefined}
-                     onShareRecording={
-                        shouldShowShareRecording ? onShareRecording : undefined
-                     }
-                  />
+                  <Box sx={styles.hoverActionsBackground}>
+                     <HoverActionIcons
+                        onEdit={shouldShowEdit ? onEdit : undefined}
+                        onEnterLiveStreamRoom={
+                           shouldShowEnterLiveStreamRoom
+                              ? onEnterLiveStreamRoom
+                              : undefined
+                        }
+                        onShareLiveStream={
+                           shouldShowShareLiveStream
+                              ? onShareLiveStream
+                              : undefined
+                        }
+                        onAnalytics={
+                           shouldShowAnalytics ? onAnalytics : undefined
+                        }
+                        onQuestions={
+                           shouldShowQuestions ? onQuestions : undefined
+                        }
+                        onFeedback={shouldShowFeedback ? onFeedback : undefined}
+                        onShareRecording={
+                           shouldShowShareRecording
+                              ? onShareRecording
+                              : undefined
+                        }
+                     />
+                  </Box>
                )}
             </Stack>
          </Box>
-         <Box
-            width={80}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            flexShrink={0}
-         >
+         <Box sx={styles.speakerAvatarsContainer}>
             <SpeakerAvatars maxVisible={3} speakers={speakers} />
          </Box>
       </Stack>

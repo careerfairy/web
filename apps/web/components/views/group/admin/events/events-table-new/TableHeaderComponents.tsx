@@ -1,6 +1,5 @@
 import {
    Box,
-   ButtonBase,
    TableCell,
    TableSortLabel,
    tooltipClasses,
@@ -89,10 +88,7 @@ type HeaderColumnWrapperProps = {
    title: string
 }
 
-export const HeaderColumnWrapper = ({
-   children,
-   title,
-}: HeaderColumnWrapperProps) => {
+const HeaderColumnWrapper = ({ children, title }: HeaderColumnWrapperProps) => {
    return (
       <BrandedTooltip
          wrapperStyles={styles.tooltipWrapper}
@@ -100,13 +96,7 @@ export const HeaderColumnWrapper = ({
          sx={styles.tooltip}
          placement="bottom"
       >
-         <Box
-            component={ButtonBase}
-            disableRipple
-            sx={styles.headerColumnButton}
-         >
-            {children}
-         </Box>
+         <span>{children}</span>
       </BrandedTooltip>
    )
 }
@@ -132,6 +122,7 @@ export const SortableHeaderCell = ({
          direction={direction}
          onClick={onSort}
          IconComponent={HeaderIcon}
+         sx={styles.headerColumnButton}
       >
          <HeaderText active={active}>{children}</HeaderText>
       </TableSortLabel>
@@ -150,7 +141,6 @@ export const SortableHeaderCell = ({
 
 type NonSortableHeaderCellProps = {
    children: ReactNode
-
    tooltip?: string
 }
 
@@ -163,7 +153,9 @@ export const NonSortableHeaderCell = ({
    return (
       <TableCell sx={styles.headerCell}>
          {tooltip ? (
-            <HeaderColumnWrapper title={tooltip}>{content}</HeaderColumnWrapper>
+            <HeaderColumnWrapper title={tooltip}>
+               <Box sx={styles.headerColumnButton}>{content}</Box>
+            </HeaderColumnWrapper>
          ) : (
             content
          )}

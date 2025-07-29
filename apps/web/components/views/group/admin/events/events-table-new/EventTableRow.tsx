@@ -19,7 +19,7 @@ const styles = sxStyles({
          borderBottom: "none",
          py: 1,
          border: "1px solid",
-         borderColor: (theme) => theme.brand.white[400],
+         borderColor: (theme) => theme.brand.purple[50],
          backgroundColor: (theme) => theme.brand.white[200],
          boxSizing: "border-box",
          transition: "all 0.2s ease-in-out",
@@ -40,11 +40,11 @@ const styles = sxStyles({
             borderLeft: "none",
          },
       },
-      "&:hover": {
-         "& .MuiTableCell-root": {
-            borderColor: "secondary.100",
-            backgroundColor: (theme) => theme.brand.white[400],
-         },
+   },
+   bodyRowHovered: {
+      "& .MuiTableCell-root": {
+         borderColor: "secondary.100",
+         backgroundColor: (theme) => theme.brand.white[400],
       },
    },
    bodyCell: {
@@ -94,9 +94,11 @@ export const EventTableRow = ({
 
    return (
       <TableRow
-         sx={styles.bodyRow}
+         sx={[styles.bodyRow, isHovered && styles.bodyRowHovered]}
          onMouseEnter={onMouseEnter}
          onMouseLeave={onMouseLeave}
+         onFocus={onMouseEnter}
+         onBlur={onMouseLeave}
          id="event-table-row"
       >
          {/* Title Column */}
