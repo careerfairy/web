@@ -16,7 +16,7 @@ import {
 } from "react-feather"
 import { checkIfPast } from "../../../../../util/streamUtil"
 import { useEventsView } from "./context/EventsViewContext"
-import { getEventActionConditions } from "./eventActionConditions"
+import { getEventActionConditions } from "./events-table-new/EventsTableUtils"
 
 type Props = {
    stat: LiveStreamStats | null
@@ -37,12 +37,13 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       handleDelete,
    } = useEventsView()
 
-   const isDraft = Boolean(stat?.livestream.isDraft)
-   const isPastEvent = checkIfPast(stat?.livestream)
-   const hasRecordingAvailable = !stat?.livestream.denyRecordingAccess
+   const isDraft = Boolean(stat?.livestream?.isDraft)
+   const isPastEvent = stat?.livestream ? checkIfPast(stat.livestream) : false
+   const hasRecordingAvailable = stat?.livestream
+      ? !stat.livestream.denyRecordingAccess
+      : false
 
    const {
-      shouldShowEdit,
       shouldShowEnterLiveStreamRoom,
       shouldShowShareLiveStream,
       shouldShowViewRecording,
@@ -50,7 +51,6 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       shouldShowAnalytics,
       shouldShowQuestions,
       shouldShowFeedback,
-      shouldShowDelete,
    } = getEventActionConditions({
       isDraft,
       isPastEvent,
@@ -123,35 +123,31 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       }
 
       // For All events
-      if (shouldShowEdit) {
-         const editLabel = isDraft
-            ? "Edit draft"
-            : isPastEvent
-            ? "Edit recording"
-            : "Edit live stream"
+      const editLabel = isDraft
+         ? "Edit draft"
+         : isPastEvent
+         ? "Edit recording"
+         : "Edit live stream"
 
-         options.push({
-            label: editLabel,
-            icon: <Edit2 />,
-            handleClick: () => handleEdit(stat),
-         })
-      }
+      options.push({
+         label: editLabel,
+         icon: <Edit2 />,
+         handleClick: () => handleEdit(stat),
+      })
 
       // Delete action (always available with different labels)
-      if (shouldShowDelete) {
-         const deleteLabel = isDraft
-            ? "Delete draft"
-            : isPastEvent
-            ? "Delete recording"
-            : "Delete live stream"
+      const deleteLabel = isDraft
+         ? "Delete draft"
+         : isPastEvent
+         ? "Delete recording"
+         : "Delete live stream"
 
-         options.push({
-            label: deleteLabel,
-            icon: <Trash2 />,
-            color: "error.main",
-            handleClick: () => handleDelete(stat),
-         })
-      }
+      options.push({
+         label: deleteLabel,
+         icon: <Trash2 />,
+         color: "error.main",
+         handleClick: () => handleDelete(stat),
+      })
 
       // Store the calculated options when drawer is open
       if (open) {
@@ -164,7 +160,6 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       stat,
       isDraft,
       isPastEvent,
-      shouldShowEdit,
       shouldShowEnterLiveStreamRoom,
       shouldShowShareLiveStream,
       shouldShowViewRecording,
@@ -172,7 +167,6 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       shouldShowAnalytics,
       shouldShowQuestions,
       shouldShowFeedback,
-      shouldShowDelete,
       handleEdit,
       handleEnterLiveStreamRoom,
       handleShareLiveStream,
