@@ -4,6 +4,7 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { placeholderBanner } from "constants/images"
 import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
+import { getEventActionConditions } from "../eventActionConditions"
 import { HoverActionIcons } from "./HoverActionIcons"
 import { SpeakerAvatars } from "./SpeakerAvatars"
 
@@ -93,22 +94,19 @@ export const EventCardPreview = ({
    onEdit,
    onShareRecording,
 }: Props) => {
-   // Action icon visibility logic:
-   // - Edit: Only visible for Draft events
-   // - Enter Live Stream Room: Only for Published (not Draft, not Past)
-   // - Share Live Stream: Only for Published (not Draft, not Past)
-   // - Analytics: Visible for all except Draft
-   // - Questions: Visible for all except Draft
-   // - Feedback: Only for Past (not Draft)
-   // - Share Recording: Only for Past events with recording available (not Draft)
-   const shouldShowEdit = isDraft // Only for Draft
-   const shouldShowEnterLiveStreamRoom = !isDraft && !isPastEvent // Only for Published
-   const shouldShowShareLiveStream = !isDraft && !isPastEvent // Only for Published
-   const shouldShowAnalytics = !isDraft // All except Draft
-   const shouldShowQuestions = !isDraft // All except Draft
-   const shouldShowFeedback = !isDraft && isPastEvent // Only for Past
-   const shouldShowShareRecording =
-      !isDraft && isPastEvent && hasRecordingAvailable // Only for past events with recordings
+   // Use centralized condition logic
+   const {
+      shouldShowEnterLiveStreamRoom,
+      shouldShowShareLiveStream,
+      shouldShowAnalytics,
+      shouldShowQuestions,
+      shouldShowFeedback,
+      shouldShowShareRecording,
+   } = getEventActionConditions({
+      isDraft,
+      isPastEvent,
+      hasRecordingAvailable,
+   })
 
    return (
       <Stack
@@ -147,7 +145,7 @@ export const EventCardPreview = ({
                {Boolean(showHoverActions) && (
                   <Box sx={styles.hoverActionsBackground}>
                      <HoverActionIcons
-                        onEdit={shouldShowEdit ? onEdit : undefined}
+                        onEdit={isDraft ? onEdit : undefined}
                         onEnterLiveStreamRoom={
                            shouldShowEnterLiveStreamRoom
                               ? onEnterLiveStreamRoom

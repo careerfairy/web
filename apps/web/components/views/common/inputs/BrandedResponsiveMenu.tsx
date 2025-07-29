@@ -104,7 +104,7 @@ type MobileDrawerProps = {
    enableDrawerCancelButton?: boolean
 } & Omit<SwipeableDrawerProps, "onOpen">
 
-const MobileDrawer: FC<MobileDrawerProps> = ({
+export const MobileDrawer: FC<MobileDrawerProps> = ({
    open,
    options,
    enableDrawerCancelButton,
