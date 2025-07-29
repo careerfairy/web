@@ -9,6 +9,7 @@ import { CompaniesTab } from "./results/CompaniesTab"
 import { JobsTab } from "./results/JobsTab"
 import { LivestreamsTab } from "./results/LivestreamsTab"
 import { RecordingsTab } from "./results/RecordingsTab"
+import { SparksTab } from "./results/SparksTab"
 
 const TAB_VALUES = {
    all: {
@@ -20,6 +21,11 @@ const TAB_VALUES = {
       label: "Live streams",
       value: "livestreams",
       component: LivestreamsTab,
+   },
+   sparks: {
+      label: "Sparks",
+      value: "sparks",
+      component: SparksTab,
    },
    jobs: {
       label: "Jobs",
@@ -92,6 +98,10 @@ export const SearchResults = () => {
             <Tab
                label={TAB_VALUES.livestreams.label}
                value={TAB_VALUES.livestreams.value}
+            />
+            <Tab
+               label={TAB_VALUES.sparks.label}
+               value={TAB_VALUES.sparks.value}
             />
             <Tab label={TAB_VALUES.jobs.label} value={TAB_VALUES.jobs.value} />
             <Tab
