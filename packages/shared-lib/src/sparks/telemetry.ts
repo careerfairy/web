@@ -148,6 +148,7 @@ export type SparkEventActionType =
 export const SparkInteractionSources = {
    Portal: "portal",
    PortalTag: "portal_tag",
+   PortalSearch: "portal_search",
    Livestream_Registration_Flow: "livestream_registration_flow",
    Company_Page: "company_page",
    New_Spark_Notification: "new_spark_notification",
