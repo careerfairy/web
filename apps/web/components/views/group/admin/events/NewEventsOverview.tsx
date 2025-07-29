@@ -6,7 +6,7 @@ import {
    useGroupLivestreamsWithStats,
 } from "../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
-import { BrandedSearchField } from "../../../common/inputs/BrandedSearchBar"
+import { BrandedSearchField } from "../../../common/inputs/BrandedSearchField"
 import BrandedTextField from "../../../common/inputs/BrandedTextField"
 import { DesktopEventsView } from "./DesktopEventsView"
 import { MobileEventsView } from "./MobileEventsView"
@@ -72,10 +72,6 @@ export const NewEventsOverview = () => {
                onChange={setSearchTerm}
                placeholder="Enter search term..."
                fullWidth
-               settings={{
-                  submitOnEnter: false,
-                  submitOnBlur: false,
-               }}
             />
 
             <BrandedTextField

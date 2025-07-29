@@ -81,6 +81,10 @@ const sparkIndex = {
       createdAtMs: data.createdAt?.toDate?.().getTime() ?? null,
       groupPublicSparks: Boolean(data.group?.publicSparks),
       publishedAtMs: data.publishedAt?.toDate?.().getTime() ?? null,
+      groupCompanySize: data.group?.companySize ?? null,
+      groupCompanyIndustriesIdTags:
+         data.group?.companyIndustries?.map((industry) => industry.id) ?? [],
+      groupCompanyName: data.group?.universityName ?? null,
    }),
    settings: {
       attributesForFaceting: SPARK_FILTERING_FIELDS,

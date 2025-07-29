@@ -1,14 +1,24 @@
 import {
+   ArrayFilterFieldType,
+   BooleanFilterFieldType,
+   SPARK_REPLICAS,
+} from "@careerfairy/shared-lib/sparks/search"
+import {
    SparkCardNotificationTypes,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
 import { SparkCategory } from "@careerfairy/shared-lib/sparks/sparks"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import { buildAlgoliaFilterString } from "components/custom-hook/spark/useSparkSearchAlgolia"
+import algoliaRepo from "data/algolia/AlgoliaRepository"
 import { sparkService } from "data/firebase/SparksService"
 import { type RootState } from "store"
+import { deserializeAlgoliaSearchResponse } from "util/algolia"
 
 type Status = "idle" | "loading" | "failed"
+
+const SPARKS_PAGE_SIZE = 20
 
 export enum AutomaticActions {
    APPLY = "apply",
@@ -58,6 +68,15 @@ interface SparksState {
    countrySpecificFeed?: boolean
    shouldShowLinkedInPopUpNotification: boolean
    isJobDialogOpen: boolean
+   // Search mode state
+   searchParameters: {
+      query: string
+      languages: string[]
+      contentTopics: string[]
+      companySizes: string[]
+      industries: string[]
+   }
+   searchResultsExhausted: boolean
 }
 
 const initialState: SparksState = {
@@ -92,6 +111,14 @@ const initialState: SparksState = {
    countrySpecificFeed: null,
    shouldShowLinkedInPopUpNotification: false,
    isJobDialogOpen: false,
+   searchParameters: {
+      query: "",
+      languages: [],
+      contentTopics: [],
+      companySizes: [],
+      industries: [],
+   },
+   searchResultsExhausted: false,
 }
 
 // Async thunk to fetch the next sparks
@@ -132,6 +159,117 @@ export const fetchInitialSparksFeed = createAsyncThunk(
       const sparkOptions = getSparkOptions(state)
 
       return sparkService.fetchFeed(sparkOptions)
+   }
+)
+
+// Async thunk to fetch initial sparks using Algolia search
+export const fetchInitialSparksFromSearch = createAsyncThunk(
+   "sparks/fetchInitialFromSearch",
+   async (_, { getState, dispatch }) => {
+      const state = getState() as RootState
+      const { searchParameters, sparks } = state.sparksFeed
+
+      // If search query is empty, fall back to natural feed
+      if (!searchParameters.query.trim()) {
+         dispatch(fetchInitialSparksFeed())
+         return { sparks: [], totalHits: 0, hasMore: false }
+      }
+
+      const filterOptions = {
+         arrayFilters: {
+            language: searchParameters.languages,
+            contentTopicsTagIds: searchParameters.contentTopics,
+            groupCompanySize: searchParameters.companySizes,
+            groupCompanyIndustriesIdTags: searchParameters.industries,
+         } as Partial<Record<ArrayFilterFieldType, string[]>>,
+         booleanFilters: {
+            published: true,
+            groupPublicSparks: true,
+         } as Partial<Record<BooleanFilterFieldType, boolean>>,
+      }
+
+      const filterString = buildAlgoliaFilterString(filterOptions)
+
+      // Fetch search results
+      const response = await algoliaRepo.searchSparks(
+         searchParameters.query,
+         filterString,
+         0, // Start from first page
+         SPARK_REPLICAS.PUBLISHED_AT_DESC,
+         SPARKS_PAGE_SIZE
+      )
+
+      const deserializedHits = response.hits.map(
+         deserializeAlgoliaSearchResponse
+      )
+      const searchSparks = deserializedHits.map((hit) =>
+         SparkPresenter.createFromFirebaseObject(hit)
+      )
+
+      // Get the original spark (first spark from server-side)
+      const originalSpark = sparks[0]
+
+      // Remove the original spark from search results if it exists there
+      const searchResultsWithoutOriginal = searchSparks.filter(
+         (spark) => spark.id !== originalSpark?.id
+      )
+
+      // Combine: original spark first, then search results
+      const combinedSparks = originalSpark
+         ? [originalSpark, ...searchResultsWithoutOriginal]
+         : searchResultsWithoutOriginal
+
+      return {
+         sparks: combinedSparks,
+         totalHits: response.nbHits,
+         hasMore: response.page < response.nbPages - 1,
+      }
+   }
+)
+
+// Async thunk to fetch next sparks using Algolia search
+export const fetchNextSparksFromSearch = createAsyncThunk(
+   "sparks/fetchNextFromSearch",
+   async (_, { getState }) => {
+      const state = getState() as RootState
+      const { searchParameters, sparks } = state.sparksFeed
+
+      const currentPage = Math.floor(sparks.length / SPARKS_PAGE_SIZE)
+
+      const filterOptions = {
+         arrayFilters: {
+            language: searchParameters.languages,
+            contentTopicsTagIds: searchParameters.contentTopics,
+            groupCompanySize: searchParameters.companySizes,
+            groupCompanyIndustriesIdTags: searchParameters.industries,
+         } as Partial<Record<ArrayFilterFieldType, string[]>>,
+         booleanFilters: {
+            published: true,
+            groupPublicSparks: true,
+         } as Partial<Record<BooleanFilterFieldType, boolean>>,
+      }
+
+      const filterString = buildAlgoliaFilterString(filterOptions)
+
+      const response = await algoliaRepo.searchSparks(
+         searchParameters.query,
+         filterString,
+         currentPage + 1,
+         SPARK_REPLICAS.PUBLISHED_AT_DESC,
+         SPARKS_PAGE_SIZE
+      )
+
+      const deserializedHits = response.hits.map(
+         deserializeAlgoliaSearchResponse
+      )
+      const sparkPresenters = deserializedHits.map((hit) =>
+         SparkPresenter.createFromFirebaseObject(hit)
+      )
+
+      return {
+         sparks: sparkPresenters,
+         hasMore: response.page < response.nbPages - 1,
+      }
    }
 )
 
@@ -327,6 +465,19 @@ const sparksFeedSlice = createSlice({
       setIsJobDialogOpen: (state, action: PayloadAction<boolean>) => {
          state.isJobDialogOpen = action.payload
       },
+      setSearchParameters: (
+         state,
+         action: PayloadAction<SparksState["searchParameters"]>
+      ) => {
+         state.searchParameters = action.payload
+      },
+      transitionToNaturalFeed: (state) => {
+         state.searchResultsExhausted = true
+         state.hasMoreSparks = true // Reset to allow natural feed fetching
+      },
+      resetSearchTransition: (state) => {
+         state.searchResultsExhausted = false
+      },
    },
    extraReducers: (builder) => {
       builder
@@ -402,6 +553,73 @@ const sparksFeedSlice = createSlice({
          .addCase(fetchInitialSparksFeed.rejected, (state, action) => {
             state.initialFetchStatus = "failed"
             state.initialFetchError = action.error.message
+         })
+         .addCase(fetchInitialSparksFromSearch.pending, (state) => {
+            state.initialFetchStatus = "loading"
+         })
+         .addCase(
+            fetchInitialSparksFromSearch.fulfilled,
+            (
+               state,
+               action: PayloadAction<{
+                  sparks: SparkPresenter[]
+                  totalHits: number
+                  hasMore: boolean
+               }>
+            ) => {
+               const { sparks: newSparks, hasMore } = action.payload
+
+               state.initialFetchStatus = "idle"
+               state.initialSparksFetched = true
+
+               const sparksWithNotifications = insertNotificationIfNeeded(
+                  state,
+                  newSparks
+               )
+               state.sparks = sparksWithNotifications
+
+               state.currentPlayingIndex = 0
+
+               state.hasMoreSparks = hasMore
+            }
+         )
+         .addCase(fetchInitialSparksFromSearch.rejected, (state, action) => {
+            state.initialFetchStatus = "failed"
+            state.initialFetchError = action.error.message
+         })
+         .addCase(fetchNextSparksFromSearch.pending, (state) => {
+            state.fetchNextSparksStatus = "loading"
+         })
+         .addCase(
+            fetchNextSparksFromSearch.fulfilled,
+            (
+               state,
+               action: PayloadAction<{
+                  sparks: SparkPresenter[]
+                  hasMore: boolean
+               }>
+            ) => {
+               const { sparks } = state
+               const { sparks: newSparks, hasMore } = action.payload
+
+               state.fetchNextSparksStatus = "idle"
+               state.sparks = insertNotificationIfNeeded(state, [
+                  ...sparks,
+                  ...newSparks,
+               ])
+
+               // If no more search results, transition to natural feed
+               if (!hasMore) {
+                  state.searchResultsExhausted = true
+                  state.hasMoreSparks = true // Reset to allow natural feed fetching
+               } else {
+                  state.hasMoreSparks = hasMore
+               }
+            }
+         )
+         .addCase(fetchNextSparksFromSearch.rejected, (state, action) => {
+            state.fetchNextSparksStatus = "failed"
+            state.fetchNextError = action.error.message
          })
    },
 })
@@ -533,6 +751,9 @@ export const {
    removeNotificationsByType,
    disableCountrySpecificFeed,
    setIsJobDialogOpen,
+   setSearchParameters,
+   transitionToNaturalFeed,
+   resetSearchTransition,
 } = sparksFeedSlice.actions
 
 export default sparksFeedSlice.reducer
