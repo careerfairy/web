@@ -91,9 +91,7 @@ export const MobileEventCard = ({ stat, onCardClick }: Props) => {
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
                <Eye size={14} />
-               <Typography variant="xsmall">
-                  {stat.generalStats.numberOfParticipants || "-"}
-               </Typography>
+               <Typography variant="xsmall">{"-"}</Typography>
             </Stack>
             <StatusIcon
                isDraft={stat.livestream.isDraft}
