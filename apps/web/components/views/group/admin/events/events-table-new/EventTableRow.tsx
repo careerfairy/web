@@ -5,10 +5,10 @@ import { sxStyles } from "types/commonTypes"
 import { checkIfPast } from "util/streamUtil"
 import { EventCardPreview } from "./EventCardPreview"
 import { COLUMN_WIDTHS } from "./EventsTableStyles"
-import { getEventDate } from "./EventsTableUtils"
 import { QuickActionIcon } from "./QuickActionIcon"
 import { StatusIcon } from "./StatusIcon"
 import { TableHighlighter } from "./TableHighlighter"
+import { getEventDate } from "./utils"
 
 const styles = sxStyles({
    bodyRow: {
