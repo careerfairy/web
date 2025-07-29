@@ -154,7 +154,7 @@ export type PopoverMenuProps = {
 
 type MenuPlacement = "top" | "bottom"
 
-const DesktopMenu = ({
+export const DesktopMenu = ({
    options,
    placement = "bottom",
    sx,

@@ -188,8 +188,10 @@ export const EventTableRow = ({
          {/* Status Column */}
          <TableCell>
             <CentredBox gap={0.5} width={COLUMN_WIDTHS.status}>
-               <StatusIcon status={eventStatus} size={20} />
-               <QuickActionIcon />
+               <Box p={1}>
+                  <StatusIcon status={eventStatus} size={20} />
+               </Box>
+               <QuickActionIcon stat={stat} isPastEvent={isPastEvent} />
             </CentredBox>
          </TableCell>
       </TableRow>

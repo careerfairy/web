@@ -84,7 +84,7 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       if (shouldShowViewRecording) {
          options.push({
             label: "View recording",
-            icon: <Eye size={18} />,
+            icon: <Eye />,
             handleClick: () => handleViewRecording(stat),
          })
       }
@@ -101,7 +101,7 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       if (shouldShowAnalytics) {
          options.push({
             label: "Analytics",
-            icon: <BarChart2 size={18} />,
+            icon: <BarChart2 />,
             handleClick: () => handleAnalytics(stat),
          })
       }
@@ -109,7 +109,7 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       if (shouldShowQuestions) {
          options.push({
             label: "Questions",
-            icon: <MessageSquare size={18} />,
+            icon: <MessageSquare />,
             handleClick: () => handleQuestions(stat),
          })
       }
@@ -132,7 +132,7 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
 
          options.push({
             label: editLabel,
-            icon: <Edit2 size={18} />,
+            icon: <Edit2 />,
             handleClick: () => handleEdit(stat),
          })
       }
@@ -147,8 +147,8 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
 
          options.push({
             label: deleteLabel,
-            icon: <Trash2 size={18} />,
-            color: "#FF1616",
+            icon: <Trash2 />,
+            color: "error.main",
             handleClick: () => handleDelete(stat),
          })
       }
