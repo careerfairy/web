@@ -6,8 +6,8 @@ import Image from "next/image"
 import { Calendar, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { checkIfPast } from "util/streamUtil"
-import { getEventDate } from "./events-table-new/EventsTableUtils"
 import { StatusIcon } from "./events-table-new/StatusIcon"
+import { getEventDate } from "./events-table-new/utils"
 
 const styles = sxStyles({
    eventCard: {
