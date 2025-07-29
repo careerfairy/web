@@ -1,8 +1,11 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { FeedbackIcon } from "components/views/common/icons/FeedbackIcon"
 import { ShareArrowIconOutlined } from "components/views/common/icons/ShareArrowIconOutlined"
-import { MobileDrawer } from "components/views/common/inputs/BrandedResponsiveMenu"
-import { useMemo } from "react"
+import {
+   MenuOption,
+   MobileDrawer,
+} from "components/views/common/inputs/BrandedResponsiveMenu"
+import { useMemo, useRef } from "react"
 import {
    BarChart2,
    Edit2,
@@ -54,23 +57,11 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       hasRecordingAvailable,
    })
 
+   // Store the last calculated menu options to persist during closing animation
+   const lastMenuOptionsRef = useRef<MenuOption[]>([])
+
    const menuOptions = useMemo(() => {
-      const options = []
-
-      // For Draft events
-      if (shouldShowEdit) {
-         const editLabel = isDraft
-            ? "Edit draft"
-            : isPastEvent
-            ? "Edit recording"
-            : "Edit live stream"
-
-         options.push({
-            label: editLabel,
-            icon: <Edit2 size={18} />,
-            handleClick: () => handleEdit(stat),
-         })
-      }
+      const options: MenuOption[] = []
 
       // For Upcoming/Published events
       if (shouldShowEnterLiveStreamRoom) {
@@ -131,6 +122,21 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
          })
       }
 
+      // For All events
+      if (shouldShowEdit) {
+         const editLabel = isDraft
+            ? "Edit draft"
+            : isPastEvent
+            ? "Edit recording"
+            : "Edit live stream"
+
+         options.push({
+            label: editLabel,
+            icon: <Edit2 size={18} />,
+            handleClick: () => handleEdit(stat),
+         })
+      }
+
       // Delete action (always available with different labels)
       if (shouldShowDelete) {
          const deleteLabel = isDraft
@@ -147,7 +153,13 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
          })
       }
 
-      return options
+      // Store the calculated options when drawer is open
+      if (open) {
+         lastMenuOptionsRef.current = options
+      }
+
+      // Return last calculated options to persist UI during closing animation
+      return open ? options : lastMenuOptionsRef.current
    }, [
       stat,
       isDraft,
@@ -170,7 +182,15 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       handleQuestions,
       handleFeedback,
       handleDelete,
+      open,
    ])
 
-   return <MobileDrawer open={open} options={menuOptions} onClose={onClose} />
+   return (
+      <MobileDrawer
+         disableSwipeToOpen
+         open={open}
+         options={menuOptions}
+         onClose={onClose}
+      />
+   )
 }
