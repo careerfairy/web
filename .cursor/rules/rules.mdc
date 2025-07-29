@@ -1,8 +1,9 @@
 ---
-description: 
-globs: 
+description: "Core CareerFairy project standards - TypeScript, React, MUI, Firebase, and design system enforcement"
+globs: []
 alwaysApply: true
 ---
+
 Cursor Rules for CareerFairy
 
 Identity
@@ -81,4 +82,229 @@ Mobile Considerations
 - Ensure responsive design for web components
 - Maintain consistent styling between web and mobile
 - Share business logic between platforms where possible
-- Use platform-specific UI components when necessary 
+- Use platform-specific UI components when necessary
+
+DESIGN SYSTEM ENFORCEMENT RULES (CRITICAL)
+===============================================
+
+## Design System Files Reference
+All theme values are defined in these files - ALWAYS reference them:
+- **`packages/config-mui/palette.ts`** - Complete color palette definition
+- **`packages/config-mui/typography.ts`** - Typography variants and responsive sizing
+- **`packages/config-mui/components.ts`** - Component styling and button/form variants
+- **`packages/config-mui/breakpoints.ts`** - Custom breakpoints for responsive design
+
+## Color Usage - NEVER HARDCODE COLORS
+- NEVER use hardcoded hex colors (#FFFFFF, #000000, etc.)
+- NEVER use RGB/RGBA values directly
+- ALWAYS use theme palette values via sx prop, color props, or theme functions
+- Multiple ways to use colors:
+  ```tsx
+  // sx prop (preferred) - for standard palette colors
+  sx={{ color: "text.primary", backgroundColor: "primary.50" }}
+  
+  // Direct component props - for standard palette colors
+  <Typography color="neutral.700">Text</Typography>
+  <Box sx={{ bgcolor: "primary.50" }}>Content</Box>
+  
+  // Theme function (REQUIRED for brand colors)
+  sx={{ color: theme => theme.palette.text.primary }}
+  sx={{ backgroundColor: theme => theme.brand.white[100] }}
+  sx={{ borderColor: theme => theme.brand.purple[300] }}
+  ```
+- Available palette paths (defined in palette.ts):
+  - **Standard colors (string notation works)**: `"primary.main"`, `"secondary.50"`, `"text.primary"`, `"neutral.700"`
+  - **Brand colors (MUST use theme function)**: `theme => theme.brand.white[100]`, `theme => theme.brand.black[200]`
+  
+  **Standard Palette Colors (string notation works):**
+  - `theme.palette.primary.*` (main, light, dark, 50-800, gradient)
+  - `theme.palette.secondary.*` (main, light, dark, 50-800, gradient) 
+  - `theme.palette.neutral.*` (main, 50-900)
+  - `theme.palette.text.*` (primary, secondary, disabled)
+  - `theme.palette.background.*` (default, paper)
+  - `theme.palette.error.*`, `theme.palette.success.*`, `theme.palette.warning.*`
+  - `theme.palette.grey.*` (main, dark, 50-900)
+  - `theme.palette.common.*` (black, white)
+  - `theme.palette.action.*` (disabled, disabledBackground, disabledOpacity)
+  - `theme.palette.info.*` (main, light, dark, contrastText) - legacy info color
+  
+  **Legacy Colors (string notation works):**
+  - `theme.palette.tertiary.*` (main, light, dark, contrastText, gradient)
+  - `theme.palette.gold.*` (main, contrastText, dark, light)
+  - `theme.palette.black.*` (main, contrastText, dark, light)
+  - `theme.palette.navyBlue.*` (main, contrastText)
+  
+  **Brand Colors (MUST use theme function):**
+  - `theme.brand.black.*` (100-900) - **MUST use theme function**: `theme => theme.brand.black[100]`
+  - `theme.brand.white.*` (50-500) - **MUST use theme function**: `theme => theme.brand.white[100]`
+  - `theme.brand.tq.*` (same as primary) - **MUST use theme function**: `theme => theme.brand.tq[300]`
+  - `theme.brand.purple.*` (same as secondary) - **MUST use theme function**: `theme => theme.brand.purple[300]`
+  - `theme.brand.info.*` (main, 50-700) - **MUST use theme function**: `theme => theme.brand.info[300]`
+  - `theme.brand.warning.*` (main, 50-700) - **MUST use theme function**: `theme => theme.brand.warning[300]`
+  - `theme.brand.error.*` (main, 50-700) - **MUST use theme function**: `theme => theme.brand.error[300]`
+  - `theme.brand.success.*` (main, 50-700) - **MUST use theme function**: `theme => theme.brand.success[300]`
+
+## Typography - ALWAYS USE THEME VARIANTS
+- NEVER hardcode fontSize, fontWeight, lineHeight
+- ALWAYS use Typography component with variant prop (defined in typography.ts)
+- Standard approach:
+  ```tsx
+  <Typography variant="brandedH3">Title</Typography>
+  <Typography variant="medium">Body text</Typography>
+  <Typography variant="small" color="text.secondary">Label</Typography>
+  
+  // Combining variant with color and styling
+  <Typography variant="brandedH4" color="primary.main" sx={{ mb: 2 }}>
+    Styled Title
+  </Typography>
+  ```
+- Available typography variants (from typography.ts):
+  - **Branded variants (preferred)**: `brandedH1`, `brandedH2`, `brandedH3`, `brandedH4`, `brandedH5`
+  - **Size variants**: `brandedBody`, `medium`, `small`, `xsmall`
+  - **Standard MUI**: `h1`, `h2`, `h3`, `h4`, `h5`, `h6`, `body1`, `body2`, `subtitle1`, `subtitle2`
+- For color with typography: `color="primary.main"`, `color="text.secondary"`, `color="neutral.700"`
+
+## Button Usage - USE THEME VARIANTS
+- ALWAYS use MUI Button component with theme variants
+- Available button sizes: `small`, `medium`, `large` (with proper padding/icon sizing)
+- Available button colors: `primary`, `secondary`, `grey`, `black`, `navyBlue`, `gold`
+- Available button variants: `contained`, `outlined`, `text`
+- Button styles are pre-configured in theme - DO NOT override with custom sx
+- Use `variant` and `color` props instead of custom styling
+
+## Branded Components - USE EXISTING COMPONENTS FIRST
+ALWAYS check if a branded component exists before creating custom components:
+
+### Input Components (apps/web/components/views/common/inputs/):
+- `BrandedTextField` - for all text inputs
+- `BrandedAutocomplete` - for autocomplete/select functionality  
+- `BrandedCheckbox` - for checkboxes
+- `BrandedRadio` - for radio buttons
+- `BrandedSwitch` - for toggle switches
+- `BrandedSearch` - for search inputs with highlighting
+- `BrandedSearchField` - for search bars
+- `ControlledBrandedTextField` - for react-hook-form integration
+- `ControlledBrandedAutoComplete` - for react-hook-form autocomplete
+- `ControlledBrandedCheckBox` - for react-hook-form checkboxes
+
+### Menu/Dropdown Components:
+- `BrandedMenu` - for desktop dropdown menus
+- `BrandedResponsiveMenu` - for responsive menus (desktop + mobile drawer)
+- `BrandedSwipeableDrawer` - for mobile bottom sheets
+
+### Dialog Components:
+- `ConfirmationDialog` - for confirmation dialogs with consistent styling
+
+### Other Components:
+- `BrandedBadge` - for badges/indicators
+- `CollapsibleText` - for expandable text content
+
+## Icons - USE REACT-FEATHER
+- ALWAYS use `react-feather` icons when possible
+- Import pattern: `import { IconName } from "react-feather"`
+- Common icons: `Search`, `ChevronDown`, `MoreVertical`, `X`, `Check`, `Plus`, etc.
+- Only use MUI icons for specific cases where react-feather doesn't have the icon
+- Icon sizing: use theme-based sizing or sx prop with theme values
+
+## The sx Prop - Use sxStyles Helper for Centralization
+- ALWAYS use `sxStyles` helper for complex styling to centralize component styles
+- Only use inline sx for minor margin/padding adjustments: `sx={{ mb: 2, pt: 1 }}`
+- Pattern for centralized styles:
+  ```tsx
+  import { sxStyles, combineStyles } from "types/commonTypes"
+  
+     const styles = sxStyles({
+      container: {
+         color: "text.primary",
+         backgroundColor: "primary.50", 
+         p: 2,
+         borderRadius: 1,
+         // Responsive with custom breakpoints
+         width: { xs: "100%", tablet: "50%", desktop: "33%" }
+      },
+      title: {
+         color: "primary.main",
+         mb: 2,
+         "&:hover": { backgroundColor: "primary.light" },
+         // Custom media queries with theme breakpoints
+         [theme => theme.breakpoints.up('mobile')]: { fontSize: "1.5rem" },
+         [theme => theme.breakpoints.down('tablet')]: { textAlign: "center" }
+      },
+      icon: {
+         "& svg": { 
+            width: 20, 
+            height: 20,
+            // Responsive icon sizing
+            [theme => theme.breakpoints.up('desktop')]: { width: 24, height: 24 }
+         }
+      }
+   })
+  
+  // Usage in JSX
+  <Box sx={styles.container}>
+     <Typography variant="brandedH3" sx={styles.title}>Title</Typography>
+     <Box sx={styles.icon}>{icon}</Box>
+  </Box>
+  
+  // Combining styles
+  sx={combineStyles([styles.base, isActive && styles.active], customSx)}
+  sx={[styles.icon, styles.iconMobile]} // Array syntax for multiple
+  ```
+
+## Spacing and Layout
+- NEVER hardcode margins/padding values
+- ALWAYS use theme spacing: `theme.spacing(1)` = 8px
+- Use shorthand in sx prop: `p: 2` (padding: 16px), `mt: 1` (margin-top: 8px)
+- Use responsive spacing: `p: { xs: 1, sm: 2, md: 3 }`
+- For gaps: `gap: 2` (16px gap), `gap: { xs: 1, md: 2 }` (responsive)
+
+## Responsive Design - Use Custom Breakpoints
+- ALWAYS use theme breakpoints (defined in breakpoints.ts) instead of hardcoded media queries
+- Available breakpoints: `xs`, `sm`, `md`, `lg`, `xl`, `lsCardsGallery`, `mobile`, `tablet`, `desktop`, `sparksFullscreen`
+- Examples:
+  ```tsx
+  // ✅ Breakpoint objects (preferred)
+  sx={{ width: { xs: "100%", tablet: "50%", desktop: "33%" } }}
+  
+  // ✅ Custom media queries with theme breakpoints
+  sx={{
+     [theme.breakpoints.up('tablet')]: { display: 'flex' },
+     [theme.breakpoints.down('mobile')]: { fontSize: '14px' }
+  }}
+  
+  // ❌ NEVER hardcode media queries
+  "@media (max-width: 768px)": { fontSize: "14px" }
+  ```
+
+## Border Radius
+- NEVER hardcode border radius values
+- Use theme values or standard values: `borderRadius: "8px"`, `borderRadius: "12px"`
+- For buttons, use `borderRadius: 100` (fully rounded)
+
+## Box Shadows and Elevations
+- Use theme shadow values when available: `theme?.legacy?.boxShadows?.grey_5_15`
+- Use MUI elevation prop for Cards: `elevation={0}` for no shadow
+
+## FIGMA MCP SPECIFIC RULES
+When using Figma MCP tools, follow MUI System best practices (https://mui.com/system/getting-started/usage/):
+1. NEVER generate hardcoded colors - always map to theme palette via sx prop or component props
+2. NEVER generate custom typography styles - always use theme variants defined in typography.ts
+3. ALWAYS use the sx prop as the primary styling method for complex styling
+4. ALWAYS check if a branded component can be used instead of creating custom
+5. ALWAYS use react-feather icons before creating custom icon components
+6. ALWAYS use theme spacing and sizing values from theme system
+7. Follow the responsive design patterns established in existing components
+8. Reference the actual design system files (palette.ts, typography.ts, components.ts) for available values
+
+## Code Review Checklist for Design System Compliance:
+Before finalizing any UI code, verify:
+- [ ] No hardcoded colors (hex, rgb, rgba) - use sx prop or component color props
+- [ ] Typography uses theme variants from typography.ts with variant prop only
+- [ ] Buttons use theme variants and colors defined in components.ts
+- [ ] Complex styling uses sxStyles helper - inline sx only for minor margin/padding
+- [ ] Existing branded components are used when applicable
+- [ ] Icons are from react-feather when possible
+- [ ] Spacing uses theme values (p: 2, m: 1, gap: 2, etc.)
+- [ ] Responsive design uses custom breakpoints from breakpoints.ts (no hardcoded media queries)
+- [ ] Component follows the established file structure
+- [ ] Design system files (palette.ts, typography.ts, components.ts) are referenced for available values 
