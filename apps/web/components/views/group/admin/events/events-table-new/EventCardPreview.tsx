@@ -4,9 +4,9 @@ import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { placeholderBanner } from "constants/images"
 import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
-import { getEventActionConditions } from "./EventsTableUtils"
 import { HoverActionIcons } from "./HoverActionIcons"
 import { SpeakerAvatars } from "./SpeakerAvatars"
+import { getEventActionConditions } from "./utils"
 
 const styles = sxStyles({
    container: {

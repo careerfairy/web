@@ -16,7 +16,7 @@ import {
 } from "react-feather"
 import { checkIfPast } from "../../../../../util/streamUtil"
 import { useEventsView } from "./context/EventsViewContext"
-import { getEventActionConditions } from "./events-table-new/EventsTableUtils"
+import { getEventActionConditions } from "./events-table-new/utils"
 
 type Props = {
    stat: LiveStreamStats | null
