@@ -1,0 +1,367 @@
+---
+description: "Design System Quick Reference - Apply when working with UI components, styling, theming, or need design system examples"
+alwaysApply: false
+---
+# DESIGN SYSTEM QUICK LOOKUP
+
+## 📁 Design System Files Reference
+- **`packages/config-mui/palette.ts`** - All color definitions
+- **`packages/config-mui/typography.ts`** - Typography variants & responsive sizing  
+- **`packages/config-mui/components.ts`** - Component styling & theme variants
+- **`packages/config-mui/breakpoints.ts`** - Custom breakpoints for responsive design
+
+## Import Statements for Branded Components
+
+```tsx
+// Styling Helpers (ALWAYS import for complex styling)
+import { sxStyles, combineStyles } from "types/commonTypes"
+
+// Input Components
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import BrandedAutocomplete from "components/views/common/inputs/BrandedAutocomplete"
+import { BrandedCheckbox } from "components/views/common/inputs/BrandedCheckbox"
+import BrandedRadio from "components/views/common/inputs/BrandedRadio"
+import BrandedSwitch from "components/views/common/inputs/BrandedSwitch"
+import BrandedSearchField from "components/views/common/inputs/BrandedSearchBar"
+
+// Form-Controlled Components (for react-hook-form)
+import { ControlledBrandedTextField } from "components/views/common/inputs/ControlledBrandedTextField"
+import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
+import { ControlledBrandedCheckBox } from "components/views/common/inputs/ControlledBrandedCheckbox"
+
+// Menu & Dialog Components
+import BrandedMenu from "components/views/common/inputs/BrandedMenu"
+import BrandedResponsiveMenu from "components/views/common/inputs/BrandedResponsiveMenu"
+import ConfirmationDialog from "materialUI/GlobalModals/ConfirmationDialog"
+
+// Other Components
+import { BrandedBadge } from "components/views/common/inputs/BrandedBadge"
+import CollapsibleText from "components/views/common/inputs/CollapsibleText"
+
+// React Feather Icons (commonly used)
+import { 
+   Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight,
+   MoreVertical, X, Check, Plus, Minus, Edit, Trash2,
+   User, Users, Settings, Mail, Phone, Calendar,
+   Download, Upload, Filter, Star, Heart
+} from "react-feather"
+```
+
+## Common Color Mappings
+
+```tsx
+// Text Colors
+color: "text.primary"        // #1F1F23 (main text)
+color: "text.secondary"      // #5C5C6A (lighter text)
+color: "text.disabled"       // #CACACA (disabled text)
+
+// Background Colors  
+backgroundColor: "background.default"  // #F5F5F5 (page background)
+backgroundColor: "background.paper"    // #FFFFFF (card background)
+
+// Standard Colors (string notation works)
+color: "primary.main"        // #2ABAA5 (teal)
+color: "secondary.main"      // #6749EA (purple)
+color: "neutral.700"         // #5C5C6A (neutral text)
+color: "text.primary"        // #1F1F23 (main text)
+color: "text.secondary"      // #5C5C6A (secondary text)
+color: "common.black"        // #1F1F1F
+color: "common.white"        // #FEFEFE
+
+// Legacy Colors (string notation works)
+color: "tertiary.main"       // #FAEDF2
+color: "gold.main"          // #FFC34F
+color: "navyBlue.main"      // #2C4251
+backgroundColor: "grey.50"   // light grey backgrounds
+
+// Brand Colors (MUST use theme function)
+backgroundColor: theme => theme.brand.white[100]    // #FEFEFE (light background)
+backgroundColor: theme => theme.brand.black[100]    // #FAFAFA (subtle background)
+color: theme => theme.brand.info[600]              // #3A70E2 (blue)
+backgroundColor: theme => theme.brand.success[50]   // #E6FBED (success background)
+borderColor: theme => theme.brand.error[300]       // #FFA2A2 (error border)
+color: theme => theme.brand.warning[600]           // #FE9B0E (warning text)
+
+// Interactive States (brand colors need theme function)
+backgroundColor: theme => theme.brand.white[300]    // hover states
+borderColor: theme => theme.brand.purple[300]       // focus states
+```
+
+## Typography Pattern Examples
+
+```tsx
+// Headings - Always use variant prop
+<Typography variant="brandedH1">Page Title</Typography>
+<Typography variant="brandedH2">Section Title</Typography>
+<Typography variant="brandedH3">Subsection Title</Typography>
+<Typography variant="brandedH4">Card Title</Typography>
+
+// Body Text
+<Typography variant="brandedBody">Main body text</Typography>
+<Typography variant="medium">Regular text</Typography>
+<Typography variant="small">Secondary text</Typography>
+<Typography variant="xsmall">Caption text</Typography>
+
+// With Color Props
+<Typography variant="brandedH3" color="primary.main">Title</Typography>
+<Typography variant="medium" color="text.secondary">Subtitle</Typography>
+<Typography variant="small" color="neutral.700">Label</Typography>
+
+// Combining variant with sx styling
+<Typography 
+   variant="brandedH4" 
+   color="primary.main"
+   sx={{ mb: 2, textAlign: "center" }}
+>
+   Styled Title
+</Typography>
+```
+
+## Button Pattern Examples
+
+```tsx
+// Primary Actions
+<Button variant="contained" color="primary" size="medium">
+<Button variant="contained" color="secondary" size="large">
+
+// Secondary Actions  
+<Button variant="outlined" color="primary" size="small">
+<Button variant="outlined" color="grey" size="medium">
+
+// Tertiary Actions
+<Button variant="text" color="secondary">
+<Button variant="text" color="grey">
+
+// With Icons (react-feather)
+<Button startIcon={<Plus />} variant="contained" color="primary">
+<Button endIcon={<ChevronDown />} variant="outlined">
+```
+
+## Input Pattern Examples
+
+```tsx
+// Basic Text Input
+<BrandedTextField
+   label="Email"
+   placeholder="Enter your email"
+   fullWidth
+/>
+
+// Search Input
+<BrandedSearchField
+   value={searchValue}
+   onChange={setSearchValue}
+   placeholder="Search items..."
+/>
+
+// Autocomplete/Select
+<BrandedAutocomplete
+   options={options}
+   getOptionLabel={(option) => option.name}
+   textFieldProps={{ label: "Select Option" }}
+/>
+
+// Checkbox
+<BrandedCheckbox 
+   checked={isChecked}
+   onChange={handleChange}
+/>
+
+// Form-Controlled (with react-hook-form)
+<ControlledBrandedTextField
+   name="email"
+   control={control}
+   label="Email Address"
+   rules={{ required: "Email is required" }}
+/>
+```
+
+## Menu Pattern Examples
+
+```tsx
+// Desktop Menu
+<BrandedMenu
+   anchorEl={anchorEl}
+   open={open}
+   onClose={handleClose}
+>
+   <MenuItem onClick={handleAction}>Action</MenuItem>
+</BrandedMenu>
+
+// Responsive Menu (desktop + mobile)
+<BrandedResponsiveMenu
+   options={[
+      { label: "Edit", icon: <Edit />, handleClick: handleEdit },
+      { label: "Delete", icon: <Trash2 />, handleClick: handleDelete }
+   ]}
+   open={open}
+   anchorEl={anchorEl}
+   handleClose={handleClose}
+/>
+```
+
+## Styling with sxStyles - Centralized Approach
+
+ALWAYS use `sxStyles` helper for complex styling - only use inline sx for minor margin/padding adjustments.
+
+```tsx
+import { sxStyles, combineStyles } from "types/commonTypes"
+
+// ✅ CENTRALIZED STYLES OBJECT
+const styles = sxStyles({
+   container: {
+      color: "text.primary",           // theme.palette.text.primary
+      backgroundColor: "primary.50",   // theme.palette.primary[50]
+      borderColor: "neutral.200",      // theme.palette.neutral[200]
+      p: 2,
+      borderRadius: 1
+   },
+   header: {
+      color: "primary.main",
+      mb: 2,
+      // Responsive values with custom breakpoints
+      fontSize: { xs: "1.2rem", tablet: "1.5rem", desktop: "1.8rem" },
+      // Pseudo-selectors
+      "&:hover": { backgroundColor: "primary.light" },
+      "&:focus": { outline: "2px solid", outlineColor: "primary.main" },
+      // Custom media queries with theme breakpoints
+      [theme => theme.breakpoints.up('mobile')]: { textAlign: "left" },
+      [theme => theme.breakpoints.down('tablet')]: { textAlign: "center" }
+   },
+   card: {
+      // Responsive padding with custom breakpoints
+      p: { xs: 1, mobile: 2, desktop: 3 },
+      borderRadius: 2,
+      // Child selectors
+      "& svg": { 
+         width: 20, 
+         height: 20, 
+         color: "neutral.600",
+         // Responsive icon sizing
+         [theme => theme.breakpoints.up('desktop')]: { width: 24, height: 24 }
+      },
+      "& .MuiTypography-root": { color: "text.secondary" }
+   },
+   iconButton: {
+      // Theme function (when needed)
+      backgroundColor: theme => theme.brand.white[100],
+      border: theme => `1px solid ${theme.palette.neutral[200]}`,
+      "&:disabled": { opacity: 0.5 }
+   }
+})
+
+// ✅ USAGE IN JSX
+<Box sx={styles.container}>
+   <Typography variant="brandedH3" sx={styles.header}>Title</Typography>
+   <Card sx={styles.card}>Content</Card>
+   <IconButton sx={styles.iconButton}>Icon</IconButton>
+</Box>
+
+// ✅ MINOR ADJUSTMENTS ONLY (inline sx)
+<Typography variant="medium" sx={{ mb: 1, pt: 0.5 }}>Text</Typography>
+
+// ✅ COMBINING STYLES
+sx={combineStyles([styles.base, isActive && styles.active], customSx)}
+sx={[styles.icon, isMobile && styles.iconMobile]} // Array syntax
+```
+
+## Custom Breakpoints Reference
+
+Available breakpoints from `packages/config-mui/breakpoints.ts`:
+
+```tsx
+// Standard MUI breakpoints
+xs: 0       // Extra small devices (phones)
+sm: 600     // Small devices (large phones)
+md: 900     // Medium devices (tablets)
+lg: 1280    // Large devices (desktops)
+xl: 1920    // Extra large devices
+
+// Custom CareerFairy breakpoints
+lsCardsGallery: 648    // Livestream cards gallery
+mobile: 768            // Mobile devices
+tablet: 1023           // Tablet devices  
+desktop: 1920          // Desktop devices
+sparksFullscreen: 989  // Sparks fullscreen mode
+
+// Usage patterns:
+// 1. Breakpoint objects (preferred)
+sx={{ width: { xs: "100%", mobile: "75%", tablet: "50%", desktop: "33%" } }}
+
+// 2. Theme breakpoint functions
+sx={{ [theme => theme.breakpoints.up('mobile')]: { display: 'flex' } }}
+sx={{ [theme => theme.breakpoints.down('tablet')]: { fontSize: '14px' } }}
+sx={{ [theme => theme.breakpoints.between('mobile', 'desktop')]: { p: 2 } }}
+
+// 3. Only with specific custom breakpoints
+sx={{ [theme => theme.breakpoints.up('lsCardsGallery')]: { gridColumns: 3 } }}
+sx={{ [theme => theme.breakpoints.down('sparksFullscreen')]: { height: '50vh' } }}
+```
+
+## Spacing Shortcuts
+
+```tsx
+// Padding/Margin shortcuts (theme.spacing units: 1 = 8px)
+sx={{ p: 1 }}     // padding: 8px
+sx={{ p: 2 }}     // padding: 16px  
+sx={{ px: 3 }}    // padding-left/right: 24px
+sx={{ py: 1.5 }}  // padding-top/bottom: 12px
+sx={{ m: 2 }}     // margin: 16px
+sx={{ mt: 3 }}    // margin-top: 24px
+
+// Responsive spacing
+sx={{ p: { xs: 1, sm: 2, md: 3 } }}  // 8px -> 16px -> 24px
+
+// Gap for Stack/Grid
+sx={{ gap: 2 }}   // 16px gap
+sx={{ gap: { xs: 1, md: 2 } }}  // responsive gap
+```
+
+## Common Layout Patterns
+
+```tsx
+// Card with proper spacing
+<Card sx={{ p: 3, borderRadius: "12px" }}>
+   <Typography variant="brandedH4" sx={{ mb: 2 }}>
+      Card Title
+   </Typography>
+   <Typography variant="medium" color="text.secondary">
+      Card content
+   </Typography>
+</Card>
+
+// Stack with proper spacing
+<Stack spacing={2} direction="row" alignItems="center">
+   <Search size={20} color={theme.palette.neutral[600]} />
+   <Typography variant="medium">Label</Typography>
+</Stack>
+
+// Box with theme colors
+<Box sx={{
+   backgroundColor: "brand.white.100",
+   border: 1,
+   borderColor: "neutral.200",
+   borderRadius: "8px",
+   p: 2
+}}>
+   Content
+</Box>
+```
+
+## Icon Sizing Patterns
+
+```tsx
+// Small icons (16px)
+<Search size={16} />
+
+// Medium icons (20px) - default
+<Search size={20} />
+
+// Large icons (24px)
+<Search size={24} />
+
+// With theme color
+<Search size={20} color={theme.palette.neutral[600]} />
+```
+
+Remember: Always check this lookup first before creating custom components!
