@@ -8,7 +8,7 @@ import {
    Typography,
 } from "@mui/material"
 import useMenuState from "components/custom-hook/useMenuState"
-import { Fragment, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { BrandedCheckbox } from "../../../../common/inputs/BrandedCheckbox"
 import { NonSortableHeaderCell } from "./TableHeaderComponents"
@@ -108,6 +108,13 @@ export const StatusFilterHeader = ({
 
    const [tempSelectedStatuses, setTempSelectedStatuses] =
       useState<LivestreamEventStatus[]>(selectedStatuses)
+
+   // Keep dropdown selections fresh and reset un-applied changes when menu is closed and re-opened
+   useEffect(() => {
+      if (!open) {
+         setTempSelectedStatuses(selectedStatuses)
+      }
+   }, [selectedStatuses, open])
 
    const handleStatusToggle = (statusValue: LivestreamEventStatus) => {
       setTempSelectedStatuses((prev) =>
