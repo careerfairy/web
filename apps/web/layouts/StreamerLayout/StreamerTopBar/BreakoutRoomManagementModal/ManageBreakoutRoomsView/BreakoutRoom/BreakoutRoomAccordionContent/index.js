@@ -1,15 +1,17 @@
-import { useCurrentStream } from "context/stream/StreamContext"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import React, { useContext, useEffect, useState } from "react"
-import useInfiniteScrollClient from "../../../../../../../components/custom-hook/useInfiniteScrollClient"
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
+import EmptyRoomIcon from "@mui/icons-material/SentimentDissatisfied"
 import { AccordionDetails } from "@mui/material"
 import Box from "@mui/material/Box"
-import EmptyRoomIcon from "@mui/icons-material/SentimentDissatisfied"
 import Typography from "@mui/material/Typography"
-import PropTypes from "prop-types"
-import UserList from "./UserList"
 import makeStyles from "@mui/styles/makeStyles"
+import useClientSideInfiniteScroll from "components/custom-hook/utils/useClientSideInfiniteScroll"
 import RTMContext from "context/agora/RTMContext"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useCurrentStream } from "context/stream/StreamContext"
+import PropTypes from "prop-types"
+import { Fragment, useContext, useEffect, useState } from "react"
+import UserList from "./UserList"
 
 const useStyles = makeStyles((theme) => ({
    listWrapper: {
@@ -42,11 +44,14 @@ const BreakoutRoomAccordionContent = ({
    const [channelMembers, setChannelMembers] = useState([])
    const [rtmChannel, setRtmChannel] = useState(null)
 
-   const [
-      paginatedChannelMembers,
-      getMorePaginatedChannelMembers,
-      hasMorePaginatedChannelMembers,
-   ] = useInfiniteScrollClient(channelMemberIds, 5)
+   const {
+      visibleData: paginatedChannelMembers,
+      hasMore: hasMorePaginatedChannelMembers,
+      ref: listRef,
+   } = useClientSideInfiniteScroll({
+      data: channelMemberIds,
+      itemsPerPage: 5,
+   })
    const [channelMemberDictionary, setChannelMemberDictionary] = useState({})
    const classes = useStyles()
 
@@ -167,12 +172,15 @@ const BreakoutRoomAccordionContent = ({
       <AccordionDetails>
          <div className={classes.listWrapper}>
             {channelMembers.length ? (
-               <UserList
-                  hasMore={hasMorePaginatedChannelMembers}
-                  loadMore={getMorePaginatedChannelMembers}
-                  channelMemberDictionary={channelMemberDictionary}
-                  members={channelMembers}
-               />
+               <Fragment>
+                  <UserList
+                     hasMore={hasMorePaginatedChannelMembers}
+                     loadMore={() => {}}
+                     channelMemberDictionary={channelMemberDictionary}
+                     members={channelMembers}
+                  />
+                  <Box height={100} ref={listRef} />
+               </Fragment>
             ) : (
                <Box display="flex" alignItems="center">
                   <EmptyRoomIcon className={classes.emptyRoomIcon} />
