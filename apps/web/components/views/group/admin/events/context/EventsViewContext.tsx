@@ -7,10 +7,8 @@ import {
    useMemo,
    useState,
 } from "react"
-import {
-   LivestreamStatsSortOption,
-   LivestreamStatusFilter,
-} from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
+import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
+import { LivestreamEventStatus } from "../events-table-new/utils"
 
 type EventsViewContextValue = {
    sortBy: LivestreamStatsSortOption
@@ -21,8 +19,8 @@ type EventsViewContextValue = {
    ) => "asc" | "desc"
    isActiveSort: (field: "title" | "date" | "registrations") => boolean
    // Status filtering
-   statusFilter: LivestreamStatusFilter[]
-   setStatusFilter: (statuses: LivestreamStatusFilter[]) => void
+   statusFilter: LivestreamEventStatus[]
+   setStatusFilter: (statuses: LivestreamEventStatus[]) => void
    // Event action handlers
    handleEnterLiveStreamRoom: (stat: LiveStreamStats) => void
    handleShareLiveStream: (stat: LiveStreamStats) => void
@@ -81,9 +79,7 @@ export const EventsViewProvider = ({
    initialSort = LivestreamStatsSortOption.STATUS_WITH_DATE,
 }: EventsViewProviderProps) => {
    const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(initialSort)
-   const [statusFilter, setStatusFilter] = useState<LivestreamStatusFilter[]>(
-      []
-   )
+   const [statusFilter, setStatusFilter] = useState<LivestreamEventStatus[]>([])
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
    const handleTableSort = useCallback(

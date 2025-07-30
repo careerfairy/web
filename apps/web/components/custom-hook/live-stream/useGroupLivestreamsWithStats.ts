@@ -48,27 +48,13 @@ export enum LivestreamStatsSortOption {
    STATUS_WITH_DATE,
 }
 
-/**
- * Status filter options for livestreams
- */
-export enum LivestreamStatusFilter {
-   /** Published/upcoming events */
-   PUBLISHED,
-   /** Draft events */
-   DRAFT,
-   /** Past events with accessible recordings */
-   RECORDED,
-   /** Past events without accessible recordings */
-   RECORDING_NOT_AVAILABLE,
-}
-
 interface UseGroupLivestreamsWithStatsOptions {
    /** Sort results by */
    sortBy?: LivestreamStatsSortOption
    /** Search term to filter by */
    searchTerm?: string
    /** Status filter options */
-   statusFilter?: LivestreamStatusFilter[]
+   statusFilter?: LivestreamEventStatus[]
 }
 
 /**
@@ -245,25 +231,13 @@ const filterStatsBySearchTerm = (
 
 const filterStatsByStatus = (
    stats: LiveStreamStats[],
-   statusFilter: LivestreamStatusFilter[]
+   statusFilter: LivestreamEventStatus[]
 ): LiveStreamStats[] => {
    if (statusFilter.length === 0) return stats
 
    return stats.filter((stat) => {
       // Determine the status of this livestream
-      let status: LivestreamStatusFilter
-
-      if (stat.livestream.isDraft) {
-         status = LivestreamStatusFilter.DRAFT
-      } else if (checkIfPast(stat.livestream)) {
-         // Past events can be either "recorded" or "recording-not-available"
-         status = stat.livestream.denyRecordingAccess
-            ? LivestreamStatusFilter.RECORDING_NOT_AVAILABLE
-            : LivestreamStatusFilter.RECORDED
-      } else {
-         // Future events are "published"
-         status = LivestreamStatusFilter.PUBLISHED
-      }
+      const status = getLivestreamEventStatus(stat.livestream)
 
       return statusFilter.includes(status)
    })

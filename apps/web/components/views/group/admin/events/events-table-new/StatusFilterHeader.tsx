@@ -7,26 +7,27 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
+import useMenuState from "components/custom-hook/useMenuState"
 import { Fragment, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { LivestreamStatusFilter } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import { BrandedCheckbox } from "../../../../common/inputs/BrandedCheckbox"
 import { NonSortableHeaderCell } from "./TableHeaderComponents"
+import { LivestreamEventStatus } from "./utils"
 
 type StatusFilterOption = {
-   value: LivestreamStatusFilter
+   value: LivestreamEventStatus
    name: string
 }
 
 const statusOptions: StatusFilterOption[] = [
    {
-      value: LivestreamStatusFilter.PUBLISHED,
+      value: LivestreamEventStatus.UPCOMING,
       name: "Published",
    },
-   { value: LivestreamStatusFilter.DRAFT, name: "Draft" },
-   { value: LivestreamStatusFilter.RECORDED, name: "Recorded" },
+   { value: LivestreamEventStatus.DRAFT, name: "Draft" },
+   { value: LivestreamEventStatus.RECORDING, name: "Recorded" },
    {
-      value: LivestreamStatusFilter.RECORDING_NOT_AVAILABLE,
+      value: LivestreamEventStatus.NOT_RECORDED,
       name: "Recording not available",
    },
 ]
@@ -95,30 +96,20 @@ const menuListProps: MenuProps["MenuListProps"] = {
 }
 
 type Props = {
-   selectedStatuses: LivestreamStatusFilter[]
-   onStatusFilterChange: (statuses: LivestreamStatusFilter[]) => void
+   selectedStatuses: LivestreamEventStatus[]
+   onStatusFilterChange: (statuses: LivestreamEventStatus[]) => void
 }
 
 export const StatusFilterHeader = ({
    selectedStatuses,
    onStatusFilterChange,
 }: Props) => {
-   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+   const { open, handleClick, handleClose, anchorEl } = useMenuState()
+
    const [tempSelectedStatuses, setTempSelectedStatuses] =
-      useState<LivestreamStatusFilter[]>(selectedStatuses)
+      useState<LivestreamEventStatus[]>(selectedStatuses)
 
-   const isOpen = Boolean(anchorEl)
-
-   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-      setAnchorEl(event.currentTarget)
-      setTempSelectedStatuses(selectedStatuses)
-   }
-
-   const handleClose = () => {
-      setAnchorEl(null)
-   }
-
-   const handleStatusToggle = (statusValue: LivestreamStatusFilter) => {
+   const handleStatusToggle = (statusValue: LivestreamEventStatus) => {
       setTempSelectedStatuses((prev) =>
          prev.includes(statusValue)
             ? prev.filter((status) => status !== statusValue)
@@ -136,14 +127,14 @@ export const StatusFilterHeader = ({
          <NonSortableHeaderCell
             tooltip="Shows if your live stream is published, still a draft, or available as a recording."
             onClick={handleClick}
-            active={isOpen}
+            active={open}
          >
             Status
          </NonSortableHeaderCell>
 
          <Menu
             anchorEl={anchorEl}
-            open={isOpen}
+            open={open}
             onClose={handleClose}
             slotProps={slotProps}
             anchorOrigin={{
