@@ -129,12 +129,14 @@ export const StatusFilterHeader = ({
       handleClose()
    }
 
+   const hasActiveFilter = selectedStatuses.length > 0
+
    return (
       <Fragment>
          <NonSortableHeaderCell
             tooltip="Shows if your live stream is published, still a draft, or available as a recording."
             onClick={handleClick}
-            active={open}
+            active={open || hasActiveFilter}
          >
             Status
          </NonSortableHeaderCell>
