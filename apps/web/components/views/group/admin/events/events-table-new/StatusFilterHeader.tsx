@@ -34,11 +34,13 @@ const statusOptions: StatusFilterOption[] = [
 const styles = sxStyles({
    menuPaper: {
       borderRadius: "6px",
-      border: "1px solid",
-      borderColor: (theme) => theme.brand.white[500],
-      boxShadow: "0px 0px 8px 0px rgba(20,20,20,0.06)",
+      border: (theme) => `1px solid ${theme.brand.white[500]}`,
       backgroundColor: (theme) => theme.brand.white[100],
       width: 294,
+      marginLeft: "-46px",
+      marginTop: "2px",
+      boxShadow: "0px 0px 8px 0px rgba(20,20,20,0.06)",
+      filter: "none",
    },
    menuHeader: {
       px: 2,
