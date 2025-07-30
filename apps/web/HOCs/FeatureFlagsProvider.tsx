@@ -69,6 +69,13 @@ export const flagsInitialState = {
    levelsV1: {
       enabled: false,
    },
+   /**
+    * New events table with stats
+    * Hide or Show
+    */
+   newEventsTableFlag: {
+      enabled: false,
+   },
 } satisfies FeatureFlagsDetails
 
 /**
