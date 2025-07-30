@@ -6,6 +6,7 @@ import { Fragment } from "react"
 import { Edit2, MoreVertical, Trash2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useEventsView } from "../context/EventsViewContext"
+import { LivestreamEventStatus } from "./utils"
 
 const styles = sxStyles({
    iconButton: {
@@ -19,22 +20,22 @@ const styles = sxStyles({
 
 type Props = {
    stat: LiveStreamStats
-   isPastEvent: boolean
+   eventStatus: LivestreamEventStatus
 }
 
-export const QuickActionIcon = ({ stat, isPastEvent }: Props) => {
+export const QuickActionIcon = ({ stat, eventStatus }: Props) => {
    const { anchorEl, open, handleClick, handleClose } = useMenuState()
    const { handleEdit, handleDelete } = useEventsView()
 
    const menuOptions = [
       {
-         label: isPastEvent ? "Edit recording" : "Edit live stream",
+         label: getEditLabel(eventStatus),
          icon: <Edit2 size={16} />,
          handleClick: () => handleEdit(stat),
          color: "neutral.700",
       },
       {
-         label: isPastEvent ? "Delete recording" : "Delete live stream",
+         label: getDeleteLabel(eventStatus),
          icon: <Trash2 size={16} />,
          handleClick: () => handleDelete(stat),
          color: "error.main",
@@ -55,4 +56,28 @@ export const QuickActionIcon = ({ stat, isPastEvent }: Props) => {
          />
       </Fragment>
    )
+}
+
+const getEditLabel = (eventStatus: LivestreamEventStatus) => {
+   switch (eventStatus) {
+      case LivestreamEventStatus.DRAFT:
+         return "Edit draft"
+      case LivestreamEventStatus.RECORDING:
+      case LivestreamEventStatus.NOT_RECORDED:
+         return "Edit recording"
+      default:
+         return "Edit live stream"
+   }
+}
+
+const getDeleteLabel = (eventStatus: LivestreamEventStatus) => {
+   switch (eventStatus) {
+      case LivestreamEventStatus.DRAFT:
+         return "Delete draft"
+      case LivestreamEventStatus.RECORDING:
+      case LivestreamEventStatus.NOT_RECORDED:
+         return "Delete recording"
+      default:
+         return "Delete live stream"
+   }
 }

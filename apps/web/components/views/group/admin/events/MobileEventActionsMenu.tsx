@@ -14,9 +14,12 @@ import {
    MessageSquare,
    Trash2,
 } from "react-feather"
-import { checkIfPast } from "../../../../../util/streamUtil"
 import { useEventsView } from "./context/EventsViewContext"
-import { getEventActionConditions } from "./events-table-new/utils"
+import {
+   getEventActionConditions,
+   getLivestreamEventStatus,
+   LivestreamEventStatus,
+} from "./events-table-new/utils"
 
 type Props = {
    stat: LiveStreamStats | null
@@ -37,11 +40,9 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       handleDelete,
    } = useEventsView()
 
-   const isDraft = Boolean(stat?.livestream?.isDraft)
-   const isPastEvent = stat?.livestream ? checkIfPast(stat.livestream) : false
-   const hasRecordingAvailable = stat?.livestream
-      ? !stat.livestream.denyRecordingAccess
-      : false
+   const eventStatus = stat?.livestream
+      ? getLivestreamEventStatus(stat.livestream)
+      : null
 
    const {
       shouldShowEnterLiveStreamRoom,
@@ -51,11 +52,7 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       shouldShowAnalytics,
       shouldShowQuestions,
       shouldShowFeedback,
-   } = getEventActionConditions({
-      isDraft,
-      isPastEvent,
-      hasRecordingAvailable,
-   })
+   } = getEventActionConditions(eventStatus)
 
    // Store the last calculated menu options to persist during closing animation
    const lastMenuOptionsRef = useRef<MenuOption[]>([])
@@ -123,11 +120,7 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       }
 
       // For All events
-      const editLabel = isDraft
-         ? "Edit draft"
-         : isPastEvent
-         ? "Edit recording"
-         : "Edit live stream"
+      const editLabel = getEditLabel(eventStatus)
 
       options.push({
          label: editLabel,
@@ -136,11 +129,7 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       })
 
       // Delete action (always available with different labels)
-      const deleteLabel = isDraft
-         ? "Delete draft"
-         : isPastEvent
-         ? "Delete recording"
-         : "Delete live stream"
+      const deleteLabel = getDeleteLabel(eventStatus)
 
       options.push({
          label: deleteLabel,
@@ -158,8 +147,7 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       return open ? options : lastMenuOptionsRef.current
    }, [
       stat,
-      isDraft,
-      isPastEvent,
+      eventStatus,
       shouldShowEnterLiveStreamRoom,
       shouldShowShareLiveStream,
       shouldShowViewRecording,
@@ -187,4 +175,28 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
          onClose={onClose}
       />
    )
+}
+
+const getEditLabel = (eventStatus: LivestreamEventStatus) => {
+   switch (eventStatus) {
+      case LivestreamEventStatus.DRAFT:
+         return "Edit draft"
+      case LivestreamEventStatus.RECORDING:
+      case LivestreamEventStatus.NOT_RECORDED:
+         return "Edit recording"
+      default:
+         return "Edit live stream"
+   }
+}
+
+const getDeleteLabel = (eventStatus: LivestreamEventStatus) => {
+   switch (eventStatus) {
+      case LivestreamEventStatus.DRAFT:
+         return "Delete draft"
+      case LivestreamEventStatus.RECORDING:
+      case LivestreamEventStatus.NOT_RECORDED:
+         return "Delete recording"
+      default:
+         return "Delete live stream"
+   }
 }

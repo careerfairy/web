@@ -5,9 +5,11 @@ import { placeholderBanner } from "constants/images"
 import Image from "next/image"
 import { Calendar, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { checkIfPast } from "util/streamUtil"
 import { StatusIcon } from "./events-table-new/StatusIcon"
-import { getEventDate } from "./events-table-new/utils"
+import {
+   getEventDate,
+   getLivestreamEventStatus,
+} from "./events-table-new/utils"
 
 const styles = sxStyles({
    eventCard: {
@@ -44,7 +46,7 @@ type Props = {
 }
 
 export const MobileEventCard = ({ stat, onCardClick }: Props) => {
-   const isPastEvent = checkIfPast(stat.livestream)
+   const eventStatus = getLivestreamEventStatus(stat.livestream)
 
    return (
       <ButtonBase sx={styles.eventCard} onClick={onCardClick} disableRipple>
@@ -93,12 +95,7 @@ export const MobileEventCard = ({ stat, onCardClick }: Props) => {
                <Eye size={14} />
                <Typography variant="xsmall">{"-"}</Typography>
             </Stack>
-            <StatusIcon
-               isDraft={stat.livestream.isDraft}
-               isPastEvent={isPastEvent}
-               hasRecordingAvailable={!stat.livestream.denyRecordingAccess}
-               size={14}
-            />
+            <StatusIcon status={eventStatus} size={14} />
          </Stack>
       </ButtonBase>
    )

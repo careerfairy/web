@@ -6,7 +6,7 @@ import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
 import { HoverActionIcons } from "./HoverActionIcons"
 import { SpeakerAvatars } from "./SpeakerAvatars"
-import { getEventActionConditions } from "./utils"
+import { getEventActionConditions, LivestreamEventStatus } from "./utils"
 
 const styles = sxStyles({
    container: {
@@ -66,9 +66,7 @@ type Props = {
    backgroundImageUrl?: string
    speakers?: Speaker[]
    showHoverActions?: boolean
-   isDraft?: boolean
-   isPastEvent?: boolean
-   hasRecordingAvailable?: boolean
+   eventStatus: LivestreamEventStatus
    onEnterLiveStreamRoom?: () => void
    onShareLiveStream?: () => void
    onAnalytics?: () => void
@@ -83,9 +81,7 @@ export const EventCardPreview = ({
    backgroundImageUrl,
    speakers,
    showHoverActions,
-   isDraft,
-   isPastEvent,
-   hasRecordingAvailable,
+   eventStatus,
    onEnterLiveStreamRoom,
    onShareLiveStream,
    onAnalytics,
@@ -102,11 +98,7 @@ export const EventCardPreview = ({
       shouldShowQuestions,
       shouldShowFeedback,
       shouldShowShareRecording,
-   } = getEventActionConditions({
-      isDraft,
-      isPastEvent,
-      hasRecordingAvailable,
-   })
+   } = getEventActionConditions(eventStatus)
 
    return (
       <Stack
@@ -145,7 +137,11 @@ export const EventCardPreview = ({
                {Boolean(showHoverActions) && (
                   <Box sx={styles.hoverActionsBackground}>
                      <HoverActionIcons
-                        onEdit={isDraft ? onEdit : undefined}
+                        onEdit={
+                           eventStatus === LivestreamEventStatus.DRAFT
+                              ? onEdit
+                              : undefined
+                        }
                         onEnterLiveStreamRoom={
                            shouldShowEnterLiveStreamRoom
                               ? onEnterLiveStreamRoom
