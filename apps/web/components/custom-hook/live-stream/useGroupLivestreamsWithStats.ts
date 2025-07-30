@@ -48,11 +48,27 @@ export enum LivestreamStatsSortOption {
    STATUS_WITH_DATE,
 }
 
+/**
+ * Status filter options for livestreams
+ */
+export enum LivestreamStatusFilter {
+   /** Published/upcoming events */
+   PUBLISHED,
+   /** Draft events */
+   DRAFT,
+   /** Past events with accessible recordings */
+   RECORDED,
+   /** Past events without accessible recordings */
+   RECORDING_NOT_AVAILABLE,
+}
+
 interface UseGroupLivestreamsWithStatsOptions {
    /** Sort results by */
    sortBy?: LivestreamStatsSortOption
    /** Search term to filter by */
    searchTerm?: string
+   /** Status filter options */
+   statusFilter?: LivestreamStatusFilter[]
 }
 
 /**
@@ -77,8 +93,11 @@ export const useGroupLivestreamsWithStats = (
    groupId: string,
    options: UseGroupLivestreamsWithStatsOptions = {}
 ) => {
-   const { sortBy = LivestreamStatsSortOption.START_DESC, searchTerm = "" } =
-      options
+   const {
+      sortBy = LivestreamStatsSortOption.START_DESC,
+      searchTerm = "",
+      statusFilter = [],
+   } = options
    const firestore = useFirestore()
 
    const fetchGroupLivestreamsWithStats = async (): Promise<
@@ -160,10 +179,11 @@ export const useGroupLivestreamsWithStats = (
    const processedData = useMemo(() => {
       if (!data) return []
 
-      // First filter by search term, then sort
-      const filteredData = filterStatsBySearchTerm(data, searchTerm)
+      // First filter by search term, then by status, then sort
+      let filteredData = filterStatsBySearchTerm(data, searchTerm)
+      filteredData = filterStatsByStatus(filteredData, statusFilter)
       return sortStatsArray(filteredData, sortBy)
-   }, [data, searchTerm, sortBy])
+   }, [data, searchTerm, statusFilter, sortBy])
 
    return {
       data: processedData,
@@ -220,6 +240,32 @@ const filterStatsBySearchTerm = (
       })
 
       return titleMatch || companyMatch || speakerMatch
+   })
+}
+
+const filterStatsByStatus = (
+   stats: LiveStreamStats[],
+   statusFilter: LivestreamStatusFilter[]
+): LiveStreamStats[] => {
+   if (statusFilter.length === 0) return stats
+
+   return stats.filter((stat) => {
+      // Determine the status of this livestream
+      let status: LivestreamStatusFilter
+
+      if (stat.livestream.isDraft) {
+         status = LivestreamStatusFilter.DRAFT
+      } else if (checkIfPast(stat.livestream)) {
+         // Past events can be either "recorded" or "recording-not-available"
+         status = stat.livestream.denyRecordingAccess
+            ? LivestreamStatusFilter.RECORDING_NOT_AVAILABLE
+            : LivestreamStatusFilter.RECORDED
+      } else {
+         // Future events are "published"
+         status = LivestreamStatusFilter.PUBLISHED
+      }
+
+      return statusFilter.includes(status)
    })
 }
 

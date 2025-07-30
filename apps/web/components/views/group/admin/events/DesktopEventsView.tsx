@@ -14,6 +14,7 @@ import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
 import { EventTableRow } from "./events-table-new/EventTableRow"
 import { eventsTableStyles } from "./events-table-new/EventsTableStyles"
+import { StatusFilterHeader } from "./events-table-new/StatusFilterHeader"
 import {
    NonSortableHeaderCell,
    SortableHeaderCell,
@@ -29,6 +30,8 @@ export const DesktopEventsView = ({ stats }: Props) => {
       handleTableSort,
       getSortDirection,
       isActiveSort,
+      statusFilter,
+      setStatusFilter,
       handleEnterLiveStreamRoom,
       handleShareLiveStream,
       handleAnalytics,
@@ -87,9 +90,10 @@ export const DesktopEventsView = ({ stats }: Props) => {
                      <NonSortableHeaderCell tooltip="The number of talent who watched your live stream, either live or recorded.">
                         Views
                      </NonSortableHeaderCell>
-                     <NonSortableHeaderCell tooltip="Shows if your live stream is published, still a draft, or available as a recording.">
-                        Status
-                     </NonSortableHeaderCell>
+                     <StatusFilterHeader
+                        selectedStatuses={statusFilter}
+                        onStatusFilterChange={setStatusFilter}
+                     />
                   </TableRow>
                </TableHead>
                <TableBody>
