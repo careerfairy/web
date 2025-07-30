@@ -2,13 +2,16 @@ import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Box, styled, TableCell, TableRow, Typography } from "@mui/material"
 import { Calendar, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { checkIfPast } from "util/streamUtil"
 import { EventCardPreview } from "./EventCardPreview"
 import { COLUMN_WIDTHS } from "./EventsTableStyles"
 import { QuickActionIcon } from "./QuickActionIcon"
 import { StatusIcon } from "./StatusIcon"
 import { TableHighlighter } from "./TableHighlighter"
-import { getEventDate } from "./utils"
+import {
+   getEventDate,
+   getLivestreamEventStatus,
+   LivestreamEventStatus,
+} from "./utils"
 
 const styles = sxStyles({
    bodyRow: {
@@ -90,7 +93,10 @@ export const EventTableRow = ({
    onRegistrationsClick,
    onViewsClick,
 }: EventTableRowProps) => {
-   const isPastEvent = checkIfPast(stat.livestream)
+   const eventStatus = getLivestreamEventStatus(stat.livestream)
+   const isPastEvent =
+      eventStatus === LivestreamEventStatus.RECORDING ||
+      eventStatus === LivestreamEventStatus.NOT_RECORDED
 
    return (
       <TableRow
@@ -113,7 +119,7 @@ export const EventTableRow = ({
                   speakers={stat.livestream.speakers}
                   backgroundImageUrl={stat.livestream.backgroundImageUrl}
                   showHoverActions={isHovered}
-                  isDraft={stat.livestream.isDraft}
+                  isDraft={eventStatus === LivestreamEventStatus.DRAFT}
                   isPastEvent={isPastEvent}
                   hasRecordingAvailable={!stat.livestream.denyRecordingAccess}
                   onEnterLiveStreamRoom={onEnterLiveStreamRoom}
@@ -184,11 +190,7 @@ export const EventTableRow = ({
          {/* Status Column */}
          <TableCell>
             <CentredBox gap={0.5} width={COLUMN_WIDTHS.status}>
-               <StatusIcon
-                  isDraft={stat.livestream.isDraft}
-                  hasRecordingAvailable={!stat.livestream.denyRecordingAccess}
-                  isPastEvent={isPastEvent}
-               />
+               <StatusIcon status={eventStatus} />
                <QuickActionIcon />
             </CentredBox>
          </TableCell>

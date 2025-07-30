@@ -4,10 +4,14 @@ import {
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
 import {
-   LiveStreamStats,
    createLiveStreamStatsDoc,
+   LiveStreamStats,
 } from "@careerfairy/shared-lib/livestreams/stats"
 import { reducedRemoteCallsOptions } from "components/custom-hook/utils/useFunctionsSWRFetcher"
+import {
+   getLivestreamEventStatus,
+   LivestreamEventStatus,
+} from "components/views/group/admin/events/events-table-new/utils"
 import {
    collection,
    collectionGroup,
@@ -19,7 +23,6 @@ import { useMemo } from "react"
 import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
-import { checkIfPast } from "util/streamUtil"
 
 /**
  * Sort options for livestream stats
@@ -270,11 +273,21 @@ const sortStatsArray = (
             )
 
          case LivestreamStatsSortOption.STATUS_WITH_DATE: {
-            // Get status priority: upcoming (0), draft (1), past (2)
+            // Get status priority: upcoming (0), draft (1), recording (2), not recorded (3)
             const getStatusPriority = (stat: LiveStreamStats): number => {
-               if (stat.livestream.isDraft) return 1
-               if (checkIfPast(stat.livestream)) return 2
-               return 0 // upcoming
+               const status = getLivestreamEventStatus(stat.livestream)
+               switch (status) {
+                  case LivestreamEventStatus.UPCOMING:
+                     return 0
+                  case LivestreamEventStatus.DRAFT:
+                     return 1
+                  case LivestreamEventStatus.RECORDING:
+                     return 2
+                  case LivestreamEventStatus.NOT_RECORDED:
+                     return 3
+                  default:
+                     return 4
+               }
             }
 
             const aStatusPriority = getStatusPriority(a)
@@ -283,16 +296,6 @@ const sortStatsArray = (
             // First sort by status priority
             if (aStatusPriority !== bStatusPriority) {
                return aStatusPriority - bStatusPriority
-            }
-
-            // For past events, prioritize those with accessible recordings (denyRecordingAccess = false)
-            if (aStatusPriority === 2 && bStatusPriority === 2) {
-               const aHasAccessibleRecording = !a.livestream.denyRecordingAccess
-               const bHasAccessibleRecording = !b.livestream.denyRecordingAccess
-
-               if (aHasAccessibleRecording !== bHasAccessibleRecording) {
-                  return aHasAccessibleRecording ? -1 : 1 // Accessible recordings first
-               }
             }
 
             // Then sort by date within each status category

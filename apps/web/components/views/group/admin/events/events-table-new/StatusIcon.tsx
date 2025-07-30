@@ -1,50 +1,40 @@
 import { Box } from "@mui/material"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { CheckCircle, File, Video, VideoOff } from "react-feather"
+import { LivestreamEventStatus } from "./utils"
 
 type Props = {
-   isDraft?: boolean
-   isPastEvent?: boolean
-   hasRecordingAvailable?: boolean
+   status: LivestreamEventStatus
 }
 
-export const StatusIcon = ({
-   isDraft,
-   isPastEvent,
-   hasRecordingAvailable,
-}: Props) => {
+export const StatusIcon = ({ status }: Props) => {
    const getIcon = () => {
-      if (isDraft) {
-         return <Box component={File} size={20} color="warning.600" />
-      }
-
-      // Check if it's a past event
-      if (isPastEvent) {
-         // Check if recording is available
-         if (!hasRecordingAvailable) {
+      switch (status) {
+         case LivestreamEventStatus.DRAFT:
+            return <Box component={File} size={20} color="warning.600" />
+         case LivestreamEventStatus.NOT_RECORDED:
             return <Box component={VideoOff} size={20} color="neutral.300" />
-         }
-         return <Box component={Video} size={20} color="neutral.500" />
+         case LivestreamEventStatus.RECORDING:
+            return <Box component={Video} size={20} color="neutral.500" />
+         default:
+            // Published/upcoming event
+            return <Box component={CheckCircle} size={20} color="success.700" />
       }
-
-      // Published/upcoming event
-      return <Box component={CheckCircle} size={20} color="success.700" />
    }
 
    const getTooltipTitle = () => {
-      if (isDraft) {
-         return "Draft"
-      }
-
-      if (isPastEvent) {
-         if (!hasRecordingAvailable) {
+      switch (status) {
+         case LivestreamEventStatus.DRAFT:
+            return "Draft"
+         case LivestreamEventStatus.RECORDING:
+            return "Recorded"
+         case LivestreamEventStatus.NOT_RECORDED:
             return "Recording not available"
-         }
-
-         return "Recorded"
+         case LivestreamEventStatus.UPCOMING:
+            return "Upcoming"
+         default:
+            return "Unknown"
       }
-
-      return "Published"
    }
 
    return (
