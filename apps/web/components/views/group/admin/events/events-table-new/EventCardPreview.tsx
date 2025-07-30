@@ -143,25 +143,33 @@ export const EventCardPreview = ({
                   {title || "Untitled"}
                </Typography>
                {Boolean(showHoverActions) && (
-                  <HoverActionIcons
-                     onEdit={isDraft ? onEdit : undefined}
-                     onEnterLiveStreamRoom={
-                        shouldShowEnterLiveStreamRoom
-                           ? onEnterLiveStreamRoom
-                           : undefined
-                     }
-                     onShareLiveStream={
-                        shouldShowShareLiveStream
-                           ? onShareLiveStream
-                           : undefined
-                     }
-                     onAnalytics={shouldShowAnalytics ? onAnalytics : undefined}
-                     onQuestions={shouldShowQuestions ? onQuestions : undefined}
-                     onFeedback={shouldShowFeedback ? onFeedback : undefined}
-                     onShareRecording={
-                        shouldShowShareRecording ? onShareRecording : undefined
-                     }
-                  />
+                  <Box sx={styles.hoverActionsBackground}>
+                     <HoverActionIcons
+                        onEdit={isDraft ? onEdit : undefined}
+                        onEnterLiveStreamRoom={
+                           shouldShowEnterLiveStreamRoom
+                              ? onEnterLiveStreamRoom
+                              : undefined
+                        }
+                        onShareLiveStream={
+                           shouldShowShareLiveStream
+                              ? onShareLiveStream
+                              : undefined
+                        }
+                        onAnalytics={
+                           shouldShowAnalytics ? onAnalytics : undefined
+                        }
+                        onQuestions={
+                           shouldShowQuestions ? onQuestions : undefined
+                        }
+                        onFeedback={shouldShowFeedback ? onFeedback : undefined}
+                        onShareRecording={
+                           shouldShowShareRecording
+                              ? onShareRecording
+                              : undefined
+                        }
+                     />
+                  </Box>
                )}
             </Stack>
          </Box>
