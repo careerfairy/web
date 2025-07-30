@@ -105,12 +105,10 @@ export const EventTableRow = ({
          onMouseLeave={onMouseLeave}
          onFocus={onMouseEnter}
          onBlur={onMouseLeave}
-         id="event-table-row"
       >
          {/* Title Column */}
          <TableCell
             variant="head"
-            id="title-column"
             sx={[styles.bodyCell, { minWidth: COLUMN_WIDTHS.title }]}
          >
             <CentredBox>

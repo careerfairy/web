@@ -76,7 +76,7 @@ export const HeaderText = ({ children, active, ...props }: HeaderTextProps) => {
 
 export const HeaderIcon = forwardRef<HTMLSpanElement, IconProps>(
    (props, ref) => (
-      <Box component="span" id="header-icon" ref={ref} sx={styles.headerIcon}>
+      <Box component="span" ref={ref} sx={styles.headerIcon}>
          <ChevronDown size={16} {...props} />
       </Box>
    )

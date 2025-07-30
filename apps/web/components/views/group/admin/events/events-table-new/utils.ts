@@ -1,5 +1,6 @@
 import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import DateUtil from "util/DateUtil"
 import { checkIfPast } from "../../../../../../util/streamUtil"
 
 export enum LivestreamEventStatus {
@@ -42,15 +43,5 @@ export const getEventDate = (stat: LiveStreamStats): string => {
       return "No date"
    }
 
-   const date = stat.livestream.start.toDate()
-   const day = date.getDate().toString().padStart(2, "0")
-   const month = date.toLocaleDateString("en-US", { month: "short" })
-   const year = date.getFullYear().toString().slice(-2)
-   const time = date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-   })
-
-   return `${day} ${month} ${year}, ${time}`
+   return DateUtil.formatEventDate(stat.livestream.start.toDate())
 }
