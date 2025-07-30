@@ -3,13 +3,13 @@ import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { checkIfPast } from "../../../../../../util/streamUtil"
 
 export enum LivestreamEventStatus {
-   /* Event is scheduled for the future */
+   /** Event is scheduled for the future */
    UPCOMING = "upcoming",
-   /* Event is in draft state, not published */
+   /** Event is in draft state, not published */
    DRAFT = "draft",
-   /* Event has ended and recording is available */
+   /** Event has ended and recording is available */
    RECORDING = "recording",
-   /* Event has ended and recording is not available */
+   /** Event has ended and recording is not available */
    NOT_RECORDED = "not-recorded",
 }
 
