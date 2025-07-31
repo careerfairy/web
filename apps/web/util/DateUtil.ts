@@ -424,4 +424,15 @@ export default class DateUtil {
    static formatDateTime(JSDate: Date | number): string {
       return dayjs(JSDate).format("DD MMM YYYY [at] HH:mm")
    }
+
+   /**
+    * Formats a given date to a string in the format "DD MMM YY, HH:mm".
+    * This matches the format used by getEventDate for livestream events.
+    *
+    * @param {Date} JSDate - The JavaScript Date object to be formatted.
+    * @return {string} - The formatted date string. Example: "15 Dec 23, 14:30"
+    */
+   static formatEventDate(JSDate: Date | number): string {
+      return dayjs(JSDate).format("DD MMM YY, HH:mm")
+   }
 }
