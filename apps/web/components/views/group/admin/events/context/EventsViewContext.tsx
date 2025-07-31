@@ -1,5 +1,7 @@
 import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { useRouter } from "next/router"
 import {
    createContext,
    ReactNode,
@@ -80,11 +82,14 @@ export const EventsViewProvider = ({
    children,
    initialSort = LivestreamStatsSortOption.STATUS_WITH_DATE,
 }: EventsViewProviderProps) => {
+   const { group } = useGroup()
    const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(initialSort)
    const [statusFilter, setStatusFilter] = useState<LivestreamEventStatus[]>([])
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
    const [livestreamToDelete, setLivestreamToDelete] =
       useState<LivestreamEventPublicData | null>(null)
+
+   const { push } = useRouter()
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
    const handleTableSort = useCallback(
@@ -156,14 +161,15 @@ export const EventsViewProvider = ({
       )
    }, [])
 
-   const handleAnalytics = useCallback((stat: LiveStreamStats) => {
-      // Navigate to analytics view
-      alert(
-         `Analytics for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
-      )
-   }, [])
+   const handleAnalytics = useCallback(
+      (stat: LiveStreamStats) => {
+         // Navigate to analytics view
+         push(
+            `/group/${group.id}/admin/analytics/live-streams/${stat.livestream.id}`
+         )
+      },
+      [group?.id, push]
+   )
 
    const handleQuestions = useCallback((stat: LiveStreamStats) => {
       // Open messaging/feedback feature
@@ -183,14 +189,15 @@ export const EventsViewProvider = ({
       )
    }, [])
 
-   const handleEdit = useCallback((stat: LiveStreamStats) => {
-      // Navigate to edit page
-      alert(
-         `Edit for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
-      )
-   }, [])
+   const handleEdit = useCallback(
+      (stat: LiveStreamStats) => {
+         // Navigate to edit page
+         push(
+            `/group/${group.id}/admin/content/live-streams/${stat.livestream.id}`
+         )
+      },
+      [group?.id, push]
+   )
 
    const handleShareRecording = useCallback((stat: LiveStreamStats) => {
       // Navigate to recording view
@@ -210,14 +217,15 @@ export const EventsViewProvider = ({
       )
    }, [])
 
-   const handleRegistrationsClick = useCallback((stat: LiveStreamStats) => {
-      // Navigate to registrations view
-      alert(
-         `Registrations for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
-   }, [])
+   const handleRegistrationsClick = useCallback(
+      (stat: LiveStreamStats) => {
+         // Navigate to registrations view
+         push(
+            `/group/${group.id}/admin/analytics/live-streams/${stat.livestream.id}`
+         )
+      },
+      [group?.id, push]
+   )
 
    const handleViewsClick = useCallback((stat: LiveStreamStats) => {
       // Navigate to views view

@@ -25,9 +25,10 @@ export const DeleteLivestreamDialog = ({
    onClose,
 }: Props) => {
    const { successNotification, errorNotification } = useSnackbarNotifications()
-   const collection = livestream?.isDraft ? "draftLivestreams" : "livestreams"
    const { group } = useGroup()
    const { mutate } = useSWRConfig()
+
+   const collection = livestream?.isDraft ? "draftLivestreams" : "livestreams"
 
    const { trigger: deleteLivestream, isMutating: isDeleting } =
       useDeleteLivestream({

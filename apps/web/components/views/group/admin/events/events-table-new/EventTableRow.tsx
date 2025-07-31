@@ -2,6 +2,7 @@ import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Box, styled, TableCell, TableRow, Typography } from "@mui/material"
 import { Calendar, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { withStopPropagation } from "util/CommonUtil"
 import { EventCardPreview } from "./EventCardPreview"
 import { QuickActionIcon } from "./QuickActionIcon"
 import { StatusIcon } from "./StatusIcon"
@@ -12,8 +13,8 @@ const styles = sxStyles({
    bodyRow: {
       transition: "all 0.2s ease-in-out",
       height: 80,
-      cursor: "default",
       "& .MuiTableCell-root": {
+         cursor: "pointer",
          borderBottom: "none",
          py: 1,
          border: "1px solid",
@@ -97,6 +98,7 @@ export const EventTableRow = ({
          onMouseLeave={onMouseLeave}
          onFocus={onMouseEnter}
          onBlur={onMouseLeave}
+         onClick={withStopPropagation(onEdit)}
       >
          {/* Title Column */}
          <TableCell variant="head" sx={styles.bodyCell}>
@@ -138,7 +140,7 @@ export const EventTableRow = ({
 
          {/* Registrations Column */}
          <TableCell
-            onClick={onRegistrationsClick}
+            onClick={withStopPropagation(onRegistrationsClick)}
             sx={[
                styles.bodyCell,
                {
@@ -165,7 +167,7 @@ export const EventTableRow = ({
 
          {/* Views Column */}
          <TableCell
-            onClick={onViewsClick}
+            onClick={withStopPropagation(onViewsClick)}
             sx={[
                styles.bodyCell,
                {

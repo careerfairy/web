@@ -5,6 +5,7 @@ import { DesktopMenu } from "components/views/common/inputs/BrandedResponsiveMen
 import { Fragment } from "react"
 import { Edit2, MoreVertical, Trash2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { withStopPropagation } from "util/CommonUtil"
 import { useEventsView } from "../context/EventsViewContext"
 import { LivestreamEventStatus } from "./utils"
 
@@ -31,20 +32,23 @@ export const QuickActionIcon = ({ stat, eventStatus }: Props) => {
       {
          label: getEditLabel(eventStatus),
          icon: <Edit2 size={16} />,
-         handleClick: () => handleEdit(stat),
+         handleClick: withStopPropagation(() => handleEdit(stat)),
          color: "neutral.700",
       },
       {
          label: getDeleteLabel(eventStatus),
          icon: <Trash2 size={16} />,
-         handleClick: () => handleDelete(stat),
+         handleClick: withStopPropagation(() => handleDelete(stat)),
          color: "error.main",
       },
    ]
 
    return (
       <Fragment>
-         <IconButton sx={styles.iconButton} onClick={handleClick}>
+         <IconButton
+            sx={styles.iconButton}
+            onClick={withStopPropagation(handleClick)}
+         >
             <MoreVertical size={16} />
          </IconButton>
          <DesktopMenu
