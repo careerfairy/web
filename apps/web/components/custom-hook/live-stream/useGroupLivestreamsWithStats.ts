@@ -4,10 +4,14 @@ import {
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
 import {
-   LiveStreamStats,
    createLiveStreamStatsDoc,
+   LiveStreamStats,
 } from "@careerfairy/shared-lib/livestreams/stats"
 import { reducedRemoteCallsOptions } from "components/custom-hook/utils/useFunctionsSWRFetcher"
+import {
+   getLivestreamEventStatus,
+   LivestreamEventStatus,
+} from "components/views/group/admin/events/events-table-new/utils"
 import {
    collection,
    collectionGroup,
@@ -40,6 +44,8 @@ export enum LivestreamStatsSortOption {
    PARTICIPANTS_DESC,
    /** Least participants first */
    PARTICIPANTS_ASC,
+   /** Status-based: upcoming, draft, past (with date as secondary sort) */
+   STATUS_WITH_DATE,
 }
 
 interface UseGroupLivestreamsWithStatsOptions {
@@ -85,7 +91,8 @@ export const useGroupLivestreamsWithStats = (
          const statsQuery = query(
             collectionGroup(firestore, "stats"),
             where("id", "==", "livestreamStats"),
-            where("livestream.groupIds", "array-contains", groupId)
+            where("livestream.groupIds", "array-contains", groupId),
+            where("livestream.test", "==", false)
          ).withConverter(createGenericConverter<LiveStreamStats>())
 
          const statsSnapshot = await getDocs(statsQuery)
@@ -167,6 +174,24 @@ export const useGroupLivestreamsWithStats = (
 
 // --- Helpers ---
 
+/**
+ * Compares two livestream stats by their start date
+ * @param a First livestream stat
+ * @param b Second livestream stat
+ * @param ascending Whether to sort in ascending order (true) or descending order (false)
+ * @returns Comparison result for sorting
+ */
+const compareByDate = (
+   a: LiveStreamStats,
+   b: LiveStreamStats,
+   ascending: boolean = false
+): number => {
+   const aDate = a.livestream.start?.toDate?.() || new Date(0)
+   const bDate = b.livestream.start?.toDate?.() || new Date(0)
+   const comparison = aDate.getTime() - bDate.getTime()
+   return ascending ? comparison : -comparison
+}
+
 const filterStatsBySearchTerm = (
    stats: LiveStreamStats[],
    searchTerm: string
@@ -178,11 +203,23 @@ const filterStatsBySearchTerm = (
    return stats.filter((stat) => {
       const title = stat.livestream.title?.toLowerCase() || ""
       const company = stat.livestream.company?.toLowerCase() || ""
+      const speakers = stat.livestream.speakers || []
 
       const titleMatch = title.includes(normalizedSearchTerm)
       const companyMatch = company.includes(normalizedSearchTerm)
 
-      return titleMatch || companyMatch
+      // Check if any speaker name contains the search term
+      const speakerMatch = speakers.some((speaker) => {
+         if (!speaker) return false
+
+         const fullName = `${speaker.firstName || ""} ${
+            speaker.lastName || ""
+         }`.toLowerCase()
+
+         return fullName.includes(normalizedSearchTerm)
+      })
+
+      return titleMatch || companyMatch || speakerMatch
    })
 }
 
@@ -192,28 +229,22 @@ const sortStatsArray = (
 ): LiveStreamStats[] => {
    return [...stats].sort((a, b) => {
       switch (sortBy) {
-         case LivestreamStatsSortOption.START_ASC: {
-            const aStartAsc = a.livestream.start?.toDate?.() || new Date(0)
-            const bStartAsc = b.livestream.start?.toDate?.() || new Date(0)
-            return aStartAsc.getTime() - bStartAsc.getTime()
-         }
+         case LivestreamStatsSortOption.START_ASC:
+            return compareByDate(a, b, true)
 
          case LivestreamStatsSortOption.START_DESC:
-         default: {
-            const aStartDesc = a.livestream.start?.toDate?.() || new Date(0)
-            const bStartDesc = b.livestream.start?.toDate?.() || new Date(0)
-            return bStartDesc.getTime() - aStartDesc.getTime()
-         }
+         default:
+            return compareByDate(a, b, false)
 
          case LivestreamStatsSortOption.TITLE_ASC: {
-            const aTitleAsc = a.livestream.title || ""
-            const bTitleAsc = b.livestream.title || ""
+            const aTitleAsc = a.livestream.title?.trim()?.toLowerCase() || ""
+            const bTitleAsc = b.livestream.title?.trim()?.toLowerCase() || ""
             return aTitleAsc.localeCompare(bTitleAsc)
          }
 
          case LivestreamStatsSortOption.TITLE_DESC: {
-            const aTitleDesc = a.livestream.title || ""
-            const bTitleDesc = b.livestream.title || ""
+            const aTitleDesc = a.livestream.title?.trim()?.toLowerCase() || ""
+            const bTitleDesc = b.livestream.title?.trim()?.toLowerCase() || ""
             return bTitleDesc.localeCompare(aTitleDesc)
          }
 
@@ -240,6 +271,36 @@ const sortStatsArray = (
                a.generalStats.numberOfParticipants -
                b.generalStats.numberOfParticipants
             )
+
+         case LivestreamStatsSortOption.STATUS_WITH_DATE: {
+            // Get status priority: upcoming (0), draft (1), recording (2), not recorded (3)
+            const getStatusPriority = (stat: LiveStreamStats): number => {
+               const status = getLivestreamEventStatus(stat.livestream)
+               switch (status) {
+                  case LivestreamEventStatus.UPCOMING:
+                     return 0
+                  case LivestreamEventStatus.DRAFT:
+                     return 1
+                  case LivestreamEventStatus.RECORDING:
+                     return 2
+                  case LivestreamEventStatus.NOT_RECORDED:
+                     return 3
+                  default:
+                     return 4
+               }
+            }
+
+            const aStatusPriority = getStatusPriority(a)
+            const bStatusPriority = getStatusPriority(b)
+
+            // First sort by status priority
+            if (aStatusPriority !== bStatusPriority) {
+               return aStatusPriority - bStatusPriority
+            }
+
+            // Then sort by date within each status category
+            return compareByDate(a, b, false)
+         }
       }
    })
 }

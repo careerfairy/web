@@ -30,6 +30,7 @@ const createFeatureFlagEnableCondition = (groupIds: string[]) => {
  * - ?sparksAdminPageFlag=true
  * - ?sparksB2BOnboardingFlag=true
  * - ?levelsV1=true
+ * - ?newEventsTableFlag=true
  */
 export const flagsInitialState = {
    /**
