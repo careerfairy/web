@@ -396,10 +396,10 @@ export function getIconUrl(siteUrl: string): string {
  * Example: Prevent a button click inside a list item from triggering the list item's onClick.
  */
 export const withStopPropagation = (
-   callback: (e: React.MouseEvent) => void
+   callback: (e?: React.MouseEvent) => void
 ) => {
-   return (e: React.MouseEvent) => {
-      e.stopPropagation()
+   return (e?: React.MouseEvent) => {
+      e?.stopPropagation()
       callback?.(e)
    }
 }
