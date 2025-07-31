@@ -1,5 +1,7 @@
 import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import {
@@ -10,7 +12,9 @@ import {
    useMemo,
    useState,
 } from "react"
+import { makeLivestreamUrl } from "util/makeUrls"
 import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
+import { StreamerLinksDialog } from "../enhanced-group-stream-card/StreamerLinksDialog"
 import { LivestreamEventStatus } from "../events-table-new/utils"
 import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
 
@@ -81,11 +85,14 @@ export const EventsViewProvider = ({
    initialSort = LivestreamStatsSortOption.STATUS_WITH_DATE,
 }: EventsViewProviderProps) => {
    const { group } = useGroup()
+   const { errorNotification } = useSnackbarNotifications()
    const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(initialSort)
    const [statusFilter, setStatusFilter] = useState<LivestreamEventStatus[]>([])
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
    const [livestreamToDelete, setLivestreamToDelete] =
       useState<LivestreamEventPublicData | null>(null)
+   const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
+      useState<string | null>(null)
 
    const { push } = useRouter()
 
@@ -141,22 +148,39 @@ export const EventsViewProvider = ({
    )
 
    // Event action handlers
-   const handleEnterLiveStreamRoom = useCallback((stat: LiveStreamStats) => {
-      // Navigate to external view of the livestream
-      alert(
-         `Enter live stream room for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
-   }, [])
+   const handleEnterLiveStreamRoom = useCallback(
+      async (stat: LiveStreamStats) => {
+         if (stat.livestream.isDraft) return
+
+         let url: string
+
+         try {
+            const token = await livestreamService.getLivestreamSecureToken(
+               stat.livestream.id
+            )
+
+            url = makeLivestreamUrl(stat.livestream.id, {
+               type: "host",
+               token,
+            })
+
+            push(url)
+         } catch (error) {
+            errorNotification(
+               error,
+               "Unable to open the live stream room. Our team has been notified.",
+               { url }
+            )
+         }
+      },
+      [push, errorNotification]
+   )
 
    const handleShareLiveStream = useCallback((stat: LiveStreamStats) => {
       // Copy livestream link or duplicate functionality
-      alert(
-         `Share live stream for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
+      if (stat.livestream.isDraft) return
+
+      setTargetLivestreamStreamerLinksId(stat.livestream.id)
    }, [])
 
    const handleAnalytics = useCallback(
@@ -226,6 +250,10 @@ export const EventsViewProvider = ({
       setLivestreamToDelete(null)
    }, [])
 
+   const handleCloseStreamerLinksModal = useCallback(() => {
+      setTargetLivestreamStreamerLinksId(null)
+   }, [])
+
    const value = useMemo<EventsViewContextValue>(
       () => ({
          sortBy,
@@ -272,6 +300,13 @@ export const EventsViewProvider = ({
             open={deleteDialogOpen}
             livestream={livestreamToDelete}
             onClose={handleDeleteDialogClose}
+         />
+         <StreamerLinksDialog
+            livestreamId={targetLivestreamStreamerLinksId}
+            companyName={group?.universityName}
+            companyCountryCode={group?.companyCountry?.id}
+            openDialog={Boolean(targetLivestreamStreamerLinksId)}
+            onClose={handleCloseStreamerLinksModal}
          />
       </EventsViewContext.Provider>
    )
