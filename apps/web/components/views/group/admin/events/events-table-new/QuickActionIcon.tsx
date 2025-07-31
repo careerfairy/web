@@ -55,7 +55,7 @@ export const QuickActionIcon = ({ stat, eventStatus }: Props) => {
             options={menuOptions}
             open={open}
             anchorEl={anchorEl}
-            onClose={handleClose}
+            onClose={withStopPropagation(handleClose)}
             placement="bottom"
          />
       </Fragment>
