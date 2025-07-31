@@ -146,18 +146,18 @@ export const EventsViewProvider = ({
    // Event action handlers
    const handleEnterLiveStreamRoom = useCallback(
       async (stat: LiveStreamStats) => {
-         // Copy livestream link or duplicate functionality
          if (stat.livestream.isDraft) return
 
+         // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
          setTargetLivestreamStreamerLinksId(stat.livestream.id)
       },
       []
    )
 
    const handleShareLiveStream = useCallback((stat: LiveStreamStats) => {
-      // Copy livestream link or duplicate functionality
       if (stat.livestream.isDraft) return
 
+      // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
       setTargetLivestreamStreamerLinksId(stat.livestream.id)
    }, [])
 
