@@ -34,8 +34,6 @@ type EventsViewContextValue = {
    handleEdit: (stat: LiveStreamStats) => void
    handleShareRecording: (stat: LiveStreamStats) => void
    handleViewRecording: (stat: LiveStreamStats) => void
-   handleRegistrationsClick: (stat: LiveStreamStats) => void
-   handleViewsClick: (stat: LiveStreamStats) => void
    handleDelete: (stat: LiveStreamStats) => void
 }
 
@@ -163,6 +161,7 @@ export const EventsViewProvider = ({
 
    const handleAnalytics = useCallback(
       (stat: LiveStreamStats) => {
+         if (stat.livestream.isDraft) return
          // Navigate to analytics view
          push(
             `/group/${group.id}/admin/analytics/live-streams/${stat.livestream.id}`
@@ -193,7 +192,7 @@ export const EventsViewProvider = ({
       (stat: LiveStreamStats) => {
          // Navigate to edit page
          push(
-            `/group/${group.id}/admin/content/live-streams/${stat.livestream.id}`
+            `/group/${group?.id}/admin/content/live-streams/${stat.livestream.id}`
          )
       },
       [group?.id, push]
@@ -214,25 +213,6 @@ export const EventsViewProvider = ({
          `View recording for ${
             stat.livestream.isDraft ? "draft" : "live stream"
          }: ${stat.livestream.id}`
-      )
-   }, [])
-
-   const handleRegistrationsClick = useCallback(
-      (stat: LiveStreamStats) => {
-         // Navigate to registrations view
-         push(
-            `/group/${group.id}/admin/analytics/live-streams/${stat.livestream.id}`
-         )
-      },
-      [group?.id, push]
-   )
-
-   const handleViewsClick = useCallback((stat: LiveStreamStats) => {
-      // Navigate to views view
-      alert(
-         `Views for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
       )
    }, [])
 
@@ -263,8 +243,6 @@ export const EventsViewProvider = ({
          handleEdit,
          handleShareRecording,
          handleViewRecording,
-         handleRegistrationsClick,
-         handleViewsClick,
          handleDelete,
       }),
       [
@@ -283,8 +261,6 @@ export const EventsViewProvider = ({
          handleEdit,
          handleShareRecording,
          handleViewRecording,
-         handleRegistrationsClick,
-         handleViewsClick,
          handleDelete,
       ]
    )

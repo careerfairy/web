@@ -7,7 +7,11 @@ import { EventCardPreview } from "./EventCardPreview"
 import { QuickActionIcon } from "./QuickActionIcon"
 import { StatusIcon } from "./StatusIcon"
 import { TableHighlighter } from "./TableHighlighter"
-import { getEventDate, getLivestreamEventStatus } from "./utils"
+import {
+   getEventDate,
+   getLivestreamEventStatus,
+   LivestreamEventStatus,
+} from "./utils"
 
 const styles = sxStyles({
    bodyRow: {
@@ -129,6 +133,7 @@ export const EventTableRow = ({
                   alignItems="center"
                   spacing={1}
                   color="neutral.600"
+                  disabled
                >
                   <Box component={Calendar} size={16} />
                   <Typography variant="small" whiteSpace="nowrap">
@@ -139,50 +144,40 @@ export const EventTableRow = ({
          </TableCell>
 
          {/* Registrations Column */}
-         <TableCell
-            onClick={withStopPropagation(onRegistrationsClick)}
-            sx={[
-               styles.bodyCell,
-               {
-                  cursor: "pointer",
-               },
-            ]}
-         >
+         <TableCell>
             <CentredBox>
                <TableHighlighter
+                  onClick={withStopPropagation(onRegistrationsClick)}
                   title="Registrations"
                   direction="row"
                   alignItems="center"
                   spacing={1}
                   color="neutral.600"
                   width={92}
+                  disabled={eventStatus === LivestreamEventStatus.DRAFT}
                >
                   <Box component={User} size={16} />
                   <Typography variant="small">
-                     {stat.generalStats.numberOfRegistrations || 0}
+                     {eventStatus === LivestreamEventStatus.DRAFT
+                        ? "-"
+                        : stat.generalStats.numberOfRegistrations || 0}
                   </Typography>
                </TableHighlighter>
             </CentredBox>
          </TableCell>
 
          {/* Views Column */}
-         <TableCell
-            onClick={withStopPropagation(onViewsClick)}
-            sx={[
-               styles.bodyCell,
-               {
-                  cursor: "pointer",
-               },
-            ]}
-         >
+         <TableCell>
             <CentredBox>
                <TableHighlighter
+                  onClick={withStopPropagation(onViewsClick)}
                   title="Views"
                   direction="row"
                   alignItems="center"
                   spacing={1}
                   color="neutral.600"
                   width={92}
+                  disabled={eventStatus === LivestreamEventStatus.DRAFT}
                >
                   <Box component={Eye} size={16} />
                   <Typography variant="small">{"-"}</Typography>

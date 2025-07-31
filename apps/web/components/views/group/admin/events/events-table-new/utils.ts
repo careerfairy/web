@@ -57,7 +57,7 @@ export const getEventTypeName = (
 
 export const getEventDate = (stat: LiveStreamStats): string => {
    if (!stat.livestream.start) {
-      return "No date"
+      return "-"
    }
 
    return DateUtil.formatEventDate(stat.livestream.start.toDate())
