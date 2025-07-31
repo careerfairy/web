@@ -551,6 +551,9 @@ export type LivestreamEventPublicData = Partial<
       | "backgroundImageUrl"
       | "duration"
       | "isDraft"
+      | "speakers"
+      | "creatorsIds"
+      | "denyRecordingAccess"
    >
 > & {
    id: LivestreamEvent["id"]
@@ -706,6 +709,9 @@ export const pickPublicDataFromLivestream = (
       hasJobs: livestreamData.hasJobs ?? false,
       duration: livestreamData.duration ?? null,
       backgroundImageUrl: livestreamData.backgroundImageUrl ?? null,
+      creatorsIds: livestreamData.creatorsIds ?? [],
+      speakers: livestreamData.speakers ?? [],
+      denyRecordingAccess: livestreamData.denyRecordingAccess ?? false,
    }
 }
 

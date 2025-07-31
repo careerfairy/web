@@ -1,47 +1,19 @@
-import { MenuItem } from "@mui/material"
 import { useRouter } from "next/router"
 import { Fragment, useState } from "react"
-import {
-   LivestreamStatsSortOption,
-   useGroupLivestreamsWithStats,
-} from "../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
+import { useGroupLivestreamsWithStats } from "../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { BrandedSearchField } from "../../../common/inputs/BrandedSearchBar"
-import BrandedTextField from "../../../common/inputs/BrandedTextField"
+import { AdminContainer } from "../common/Container"
+import { EventsViewProvider, useEventsView } from "./context/EventsViewContext"
 import { DesktopEventsView } from "./DesktopEventsView"
 import { MobileEventsView } from "./MobileEventsView"
 
-const SORT_OPTIONS: { value: LivestreamStatsSortOption; label: string }[] = [
-   { value: LivestreamStatsSortOption.START_DESC, label: "Most Recent First" },
-   { value: LivestreamStatsSortOption.START_ASC, label: "Oldest First" },
-   { value: LivestreamStatsSortOption.TITLE_ASC, label: "Title A-Z" },
-   { value: LivestreamStatsSortOption.TITLE_DESC, label: "Title Z-A" },
-   {
-      value: LivestreamStatsSortOption.REGISTRATIONS_DESC,
-      label: "Most Registrations",
-   },
-   {
-      value: LivestreamStatsSortOption.REGISTRATIONS_ASC,
-      label: "Least Registrations",
-   },
-   {
-      value: LivestreamStatsSortOption.PARTICIPANTS_DESC,
-      label: "Most Participants",
-   },
-   {
-      value: LivestreamStatsSortOption.PARTICIPANTS_ASC,
-      label: "Least Participants",
-   },
-]
-
-export const NewEventsOverview = () => {
+const NewEventsOverviewContent = () => {
    const router = useRouter()
    const groupId = router.query.groupId as string
    const [searchTerm, setSearchTerm] = useState("")
-   const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(
-      LivestreamStatsSortOption.START_DESC
-   )
    const isMobile = useIsMobile()
+   const { sortBy } = useEventsView()
 
    const {
       data: stats,
@@ -54,10 +26,6 @@ export const NewEventsOverview = () => {
 
    return (
       <div style={{ padding: isMobile ? "15px" : "20px" }}>
-         <h1 style={{ fontSize: isMobile ? "20px" : "24px" }}>
-            New Events Table (Feature Flag Enabled)
-         </h1>
-
          <div
             style={{
                marginBottom: "20px",
@@ -77,27 +45,6 @@ export const NewEventsOverview = () => {
                   submitOnBlur: false,
                }}
             />
-
-            <BrandedTextField
-               label="Sort by"
-               select
-               value={sortBy}
-               onChange={(e) =>
-                  setSortBy(
-                     e.target.value as unknown as LivestreamStatsSortOption
-                  )
-               }
-               fullWidth={isMobile}
-               sx={{
-                  minWidth: isMobile ? "100%" : "200px",
-               }}
-            >
-               {SORT_OPTIONS.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                     {option.label}
-                  </MenuItem>
-               ))}
-            </BrandedTextField>
          </div>
 
          {Boolean(isLoading) && <p>Loading stats...</p>}
@@ -115,5 +62,15 @@ export const NewEventsOverview = () => {
             <p>No events found matching your search criteria.</p>
          )}
       </div>
+   )
+}
+
+export const NewEventsOverview = () => {
+   return (
+      <AdminContainer>
+         <EventsViewProvider>
+            <NewEventsOverviewContent />
+         </EventsViewProvider>
+      </AdminContainer>
    )
 }
