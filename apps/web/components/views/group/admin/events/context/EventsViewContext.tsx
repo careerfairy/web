@@ -1,3 +1,4 @@
+import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
    createContext,
@@ -9,6 +10,7 @@ import {
 } from "react"
 import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import { LivestreamEventStatus } from "../events-table-new/utils"
+import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
 
 type EventsViewContextValue = {
    sortBy: LivestreamStatsSortOption
@@ -80,6 +82,9 @@ export const EventsViewProvider = ({
 }: EventsViewProviderProps) => {
    const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(initialSort)
    const [statusFilter, setStatusFilter] = useState<LivestreamEventStatus[]>([])
+   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+   const [livestreamToDelete, setLivestreamToDelete] =
+      useState<LivestreamEventPublicData | null>(null)
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
    const handleTableSort = useCallback(
@@ -224,11 +229,13 @@ export const EventsViewProvider = ({
    }, [])
 
    const handleDelete = useCallback((stat: LiveStreamStats) => {
-      alert(
-         `Delete for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
-      )
+      setLivestreamToDelete(stat.livestream)
+      setDeleteDialogOpen(true)
+   }, [])
+
+   const handleDeleteDialogClose = useCallback(() => {
+      setDeleteDialogOpen(false)
+      setLivestreamToDelete(null)
    }, [])
 
    const value = useMemo<EventsViewContextValue>(
@@ -277,6 +284,11 @@ export const EventsViewProvider = ({
    return (
       <EventsViewContext.Provider value={value}>
          {children}
+         <DeleteLivestreamDialog
+            open={deleteDialogOpen}
+            livestream={livestreamToDelete}
+            onClose={handleDeleteDialogClose}
+         />
       </EventsViewContext.Provider>
    )
 }
