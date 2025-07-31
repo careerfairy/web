@@ -1,7 +1,5 @@
 import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { livestreamService } from "data/firebase/LivestreamService"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import {
@@ -12,7 +10,6 @@ import {
    useMemo,
    useState,
 } from "react"
-import { makeLivestreamUrl } from "util/makeUrls"
 import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import { StreamerLinksDialog } from "../enhanced-group-stream-card/StreamerLinksDialog"
 import { LivestreamEventStatus } from "../events-table-new/utils"
@@ -85,7 +82,6 @@ export const EventsViewProvider = ({
    initialSort = LivestreamStatsSortOption.STATUS_WITH_DATE,
 }: EventsViewProviderProps) => {
    const { group } = useGroup()
-   const { errorNotification } = useSnackbarNotifications()
    const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(initialSort)
    const [statusFilter, setStatusFilter] = useState<LivestreamEventStatus[]>([])
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -150,30 +146,12 @@ export const EventsViewProvider = ({
    // Event action handlers
    const handleEnterLiveStreamRoom = useCallback(
       async (stat: LiveStreamStats) => {
+         // Copy livestream link or duplicate functionality
          if (stat.livestream.isDraft) return
 
-         let url: string
-
-         try {
-            const token = await livestreamService.getLivestreamSecureToken(
-               stat.livestream.id
-            )
-
-            url = makeLivestreamUrl(stat.livestream.id, {
-               type: "host",
-               token,
-            })
-
-            push(url)
-         } catch (error) {
-            errorNotification(
-               error,
-               "Unable to open the live stream room. Our team has been notified.",
-               { url }
-            )
-         }
+         setTargetLivestreamStreamerLinksId(stat.livestream.id)
       },
-      [push, errorNotification]
+      []
    )
 
    const handleShareLiveStream = useCallback((stat: LiveStreamStats) => {
