@@ -133,7 +133,7 @@ export const EventTableRow = ({
                   alignItems="center"
                   spacing={1}
                   color="neutral.600"
-                  disabled
+                  cursor="default"
                >
                   <Box component={Calendar} size={16} />
                   <Typography variant="small" whiteSpace="nowrap">
@@ -154,7 +154,11 @@ export const EventTableRow = ({
                   spacing={1}
                   color="neutral.600"
                   width={92}
-                  disabled={eventStatus === LivestreamEventStatus.DRAFT}
+                  cursor={
+                     eventStatus === LivestreamEventStatus.DRAFT
+                        ? "default"
+                        : "pointer"
+                  }
                >
                   <Box component={User} size={16} />
                   <Typography variant="small">
@@ -177,7 +181,11 @@ export const EventTableRow = ({
                   spacing={1}
                   color="neutral.600"
                   width={92}
-                  disabled={eventStatus === LivestreamEventStatus.DRAFT}
+                  cursor={
+                     eventStatus === LivestreamEventStatus.DRAFT
+                        ? "default"
+                        : "pointer"
+                  }
                >
                   <Box component={Eye} size={16} />
                   <Typography variant="small">{"-"}</Typography>

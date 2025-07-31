@@ -164,7 +164,7 @@ export const EventsViewProvider = ({
          if (stat.livestream.isDraft) return
          // Navigate to analytics view
          push(
-            `/group/${group.id}/admin/analytics/live-streams/${stat.livestream.id}`
+            `/group/${group?.id}/admin/analytics/live-streams/${stat.livestream.id}`
          )
       },
       [group?.id, push]

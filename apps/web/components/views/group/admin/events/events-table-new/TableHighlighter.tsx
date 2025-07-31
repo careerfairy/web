@@ -6,7 +6,7 @@ import { sxStyles } from "types/commonTypes"
 type TableHighlighterProps = StackProps & {
    title?: string
    children: ReactNode
-   disabled?: boolean
+   cursor?: string
 }
 
 const styles = sxStyles({
@@ -36,22 +36,16 @@ const styles = sxStyles({
          },
       },
    },
-   disabled: {
-      cursor: "default",
-   },
 })
 
 export const TableHighlighter = ({
    title,
    children,
-   disabled,
+   cursor = "pointer",
    ...stackProps
 }: TableHighlighterProps) => {
    const content = (
-      <Stack
-         sx={[styles.container, disabled && styles.disabled]}
-         {...stackProps}
-      >
+      <Stack sx={[styles.container, { cursor }]} {...stackProps}>
          {children}
       </Stack>
    )
