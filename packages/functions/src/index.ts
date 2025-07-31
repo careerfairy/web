@@ -259,11 +259,13 @@ exports[FUNCTION_NAMES.getRecommendedEvents] =
 exports[FUNCTION_NAMES.getRecommendedJobs] = recommendation.getRecommendedJobs
 
 // On Write Triggers for all collections
-exports.syncLivestreams = onWriteTriggers.syncLivestreams
+exports[FUNCTION_NAMES.syncLivestreams] = onWriteTriggers.syncLivestreams
 exports.syncLivestreamStartNotifications =
    onWriteTriggers.syncLivestreamStartNotifications
-exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
-exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
+exports[FUNCTION_NAMES.syncUserLivestreamData] =
+   onWriteTriggers.syncUserLivestreamData
+exports[FUNCTION_NAMES.syncLivestreamStats] =
+   onWriteTriggers.syncLivestreamStats
 exports.syncUserStats = onWriteTriggers.syncUserStats
 exports.onWriteCreator = onWriteTriggers.onWriteCreator
 exports.onWriteGroup = onWriteTriggers.onWriteGroup
@@ -276,7 +278,7 @@ exports.onWriteCustomJobsSendNotifications =
 exports.onWriteStudyBackground = onWriteTriggers.onWriteStudyBackground
 
 // On Create Triggers for all collections
-exports.onCreateLivestreamRatingAnswer =
+exports[FUNCTION_NAMES.onCreateLivestreamRatingAnswer] =
    onCreateTriggers.onCreateLivestreamRatingAnswer
 exports.onCreateUserData_v2 = onCreateTriggers.onCreateUserData
 exports.onUpdateUserData = onCreateTriggers.onUpdateUserData

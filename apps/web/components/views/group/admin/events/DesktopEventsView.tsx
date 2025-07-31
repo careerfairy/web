@@ -1,7 +1,23 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { Stack } from "@mui/material"
+import {
+   Box,
+   Stack,
+   Table,
+   TableBody,
+   TableContainer,
+   TableHead,
+   TableRow,
+} from "@mui/material"
+import { useState } from "react"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
+import { useEventsView } from "./context/EventsViewContext"
+import { EventTableRow } from "./events-table-new/EventTableRow"
+import { eventsTableStyles } from "./events-table-new/EventsTableStyles"
+import {
+   NonSortableHeaderCell,
+   SortableHeaderCell,
+} from "./events-table-new/TableHeaderComponents"
 import { getEventStatsKey } from "./util"
 
 type Props = {
@@ -9,101 +25,104 @@ type Props = {
 }
 
 export const DesktopEventsView = ({ stats }: Props) => {
+   const {
+      handleTableSort,
+      getSortDirection,
+      isActiveSort,
+      handleEnterLiveStreamRoom,
+      handleShareLiveStream,
+      handleAnalytics,
+      handleQuestions,
+      handleFeedback,
+      handleEdit,
+      handleShareRecording,
+      handleRegistrationsClick,
+      handleViewsClick,
+   } = useEventsView()
+   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
+
    const { currentPageData, currentPage, totalPages, goToPage } =
       useClientSidePagination({
          data: stats,
          itemsPerPage: 10,
       })
 
-   return (
-      <div>
-         <p>
-            Showing {(currentPage - 1) * 10 + 1}-
-            {Math.min(currentPage * 10, stats.length)} of {stats.length}{" "}
-            livestream stats
-         </p>
+   const handleRowMouseEnter = (statKey: string) => {
+      setHoveredRow(statKey)
+   }
 
-         <ul style={{ listStyle: "none", padding: 0 }}>
-            {currentPageData.map((stat, index) => {
-               const globalIndex = (currentPage - 1) * 10 + index + 1
-               return (
-                  <li
-                     key={getEventStatsKey(stat)}
-                     style={{
-                        marginBottom: "10px",
-                        padding: "15px",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        backgroundColor: stat.livestream.isDraft
-                           ? "#fff3cd"
-                           : "#f8f9fa",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                     }}
-                  >
-                     <div
-                        style={{
-                           fontWeight: "bold",
-                           fontSize: "18px",
-                           marginBottom: "8px",
-                        }}
+   const handleRowMouseLeave = () => {
+      setHoveredRow(null)
+   }
+
+   return (
+      <Box>
+         <TableContainer sx={eventsTableStyles.tableContainer}>
+            <Table sx={eventsTableStyles.table}>
+               <TableHead>
+                  <TableRow>
+                     <SortableHeaderCell
+                        active={isActiveSort("title")}
+                        direction={getSortDirection("title")}
+                        onSort={() => handleTableSort("title")}
                      >
-                        #{globalIndex} - {stat.livestream.title || "Untitled"}
-                     </div>
-                     <div
-                        style={{
-                           color: "#666",
-                           fontSize: "14px",
-                           marginBottom: "8px",
-                        }}
+                        Live stream title
+                     </SortableHeaderCell>
+                     <SortableHeaderCell
+                        active={isActiveSort("date")}
+                        direction={getSortDirection("date")}
+                        onSort={() => handleTableSort("date")}
+                        tooltip="The date when your live stream is scheduled to occur or has already taken place."
                      >
-                        <strong>Company:</strong>{" "}
-                        {stat.livestream.company || "No company"}
-                        {Boolean(stat.livestream.isDraft) && (
-                           <span
-                              style={{
-                                 color: "#856404",
-                                 fontWeight: "bold",
-                                 marginLeft: "10px",
-                                 padding: "2px 8px",
-                                 backgroundColor: "#ffeaa7",
-                                 borderRadius: "4px",
-                                 fontSize: "12px",
-                              }}
-                           >
-                              DRAFT
-                           </span>
-                        )}
-                     </div>
-                     <div
-                        style={{
-                           fontSize: "13px",
-                           display: "flex",
-                           gap: "15px",
-                           flexWrap: "wrap",
-                        }}
+                        Date
+                     </SortableHeaderCell>
+                     <SortableHeaderCell
+                        active={isActiveSort("registrations")}
+                        direction={getSortDirection("registrations")}
+                        onSort={() => handleTableSort("registrations")}
+                        tooltip="The number of talent who registered to your live stream."
                      >
-                        <span>
-                           <strong>Registrations:</strong>{" "}
-                           {stat.generalStats.numberOfRegistrations}
-                        </span>
-                        <span>
-                           <strong>Participants:</strong>{" "}
-                           {stat.generalStats.numberOfParticipants}
-                        </span>
-                        <span>
-                           <strong>Views:</strong> (not implemented)
-                        </span>
-                        <span>
-                           <strong>Start:</strong>{" "}
-                           {stat.livestream.start
-                              ?.toDate?.()
-                              ?.toLocaleDateString() || "No date"}
-                        </span>
-                     </div>
-                  </li>
-               )
-            })}
-         </ul>
+                        Registrations
+                     </SortableHeaderCell>
+                     <NonSortableHeaderCell tooltip="The number of talent who watched your live stream, either live or recorded.">
+                        Views
+                     </NonSortableHeaderCell>
+                     <NonSortableHeaderCell tooltip="Shows if your live stream is published, still a draft, or available as a recording.">
+                        Status
+                     </NonSortableHeaderCell>
+                  </TableRow>
+               </TableHead>
+               <TableBody>
+                  {currentPageData.map((stat) => {
+                     const statKey = getEventStatsKey(stat)
+                     const isHovered = hoveredRow === statKey
+
+                     return (
+                        <EventTableRow
+                           key={statKey}
+                           stat={stat}
+                           isHovered={isHovered}
+                           onMouseEnter={() => handleRowMouseEnter(statKey)}
+                           onMouseLeave={handleRowMouseLeave}
+                           onEnterLiveStreamRoom={() =>
+                              handleEnterLiveStreamRoom(stat)
+                           }
+                           onShareLiveStream={() => handleShareLiveStream(stat)}
+                           onShareRecording={() => handleShareRecording(stat)}
+                           onAnalytics={() => handleAnalytics(stat)}
+                           onQuestions={() => handleQuestions(stat)}
+                           onFeedback={() => handleFeedback(stat)}
+                           onEdit={() => handleEdit(stat)}
+                           onRegistrationsClick={() =>
+                              handleRegistrationsClick(stat)
+                           }
+                           onViewsClick={() => handleViewsClick(stat)}
+                        />
+                     )
+                  })}
+               </TableBody>
+            </Table>
+         </TableContainer>
 
          {totalPages > 1 && (
             <Stack
@@ -122,6 +141,6 @@ export const DesktopEventsView = ({ stats }: Props) => {
                />
             </Stack>
          )}
-      </div>
+      </Box>
    )
 }

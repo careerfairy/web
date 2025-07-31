@@ -1,4 +1,4 @@
-import { Group } from "@careerfairy/shared-lib/src/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import counterConstants from "../../lib/Counter/constants"
@@ -42,26 +42,22 @@ interface UpdateDocumentsConfig<T = unknown> {
    customDataFilter?: (data: T) => boolean
 }
 
-const COLLECTION_NAME = "careerCenterData"
-const FIELD_TO_ORDER_BY = "groupId"
+const COLLECTION_NAME = "livestreams"
+const FIELD_TO_ORDER_BY = "start"
 
 // Configure your update here
-const config: UpdateDocumentsConfig<Group> = {
-   // Example: collection query
+const config: UpdateDocumentsConfig<LivestreamEvent> = {
+   // Query for livestreams, excluding test livestreams
    query: firestore
       .collection(COLLECTION_NAME)
-      // Keep this commented out for now as an example
-      // .where(FIELD_TO_FILTER_BY, "!=", null)
+      .where("test", "==", false)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
    updateData: {
       migrationTrigger: Date.now(),
    },
-   batchSize: 100,
-   waitTimeBetweenBatches: 2_000,
+   batchSize: 200, // Increased batch size for faster processing
+   waitTimeBetweenBatches: 3_000, // Longer wait time to allow functions to process
    dryRun: false, // Set to false to run the migration
-   // customDataFilter: (group) => {
-   //    return !group?.id?.length
-   // },
 }
 
 const getTotalDocumentCount = async (query: Query) => {
@@ -122,7 +118,7 @@ export async function run() {
          for (const doc of docs) {
             if (
                config.customDataFilter &&
-               !config.customDataFilter(doc.data() as Group)
+               !config.customDataFilter(doc.data() as LivestreamEvent)
             ) {
                skips++
                continue
@@ -134,7 +130,7 @@ export async function run() {
             if (!config.dryRun) {
                const updateData =
                   typeof config.updateData === "function"
-                     ? config.updateData(doc.data() as Group)
+                     ? config.updateData(doc.data() as LivestreamEvent)
                      : {
                           ...doc.data(),
                           ...config.updateData,
