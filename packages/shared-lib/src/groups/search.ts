@@ -6,6 +6,7 @@ import { Group } from "."
  */
 export type TransformedGroup = Group & {
    companyIndustriesIdTags: string[]
+   targetedFieldsOfStudyIdTags: string[]
    companyCountryId: string
    featuredCompanyPriority: number
 }
@@ -15,6 +16,7 @@ export const COMPANY_FIELDS_TO_INDEX = [
    "test",
    "targetedUniversities",
    "targetedFieldsOfStudy",
+   "targetedFieldsOfStudyIdTags",
    "targetedCountries",
    "companyIndustries",
    "companyIndustriesIdTags",
@@ -68,6 +70,7 @@ export const COMPANY_SEARCHABLE_ATTRIBUTES = [
  */
 export const COMPANY_FILTERING_FIELDS = [
    "companyIndustriesIdTags",
+   "targetedFieldsOfStudyIdTags",
    "test",
    "companyCountryId",
    "companySize",
@@ -83,6 +86,7 @@ export type ArrayFilterFieldType = Extract<
    FilterFieldType,
    | "companySize"
    | "companyIndustriesIdTags"
+   | "targetedFieldsOfStudyIdTags"
    | "companyCountryId"
    | "id"
    | "contentLanguages"

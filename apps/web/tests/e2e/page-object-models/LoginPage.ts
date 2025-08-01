@@ -8,7 +8,6 @@ export class LoginPage {
    readonly passwordTextField: Locator
    readonly loginButton: Locator
    readonly portalPageUpcomingHeader: Locator
-   readonly portalNextEventsHeader: Locator
    readonly passwordResetLink: Locator
    readonly signupLink: Locator
 
@@ -20,7 +19,6 @@ export class LoginPage {
       this.portalPageUpcomingHeader = page.locator(
          "text='Upcoming live streams'"
       )
-      this.portalNextEventsHeader = page.locator("text='My registrations'")
       this.passwordResetLink = page.locator(
          "data-testid=forgot-password-page-link"
       )

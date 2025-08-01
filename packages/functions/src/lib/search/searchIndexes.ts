@@ -17,6 +17,7 @@ import {
    TransformedGroup,
 } from "@careerfairy/shared-lib/groups/search"
 
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { normalizeLocationIds } from "@careerfairy/shared-lib/countries/types"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import {
@@ -84,7 +85,20 @@ const sparkIndex = {
       groupCompanySize: data.group?.companySize ?? null,
       groupCompanyIndustriesIdTags:
          data.group?.companyIndustries?.map((industry) => industry.id) ?? [],
+      groupCompanyIndustriesLabels:
+         data.group?.companyIndustries?.map(
+            (industry) =>
+               CompanyIndustryValuesLookup[industry.id] ?? industry.name
+         ) ?? [],
       groupCompanyName: data.group?.universityName ?? null,
+      linkedCustomJobsLabels:
+         data.linkedCustomJobsTagIds?.map(
+            (tagId) => TagValuesLookup[tagId] ?? tagId
+         ) ?? [],
+      contentTopicsTagLabels:
+         data.contentTopicsTagIds?.map(
+            (tagId) => TagValuesLookup[tagId] ?? tagId
+         ) ?? [],
    }),
    settings: {
       attributesForFaceting: SPARK_FILTERING_FIELDS,
@@ -110,6 +124,8 @@ const companyIndex = {
       companyCountryId: data.companyCountry?.id ?? null,
       companyIndustriesIdTags:
          data.companyIndustries?.map((industry) => industry.id) ?? [],
+      targetedFieldsOfStudyIdTags:
+         data.targetedFieldsOfStudy?.map((field) => field.id) ?? [],
       featuredCompanyPriority: generateFeaturedCompanyPriority(data),
    }),
    settings: {

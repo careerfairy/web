@@ -182,6 +182,7 @@ const Input = ({
             "aria-controls": ariaControls,
             "aria-autocomplete": "list",
             role: "combobox",
+            autoComplete: "off",
          }}
          value={value}
          onChange={handleInputChange}

@@ -83,9 +83,7 @@ test.describe("Signup Page Functionality", () => {
 
       await signup.clickContinueButton()
 
-      await expect(portal.UpcomingEventsHeader).toBeVisible({
-         timeout: 15000,
-      })
+      await portal.assertWelcomeText(correctFirstName)
 
       const userDataFromDb = await UserSeed.getUserData(correctEmail)
 
@@ -255,9 +253,7 @@ test.describe("Signup Page Functionality", () => {
 
       await signup.clickContinueButton()
 
-      await expect(portal.UpcomingEventsHeader).toBeVisible({
-         timeout: 15000,
-      })
+      await portal.assertWelcomeText(correctFirstName)
 
       const userDataFromDb = await UserSeed.getUserData(correctEmail)
 
@@ -335,9 +331,7 @@ test.describe("Signup Page Functionality", () => {
 
       await signup.clickContinueButton()
 
-      await expect(portal.UpcomingEventsHeader).toBeVisible({
-         timeout: 15000,
-      })
+      await portal.assertWelcomeText(correctFirstName)
 
       const userDataFromDb = await UserSeed.getUserData(correctEmail)
 
@@ -399,9 +393,7 @@ test.describe("Signup Page Functionality", () => {
 
       await signup.clickContinueButton()
 
-      await expect(portal.UpcomingEventsHeader).toBeVisible({
-         timeout: 15000,
-      })
+      await portal.assertWelcomeText(correctFirstName)
 
       const userDataAnalyticsFromDb = await UserSeed.getUserDataAnalytics(
          correctEmail
@@ -479,9 +471,7 @@ test.describe("Signup Page Functionality", () => {
 
       await signup.clickContinueButton()
 
-      await expect(portal.UpcomingEventsHeader).toBeVisible({
-         timeout: 15000,
-      })
+      await portal.assertWelcomeText(correctFirstName)
 
       const userDataAnalyticsFromDb = await UserSeed.getUserDataAnalytics(
          correctEmail

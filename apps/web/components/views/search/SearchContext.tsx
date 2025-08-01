@@ -27,6 +27,9 @@ type SearchContextType = {
    selectedJobId: string | null
    handleOpenJobDialog: (jobId: string) => void
    handleCloseJobDialog: () => void
+   currentTab: string
+   setCurrentTab: (tab: string) => void
+   handleTabChange: (event: any, newValue: string) => void
 }
 
 export const SearchContext = createContext<SearchContextType | undefined>(
@@ -39,6 +42,7 @@ type SearchContextProviderType = {
 
 export const SearchProvider = ({ children }: SearchContextProviderType) => {
    const [searchQuery, setSearchQuery] = useState("")
+   const [currentTab, setCurrentTab] = useState("all")
    const { query, push, pathname, isReady } = useRouter()
    const {
       recentSearches,
@@ -58,7 +62,13 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
             setSearchQuery(queryFromUrl)
          }
       }
-   }, [isReady, query.q])
+      if (query.tab) {
+         const tabFromUrl = Array.isArray(query.tab) ? query.tab[0] : query.tab
+         if (tabFromUrl) {
+            setCurrentTab(tabFromUrl)
+         }
+      }
+   }, [isReady, query.q, query.tab])
 
    const handleSearchSubmit = useCallback(
       (query: string) => {
@@ -169,6 +179,29 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
       )
    }, [query, push, pathname])
 
+   const handleTabChange = useCallback(
+      (_, newValue: string) => {
+         setCurrentTab(newValue)
+
+         // Update URL with new tab value, but don't add "all" since it's the default
+         const newQuery = { ...query }
+         if (newValue === "all") {
+            delete newQuery.tab
+         } else {
+            newQuery.tab = newValue
+         }
+         void push(
+            {
+               pathname: pathname,
+               query: newQuery,
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
    const value: SearchContextType = useMemo(() => {
       return {
          searchQuery,
@@ -186,6 +219,9 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
          selectedJobId,
          handleOpenJobDialog,
          handleCloseJobDialog,
+         currentTab,
+         setCurrentTab,
+         handleTabChange,
       }
    }, [
       searchQuery,
@@ -203,6 +239,9 @@ export const SearchProvider = ({ children }: SearchContextProviderType) => {
       selectedJobId,
       handleOpenJobDialog,
       handleCloseJobDialog,
+      currentTab,
+      setCurrentTab,
+      handleTabChange,
    ])
 
    return (
