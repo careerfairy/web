@@ -2,7 +2,10 @@ import { convertLocationIdsToCountryCodes } from "@careerfairy/shared-lib/countr
 import { COMPANY_REPLICAS } from "@careerfairy/shared-lib/groups/search"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, CircularProgress, Grid, Stack, Typography } from "@mui/material"
-import { useCompanySearchAlgolia } from "components/custom-hook/group/useGroupSearchAlgolia"
+import {
+   FilterOptions,
+   useCompanySearchAlgolia,
+} from "components/custom-hook/group/useGroupSearchAlgolia"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ChipDropdownProvider } from "components/views/common/ChipDropdown/ChipDropdownContext"
 import CompanyCard from "components/views/companies/CompanyCard"
@@ -32,7 +35,7 @@ const styles = sxStyles({
    },
    resultsContainer: {
       py: { xs: 1.5, md: 2 },
-      px: { xs: 2, md: 4 },
+      px: 2,
    },
    filterContainer: {
       mb: { xs: 1.5, md: 2 },
@@ -73,7 +76,7 @@ export const CompaniesTab = () => {
       return convertLocationIdsToCountryCodes(selectedLocations)
    }, [selectedLocations])
 
-   const filterOptions = {
+   const filterOptions: FilterOptions = {
       arrayFilters: {
          contentLanguages: selectedLanguages,
          fieldOfStudyIdTags: selectedFieldsOfStudy,

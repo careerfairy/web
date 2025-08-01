@@ -33,7 +33,7 @@ import FilterLocation from "./filter/FilterLocation"
 const styles = sxStyles({
    resultsContainer: {
       py: { xs: 1.5, md: 2 },
-      px: { xs: 2, md: 4 },
+      px: 2,
    },
    filterContainer: {
       mb: { xs: 1.5, md: 2 },
@@ -71,7 +71,7 @@ const styles = sxStyles({
          xs: "100%",
          md: "339px",
       },
-      pr: { xs: 0, md: 0.5 },
+      px: { xs: 0, md: 0.5 },
       pt: { xs: 0, md: 0.5 },
       pb: 0.5,
       overflowY: "auto",
@@ -232,77 +232,77 @@ export const JobsTab = () => {
             {numberOfResults} result{numberOfResults !== 1 ? "s" : ""}
          </Typography>
 
-         <Box sx={{ mt: 2 }}>
-            <Box sx={styles.jobsContainer}>
-               {/* Jobs List */}
-               <Stack sx={styles.jobsList} spacing={1}>
-                  {infiniteJobs.length > 0 ? (
-                     <>
-                        {infiniteJobs.map((job, idx) => {
-                           return (
-                              <ListItem
-                                 key={job.id}
-                                 sx={[
-                                    styles.jobListItemWrapper,
-                                    idx === infiniteJobs.length - 1 &&
-                                       styles.lastJobListItemWrapper,
-                                 ]}
-                                 onClick={() => handleJobClick(job)}
-                              >
-                                 <JobCard
-                                    job={job}
-                                    previewMode
-                                    typographySx={
-                                       isMobile ? null : styles.typography
-                                    }
-                                    hideJobUrl
-                                    smallCard
-                                    showCompanyLogo
-                                    companyLogoUrl={job.group?.logoUrl}
-                                    companyName={job.group?.universityName}
-                                    selected={
-                                       !isMobile &&
-                                       (selectedJob?.id
-                                          ? job.id === selectedJob.id
-                                          : infiniteJobs[0].id === job.id)
-                                    }
-                                 />
-                              </ListItem>
-                           )
-                        })}
+         {infiniteJobs.length > 0 ? (
+            <Box sx={{ mt: 2 }}>
+               <Box sx={styles.jobsContainer}>
+                  {/* Jobs List */}
+                  <Stack sx={styles.jobsList} spacing={1}>
+                     {infiniteJobs.map((job, idx) => {
+                        return (
+                           <ListItem
+                              key={job.id}
+                              sx={[
+                                 styles.jobListItemWrapper,
+                                 idx === infiniteJobs.length - 1 &&
+                                    styles.lastJobListItemWrapper,
+                              ]}
+                              onClick={() => handleJobClick(job)}
+                           >
+                              <JobCard
+                                 job={job}
+                                 previewMode
+                                 typographySx={
+                                    isMobile ? null : styles.typography
+                                 }
+                                 hideJobUrl
+                                 smallCard
+                                 showCompanyLogo
+                                 companyLogoUrl={job.group?.logoUrl}
+                                 companyName={job.group?.universityName}
+                                 selected={
+                                    !isMobile &&
+                                    (selectedJob?.id
+                                       ? job.id === selectedJob.id
+                                       : infiniteJobs[0].id === job.id)
+                                 }
+                              />
+                           </ListItem>
+                        )
+                     })}
 
-                        {Boolean(isValidating) && (
-                           <Box sx={styles.loader}>
-                              <CircularProgress />
-                           </Box>
-                        )}
-                        {Boolean(hasMore) && <Box height={100} ref={ref} />}
-                     </>
-                  ) : !isValidating ? (
-                     <NoResultsFound />
-                  ) : null}
-               </Stack>
-
-               {/* Job Details Panel (Desktop Only) */}
-               {!isMobile && (
-                  <Box sx={styles.jobDetails}>
-                     {selectedJob ? (
-                        <InlineCustomJobDetailsContent
-                           customJob={selectedJob}
-                           source={jobApplicationSource}
-                           key={selectedJob.id}
-                        />
-                     ) : (
-                        <InlineCustomJobDetailsContent
-                           customJob={infiniteJobs[0]}
-                           source={jobApplicationSource}
-                           key={infiniteJobs[0]?.id}
-                        />
+                     {Boolean(isValidating) && (
+                        <Box sx={styles.loader}>
+                           <CircularProgress />
+                        </Box>
                      )}
-                  </Box>
-               )}
+                     {Boolean(hasMore) && <Box height={100} ref={ref} />}
+                  </Stack>
+
+                  {/* Job Details Panel (Desktop Only) */}
+                  {!isMobile && (
+                     <Box sx={styles.jobDetails}>
+                        {selectedJob ? (
+                           <InlineCustomJobDetailsContent
+                              customJob={selectedJob}
+                              source={jobApplicationSource}
+                              key={selectedJob.id}
+                           />
+                        ) : (
+                           <InlineCustomJobDetailsContent
+                              customJob={infiniteJobs[0]}
+                              source={jobApplicationSource}
+                              key={infiniteJobs[0]?.id}
+                           />
+                        )}
+                     </Box>
+                  )}
+               </Box>
             </Box>
-         </Box>
+         ) : !isValidating ? (
+            <Box sx={{ mt: 2 }}>
+               <NoResultsFound />
+            </Box>
+         ) : null}
 
          <Box ref={ref} />
       </Box>

@@ -1,3 +1,4 @@
+import { Container } from "@mui/material"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { NextPage } from "next"
 import { useRouter } from "next/router"
@@ -70,9 +71,11 @@ const SearchPage: NextPage = () => {
             blurHeaderOnScroll
             headerScrollThreshold={20}
          >
-            <SearchProvider>
-               <SearchPageContent />
-            </SearchProvider>
+            <Container disableGutters>
+               <SearchProvider>
+                  <SearchPageContent />
+               </SearchProvider>
+            </Container>
          </GenericDashboardLayout>
       </Fragment>
    )

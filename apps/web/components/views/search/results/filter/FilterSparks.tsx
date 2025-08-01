@@ -4,25 +4,23 @@ import { useSearchContext } from "../../SearchContext"
 
 const styles = sxStyles({
    chip: {
-      borderRadius: "60px",
-      border: (theme) => `1px solid ${theme.palette.secondary.light}`,
-      backgroundColor: (theme) => theme.palette.neutral[50],
-      color: (theme) => theme.palette.neutral[700],
-      fontSize: "14px",
-      fontWeight: "400",
-      "&:hover": {
-         backgroundColor: (theme) => theme.palette.neutral[100],
+      p: "8px 12px 8px 16px",
+      backgroundColor: "neutral.50",
+      "& .MuiChip-label": {
+         pl: 0,
+         pr: "8px",
+         fontWeight: "400",
+         color: "neutral.700",
       },
    },
    selectedChip: {
-      borderRadius: "60px",
-      border: (theme) => `1px solid ${theme.palette.secondary.light}`,
-      backgroundColor: (theme) => theme.palette.primary.main,
-      color: (theme) => theme.brand.white[50],
-      fontSize: "14px",
-      fontWeight: "400",
+      p: "8px 12px 8px 16px",
+      background: (theme) => theme.palette.primary[500],
       "&:hover": {
-         backgroundColor: (theme) => theme.palette.primary[700],
+         background: (theme) => theme.palette.primary[600],
+      },
+      "& .MuiChip-label": {
+         color: (theme) => theme.brand.white[50],
       },
    },
 })
