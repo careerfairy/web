@@ -81,6 +81,9 @@ const styles = sxStyles({
          backgroundColor: (theme) => theme.brand.purple[50],
       },
    },
+   statusFilterHeader: {
+      pl: 1,
+   },
 })
 
 const slotProps: MenuProps["slotProps"] = {
@@ -140,6 +143,7 @@ export const StatusFilterHeader = ({
             onClick={handleClick}
             active={open || hasActiveFilter}
             width={width}
+            sx={styles.statusFilterHeader}
          >
             Status
          </NonSortableHeaderCell>

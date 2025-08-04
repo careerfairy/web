@@ -52,7 +52,12 @@ export const TableHighlighter = ({
 
    if (title) {
       return (
-         <BrandedTooltip placement="top" title={title} offset={[0, -10]}>
+         <BrandedTooltip
+            placement="top"
+            title={title}
+            disableInteractive
+            offset={[0, -10]}
+         >
             {content}
          </BrandedTooltip>
       )
