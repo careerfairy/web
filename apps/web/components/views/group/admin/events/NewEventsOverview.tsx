@@ -31,7 +31,7 @@ const NewEventsOverviewContent = () => {
          <BrandedSearchField
             value={searchTerm}
             onChange={setSearchTerm}
-            placeholder="Enter search term..."
+            placeholder="Search by title or company"
             fullWidth
             settings={{
                submitOnEnter: false,

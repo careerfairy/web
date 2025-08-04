@@ -201,12 +201,10 @@ export const EventsViewProvider = ({
    )
 
    const handleShareRecording = useCallback((stat: LiveStreamStats) => {
-      // Navigate to recording view
-      alert(
-         `Share recording for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
+      if (stat.livestream.isDraft) return
+
+      // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
+      setTargetLivestreamStreamerLinksId(stat.livestream.id)
    }, [])
 
    const handleViewRecording = useCallback((stat: LiveStreamStats) => {
