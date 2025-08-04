@@ -115,6 +115,8 @@ type SortableHeaderCellProps = {
    direction: "asc" | "desc"
    onSort: () => void
    tooltip?: string
+   width?: number | string
+   minWidth?: number | string
 }
 
 export const SortableHeaderCell = ({
@@ -123,6 +125,8 @@ export const SortableHeaderCell = ({
    direction,
    onSort,
    tooltip,
+   width,
+   minWidth,
 }: SortableHeaderCellProps) => {
    const content = (
       <TableSortLabel
@@ -137,7 +141,7 @@ export const SortableHeaderCell = ({
    )
 
    return (
-      <TableCell sx={styles.headerCell}>
+      <TableCell sx={[styles.headerCell, { width, minWidth }]}>
          {tooltip ? (
             <HeaderColumnWrapper title={tooltip}>{content}</HeaderColumnWrapper>
          ) : (
@@ -149,6 +153,8 @@ export const SortableHeaderCell = ({
 
 type NonSortableHeaderCellProps = {
    tooltip?: string
+   width?: number | string
+   minWidth?: number | string
 } & TableCellProps & { active?: boolean }
 
 export const NonSortableHeaderCell = ({
@@ -156,12 +162,17 @@ export const NonSortableHeaderCell = ({
    tooltip,
    sx,
    active,
+   width,
+   minWidth,
    ...props
 }: NonSortableHeaderCellProps) => {
    const content = <HeaderText>{children}</HeaderText>
 
    return (
-      <TableCell sx={combineStyles(styles.headerCell, sx)} {...props}>
+      <TableCell
+         sx={combineStyles(styles.headerCell, { width, minWidth }, sx)}
+         {...props}
+      >
          {tooltip ? (
             <HeaderColumnWrapper title={tooltip}>
                <Box

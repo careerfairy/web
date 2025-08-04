@@ -98,11 +98,13 @@ const menuListProps: MenuProps["MenuListProps"] = {
 type Props = {
    selectedStatuses: LivestreamEventStatus[]
    onStatusFilterChange: (statuses: LivestreamEventStatus[]) => void
+   width?: number | string
 }
 
 export const StatusFilterHeader = ({
    selectedStatuses,
    onStatusFilterChange,
+   width,
 }: Props) => {
    const { open, handleClick, handleClose, anchorEl } = useMenuState()
 
@@ -137,6 +139,7 @@ export const StatusFilterHeader = ({
             tooltip="Shows if your live stream is published, still a draft, or available as a recording."
             onClick={handleClick}
             active={open || hasActiveFilter}
+            width={width}
          >
             Status
          </NonSortableHeaderCell>

@@ -13,7 +13,10 @@ import useClientSidePagination from "../../../../custom-hook/utils/useClientSide
 import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
 import { EventTableRow } from "./events-table-new/EventTableRow"
-import { eventsTableStyles } from "./events-table-new/EventsTableStyles"
+import {
+   COLUMN_WIDTHS,
+   eventsTableStyles,
+} from "./events-table-new/EventsTableStyles"
 import { StatusFilterHeader } from "./events-table-new/StatusFilterHeader"
 import {
    NonSortableHeaderCell,
@@ -68,6 +71,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         active={isActiveSort("title")}
                         direction={getSortDirection("title")}
                         onSort={() => handleTableSort("title")}
+                        minWidth={COLUMN_WIDTHS.title}
                      >
                         Live stream title
                      </SortableHeaderCell>
@@ -76,6 +80,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         direction={getSortDirection("date")}
                         onSort={() => handleTableSort("date")}
                         tooltip="The date when your live stream is scheduled to occur or has already taken place."
+                        width={COLUMN_WIDTHS.date}
                      >
                         Date
                      </SortableHeaderCell>
@@ -84,15 +89,20 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         direction={getSortDirection("registrations")}
                         onSort={() => handleTableSort("registrations")}
                         tooltip="The number of talent who registered to your live stream."
+                        width={COLUMN_WIDTHS.registrations}
                      >
                         Registrations
                      </SortableHeaderCell>
-                     <NonSortableHeaderCell tooltip="The number of talent who watched your live stream, either live or recorded.">
+                     <NonSortableHeaderCell
+                        tooltip="The number of talent who watched your live stream, either live or recorded."
+                        width={COLUMN_WIDTHS.views}
+                     >
                         Views
                      </NonSortableHeaderCell>
                      <StatusFilterHeader
                         selectedStatuses={statusFilter}
                         onStatusFilterChange={setStatusFilter}
+                        width={COLUMN_WIDTHS.status}
                      />
                   </TableRow>
                </TableHead>

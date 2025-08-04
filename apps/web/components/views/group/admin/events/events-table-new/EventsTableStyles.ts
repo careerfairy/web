@@ -25,7 +25,7 @@ export const eventsTableStyles = sxStyles({
 export const COLUMN_WIDTHS = {
    title: 350,
    date: 190,
-   registrations: 92,
+   registrations: 150,
    views: 92,
    status: 40,
 } as const
