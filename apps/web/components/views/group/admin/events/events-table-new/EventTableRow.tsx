@@ -11,6 +11,7 @@ import { TableHighlighter } from "./TableHighlighter"
 import {
    getEventDate,
    getLivestreamEventStatus,
+   getViewValue,
    LivestreamEventStatus,
 } from "./utils"
 
@@ -103,13 +104,12 @@ export const EventTableRow = ({
       shouldFetchRecordingViews ? stat.livestream.id : null
    )
 
-   const getViewValue = () => {
-      if (eventStatus !== LivestreamEventStatus.RECORDING) return "-"
-      if (loading) return "..."
-
-      const participants = stat.generalStats?.numberOfParticipants ?? 0
-      return totalViews + participants
-   }
+   const viewValue = getViewValue(
+      eventStatus,
+      totalViews,
+      loading,
+      stat.generalStats?.numberOfParticipants
+   )
 
    return (
       <TableRow
@@ -204,7 +204,7 @@ export const EventTableRow = ({
                   }
                >
                   <Box component={Eye} size={16} />
-                  <Typography variant="small">{getViewValue()}</Typography>
+                  <Typography variant="small">{viewValue}</Typography>
                </TableHighlighter>
             </CentredBox>
          </TableCell>
