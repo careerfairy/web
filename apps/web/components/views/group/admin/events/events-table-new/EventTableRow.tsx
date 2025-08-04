@@ -7,11 +7,7 @@ import { COLUMN_WIDTHS } from "./EventsTableStyles"
 import { QuickActionIcon } from "./QuickActionIcon"
 import { StatusIcon } from "./StatusIcon"
 import { TableHighlighter } from "./TableHighlighter"
-import {
-   getEventDate,
-   getLivestreamEventStatus,
-   LivestreamEventStatus,
-} from "./utils"
+import { getEventDate, getLivestreamEventStatus } from "./utils"
 
 const styles = sxStyles({
    bodyRow: {
@@ -94,9 +90,6 @@ export const EventTableRow = ({
    onViewsClick,
 }: EventTableRowProps) => {
    const eventStatus = getLivestreamEventStatus(stat.livestream)
-   const isPastEvent =
-      eventStatus === LivestreamEventStatus.RECORDING ||
-      eventStatus === LivestreamEventStatus.NOT_RECORDED
 
    return (
       <TableRow
@@ -117,9 +110,7 @@ export const EventTableRow = ({
                   speakers={stat.livestream.speakers}
                   backgroundImageUrl={stat.livestream.backgroundImageUrl}
                   showHoverActions={isHovered}
-                  isDraft={eventStatus === LivestreamEventStatus.DRAFT}
-                  isPastEvent={isPastEvent}
-                  hasRecordingAvailable={!stat.livestream.denyRecordingAccess}
+                  eventStatus={eventStatus}
                   onEnterLiveStreamRoom={onEnterLiveStreamRoom}
                   onShareLiveStream={onShareLiveStream}
                   onShareRecording={onShareRecording}
@@ -188,8 +179,10 @@ export const EventTableRow = ({
          {/* Status Column */}
          <TableCell>
             <CentredBox gap={0.5} width={COLUMN_WIDTHS.status}>
-               <StatusIcon status={eventStatus} />
-               <QuickActionIcon />
+               <Box p={1}>
+                  <StatusIcon status={eventStatus} size={20} />
+               </Box>
+               <QuickActionIcon stat={stat} eventStatus={eventStatus} />
             </CentredBox>
          </TableCell>
       </TableRow>

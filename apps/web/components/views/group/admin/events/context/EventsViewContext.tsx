@@ -25,8 +25,10 @@ type EventsViewContextValue = {
    handleFeedback: (stat: LiveStreamStats) => void
    handleEdit: (stat: LiveStreamStats) => void
    handleShareRecording: (stat: LiveStreamStats) => void
+   handleViewRecording: (stat: LiveStreamStats) => void
    handleRegistrationsClick: (stat: LiveStreamStats) => void
    handleViewsClick: (stat: LiveStreamStats) => void
+   handleDelete: (stat: LiveStreamStats) => void
 }
 
 const EventsViewContext = createContext<EventsViewContextValue | null>(null)
@@ -189,6 +191,15 @@ export const EventsViewProvider = ({
       )
    }, [])
 
+   const handleViewRecording = useCallback((stat: LiveStreamStats) => {
+      // Navigate to recording view
+      alert(
+         `View recording for ${
+            stat.livestream.isDraft ? "draft" : "live stream"
+         }: ${stat.livestream.id}`
+      )
+   }, [])
+
    const handleRegistrationsClick = useCallback((stat: LiveStreamStats) => {
       // Navigate to registrations view
       alert(
@@ -202,6 +213,14 @@ export const EventsViewProvider = ({
       // Navigate to views view
       alert(
          `Views for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
+            stat.livestream.id
+         }`
+      )
+   }, [])
+
+   const handleDelete = useCallback((stat: LiveStreamStats) => {
+      alert(
+         `Delete for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
             stat.livestream.id
          }`
       )
@@ -221,8 +240,10 @@ export const EventsViewProvider = ({
          handleFeedback,
          handleEdit,
          handleShareRecording,
+         handleViewRecording,
          handleRegistrationsClick,
          handleViewsClick,
+         handleDelete,
       }),
       [
          sortBy,
@@ -237,8 +258,10 @@ export const EventsViewProvider = ({
          handleFeedback,
          handleEdit,
          handleShareRecording,
+         handleViewRecording,
          handleRegistrationsClick,
          handleViewsClick,
+         handleDelete,
       ]
    )
 

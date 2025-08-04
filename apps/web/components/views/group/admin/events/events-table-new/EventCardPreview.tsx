@@ -6,6 +6,7 @@ import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
 import { HoverActionIcons } from "./HoverActionIcons"
 import { SpeakerAvatars } from "./SpeakerAvatars"
+import { getEventActionConditions, LivestreamEventStatus } from "./utils"
 
 const styles = sxStyles({
    container: {
@@ -65,9 +66,7 @@ type Props = {
    backgroundImageUrl?: string
    speakers?: Speaker[]
    showHoverActions?: boolean
-   isDraft?: boolean
-   isPastEvent?: boolean
-   hasRecordingAvailable?: boolean
+   eventStatus: LivestreamEventStatus
    onEnterLiveStreamRoom?: () => void
    onShareLiveStream?: () => void
    onAnalytics?: () => void
@@ -82,9 +81,7 @@ export const EventCardPreview = ({
    backgroundImageUrl,
    speakers,
    showHoverActions,
-   isDraft,
-   isPastEvent,
-   hasRecordingAvailable,
+   eventStatus,
    onEnterLiveStreamRoom,
    onShareLiveStream,
    onAnalytics,
@@ -93,22 +90,15 @@ export const EventCardPreview = ({
    onEdit,
    onShareRecording,
 }: Props) => {
-   // Action icon visibility logic:
-   // - Edit: Only visible for Draft events
-   // - Enter Live Stream Room: Only for Published (not Draft, not Past)
-   // - Share Live Stream: Only for Published (not Draft, not Past)
-   // - Analytics: Visible for all except Draft
-   // - Questions: Visible for all except Draft
-   // - Feedback: Only for Past (not Draft)
-   // - Share Recording: Only for Past events with recording available (not Draft)
-   const shouldShowEdit = isDraft // Only for Draft
-   const shouldShowEnterLiveStreamRoom = !isDraft && !isPastEvent // Only for Published
-   const shouldShowShareLiveStream = !isDraft && !isPastEvent // Only for Published
-   const shouldShowAnalytics = !isDraft // All except Draft
-   const shouldShowQuestions = !isDraft // All except Draft
-   const shouldShowFeedback = !isDraft && isPastEvent // Only for Past
-   const shouldShowShareRecording =
-      !isDraft && isPastEvent && hasRecordingAvailable // Only for past events with recordings
+   // Use centralized condition logic
+   const {
+      shouldShowEnterLiveStreamRoom,
+      shouldShowShareLiveStream,
+      shouldShowAnalytics,
+      shouldShowQuestions,
+      shouldShowFeedback,
+      shouldShowShareRecording,
+   } = getEventActionConditions(eventStatus)
 
    return (
       <Stack
@@ -147,7 +137,11 @@ export const EventCardPreview = ({
                {Boolean(showHoverActions) && (
                   <Box sx={styles.hoverActionsBackground}>
                      <HoverActionIcons
-                        onEdit={shouldShowEdit ? onEdit : undefined}
+                        onEdit={
+                           eventStatus === LivestreamEventStatus.DRAFT
+                              ? onEdit
+                              : undefined
+                        }
                         onEnterLiveStreamRoom={
                            shouldShowEnterLiveStreamRoom
                               ? onEnterLiveStreamRoom
