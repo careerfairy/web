@@ -20,6 +20,10 @@ export const eventsTableStyles = sxStyles({
          },
       },
    },
+   paginationContainer: {
+      mt: 1,
+      pb: 1.5,
+   },
 })
 
 export const COLUMN_WIDTHS = {

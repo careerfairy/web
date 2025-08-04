@@ -24,6 +24,8 @@ import {
 } from "./events-table-new/TableHeaderComponents"
 import { getEventStatsKey } from "./util"
 
+const ITEMS_PER_PAGE = 10
+
 type Props = {
    stats: LiveStreamStats[]
 }
@@ -50,7 +52,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
    const { currentPageData, currentPage, totalPages, goToPage } =
       useClientSidePagination({
          data: stats,
-         itemsPerPage: 10,
+         itemsPerPage: ITEMS_PER_PAGE,
       })
 
    const handleRowMouseEnter = (statKey: string) => {
@@ -136,25 +138,23 @@ export const DesktopEventsView = ({ stats }: Props) => {
                   })}
                </TableBody>
             </Table>
-         </TableContainer>
 
-         {totalPages > 1 && (
-            <Stack
-               direction="row"
-               justifyContent="flex-end"
-               alignItems="center"
-               spacing={2}
-               mt={2}
-            >
-               <StyledPagination
-                  color="secondary"
-                  size="small"
-                  count={totalPages}
-                  page={currentPage}
-                  onChange={(_, page) => goToPage(page)}
-               />
-            </Stack>
-         )}
+            {totalPages > 1 && (
+               <Stack
+                  direction="row"
+                  justifyContent="flex-end"
+                  sx={eventsTableStyles.paginationContainer}
+               >
+                  <StyledPagination
+                     color="secondary"
+                     size="small"
+                     count={totalPages}
+                     page={currentPage}
+                     onChange={(_, page) => goToPage(page)}
+                  />
+               </Stack>
+            )}
+         </TableContainer>
       </Box>
    )
 }
