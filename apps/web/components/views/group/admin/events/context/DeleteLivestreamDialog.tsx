@@ -6,6 +6,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
 import { useSWRConfig } from "swr"
+import { capitalizeFirstLetter } from "util/CommonUtil"
 import ConfirmationDialog from "../../../../../../materialUI/GlobalModals/ConfirmationDialog"
 import { useDeleteLivestream } from "../../../../../custom-hook/streaming/useDeleteLivestream"
 import {
@@ -49,11 +50,15 @@ export const DeleteLivestreamDialog = ({
          mutate(getGroupLivestreamsWithStatsKey(group?.id))
 
          onClose()
-         successNotification(`${eventType} deleted successfully`)
+         successNotification(
+            `${capitalizeFirstLetter(eventType)} deleted successfully`
+         )
       } catch (error) {
          errorNotification(
             error,
-            `Unable to delete ${eventType}. Please try again.`,
+            `Unable to delete ${capitalizeFirstLetter(
+               eventType
+            )}. Please try again.`,
             {
                collection,
                eventId: livestream?.id,

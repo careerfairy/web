@@ -38,20 +38,17 @@ export const getLivestreamEventStatus = (
    return LivestreamEventStatus.RECORDING
 }
 
-export const getEventTypeName = (
-   status: LivestreamEventStatus,
-   capitalize: boolean = false
-): string => {
+export const getEventTypeName = (status: LivestreamEventStatus) => {
    switch (status) {
       case LivestreamEventStatus.DRAFT:
-         return capitalize ? "Draft" : "draft"
+         return "draft"
       case LivestreamEventStatus.UPCOMING:
-         return capitalize ? "Live Stream" : "live stream"
+         return "live stream"
       case LivestreamEventStatus.RECORDING:
       case LivestreamEventStatus.NOT_RECORDED:
-         return capitalize ? "Recording" : "recording"
+         return "recording"
       default:
-         return capitalize ? "Live Stream" : "live stream"
+         return "live stream"
    }
 }
 
