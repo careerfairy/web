@@ -104,7 +104,7 @@ type MobileDrawerProps = {
    enableDrawerCancelButton?: boolean
 } & Omit<SwipeableDrawerProps, "onOpen">
 
-const MobileDrawer: FC<MobileDrawerProps> = ({
+export const MobileDrawer: FC<MobileDrawerProps> = ({
    open,
    options,
    enableDrawerCancelButton,
@@ -154,7 +154,7 @@ export type PopoverMenuProps = {
 
 type MenuPlacement = "top" | "bottom"
 
-const DesktopMenu = ({
+export const DesktopMenu = ({
    options,
    placement = "bottom",
    sx,

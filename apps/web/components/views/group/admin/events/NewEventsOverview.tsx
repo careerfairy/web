@@ -1,3 +1,4 @@
+import { Stack } from "@mui/material"
 import { useRouter } from "next/router"
 import { Fragment, useState } from "react"
 import { useGroupLivestreamsWithStats } from "../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
@@ -25,27 +26,17 @@ const NewEventsOverviewContent = () => {
    })
 
    return (
-      <div style={{ padding: isMobile ? "15px" : "20px" }}>
-         <div
-            style={{
-               marginBottom: "20px",
-               display: "flex",
-               flexDirection: isMobile ? "column" : "row",
-               gap: isMobile ? "15px" : "20px",
-               alignItems: isMobile ? "stretch" : "center",
+      <Stack spacing={1} pt={isMobile ? 2 : 3.5}>
+         <BrandedSearchField
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Enter search term..."
+            fullWidth
+            settings={{
+               submitOnEnter: false,
+               submitOnBlur: false,
             }}
-         >
-            <BrandedSearchField
-               value={searchTerm}
-               onChange={setSearchTerm}
-               placeholder="Enter search term..."
-               fullWidth
-               settings={{
-                  submitOnEnter: false,
-                  submitOnBlur: false,
-               }}
-            />
-         </div>
+         />
 
          {Boolean(isLoading) && <p>Loading stats...</p>}
          {Boolean(error) && <p>Error loading stats: {error.message}</p>}
@@ -61,7 +52,7 @@ const NewEventsOverviewContent = () => {
          ) : (
             <p>No events found matching your search criteria.</p>
          )}
-      </div>
+      </Stack>
    )
 }
 
