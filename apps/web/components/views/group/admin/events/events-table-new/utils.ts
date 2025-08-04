@@ -45,3 +45,36 @@ export const getEventDate = (stat: LiveStreamStats): string => {
 
    return DateUtil.formatEventDate(stat.livestream.start.toDate())
 }
+
+/**
+ * Centralized logic for determining which actions should be available for an event
+ * Based on the conditions from EventCardPreview.tsx and HoverActionIcons.tsx
+ */
+export const getEventActionConditions = (
+   status: LivestreamEventStatus | null
+) => {
+   if (!status) {
+      return {}
+   }
+
+   return {
+      /** Only for Upcoming Live Streams (not Draft, not Past) */
+      shouldShowEnterLiveStreamRoom: status === LivestreamEventStatus.UPCOMING,
+      /** Only for Upcoming Live Streams (not Draft, not Past) */
+      shouldShowShareLiveStream: status === LivestreamEventStatus.UPCOMING,
+      /** Visible for all except Drafts */
+      shouldShowAnalytics: status !== LivestreamEventStatus.DRAFT,
+      /** Visible for all except Drafts */
+      shouldShowQuestions: status !== LivestreamEventStatus.DRAFT,
+      /** Only for Past events (not Draft) */
+      shouldShowFeedback:
+         status === LivestreamEventStatus.RECORDING ||
+         status === LivestreamEventStatus.NOT_RECORDED,
+      /** Only for Past events with recording available (not Draft) */
+      shouldShowShareRecording: status === LivestreamEventStatus.RECORDING,
+      /** Only for Past events with recording available (not Draft) */
+      shouldShowViewRecording: status === LivestreamEventStatus.RECORDING,
+      /** Available for all states (with different labels) */
+      shouldShowDelete: true,
+   }
+}
