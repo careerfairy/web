@@ -6,7 +6,10 @@ import {
    AgoraRTMTokenResponse,
 } from "@careerfairy/shared-lib/agora/token"
 import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
-import { GetRecommendedEventsFnArgs } from "@careerfairy/shared-lib/functions/types"
+import type {
+   DeleteLivestreamRequest,
+   GetRecommendedEventsFnArgs,
+} from "@careerfairy/shared-lib/functions/types"
 import {
    CreateLivestreamCTARequest,
    CreateLivestreamPollRequest,
@@ -1330,6 +1333,21 @@ export class LivestreamService {
       await httpsCallable<DeleteLivestreamCTARequest>(
          this.functions,
          "deleteCTA"
+      )(options)
+      return
+   }
+
+   /**
+    * Deletes a livestream from the specified collection using a cloud function
+    * Requires user to be a group admin for the specified group
+    * @param livestreamId - The ID of the livestream to delete
+    * @param collection - The collection to delete from ("livestreams" or "draftLivestreams")
+    * @param groupId - The ID of the group the user must be admin of
+    */
+   deleteLivestream = async (options: DeleteLivestreamRequest) => {
+      await httpsCallable<DeleteLivestreamRequest>(
+         this.functions,
+         FUNCTION_NAMES.deleteLivestream
       )(options)
       return
    }

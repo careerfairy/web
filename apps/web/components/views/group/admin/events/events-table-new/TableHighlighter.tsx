@@ -6,6 +6,7 @@ import { sxStyles } from "types/commonTypes"
 type TableHighlighterProps = StackProps & {
    title?: string
    children: ReactNode
+   cursor?: string
 }
 
 const styles = sxStyles({
@@ -40,17 +41,23 @@ const styles = sxStyles({
 export const TableHighlighter = ({
    title,
    children,
+   cursor = "pointer",
    ...stackProps
 }: TableHighlighterProps) => {
    const content = (
-      <Stack sx={styles.container} {...stackProps}>
+      <Stack sx={[styles.container, { cursor }]} {...stackProps}>
          {children}
       </Stack>
    )
 
    if (title) {
       return (
-         <BrandedTooltip placement="top" title={title} offset={[0, -10]}>
+         <BrandedTooltip
+            placement="top"
+            title={title}
+            disableInteractive
+            offset={[0, -10]}
+         >
             {content}
          </BrandedTooltip>
       )
