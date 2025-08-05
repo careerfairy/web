@@ -1,15 +1,16 @@
-import React, { FC, useMemo } from "react"
 import { Dialog, DialogContent, Slide } from "@mui/material"
-import useGroupLivestreamStat from "../../../../../../custom-hook/live-stream/useGroupLivestreamStat"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { useFeedbackPageContext } from "../FeedbackPageProvider"
-import useIsMobile from "../../../../../../custom-hook/useIsMobile"
-import Title from "./Title"
-import { GeneralOverviewContent, GeneralOverviewTitle } from "./GeneralOverview"
+import { useMemo } from "react"
 import SwipeableViews from "react-swipeable-views"
-import { RatingOverviewContent, RatingOverviewTitle } from "./RatingOverview"
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { AnimatedTabPanel } from "../../../../../../../materialUI/GlobalPanels/GlobalPanels"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import useGroupLivestreamStat from "../../../../../../custom-hook/live-stream/useGroupLivestreamStat"
+import useIsMobile from "../../../../../../custom-hook/useIsMobile"
+
+import { useFeedbackDialogContext } from "./FeedbackDialogProvider"
+import { GeneralOverviewContent, GeneralOverviewTitle } from "./GeneralOverview"
+import { RatingOverviewContent, RatingOverviewTitle } from "./RatingOverview"
+import Title from "./Title"
 
 const styles = sxStyles({
    content: {
@@ -19,18 +20,20 @@ const styles = sxStyles({
    },
 })
 
-type Props = {
-   livestreamId: string
-   feedbackQuestionId?: string
-}
-
 const generalOverviewKey = 0
 const ratingOverviewKey = 1
 
 type Value = typeof generalOverviewKey | typeof ratingOverviewKey
 
-const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
-   const { handleCloseFeedbackDialog } = useFeedbackPageContext()
+const FeedbackDialog = () => {
+   const {
+      livestreamId,
+      feedbackQuestionId,
+      onRatingQuestionClick,
+      onBackToFeedback,
+      onCloseFeedbackDialog,
+   } = useFeedbackDialogContext()
+
    const { group } = useGroup()
    const isMobile = useIsMobile()
 
@@ -48,13 +51,13 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
    return (
       <Dialog
          open={Boolean(livestreamStats)}
-         onClose={handleCloseFeedbackDialog}
+         onClose={onCloseFeedbackDialog}
          TransitionComponent={Slide}
          maxWidth="lg"
          fullWidth
          fullScreen={isMobile}
       >
-         <Title id="feedback-dialog-title" onClose={handleCloseFeedbackDialog}>
+         <Title id="feedback-dialog-title" onClose={onCloseFeedbackDialog}>
             <SwipeableViews index={value}>
                <AnimatedTabPanel
                   key={generalOverviewKey}
@@ -73,8 +76,8 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
                >
                   <RatingOverviewTitle
                      livestreamStats={livestreamStats}
-                     groupId={group.id}
                      feedbackQuestionId={feedbackQuestionId}
+                     onBackToFeedback={onBackToFeedback}
                   />
                </AnimatedTabPanel>
             </SwipeableViews>
@@ -87,8 +90,8 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
                   activeValue={value}
                >
                   <GeneralOverviewContent
-                     groupId={group.id}
                      livestreamStats={livestreamStats}
+                     onRatingQuestionClick={onRatingQuestionClick}
                   />
                </AnimatedTabPanel>
                <AnimatedTabPanel
@@ -97,7 +100,6 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
                   activeValue={value}
                >
                   <RatingOverviewContent
-                     groupId={group.id}
                      livestreamStats={livestreamStats}
                      feedbackQuestionId={feedbackQuestionId}
                   />
