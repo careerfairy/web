@@ -13,12 +13,18 @@ import useClientSidePagination from "../../../../custom-hook/utils/useClientSide
 import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
 import { EventTableRow } from "./events-table-new/EventTableRow"
-import { eventsTableStyles } from "./events-table-new/EventsTableStyles"
+import {
+   COLUMN_WIDTHS,
+   eventsTableStyles,
+} from "./events-table-new/EventsTableStyles"
+import { StatusFilterHeader } from "./events-table-new/StatusFilterHeader"
 import {
    NonSortableHeaderCell,
    SortableHeaderCell,
 } from "./events-table-new/TableHeaderComponents"
 import { getEventStatsKey } from "./util"
+
+const ITEMS_PER_PAGE = 10
 
 type Props = {
    stats: LiveStreamStats[]
@@ -29,6 +35,8 @@ export const DesktopEventsView = ({ stats }: Props) => {
       handleTableSort,
       getSortDirection,
       isActiveSort,
+      statusFilter,
+      setStatusFilter,
       handleEnterLiveStreamRoom,
       handleShareLiveStream,
       handleAnalytics,
@@ -44,7 +52,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
    const { currentPageData, currentPage, totalPages, goToPage } =
       useClientSidePagination({
          data: stats,
-         itemsPerPage: 10,
+         itemsPerPage: ITEMS_PER_PAGE,
       })
 
    const handleRowMouseEnter = (statKey: string) => {
@@ -65,6 +73,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         active={isActiveSort("title")}
                         direction={getSortDirection("title")}
                         onSort={() => handleTableSort("title")}
+                        minWidth={COLUMN_WIDTHS.title}
                      >
                         Live stream title
                      </SortableHeaderCell>
@@ -73,6 +82,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         direction={getSortDirection("date")}
                         onSort={() => handleTableSort("date")}
                         tooltip="The date when your live stream is scheduled to occur or has already taken place."
+                        width={COLUMN_WIDTHS.date}
                      >
                         Date
                      </SortableHeaderCell>
@@ -81,15 +91,21 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         direction={getSortDirection("registrations")}
                         onSort={() => handleTableSort("registrations")}
                         tooltip="The number of talent who registered to your live stream."
+                        width={COLUMN_WIDTHS.registrations}
                      >
                         Registrations
                      </SortableHeaderCell>
-                     <NonSortableHeaderCell tooltip="The number of talent who watched your live stream, either live or recorded.">
+                     <NonSortableHeaderCell
+                        tooltip="The number of talent who watched your live stream, either live or recorded."
+                        width={COLUMN_WIDTHS.views}
+                     >
                         Views
                      </NonSortableHeaderCell>
-                     <NonSortableHeaderCell tooltip="Shows if your live stream is published, still a draft, or available as a recording.">
-                        Status
-                     </NonSortableHeaderCell>
+                     <StatusFilterHeader
+                        selectedStatuses={statusFilter}
+                        onStatusFilterChange={setStatusFilter}
+                        width={COLUMN_WIDTHS.status}
+                     />
                   </TableRow>
                </TableHead>
                <TableBody>
@@ -122,25 +138,23 @@ export const DesktopEventsView = ({ stats }: Props) => {
                   })}
                </TableBody>
             </Table>
-         </TableContainer>
 
-         {totalPages > 1 && (
-            <Stack
-               direction="row"
-               justifyContent="flex-end"
-               alignItems="center"
-               spacing={2}
-               mt={2}
-            >
-               <StyledPagination
-                  color="secondary"
-                  size="small"
-                  count={totalPages}
-                  page={currentPage}
-                  onChange={(_, page) => goToPage(page)}
-               />
-            </Stack>
-         )}
+            {totalPages > 1 && (
+               <Stack
+                  direction="row"
+                  justifyContent="flex-end"
+                  sx={eventsTableStyles.paginationContainer}
+               >
+                  <StyledPagination
+                     color="secondary"
+                     size="small"
+                     count={totalPages}
+                     page={currentPage}
+                     onChange={(_, page) => goToPage(page)}
+                  />
+               </Stack>
+            )}
+         </TableContainer>
       </Box>
    )
 }

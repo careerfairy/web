@@ -53,6 +53,8 @@ interface UseGroupLivestreamsWithStatsOptions {
    sortBy?: LivestreamStatsSortOption
    /** Search term to filter by */
    searchTerm?: string
+   /** Status filter options */
+   statusFilter?: LivestreamEventStatus[]
 }
 
 /**
@@ -77,8 +79,11 @@ export const useGroupLivestreamsWithStats = (
    groupId: string,
    options: UseGroupLivestreamsWithStatsOptions = {}
 ) => {
-   const { sortBy = LivestreamStatsSortOption.START_DESC, searchTerm = "" } =
-      options
+   const {
+      sortBy = LivestreamStatsSortOption.START_DESC,
+      searchTerm = "",
+      statusFilter = [],
+   } = options
    const firestore = useFirestore()
 
    const fetchGroupLivestreamsWithStats = async (): Promise<
@@ -160,10 +165,11 @@ export const useGroupLivestreamsWithStats = (
    const processedData = useMemo(() => {
       if (!data) return []
 
-      // First filter by search term, then sort
-      const filteredData = filterStatsBySearchTerm(data, searchTerm)
+      // First filter by search term, then by status, then sort
+      let filteredData = filterStatsBySearchTerm(data, searchTerm)
+      filteredData = filterStatsByStatus(filteredData, statusFilter)
       return sortStatsArray(filteredData, sortBy)
-   }, [data, searchTerm, sortBy])
+   }, [data, searchTerm, statusFilter, sortBy])
 
    return {
       data: processedData,
@@ -220,6 +226,20 @@ const filterStatsBySearchTerm = (
       })
 
       return titleMatch || companyMatch || speakerMatch
+   })
+}
+
+const filterStatsByStatus = (
+   stats: LiveStreamStats[],
+   statusFilter: LivestreamEventStatus[]
+): LiveStreamStats[] => {
+   if (statusFilter.length === 0) return stats
+
+   return stats.filter((stat) => {
+      // Determine the status of this livestream
+      const status = getLivestreamEventStatus(stat.livestream)
+
+      return statusFilter.includes(status)
    })
 }
 
