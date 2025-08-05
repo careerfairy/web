@@ -305,7 +305,7 @@ export const EventsViewProvider = ({
          {feedbackDialogLivestreamId ? (
             <FeedbackDialogProvider
                livestreamId={feedbackDialogLivestreamId}
-               feedbackQuestionId={feedbackDialogQuestionId || undefined}
+               feedbackQuestionId={feedbackDialogQuestionId}
                onCloseFeedbackDialog={handleCloseFeedbackDialog}
                onRatingQuestionClick={handleFeedbackRatingQuestionClick}
                onBackToFeedback={handleFeedbackBackToFeedback}
