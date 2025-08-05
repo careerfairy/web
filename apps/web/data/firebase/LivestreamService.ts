@@ -31,6 +31,7 @@ import {
    LivestreamPresentation,
    LivestreamQuestion,
    LivestreamQuestionComment,
+   LivestreamSecureToken,
    LivestreamVideo,
    MarkLivestreamPollAsCurrentRequest,
    MarkLivestreamQuestionAsCurrentRequest,
@@ -1514,6 +1515,21 @@ export class LivestreamService {
             new Date(Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS) &&
          eventStartDate > new Date(START_DATE_FOR_REPORTED_EVENTS)
       )
+   }
+
+   getLivestreamSecureToken = async (livestreamId: string) => {
+      const ref = doc(
+         FirestoreInstance,
+         "livestreams",
+         livestreamId,
+         "tokens",
+         "secureToken"
+      ).withConverter(createGenericConverter<LivestreamSecureToken>())
+      const snap = await getDoc(ref)
+      if (!snap.exists()) {
+         return null
+      }
+      return snap.data().value
    }
 }
 

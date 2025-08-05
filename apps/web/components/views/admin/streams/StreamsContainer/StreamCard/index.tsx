@@ -55,7 +55,7 @@ import {
    getResizedUrl,
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions"
-import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog"
+import { StreamerLinksDialog } from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog"
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog"
 import { PhoneNumbersDialog } from "./PhoneNumbersDialog"
 
@@ -534,11 +534,12 @@ const StreamCard = forwardRef<HTMLDivElement, Props>(
                onClose={handleCloseStreamerLinksDialog}
                livestreamId={stream.id}
                openDialog={openStreamerLinksDialog}
-               setOpenDialog={setOpenStreamerLinksDialog}
                companyName={stream.company}
-               companyCountryCode={countriesOptionCodes.find(
-                  (country) => country.name == stream.companyCountries?.[0]
-               )}
+               companyCountryCode={
+                  countriesOptionCodes.find(
+                     (country) => country.name == stream.companyCountries?.[0]
+                  )?.id
+               }
             />
             <Dialog open={recordingRequestOngoing}>
                <DialogContent>

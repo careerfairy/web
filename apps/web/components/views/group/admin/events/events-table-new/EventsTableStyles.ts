@@ -1,13 +1,31 @@
 import { sxStyles } from "types/commonTypes"
 
 export const eventsTableStyles = sxStyles({
-   tableContainer: {
+   root: {
       backgroundColor: (theme) => theme.brand.white[100],
       borderRadius: "16px",
       border: "1px solid",
       borderColor: "secondary.50",
-      overflowX: "auto",
       px: 1, // 8px horizontal padding to match Figma design
+   },
+   tableContainer: {
+      // Custom nice scrollbar styles for table container
+      overflowX: "auto",
+      "& ::-webkit-scrollbar": {
+         height: "6px",
+         backgroundColor: "transparent",
+      },
+      "& ::-webkit-scrollbar-thumb": {
+         borderRadius: "8px",
+         backgroundColor: (theme) => theme.palette.neutral[200],
+         minHeight: "24px",
+      },
+      "& ::-webkit-scrollbar-thumb:hover": {
+         backgroundColor: (theme) => theme.palette.neutral[300],
+      },
+      // Firefox
+      scrollbarWidth: "thin",
+      scrollbarColor: (theme) => `${theme.palette.neutral[200]} transparent`,
    },
    table: {
       borderCollapse: "separate",

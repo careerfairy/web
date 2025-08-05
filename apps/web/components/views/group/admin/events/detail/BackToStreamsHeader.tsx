@@ -5,6 +5,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    root: {
+      cursor: "pointer",
       display: "flex",
       alignItems: "center",
       gap: 1,

@@ -126,7 +126,7 @@ export const EventTableRow = ({
 
          {/* Date Column */}
          <TableCell sx={styles.bodyCell}>
-            <CentredBox flexShrink={0}>
+            <CentredBox>
                <TableHighlighter
                   title="Live stream date"
                   direction="row"
