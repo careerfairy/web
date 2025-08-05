@@ -45,6 +45,7 @@ export const StatusIcon = ({ status, size }: Props) => {
          title={getTooltipTitle()}
          placement="top"
          offset={[0, -5]}
+         disableInteractive
       >
          {getIcon()}
       </BrandedTooltip>

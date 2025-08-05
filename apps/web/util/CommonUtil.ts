@@ -388,3 +388,18 @@ export const generateUniqueId = () => {
 export function getIconUrl(siteUrl: string): string {
    return `https://icon.horse/icon/?uri=${siteUrl}`
 }
+
+/**
+ * Utility to wrap an event handler and stop event propagation before invoking the callback.
+ * Useful for preventing parent event handlers from firing when interacting with child elements.
+ *
+ * Example: Prevent a button click inside a list item from triggering the list item's onClick.
+ */
+export const withStopPropagation = (
+   callback: (e?: React.MouseEvent) => void
+) => {
+   return (e?: React.MouseEvent) => {
+      e?.stopPropagation()
+      callback?.(e)
+   }
+}

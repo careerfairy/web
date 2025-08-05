@@ -352,6 +352,7 @@ exports.syncCompanyLanguages = companies.syncCompanyLanguages
 exports.manualSyncCompanyLanguages = companies.manualSyncCompanyLanguages
 
 // Streaming
+exports[FUNCTION_NAMES.deleteLivestream] = streaming.deleteLivestream
 exports.deleteLivestreamChatEntry = streaming.deleteLivestreamChatEntry
 exports.createPoll = streaming.createPoll
 exports.deletePoll = streaming.deletePoll
