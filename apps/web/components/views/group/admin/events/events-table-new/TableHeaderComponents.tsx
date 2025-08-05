@@ -1,6 +1,7 @@
 import {
    Box,
    TableCell,
+   TableCellProps,
    TableSortLabel,
    tooltipClasses,
    Typography,
@@ -8,7 +9,7 @@ import {
 } from "@mui/material"
 import { forwardRef, ReactNode } from "react"
 import { ChevronDown, IconProps } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { BrandedTooltip } from "../../../../streaming-page/components/BrandedTooltip"
 
 const styles = sxStyles({
@@ -55,9 +56,13 @@ const styles = sxStyles({
       px: 1,
       py: 0.5,
       borderRadius: "4px",
+      transition: (theme) => theme.transitions.create(["background-color"]),
       "&:hover": {
          backgroundColor: (theme) => theme.brand.white[500],
       },
+   },
+   headerColumnButtonActive: {
+      backgroundColor: (theme) => theme.brand.white[500],
    },
 })
 
@@ -88,7 +93,10 @@ type HeaderColumnWrapperProps = {
    title: string
 }
 
-const HeaderColumnWrapper = ({ children, title }: HeaderColumnWrapperProps) => {
+export const HeaderColumnWrapper = ({
+   children,
+   title,
+}: HeaderColumnWrapperProps) => {
    return (
       <BrandedTooltip
          wrapperStyles={styles.tooltipWrapper}
@@ -107,6 +115,8 @@ type SortableHeaderCellProps = {
    direction: "asc" | "desc"
    onSort: () => void
    tooltip?: string
+   width?: number | string
+   minWidth?: number | string
 }
 
 export const SortableHeaderCell = ({
@@ -115,6 +125,8 @@ export const SortableHeaderCell = ({
    direction,
    onSort,
    tooltip,
+   width,
+   minWidth,
 }: SortableHeaderCellProps) => {
    const content = (
       <TableSortLabel
@@ -129,7 +141,7 @@ export const SortableHeaderCell = ({
    )
 
    return (
-      <TableCell sx={styles.headerCell}>
+      <TableCell sx={[styles.headerCell, { width, minWidth }]}>
          {tooltip ? (
             <HeaderColumnWrapper title={tooltip}>{content}</HeaderColumnWrapper>
          ) : (
@@ -140,21 +152,37 @@ export const SortableHeaderCell = ({
 }
 
 type NonSortableHeaderCellProps = {
-   children: ReactNode
    tooltip?: string
-}
+   width?: number | string
+   minWidth?: number | string
+} & TableCellProps & { active?: boolean }
 
 export const NonSortableHeaderCell = ({
    children,
    tooltip,
+   sx,
+   active,
+   width,
+   minWidth,
+   ...props
 }: NonSortableHeaderCellProps) => {
    const content = <HeaderText>{children}</HeaderText>
 
    return (
-      <TableCell sx={styles.headerCell}>
+      <TableCell
+         sx={combineStyles(styles.headerCell, { width, minWidth }, sx)}
+         {...props}
+      >
          {tooltip ? (
             <HeaderColumnWrapper title={tooltip}>
-               <Box sx={styles.headerColumnButton}>{content}</Box>
+               <Box
+                  sx={[
+                     styles.headerColumnButton,
+                     active && styles.headerColumnButtonActive,
+                  ]}
+               >
+                  {content}
+               </Box>
             </HeaderColumnWrapper>
          ) : (
             content
