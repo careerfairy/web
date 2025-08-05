@@ -38,4 +38,8 @@ export type GetTotalUsersMatchingTargetingResponse = {
    total: number
 }
 
-// trigger commit
+export type DeleteLivestreamRequest = {
+   livestreamId: string
+   collection: "livestreams" | "draftLivestreams"
+   groupId: string
+}

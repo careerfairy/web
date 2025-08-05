@@ -48,6 +48,11 @@ export enum LivestreamStatsSortOption {
    STATUS_WITH_DATE,
 }
 
+export const getGroupLivestreamsWithStatsKey = (groupId: string | null) => {
+   if (!groupId) return null
+   return `group-livestreams-with-stats-${groupId}`
+}
+
 interface UseGroupLivestreamsWithStatsOptions {
    /** Sort results by */
    sortBy?: LivestreamStatsSortOption
@@ -149,7 +154,7 @@ export const useGroupLivestreamsWithStats = (
    }
 
    const { data, isLoading, error } = useSWR<LiveStreamStats[]>(
-      groupId ? `group-livestreams-with-stats-${groupId}` : null,
+      getGroupLivestreamsWithStatsKey(groupId),
       fetchGroupLivestreamsWithStats,
       {
          ...reducedRemoteCallsOptions,
