@@ -13,8 +13,7 @@ import {
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
-import { withFirebase } from "context/firebase/FirebaseServiceContext"
-import PropTypes from "prop-types"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { useEffect, useMemo, useState } from "react"
 import { Copy, ExternalLink } from "react-feather"
 import { useCopyToClipboard } from "react-use"
@@ -31,6 +30,9 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       gap: "24px",
+   },
+   dialog: {
+      maxWidth: 658,
    },
    drawer: {
       borderRadius: "12px 12px 0 0",
@@ -74,26 +76,81 @@ const styles = sxStyles({
    }),
 })
 
-const StreamerLinksDialogContent = ({
+type Props = {
+   livestreamId: string
+   companyName: string
+   companyCountryCode?: string
+   openDialog: boolean
+   onClose: () => void
+}
+
+export const StreamerLinksDialog = ({
    livestreamId,
-   handleClose,
-   firebase,
    companyName,
    companyCountryCode,
-}) => {
-   const [secureToken, setSecureToken] = useState(null)
+   openDialog,
+   onClose,
+}: Props) => {
+   const isMobile = useIsMobile()
+
+   if (isMobile) {
+      return (
+         <SwipeableDrawer
+            open={openDialog}
+            onClose={onClose}
+            onOpen={() => {}}
+            anchor="bottom"
+            PaperProps={{
+               sx: styles.drawer,
+            }}
+         >
+            <StreamerLinksDialogContent
+               livestreamId={livestreamId}
+               onClose={onClose}
+               companyName={companyName}
+               companyCountryCode={companyCountryCode}
+            />
+         </SwipeableDrawer>
+      )
+   }
+
+   return (
+      <Dialog
+         open={openDialog}
+         onClose={onClose}
+         fullWidth={true}
+         maxWidth={"md"}
+         aria-labelledby="form-dialog-title"
+         PaperProps={{
+            sx: styles.dialog,
+         }}
+      >
+         <StreamerLinksDialogContent
+            livestreamId={livestreamId}
+            onClose={onClose}
+            companyName={companyName}
+            companyCountryCode={companyCountryCode}
+         />
+      </Dialog>
+   )
+}
+
+const StreamerLinksDialogContent = ({
+   livestreamId,
+   companyName,
+   companyCountryCode,
+   onClose,
+}: Omit<Props, "openDialog">) => {
+   const [secureToken, setSecureToken] = useState<string | null>(null)
    const [copyToClipboardState, copyToClipboard] = useCopyToClipboard()
 
    useEffect(() => {
       if (livestreamId) {
-         firebase.getLivestreamSecureToken(livestreamId).then((doc) => {
-            if (doc.exists) {
-               const secureToken: string = doc.data().value
-               setSecureToken(secureToken)
-            }
-         })
+         livestreamService
+            .getLivestreamSecureToken(livestreamId)
+            .then(setSecureToken)
       }
-   }, [livestreamId, firebase])
+   }, [livestreamId])
 
    const hostLink = useMemo(
       () =>
@@ -124,11 +181,7 @@ const StreamerLinksDialogContent = ({
          <Stack sx={styles.container}>
             <Box sx={styles.title}>
                <Typography variant="brandedH4">Ready to go?</Typography>
-               <IconButton
-                  color="inherit"
-                  onClick={handleClose}
-                  aria-label="close"
-               >
+               <IconButton color="inherit" onClick={onClose} aria-label="close">
                   <CloseIcon />
                </IconButton>
             </Box>
@@ -194,6 +247,7 @@ const StreamerLinksDialogContent = ({
                   <Divider sx={{ width: "100%" }} />
                   <Button
                      variant="contained"
+                     color="secondary"
                      fullWidth
                      endIcon={<ExternalLink />}
                      href={hostLink}
@@ -209,81 +263,3 @@ const StreamerLinksDialogContent = ({
       </Box>
    )
 }
-
-StreamerLinksDialogContent.propTypes = {
-   handleClose: PropTypes.func,
-   livestreamId: PropTypes.string,
-   companyName: PropTypes.string,
-   companyCountryCode: PropTypes.string,
-   firebase: PropTypes.shape({
-      getLivestreamSecureToken: PropTypes.func,
-   }),
-}
-
-const StreamerLinksDialog = ({
-   firebase,
-   livestreamId,
-   companyName,
-   companyCountryCode,
-   openDialog,
-   onClose,
-}) => {
-   const isMobile = useIsMobile()
-   const handleClose = () => {
-      onClose?.()
-   }
-
-   if (isMobile) {
-      return (
-         <SwipeableDrawer
-            open={openDialog}
-            onClose={handleClose}
-            onOpen={() => {}}
-            anchor="bottom"
-            PaperProps={{
-               sx: styles.drawer,
-            }}
-         >
-            <StreamerLinksDialogContent
-               livestreamId={livestreamId}
-               handleClose={handleClose}
-               firebase={firebase}
-               companyName={companyName}
-               companyCountryCode={companyCountryCode}
-            />
-         </SwipeableDrawer>
-      )
-   }
-
-   return (
-      <Dialog
-         open={openDialog}
-         onClose={handleClose}
-         fullWidth={true}
-         maxWidth={"md"}
-         aria-labelledby="form-dialog-title"
-      >
-         <StreamerLinksDialogContent
-            livestreamId={livestreamId}
-            handleClose={handleClose}
-            firebase={firebase}
-            companyName={companyName}
-            companyCountryCode={companyCountryCode}
-         />
-      </Dialog>
-   )
-}
-
-StreamerLinksDialog.propTypes = {
-   firebase: PropTypes.shape({
-      getLivestreamSecureToken: PropTypes.func,
-   }),
-   onClose: PropTypes.func,
-   livestreamId: PropTypes.string,
-   companyName: PropTypes.string,
-   companyCountryCode: PropTypes.string,
-   openDialog: PropTypes.bool,
-   setOpenDialog: PropTypes.func,
-}
-
-export default withFirebase(StreamerLinksDialog)
