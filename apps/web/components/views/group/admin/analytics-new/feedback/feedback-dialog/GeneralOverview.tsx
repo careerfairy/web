@@ -34,7 +34,7 @@ const styles = sxStyles({
 
 type OverviewContentProps = {
    livestreamStats: LiveStreamStats
-   onRatingQuestionClick?: (ratingId: string) => void
+   onRatingQuestionClick: (ratingId: string) => void
 }
 
 export const GeneralOverviewContent = ({
