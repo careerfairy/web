@@ -11,6 +11,7 @@ import {
    useState,
 } from "react"
 import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
+import { StreamerLinksDialog } from "../enhanced-group-stream-card/StreamerLinksDialog"
 import { LivestreamEventStatus } from "../events-table-new/utils"
 import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
 
@@ -86,6 +87,8 @@ export const EventsViewProvider = ({
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
    const [livestreamToDelete, setLivestreamToDelete] =
       useState<LivestreamEventPublicData | null>(null)
+   const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
+      useState<string | null>(null)
 
    const { push } = useRouter()
 
@@ -141,22 +144,21 @@ export const EventsViewProvider = ({
    )
 
    // Event action handlers
-   const handleEnterLiveStreamRoom = useCallback((stat: LiveStreamStats) => {
-      // Navigate to external view of the livestream
-      alert(
-         `Enter live stream room for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
-   }, [])
+   const handleEnterLiveStreamRoom = useCallback(
+      async (stat: LiveStreamStats) => {
+         if (stat.livestream.isDraft) return
+
+         // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
+         setTargetLivestreamStreamerLinksId(stat.livestream.id)
+      },
+      []
+   )
 
    const handleShareLiveStream = useCallback((stat: LiveStreamStats) => {
-      // Copy livestream link or duplicate functionality
-      alert(
-         `Share live stream for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
+      if (stat.livestream.isDraft) return
+
+      // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
+      setTargetLivestreamStreamerLinksId(stat.livestream.id)
    }, [])
 
    const handleAnalytics = useCallback(
@@ -199,12 +201,10 @@ export const EventsViewProvider = ({
    )
 
    const handleShareRecording = useCallback((stat: LiveStreamStats) => {
-      // Navigate to recording view
-      alert(
-         `Share recording for ${
-            stat.livestream.isDraft ? "draft" : "live stream"
-         }: ${stat.livestream.id}`
-      )
+      if (stat.livestream.isDraft) return
+
+      // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
+      setTargetLivestreamStreamerLinksId(stat.livestream.id)
    }, [])
 
    const handleViewRecording = useCallback((stat: LiveStreamStats) => {
@@ -224,6 +224,10 @@ export const EventsViewProvider = ({
    const handleDeleteDialogClose = useCallback(() => {
       setDeleteDialogOpen(false)
       setLivestreamToDelete(null)
+   }, [])
+
+   const handleCloseStreamerLinksModal = useCallback(() => {
+      setTargetLivestreamStreamerLinksId(null)
    }, [])
 
    const value = useMemo<EventsViewContextValue>(
@@ -272,6 +276,13 @@ export const EventsViewProvider = ({
             open={deleteDialogOpen}
             livestream={livestreamToDelete}
             onClose={handleDeleteDialogClose}
+         />
+         <StreamerLinksDialog
+            livestreamId={targetLivestreamStreamerLinksId}
+            companyName={group?.universityName}
+            companyCountryCode={group?.companyCountry?.id}
+            openDialog={Boolean(targetLivestreamStreamerLinksId)}
+            onClose={handleCloseStreamerLinksModal}
          />
       </EventsViewContext.Provider>
    )

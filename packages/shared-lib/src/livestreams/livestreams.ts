@@ -372,8 +372,9 @@ export interface RecordingToken extends Identifiable {
    sid: string
 }
 
-// Path: /livestreams/{livestreamId}/secureToken
-export interface LivestreamSecureToken extends Identifiable {
+// Path: /livestreams/{livestreamId}/tokens/secureToken
+export interface LivestreamSecureToken {
+   id: "secureToken"
    value: string
 }
 
