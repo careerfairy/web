@@ -846,6 +846,12 @@ export class LivestreamService {
       return newQuestion
    }
 
+   /**
+    * Returns the query for livestream questions without executing it.
+    * Used with usePaginatedCollection for pagination.
+    * @param livestreamId - The unique identifier for the live stream.
+    * @returns Firestore query for questions ordered by votes descending, then by timestamp ascending.
+    */
    getQuestions = async (livestreamId: string) => {
       const questionsRef = query(
          collection(
@@ -858,9 +864,8 @@ export class LivestreamService {
          orderBy("timestamp", "asc")
       ).withConverter(createGenericConverter<LivestreamQuestion>())
 
-      const questions = await getDocs(questionsRef)
-
-      return questions.docs.map((doc) => doc.data())
+      const questionsSnap = await getDocs(questionsRef)
+      return questionsSnap.docs.map((doc) => doc.data())
    }
 
    /**
