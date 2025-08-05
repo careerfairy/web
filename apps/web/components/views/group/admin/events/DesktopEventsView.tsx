@@ -62,7 +62,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
    }
 
    return (
-      <Box>
+      <Box sx={eventsTableStyles.root}>
          <TableContainer sx={eventsTableStyles.tableContainer}>
             <Table sx={eventsTableStyles.table}>
                <TableHead>
@@ -80,7 +80,7 @@ export const DesktopEventsView = ({ stats }: Props) => {
                         direction={getSortDirection("date")}
                         onSort={() => handleTableSort("date")}
                         tooltip="The date when your live stream is scheduled to occur or has already taken place."
-                        width={COLUMN_WIDTHS.date}
+                        minWidth={COLUMN_WIDTHS.date}
                      >
                         Date
                      </SortableHeaderCell>
@@ -134,23 +134,22 @@ export const DesktopEventsView = ({ stats }: Props) => {
                   })}
                </TableBody>
             </Table>
-
-            {totalPages > 1 && (
-               <Stack
-                  direction="row"
-                  justifyContent="flex-end"
-                  sx={eventsTableStyles.paginationContainer}
-               >
-                  <StyledPagination
-                     color="secondary"
-                     size="small"
-                     count={totalPages}
-                     page={currentPage}
-                     onChange={(_, page) => goToPage(page)}
-                  />
-               </Stack>
-            )}
          </TableContainer>
+         {totalPages > 1 && (
+            <Stack
+               direction="row"
+               justifyContent="flex-end"
+               sx={eventsTableStyles.paginationContainer}
+            >
+               <StyledPagination
+                  color="secondary"
+                  size="small"
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={(_, page) => goToPage(page)}
+               />
+            </Stack>
+         )}
       </Box>
    )
 }

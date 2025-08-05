@@ -27,7 +27,7 @@ import {
 } from "../../../../../helperFunctions/HelperFunctions"
 import PdfReportDownloadDialog from "../PdfReportDownloadDialog"
 import ToolbarActionsDialog from "../ToolbarActionsDialog"
-import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog"
+import { StreamerLinksDialog } from "../enhanced-group-stream-card/StreamerLinksDialog"
 import CompanyLogo from "./CompanyLogo"
 import DeleteEventDialog from "./DeleteEventDialog"
 import GroupLogos from "./GroupLogos"
