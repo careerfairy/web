@@ -50,6 +50,8 @@ type ResponsiveDialogProps = {
    handleClose?: () => unknown
    open: boolean
    children: ReactNode
+   hideDragHandle?: boolean
+   dialogPaperStyles?: SxProps
 }
 
 /**
@@ -59,6 +61,8 @@ export const ResponsiveDialogLayout = ({
    children,
    open,
    handleClose,
+   hideDragHandle,
+   dialogPaperStyles,
 }: ResponsiveDialogProps) => {
    const isMobile = useIsMobile()
 
@@ -73,6 +77,7 @@ export const ResponsiveDialogLayout = ({
             onOpen={() => {}}
             onClose={handleClose}
             disableEnforceFocus
+            hideDragHandle={hideDragHandle}
          >
             {children}
          </BrandedSwipeableDrawer>
@@ -83,6 +88,9 @@ export const ResponsiveDialogLayout = ({
          open={open}
          maxWidth={"md"}
          onClose={handleClose}
+         PaperProps={{
+            sx: dialogPaperStyles,
+         }}
          fullWidth
          disableEnforceFocus
       >

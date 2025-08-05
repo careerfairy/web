@@ -435,4 +435,15 @@ export default class DateUtil {
    static formatEventDate(JSDate: Date | number): string {
       return dayjs(JSDate).format("DD MMM YY, HH:mm")
    }
+
+   /**
+    * Formats a given date to a string in the format "D MMMM YYYY, h:mm A".
+    * This produces the format like "15 December 2024, 5:00 PM".
+    *
+    * @param {Date | number} JSDate - The JavaScript Date object or timestamp to be formatted.
+    * @return {string} - The formatted date string. Example: "15 December 2024, 5:00 PM"
+    */
+   static formatFullDateWithTime(JSDate: Date | number): string {
+      return dayjs(JSDate).format("D MMMM YYYY, h:mm A")
+   }
 }

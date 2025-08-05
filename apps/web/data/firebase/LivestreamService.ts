@@ -846,6 +846,23 @@ export class LivestreamService {
       return newQuestion
    }
 
+   getQuestions = async (livestreamId: string) => {
+      const questionsRef = query(
+         collection(
+            FirestoreInstance,
+            "livestreams",
+            livestreamId,
+            "questions"
+         ),
+         orderBy("votes", "desc"),
+         orderBy("timestamp", "asc")
+      ).withConverter(createGenericConverter<LivestreamQuestion>())
+
+      const questions = await getDocs(questionsRef)
+
+      return questions.docs.map((doc) => doc.data())
+   }
+
    /**
     * Toggles the upvote status of a question.
     * @param livestreamRef - Livestream document reference.
