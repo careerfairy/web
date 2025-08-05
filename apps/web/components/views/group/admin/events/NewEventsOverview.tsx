@@ -14,7 +14,7 @@ const NewEventsOverviewContent = () => {
    const groupId = router.query.groupId as string
    const [searchTerm, setSearchTerm] = useState("")
    const isMobile = useIsMobile()
-   const { sortBy } = useEventsView()
+   const { sortBy, statusFilter } = useEventsView()
 
    const {
       data: stats,
@@ -23,6 +23,7 @@ const NewEventsOverviewContent = () => {
    } = useGroupLivestreamsWithStats(groupId, {
       sortBy,
       searchTerm,
+      statusFilter,
    })
 
    return (
