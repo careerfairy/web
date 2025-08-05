@@ -8,12 +8,11 @@ import { Box, ButtonBase, Typography } from "@mui/material"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import { collection, query } from "firebase/firestore"
-import { FC } from "react"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
-import Link from "../../../../../common/Link"
+
 import {
    RatingWithLabel,
    RatingWithLabelSkeleton,
@@ -31,9 +30,13 @@ const styles = sxStyles({
 
 type FeedbacksProps = {
    livestreamStats: LiveStreamStats
-   groupId: string
+   onRatingQuestionClick: (ratingId: string) => void
 }
-const Ratings: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
+
+const Ratings = ({
+   livestreamStats,
+   onRatingQuestionClick,
+}: FeedbacksProps) => {
    const isMobile = useIsMobile()
    const { data: ratings } = useLivestreamRatings(livestreamStats.livestream.id)
 
@@ -52,41 +55,36 @@ const Ratings: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
          </Stack>
          <Stack spacing={2}>
             {ratings.map((rating) => (
-               <Link
-                  href={`/group/${groupId}/admin/analytics/live-streams/feedback/${livestreamStats.livestream.id}/question/${rating.id}`}
+               <Stack
+                  component={ButtonBase}
+                  sx={styles.question}
+                  color="text.primary"
+                  width="100%"
+                  spacing={1}
                   key={rating.id}
-                  noLinkStyle
+                  direction={{
+                     xs: "column",
+                     md: "row",
+                  }}
+                  onClick={() => onRatingQuestionClick(rating.id)}
                >
-                  <Stack
-                     component={ButtonBase}
-                     sx={styles.question}
-                     color="text.primary"
-                     width="100%"
-                     spacing={1}
-                     key={rating.id}
-                     direction={{
-                        xs: "column",
-                        md: "row",
-                     }}
-                  >
-                     <Typography fontSize="1.07rem" variant="body1">
-                        {rating.question}
-                     </Typography>
-                     <Box minWidth={195} width={195}>
-                        <RatingWithLabel
-                           average={
-                              livestreamStats.ratings?.[rating.id]
-                                 ?.averageRating ?? 0
-                           }
-                           numberOfRatings={
-                              livestreamStats.ratings?.[rating.id]
-                                 ?.numberOfRatings ?? 0
-                           }
-                           color={"primary.main"}
-                        />
-                     </Box>
-                  </Stack>
-               </Link>
+                  <Typography fontSize="1.07rem" variant="body1">
+                     {rating.question}
+                  </Typography>
+                  <Box minWidth={195} width={195}>
+                     <RatingWithLabel
+                        average={
+                           livestreamStats.ratings?.[rating.id]
+                              ?.averageRating ?? 0
+                        }
+                        numberOfRatings={
+                           livestreamStats.ratings?.[rating.id]
+                              ?.numberOfRatings ?? 0
+                        }
+                        color={"primary.main"}
+                     />
+                  </Box>
+               </Stack>
             ))}
          </Stack>
       </Stack>

@@ -1,19 +1,18 @@
-import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
-import Ratings, { RatingsSkeleton } from "./Ratings"
-import Questions from "./Questions"
-import Polls from "./Polls"
-import Stack from "@mui/material/Stack"
-import React, { FC } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Box, Typography } from "@mui/material"
-import ExportPdfButton from "../../../common/ExportPDFButton"
+import Collapse from "@mui/material/Collapse"
+import Stack from "@mui/material/Stack"
+import { sxStyles } from "../../../../../../../types/commonTypes"
 import DateUtil from "../../../../../../../util/DateUtil"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
 import { getMaxLineStyles } from "../../../../../../helperFunctions/HelperFunctions"
-import Collapse from "@mui/material/Collapse"
-import GroupQuestions from "./GroupQuestions"
+import ExportPdfButton from "../../../common/ExportPDFButton"
 import { CardVotesSectionSkeleton } from "./CardVotes"
+import GroupQuestions from "./GroupQuestions"
+import Polls from "./Polls"
+import Questions from "./Questions"
+import Ratings, { RatingsSkeleton } from "./Ratings"
 
 const styles = sxStyles({
    time: {
@@ -35,18 +34,21 @@ const styles = sxStyles({
 
 type OverviewContentProps = {
    livestreamStats: LiveStreamStats
-   groupId: string
+   onRatingQuestionClick?: (ratingId: string) => void
 }
 
-export const GeneralOverviewContent: FC<OverviewContentProps> = ({
+export const GeneralOverviewContent = ({
    livestreamStats,
-   groupId,
-}) => {
+   onRatingQuestionClick,
+}: OverviewContentProps) => {
    return (
       <Collapse in={true} timeout={500}>
          <Stack spacing={3}>
             <SuspenseWithBoundary fallback={<RatingsSkeleton />}>
-               <Ratings groupId={groupId} livestreamStats={livestreamStats} />
+               <Ratings
+                  livestreamStats={livestreamStats}
+                  onRatingQuestionClick={onRatingQuestionClick}
+               />
             </SuspenseWithBoundary>
             <Questions livestreamStats={livestreamStats} />
 
@@ -66,10 +68,10 @@ type OverviewTitleProps = {
    livestreamStats: LiveStreamStats
    groupId: string
 }
-export const GeneralOverviewTitle: FC<OverviewTitleProps> = ({
+export const GeneralOverviewTitle = ({
    livestreamStats,
    groupId,
-}) => {
+}: OverviewTitleProps) => {
    const isMobile = useIsMobile()
 
    const title = (
