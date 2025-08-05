@@ -340,6 +340,17 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string,
       reminderTaskId: string
    ): Promise<LivestreamReminderTask | null>
+
+   /**
+    * Deletes a livestream and its associated data
+    * @param livestreamId - The ID of the livestream to delete
+    * @param collection - The collection to delete from ("livestreams" or "draftLivestreams")
+    * @returns A promise that resolves when the livestream has been deleted
+    */
+   deleteLivestream(
+      livestreamId: string,
+      collection: "livestreams" | "draftLivestreams"
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -1400,5 +1411,31 @@ export class LivestreamFunctionsRepository
          .get()
 
       return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async deleteLivestream(
+      livestreamId: string,
+      collection: "livestreams" | "draftLivestreams"
+   ): Promise<void> {
+      // Delete the livestream document from the specified collection
+      const livestreamRef = this.firestore
+         .collection(collection)
+         .doc(livestreamId)
+      await livestreamRef.delete()
+
+      // Delete livestream stats document as well
+      if (collection === "livestreams") {
+         const statsRef = this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("stats")
+            .doc("livestreamStats")
+
+         await statsRef.delete()
+
+         functions.logger.info("Livestream stats deleted", {
+            livestreamId,
+         })
+      }
    }
 }

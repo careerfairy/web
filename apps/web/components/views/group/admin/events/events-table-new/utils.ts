@@ -38,9 +38,23 @@ export const getLivestreamEventStatus = (
    return LivestreamEventStatus.RECORDING
 }
 
+export const getEventTypeName = (status: LivestreamEventStatus) => {
+   switch (status) {
+      case LivestreamEventStatus.DRAFT:
+         return "draft"
+      case LivestreamEventStatus.UPCOMING:
+         return "live stream"
+      case LivestreamEventStatus.RECORDING:
+      case LivestreamEventStatus.NOT_RECORDED:
+         return "recording"
+      default:
+         return "live stream"
+   }
+}
+
 export const getEventDate = (stat: LiveStreamStats): string => {
    if (!stat.livestream.start) {
-      return "No date"
+      return "-"
    }
 
    return DateUtil.formatEventDate(stat.livestream.start.toDate())

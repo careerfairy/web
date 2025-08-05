@@ -5,6 +5,7 @@ import { ShareArrowIconOutlined } from "components/views/common/icons/ShareArrow
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { BarChart2, Edit2, ExternalLink, MessageSquare } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { withStopPropagation } from "util/CommonUtil"
 
 const styles = sxStyles({
    iconButton: {
@@ -76,7 +77,10 @@ export const HoverActionIcons = ({
       >
          {Boolean(onEdit) && (
             <BrandedTooltip title="Edit" placement="top" disableInteractive>
-               <IconButton sx={styles.iconButton} onClick={onEdit}>
+               <IconButton
+                  sx={styles.iconButton}
+                  onClick={withStopPropagation(onEdit)}
+               >
                   <Edit2 />
                </IconButton>
             </BrandedTooltip>
@@ -89,7 +93,7 @@ export const HoverActionIcons = ({
             >
                <IconButton
                   sx={styles.iconButton}
-                  onClick={onEnterLiveStreamRoom}
+                  onClick={withStopPropagation(onEnterLiveStreamRoom)}
                >
                   <ExternalLink />
                </IconButton>
@@ -101,7 +105,10 @@ export const HoverActionIcons = ({
                placement="top"
                disableInteractive
             >
-               <IconButton sx={styles.iconButton} onClick={onShareLiveStream}>
+               <IconButton
+                  sx={styles.iconButton}
+                  onClick={withStopPropagation(onShareLiveStream)}
+               >
                   <ShareArrowIconOutlined />
                </IconButton>
             </BrandedTooltip>
@@ -112,7 +119,10 @@ export const HoverActionIcons = ({
                placement="top"
                disableInteractive
             >
-               <IconButton sx={styles.iconButton} onClick={onShareRecording}>
+               <IconButton
+                  sx={styles.iconButton}
+                  onClick={withStopPropagation(onShareRecording)}
+               >
                   <ShareArrowIconOutlined />
                </IconButton>
             </BrandedTooltip>
@@ -123,7 +133,10 @@ export const HoverActionIcons = ({
                placement="top"
                disableInteractive
             >
-               <IconButton sx={styles.iconButton} onClick={onAnalytics}>
+               <IconButton
+                  sx={styles.iconButton}
+                  onClick={withStopPropagation(onAnalytics)}
+               >
                   <BarChart2 />
                </IconButton>
             </BrandedTooltip>
@@ -134,14 +147,20 @@ export const HoverActionIcons = ({
                placement="top"
                disableInteractive
             >
-               <IconButton sx={styles.iconButton} onClick={onQuestions}>
+               <IconButton
+                  sx={styles.iconButton}
+                  onClick={withStopPropagation(onQuestions)}
+               >
                   <MessageSquare />
                </IconButton>
             </BrandedTooltip>
          )}
          {Boolean(onFeedback) && (
             <BrandedTooltip title="Feedback" placement="top" disableInteractive>
-               <IconButton sx={styles.iconButton} onClick={onFeedback}>
+               <IconButton
+                  sx={styles.iconButton}
+                  onClick={withStopPropagation(onFeedback)}
+               >
                   <FeedbackIcon />
                </IconButton>
             </BrandedTooltip>
