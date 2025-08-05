@@ -29,14 +29,8 @@ export const QuestionCard = ({ question }: Props) => {
       <Stack
          sx={styles.card}
          spacing={2}
-         direction={{
-            xs: "column",
-            md: "row",
-         }}
-         justifyContent={{
-            xs: "flex-start",
-            md: "space-between",
-         }}
+         direction={isMobile ? "column" : "row"}
+         justifyContent={isMobile ? "flex-start" : "space-between"}
          alignItems="start"
       >
          <Typography

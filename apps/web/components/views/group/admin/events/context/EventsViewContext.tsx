@@ -14,7 +14,7 @@ import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-strea
 import { FeedbackDialogProvider } from "../../analytics-new/feedback/feedback-dialog/FeedbackDialogProvider"
 import { StreamerLinksDialog } from "../enhanced-group-stream-card/StreamerLinksDialog"
 import { LivestreamEventStatus } from "../events-table-new/utils"
-import { QuestionsDialog } from "../questions-dialog/QuestionsDialog"
+import { QuestionsDialog } from "../feedback-dialogs/QuestionsDialog"
 import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
 
 type EventsViewContextValue = {
@@ -97,8 +97,6 @@ export const EventsViewProvider = ({
    const [feedbackDialogQuestionId, setFeedbackDialogQuestionId] = useState<
       string | null
    >(null)
-   const [questionsDialogLivestreamId, setQuestionsDialogLivestreamId] =
-      useState<string | null>(null)
    const [questionsDialogLivestream, setQuestionsDialogLivestream] =
       useState<LivestreamEventPublicData | null>(null)
 
@@ -187,7 +185,6 @@ export const EventsViewProvider = ({
    const handleQuestions = useCallback((stat: LiveStreamStats) => {
       if (stat.livestream.isDraft) return
       // Open questions dialog
-      setQuestionsDialogLivestreamId(stat.livestream.id)
       setQuestionsDialogLivestream(stat.livestream)
    }, [])
 
@@ -252,7 +249,6 @@ export const EventsViewProvider = ({
    }, [])
 
    const handleCloseQuestionsDialog = useCallback(() => {
-      setQuestionsDialogLivestreamId(null)
       setQuestionsDialogLivestream(null)
    }, [])
 
@@ -319,7 +315,6 @@ export const EventsViewProvider = ({
          />
 
          <QuestionsDialog
-            livestreamId={questionsDialogLivestreamId}
             livestream={questionsDialogLivestream}
             onClose={handleCloseQuestionsDialog}
          />

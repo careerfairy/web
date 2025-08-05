@@ -142,13 +142,20 @@ const Actions = ({ children }: Pick<ResponsiveDialogProps, "children">) => {
    return <DialogActions sx={styles.dialogActions}>{children}</DialogActions>
 }
 
-const Content = ({ children }: Pick<ResponsiveDialogProps, "children">) => {
+const Content = ({
+   children,
+   sx,
+}: Pick<ResponsiveDialogProps, "children"> & { sx?: SxProps }) => {
    const isMobile = useIsMobile()
 
    if (isMobile) {
-      return <Box sx={styles.dialogContent}>{children}</Box>
+      return <Box sx={combineStyles(styles.dialogContent, sx)}>{children}</Box>
    }
-   return <DialogContent sx={styles.dialogContent}>{children}</DialogContent>
+   return (
+      <DialogContent sx={combineStyles(styles.dialogContent, sx)}>
+         {children}
+      </DialogContent>
+   )
 }
 
 ResponsiveDialogLayout.Header = Header
