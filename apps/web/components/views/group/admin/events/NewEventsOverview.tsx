@@ -27,7 +27,7 @@ const NewEventsOverviewContent = () => {
    })
 
    return (
-      <Stack spacing={1} pt={isMobile ? 2 : 3.5}>
+      <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
          <BrandedSearchField
             value={searchTerm}
             onChange={setSearchTerm}
