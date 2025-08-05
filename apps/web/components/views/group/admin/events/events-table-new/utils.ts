@@ -106,5 +106,5 @@ export const getViewValue = (
    if (eventStatus !== LivestreamEventStatus.RECORDING) return "-"
    if (loading) return "..."
 
-   return totalViews + numberOfParticipants
+   return (totalViews || 0) + (numberOfParticipants || 0)
 }
