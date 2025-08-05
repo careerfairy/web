@@ -3,7 +3,6 @@ import { Box, styled, TableCell, TableRow, Typography } from "@mui/material"
 import { Calendar, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { EventCardPreview } from "./EventCardPreview"
-import { COLUMN_WIDTHS } from "./EventsTableStyles"
 import { QuickActionIcon } from "./QuickActionIcon"
 import { StatusIcon } from "./StatusIcon"
 import { TableHighlighter } from "./TableHighlighter"
@@ -100,10 +99,7 @@ export const EventTableRow = ({
          onBlur={onMouseLeave}
       >
          {/* Title Column */}
-         <TableCell
-            variant="head"
-            sx={[styles.bodyCell, { minWidth: COLUMN_WIDTHS.title }]}
-         >
+         <TableCell variant="head" sx={styles.bodyCell}>
             <CentredBox>
                <EventCardPreview
                   title={stat.livestream.title}
@@ -123,8 +119,8 @@ export const EventTableRow = ({
          </TableCell>
 
          {/* Date Column */}
-         <TableCell>
-            <CentredBox flexShrink={0} width={COLUMN_WIDTHS.date}>
+         <TableCell sx={styles.bodyCell}>
+            <CentredBox flexShrink={0}>
                <TableHighlighter
                   title="Live stream date"
                   direction="row"
@@ -141,15 +137,23 @@ export const EventTableRow = ({
          </TableCell>
 
          {/* Registrations Column */}
-         <TableCell onClick={onRegistrationsClick} sx={{ cursor: "pointer" }}>
+         <TableCell
+            onClick={onRegistrationsClick}
+            sx={[
+               styles.bodyCell,
+               {
+                  cursor: "pointer",
+               },
+            ]}
+         >
             <CentredBox>
                <TableHighlighter
                   title="Registrations"
                   direction="row"
                   alignItems="center"
                   spacing={1}
-                  width={COLUMN_WIDTHS.registrations}
                   color="neutral.600"
+                  width={92}
                >
                   <Box component={User} size={16} />
                   <Typography variant="small">
@@ -160,15 +164,23 @@ export const EventTableRow = ({
          </TableCell>
 
          {/* Views Column */}
-         <TableCell onClick={onViewsClick} sx={{ cursor: "pointer" }}>
+         <TableCell
+            onClick={onViewsClick}
+            sx={[
+               styles.bodyCell,
+               {
+                  cursor: "pointer",
+               },
+            ]}
+         >
             <CentredBox>
                <TableHighlighter
                   title="Views"
                   direction="row"
                   alignItems="center"
                   spacing={1}
-                  width={COLUMN_WIDTHS.views}
                   color="neutral.600"
+                  width={92}
                >
                   <Box component={Eye} size={16} />
                   <Typography variant="small">{"-"}</Typography>
@@ -177,8 +189,8 @@ export const EventTableRow = ({
          </TableCell>
 
          {/* Status Column */}
-         <TableCell>
-            <CentredBox gap={0.5} width={COLUMN_WIDTHS.status}>
+         <TableCell sx={styles.bodyCell}>
+            <CentredBox gap={0.5}>
                <Box p={1}>
                   <StatusIcon status={eventStatus} size={20} />
                </Box>
