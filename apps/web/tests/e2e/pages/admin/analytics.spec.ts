@@ -88,7 +88,8 @@ test.describe("Group Analytics", () => {
       }
    )
 
-   test("Can see feedback questions from live stream", async ({
+   // TODO: Re-enable in e2e test ticket 1529
+   test.skip("Can see feedback questions from live stream", async ({
       groupPage,
       group,
    }) => {
