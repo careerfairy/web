@@ -1,5 +1,6 @@
 import {
    Box,
+   ButtonBase,
    TableCell,
    TableCellProps,
    TableSortLabel,
@@ -176,6 +177,7 @@ export const NonSortableHeaderCell = ({
          {tooltip ? (
             <HeaderColumnWrapper title={tooltip}>
                <Box
+                  component={ButtonBase}
                   sx={[
                      styles.headerColumnButton,
                      active && styles.headerColumnButtonActive,
