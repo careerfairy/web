@@ -11,7 +11,6 @@ import ExportPdfButton from "../../../common/ExportPDFButton"
 import { CardVotesSectionSkeleton } from "./CardVotes"
 import GroupQuestions from "./GroupQuestions"
 import Polls from "./Polls"
-import Questions from "./Questions"
 import Ratings, { RatingsSkeleton } from "./Ratings"
 
 const styles = sxStyles({
@@ -58,7 +57,6 @@ export const GeneralOverviewContent = ({
                   onRatingQuestionClick={onRatingQuestionClick}
                />
             </SuspenseWithBoundary>
-            <Questions livestreamStats={livestreamStats} />
 
             <SuspenseWithBoundary fallback={<CardVotesSectionSkeleton />}>
                <GroupQuestions />

@@ -20,6 +20,9 @@ const styles = sxStyles({
          mobile: 4.75,
       },
    },
+   paper: {
+      maxWidth: 996,
+   },
 })
 
 const generalOverviewKey = 0
@@ -58,6 +61,9 @@ const FeedbackDialog = () => {
          maxWidth="lg"
          fullWidth
          fullScreen={isMobile}
+         PaperProps={{
+            sx: styles.paper,
+         }}
          TransitionProps={{
             unmountOnExit: true,
          }}
