@@ -1,5 +1,6 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { ButtonBase, Stack, Typography } from "@mui/material"
+import { useRecordingViewsSWR } from "components/custom-hook/recordings/useRecordingViewsSWR"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { placeholderBanner } from "constants/images"
 import Image from "next/image"
@@ -9,6 +10,8 @@ import { StatusIcon } from "./events-table-new/StatusIcon"
 import {
    getEventDate,
    getLivestreamEventStatus,
+   getViewValue,
+   LivestreamEventStatus,
 } from "./events-table-new/utils"
 
 const styles = sxStyles({
@@ -47,6 +50,20 @@ type Props = {
 
 export const MobileEventCard = ({ stat, onCardClick }: Props) => {
    const eventStatus = getLivestreamEventStatus(stat.livestream)
+
+   const shouldFetchRecordingViews =
+      eventStatus === LivestreamEventStatus.RECORDING
+
+   const { totalViews, loading } = useRecordingViewsSWR(
+      shouldFetchRecordingViews ? stat.livestream.id : null
+   )
+
+   const viewValue = getViewValue(
+      eventStatus,
+      totalViews,
+      loading,
+      stat.generalStats?.numberOfParticipants
+   )
 
    return (
       <ButtonBase sx={styles.eventCard} onClick={onCardClick} disableRipple>
@@ -93,7 +110,7 @@ export const MobileEventCard = ({ stat, onCardClick }: Props) => {
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
                <Eye size={14} />
-               <Typography variant="xsmall">{"-"}</Typography>
+               <Typography variant="xsmall">{viewValue}</Typography>
             </Stack>
             <StatusIcon status={eventStatus} size={14} />
          </Stack>
