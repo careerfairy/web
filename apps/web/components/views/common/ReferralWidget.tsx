@@ -86,13 +86,13 @@ export const ReferralWidget = ({
          {socials.map((icon) =>
             roundedIcons ? (
                <SocialButtonWithText
-                  onSocialClick={() => onSocialClick(icon.type)}
+                  onSocialClick={() => onSocialClick?.(icon.type)}
                   key={icon.name}
                   {...icon}
                />
             ) : (
                <IconButtonComponent
-                  onSocialClick={() => onSocialClick(icon.type)}
+                  onSocialClick={() => onSocialClick?.(icon.type)}
                   key={icon.name}
                   iconsColor={iconsColor}
                   iconStyle={iconStyle}
@@ -161,7 +161,7 @@ const IconButtonComponent: FC<IconButtonProps> = ({
    </Tooltip>
 )
 
-const handleButtonClick = (onClick: Function, onSocialClick?: Function) => {
+const handleButtonClick = (onClick: () => void, onSocialClick?: () => void) => {
    onClick()
    if (onSocialClick) {
       onSocialClick()
