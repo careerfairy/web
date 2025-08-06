@@ -1,177 +1,167 @@
-import { Group } from "@careerfairy/shared-lib/groups"
-import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import {
    Box,
-   Button,
    Dialog,
    DialogActions,
    DialogContent,
    DialogTitle,
    Grow,
+   IconButton,
    Stack,
-   TextField,
    Typography,
 } from "@mui/material"
-import SanitizedHTML from "components/util/SanitizedHTML"
-import Image from "next/legacy/image"
-import { useSnackbar } from "notistack"
-import { FC, useMemo } from "react"
-import { AnalyticsEvents } from "util/analyticsConstants"
-import { sxStyles } from "../../../types/commonTypes"
-import { dataLayerEvent } from "../../../util/analyticsUtils"
-import { makeGroupCompanyPageUrl } from "../../../util/makeUrls"
-import useSocials, { SocialPlatformObject } from "../../custom-hook/useSocials"
+
+import { Group } from "@careerfairy/shared-lib/groups"
+import { useTheme } from "@mui/styles"
+import useCompanyPageSocials from "components/custom-hook/useCompanyPageSocials"
+import { SocialPlatformType } from "components/custom-hook/useSocials"
+import ReferralWidget from "components/views/common/ReferralWidget"
+import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
 import {
-   copyStringToClipboard,
-   getMaxLineStyles,
-   getResizedUrl,
-} from "../../helperFunctions/HelperFunctions"
-import ReferralWidget from "./ReferralWidget"
+   CheckCircle as CheckIcon,
+   X as CloseIcon,
+   Copy as CopyIcon,
+} from "react-feather"
+import { useCopyToClipboard } from "react-use"
+import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
+   titleContainer: {
+      display: "flex",
+      justifyContent: "space-between",
+   },
    title: {
-      textTransform: "uppercase",
-      fontWeight: "800",
+      display: "flex",
+      alignItems: "center",
    },
-   body2: {
-      fontSize: "1rem",
-      mb: 3,
+   shareIcon: {
+      color: "transparent",
    },
-   imageBox: {
+   dialogContent: {
+      borderTop: "none",
+      display: "grid",
+      placeItems: "center",
+   },
+   dialogActions: {
       p: 0,
-      "& img": {
-         height: 50,
+   },
+   copyContainer: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      py: "32px",
+      "&.MuiBox-root": {
+         transition: (theme) => theme.transitions.create("background-color"),
+         "&:hover": {
+            backgroundColor: "grey.main",
+            cursor: "pointer",
+         },
       },
    },
-   titleBox: {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
+   copyText: {
+      ml: "10px",
+      color: "neutral.700",
    },
-   companyDescription: {
-      ...getMaxLineStyles(3),
+   copiedText: {
+      color: "success.main",
+   },
+   dialogPaper: {
+      maxWidth: 508,
    },
 })
 
 type Props = {
    group: Group
    handleClose: () => void
-   isGroupAdmin?: boolean
+   onShareOptionClick?: (type: SocialPlatformType) => void
 }
 
-const ShareCompanyPageDialog: FC<Props> = ({
+export const ShareCompanyPageDialog = ({
    group,
    handleClose,
-   isGroupAdmin,
-}) => {
-   const { enqueueSnackbar } = useSnackbar()
+   onShareOptionClick,
+}: Props) => {
+   const [clipboardState, copyToClipboard] = useCopyToClipboard()
+   const theme = useTheme()
 
-   const companyPageLink = useMemo(() => {
-      return makeGroupCompanyPageUrl(group.universityName, {
-         absoluteUrl: true,
-      })
-   }, [group])
+   const { socials, handleCopy, resetClickedPlatforms } = useCompanyPageSocials(
+      {
+         group,
+         onShareOptionClick,
+      }
+   )
 
-   const socials = useSocials({
-      title: group.universityName,
-      url: companyPageLink,
-      dataLayerEntityName: AnalyticsEvents.Company_Page,
-      message: `Check out ${group.universityName}'s company page on CareerFairy!`,
-      platforms: [
-         SocialPlatformObject.Linkedin,
-         SocialPlatformObject.Facebook,
-         SocialPlatformObject.X,
-         SocialPlatformObject.Email,
-      ],
-   })
-
-   const copyCompanyPageLinkToClipboard = (link: string) => {
-      copyStringToClipboard(link)
-      enqueueSnackbar("Link has been copied to your clipboard", {
-         variant: "success",
-         preventDuplicate: true,
-      })
-      dataLayerEvent(AnalyticsEvents.CompanyPageShare, {
-         medium: "Copy Link",
-      })
+   const handleCloseDialog = () => {
+      handleClose()
+      resetClickedPlatforms() // Reset analytics deduplication when dialog closes
    }
 
-   if (!companyPageLink) return null
+   const copyCompanyPageLinkToClipboard = () => {
+      const sourceLink = handleCopy()
+      copyToClipboard(sourceLink)
+   }
 
    return (
       <Dialog
-         maxWidth="md"
          scroll="paper"
          fullWidth
          TransitionComponent={Grow}
          open={true}
-         onClose={handleClose}
+         onClose={handleCloseDialog}
+         PaperProps={{
+            sx: styles.dialogPaper,
+         }}
       >
          <DialogTitle>
-            <Typography sx={styles.title}>
-               {isGroupAdmin
-                  ? `Share ${group.universityName} Company Page`
-                  : `Share ${group.universityName}'s Company Page`}
-            </Typography>
-         </DialogTitle>
-         <DialogContent dividers>
-            <Stack spacing={2}>
-               <Typography sx={styles.body2} variant="body2" my={1}>
-                  {isGroupAdmin
-                     ? `Share your company page on your social media channels and with your network of young talent.`
-                     : `Share this company page with your friends and network!`}
-               </Typography>
-               <Box>
-                  <Stack spacing={4} direction="row">
-                     <Box sx={styles.imageBox}>
-                        <Image
-                           src={getResizedUrl(group.logoUrl)}
-                           alt={group.universityName}
-                           width={100}
-                           height={100}
-                           objectFit={"contain"}
-                        />
-                     </Box>
-                     <Box sx={styles.titleBox}>
-                        <Typography fontWeight={800}>
-                           {group.universityName}
-                        </Typography>
-                        <SanitizedHTML
-                           htmlString={group.extraInfo}
-                           sx={styles.companyDescription}
-                           color={"text.secondary"}
-                        />
-                     </Box>
-                  </Stack>
-               </Box>
-               <ReferralWidget socials={socials} noBackgroundColor />
-               <Box sx={{ display: "flex", flexWrap: "wrap" }}>
-                  <TextField
-                     sx={{ flex: 1, marginRight: "10px" }}
-                     variant="outlined"
-                     value={companyPageLink}
-                     disabled
-                  />
-                  <Button
-                     variant="contained"
-                     sx={{ boxShadow: "none" }}
-                     startIcon={<ContentPasteIcon />}
-                     onClick={() =>
-                        copyCompanyPageLinkToClipboard(companyPageLink)
-                     }
+            <Box sx={styles.titleContainer}>
+               <Stack direction="row" alignItems="center" spacing={1.125}>
+                  <ShareArrowIcon sx={styles.shareIcon} />
+                  <Typography
+                     variant="medium"
+                     fontWeight={400}
+                     sx={styles.title}
                   >
-                     Copy
-                  </Button>
-               </Box>
-            </Stack>
+                     Share
+                  </Typography>
+               </Stack>
+               <IconButton onClick={handleCloseDialog}>
+                  <CloseIcon />
+               </IconButton>
+            </Box>
+         </DialogTitle>
+         <DialogContent dividers sx={styles.dialogContent}>
+            <ReferralWidget socials={socials} noBackgroundColor roundedIcons />
          </DialogContent>
-         <DialogActions sx={{ justifyContent: "right" }}>
-            <Button variant="outlined" onClick={handleClose}>
-               Close
-            </Button>
+         <DialogActions sx={styles.dialogActions}>
+            <Box
+               sx={styles.copyContainer}
+               onClick={copyCompanyPageLinkToClipboard}
+            >
+               {clipboardState.value ? (
+                  <>
+                     <CheckIcon color={theme.palette.success.main} />
+                     <Typography
+                        variant="medium"
+                        fontWeight={400}
+                        sx={[styles.copyText, styles.copiedText]}
+                     >
+                        Link copied
+                     </Typography>
+                  </>
+               ) : (
+                  <>
+                     <CopyIcon />
+                     <Typography
+                        variant="medium"
+                        fontWeight={400}
+                        sx={styles.copyText}
+                     >
+                        Copy company link
+                     </Typography>
+                  </>
+               )}
+            </Box>
          </DialogActions>
       </Dialog>
    )
 }
-
-export default ShareCompanyPageDialog

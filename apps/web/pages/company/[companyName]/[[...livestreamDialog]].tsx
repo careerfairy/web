@@ -26,7 +26,6 @@ import {
    GetStaticPathsContext,
    GetStaticProps,
    GetStaticPropsContext,
-   InferGetStaticPropsType,
    NextPage,
 } from "next"
 import { useRouter } from "next/router"
@@ -35,8 +34,8 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerCompanyEvent } from "util/analyticsUtils"
 import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
-import SEO from "../../../components/util/SEO"
 import CompanyPageOverview from "../../../components/views/company-page"
+import { CompanyPageSEO } from "../../../components/views/company-page/CompanyPageSEO"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
@@ -59,7 +58,7 @@ type TrackProps = {
    visitorId: string
 }
 
-const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+const CompanyPage: NextPage<CompanyPageData> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -71,7 +70,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    const { query, isReady } = useRouter()
    const { trackCompanyPageView } = useFirebaseService()
    const { trackEvent } = useCompaniesTracker()
-   const { universityName, id } = deserializeGroupClient(serverSideGroup)
+   const { id } = deserializeGroupClient(serverSideGroup)
 
    const customJobId = query.dialogJobId?.toString() || null
    const interactionSource = query.interactionSource?.toString() || null
@@ -115,9 +114,9 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
             {mappedServerCustomJobs?.map((job) => (
                <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
             ))}
-            <SEO
-               id={`CareerFairy | ${universityName}`}
-               title={`CareerFairy | ${universityName}`}
+            <CompanyPageSEO
+               serverSideGroup={serverSideGroup}
+               pageType="overview"
             />
 
             <GenericDashboardLayout pageDisplayName={""}>
@@ -145,7 +144,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    )
 }
 
-type CompanyPageData = {
+export type CompanyPageData = {
    serverSideGroup: SerializedGroup
    serverSideUpcomingLivestreams: ReturnType<
       typeof LivestreamPresenter.serializeDocument
