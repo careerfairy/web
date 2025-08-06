@@ -74,9 +74,7 @@ export const QuestionsDialog = ({
 
       return questions.map((question) => ({
          Question: question.title,
-         Timestamp: question.timestamp
-            ? DateUtil.formatFullDateWithTime(question.timestamp.toDate())
-            : "N/A",
+         Timestamp: question.timestamp?.toDate?.()?.toISOString() || "N/A",
          Votes: question.votes.toString(),
          "Number of Comments": (question.numberOfComments || 0).toString(),
       }))
