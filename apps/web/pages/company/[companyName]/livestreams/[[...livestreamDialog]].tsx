@@ -1,24 +1,22 @@
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box } from "@mui/material"
 import { TabValue } from "components/views/company-page"
+import { CompanyPageSEO } from "components/views/company-page/CompanyPageSEO"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
-import { GetStaticPaths, InferGetStaticPropsType, NextPage } from "next"
-import SEO from "../../../../components/util/SEO"
+import { LivestreamDialogLayout } from "components/views/livestream-dialog"
+import { GetStaticPaths, NextPage } from "next"
 import CompanyPageOverview from "../../../../components/views/company-page"
-import { LivestreamDialogLayout } from "../../../../components/views/livestream-dialog"
 import GenericDashboardLayout from "../../../../layouts/GenericDashboardLayout"
 import {
    deserializeGroupClient,
    mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../../util/serverUtil"
-import { getCompanyPageData } from "../[[...livestreamDialog]]"
+import { CompanyPageData, getCompanyPageData } from "../[[...livestreamDialog]]"
 
 const PARAMETER_SOURCE = "livestreamDialog"
 
-const LivestreamsPage: NextPage<
-   InferGetStaticPropsType<typeof getStaticProps>
-> = ({
+const LivestreamsPage: NextPage<CompanyPageData> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -27,7 +25,7 @@ const LivestreamsPage: NextPage<
    customJobDialogData,
    groupCreators,
 }) => {
-   const { universityName, id } = deserializeGroupClient(serverSideGroup)
+   const { id } = deserializeGroupClient(serverSideGroup)
 
    return (
       <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
@@ -36,10 +34,9 @@ const LivestreamsPage: NextPage<
             source={{ source: CustomJobApplicationSourceTypes.Group, id: id }}
             dialogSource={PARAMETER_SOURCE}
          >
-            <SEO
-               id={`CareerFairy | ${universityName} | Live streams`}
-               title={`CareerFairy | ${universityName} | Live streams`}
-               description={`Watch live streams of ${universityName} with CareerFairy`}
+            <CompanyPageSEO
+               serverSideGroup={serverSideGroup}
+               pageType="livestreams"
             />
 
             <GenericDashboardLayout pageDisplayName={""}>
