@@ -41,6 +41,14 @@ export const GeneralOverviewContent = ({
    livestreamStats,
    onRatingQuestionClick,
 }: OverviewContentProps) => {
+   if (!livestreamStats)
+      return (
+         <Stack spacing={3}>
+            <RatingsSkeleton />
+            <CardVotesSectionSkeleton />
+         </Stack>
+      )
+
    return (
       <Collapse in={true} timeout={500}>
          <Stack spacing={3}>
@@ -80,13 +88,13 @@ export const GeneralOverviewTitle = ({
          whiteSpace="pre-line"
          variant={isMobile ? "h5" : "h4"}
       >
-         {livestreamStats.livestream.title}
+         {livestreamStats?.livestream?.title}
       </Typography>
    )
 
    const time = (
       <Typography sx={styles.time} color="text.secondary">
-         {DateUtil.dateWithYear(livestreamStats.livestream.start.toDate())}
+         {DateUtil.dateWithYear(livestreamStats?.livestream?.start.toDate())}
       </Typography>
    )
 
@@ -107,7 +115,7 @@ export const GeneralOverviewTitle = ({
          </Box>
          <Box sx={styles.buttonWrapper}>
             <ExportPdfButton
-               livestreamId={livestreamStats.livestream.id}
+               livestreamId={livestreamStats?.livestream?.id}
                size={isMobile ? "small" : "medium"}
                groupId={groupId}
                sx={styles.exportButton}

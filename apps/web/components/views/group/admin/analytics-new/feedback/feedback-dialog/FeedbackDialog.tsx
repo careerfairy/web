@@ -1,12 +1,14 @@
-import { Dialog, DialogContent, Slide } from "@mui/material"
+import { Dialog, DialogContent } from "@mui/material"
 import { useMemo } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { AnimatedTabPanel } from "../../../../../../../materialUI/GlobalPanels/GlobalPanels"
 import { sxStyles } from "../../../../../../../types/commonTypes"
-import useGroupLivestreamStat from "../../../../../../custom-hook/live-stream/useGroupLivestreamStat"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { useListenToDocument } from "components/custom-hook/useListenToDocument"
+import { SlideUpTransition } from "components/views/common/transitions"
 import { useFeedbackDialogContext } from "./FeedbackDialogProvider"
 import { GeneralOverviewContent, GeneralOverviewTitle } from "./GeneralOverview"
 import { RatingOverviewContent, RatingOverviewTitle } from "./RatingOverview"
@@ -37,7 +39,9 @@ const FeedbackDialog = () => {
    const { group } = useGroup()
    const isMobile = useIsMobile()
 
-   const { data: stats } = useGroupLivestreamStat(group.id, livestreamId)
+   const { data: livestreamStats } = useListenToDocument<LiveStreamStats>(
+      livestreamId ? `livestreams/${livestreamId}/stats/livestreamStats` : null
+   )
 
    const value = useMemo<Value>(() => {
       if (feedbackQuestionId) {
@@ -46,16 +50,17 @@ const FeedbackDialog = () => {
       return generalOverviewKey
    }, [feedbackQuestionId])
 
-   const livestreamStats = stats?.[0]
-
    return (
       <Dialog
          open={Boolean(livestreamStats)}
          onClose={onCloseFeedbackDialog}
-         TransitionComponent={Slide}
+         TransitionComponent={SlideUpTransition}
          maxWidth="lg"
          fullWidth
          fullScreen={isMobile}
+         TransitionProps={{
+            unmountOnExit: true,
+         }}
       >
          <Title id="feedback-dialog-title" onClose={onCloseFeedbackDialog}>
             <SwipeableViews index={value}>
