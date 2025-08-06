@@ -5,6 +5,7 @@ import {
    DialogContent,
    DialogProps,
    DialogTitle,
+   SwipeableDrawerProps,
    SxProps,
 } from "@mui/material"
 import Box from "@mui/material/Box"
@@ -54,6 +55,8 @@ type ResponsiveDialogProps = {
    hideDragHandle?: boolean
    dialogPaperStyles?: SxProps
    TransitionComponent?: DialogProps["TransitionComponent"]
+   SlideProps?: SwipeableDrawerProps["SlideProps"]
+   TransitionProps?: DialogProps["TransitionProps"]
 }
 
 /**
@@ -66,6 +69,8 @@ export const ResponsiveDialogLayout = ({
    hideDragHandle,
    dialogPaperStyles,
    TransitionComponent,
+   SlideProps,
+   TransitionProps,
 }: ResponsiveDialogProps) => {
    const isMobile = useIsMobile()
 
@@ -81,9 +86,7 @@ export const ResponsiveDialogLayout = ({
             onClose={handleClose}
             disableEnforceFocus
             hideDragHandle={hideDragHandle}
-            SlideProps={{
-               unmountOnExit: true,
-            }}
+            SlideProps={SlideProps}
          >
             {children}
          </BrandedSwipeableDrawer>
@@ -100,9 +103,7 @@ export const ResponsiveDialogLayout = ({
          fullWidth
          disableEnforceFocus
          TransitionComponent={TransitionComponent}
-         TransitionProps={{
-            unmountOnExit: true,
-         }}
+         TransitionProps={TransitionProps}
       >
          {children}
       </Dialog>
