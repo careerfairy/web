@@ -92,3 +92,19 @@ export const getEventActionConditions = (
       shouldShowDelete: true,
    }
 }
+
+/**
+ * Centralized logic for determining the view value to display
+ * Based on event status and recording views data
+ */
+export const getViewValue = (
+   eventStatus: LivestreamEventStatus,
+   totalViews: number,
+   loading: boolean,
+   numberOfParticipants: number = 0
+): string | number => {
+   if (eventStatus !== LivestreamEventStatus.RECORDING) return "-"
+   if (loading) return "..."
+
+   return (totalViews || 0) + (numberOfParticipants || 0)
+}
