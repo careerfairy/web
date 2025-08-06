@@ -6,18 +6,13 @@ import {
 import { Box } from "@mui/material"
 import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import { TabValue } from "components/views/company-page"
+import { CompanyPageSEO } from "components/views/company-page/CompanyPageSEO"
 import { CustomJobDialogProvider } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
 import { fromDate } from "data/firebase/FirebaseInstance"
-import {
-   GetServerSideProps,
-   GetServerSidePropsContext,
-   InferGetServerSidePropsType,
-   NextPage,
-} from "next"
+import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
-import SEO from "../../../../components/util/SEO"
 import CompanyPageOverview from "../../../../components/views/company-page"
 import { LivestreamDialogLayout } from "../../../../components/views/livestream-dialog"
 import GenericDashboardLayout from "../../../../layouts/GenericDashboardLayout"
@@ -27,11 +22,9 @@ import {
    mapCustomJobsFromServerSide,
    mapFromServerSide,
 } from "../../../../util/serverUtil"
-import { getCompanyPageData } from "../[[...livestreamDialog]]"
+import { CompanyPageData, getCompanyPageData } from "../[[...livestreamDialog]]"
 
-const JobsPage: NextPage<
-   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({
+const JobsPage: NextPage<CompanyPageData> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
    serverSidePastLivestreams,
@@ -41,7 +34,7 @@ const JobsPage: NextPage<
    groupCreators,
 }) => {
    const { query } = useRouter()
-   const { universityName, id } = deserializeGroupClient(serverSideGroup)
+   const { id } = deserializeGroupClient(serverSideGroup)
 
    const customJobId = query.dialogJobId?.toString() || null
 
@@ -77,10 +70,9 @@ const JobsPage: NextPage<
                      <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
                   ))
                )}
-               <SEO
-                  id={`CareerFairy | ${universityName} | Jobs`}
-                  title={`CareerFairy | ${universityName} | Jobs`}
-                  description={`Find your dream job at ${universityName} with CareerFairy`}
+               <CompanyPageSEO
+                  serverSideGroup={serverSideGroup}
+                  pageType="jobs"
                />
 
                <GenericDashboardLayout pageDisplayName={""}>

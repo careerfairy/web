@@ -1,12 +1,17 @@
-import React from "react"
-import Button from "@mui/material/Button"
-import { useCompanyPage } from "../"
 import ShareIcon from "@mui/icons-material/ShareOutlined"
-import ShareCompanyPageDialog from "../../common/ShareCompanyPageDialog"
+import Button from "@mui/material/Button"
+import { Fragment } from "react"
+import { useCompanyPage } from "../"
+import { AnalyticsEvents } from "../../../../util/analyticsConstants"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { makeGroupCompanyPageUrl } from "../../../../util/makeUrls"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import useIsMobile from "../../../custom-hook/useIsMobile"
+import { ShareCompanyPageDialog } from "../../common/ShareCompanyPageDialog"
 
 const ShareButton = () => {
-   const { group, editMode } = useCompanyPage()
+   const { group } = useCompanyPage()
+   const isMobile = useIsMobile()
 
    const [
       shareCompanyDialogOpen,
@@ -14,10 +19,50 @@ const ShareButton = () => {
       handleCloseShareCompanyDialog,
    ] = useDialogStateHandler()
 
+   const handleShare = async () => {
+      if (isMobile && navigator?.share) {
+         try {
+            const companyPageUrl = makeGroupCompanyPageUrl(
+               group.universityName,
+               {
+                  absoluteUrl: true,
+               }
+            )
+
+            const utmParams = new URLSearchParams({
+               utm_source: "careerfairy",
+               utm_medium: "mobile",
+               utm_campaign: "company-page",
+               utm_content: group.universityName,
+            })
+
+            const urlWithUtm = `${companyPageUrl}?${utmParams.toString()}`
+
+            await navigator.share({
+               title: group.universityName,
+               text: `Check out ${group.universityName}'s company page on CareerFairy!`,
+               url: urlWithUtm,
+            })
+
+            // Track mobile share directly since it doesn't go through the hook
+            dataLayerEvent(AnalyticsEvents.CompanyPageShare, {
+               medium: "mobile",
+            })
+         } catch (error) {
+            // If native share fails or is cancelled, fallback to dialog
+            if (error.name !== "AbortError") {
+               handleOpenShareCompanyDialog()
+            }
+         }
+      } else {
+         handleOpenShareCompanyDialog()
+      }
+   }
+
    return (
-      <>
+      <Fragment>
          <Button
-            onClick={handleOpenShareCompanyDialog}
+            onClick={handleShare}
             variant={"outlined"}
             size={"medium"}
             color={"primary"}
@@ -29,10 +74,9 @@ const ShareButton = () => {
             <ShareCompanyPageDialog
                group={group}
                handleClose={handleCloseShareCompanyDialog}
-               isGroupAdmin={editMode}
             />
          ) : null}
-      </>
+      </Fragment>
    )
 }
 
