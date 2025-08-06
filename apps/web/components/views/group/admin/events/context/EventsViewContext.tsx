@@ -302,15 +302,13 @@ export const EventsViewProvider = ({
             openDialog={Boolean(targetLivestreamStreamerLinksId)}
             onClose={handleCloseStreamerLinksModal}
          />
-         {feedbackDialogLivestreamId ? (
-            <FeedbackDialogProvider
-               livestreamId={feedbackDialogLivestreamId}
-               feedbackQuestionId={feedbackDialogQuestionId}
-               onCloseFeedbackDialog={handleCloseFeedbackDialog}
-               onRatingQuestionClick={handleFeedbackRatingQuestionClick}
-               onBackToFeedback={handleFeedbackBackToFeedback}
-            />
-         ) : null}
+         <FeedbackDialogProvider
+            livestreamId={feedbackDialogLivestreamId}
+            feedbackQuestionId={feedbackDialogQuestionId}
+            onCloseFeedbackDialog={handleCloseFeedbackDialog}
+            onRatingQuestionClick={handleFeedbackRatingQuestionClick}
+            onBackToFeedback={handleFeedbackBackToFeedback}
+         />
       </EventsViewContext.Provider>
    )
 }

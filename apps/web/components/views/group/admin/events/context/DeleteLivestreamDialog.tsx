@@ -2,6 +2,7 @@ import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams/l
 import { Box } from "@mui/material"
 import { getGroupLivestreamsWithStatsKey } from "components/custom-hook/live-stream/useGroupLivestreamsWithStats"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { SlideUpTransition } from "components/views/common/transitions"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
@@ -101,6 +102,7 @@ export const DeleteLivestreamDialog = ({
             color: "grey",
             fullWidth: true,
          }}
+         TransitionComponent={SlideUpTransition}
       />
    )
 }
