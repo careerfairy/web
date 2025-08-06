@@ -102,6 +102,12 @@ export const QuestionsDialog = ({
             maxWidth: 1100,
          }}
          TransitionComponent={SlideUpTransition}
+         SlideProps={{
+            unmountOnExit: true,
+         }}
+         TransitionProps={{
+            unmountOnExit: true,
+         }}
       >
          <Header
             title={livestream?.title}
