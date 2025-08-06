@@ -13,6 +13,7 @@ import {
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import { SlideUpTransition } from "components/views/common/transitions"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useEffect, useMemo, useState } from "react"
 import { Copy, ExternalLink } from "react-feather"
@@ -124,6 +125,7 @@ export const StreamerLinksDialog = ({
          PaperProps={{
             sx: styles.dialog,
          }}
+         TransitionComponent={SlideUpTransition}
       >
          <StreamerLinksDialogContent
             livestreamId={livestreamId}
