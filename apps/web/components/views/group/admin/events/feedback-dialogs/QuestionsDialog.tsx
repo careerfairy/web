@@ -31,8 +31,8 @@ const styles = sxStyles({
 })
 
 type QuestionsDialogProps = {
-   livestream?: LivestreamEventPublicData
-   onClose?: () => void
+   livestream: LivestreamEventPublicData | null
+   onClose: () => void
 }
 
 const ITEMS_PER_PAGE = 7
