@@ -2,18 +2,19 @@ import {
    LivestreamEvent,
    LivestreamEventPublicData,
 } from "@careerfairy/shared-lib/livestreams"
-import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
 import { useAllLivestreamQuestions } from "components/custom-hook/streaming/question/useAllLivestreamQuestions"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { CSVDialogDownload } from "components/custom-hook/useMetaDataActions"
 import useClientSideInfiniteScroll from "components/custom-hook/utils/useClientSideInfiniteScroll"
 import useClientSidePagination from "components/custom-hook/utils/useClientSidePagination"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
+import { SlideUpTransition } from "components/views/common/transitions"
 import { DownloadCloud } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { StyledPagination } from "../../common/CardCustom"
-import { QuestionCard } from "./QuestionCard"
+import { QuestionCard, QuestionCardSkeleton } from "./QuestionCard"
 import { Content, Header } from "./common"
 
 const styles = sxStyles({
@@ -22,15 +23,10 @@ const styles = sxStyles({
       justifyContent: "flex-end",
       alignItems: "center",
       mt: 3,
-      pb: 4,
    },
    loadMoreTrigger: {
       height: "100px",
       width: "100%",
-   },
-   skeletonCard: {
-      borderRadius: 2,
-      mb: { xs: 0.75, md: 1.5 },
    },
 })
 
@@ -105,6 +101,7 @@ export const QuestionsDialog = ({
          dialogPaperStyles={{
             maxWidth: 1100,
          }}
+         TransitionComponent={SlideUpTransition}
       >
          <Header
             title={livestream?.title}
@@ -113,79 +110,79 @@ export const QuestionsDialog = ({
          />
 
          <Content>
-            <Stack
-               direction="row"
-               spacing={1}
-               justifyContent="space-between"
-               pb={{ xs: 1.5, md: 3 }}
-            >
-               <Typography
-                  variant={isMobile ? "medium" : "brandedH5"}
-                  fontWeight="600"
-                  color="neutral.800"
+            <Box pb={4}>
+               <Stack
+                  direction="row"
+                  spacing={1}
+                  justifyContent="space-between"
+                  alignItems="center"
+                  pb={{ xs: 1.5, md: 3 }}
                >
-                  Questions
-               </Typography>
-               <CSVDialogDownload
-                  title="Download Questions"
-                  data={formatQuestionsForCSV()}
-                  filename={`Questions ${livestream?.title || livestream?.id} ${
-                     new Date().toISOString().split("T")[0]
-                  }.csv`}
-               >
-                  <Button
-                     variant="outlined"
-                     color="grey"
-                     size="small"
-                     startIcon={<DownloadCloud size={16} />}
+                  <Typography
+                     variant={isMobile ? "medium" : "brandedH5"}
+                     fontWeight="600"
+                     color="neutral.800"
                   >
-                     {isMobile ? "Download" : "Download questions"}
-                  </Button>
-               </CSVDialogDownload>
-            </Stack>
-
-            <Stack spacing={isMobile ? 0.75 : 1.5}>
-               {isLoading ? (
-                  // Loading skeleton cards
-                  Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
-                     <Box key={index} sx={styles.skeletonCard}>
-                        <Skeleton
-                           variant="rectangular"
-                           height={isMobile ? 80 : 100}
-                           sx={{ borderRadius: 2 }}
-                        />
-                     </Box>
-                  ))
-               ) : displayQuestions.length === 0 ? (
-                  <Typography py={6} color="neutral.400" variant="medium">
-                     No questions have been submitted for this event yet.
+                     Questions
                   </Typography>
-               ) : (
-                  displayQuestions.map((question) => (
-                     <QuestionCard key={question.id} question={question} />
-                  ))
-               )}
+                  <CSVDialogDownload
+                     title="Download Questions"
+                     data={formatQuestionsForCSV()}
+                     filename={`Questions ${
+                        livestream?.title || livestream?.id
+                     } ${new Date().toISOString().split("T")[0]}.csv`}
+                  >
+                     <Button
+                        variant="outlined"
+                        color="grey"
+                        size="small"
+                        startIcon={<DownloadCloud size={16} />}
+                     >
+                        {isMobile ? "Download" : "Download questions"}
+                     </Button>
+                  </CSVDialogDownload>
+               </Stack>
 
-               {/* Mobile infinite scroll trigger */}
-               {Boolean(isMobile && hasMore) && (
-                  <Box ref={ref} sx={styles.loadMoreTrigger} />
-               )}
-            </Stack>
+               <Stack spacing={isMobile ? 0.75 : 1.5}>
+                  {isLoading || !livestream ? (
+                     <Loader />
+                  ) : displayQuestions.length === 0 ? (
+                     <Typography py={6} color="neutral.400" variant="medium">
+                        No questions have been submitted for this event yet.
+                     </Typography>
+                  ) : (
+                     displayQuestions.map((question) => (
+                        <QuestionCard key={question.id} question={question} />
+                     ))
+                  )}
 
-            {/* Desktop pagination */}
-            {!isMobile && totalPages > 1 && (
-               <Box sx={styles.paginationContainer}>
-                  <StyledPagination
-                     color="secondary"
-                     page={currentPage}
-                     count={totalPages}
-                     onChange={(_, page) => goToPage(page)}
-                     siblingCount={1}
-                     boundaryCount={1}
-                  />
-               </Box>
-            )}
+                  {/* Mobile infinite scroll trigger */}
+                  {Boolean(isMobile && hasMore) && (
+                     <Box ref={ref} sx={styles.loadMoreTrigger} />
+                  )}
+               </Stack>
+
+               {/* Desktop pagination */}
+               {!isMobile && totalPages > 1 && (
+                  <Box sx={styles.paginationContainer}>
+                     <StyledPagination
+                        color="secondary"
+                        page={currentPage}
+                        count={totalPages}
+                        onChange={(_, page) => goToPage(page)}
+                        siblingCount={1}
+                        boundaryCount={1}
+                     />
+                  </Box>
+               )}
+            </Box>
          </Content>
       </ResponsiveDialogLayout>
    )
+}
+
+const Loader = () => {
+   return Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+      <QuestionCardSkeleton key={index} />
+   ))
 }

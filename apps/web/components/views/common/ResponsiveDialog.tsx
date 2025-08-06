@@ -3,6 +3,7 @@ import {
    Dialog,
    DialogActions,
    DialogContent,
+   DialogProps,
    DialogTitle,
    SxProps,
 } from "@mui/material"
@@ -52,6 +53,7 @@ type ResponsiveDialogProps = {
    children: ReactNode
    hideDragHandle?: boolean
    dialogPaperStyles?: SxProps
+   TransitionComponent?: DialogProps["TransitionComponent"]
 }
 
 /**
@@ -63,6 +65,7 @@ export const ResponsiveDialogLayout = ({
    handleClose,
    hideDragHandle,
    dialogPaperStyles,
+   TransitionComponent,
 }: ResponsiveDialogProps) => {
    const isMobile = useIsMobile()
 
@@ -78,6 +81,9 @@ export const ResponsiveDialogLayout = ({
             onClose={handleClose}
             disableEnforceFocus
             hideDragHandle={hideDragHandle}
+            SlideProps={{
+               unmountOnExit: true,
+            }}
          >
             {children}
          </BrandedSwipeableDrawer>
@@ -93,6 +99,10 @@ export const ResponsiveDialogLayout = ({
          }}
          fullWidth
          disableEnforceFocus
+         TransitionComponent={TransitionComponent}
+         TransitionProps={{
+            unmountOnExit: true,
+         }}
       >
          {children}
       </Dialog>
@@ -117,6 +127,7 @@ const Header = ({
             color="inherit"
             onClick={handleClose}
             aria-label="close"
+            className="close-button"
             sx={styles.closeButton}
          >
             <CloseIcon />

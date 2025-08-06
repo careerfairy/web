@@ -1,4 +1,4 @@
-import { iconButtonClasses, Stack, Typography } from "@mui/material"
+import { Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { ReactNode } from "react"
@@ -12,7 +12,7 @@ export const styles = sxStyles({
       px: { xs: 1.5, md: 4 },
       pt: { xs: 1.5, md: 4 },
       position: "relative",
-      [`& .${iconButtonClasses.root}`]: {
+      "& .close-button": {
          position: "absolute",
          top: {
             xs: 12,
