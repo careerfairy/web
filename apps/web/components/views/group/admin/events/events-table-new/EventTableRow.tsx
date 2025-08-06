@@ -1,5 +1,6 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Box, styled, TableCell, TableRow, Typography } from "@mui/material"
+import { useRecordingViewsSWR } from "components/custom-hook/recordings/useRecordingViewsSWR"
 import { Calendar, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { withStopPropagation } from "util/CommonUtil"
@@ -10,6 +11,7 @@ import { TableHighlighter } from "./TableHighlighter"
 import {
    getEventDate,
    getLivestreamEventStatus,
+   getViewValue,
    LivestreamEventStatus,
 } from "./utils"
 
@@ -94,6 +96,20 @@ export const EventTableRow = ({
    onViewsClick,
 }: EventTableRowProps) => {
    const eventStatus = getLivestreamEventStatus(stat.livestream)
+
+   const shouldFetchRecordingViews =
+      eventStatus === LivestreamEventStatus.RECORDING
+
+   const { totalViews, loading } = useRecordingViewsSWR(
+      shouldFetchRecordingViews ? stat.livestream.id : null
+   )
+
+   const viewValue = getViewValue(
+      eventStatus,
+      totalViews,
+      loading,
+      stat.generalStats?.numberOfParticipants
+   )
 
    return (
       <TableRow
@@ -188,7 +204,7 @@ export const EventTableRow = ({
                   }
                >
                   <Box component={Eye} size={16} />
-                  <Typography variant="small">{"-"}</Typography>
+                  <Typography variant="small">{viewValue}</Typography>
                </TableHighlighter>
             </CentredBox>
          </TableCell>
