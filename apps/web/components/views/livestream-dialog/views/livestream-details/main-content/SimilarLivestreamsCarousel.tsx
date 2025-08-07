@@ -38,14 +38,16 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
 }) => {
    const recommendedEventsConfig = useMemo(
       () => ({
-         limit: 4,
+         limit: 4 as const,
          referenceLivestreamId: currentLivestream.id,
          suspense: true,
       }),
       [currentLivestream.id]
    )
 
-   const { events: similarEvents, loading } = useRecommendedEvents(recommendedEventsConfig)
+   const { events: similarEvents, loading } = useRecommendedEvents(
+      recommendedEventsConfig
+   )
 
    // Don't render if no events or still loading
    if (loading || !similarEvents?.length) {
