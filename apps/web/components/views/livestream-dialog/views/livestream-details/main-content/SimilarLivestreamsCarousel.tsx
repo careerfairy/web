@@ -5,6 +5,7 @@ import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
+import Section from "./Section"
 import SectionTitle from "./SectionTitle"
 
 const styles = sxStyles({
@@ -52,21 +53,23 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
    }
 
    return (
-      <Box>
-         <SectionTitle>Similar live streams</SectionTitle>
-         <Box sx={styles.carouselWrapper}>
-            <EventsPreviewCarousel
-               title={null} // We already have the section title above
-               events={similarEvents}
-               location={`livestream-dialog-similar-events-carousel-${currentLivestream.id}`}
-               isRecommended
-               isEmbedded
-               styling={{
-                  padding: false,
-               }}
-            />
+      <Section>
+         <Box>
+            <SectionTitle>Similar live streams</SectionTitle>
+            <Box sx={styles.carouselWrapper}>
+               <EventsPreviewCarousel
+                  title={null} // We already have the section title above
+                  events={similarEvents}
+                  location={`livestream-dialog-similar-events-carousel-${currentLivestream.id}`}
+                  isRecommended
+                  isEmbedded
+                  styling={{
+                     padding: false,
+                  }}
+               />
+            </Box>
          </Box>
-      </Box>
+      </Section>
    )
 }
 
