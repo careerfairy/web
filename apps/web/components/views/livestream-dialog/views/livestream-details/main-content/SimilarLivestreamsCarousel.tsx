@@ -3,7 +3,7 @@ import { Box } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { FC } from "react"
+import { FC, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import SectionTitle from "./SectionTitle"
 
@@ -39,11 +39,16 @@ const SimilarLivestreamsCarousel: FC<SimilarLivestreamsCarouselProps> = ({
 const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
    currentLivestream,
 }) => {
-   const { events: similarEvents, loading } = useRecommendedEvents({
-      limit: 4,
-      referenceLivestreamId: currentLivestream.id,
-      suspense: true,
-   })
+   const recommendedEventsConfig = useMemo(
+      () => ({
+         limit: 4,
+         referenceLivestreamId: currentLivestream.id,
+         suspense: true,
+      }),
+      [currentLivestream.id]
+   )
+
+   const { events: similarEvents, loading } = useRecommendedEvents(recommendedEventsConfig)
 
    // Don't render if no events or still loading
    if (loading || !similarEvents?.length) {
