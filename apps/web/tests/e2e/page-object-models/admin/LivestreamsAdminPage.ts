@@ -62,15 +62,6 @@ export class LivestreamsAdminPage extends CommonPage {
       await this.applyFilterButton.click()
    }
 
-   // Legacy methods for backward compatibility (now use status filtering)
-   public async clickDraftsTab() {
-      await this.filterByStatus("Draft")
-   }
-
-   public async clickUpcomingTab() {
-      await this.filterByStatus("Published")
-   }
-
    // Method to click on a specific event by title (navigates to edit page)
    public async clickEventToEditByTitle(title: string) {
       // Find the table cell containing the specific title and click on it
