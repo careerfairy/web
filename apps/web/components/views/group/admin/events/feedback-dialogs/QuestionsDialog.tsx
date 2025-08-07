@@ -91,6 +91,7 @@ export const QuestionsDialog = ({
          TransitionProps={{
             unmountOnExit: true,
          }}
+         dataTestId="livestream-questions-dialog"
       >
          <Header
             title={livestream?.title}
