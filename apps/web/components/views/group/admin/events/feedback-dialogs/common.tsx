@@ -3,6 +3,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { ReactNode } from "react"
 import { sxStyles } from "types/commonTypes"
+import DateUtil from "util/DateUtil"
 
 export const styles = sxStyles({
    dialog: {
@@ -33,7 +34,7 @@ export const styles = sxStyles({
 
 type HeaderProps = {
    title?: string
-   start?: string
+   start?: Date
    onClose: () => void
 }
 
@@ -47,7 +48,7 @@ export const Header = ({ title, start, onClose }: HeaderProps) => {
       <ResponsiveDialogLayout.Header sx={styles.header} handleClose={onClose}>
          <Stack spacing={0.5}>
             <Typography variant="small" color="neutral.400">
-               {start}
+               {DateUtil.formatFullDateWithTime(start)}
             </Typography>
             <Typography
                color="neutral.800"
