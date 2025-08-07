@@ -63,8 +63,8 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
                title={null} // We already have the section title above
                events={similarEvents}
                location={`livestream-dialog-similar-events-carousel-${currentLivestream.id}`}
-               isRecommended={true}
-               isEmbedded={true}
+               isRecommended
+               isEmbedded
                styling={{
                   mainWrapperBoxSx: {
                      // Remove margin-top as requested
