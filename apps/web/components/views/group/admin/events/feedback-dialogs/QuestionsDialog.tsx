@@ -1,7 +1,4 @@
-import {
-   LivestreamEvent,
-   LivestreamEventPublicData,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import { useAllLivestreamQuestions } from "components/custom-hook/streaming/question/useAllLivestreamQuestions"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -12,7 +9,6 @@ import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog
 import { SlideUpTransition } from "components/views/common/transitions"
 import { DownloadCloud } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import DateUtil from "util/DateUtil"
 import { StyledPagination } from "../../common/CardCustom"
 import { QuestionCard, QuestionCardSkeleton } from "./QuestionCard"
 import { Content, Header } from "./common"
@@ -80,17 +76,6 @@ export const QuestionsDialog = ({
       }))
    }
 
-   const formatDate = (timestamp: LivestreamEvent["start"]) => {
-      if (!timestamp) return ""
-      try {
-         const date = timestamp.toDate()
-         return DateUtil.formatFullDateWithTime(date)
-      } catch (error) {
-         console.error("Error formatting date", error)
-         return ""
-      }
-   }
-
    return (
       <ResponsiveDialogLayout
          open={Boolean(livestream?.id)}
@@ -109,7 +94,7 @@ export const QuestionsDialog = ({
       >
          <Header
             title={livestream?.title}
-            start={formatDate(livestream?.start)}
+            start={livestream?.start?.toDate?.()}
             onClose={onClose}
          />
 
@@ -152,7 +137,8 @@ export const QuestionsDialog = ({
                      <Loader />
                   ) : displayQuestions.length === 0 ? (
                      <Typography py={6} color="neutral.400" variant="medium">
-                        No questions have been submitted for this event yet.
+                        No questions have been submitted for this live stream
+                        yet.
                      </Typography>
                   ) : (
                      displayQuestions.map((question) => (
