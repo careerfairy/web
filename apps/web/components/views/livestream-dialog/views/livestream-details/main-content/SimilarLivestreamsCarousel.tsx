@@ -1,7 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
+import useSimilarLivestreams from "components/custom-hook/useSimilarLivestreams"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
 import { FC, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -26,27 +25,22 @@ type SimilarLivestreamsCarouselProps = {
 const SimilarLivestreamsCarousel: FC<SimilarLivestreamsCarouselProps> = ({
    currentLivestream,
 }) => {
-   return (
-      <SuspenseWithBoundary fallback={null}>
-         <SimilarLivestreamsContent currentLivestream={currentLivestream} />
-      </SuspenseWithBoundary>
-   )
+   return <SimilarLivestreamsContent currentLivestream={currentLivestream} />
 }
 
 const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
    currentLivestream,
 }) => {
-   const recommendedEventsConfig = useMemo(
+   const similarLivestreamsConfig = useMemo(
       () => ({
          limit: 4 as const,
-         referenceLivestreamId: currentLivestream.id,
-         suspense: true,
+         currentLivestream,
       }),
-      [currentLivestream.id]
+      [currentLivestream]
    )
 
-   const { events: similarEvents, loading } = useRecommendedEvents(
-      recommendedEventsConfig
+   const { events: similarEvents, loading } = useSimilarLivestreams(
+      similarLivestreamsConfig
    )
 
    // Don't render if no events or still loading
