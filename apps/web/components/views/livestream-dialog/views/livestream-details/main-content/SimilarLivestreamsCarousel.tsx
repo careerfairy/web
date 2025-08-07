@@ -8,12 +8,8 @@ import { sxStyles } from "types/commonTypes"
 import SectionTitle from "./SectionTitle"
 
 const styles = sxStyles({
-   carouselContainer: {
-      // Remove unnecessary margin since Section component provides spacing
-   },
    carouselWrapper: {
       "& > div": {
-         // Target the carousel wrapper to remove default margins and padding
          marginLeft: 0,
          marginRight: 0,
          paddingLeft: 0,
@@ -56,7 +52,7 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
    }
 
    return (
-      <Box sx={styles.carouselContainer}>
+      <Box>
          <SectionTitle>Similar live streams</SectionTitle>
          <Box sx={styles.carouselWrapper}>
             <EventsPreviewCarousel
@@ -66,14 +62,7 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
                isRecommended
                isEmbedded
                styling={{
-                  mainWrapperBoxSx: {
-                     // Remove margin-top as requested
-                  },
-                  // Remove all default padding since we're in a dialog
                   padding: false,
-                  viewportSx: {
-                     // Remove vertical padding from carousel
-                  },
                }}
             />
          </Box>
