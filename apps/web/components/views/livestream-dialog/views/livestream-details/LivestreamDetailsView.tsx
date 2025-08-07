@@ -184,6 +184,4 @@ const LivestreamDetailsView = () => {
    )
 }
 
-const FloatingButtonOffset = () => <Box height={90} />
-
 export default LivestreamDetailsView
