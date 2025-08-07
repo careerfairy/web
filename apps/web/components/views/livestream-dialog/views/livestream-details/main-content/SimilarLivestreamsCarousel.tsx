@@ -1,5 +1,5 @@
-import { ImpressionLocation, LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Typography } from "@mui/material"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Box } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
