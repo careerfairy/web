@@ -1,10 +1,30 @@
-import { expect } from "@playwright/test"
+import { expect, Locator } from "@playwright/test"
 import { CommonPage } from "../CommonPage"
 import { GroupDashboardPage } from "../GroupDashboardPage"
 
 export class LivestreamsAdminPage extends CommonPage {
+   // Locator constants
+   public readonly statusFilterButton: Locator
+   public readonly applyFilterButton: Locator
+   public readonly searchField: Locator
+   public readonly livestreamQuestionsDialog: Locator
+   public readonly csvDownloadDialog: Locator
+
    constructor(private readonly parent: GroupDashboardPage) {
       super(parent.page)
+
+      // Initialize locators
+      this.statusFilterButton = this.page.getByRole("button", {
+         name: "Status",
+      })
+      this.applyFilterButton = this.page.getByRole("button", { name: "Apply" })
+      this.searchField = this.page.getByPlaceholder(
+         "Search by title or company"
+      )
+      this.livestreamQuestionsDialog = this.page.getByTestId(
+         "livestream-questions-dialog"
+      )
+      this.csvDownloadDialog = this.page.getByTestId("csv-download-dialog")
    }
 
    // Status filter methods for the new table structure
@@ -12,18 +32,18 @@ export class LivestreamsAdminPage extends CommonPage {
       status: "Published" | "Draft" | "Recorded" | "Recording not available"
    ) {
       // Click on the Status filter header to open the dropdown
-      await this.page.getByRole("button", { name: "Status" }).click()
+      await this.statusFilterButton.click()
 
       // Select the specific status option
       await this.page.getByRole("menuitem", { name: status }).click()
 
       // Click Apply button
-      await this.page.getByRole("button", { name: "Apply" }).click()
+      await this.applyFilterButton.click()
    }
 
    public async clearStatusFilter() {
       // Click on the Status filter header to open the dropdown
-      await this.page.getByRole("button", { name: "Status" }).click()
+      await this.statusFilterButton.click()
 
       // Uncheck all selected options
       const checkboxes = this.page.locator(
@@ -39,7 +59,7 @@ export class LivestreamsAdminPage extends CommonPage {
       }
 
       // Click Apply button
-      await this.page.getByRole("button", { name: "Apply" }).click()
+      await this.applyFilterButton.click()
    }
 
    // Legacy methods for backward compatibility (now use status filtering)
@@ -58,7 +78,7 @@ export class LivestreamsAdminPage extends CommonPage {
       const eventCell = this.page.getByRole("cell", { name: title })
       await eventCell.click()
 
-      // Wait for navigation to the edit page
+      // Wait for navigation to the edit page eg: /group/123/admin/content/live-streams/123
       await this.page.waitForURL(/\/admin\/content\/live-streams\/[^/]+$/)
    }
 
@@ -70,10 +90,7 @@ export class LivestreamsAdminPage extends CommonPage {
 
    // Method to search for events
    public async searchEvents(searchTerm: string) {
-      const searchField = this.page.getByPlaceholder(
-         "Search by title or company"
-      )
-      await searchField.fill(searchTerm)
+      await this.searchField.fill(searchTerm)
    }
 
    // Method to verify event is visible in the table
@@ -88,6 +105,69 @@ export class LivestreamsAdminPage extends CommonPage {
       // Use the same locator pattern as clickEventToEditByTitle for consistency
       const eventCell = this.page.getByRole("cell", { name: title })
       return expect(eventCell).not.toBeVisible()
+   }
+
+   // Action button methods
+   public async hoverOverEventRow(title: string) {
+      const eventRow = this.page.getByRole("row").filter({
+         hasText: title,
+      })
+      await eventRow.hover()
+   }
+
+   public async clickActionButton(
+      action:
+         | "edit"
+         | "enter-livestream"
+         | "share-livestream"
+         | "share-recording"
+         | "analytics"
+         | "questions"
+         | "feedback"
+   ) {
+      const testId = `hover-action-${action}`
+      const actionButton = this.page.getByTestId(testId).first()
+      await actionButton.click()
+   }
+
+   // Dialog interaction methods
+   public async waitForQuestionsDialog() {
+      await this.livestreamQuestionsDialog.waitFor({ state: "visible" })
+   }
+
+   public async closeQuestionsDialog() {
+      const closeButton = this.livestreamQuestionsDialog
+         .getByRole("button", { name: "Close" })
+         .first()
+      await closeButton.click()
+   }
+
+   public async downloadQuestions() {
+      const downloadButton = this.livestreamQuestionsDialog.getByRole(
+         "button",
+         {
+            name: /Download questions?/,
+         }
+      )
+
+      await downloadButton.click()
+
+      // Wait for the download confirmation dialog
+      await this.csvDownloadDialog.waitFor({ state: "visible" })
+
+      // Set up download event listener before clicking download
+      const downloadPromise = this.page.waitForEvent("download")
+
+      // Click the Download button in the confirmation dialog
+      await this.csvDownloadDialog
+         .getByRole("button", { name: "Download" })
+         .click()
+
+      // Wait for the download to start
+      const download = await downloadPromise
+
+      // Verify the download filename contains expected text
+      expect(download.suggestedFilename()).toContain(".csv")
    }
 
    public async publish() {

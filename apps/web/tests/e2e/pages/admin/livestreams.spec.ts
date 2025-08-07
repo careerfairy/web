@@ -127,4 +127,48 @@ test.describe("Group Admin Livestreams", () => {
       const addedJobLinks = jobs.map((job) => job.postingUrl)
       await groupPage.assertJobIsAttachedToStream(addedJobLinks)
    })
+
+   test("View and download questions from published livestream", async ({
+      groupPage,
+      group,
+   }) => {
+      const userQuestions = [
+         "What is the interview process like?",
+         "What is the company culture like?",
+         "Are there any specific skills you look for in candidates?",
+      ]
+
+      // Setup livestream with user questions
+      const { livestream } = await setupLivestreamData(group, {
+         livestreamType: "create",
+         userQuestions,
+      })
+
+      const livestreamsPage = await groupPage.goToLivestreams()
+
+      await livestreamsPage.searchEvents(livestream.title)
+
+      await livestreamsPage.assertEventIsVisible(livestream.title)
+
+      await livestreamsPage.hoverOverEventRow(livestream.title)
+
+      await livestreamsPage.clickActionButton("questions")
+
+      await livestreamsPage.waitForQuestionsDialog()
+
+      for (const question of userQuestions) {
+         await livestreamsPage.livestreamQuestionsDialog
+            .getByText(question)
+            .waitFor({ state: "visible" })
+      }
+
+      await livestreamsPage.downloadQuestions()
+
+      await livestreamsPage.closeQuestionsDialog()
+
+      // Verify dialog is closed
+      await livestreamsPage.livestreamQuestionsDialog.waitFor({
+         state: "hidden",
+      })
+   })
 })
