@@ -2,7 +2,7 @@ import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon"
 
 export const LinkedInIconFilled = (props: SvgIconProps) => {
    return (
-      <SvgIcon viewBox="0 0 15 15" {...props}>
+      <SvgIcon viewBox="0 0 18 18" {...props}>
          <svg
             xmlns="http://www.w3.org/2000/svg"
             width="18"
