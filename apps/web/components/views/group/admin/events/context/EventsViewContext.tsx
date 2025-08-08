@@ -15,6 +15,7 @@ import { FeedbackDialogProvider } from "../../analytics-new/feedback/feedback-di
 import { StreamerLinksDialog } from "../enhanced-group-stream-card/StreamerLinksDialog"
 import { LivestreamEventStatus } from "../events-table-new/utils"
 import { QuestionsDialog } from "../feedback-dialogs/QuestionsDialog"
+import { PromoteLivestreamDialog } from "../PromoteLivestreamDialog"
 import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
 
 type EventsViewContextValue = {
@@ -91,6 +92,8 @@ export const EventsViewProvider = ({
       useState<LivestreamEventPublicData | null>(null)
    const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
       useState<string | null>(null)
+   const [promoteDialogLivestream, setPromoteDialogLivestream] =
+      useState<LivestreamEventPublicData | null>(null)
    const [feedbackDialogLivestreamId, setFeedbackDialogLivestreamId] = useState<
       string | null
    >(null)
@@ -166,9 +169,8 @@ export const EventsViewProvider = ({
 
    const handleShareLiveStream = useCallback((stat: LiveStreamStats) => {
       if (stat.livestream.isDraft) return
-
-      // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
-      setTargetLivestreamStreamerLinksId(stat.livestream.id)
+      // Open new promote dialog
+      setPromoteDialogLivestream(stat.livestream)
    }, [])
 
    const handleAnalytics = useCallback(
@@ -233,6 +235,10 @@ export const EventsViewProvider = ({
 
    const handleCloseStreamerLinksModal = useCallback(() => {
       setTargetLivestreamStreamerLinksId(null)
+   }, [])
+
+   const handleClosePromoteDialog = useCallback(() => {
+      setPromoteDialogLivestream(null)
    }, [])
 
    const handleCloseFeedbackDialog = useCallback(() => {
@@ -305,6 +311,13 @@ export const EventsViewProvider = ({
             companyCountryCode={group?.companyCountry?.id}
             openDialog={Boolean(targetLivestreamStreamerLinksId)}
             onClose={handleCloseStreamerLinksModal}
+         />
+         <PromoteLivestreamDialog
+            livestream={promoteDialogLivestream}
+            open={Boolean(promoteDialogLivestream)}
+            companyName={group?.universityName}
+            companyCountryCode={group?.companyCountry?.id}
+            onClose={handleClosePromoteDialog}
          />
          <FeedbackDialogProvider
             livestreamId={feedbackDialogLivestreamId}
