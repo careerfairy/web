@@ -1,6 +1,13 @@
 import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
-import { Box, Button, Divider, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   Divider,
+   IconButton,
+   Stack,
+   Typography,
+} from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { generateAndDownloadQr } from "components/util/image"
 import { LinkedInIconFilled } from "components/views/common/icons/LinkedInIconFilled"
@@ -10,7 +17,7 @@ import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog
 import { SlideUpTransition } from "components/views/common/transitions"
 import Image from "next/image"
 import { useMemo } from "react"
-import { Copy } from "react-feather"
+import { Copy, X } from "react-feather"
 import { useCopyToClipboard } from "react-use"
 import { sxStyles } from "types/commonTypes"
 import { makeLivestreamEventDetailsShareUrl } from "util/makeUrls"
@@ -27,7 +34,7 @@ const styles = sxStyles({
       aspectRatio: { xs: "351 / 177", md: "auto" },
       height: { md: 177 },
       position: "relative",
-      borderRadius: "18.5px",
+      borderRadius: { xs: "8px", md: "18.5px" },
       overflow: "hidden",
       mb: 3,
    },
@@ -60,8 +67,16 @@ const styles = sxStyles({
    }),
    divider: {
       width: "100%",
-      my: 0.9375,
       color: "neutral.50",
+   },
+   closeIcon: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      color: "white",
+      "& svg": { width: 24, height: 24 },
+      p: 0.5,
+      m: 0.3,
    },
 })
 
@@ -77,12 +92,14 @@ type ContentProps = {
    companyName: string
    companyCountryCode?: string
    livestream: LivestreamEventPublicData
+   onClose: () => void
 }
 
 const Content = ({
    companyName,
    companyCountryCode,
    livestream,
+   onClose,
 }: ContentProps) => {
    const [copyState, copyToClipboard] = useCopyToClipboard()
    const isMobile = useIsMobile()
@@ -148,7 +165,17 @@ const Content = ({
                fill
                quality={100}
                style={styles.image}
+               sizes={
+                  isMobile
+                     ? "(max-width: 600px) 100vw"
+                     : "(min-width: 601px) 100vw"
+               }
             />
+            {isMobile ? null : (
+               <IconButton onClick={onClose} sx={styles.closeIcon}>
+                  <X />
+               </IconButton>
+            )}
          </Box>
          <Stack sx={styles.content}>
             <Stack textAlign="center" mb={2}>
@@ -163,7 +190,7 @@ const Content = ({
                   Use this link to share your stream with your talent community!
                </Typography>
             </Stack>
-            <Stack spacing={1.5}>
+            <Stack spacing={2.4375}>
                <BrandedTextField
                   label={hasCopied ? "Link copied!" : "Live stream link"}
                   value={viewerLink}
@@ -252,6 +279,7 @@ export const PromoteLivestreamDialog = ({
             companyName={companyName}
             companyCountryCode={companyCountryCode}
             livestream={livestream}
+            onClose={onClose}
          />
       </ResponsiveDialogLayout>
    )
