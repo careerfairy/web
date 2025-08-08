@@ -12,7 +12,7 @@ import {
 } from "react"
 import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import { FeedbackDialogProvider } from "../../analytics-new/feedback/feedback-dialog/FeedbackDialogProvider"
-import { StreamerLinksDialog } from "../enhanced-group-stream-card/StreamerLinksDialog"
+import { EnterStreamDialog } from "../EnterStreamDialog"
 import { LivestreamEventStatus } from "../events-table-new/utils"
 import { QuestionsDialog } from "../feedback-dialogs/QuestionsDialog"
 import { PromoteLivestreamDialog } from "../PromoteLivestreamDialog"
@@ -90,8 +90,6 @@ export const EventsViewProvider = ({
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
    const [livestreamToDelete, setLivestreamToDelete] =
       useState<LivestreamEventPublicData | null>(null)
-   const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
-      useState<string | null>(null)
    const [promoteDialogLivestream, setPromoteDialogLivestream] =
       useState<LivestreamEventPublicData | null>(null)
    const [feedbackDialogLivestreamId, setFeedbackDialogLivestreamId] = useState<
@@ -102,7 +100,8 @@ export const EventsViewProvider = ({
    >(null)
    const [questionsDialogLivestream, setQuestionsDialogLivestream] =
       useState<LivestreamEventPublicData | null>(null)
-
+   const [enterStreamDialogLivestreamId, setEnterStreamDialogLivestreamId] =
+      useState<string | null>(null)
    const { push } = useRouter()
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
@@ -161,8 +160,7 @@ export const EventsViewProvider = ({
       async (stat: LiveStreamStats) => {
          if (stat.livestream.isDraft) return
 
-         // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
-         setTargetLivestreamStreamerLinksId(stat.livestream.id)
+         setEnterStreamDialogLivestreamId(stat.livestream.id)
       },
       []
    )
@@ -210,8 +208,7 @@ export const EventsViewProvider = ({
    const handleShareRecording = useCallback((stat: LiveStreamStats) => {
       if (stat.livestream.isDraft) return
 
-      // Open streamer links dialog for now, in 2nd iteration will be a specialized dialog
-      setTargetLivestreamStreamerLinksId(stat.livestream.id)
+      setEnterStreamDialogLivestreamId(stat.livestream.id)
    }, [])
 
    const handleViewRecording = useCallback((stat: LiveStreamStats) => {
@@ -233,10 +230,6 @@ export const EventsViewProvider = ({
       setLivestreamToDelete(null)
    }, [])
 
-   const handleCloseStreamerLinksModal = useCallback(() => {
-      setTargetLivestreamStreamerLinksId(null)
-   }, [])
-
    const handleClosePromoteDialog = useCallback(() => {
       setPromoteDialogLivestream(null)
    }, [])
@@ -256,6 +249,10 @@ export const EventsViewProvider = ({
 
    const handleCloseQuestionsDialog = useCallback(() => {
       setQuestionsDialogLivestream(null)
+   }, [])
+
+   const handleCloseEnterStreamDialog = useCallback(() => {
+      setEnterStreamDialogLivestreamId(null)
    }, [])
 
    const value = useMemo<EventsViewContextValue>(
@@ -305,13 +302,6 @@ export const EventsViewProvider = ({
             livestream={livestreamToDelete}
             onClose={handleDeleteDialogClose}
          />
-         <StreamerLinksDialog
-            livestreamId={targetLivestreamStreamerLinksId}
-            companyName={group?.universityName}
-            companyCountryCode={group?.companyCountry?.id}
-            openDialog={Boolean(targetLivestreamStreamerLinksId)}
-            onClose={handleCloseStreamerLinksModal}
-         />
          <PromoteLivestreamDialog
             livestream={promoteDialogLivestream}
             open={Boolean(promoteDialogLivestream)}
@@ -330,6 +320,11 @@ export const EventsViewProvider = ({
          <QuestionsDialog
             livestream={questionsDialogLivestream}
             onClose={handleCloseQuestionsDialog}
+         />
+         <EnterStreamDialog
+            livestreamId={enterStreamDialogLivestreamId}
+            open={Boolean(enterStreamDialogLivestreamId)}
+            onClose={handleCloseEnterStreamDialog}
          />
       </EventsViewContext.Provider>
    )
