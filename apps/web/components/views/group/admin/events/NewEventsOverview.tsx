@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material"
 import { useRouter } from "next/router"
-import { Fragment, useState } from "react"
+import { Fragment } from "react"
 import { useGroupLivestreamsWithStats } from "../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { BrandedSearchField } from "../../../common/inputs/BrandedSearchBar"
@@ -8,13 +8,14 @@ import { AdminContainer } from "../common/Container"
 import { EventsViewProvider, useEventsView } from "./context/EventsViewContext"
 import { DesktopEventsView } from "./DesktopEventsView"
 import { MobileEventsView } from "./MobileEventsView"
+import { useLivestreamRouting } from "./useLivestreamRouting"
 
 const NewEventsOverviewContent = () => {
    const router = useRouter()
    const groupId = router.query.groupId as string
-   const [searchTerm, setSearchTerm] = useState("")
    const isMobile = useIsMobile()
-   const { sortBy, statusFilter } = useEventsView()
+   const { sortBy, statusFilter, searchTerm, setSearchTerm } = useEventsView()
+   const { createDraftLivestream } = useLivestreamRouting()
 
    const {
       data: stats,
@@ -25,6 +26,9 @@ const NewEventsOverviewContent = () => {
       searchTerm,
       statusFilter,
    })
+
+   const hasFilters = Boolean(statusFilter.length > 0 || searchTerm.trim())
+   const noResults = stats.length === 0
 
    return (
       <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
@@ -41,18 +45,23 @@ const NewEventsOverviewContent = () => {
 
          {Boolean(isLoading) && <p>Loading stats...</p>}
          {Boolean(error) && <p>Error loading stats: {error.message}</p>}
-
-         {stats.length > 0 ? (
-            <Fragment>
-               {isMobile ? (
-                  <MobileEventsView stats={stats} />
-               ) : (
-                  <DesktopEventsView stats={stats} />
-               )}
-            </Fragment>
-         ) : (
-            <p>No events found matching your search criteria.</p>
-         )}
+         <Fragment>
+            {isMobile ? (
+               <MobileEventsView
+                  stats={stats}
+                  isEmptyNoEvents={!hasFilters && noResults}
+                  isEmptySearchFilter={Boolean(hasFilters && noResults)}
+                  onCreateLivestream={createDraftLivestream}
+               />
+            ) : (
+               <DesktopEventsView
+                  stats={stats}
+                  isEmptyNoEvents={!hasFilters && noResults}
+                  isEmptySearchFilter={Boolean(hasFilters && noResults)}
+                  onCreateLivestream={createDraftLivestream}
+               />
+            )}
+         </Fragment>
       </Stack>
    )
 }

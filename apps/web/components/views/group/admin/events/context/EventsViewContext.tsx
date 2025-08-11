@@ -29,6 +29,11 @@ type EventsViewContextValue = {
    // Status filtering
    statusFilter: LivestreamEventStatus[]
    setStatusFilter: (statuses: LivestreamEventStatus[]) => void
+   // Search term
+   searchTerm: string
+   setSearchTerm: (searchTerm: string) => void
+   // Reset method
+   resetFilters: () => void
    // Event action handlers
    handleEnterLiveStreamRoom: (stat: LiveStreamStats) => void
    handleShareLiveStream: (stat: LiveStreamStats) => void
@@ -75,18 +80,19 @@ const fieldMappings = {
    },
 } as const
 
+const initialSort = LivestreamStatsSortOption.STATUS_WITH_DATE
+
 type EventsViewProviderProps = {
    children: ReactNode
-   initialSort?: LivestreamStatsSortOption
 }
 
-export const EventsViewProvider = ({
-   children,
-   initialSort = LivestreamStatsSortOption.STATUS_WITH_DATE,
-}: EventsViewProviderProps) => {
+export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
    const { group } = useGroup()
-   const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(initialSort)
+   const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(
+      LivestreamStatsSortOption.STATUS_WITH_DATE
+   )
    const [statusFilter, setStatusFilter] = useState<LivestreamEventStatus[]>([])
+   const [searchTerm, setSearchTerm] = useState("")
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
    const [livestreamToDelete, setLivestreamToDelete] =
       useState<LivestreamEventPublicData | null>(null)
@@ -255,6 +261,12 @@ export const EventsViewProvider = ({
       setEnterStreamDialogLivestreamId(null)
    }, [])
 
+   const resetFilters = useCallback(() => {
+      setSortBy(initialSort)
+      setStatusFilter([])
+      setSearchTerm("")
+   }, [])
+
    const value = useMemo<EventsViewContextValue>(
       () => ({
          sortBy,
@@ -264,6 +276,9 @@ export const EventsViewProvider = ({
          isActiveSort,
          statusFilter,
          setStatusFilter,
+         searchTerm,
+         setSearchTerm,
+         resetFilters,
          handleEnterLiveStreamRoom,
          handleShareLiveStream,
          handleAnalytics,
@@ -282,6 +297,9 @@ export const EventsViewProvider = ({
          isActiveSort,
          statusFilter,
          setStatusFilter,
+         searchTerm,
+         setSearchTerm,
+         resetFilters,
          handleEnterLiveStreamRoom,
          handleShareLiveStream,
          handleAnalytics,
