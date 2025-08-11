@@ -31,10 +31,13 @@ const styles = sxStyles({
       flex: `0 0 ${slideSpacing}px`,
    },
    chip: {
-      backgroundColor: (t) => t.palette.neutral[50],
+      backgroundColor: "#CFDEDF",
       color: (t) => t.palette.neutral[700],
-      py: "8px",
-      px: "4px",
+      padding: "8px 16px",
+      "& .MuiChip-label": {
+         fontWeight: 400,
+         padding: 0,
+      },
    },
    selectedChip: {
       backgroundColor: (t) => t.palette.primary.main,

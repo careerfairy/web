@@ -59,6 +59,7 @@ export type CompanyFieldToIndexType = (typeof COMPANY_FIELDS_TO_INDEX)[number]
 export const COMPANY_SEARCHABLE_ATTRIBUTES = [
    "universityName",
    "normalizedUniversityName",
+   "companyIndustriesIdTags",
 ] satisfies CompanyFieldToIndexType[]
 
 /**
