@@ -181,11 +181,9 @@ const Content = ({
                      : "(min-width: 601px) 100vw"
                }
             />
-            {isMobile ? null : (
-               <IconButton onClick={onClose} sx={styles.closeIcon}>
-                  <X />
-               </IconButton>
-            )}
+            <IconButton onClick={onClose} sx={styles.closeIcon}>
+               <X />
+            </IconButton>
          </Box>
          <Stack sx={styles.content}>
             <Stack textAlign="center" mb={2}>
