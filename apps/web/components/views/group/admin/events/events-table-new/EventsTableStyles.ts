@@ -42,6 +42,19 @@ export const eventsTableStyles = sxStyles({
       mt: 1,
       pb: 1.5,
    },
+   emptyCell: {
+      p: 0,
+      border: "none",
+      px: 0.5,
+      pb: 0.5,
+   },
+   emptyCard: {
+      bgcolor: (theme) => theme.brand.white[200],
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
+      borderRadius: 2,
+      px: 1,
+      textAlign: "center",
+   },
 })
 
 export const COLUMN_WIDTHS = {

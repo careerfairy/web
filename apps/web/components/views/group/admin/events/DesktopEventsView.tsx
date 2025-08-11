@@ -128,17 +128,8 @@ export const DesktopEventsView = ({
                <TableBody>
                   {isEmptySearchFilter ? (
                      <TableRow>
-                        <TableCell colSpan={5} sx={{ p: 1.5, border: "none" }}>
-                           <Box
-                              sx={{
-                                 bgcolor: (theme) => theme.brand.white[200],
-                                 border: (theme) =>
-                                    `1px solid ${theme.brand.white[400]}`,
-                                 borderRadius: 2,
-                                 p: 2.5,
-                                 textAlign: "center",
-                              }}
-                           >
+                        <TableCell colSpan={5} sx={eventsTableStyles.emptyCell}>
+                           <Box sx={eventsTableStyles.emptyCard} py={5}>
                               <Typography
                                  variant="brandedBody"
                                  color="neutral.700"
@@ -150,17 +141,11 @@ export const DesktopEventsView = ({
                      </TableRow>
                   ) : isEmptyNoEvents ? (
                      <TableRow>
-                        <TableCell colSpan={5} sx={{ p: 1.5, border: "none" }}>
+                        <TableCell colSpan={5} sx={eventsTableStyles.emptyCell}>
                            <Stack
                               alignItems="center"
-                              sx={{
-                                 bgcolor: (theme) => theme.brand.white[200],
-                                 border: (theme) =>
-                                    `1px solid ${theme.brand.white[400]}`,
-                                 borderRadius: 2,
-                                 p: 2.5,
-                                 textAlign: "center",
-                              }}
+                              sx={eventsTableStyles.emptyCard}
+                              py={4}
                            >
                               <Typography
                                  variant="brandedBody"
@@ -168,22 +153,22 @@ export const DesktopEventsView = ({
                                  fontWeight={600}
                                  mb={0.5}
                               >
-                                 Plan your first livestream
+                                 Plan your first live stream
                               </Typography>
                               <Typography
                                  variant="brandedBody"
                                  color="neutral.700"
                                  mb={1.5}
                               >
-                                 This is where all your livestreams will appear.
-                                 Start by creating one
+                                 This is where all your live streams will
+                                 appear. Start by creating one
                               </Typography>
                               <Button
                                  variant="contained"
                                  color="secondary"
                                  onClick={onCreateLivestream}
                               >
-                                 Create livestream
+                                 Create live stream
                               </Button>
                            </Stack>
                         </TableCell>

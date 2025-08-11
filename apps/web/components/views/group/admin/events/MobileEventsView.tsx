@@ -26,15 +26,6 @@ const styles = sxStyles({
       textAlign: "center",
       border: (theme) => `1px solid ${theme.brand.white[400]}`,
    },
-   emptyTitle: {
-      color: "neutral.800",
-   },
-   emptyDescription: {
-      color: "neutral.700",
-   },
-   emptyActions: {
-      mt: 1,
-   },
 })
 
 export const MobileEventsView = ({
@@ -73,7 +64,7 @@ export const MobileEventsView = ({
    if (isEmptySearchFilter) {
       return (
          <Box py={5} sx={styles.emptyCard}>
-            <Typography variant="brandedBody" sx={styles.emptyDescription}>
+            <Typography variant="brandedBody" color="neutral.700">
                No live streams found matching your search
             </Typography>
          </Box>
@@ -85,27 +76,24 @@ export const MobileEventsView = ({
       return (
          <Stack
             sx={styles.emptyCard}
-            spacing={1.5}
             py={4}
             color="neutral.700"
             alignItems="center"
          >
-            <Typography variant="brandedBody" fontWeight={600}>
-               Plan your first livestream
+            <Typography variant="brandedBody" mb={1} fontWeight={600}>
+               Plan your first live stream
             </Typography>
-            <Typography variant="brandedBody" textAlign="center">
-               This is where all your livestreams will appear. Start by creating
-               one
+            <Typography variant="brandedBody" textAlign="center" mb={1.5}>
+               This is where all your live streams will appear. Start by
+               creating one
             </Typography>
-            <Box sx={styles.emptyActions}>
-               <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={onCreateLivestream}
-               >
-                  Create livestream
-               </Button>
-            </Box>
+            <Button
+               variant="contained"
+               color="secondary"
+               onClick={onCreateLivestream}
+            >
+               Create live stream
+            </Button>
          </Stack>
       )
    }
