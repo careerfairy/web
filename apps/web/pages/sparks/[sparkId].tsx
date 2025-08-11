@@ -3,8 +3,10 @@ import {
    SparkCardNotificationTypes,
    SparkPresenter,
 } from "@careerfairy/shared-lib/sparks/SparkPresenter"
+import { queryParamToArr } from "@careerfairy/shared-lib/utils"
 import { Button } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import { appendCurrentQueryParams } from "components/util/url"
 import SparksFeedCarousel from "components/views/sparks-feed/SparksFeedCarousel"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import SparkSeo from "components/views/sparks/components/SparkSeo"
@@ -15,14 +17,18 @@ import { useSnackbar } from "notistack"
 import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useMountedState } from "react-use"
+import { RootState } from "store"
 import {
    AddCardNotificationPayload,
    addCardNotificationToSparksList,
    fetchInitialSparksFeed,
+   fetchInitialSparksFromSearch,
    fetchNextSparks,
+   fetchNextSparksFromSearch,
    removeCreatorId,
    removeGroupId,
    removeNotificationsByType,
+   resetSearchTransition,
    resetSparksFeed,
    setContentTopicIds,
    setConversionCardInterval,
@@ -30,6 +36,7 @@ import {
    setGroupId,
    setInteractionSource,
    setOriginalSparkId,
+   setSearchParameters,
    setSparks,
    setUserEmail,
    setVideosMuted,
@@ -46,6 +53,7 @@ import {
    isGroupFeedSelector,
    isInCreatorFeedSelector,
    isOnLastSparkSelector,
+   searchResultsExhaustedSelector,
    wasInCreatorFeedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
@@ -82,6 +90,17 @@ const SparksPage: NextPage<
    const isCreatorFeed = useSelector(isCreatorFeedSelector)
    const isInCreatorFeed = useSelector(isInCreatorFeedSelector)
    const wasInCreatorFeed = useSelector(wasInCreatorFeedSelector)
+   const searchResultsExhausted = useSelector(searchResultsExhaustedSelector)
+   const currentPlayingIndex = useSelector(
+      (state: RootState) => state.sparksFeed.currentPlayingIndex
+   )
+   const totalSparks = useSelector(
+      (state: RootState) => state.sparksFeed.sparks.length
+   )
+   const searchParameters = useSelector(
+      (state: RootState) => state.sparksFeed.searchParameters
+   )
+   const isSearchMode = Boolean(searchParameters.query)
    const { userData } = useAuth()
 
    useEffect(() => {
@@ -130,18 +149,48 @@ const SparksPage: NextPage<
       }
    }, [conversionInterval, dispatch, isFromGroupPage, userData])
 
+   // Handle search mode setup by synchronizing URL search parameters with
+   // the state machine
+   useEffect(() => {
+      // Check if we have search parameters from URL
+      const isSearchMode = Boolean(query.q)
+
+      if (isSearchMode) {
+         // Reset transition state for new search session
+         dispatch(resetSearchTransition())
+
+         // Extract search parameters from URL
+         const searchParams = {
+            query: (query.q as string) || "",
+            languages: queryParamToArr(query.languages),
+            contentTopics: queryParamToArr(query.contentTopics),
+            companySizes: queryParamToArr(query.companySizes),
+            industries: queryParamToArr(query.industries),
+         }
+
+         dispatch(setSearchParameters(searchParams))
+      }
+   }, [dispatch, query])
+
    useEffect(() => {
       if (!groupId) {
          dispatch(removeGroupId())
       }
 
-      dispatch(fetchInitialSparksFeed())
+      const isSearchMode = Boolean(query.q)
+
+      // Use search-based fetching if coming from search, otherwise use regular feed
+      if (isSearchMode) {
+         dispatch(fetchInitialSparksFromSearch())
+      } else {
+         dispatch(fetchInitialSparksFeed())
+      }
 
       return () => {
          dispatch(resetSparksFeed())
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [groupId])
+   }, [groupId, query.q])
 
    useEffect(() => {
       if (!interactionSource) {
@@ -160,12 +209,18 @@ const SparksPage: NextPage<
          initialSparksFetched &&
          isOnLastSpark &&
          !isFetchingNextSparks &&
-         !hasNoMoreSparks &&
+         (isSearchMode || !hasNoMoreSparks) &&
          !fetchNextError &&
          (fetchedCompanyWithCreatorStatus === "unset" ||
             fetchedCompanyWithCreatorStatus === "finished")
       ) {
-         dispatch(fetchNextSparks())
+         // For search mode: either fetch more results or transition to natural feed
+         if (isSearchMode && !searchResultsExhausted) {
+            dispatch(fetchNextSparksFromSearch())
+         } else {
+            // For natural feed mode: fetch more if on last spark and more available
+            dispatch(fetchNextSparks())
+         }
       }
    }, [
       dispatch,
@@ -175,6 +230,10 @@ const SparksPage: NextPage<
       initialSparksFetched,
       isFetchingNextSparks,
       isOnLastSpark,
+      isSearchMode,
+      searchResultsExhausted,
+      currentPlayingIndex,
+      totalSparks,
    ])
 
    /**
@@ -263,13 +322,28 @@ const SparksPage: NextPage<
     * - We use the `replace` method to avoid adding a new entry to the history stack,
     *   allowing the user to use the back button to go back to the page before the sparks page.
     * - We use the `shallow` option to avoid re-rendering the page.
+    * - In search mode, we preserve only search-related query parameters to maintain search state.
     */
    useEffect(() => {
       const currentSparkId = query.sparkId
       const newSparkId = sparkForSeo?.id
 
       if (newSparkId && currentSparkId !== newSparkId) {
-         replace(`/sparks/${newSparkId}`, undefined, {
+         // Only preserve search-related parameters
+         const searchParamKeys = [
+            "q",
+            "languages",
+            "contentTopics",
+            "companySizes",
+            "industries",
+         ]
+         const newUrl = appendCurrentQueryParams(
+            `/sparks/${newSparkId}`,
+            [],
+            searchParamKeys
+         )
+
+         replace(newUrl, undefined, {
             shallow: true,
          })
       }
