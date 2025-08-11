@@ -6,7 +6,6 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { SlideUpTransition } from "components/views/common/transitions"
@@ -87,7 +86,6 @@ type ContentProps = {
 }
 
 const Content = ({ livestreamId, onClose }: ContentProps) => {
-   const isMobile = useIsMobile()
    const [secureToken, setSecureToken] = useState<string | null>(null)
    const [copyState, copyToClipboard] = useCopyToClipboard()
 
@@ -123,11 +121,9 @@ const Content = ({ livestreamId, onClose }: ContentProps) => {
                style={styles.image}
                sizes="100vw"
             />
-            {isMobile ? null : (
-               <IconButton onClick={onClose} sx={styles.closeIcon}>
-                  <X />
-               </IconButton>
-            )}
+            <IconButton onClick={onClose} sx={styles.closeIcon}>
+               <X />
+            </IconButton>
          </Box>
          <Stack sx={styles.content}>
             <Stack textAlign="center" mb={2}>
