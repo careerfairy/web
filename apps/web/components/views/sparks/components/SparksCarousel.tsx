@@ -12,9 +12,9 @@ import { combineStyles, sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    viewport: {
       // hack to ensure overflow visibility with parent padding
-      padding: "16px",
-      margin: "-16px",
-      width: "calc(100% + 16px)",
+      paddingX: "16px",
+      marginX: "-16px",
+      width: "calc(100% + 32px)",
    },
    disableUserSelect: {
       userSelect: "none",

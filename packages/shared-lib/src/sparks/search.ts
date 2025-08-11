@@ -10,7 +10,10 @@ export type TransformedSpark = Spark & {
    groupPublicSparks: boolean
    groupCompanySize: string | null
    groupCompanyIndustriesIdTags: string[]
+   groupCompanyIndustriesLabels: string[]
    groupCompanyName: string | null
+   linkedCustomJobsLabels: string[]
+   contentTopicsTagLabels: string[]
 }
 
 export const SPARK_FIELDS_TO_INDEX = [
@@ -33,7 +36,10 @@ export const SPARK_FIELDS_TO_INDEX = [
    "groupPublicSparks",
    "groupCompanySize",
    "groupCompanyIndustriesIdTags",
+   "groupCompanyIndustriesLabels",
    "groupCompanyName",
+   "linkedCustomJobsLabels",
+   "contentTopicsTagLabels",
 ] satisfies (keyof TransformedSpark)[]
 
 export type FieldToIndexType = (typeof SPARK_FIELDS_TO_INDEX)[number]
@@ -44,10 +50,10 @@ export type FieldToIndexType = (typeof SPARK_FIELDS_TO_INDEX)[number]
  * They must be a subset of the fields defined in SPARK_FIELDS_TO_INDEX.
  */
 export const SPARK_SEARCHABLE_ATTRIBUTES = [
-   "contentTopicsTagIds",
+   "contentTopicsTagLabels",
    "languageTagIds",
-   "linkedCustomJobsTagIds",
-   "groupCompanyIndustriesIdTags",
+   "linkedCustomJobsLabels",
+   "groupCompanyIndustriesLabels",
    "question",
    "groupCompanyName",
 ] satisfies FieldToIndexType[]

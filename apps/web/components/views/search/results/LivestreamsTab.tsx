@@ -34,7 +34,7 @@ const styles = sxStyles({
    },
    resultsContainer: {
       py: { xs: 1.5, md: 2 },
-      px: { xs: 2, md: 4 },
+      px: 2,
    },
    filterContainer: {
       mb: { xs: 1.5, md: 2 },

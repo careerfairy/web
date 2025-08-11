@@ -18,7 +18,7 @@ type Props = {
 }
 
 const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
-   const { authenticatedUser, userData } = useAuth()
+   const { userData } = useAuth()
 
    const options = useMemo(
       () => ({
@@ -29,9 +29,6 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
 
    const { loading, events } = useRecommendedEvents(options)
 
-   if (!authenticatedUser?.email || !events?.length) {
-      return null
-   }
    return (
       <div>
          <EventsPreviewCarousel

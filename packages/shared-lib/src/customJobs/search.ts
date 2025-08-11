@@ -51,12 +51,10 @@ export type CustomJobFieldToIndexType =
 export const CUSTOM_JOB_SEARCHABLE_ATTRIBUTES = [
    "id",
    "title",
-   "group",
    "jobLocation",
    "locationNameTags",
    "businessFunctionsTagIds",
    "jobType",
-   "description", // We might not want to index this field, as it might bring noise to the search results
    "normalizedJobType",
    "workplace",
    "normalizedLocationIds",
