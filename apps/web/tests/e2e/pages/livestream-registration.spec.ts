@@ -16,35 +16,28 @@ test.describe("Livestream Registration Signed In", () => {
       user,
    }) => {
       const { livestream } = await setupLivestreamData()
+
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
-      await livestreamDialogPage.openDialog()
+      // in order to bypass the recommendation system, we go directly to the livestream page
+      await page.goto(`/portal/livestream/${livestream.id}`)
+
       await livestreamDialogPage.completeSuccessfulRegistration()
       await livestreamDialogPage.closeDialog()
-
-      // confirm we have the card with the Booked chip
-      const livestreamCard = page
-         .getByTestId(`livestream-card-${livestream.id}`)
-         .first()
-
-      await livestreamCard.scrollIntoViewIfNeeded()
-
-      await expect(livestreamCard.getByText("Registered")).toBeVisible()
-      await expect(livestreamCard.getByText(livestream.title)).toBeVisible()
 
       // confirm the userLivestreamData was created
       await expectUserLivestreamDataCreated(user, livestream)
 
+      // go back to the livestream page
+      await page.goto(`/portal/livestream/${livestream.id}`)
+
       // confirm the dialog has the registered state
-      await livestreamDialogPage.openDialog()
       await expect(page.getByText("You're registered")).toBeVisible()
       await expect(livestreamDialogPage.cancelRegistrationButton).toBeVisible()
 
       // cancel registration
       await livestreamDialogPage.cancelRegistrationClick()
       await expect(livestreamDialogPage.registrationButton).toBeVisible()
-      await livestreamDialogPage.closeDialog()
-      await expect(livestreamCard.getByText("Registered")).not.toBeVisible()
    })
 
    test("successful registration on a livestream event with no group questions", async ({
@@ -60,7 +53,9 @@ test.describe("Livestream Registration Signed In", () => {
 
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
-      await livestreamDialogPage.openDialog()
+      // in order to bypass the recommendation system, we go directly to the livestream page
+      await page.goto(`/portal/livestream/${livestream.id}`)
+
       await livestreamDialogPage.completeSuccessfulRegistration()
    })
 
@@ -81,7 +76,9 @@ test.describe("Livestream Registration Signed In", () => {
 
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
-      await livestreamDialogPage.openDialog()
+      // in order to bypass the recommendation system, we go directly to the livestream page
+      await page.goto(`/portal/livestream/${livestream.id}`)
+
       await livestreamDialogPage.completeSuccessfulRegistration({
          groupConsentRequired: true,
       })
@@ -101,7 +98,9 @@ test.describe("Livestream Registration Signed In", () => {
 
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
-      await livestreamDialogPage.openDialog()
+      // in order to bypass the recommendation system, we go directly to the livestream page
+      await page.goto(`/portal/livestream/${livestream.id}`)
+
       await livestreamDialogPage.completeSuccessfulRegistration({
          groupConsentRequired: true,
       })
@@ -235,7 +234,8 @@ test.describe("Livestream Registration Signed In", () => {
       // Use the first created livestream for registration
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
-      await livestreamDialogPage.openDialog()
+      // in order to bypass the recommendation system, we go directly to the livestream page
+      await page.goto(`/portal/livestream/${livestream.id}`)
 
       // Complete the registration process
       await livestreamDialogPage.completeSuccessfulRegistration()

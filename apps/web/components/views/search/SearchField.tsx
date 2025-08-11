@@ -1,8 +1,10 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { AnimatePresence, motion } from "framer-motion"
+import { useRouter } from "next/router"
 import { useCallback, useState } from "react"
 import { ChevronLeft, Clock } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 import { BrandedSearchField } from "../common/inputs/BrandedSearchField"
 import { useSearchContext } from "./SearchContext"
 
@@ -11,7 +13,26 @@ const ANIMATION_DURATION = 0.25
 
 type AnimationState = "idle" | "opening" | "open" | "closing"
 
-export const SearchField = () => {
+const styles = sxStyles({
+   backStack: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 1,
+   },
+   backButton: {
+      fontSize: 24,
+      color: "neutral.800",
+      display: "flex",
+      cursor: "pointer",
+   },
+})
+
+type SearchFieldProps = {
+   type?: "main" | "backButton"
+}
+
+export const SearchField = ({ type = "main" }: SearchFieldProps) => {
    const {
       searchQuery,
       setSearchQuery,
@@ -20,7 +41,7 @@ export const SearchField = () => {
    } = useSearchContext()
    const isMobile = useIsMobile()
    const theme = useTheme()
-
+   const router = useRouter()
    const [animationState, setAnimationState] = useState<AnimationState>("idle")
 
    // Derived states for cleaner logic
@@ -81,6 +102,10 @@ export const SearchField = () => {
    const handleBackClick = useCallback(() => {
       closeDrawer()
    }, [closeDrawer])
+
+   const handleExitClick = () => {
+      router.push("/portal")
+   }
 
    const handleSelectOption = useCallback(
       (option: string) => {
@@ -151,20 +176,10 @@ export const SearchField = () => {
                            duration: ANIMATION_DURATION * 0.3,
                         }}
                      >
-                        <Stack
-                           direction="row"
-                           justifyContent="space-between"
-                           alignItems="center"
-                           sx={{ mb: 3, gap: 1 }}
-                        >
+                        <Stack sx={[styles.backStack, { mb: 3 }]}>
                            <Box
                               component={ChevronLeft}
-                              sx={{
-                                 fontSize: 24,
-                                 color: "neutral.800",
-                                 display: "flex",
-                                 cursor: "pointer",
-                              }}
+                              sx={styles.backButton}
                               onClick={handleBackClick}
                            />
                            <Box sx={{ flex: 1 }}>
@@ -238,34 +253,48 @@ export const SearchField = () => {
             }}
             onAnimationComplete={handleClosingAnimationComplete}
          >
-            <Box sx={{ mx: 2, mt: isMobile ? 0 : 2 }}>
-               <BrandedSearchField
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                  placeholder="What are you looking for?"
-                  onFocus={handleSearchFocus}
-                  onClear={handleSearchFocus}
-                  enableDropdown={!isMobile}
-                  onKeyDown={handleEnterKeyDown}
+            <Stack sx={[styles.backStack, { mx: isMobile ? 1.5 : 0 }]}>
+               {isMobile && type === "backButton" ? (
+                  <Box
+                     component={ChevronLeft}
+                     sx={styles.backButton}
+                     onClick={handleExitClick}
+                  />
+               ) : null}
+               <Box
+                  sx={{ mx: isMobile ? 0 : 2, mt: isMobile ? 0 : 2, flex: 1 }}
                >
-                  {({ close }) => (
-                     <>
-                        <RecentSearches
-                           onOptionSelect={(option) => {
-                              handleSelectOption(option)
-                              close()
-                           }}
-                        />
-                        <SuggestedSearches
-                           onOptionSelect={(option) => {
-                              handleSelectOption(option)
-                              close()
-                           }}
-                        />
-                     </>
-                  )}
-               </BrandedSearchField>
-            </Box>
+                  <BrandedSearchField
+                     value={searchQuery}
+                     onChange={setSearchQuery}
+                     placeholder="What are you looking for?"
+                     onFocus={handleSearchFocus}
+                     onClear={handleSearchFocus}
+                     enableDropdown={!isMobile}
+                     showStartIcon={
+                        type === "main" || (type === "backButton" && !isMobile)
+                     }
+                     onKeyDown={handleEnterKeyDown}
+                  >
+                     {({ close }) => (
+                        <>
+                           <RecentSearches
+                              onOptionSelect={(option) => {
+                                 handleSelectOption(option)
+                                 close()
+                              }}
+                           />
+                           <SuggestedSearches
+                              onOptionSelect={(option) => {
+                                 handleSelectOption(option)
+                                 close()
+                              }}
+                           />
+                        </>
+                     )}
+                  </BrandedSearchField>
+               </Box>
+            </Stack>
          </motion.div>
       </Box>
    )
@@ -315,7 +344,7 @@ const searchSuggestions = [
    "Engineering",
    "Consulting",
    "Internships",
-   "Automotive Industry",
+   "Automotive",
 ]
 
 const SuggestedSearches = ({ onOptionSelect }: SuggestedSearchesProps) => {

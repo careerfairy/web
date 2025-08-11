@@ -83,13 +83,6 @@ const RecommendedEvents = dynamic(
    }
 )
 
-const MyNextEvents = dynamic(
-   () => import("../../components/views/portal/events-preview/MyNextEvents"),
-   {
-      ssr: false,
-   }
-)
-
 const WelcomeDialogContainer = dynamic(
    () =>
       import(
@@ -194,6 +187,19 @@ const PortalPage = ({
                         </SearchProvider>
 
                         <PortalTags>
+                           {hasInterests ? (
+                              <RecommendedEvents limit={10} />
+                           ) : (
+                              <ComingUpNextEvents
+                                 serverSideEvents={comingUpNext}
+                                 limit={20}
+                              />
+                           )}
+                           <RecommendedCustomJobs
+                              userCountryCode={userCountryCode}
+                           />
+                           <FeaturedCompanies />
+
                            <UserSparksCarousel
                               header={
                                  <Typography
@@ -206,18 +212,7 @@ const PortalPage = ({
                               }
                               handleSparksClicked={handleSparksClicked}
                            />
-                           {hasInterests ? (
-                              <RecommendedEvents limit={10} />
-                           ) : null}
-                           <FeaturedCompanies />
-                           <ComingUpNextEvents
-                              serverSideEvents={comingUpNext}
-                              limit={20}
-                           />
-                           <RecommendedCustomJobs
-                              userCountryCode={userCountryCode}
-                           />
-                           <MyNextEvents />
+
                            <ConditionalWrapper
                               condition={Boolean(events?.length)}
                            >

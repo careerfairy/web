@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
+import { expect, test } from "@playwright/test"
 import { credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"
+import { PasswordResetPage } from "../page-object-models/PasswordResetPage"
 import { PortalPage } from "../page-object-models/PortalPage"
 import { SignupPage } from "../page-object-models/SignupPage"
-import { PasswordResetPage } from "../page-object-models/PasswordResetPage"
 
 test.describe("Login Page Functionality", () => {
    test.afterAll(async () => {
@@ -25,7 +25,7 @@ test.describe("Login Page Functionality", () => {
       await login.enterEmail(credentials.correctEmail)
       await login.enterPassword(credentials.correctPassword)
       await login.clickLogin()
-      await expect(portal.UpcomingEventsHeader).toBeVisible({ timeout: 15000 })
+      await portal.assertWelcomeText(credentials.correctFirstName)
    })
 
    test("It fails to log in with wrong password", async ({ page }) => {
@@ -104,7 +104,7 @@ test.describe("Login Page Functionality", () => {
       const portal = new PortalPage(page)
       await UserSeed.deleteUser(credentials.correctEmail)
       await login.createUserAndLogin()
-      await expect(portal.UpcomingEventsHeader).toBeVisible({ timeout: 15000 })
+      await portal.assertWelcomeText(credentials.correctFirstName)
    })
    test("It redirects to signup page when logged in with unverified email", async ({
       page,

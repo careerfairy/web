@@ -1,9 +1,9 @@
 import { Box, Stack, Tab, Tabs, Typography, useTheme } from "@mui/material"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import { useRouter } from "next/router"
-import { useState } from "react"
 import { Frown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { useSearchContext } from "./SearchContext"
 import { AllTab } from "./results/AllTab"
 import { CompaniesTab } from "./results/CompaniesTab"
 import { JobsTab } from "./results/JobsTab"
@@ -76,10 +76,7 @@ const styles = sxStyles({
 })
 
 export const SearchResults = () => {
-   const [currentTab, setCurrentTab] = useState<string>(TAB_VALUES.all.value)
-   const handleTabChange = (_, newValue: string) => {
-      setCurrentTab(newValue)
-   }
+   const { currentTab, handleTabChange } = useSearchContext()
 
    const TabComponent =
       TAB_VALUES[currentTab as keyof typeof TAB_VALUES]?.component
@@ -155,5 +152,3 @@ export const NoResultsFound = () => {
       </Stack>
    )
 }
-
-export default SearchResults
