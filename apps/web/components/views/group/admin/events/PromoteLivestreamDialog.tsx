@@ -127,6 +127,11 @@ const Content = ({
 
    const handleLinkedIn = () => {
       if (!viewerLink) return
+      const linkedInLink = new URL(viewerLink)
+
+      // We need to add utm_medium=linkedin to the link to track the source
+      linkedInLink.searchParams.set("utm_medium", "linkedin")
+
       const message =
          `Want to know more about ${companyName} and get the unique opportunity to start your career in [industry]?\n\n` +
          `Then mark the date: ${livestream.start
@@ -135,7 +140,8 @@ const Content = ({
          `We are going live on #CareerFairy and we will introduce you to the world of [live stream topic].\n\n` +
          `Join us to learn more about:\n` +
          `- [add reasons why students should join the live stream]\n\n` +
-         `Register now: ${viewerLink}`
+         `Register now: ${linkedInLink.toString()}`
+
       const share = `https://www.linkedin.com/feed/?shareActive&mini=true&text=${encodeURIComponent(
          message
       )}`
