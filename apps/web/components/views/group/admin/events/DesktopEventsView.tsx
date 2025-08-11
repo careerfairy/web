@@ -1,14 +1,17 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
    Box,
+   Button,
    Stack,
    Table,
    TableBody,
+   TableCell,
    TableContainer,
    TableHead,
    TableRow,
+   Typography,
 } from "@mui/material"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
@@ -28,15 +31,24 @@ const ITEMS_PER_PAGE = 10
 
 type Props = {
    stats: LiveStreamStats[]
+   isEmptyNoEvents?: boolean
+   isEmptySearchFilter?: boolean
+   onCreateLivestream?: () => void
 }
 
-export const DesktopEventsView = ({ stats }: Props) => {
+export const DesktopEventsView = ({
+   stats,
+   isEmptyNoEvents,
+   isEmptySearchFilter,
+   onCreateLivestream,
+}: Props) => {
    const {
       handleTableSort,
       getSortDirection,
       isActiveSort,
       statusFilter,
       setStatusFilter,
+      resetFilters,
       handleEnterLiveStreamRoom,
       handleShareLiveStream,
       handleAnalytics,
@@ -46,6 +58,13 @@ export const DesktopEventsView = ({ stats }: Props) => {
       handleShareRecording,
    } = useEventsView()
    const [hoveredRow, setHoveredRow] = useState<string | null>(null)
+
+   // Reset filters when component unmounts
+   useEffect(() => {
+      return () => {
+         resetFilters()
+      }
+   }, [resetFilters])
 
    const { currentPageData, currentPage, totalPages, goToPage } =
       useClientSidePagination({
@@ -107,31 +126,99 @@ export const DesktopEventsView = ({ stats }: Props) => {
                   </TableRow>
                </TableHead>
                <TableBody>
-                  {currentPageData.map((stat) => {
-                     const statKey = getEventStatsKey(stat)
-                     const isHovered = hoveredRow === statKey
+                  {isEmptySearchFilter ? (
+                     <TableRow>
+                        <TableCell colSpan={5} sx={{ p: 1.5, border: "none" }}>
+                           <Box
+                              sx={{
+                                 bgcolor: (theme) => theme.brand.white[200],
+                                 border: (theme) =>
+                                    `1px solid ${theme.brand.white[400]}`,
+                                 borderRadius: 2,
+                                 p: 2.5,
+                                 textAlign: "center",
+                              }}
+                           >
+                              <Typography
+                                 variant="brandedBody"
+                                 color="neutral.700"
+                              >
+                                 No live streams found matching your search
+                              </Typography>
+                           </Box>
+                        </TableCell>
+                     </TableRow>
+                  ) : isEmptyNoEvents ? (
+                     <TableRow>
+                        <TableCell colSpan={5} sx={{ p: 1.5, border: "none" }}>
+                           <Stack
+                              alignItems="center"
+                              sx={{
+                                 bgcolor: (theme) => theme.brand.white[200],
+                                 border: (theme) =>
+                                    `1px solid ${theme.brand.white[400]}`,
+                                 borderRadius: 2,
+                                 p: 2.5,
+                                 textAlign: "center",
+                              }}
+                           >
+                              <Typography
+                                 variant="brandedBody"
+                                 color="neutral.800"
+                                 fontWeight={600}
+                                 mb={0.5}
+                              >
+                                 Plan your first livestream
+                              </Typography>
+                              <Typography
+                                 variant="brandedBody"
+                                 color="neutral.700"
+                                 mb={1.5}
+                              >
+                                 This is where all your livestreams will appear.
+                                 Start by creating one
+                              </Typography>
+                              <Button
+                                 variant="contained"
+                                 color="secondary"
+                                 onClick={onCreateLivestream}
+                              >
+                                 Create livestream
+                              </Button>
+                           </Stack>
+                        </TableCell>
+                     </TableRow>
+                  ) : (
+                     currentPageData.map((stat) => {
+                        const statKey = getEventStatsKey(stat)
+                        const isHovered = hoveredRow === statKey
 
-                     return (
-                        <EventTableRow
-                           key={statKey}
-                           stat={stat}
-                           isHovered={isHovered}
-                           onMouseEnter={() => handleRowMouseEnter(statKey)}
-                           onMouseLeave={handleRowMouseLeave}
-                           onEnterLiveStreamRoom={() =>
-                              handleEnterLiveStreamRoom(stat)
-                           }
-                           onShareLiveStream={() => handleShareLiveStream(stat)}
-                           onShareRecording={() => handleShareRecording(stat)}
-                           onAnalytics={() => handleAnalytics(stat)}
-                           onQuestions={() => handleQuestions(stat)}
-                           onFeedback={() => handleFeedback(stat)}
-                           onEdit={() => handleEdit(stat)}
-                           onRegistrationsClick={() => handleAnalytics(stat)}
-                           onViewsClick={() => handleAnalytics(stat)}
-                        />
-                     )
-                  })}
+                        return (
+                           <EventTableRow
+                              key={statKey}
+                              stat={stat}
+                              isHovered={isHovered}
+                              onMouseEnter={() => handleRowMouseEnter(statKey)}
+                              onMouseLeave={handleRowMouseLeave}
+                              onEnterLiveStreamRoom={() =>
+                                 handleEnterLiveStreamRoom(stat)
+                              }
+                              onShareLiveStream={() =>
+                                 handleShareLiveStream(stat)
+                              }
+                              onShareRecording={() =>
+                                 handleShareRecording(stat)
+                              }
+                              onAnalytics={() => handleAnalytics(stat)}
+                              onQuestions={() => handleQuestions(stat)}
+                              onFeedback={() => handleFeedback(stat)}
+                              onEdit={() => handleEdit(stat)}
+                              onRegistrationsClick={() => handleAnalytics(stat)}
+                              onViewsClick={() => handleAnalytics(stat)}
+                           />
+                        )
+                     })
+                  )}
                </TableBody>
             </Table>
          </TableContainer>
