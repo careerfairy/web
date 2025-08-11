@@ -1,4 +1,6 @@
 import { Box, Stack, Tab, Tabs, Typography, useTheme } from "@mui/material"
+import SanitizedHTML from "components/util/SanitizedHTML"
+import { useRouter } from "next/router"
 import { useState } from "react"
 import { Frown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -7,7 +9,6 @@ import { CompaniesTab } from "./results/CompaniesTab"
 import { JobsTab } from "./results/JobsTab"
 import { LivestreamsTab } from "./results/LivestreamsTab"
 import { RecordingsTab } from "./results/RecordingsTab"
-import { useSearchContext } from "./SearchContext"
 
 const TAB_VALUES = {
    all: {
@@ -110,7 +111,9 @@ export const SearchResults = () => {
 
 export const NoResultsFound = () => {
    const theme = useTheme()
-   const { searchQuery } = useSearchContext()
+   const { query } = useRouter()
+
+   const searchQuery = query.q as string
 
    return (
       <Stack sx={styles.notFoundRoot} spacing={1}>
@@ -126,8 +129,14 @@ export const NoResultsFound = () => {
                   variant="brandedBody"
                   color="neutral.700"
                   fontWeight={600}
+                  component="span"
                >
-                  &quot;{searchQuery}&quot;
+                  &quot;
+                  <SanitizedHTML
+                     htmlString={searchQuery as string}
+                     sx={{ display: "inline" }}
+                  />
+                  &quot;
                </Typography>
             ) : (
                ""

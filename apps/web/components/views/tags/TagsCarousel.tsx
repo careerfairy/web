@@ -34,6 +34,9 @@ const styles = sxStyles({
       backgroundColor: "#CFDEDF",
       color: (t) => t.palette.neutral[700],
       padding: "8px 16px",
+      "&:hover": {
+         backgroundColor: "#CED8D9",
+      },
       "& .MuiChip-label": {
          fontWeight: 400,
          padding: 0,

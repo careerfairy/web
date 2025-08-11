@@ -136,7 +136,6 @@ export const SearchField = () => {
                   aria-describedby="search-drawer-description"
                   initial={{ opacity: 0, x: 0 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ x: "100vw" }}
                   transition={{
                      duration: ANIMATION_DURATION,
                   }}
@@ -204,7 +203,6 @@ export const SearchField = () => {
                         <motion.div
                            initial={{ opacity: 0, y: 20 }}
                            animate={{ opacity: 1, y: 0 }}
-                           exit={{ opacity: 0, y: 20 }}
                            transition={{
                               duration: ANIMATION_DURATION * 0.5,
                            }}
@@ -246,6 +244,7 @@ export const SearchField = () => {
                   onChange={setSearchQuery}
                   placeholder="What are you looking for?"
                   onFocus={handleSearchFocus}
+                  onClear={handleSearchFocus}
                   enableDropdown={!isMobile}
                   onKeyDown={handleEnterKeyDown}
                >
