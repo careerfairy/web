@@ -17,6 +17,7 @@ import useGroupAvailableCustomJobs from "components/custom-hook/custom-job/useGr
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { doc } from "firebase/firestore"
+import isEmpty from "lodash/isEmpty"
 import Link from "next/link"
 import {
    MutableRefObject,
@@ -340,9 +341,15 @@ const CompanyPageOverview = ({
          groupPresenter: presenter,
          groupCreators: groupCreators,
          editMode,
-         upcomingLivestreams: contextUpcomingLivestream || upcomingLivestreams,
-         pastLivestreams: contextPastLivestreams || pastLivestreams,
-         customJobs: contextGroupAvailableJobs || customJobs,
+         upcomingLivestreams: isEmpty(contextUpcomingLivestream)
+            ? upcomingLivestreams
+            : contextUpcomingLivestream,
+         pastLivestreams: isEmpty(contextPastLivestreams)
+            ? pastLivestreams
+            : contextPastLivestreams,
+         customJobs: isEmpty(contextGroupAvailableJobs)
+            ? customJobs
+            : contextGroupAvailableJobs,
          sectionRefs: {
             overviewSectionRef,
             jobsSectionRef,
