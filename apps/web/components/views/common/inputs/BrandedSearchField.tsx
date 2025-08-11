@@ -101,7 +101,7 @@ const styles = sxStyles({
       cursor: "pointer",
       position: "relative",
       "&:hover": {
-         backgroundColor: (theme) => theme.palette.neutral[50],
+         backgroundColor: (theme) => theme.brand.black[100],
       },
       "&.selected": {
          backgroundColor: (theme) => theme.palette.neutral[100],
@@ -307,6 +307,7 @@ export interface BrandedSearchFieldProps {
    showStartIcon?: boolean
    onFocus?: () => void
    onBlur?: () => void
+   onClear?: () => void
    children?:
       | React.ReactNode
       | ((props: DropdownRenderProps) => React.ReactNode)
@@ -323,6 +324,7 @@ export const BrandedSearchField = ({
    showStartIcon = true,
    onFocus,
    onBlur,
+   onClear,
    children,
    enableDropdown = false,
    autoFocus = false,
@@ -337,7 +339,8 @@ export const BrandedSearchField = ({
    }
 
    const handleClear = () => {
-      setIsDropdownOpen(false)
+      setIsDropdownOpen(true)
+      onClear?.()
    }
 
    const handleFocus = () => {
