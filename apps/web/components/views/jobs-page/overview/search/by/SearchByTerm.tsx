@@ -1,4 +1,4 @@
-import BrandedSearchField from "components/views/common/inputs/BrandedSearchBar"
+import { BrandedSearchField } from "components/views/common/inputs/BrandedSearchField"
 import { useState } from "react"
 
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -13,16 +13,25 @@ export const SearchByTerm = () => {
       setSearchTerm(value)
    }
 
+   const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+         handleSubmit(localSearchTerm)
+      }
+   }
+
+   const handleBlur = () => {
+      if (isMobile) {
+         handleSubmit(localSearchTerm)
+      }
+   }
+
    return (
       <BrandedSearchField
          value={localSearchTerm}
          onChange={setLocalSearchTerm}
          placeholder="Search jobs or companies"
-         settings={{
-            submitOnEnter: true,
-            submitOnBlur: isMobile,
-            onSubmit: handleSubmit,
-         }}
+         onKeyDown={handleKeyDown}
+         onBlur={handleBlur}
       />
    )
 }
