@@ -497,7 +497,7 @@ export const LoginNudgeOverlay = ({ children }: LoginNudgeOverlayProps) => {
       resetTimer()
    }, [currentSlide, resetTimer])
 
-   if (isLoadingAuth || isLoadingUserData) return null
+   if (isLoadingAuth || isLoadingUserData) return children
 
    if (!shouldShow) return children
 
