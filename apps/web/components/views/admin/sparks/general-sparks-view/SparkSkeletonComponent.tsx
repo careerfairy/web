@@ -1,7 +1,7 @@
-import { FC } from "react"
 import { SxProps } from "@mui/material"
 import SparkAspectRatioBox from "components/views/sparks/components/SparkAspectRatioBox"
-import SparkCarouselCardSkeleton from "components/views/sparks/components/spark-card/SparkCarouselCardSkeleton"
+import SparkCardSkeleton from "components/views/sparks/components/spark-card/SparkCardSkeleton"
+import { FC } from "react"
 
 type Props = {
    sx?: SxProps
@@ -10,7 +10,7 @@ type Props = {
 const SparkSkeletonComponent: FC<Props> = ({ sx }) => {
    return (
       <SparkAspectRatioBox sx={sx}>
-         <SparkCarouselCardSkeleton />
+         <SparkCardSkeleton />
       </SparkAspectRatioBox>
    )
 }
