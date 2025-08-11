@@ -150,8 +150,12 @@ const Content = ({
 
    const handleQrCode = async () => {
       if (!viewerLink) return
+
+      const qrLink = new URL(viewerLink)
+      qrLink.searchParams.set("utm_medium", "qr")
+
       await generateAndDownloadQr({
-         value: viewerLink,
+         value: qrLink.toString(),
          size: 512,
          backgroundColor: null,
          fileName: `livestream-qr-${livestream.id}.png`,
