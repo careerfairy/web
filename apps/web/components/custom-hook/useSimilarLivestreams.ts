@@ -1,11 +1,19 @@
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { useMemo } from "react"
 import useListenToStreams from "./useListenToStreams"
 
 type Config = {
    limit?: FirebaseInArrayLimit
    currentLivestream: LivestreamEvent
+}
+
+const removeCurrentLivestream = (
+   livestreams: LivestreamEvent[] | undefined,
+   currentLivestream: LivestreamEvent
+) => {
+   return (
+      livestreams?.filter((stream) => stream.id !== currentLivestream.id) || []
+   )
 }
 
 /**
@@ -21,27 +29,19 @@ const useSimilarLivestreams = (config: Config) => {
 
    // Use the existing useListenToStreams hook with industry filtering
    const allSimilarStreams = useListenToStreams({
-      companyIndustriesIds:
-         companyIndustries.length > 0 ? companyIndustries : undefined,
-      limit: limit + 1, // Get one extra to filter out current livestream
+      companyIndustriesIds: companyIndustries,
    })
 
    // Filter out the current livestream and limit results
-   const similarStreams = useMemo(() => {
-      if (!allSimilarStreams) return []
+   const events = removeCurrentLivestream(
+      allSimilarStreams,
+      currentLivestream
+   ).slice(0, limit)
 
-      return allSimilarStreams
-         .filter((stream) => stream.id !== currentLivestream.id)
-         .slice(0, limit)
-   }, [allSimilarStreams, currentLivestream.id, limit])
-
-   return useMemo(
-      () => ({
-         events: similarStreams,
-         loading: false, // useListenToStreams doesn't provide loading state
-      }),
-      [similarStreams]
-   )
+   return {
+      events,
+      loading: allSimilarStreams === undefined, // useListenToStreams returns undefined when loading
+   }
 }
 
 export default useSimilarLivestreams
