@@ -124,6 +124,8 @@ const companyIndex = {
       companyCountryId: data.companyCountry?.id ?? null,
       companyIndustriesIdTags:
          data.companyIndustries?.map((industry) => industry.id) ?? [],
+      companyIndustriesLabelTags:
+         data.companyIndustries?.map((industry) => industry.name) ?? [],
       targetedFieldsOfStudyIdTags:
          data.targetedFieldsOfStudy?.map((field) => field.id) ?? [],
       featuredCompanyPriority: generateFeaturedCompanyPriority(data),
