@@ -95,6 +95,7 @@ const CustomJobLinkedLivestreams = ({
                isEmbedded
                disableClick={disableClick}
                styling={{ padding: false, viewportSx: { py: "12px" } }}
+               openGlobalLivestreamDialog
             />
          </Box>
       </Stack>

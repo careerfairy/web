@@ -2,13 +2,15 @@ import { CacheProvider } from "@emotion/react"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import config from "@stahl.luke/react-reveal/globals"
+import dynamic from "next/dynamic"
 import Head from "next/head"
+import { useRouter } from "next/router"
 import NextNProgress from "nextjs-progressbar"
 import { Provider } from "react-redux"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 import { actionTypes, createFirestoreInstance } from "redux-firestore"
 import "styles.css"
-import { AuthProvider } from "../HOCs/AuthProvider"
+import { AuthProvider, useAuth } from "../HOCs/AuthProvider"
 import Notifier from "../components/views/notifier"
 import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
@@ -126,6 +128,7 @@ function MyApp(props) {
                                                                {...pageProps}
                                                             />
                                                          )}
+                                                         <GlobalLivestreamDialogWrapper />
                                                       </CompaniesTrackerProvider>
                                                    </SparksFeedTrackerProvider>
                                                 </UserRewardsNotifications>
@@ -177,3 +180,44 @@ const ReactFireProviders = ({ children }) => {
 // }
 
 export default wrapper.withRedux(MyApp)
+
+const GlobalLivestreamDialog = dynamic(
+   () => import("../components/views/livestream-dialog/LivestreamDialog"),
+   { ssr: false }
+)
+
+const GlobalLivestreamDialogWrapper = () => {
+   const { pathname, query, push } = useRouter()
+   const { userStats, authenticatedUser } = useAuth()
+
+   const livestreamDialogId = query?.livestreamDialogId as string
+
+   const open = Boolean(livestreamDialogId)
+
+   const handleClose = () => {
+      const newQuery = { ...query }
+      delete newQuery.livestreamDialogId
+      delete newQuery.originSource
+
+      void push({ pathname, query: newQuery }, undefined, {
+         shallow: true,
+         scroll: false,
+      })
+   }
+
+   if (!open) return null
+
+   return (
+      <GlobalLivestreamDialog
+         mode="stand-alone"
+         open={open}
+         livestreamId={livestreamDialogId}
+         handleClose={handleClose}
+         initialPage="details"
+         updatedStats={userStats}
+         providedOriginSource={query.originSource as string}
+         serverUserEmail={authenticatedUser?.email || ""}
+         appear
+      />
+   )
+}

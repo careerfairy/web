@@ -10,3 +10,17 @@ export const isJobValidButNoLinkedContent = (job: CustomJob): boolean => {
 
    return jobHasNoContent && !DateUtil.isDeadlineExpired(job.deadline.toDate())
 }
+
+type BuildRelativeLinkProps = {
+   searchTerm?: string
+   jobId: string
+}
+
+export const buildRelativeJobPostingLink = ({
+   searchTerm,
+   jobId,
+}: BuildRelativeLinkProps) => {
+   return `/jobs?currentJobId=${jobId}&first=true${
+      searchTerm ? (`&term=${searchTerm}` as const) : ""
+   }` as const
+}

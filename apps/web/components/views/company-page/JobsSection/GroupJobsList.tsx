@@ -2,9 +2,8 @@ import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { ListItem, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
-import { DIALOG_JOB_ID_QUERY_PARAM } from "components/views/jobs/components/custom-jobs/CustomJobDialogContext"
+import { buildRelativeJobPostingLink } from "components/views/common/jobs/utils"
 import Link from "next/link"
-import { useRouter } from "next/router"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -22,7 +21,6 @@ type Props = {
 }
 
 const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
-   const router = useRouter()
    const isMobile = useIsMobile("lg")
 
    if (!groupCustomJobs?.length) return null
@@ -32,13 +30,10 @@ const GroupJobsList = ({ jobs: groupCustomJobs }: Props) => {
          {groupCustomJobs.map((customJob, idx) => {
             return (
                <Link
-                  href={{
-                     pathname: router.pathname,
-                     query: {
-                        ...router.query,
-                        [DIALOG_JOB_ID_QUERY_PARAM]: customJob.id,
-                     },
-                  }}
+                  href={buildRelativeJobPostingLink({
+                     jobId: customJob.id,
+                     searchTerm: customJob.group?.universityName,
+                  })}
                   shallow
                   passHref
                   // Prevents the page from scrolling to the top when the link is clicked

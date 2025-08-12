@@ -10,9 +10,13 @@ import {
    jobTypeOptions,
 } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { CUSTOM_JOB_REPLICAS } from "@careerfairy/shared-lib/customJobs/search"
+import { mainProductionDomainWithProtocol } from "@careerfairy/shared-lib/utils/urls"
 import { getQueryStringArray } from "@careerfairy/shared-lib/utils/utils"
 import { useAuth } from "HOCs/AuthProvider"
-import { buildAlgoliaFilterString } from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
+import {
+   buildAlgoliaFilterString,
+   FilterOptions,
+} from "components/custom-hook/custom-job/useCustomJobSearchAlgolia"
 import { usePreFetchRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import { CustomJobSEOSchemaScriptTag } from "components/views/common/CustomJobSEOSchemaScriptTag"
 import {
@@ -29,6 +33,7 @@ import { customJobServiceInstance } from "data/firebase/CustomJobService"
 import { Timestamp } from "firebase/firestore"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { useRouter } from "next/router"
+import { Fragment } from "react"
 import { AlgoliaCustomJobResponse } from "types/algolia"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
 import { getUserTokenFromCookie } from "util/serverUtil"
@@ -42,7 +47,6 @@ export const RECOMMENDED_JOBS_LIMIT = 30
 const JobsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({
-   serializedCustomJobs,
    customJobData,
    userCountryCode,
    dialogOpen,
@@ -53,13 +57,6 @@ const JobsPage: NextPage<
    const router = useRouter()
    const { currentJobId } = router.query
    const { authenticatedUser } = useAuth()
-
-   const serverCustomJobs =
-      serializedCustomJobs?.map((job) =>
-         CustomJobsPresenter.deserialize(job).convertToDocument(
-            Timestamp.fromDate
-         )
-      ) || []
 
    const serverJob = customJobData?.serializedCustomJob
       ? CustomJobsPresenter.deserialize(
@@ -76,11 +73,18 @@ const JobsPage: NextPage<
    return (
       <>
          {serverJob && serverJob.id === currentJobId ? (
-            <CustomJobSEOSchemaScriptTag job={serverJob} />
+            <Fragment>
+               <CustomJobSEOSchemaScriptTag job={serverJob} />
+               <link
+                  rel="canonical"
+                  href={`${mainProductionDomainWithProtocol}/jobs?currentJobId=${serverJob.id}`}
+               />
+            </Fragment>
          ) : (
-            serverCustomJobs.map((job) => (
-               <CustomJobSEOSchemaScriptTag key={job.id} job={job} />
-            ))
+            <link
+               rel="canonical"
+               href={`${mainProductionDomainWithProtocol}/jobs`}
+            />
          )}
 
          <GenericDashboardLayout
@@ -245,7 +249,6 @@ const getBusinessFunctionTagLabels = (tags?: string[]) => {
 }
 
 type JobsPageProps = {
-   serializedCustomJobs: SerializedCustomJob[]
    customJobData?: {
       serializedCustomJob: SerializedCustomJob
    }
@@ -275,7 +278,6 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const term = queryTerm as string
    const currentJobId = queryCurrentJobId as string
-
    const dialogOpen = Boolean(currentJobId)
 
    const queryLocations = getQueryStringArray(context.query.location)
@@ -302,7 +304,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          published: true,
          isPermanentlyExpired: false,
       },
-   }
+   } satisfies FilterOptions
 
    const filters: string = buildAlgoliaFilterString(filterOptions)
 
@@ -341,14 +343,8 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
       ? CustomJobsPresenter.serializeDocument(customJob)
       : null
 
-   const serializedCustomJobs =
-      algoliaCustomJobs?.map((job) =>
-         CustomJobsPresenter.serializeDocument(job)
-      ) ?? []
-
    return {
       props: {
-         serializedCustomJobs: serializedCustomJobs,
          algoliaServerResponse: algoliaResponse,
          customJobData: {
             serializedCustomJob,

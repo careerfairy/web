@@ -10,6 +10,7 @@ export type TransformedCustomJob = CustomJob & {
    normalizedLocationIds?: string[]
    normalizedJobType?: string
    deadlineAtMs?: number
+   companyName?: string
 }
 
 export const CUSTOM_JOB_FIELDS_TO_INDEX = [
@@ -38,6 +39,7 @@ export const CUSTOM_JOB_FIELDS_TO_INDEX = [
    "normalizedJobType",
    "deadlineAtMs",
    "normalizedLocationIds",
+   "companyName",
 ] satisfies (keyof TransformedCustomJob)[]
 
 export type CustomJobFieldToIndexType =
@@ -60,6 +62,7 @@ export const CUSTOM_JOB_SEARCHABLE_ATTRIBUTES = [
    "normalizedJobType",
    "workplace",
    "normalizedLocationIds",
+   "companyName",
 ] satisfies CustomJobFieldToIndexType[]
 
 /**

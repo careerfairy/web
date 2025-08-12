@@ -4,6 +4,7 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useUserRecommendedJobs } from "components/custom-hook/custom-job/useRecommendedJobs"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import JobCard from "components/views/common/jobs/JobCard"
+import { buildRelativeJobPostingLink } from "components/views/common/jobs/utils"
 import { SeeAllLink } from "components/views/company-page/Overview/SeeAllLink"
 import { JobCardSkeleton } from "components/views/streaming-page/components/jobs/JobListSkeleton"
 import useEmblaCarousel from "embla-carousel-react"
@@ -113,7 +114,9 @@ const Content = ({ userCountryCode }: RecommendedCustomJobsProps) => {
                      maxWidth="320px"
                      minWidth="320px"
                      component={Link}
-                     href={`/jobs?currentJobId=${customJob.id}&first=true`}
+                     href={buildRelativeJobPostingLink({
+                        jobId: customJob.id,
+                     })}
                   >
                      <JobCard
                         job={customJob}

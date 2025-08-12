@@ -177,6 +177,7 @@ export type EventsProps = {
    preventPaddingSlide?: boolean
    onClickSeeMore?: () => void
    disableAutoPlay?: boolean
+   openGlobalLivestreamDialog?: boolean
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -206,6 +207,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          header,
          preventPaddingSlide = false,
          disableAutoPlay,
+         openGlobalLivestreamDialog,
       } = props
 
       const allStyles = { ...defaultStyling, ...styling }
@@ -402,6 +404,9 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                              }
                                              muted={muted}
                                              setMuted={setMuted}
+                                             openGlobalLivestreamDialog={
+                                                openGlobalLivestreamDialog
+                                             }
                                              onCardClick={
                                                 onCardClick
                                                    ? () => onCardClick(event)

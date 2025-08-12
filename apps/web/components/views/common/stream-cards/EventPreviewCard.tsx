@@ -42,13 +42,15 @@ export type EventPreviewCardProps = {
    selectInput?: React.ReactNode
    selected?: boolean
    disableTracking?: boolean
+   /* When true, clicking the card opens the global livestream dialog by appending a flat query param on the current URL (shallow) */
+   openGlobalLivestreamDialog?: boolean
 } & AdditionalContextProps
 
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
    (props, ref) => {
       const router = useRouter()
       const dispatch = useAppDispatch()
-      const { pathname } = router
+      const { pathname, query } = router
 
       const { inView: cardInView, ref: cardInViewRef } = useInView({
          fallbackInView: true,
@@ -112,6 +114,22 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             }
          }
 
+         // Force appending a flat livestreamDialogId on the current page
+         if (props.openGlobalLivestreamDialog) {
+            return {
+               href: {
+                  pathname,
+                  query: {
+                     ...query,
+                     livestreamDialogId: presenterEvent.id,
+                     ...(props.location
+                        ? { originSource: props.location }
+                        : {}),
+                  },
+               },
+            }
+         }
+
          // If the application is running in an iframe, open the link in a new tab with UTM tags
          if (isInIframe()) {
             return {
@@ -145,8 +163,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          hasRegistered,
          router,
          pathname,
+         query,
          getPartnerEventLink,
          props.location,
+         props.openGlobalLivestreamDialog,
       ])
 
       const isLink =

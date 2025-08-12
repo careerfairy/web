@@ -129,6 +129,7 @@ const customJobsIndex = {
       normalizedLocationIds: normalizeLocationIds(
          data.jobLocation?.map((location) => location.id) ?? []
       ),
+      companyName: data.group?.universityName ?? "",
    }),
    shouldIndex: () => true, // We could index only valid custom jobs
    fullIndexSyncQueryConstraints: (collectionRef) => collectionRef,
