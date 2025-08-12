@@ -14,10 +14,15 @@ const defaultStyling: EventsCarouselStyling = {
 
 type Props = {
    limit?: FirebaseInArrayLimit
+   title?: string
    hideTitle?: boolean
 }
 
-const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
+const RecommendedEvents = ({
+   limit = 10,
+   hideTitle,
+   title = "Recommended for you",
+}: Props) => {
    const { userData } = useAuth()
 
    const options = useMemo(
@@ -32,7 +37,7 @@ const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    return (
       <div>
          <EventsPreviewCarousel
-            title={!hideTitle && "Recommended for you"}
+            title={!hideTitle && title}
             events={events}
             location={"portal-recommended-livestreams-carousel"}
             loading={loading}
