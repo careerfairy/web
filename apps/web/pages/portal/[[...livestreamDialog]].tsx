@@ -188,9 +188,13 @@ const PortalPage = ({
 
                         <PortalTags>
                            {hasInterests ? (
-                              <RecommendedEvents limit={10} />
+                              <RecommendedEvents
+                                 title="Live streams"
+                                 limit={10}
+                              />
                            ) : (
                               <ComingUpNextEvents
+                                 title="Live streams"
                                  serverSideEvents={comingUpNext}
                                  limit={20}
                               />
