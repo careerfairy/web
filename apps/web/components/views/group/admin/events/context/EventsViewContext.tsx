@@ -278,12 +278,19 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
          livestreamService
             .getById(livestreamIdToPromote as string)
             .then(setPromoteDialogLivestream)
-            .catch(errorLogAndNotify)
+            .catch((err) => {
+               errorLogAndNotify(err, {
+                  message: "Failed to fetch livestream for promote dialog",
+                  livestreamId: livestreamIdToPromote,
+               })
+            })
             .finally(() => {
                const newQuery = {
                   ...query,
                }
+
                delete newQuery.livestreamIdToPromote
+
                replace({
                   pathname: pathname,
                   query: newQuery,
