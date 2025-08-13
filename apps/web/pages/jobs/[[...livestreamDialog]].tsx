@@ -48,6 +48,7 @@ const JobsPage: NextPage<
    dialogOpen,
    locationNames,
    algoliaServerResponse,
+   ipBasedLocationName,
 }) => {
    const router = useRouter()
    const { currentJobId } = router.query
@@ -98,7 +99,7 @@ const JobsPage: NextPage<
                   numberOfJobs={algoliaServerResponse?.nbHits}
                   userCountryCode={userCountryCode}
                >
-                  <PageSEO />
+                  <PageSEO ipBasedLocationName={ipBasedLocationName} />
                   <JobsPageOverview />
                </JobsOverviewContextProvider>
                <ScrollToTop hasBottomNavBar />
@@ -108,7 +109,7 @@ const JobsPage: NextPage<
    )
 }
 
-const PageSEO = () => {
+const PageSEO = ({ ipBasedLocationName }: { ipBasedLocationName: string }) => {
    const { searchParams, searchResultsCount, selectedLocationsNames } =
       useJobsOverviewContext()
 
@@ -133,7 +134,8 @@ const PageSEO = () => {
             title={getSeoTitle(
                searchParams,
                searchResultsCount,
-               selectedLocationsNames
+               selectedLocationsNames,
+               ipBasedLocationName
             )}
          />
       </>
@@ -186,49 +188,41 @@ const getMetaContent = (
 const getSeoTitle = (
    searchParams: SearchParams,
    numberOfJobs: number,
-   locationNames: string[]
+   locationNames: string[],
+   ipBasedLocationName: string
 ) => {
-   const jobTypes = getJobTypeLabels(searchParams.jobTypes)
-   const businessFunctions = getBusinessFunctionTagLabels(
-      searchParams.businessFunctionTags
+   // Get at most 2 location names
+   const selectedLocations = locationNames?.slice(0, 2) ?? []
+   const locationsText = selectedLocations.join(
+      selectedLocations.length > 1 ? ", " : ""
    )
-   const locations = locationNames?.length ? locationNames.join(", ") : null
-   const term = searchParams.term
 
-   // Build title components
+   // Handle singular/plural for jobs
+   const jobsText = numberOfJobs === 1 ? "job" : "jobs"
+
+   // Build title parts
    const titleParts: string[] = []
 
-   // Start with number of jobs
+   // Add number
    titleParts.push(numberOfJobs.toString())
 
-   // Add job types (e.g., "Part-Time", "Full-Time")
-   if (jobTypes.length) {
-      titleParts.push(jobTypes.join(", "))
+   // Add search term if available
+   if (searchParams.term) {
+      titleParts.push(searchParams.term)
    }
 
-   // Add business functions (e.g., "Accounting", "Engineering")
-   if (businessFunctions.length) {
-      titleParts.push(businessFunctions.join(", "))
+   // Add jobs text
+   titleParts.push(jobsText)
+
+   // Add location if available
+   if (locationsText) {
+      titleParts.push(`in ${locationsText}`)
+   } else if (ipBasedLocationName) {
+      titleParts.push(`in ${ipBasedLocationName}`)
    }
 
-   // Add "Jobs"
-   titleParts.push("Jobs")
-
-   // Build the base title
-   let title = titleParts.join(" ")
-
-   // Add location with "in" prefix
-   if (locations) {
-      title += ` in ${locations}`
-   }
-
-   // Add search term with "matching" prefix
-   if (term) {
-      title += ` matching "${term}"`
-   }
-
-   // Add platform branding
-   title += " on CareerFairy"
+   // Join with spaces and add period
+   const title = titleParts.join(" ")
 
    return title
 }
@@ -256,6 +250,7 @@ type JobsPageProps = {
       serializedCustomJob: SerializedCustomJob
    }
    locationNames: string[]
+   ipBasedLocationName: string
    searchParams: SearchParams
    userCountryCode: string
    algoliaServerResponse: SearchResponse<AlgoliaCustomJobResponse>
@@ -270,6 +265,10 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
 
    const { term: queryTerm = "", currentJobId: queryCurrentJobId } =
       context.query
+
+   const ipBasedLocationName = userCountryCode
+      ? getLocationNames([userCountryCode])?.at(0)
+      : null
 
    const token = getUserTokenFromCookie(context) as any
    const userAuthId = token?.user_id
@@ -357,6 +356,7 @@ export const getServerSideProps: GetServerSideProps<JobsPageProps> = async (
          dialogOpen,
          userCountryCode,
          locationNames,
+         ipBasedLocationName,
          searchParams: {
             location: queryLocations,
             term: term as string,
