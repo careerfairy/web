@@ -1,0 +1,19 @@
+<svg width="320" height="140" viewBox="0 0 320 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="140" fill="#F59E0B"/>
+  <rect x="40" y="25" width="240" height="90" rx="8" fill="white" fill-opacity="0.2"/>
+  <rect x="50" y="35" width="220" height="15" rx="4" fill="white" fill-opacity="0.8"/>
+  <circle cx="70" cy="65" r="8" fill="white" fill-opacity="0.8"/>
+  <circle cx="100" cy="65" r="8" fill="white" fill-opacity="0.8"/>
+  <circle cx="130" cy="65" r="8" fill="white" fill-opacity="0.8"/>
+  <circle cx="160" cy="65" r="8" fill="white" fill-opacity="0.8"/>
+  <circle cx="190" cy="65" r="8" fill="white" fill-opacity="0.8"/>
+  <circle cx="220" cy="65" r="8" fill="white" fill-opacity="0.8"/>
+  <circle cx="250" cy="65" r="8" fill="white" fill-opacity="0.8"/>
+  <circle cx="70" cy="85" r="8" fill="white" fill-opacity="0.6"/>
+  <circle cx="100" cy="85" r="8" fill="white" fill-opacity="0.6"/>
+  <circle cx="130" cy="85" r="8" fill="white" fill-opacity="0.9"/>
+  <circle cx="160" cy="85" r="8" fill="white" fill-opacity="0.6"/>
+  <circle cx="190" cy="85" r="8" fill="white" fill-opacity="0.6"/>
+  <circle cx="220" cy="85" r="8" fill="white" fill-opacity="0.9"/>
+  <circle cx="250" cy="85" r="8" fill="white" fill-opacity="0.6"/>
+</svg>
