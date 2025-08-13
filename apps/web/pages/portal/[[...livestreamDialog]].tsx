@@ -216,7 +216,6 @@ const PortalPage = ({
                               }
                               handleSparksClicked={handleSparksClicked}
                            />
-
                            <ConditionalWrapper
                               condition={Boolean(events?.length)}
                            >
