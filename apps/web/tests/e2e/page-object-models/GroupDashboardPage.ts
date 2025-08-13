@@ -14,6 +14,7 @@ import { sleep } from "../utils"
 import { CommonPage } from "./CommonPage"
 import { ATSAdminPage } from "./admin/ATSAdminPage"
 import { FeedbackPage } from "./admin/FeedbackPage"
+import { GuidesPage } from "./admin/GuidesPage"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
@@ -134,6 +135,10 @@ export class GroupDashboardPage extends CommonPage {
       await this.goToPage("Feedback")
 
       return new FeedbackPage(this)
+   }
+
+   public getGuidesPage() {
+      return new GuidesPage(this)
    }
 
    // Team Members page

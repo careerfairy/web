@@ -84,7 +84,7 @@ test.describe("Group Admin Livestreams", () => {
       await livestreamsPage.assertTextIsVisible(livestream.title)
       await groupPage.open()
 
-      // should also be in the main page
+      // should also be in the main page (likely in the Next Livestream card)
       await groupPage.assertTextIsVisible(livestream.title)
 
       // edit livestream title
