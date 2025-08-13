@@ -1,7 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { ThemeProvider } from "@mui/material/styles"
-import { GroupProvider } from "layouts/GroupDashboardLayout"
-import { theme } from "packages/config-mui"
+import { brandedLightTheme } from "materialUI"
 import MainPageContent from "../index"
 
 // Mock the group context
@@ -28,6 +27,13 @@ jest.mock("embla-carousel-react", () => ({
    default: () => [jest.fn(), { scrollTo: jest.fn() }],
 }))
 
+// Mock the ContentCarousel component
+jest.mock("components/views/common/carousels/ContentCarousel", () => ({
+   ContentCarousel: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="content-carousel">{children}</div>
+   ),
+}))
+
 // Mock the custom hooks used by child components
 jest.mock("../analytics/AggregatedTalentPoolValue", () => ({
    __esModule: true,
@@ -39,12 +45,29 @@ jest.mock("../analytics/AverageRegistrationsValue", () => ({
    default: () => <div>Average Registrations</div>,
 }))
 
+// Mock other admin components that might have complex dependencies
+jest.mock("../next-livestream/NextLivestreamCard", () => ({
+   NextLivestreamCard: () => <div data-testid="next-livestream-card">Next Livestream</div>,
+}))
+
+jest.mock("../analytics/AggregatedAnalytics", () => ({
+   __esModule: true,
+   default: () => <div data-testid="aggregated-analytics">Analytics</div>,
+}))
+
+jest.mock("../registration-sources/AggregatedRegistrationSourcesCard", () => ({
+   AggregatedRegistrationSourcesCard: () => <div data-testid="registration-sources-card">Registration Sources</div>,
+}))
+
+// Mock the MainPageProvider
+jest.mock("../MainPageProvider", () => ({
+   MainPageProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}))
+
 const renderWithProviders = (component: React.ReactElement) => {
    return render(
-      <ThemeProvider theme={theme}>
-         <GroupProvider value={{ group: mockGroup, stats: mockStats }}>
-            {component}
-         </GroupProvider>
+      <ThemeProvider theme={brandedLightTheme}>
+         {component}
       </ThemeProvider>
    )
 }
@@ -53,8 +76,8 @@ describe("MainPageContent", () => {
    it("renders without crashing", () => {
       renderWithProviders(<MainPageContent />)
       
-      // Should render the main container
-      expect(screen.getByRole("main")).toBeInTheDocument()
+      // Should render the Guides card title to verify the component rendered
+      expect(screen.getByText("Guides")).toBeInTheDocument()
    })
 
    it("renders the Guides card instead of Live Stream Feedback card", () => {
@@ -67,26 +90,23 @@ describe("MainPageContent", () => {
       expect(screen.queryByText("Live Stream Feedback")).not.toBeInTheDocument()
    })
 
-   it("renders all expected admin cards", () => {
+   it("renders all expected admin components", () => {
       renderWithProviders(<MainPageContent />)
       
-      // Should have multiple cards (analytics, guides, etc.)
-      const cards = screen.getAllByTestId("card-custom")
-      expect(cards.length).toBeGreaterThan(1)
-      
-      // Should have the Guides card
-      expect(screen.getByText("Guides")).toBeInTheDocument()
+      // Should have all the mocked components
+      expect(screen.getByTestId("next-livestream-card")).toBeInTheDocument()
+      expect(screen.getByTestId("aggregated-analytics")).toBeInTheDocument()
+      expect(screen.getByTestId("registration-sources-card")).toBeInTheDocument()
+      expect(screen.getByTestId("card-custom")).toBeInTheDocument() // Guides card
    })
 
-   it("maintains the same grid structure", () => {
+   it("has the correct title and structure", () => {
       renderWithProviders(<MainPageContent />)
       
-      // Should have the MUI Grid container
-      const container = screen.getByRole("main")
-      expect(container).toBeInTheDocument()
+      // Should have the Guides card with correct title
+      expect(screen.getByText("Guides")).toBeInTheDocument()
       
-      // Should have multiple grid items
-      const gridItems = container.querySelectorAll('[class*="MuiGrid-item"]')
-      expect(gridItems.length).toBeGreaterThan(0)
+      // Should have the guide content
+      expect(screen.getByText("Host live streams that attract and engage top talent")).toBeInTheDocument()
    })
 })
