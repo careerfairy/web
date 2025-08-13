@@ -1,7 +1,6 @@
 import { render, screen } from "@testing-library/react"
 import { ThemeProvider } from "@mui/material/styles"
-import { GroupProvider } from "layouts/GroupDashboardLayout"
-import { theme } from "packages/config-mui"
+import { brandedLightTheme } from "materialUI"
 import GuidesCard from "../GuidesCard"
 
 // Mock the group context
@@ -13,7 +12,7 @@ const mockGroup = {
 // Mock useGroup hook
 jest.mock("layouts/GroupDashboardLayout", () => ({
    ...jest.requireActual("layouts/GroupDashboardLayout"),
-   useGroup: () => ({ group: mockGroup }),
+   useGroup: () => ({ group: mockGroup, stats: null }),
 }))
 
 // Mock useEmblaCarousel
@@ -22,12 +21,17 @@ jest.mock("embla-carousel-react", () => ({
    default: () => [jest.fn(), { scrollTo: jest.fn() }],
 }))
 
+// Mock the ContentCarousel component
+jest.mock("components/views/common/carousels/ContentCarousel", () => ({
+   ContentCarousel: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="content-carousel">{children}</div>
+   ),
+}))
+
 const renderWithProviders = (component: React.ReactElement) => {
    return render(
-      <ThemeProvider theme={theme}>
-         <GroupProvider value={{ group: mockGroup, stats: null }}>
-            {component}
-         </GroupProvider>
+      <ThemeProvider theme={brandedLightTheme}>
+         {component}
       </ThemeProvider>
    )
 }
