@@ -19,6 +19,9 @@ const styles = sxStyles({
          xs: "100%",
          md: "339px",
       },
+      pr: { xs: 0, md: 0.5 },
+      pt: { xs: 0, md: 0.5 },
+      pb: 0.5,
       overflowY: "auto",
    },
    listTitle: {

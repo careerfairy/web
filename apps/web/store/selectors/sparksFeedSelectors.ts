@@ -28,6 +28,9 @@ export const initialSparksFetchedSelector = (state: RootState) =>
 export const hasNoMoreSparksSelector = (state: RootState) =>
    state.sparksFeed.hasMoreSparks === false
 
+export const searchResultsExhaustedSelector = (state: RootState) =>
+   state.sparksFeed.searchResultsExhausted
+
 export const fetchedCompanyWithCreatorStatusSelector = (state: RootState) =>
    state.sparksFeed.fetchedCompanyWithCreatorStatus
 

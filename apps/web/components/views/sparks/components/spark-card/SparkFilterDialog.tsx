@@ -22,10 +22,12 @@ import SparkIcon from "components/views/common/icons/SparkIcon"
 import useSparksFeedIsFullScreen from "components/views/sparks-feed/hooks/useSparksFeedIsFullScreen"
 import { DRAWER_WIDTH } from "constants/layout"
 import { useFormik } from "formik"
+import { useRouter } from "next/router"
 import { useCallback, useMemo } from "react"
 import { useDispatch } from "react-redux"
 import {
    fetchNextSparks,
+   resetSearchTransition,
    resetSparksFeed,
    setSparkCategories,
 } from "store/reducers/sparksFeedReducer"
@@ -184,9 +186,40 @@ const FilterContent = ({
    isOpen,
 }: ContentProps) => {
    const dispatch = useDispatch()
+   const router = useRouter()
+
    const formik = useFormik({
       initialValues: selectedCategoryIds,
       onSubmit: (values) => {
+         const isSearchMode = Boolean(router.query.q)
+
+         if (isSearchMode) {
+            // Clear search state and transition to natural feed
+            dispatch(resetSearchTransition())
+
+            // Update URL to remove search parameters
+            /* eslint-disable @typescript-eslint/no-unused-vars */
+            const {
+               fromSearch,
+               q,
+               languages,
+               contentTopics,
+               companySizes,
+               industries,
+               ...cleanQuery
+            } = router.query
+            /* eslint-enable @typescript-eslint/no-unused-vars */
+            router.replace(
+               {
+                  pathname: router.pathname,
+                  query: cleanQuery,
+               },
+               undefined,
+               { shallow: true }
+            )
+         }
+
+         // Reset feed and apply new filters
          dispatch(resetSparksFeed())
          dispatch(setSparkCategories(values ? values : []))
          dispatch(fetchNextSparks())

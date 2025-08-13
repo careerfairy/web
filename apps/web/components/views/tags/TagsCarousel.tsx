@@ -11,6 +11,8 @@ const mobileSlideWidth = 280 + slideSpacing
 const styles = sxStyles({
    viewport: {
       overflow: "hidden",
+      px: { xs: 2, md: 0 },
+      mx: { xs: -2, md: 0 },
    },
    slide: {
       flex: {
@@ -29,10 +31,16 @@ const styles = sxStyles({
       flex: `0 0 ${slideSpacing}px`,
    },
    chip: {
-      backgroundColor: (t) => t.palette.neutral[50],
+      backgroundColor: "#CFDEDF",
       color: (t) => t.palette.neutral[700],
-      py: "8px",
-      px: "4px",
+      padding: "8px 16px",
+      "&:hover": {
+         backgroundColor: "#CED8D9",
+      },
+      "& .MuiChip-label": {
+         fontWeight: 400,
+         padding: 0,
+      },
    },
    selectedChip: {
       backgroundColor: (t) => t.palette.primary.main,
@@ -67,7 +75,7 @@ const TagsCarousel = forwardRef<ChildRefType, PropType>((props, ref) => {
 
    return (
       <Box sx={styles.viewport} ref={emblaRef}>
-         <Stack direction={"row"} spacing={"12px"} pl={2}>
+         <Stack direction={"row"} spacing={"12px"}>
             {/* Chip for All  */}
             <Chip
                sx={[

@@ -20,7 +20,7 @@ type Options = {
  * if the user is allowed to proceed or not
  */
 const RegistrationPreConditions = ({ children, skeleton }: Options) => {
-   const { goToView, mode } = useLiveStreamDialog()
+   const { mode, activeView, goToView } = useLiveStreamDialog()
    const { registrationStatus, redirectToLogin } = useRegistrationHandler()
    const { isLoadingAuth, isLoadingUserData } = useAuth()
    const status = registrationStatus()
@@ -54,7 +54,9 @@ const RegistrationPreConditions = ({ children, skeleton }: Options) => {
    if (
       isAuthLoading ||
       status === "login_required" ||
-      (isPageMode && status === "registered")
+      (isPageMode &&
+         status === "registered" &&
+         activeView === "livestream-details")
    ) {
       // if the user can't register, there will be a navigation
       // continue showing the skeleton while that happens
