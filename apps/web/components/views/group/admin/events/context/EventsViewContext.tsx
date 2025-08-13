@@ -1,5 +1,6 @@
 import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import {
@@ -7,9 +8,11 @@ import {
    ReactNode,
    useCallback,
    useContext,
+   useEffect,
    useMemo,
    useState,
 } from "react"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
 import { FeedbackDialogProvider } from "../../analytics-new/feedback/feedback-dialog/FeedbackDialogProvider"
 import { EnterStreamDialog } from "../EnterStreamDialog"
@@ -87,6 +90,9 @@ type EventsViewProviderProps = {
 }
 
 export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
+   const { query, replace, pathname } = useRouter()
+   const { livestreamIdToPromote } = query
+
    const { group } = useGroup()
    const [sortBy, setSortBy] = useState<LivestreamStatsSortOption>(
       LivestreamStatsSortOption.STATUS_WITH_DATE
@@ -266,6 +272,26 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
       setStatusFilter([])
       setSearchTerm("")
    }, [])
+
+   useEffect(() => {
+      if (livestreamIdToPromote) {
+         livestreamService
+            .getById(livestreamIdToPromote as string)
+            .then(setPromoteDialogLivestream)
+            .catch(errorLogAndNotify)
+            .finally(() => {
+               const newQuery = {
+                  ...query,
+               }
+               delete newQuery.livestreamIdToPromote
+               replace({
+                  pathname: pathname,
+                  query: newQuery,
+               })
+            })
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [livestreamIdToPromote, replace])
 
    const value = useMemo<EventsViewContextValue>(
       () => ({
