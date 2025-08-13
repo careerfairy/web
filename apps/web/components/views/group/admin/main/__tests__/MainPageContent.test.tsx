@@ -1,6 +1,4 @@
-import { render, screen } from "@testing-library/react"
-import { ThemeProvider } from "@mui/material/styles"
-import { brandedLightTheme } from "materialUI"
+import { render, screen } from "../../../../../../tests/test-utils"
 import MainPageContent from "../index"
 
 // Mock the group context
@@ -64,12 +62,29 @@ jest.mock("../MainPageProvider", () => ({
    MainPageProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
+// Mock the Link component
+jest.mock("components/views/common/Link", () => ({
+   __esModule: true,
+   default: ({ children, href, ...props }: any) => (
+      <a href={href} {...props}>
+         {children}
+      </a>
+   ),
+}))
+
+// Mock CardCustom component
+jest.mock("../common/CardCustom", () => ({
+   __esModule: true,
+   default: ({ title, children }: { title: string; children: React.ReactNode }) => (
+      <div data-testid="card-custom">
+         <div data-testid="card-title">{title}</div>
+         <div data-testid="card-value">{children}</div>
+      </div>
+   ),
+}))
+
 const renderWithProviders = (component: React.ReactElement) => {
-   return render(
-      <ThemeProvider theme={brandedLightTheme}>
-         {component}
-      </ThemeProvider>
-   )
+   return render(component)
 }
 
 describe("MainPageContent", () => {
