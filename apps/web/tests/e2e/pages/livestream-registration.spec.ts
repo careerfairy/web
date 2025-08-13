@@ -177,7 +177,8 @@ test.describe("Livestream Registration Signed In", () => {
          referenceLivestream
       )
 
-      await livestreamDialogPage.openDialog()
+      // In order to bypass the recommendation system, we go directly to the livestream page
+      await page.goto(`/portal/livestream/${referenceLivestream.id}`)
 
       // Complete the registration process
       await livestreamDialogPage.completeSuccessfulRegistration()
@@ -216,18 +217,35 @@ test.describe("Livestream Registration Signed In", () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
    }) => {
-      const { livestream } = await setupLivestreamData()
+      const { livestream } = await setupLivestreamData(undefined, {
+         overrideLivestreamDetails: {
+            companyIndustries: ["Technology", "Software"],
+            companyCountries: ["Germany", "United Kingdom"],
+         },
+      })
 
       // Create multiple livestreams to ensure we have recommendations
       await Promise.all([
          LivestreamSeed.createUpcoming({
             title: "Recommendation Stream 1",
+            companyIndustries: ["Technology"],
+            companyCountries: ["Germany"],
+            businessFunctionsTagIds: ["BusinessDevelopment"],
+            contentTopicsTagIds: ["ApplicationProcess"],
          }),
          LivestreamSeed.createUpcoming({
             title: "Recommendation Stream 2",
+            companyIndustries: ["Software"],
+            companyCountries: ["United Kingdom"],
+            businessFunctionsTagIds: ["Consulting"],
+            contentTopicsTagIds: ["ApplicationProcess"],
          }),
          LivestreamSeed.createUpcoming({
             title: "Recommendation Stream 3",
+            companyIndustries: ["IT"],
+            companyCountries: ["Portugal"],
+            businessFunctionsTagIds: ["BusinessDevelopment"],
+            contentTopicsTagIds: ["ApplicationProcess"],
          }),
       ])
 
@@ -312,7 +330,7 @@ test.describe("Livestream Registration Signed In", () => {
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       // open page
-      await livestreamDialogPage.openDialog()
+      await page.goto(`/portal/livestream/${livestream.id}`)
       expect(await livestreamDialogPage.registrationButton.textContent()).toBe(
          "Join live stream"
       )
@@ -352,10 +370,9 @@ test.describe("Livestream Registration Signed Out", () => {
       const { livestream } = await setupLivestreamData()
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
-      await page.goto("/portal")
+      await page.goto(`/portal/livestream/${livestream.id}`)
 
       // open dialog and try to register without login
-      await livestreamDialogPage.openDialog()
       await livestreamDialogPage.registrationButton.click()
 
       // redirection to login
