@@ -9,6 +9,7 @@ export class LivestreamsAdminPage extends CommonPage {
    public readonly searchField: Locator
    public readonly livestreamQuestionsDialog: Locator
    public readonly csvDownloadDialog: Locator
+   public readonly promoteLivestreamDialog: Locator
 
    constructor(private readonly parent: GroupDashboardPage) {
       super(parent.page)
@@ -25,6 +26,9 @@ export class LivestreamsAdminPage extends CommonPage {
          "livestream-questions-dialog"
       )
       this.csvDownloadDialog = this.page.getByTestId("csv-download-dialog")
+      this.promoteLivestreamDialog = this.page.getByTestId(
+         "promote-livestream-dialog"
+      )
    }
 
    // Status filter methods for the new table structure
@@ -163,5 +167,36 @@ export class LivestreamsAdminPage extends CommonPage {
 
    public async publish() {
       await this.parent.clickPublish()
+   }
+
+   // Promote livestream dialog helpers
+   public async waitForPromoteDialog() {
+      await this.promoteLivestreamDialog.waitFor({ state: "visible" })
+   }
+
+   public async closePromoteDialog() {
+      const closeButton = this.promoteLivestreamDialog.getByTestId(
+         "promote-livestream-dialog-close-button"
+      )
+      await closeButton.click()
+   }
+
+   public async assertPromoteDialogCopyLinkWorks() {
+      const inputElement =
+         this.promoteLivestreamDialog.getByLabel("Live stream link")
+
+      const link = await inputElement.inputValue()
+
+      expect(link).toMatch(
+         /\/portal\/livestream\/([a-zA-Z0-9_-]+)\?utm_source=client&utm_campaign=events&utm_content=([a-zA-Z0-9_-]+)/
+      )
+
+      await this.promoteLivestreamDialog
+         .getByRole("button", { name: "Copy" })
+         .click()
+
+      await expect(
+         this.promoteLivestreamDialog.getByText("Link copied!")
+      ).toBeVisible()
    }
 }

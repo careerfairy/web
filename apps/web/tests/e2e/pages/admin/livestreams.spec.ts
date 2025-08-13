@@ -52,13 +52,13 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.clickCreateNewLivestreamTop()
       await groupPage.fillLivestreamForm(livestream)
 
-      // 1. - publish draft
+      // Publish draft
       const livestreamsPage = await groupPage.goToLivestreams()
       await livestreamsPage.filterByStatus("Draft")
       // Click on the specific event to navigate to the edit page
       await livestreamsPage.clickEventToEditByTitle(livestream.title)
 
-      // 1.1 - fill in missing required fields
+      // Fill in missing required fields
 
       const overrideFields = {
          ...livestream,
@@ -74,15 +74,15 @@ test.describe("Group Admin Livestreams", () => {
       const livestreamToPublish: LivestreamEvent =
          LivestreamSeed.random(overrideFields)
 
-      // 1.2 - fill form and publish after auto save
+      // Fill form and publish after auto save
       await groupPage.fillLivestreamForm(livestreamToPublish, true)
 
-      // Should be in published status after filling missing fields
-      await groupPage.goToLivestreams()
-      await livestreamsPage.filterByStatus("Published")
+      // Assert promoted livestream dialog is visible right after publishing
+      await livestreamsPage.waitForPromoteDialog()
+      await livestreamsPage.assertPromoteDialogCopyLinkWorks()
+      await livestreamsPage.closePromoteDialog()
 
-      // assert livestream is published in the published filter
-      await livestreamsPage.assertEventIsVisible(livestream.title)
+      // go back to the main page
       await groupPage.open()
 
       // should also be in the main page
