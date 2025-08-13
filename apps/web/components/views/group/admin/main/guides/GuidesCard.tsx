@@ -67,7 +67,7 @@ const GUIDE_CARDS_DATA = [
       title: "Host live streams that attract and engage top talent",
       text: "Learn the three key stages before, during and after the event to plan effectively, present with impact and follow up for measurable recruitment results.",
       cta: "Read the full guide",
-      url: "", // Empty URL as specified
+      url: "https://support.careerfairy.io/en/article/live-stream-your-way-to-top-talent-a-guide-to-engaging-gen-z-recruitment-1ifie4a/",
       image: "/images/guides/livestream-guide.svg",
    },
    {
