@@ -48,7 +48,7 @@ const styles = sxStyles({
       position: "absolute",
       inset: 0,
       height: "auto",
-      borderRadius: "8px",
+      borderRadius: "8px 8px 0 0",
    },
    recordingWrapper: {
       overflow: "hidden",

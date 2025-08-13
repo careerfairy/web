@@ -78,7 +78,7 @@ const generateDateFilterString = (
  * @param {Object} options - The filters to apply.
  * @returns {string} The constructed filter string.
  */
-const buildAlgoliaFilterString = (options: FilterOptions): string => {
+export const buildAlgoliaFilterString = (options: FilterOptions): string => {
    const filters = []
 
    const { arrayFilters, booleanFilters, dateFilter } = options

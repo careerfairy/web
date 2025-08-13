@@ -1,4 +1,4 @@
-import SparkCarouselCardSkeleton from "components/views/sparks/components/spark-card/SparkCarouselCardSkeleton"
+import SparkCardSkeleton from "components/views/sparks/components/spark-card/SparkCardSkeleton"
 import { FC } from "react"
 import SparksCarousel from "./SparksCarousel"
 
@@ -10,7 +10,7 @@ const SparksCarouselSkeleton: FC<Props> = ({ numSlides = 3 }) => {
    return (
       <SparksCarousel>
          {[...Array(numSlides)].map((_, index) => (
-            <SparkCarouselCardSkeleton key={index} />
+            <SparkCardSkeleton key={index} type="carousel" />
          ))}
       </SparksCarousel>
    )

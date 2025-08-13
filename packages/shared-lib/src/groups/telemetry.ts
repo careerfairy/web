@@ -32,6 +32,7 @@ export type GroupEventActionType =
 
 export const InteractionSources = {
    Portal_Page_Featured_Company: "Portal_Page_Featured_Company",
+   Portal_Page_Search_Results: "Portal_Page_Search_Results",
    Companies_Overview_Page: "Companies_Overview_Page",
    Company_Page: "Company_Page",
    Live_Stream_Details: "Live_Stream_Details",

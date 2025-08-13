@@ -1,5 +1,5 @@
+import { expect, Locator, Page } from "@playwright/test"
 import { CommonPage } from "./CommonPage"
-import { Locator, expect, Page } from "@playwright/test"
 
 export class PortalPage extends CommonPage {
    readonly cookieAcceptButton: Locator
@@ -9,8 +9,6 @@ export class PortalPage extends CommonPage {
 
    constructor(page: Page) {
       super(page)
-      this.UpcomingEventsHeader = page.locator("text='Upcoming live streams'")
-      this.NextEventsHeader = page.locator("text='My registrations'")
       this.cookieAcceptButton = page.locator("id=rcc-confirm-button")
       this.skipVideoButton = this.page.getByRole("button", {
          name: "Skip video",
@@ -23,5 +21,9 @@ export class PortalPage extends CommonPage {
 
       // welcome view
       await expect(this.page.getByText("Welcome to CareerFairy!")).toBeVisible()
+   }
+
+   async assertWelcomeText(userName: string) {
+      await expect(this.page.getByText(`Welcome, ${userName}!`)).toBeVisible()
    }
 }

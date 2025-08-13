@@ -30,6 +30,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
       goToView,
       onRegisterSuccess,
    } = useLiveStreamDialog()
+
    const { authenticatedUser, userData, userStats } = useAuth()
    const { checkIfUserAgreedToGroupPolicy } = useFirebaseService()
    const { errorNotification } = useSnackbarNotifications()
@@ -50,10 +51,6 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
 
    // check if user has answered all questions / given consent
    useEffect(() => {
-      if (hasRegistered) {
-         return
-      }
-
       const promises = []
 
       // parallel load
@@ -84,6 +81,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
 
             const hasAnsweredAllQuestions =
                checkIfUserHasAnsweredAllLivestreamGroupQuestions(answers)
+
             if (hasAgreedToAll && hasAnsweredAllQuestions) {
                switch (registrationStatus()) {
                   case "can_register":
@@ -116,6 +114,11 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
                      break
                   case "registered":
                      // user is already registered, so we can skip the registration process
+
+                     registrationDispatch({
+                        type: "set-loading-finished",
+                     })
+
                      if (onRegisterSuccess) {
                         onRegisterSuccess()
                      }

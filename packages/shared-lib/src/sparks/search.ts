@@ -8,6 +8,12 @@ export type TransformedSpark = Spark & {
    createdAtMs: number
    publishedAtMs: number
    groupPublicSparks: boolean
+   groupCompanySize: string | null
+   groupCompanyIndustriesIdTags: string[]
+   groupCompanyIndustriesLabels: string[]
+   groupCompanyName: string | null
+   linkedCustomJobsLabels: string[]
+   contentTopicsTagLabels: string[]
 }
 
 export const SPARK_FIELDS_TO_INDEX = [
@@ -28,6 +34,12 @@ export const SPARK_FIELDS_TO_INDEX = [
    "contentTopicsTagIds",
    "linkedCustomJobsTagIds",
    "groupPublicSparks",
+   "groupCompanySize",
+   "groupCompanyIndustriesIdTags",
+   "groupCompanyIndustriesLabels",
+   "groupCompanyName",
+   "linkedCustomJobsLabels",
+   "contentTopicsTagLabels",
 ] satisfies (keyof TransformedSpark)[]
 
 export type FieldToIndexType = (typeof SPARK_FIELDS_TO_INDEX)[number]
@@ -38,10 +50,12 @@ export type FieldToIndexType = (typeof SPARK_FIELDS_TO_INDEX)[number]
  * They must be a subset of the fields defined in SPARK_FIELDS_TO_INDEX.
  */
 export const SPARK_SEARCHABLE_ATTRIBUTES = [
-   "contentTopicsTagIds",
+   "contentTopicsTagLabels",
    "languageTagIds",
-   "language",
-   "linkedCustomJobsTagIds",
+   "linkedCustomJobsLabels",
+   "groupCompanyIndustriesLabels",
+   "question",
+   "groupCompanyName",
 ] satisfies FieldToIndexType[]
 
 /**
@@ -57,13 +71,19 @@ export const SPARK_FILTERING_FIELDS = [
    "languageTagIds",
    "language",
    "group",
+   "groupCompanySize",
+   "groupCompanyIndustriesIdTags",
 ] satisfies FieldToIndexType[]
 
 type FilterFieldType = (typeof SPARK_FILTERING_FIELDS)[number]
 
 export type ArrayFilterFieldType = Extract<
    FilterFieldType,
-   "contentTopicsTagIds" | "languageTagIds"
+   | "contentTopicsTagIds"
+   | "languageTagIds"
+   | "groupCompanyIndustriesIdTags"
+   | "groupCompanySize"
+   | "language"
 >
 
 export type BooleanFilterFieldType = Extract<

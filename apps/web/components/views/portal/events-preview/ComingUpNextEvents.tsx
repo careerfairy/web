@@ -24,9 +24,10 @@ const defaultStyling: EventsCarouselStyling = {
 type Props = {
    limit?: number
    serverSideEvents?: LivestreamEvent[]
+   title?: string
 }
 
-const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
+const ComingUpNextEvents = ({ limit, serverSideEvents, title }: Props) => {
    const { isLoggedIn } = useAuth()
    const {
       query: { livestreamId },
@@ -87,7 +88,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    return (
       <EventsPreviewCarousel
          id={"upcoming-events"}
-         title={COMING_UP_NEXT_EVENT_TITLE}
+         title={title || COMING_UP_NEXT_EVENT_TITLE}
          location={"portal-next-livestreams-carousel"}
          events={formatLivestreamsEvents(localEvents)}
          seeMoreLink={"/next-livestreams"}

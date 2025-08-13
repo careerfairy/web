@@ -1,0 +1,262 @@
+import { queryParamToArr } from "@careerfairy/shared-lib/utils"
+import { useRouter } from "next/router"
+import {
+   createContext,
+   ReactNode,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
+import { useRecentSearches } from "./useRecentSearches"
+
+type SearchContextType = {
+   searchQuery: string
+   setSearchQuery: (query: string) => void
+   handleDropdownSelect: (option: string) => void
+   recentSearches: string[]
+   removeRecentSearch: (search: string) => void
+   clearRecentSearches: () => void
+   handleSearchSubmit: (query: string) => void
+   handleFilterSelect: (filter: string, value: string[]) => void
+   getFilterValues: (filter: string) => string[]
+   selectedLivestreamId: string | null
+   handleOpenLivestreamDialog: (livestreamId: string) => void
+   handleCloseLivestreamDialog: () => void
+   selectedJobId: string | null
+   handleOpenJobDialog: (jobId: string) => void
+   handleCloseJobDialog: () => void
+   currentTab: string
+   setCurrentTab: (tab: string) => void
+   handleTabChange: (event: any, newValue: string) => void
+}
+
+export const SearchContext = createContext<SearchContextType | undefined>(
+   undefined
+)
+
+type SearchContextProviderType = {
+   children: ReactNode
+}
+
+export const SearchProvider = ({ children }: SearchContextProviderType) => {
+   const [searchQuery, setSearchQuery] = useState("")
+   const [currentTab, setCurrentTab] = useState("all")
+   const { query, push, pathname, isReady } = useRouter()
+   const {
+      recentSearches,
+      addRecentSearch,
+      removeRecentSearch,
+      clearRecentSearches,
+   } = useRecentSearches()
+
+   const selectedLivestreamId = (query.selectedLivestreamId as string) || null
+   const selectedJobId = (query.selectedJobId as string) || null
+
+   // Initialize search query from URL parameter
+   useEffect(() => {
+      if (query.q) {
+         const queryFromUrl = Array.isArray(query.q) ? query.q[0] : query.q
+         if (queryFromUrl) {
+            setSearchQuery(queryFromUrl)
+         }
+      }
+      if (query.tab) {
+         const tabFromUrl = Array.isArray(query.tab) ? query.tab[0] : query.tab
+         if (tabFromUrl) {
+            setCurrentTab(tabFromUrl)
+         }
+      }
+   }, [isReady, query.q, query.tab])
+
+   const handleSearchSubmit = useCallback(
+      (query: string) => {
+         if (query.trim().length > 0) {
+            const trimmedQuery = query.trim()
+            addRecentSearch(trimmedQuery)
+            // Redirect to search page with query as URL parameter
+            push(`/portal/search?q=${encodeURIComponent(trimmedQuery)}`)
+         }
+      },
+      [push, addRecentSearch]
+   )
+
+   const handleDropdownSelect = useCallback(
+      (option: string) => {
+         if (option.length > 0) {
+            setSearchQuery(option)
+            handleSearchSubmit(option)
+         }
+      },
+      [handleSearchSubmit]
+   )
+
+   const handleFilterSelect = useCallback(
+      (filter: string, value: string[]) => {
+         const newQuery = { ...query }
+         if (value.length > 0) {
+            newQuery[filter] = value.join(",")
+         } else {
+            delete newQuery[filter]
+         }
+         void push(
+            {
+               pathname: pathname,
+               query: newQuery,
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
+   const getFilterValues = useCallback(
+      (filter: string) => {
+         return queryParamToArr(query[filter])
+      },
+      [query]
+   )
+
+   const handleOpenLivestreamDialog = useCallback(
+      (livestreamId: string) => {
+         void push(
+            {
+               pathname: pathname,
+               query: {
+                  ...query,
+                  selectedLivestreamId: livestreamId,
+               },
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
+   const handleCloseLivestreamDialog = useCallback(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { selectedLivestreamId: _, ...restOfQuery } = query
+      void push(
+         {
+            pathname: pathname,
+            query: restOfQuery,
+         },
+         undefined,
+         { shallow: true }
+      )
+   }, [query, push, pathname])
+
+   const handleOpenJobDialog = useCallback(
+      (jobId: string) => {
+         void push(
+            {
+               pathname: pathname,
+               query: {
+                  ...query,
+                  selectedJobId: jobId,
+               },
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
+   const handleCloseJobDialog = useCallback(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { selectedJobId: _, ...restOfQuery } = query
+      void push(
+         {
+            pathname: pathname,
+            query: restOfQuery,
+         },
+         undefined,
+         { shallow: true }
+      )
+   }, [query, push, pathname])
+
+   const handleTabChange = useCallback(
+      (_, newValue: string) => {
+         setCurrentTab(newValue)
+
+         // Update URL with new tab value, but don't add "all" since it's the default
+         const newQuery = { ...query }
+         if (newValue === "all") {
+            delete newQuery.tab
+         } else {
+            newQuery.tab = newValue
+         }
+         void push(
+            {
+               pathname: pathname,
+               query: newQuery,
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
+   const value: SearchContextType = useMemo(() => {
+      return {
+         searchQuery,
+         setSearchQuery,
+         handleDropdownSelect,
+         recentSearches,
+         removeRecentSearch,
+         clearRecentSearches,
+         handleSearchSubmit,
+         handleFilterSelect,
+         getFilterValues,
+         selectedLivestreamId,
+         handleOpenLivestreamDialog,
+         handleCloseLivestreamDialog,
+         selectedJobId,
+         handleOpenJobDialog,
+         handleCloseJobDialog,
+         currentTab,
+         setCurrentTab,
+         handleTabChange,
+      }
+   }, [
+      searchQuery,
+      setSearchQuery,
+      handleDropdownSelect,
+      recentSearches,
+      removeRecentSearch,
+      clearRecentSearches,
+      handleSearchSubmit,
+      handleFilterSelect,
+      getFilterValues,
+      selectedLivestreamId,
+      handleOpenLivestreamDialog,
+      handleCloseLivestreamDialog,
+      selectedJobId,
+      handleOpenJobDialog,
+      handleCloseJobDialog,
+      currentTab,
+      setCurrentTab,
+      handleTabChange,
+   ])
+
+   return (
+      <SearchContext.Provider value={value}>{children}</SearchContext.Provider>
+   )
+}
+
+export const useSearchContext = () => {
+   const context = useContext(SearchContext)
+
+   if (!context) {
+      throw new Error(
+         "useSearchContext must be used within a SearchContextProvider"
+      )
+   }
+
+   return context
+}
