@@ -8,8 +8,8 @@ import CardCustom from "../../common/CardCustom"
 const styles = sxStyles({
    carouselContainer: {
       position: "relative",
-      height: "422px",
-      padding: "16px",
+      minHeight: "390px", // Adjusted for minimum tile height minus header
+      padding: "16px", // Reduced from 24px
    },
    carousel: {
       position: "relative",
@@ -27,30 +27,29 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
-      padding: 0,
+      padding: 0, // No card padding
    },
    cardImage: {
       width: "100%",
       height: "140px",
       objectFit: "cover",
       borderRadius: "8px",
+      marginBottom: "12px", // Bottom padding for image
    },
    cardTitle: {
       fontWeight: 600,
       fontSize: "16px",
       lineHeight: "24px",
-      marginTop: "16px",
-      marginBottom: "8px",
+      marginBottom: "12px", // Bottom padding for title
    },
    cardText: {
       fontSize: "14px",
       lineHeight: "20px",
       color: "text.secondary",
-      marginBottom: "16px",
+      marginBottom: "12px", // Bottom padding for text
       flex: 1,
    },
    ctaButton: {
-      width: "163px",
       height: "40px",
       border: "1px solid",
       borderColor: "neutral.200",
@@ -59,34 +58,34 @@ const styles = sxStyles({
       textTransform: "none",
       fontSize: "14px",
       fontWeight: 500,
+      padding: "0 16px", // Dynamic width with padding
       "&:hover": {
-         backgroundColor: "neutral.50",
+         backgroundColor: (theme) => theme.brand.black[400],
+         borderColor: "neutral.50",
       },
    },
-   navigationButton: {
+   navigationContainer: {
       position: "absolute",
-      top: "50%",
-      transform: "translateY(-50%)",
+      top: "16px",
+      right: "16px",
+      display: "flex",
+      gap: "8px",
       zIndex: 2,
-      minWidth: "40px",
-      height: "40px",
-      borderRadius: "50%",
-      backgroundColor: "background.paper",
-      border: "1px solid",
-      borderColor: "neutral.200",
-      color: "neutral.600",
+   },
+   navigationButton: {
+      minWidth: "32px",
+      width: "32px",
+      height: "32px",
+      borderRadius: "4px",
+      backgroundColor: "neutral.50",
+      border: "none",
+      color: "neutral.900",
       "&:hover": {
-         backgroundColor: "neutral.50",
+         backgroundColor: "neutral.100",
       },
       "&:disabled": {
          opacity: 0.3,
       },
-   },
-   prevButton: {
-      left: "8px",
-   },
-   nextButton: {
-      right: "8px",
    },
    indicators: {
       position: "absolute",
@@ -125,15 +124,15 @@ const guideCards: GuideCard[] = [
       text: "Learn the three key stages before, during and after the event to plan effectively, present with impact and follow up for measurable recruitment results.",
       cta: "Read the full guide",
       url: "https://support.careerfairy.io/en/article/live-stream-your-way-to-top-talent-a-guide-to-engaging-gen-z-recruitment-1ifie4a/",
-      image: "/streamer.png", // Using existing placeholder
+      image: "/images/guides/events-guide.svg",
    },
    {
       id: 2,
       title: "New live stream management experience",
       text: "Discover the new live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview",
       cta: "Discover now",
-      url: "/group/[groupId]/admin/content/sparks",
-      image: "/computer.png", // Using existing placeholder
+      url: "/group/[groupId]/admin/content/live-streams",
+      image: "/images/guides/livestream-guide.svg",
    },
    {
       id: 3,
@@ -141,7 +140,7 @@ const guideCards: GuideCard[] = [
       text: "Showcase your career fairs, info sessions, and on-campus events to a targeted audience already engaged with your company. Increase registrations and attendance by leveraging our platform.",
       cta: "Talk to us",
       url: "https://meetings.hubspot.com/denis-lehn-koza/clientdemocallcalender",
-      image: "/next-livestreams-side.jpg", // Using existing placeholder
+      image: "/images/guides/management-guide.svg",
    },
 ]
 
@@ -172,8 +171,30 @@ const GuidesCard = () => {
    }
 
    return (
-      <CardCustom title="Guides" sx={{ height: "422px" }}>
+      <CardCustom title="Guides" sx={{ minHeight: "422px" }}>
          <Box sx={styles.carouselContainer}>
+            <Box sx={styles.navigationContainer}>
+               <Button
+                  sx={styles.navigationButton}
+                  onClick={handlePrevious}
+                  disabled={currentIndex === 0}
+                  data-testid="guides-prev-button"
+                  aria-label="Previous guide"
+               >
+                  <ChevronLeft size={16} />
+               </Button>
+
+               <Button
+                  sx={styles.navigationButton}
+                  onClick={handleNext}
+                  disabled={currentIndex === guideCards.length - 1}
+                  data-testid="guides-next-button"
+                  aria-label="Next guide"
+               >
+                  <ChevronRight size={16} />
+               </Button>
+            </Box>
+
             <Box sx={styles.carousel}>
                <Box
                   sx={{
@@ -206,26 +227,6 @@ const GuidesCard = () => {
                   ))}
                </Box>
             </Box>
-
-            <Button
-               sx={[styles.navigationButton, styles.prevButton]}
-               onClick={handlePrevious}
-               disabled={currentIndex === 0}
-               data-testid="guides-prev-button"
-               aria-label="Previous guide"
-            >
-               <ChevronLeft size={20} />
-            </Button>
-
-            <Button
-               sx={[styles.navigationButton, styles.nextButton]}
-               onClick={handleNext}
-               disabled={currentIndex === guideCards.length - 1}
-               data-testid="guides-next-button"
-               aria-label="Next guide"
-            >
-               <ChevronRight size={20} />
-            </Button>
 
             <Box sx={styles.indicators} data-testid="guides-indicators">
                {guideCards.map((_, index) => (

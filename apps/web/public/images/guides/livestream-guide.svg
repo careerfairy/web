@@ -1,0 +1,8 @@
+<svg width="300" height="140" viewBox="0 0 300 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="140" fill="#F1FCF9"/>
+  <rect x="50" y="30" width="200" height="80" rx="8" fill="#2ABAA5" fill-opacity="0.1"/>
+  <rect x="80" y="50" width="140" height="40" rx="6" fill="#2ABAA5" fill-opacity="0.2"/>
+  <polygon points="120,65 120,75 130,70" fill="#2ABAA5"/>
+  <circle cx="190" cy="55" r="3" fill="#2ABAA5"/>
+  <text x="150" y="125" font-family="Arial, sans-serif" font-size="12" fill="#2ABAA5" text-anchor="middle">Livestream Guide</text>
+</svg>
