@@ -75,7 +75,7 @@ export const flagsInitialState = {
     * Hide or Show
     */
    newEventsTableFlag: {
-      enabled: false,
+      enabled: true,
    },
 } satisfies FeatureFlagsDetails
 

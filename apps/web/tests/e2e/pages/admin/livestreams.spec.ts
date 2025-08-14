@@ -20,10 +20,10 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.clickCreateNewLivestreamTop()
       await groupPage.fillLivestreamForm(livestream)
 
-      // assert draft is visible
+      // assert draft is visible in the new table structure
       const livestreamsPage = await groupPage.goToLivestreams()
-      await livestreamsPage.clickDraftsTab()
-      await livestreamsPage.assertTextIsVisible(livestream.title)
+      await livestreamsPage.filterByStatus("Draft")
+      await livestreamsPage.assertEventIsVisible(livestream.title)
    })
 
    /**
@@ -54,8 +54,9 @@ test.describe("Group Admin Livestreams", () => {
 
       // 1. - publish draft
       const livestreamsPage = await groupPage.goToLivestreams()
-      await livestreamsPage.clickDraftsTab()
-      await livestreamsPage.launchEditModal()
+      await livestreamsPage.filterByStatus("Draft")
+      // Click on the specific event to navigate to the edit page
+      await livestreamsPage.clickEventToEditByTitle(livestream.title)
 
       // 1.1 - fill in missing required fields
 
@@ -76,12 +77,12 @@ test.describe("Group Admin Livestreams", () => {
       // 1.2 - fill form and publish after auto save
       await groupPage.fillLivestreamForm(livestreamToPublish, true)
 
-      // Should be in upcoming after filling missing fields
+      // Should be in published status after filling missing fields
       await groupPage.goToLivestreams()
-      await livestreamsPage.clickUpcomingTab()
+      await livestreamsPage.filterByStatus("Published")
 
-      // assert livestream is published in the upcoming tab
-      await livestreamsPage.assertTextIsVisible(livestream.title)
+      // assert livestream is published in the published filter
+      await livestreamsPage.assertEventIsVisible(livestream.title)
       await groupPage.open()
 
       // should also be in the main page
@@ -119,10 +120,55 @@ test.describe("Group Admin Livestreams", () => {
       const livestreamsPage = await groupPage.goToLivestreams()
 
       // Re edit to check custom jobs
-      await livestreamsPage.clickDraftsTab()
-      await livestreamsPage.launchEditModal()
+      await livestreamsPage.filterByStatus("Draft")
+      // Click on the specific event to navigate to the edit page
+      await livestreamsPage.clickEventToEditByTitle(livestream.title)
 
       const addedJobLinks = jobs.map((job) => job.postingUrl)
       await groupPage.assertJobIsAttachedToStream(addedJobLinks)
+   })
+
+   test("View and download questions from published livestream", async ({
+      groupPage,
+      group,
+   }) => {
+      const userQuestions = [
+         "What is the interview process like?",
+         "What is the company culture like?",
+         "Are there any specific skills you look for in candidates?",
+      ]
+
+      // Setup livestream with user questions
+      const { livestream } = await setupLivestreamData(group, {
+         livestreamType: "create",
+         userQuestions,
+      })
+
+      const livestreamsPage = await groupPage.goToLivestreams()
+
+      await livestreamsPage.searchEvents(livestream.title)
+
+      await livestreamsPage.assertEventIsVisible(livestream.title)
+
+      await livestreamsPage.hoverOverEventRow(livestream.title)
+
+      await livestreamsPage.clickActionButton("questions")
+
+      await livestreamsPage.waitForQuestionsDialog()
+
+      for (const question of userQuestions) {
+         await livestreamsPage.livestreamQuestionsDialog
+            .getByText(question)
+            .waitFor({ state: "visible" })
+      }
+
+      await livestreamsPage.downloadQuestions()
+
+      await livestreamsPage.closeQuestionsDialog()
+
+      // Verify dialog is closed
+      await livestreamsPage.livestreamQuestionsDialog.waitFor({
+         state: "hidden",
+      })
    })
 })

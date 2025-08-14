@@ -78,6 +78,7 @@ export const HoverActionIcons = ({
          {Boolean(onEdit) && (
             <BrandedTooltip title="Edit" placement="top" disableInteractive>
                <IconButton
+                  data-testid="hover-action-edit"
                   sx={styles.iconButton}
                   onClick={withStopPropagation(onEdit)}
                >
@@ -92,6 +93,7 @@ export const HoverActionIcons = ({
                disableInteractive
             >
                <IconButton
+                  data-testid="hover-action-enter-livestream"
                   sx={styles.iconButton}
                   onClick={withStopPropagation(onEnterLiveStreamRoom)}
                >
@@ -106,6 +108,7 @@ export const HoverActionIcons = ({
                disableInteractive
             >
                <IconButton
+                  data-testid="hover-action-share-livestream"
                   sx={styles.iconButton}
                   onClick={withStopPropagation(onShareLiveStream)}
                >
@@ -120,6 +123,7 @@ export const HoverActionIcons = ({
                disableInteractive
             >
                <IconButton
+                  data-testid="hover-action-share-recording"
                   sx={styles.iconButton}
                   onClick={withStopPropagation(onShareRecording)}
                >
@@ -134,6 +138,7 @@ export const HoverActionIcons = ({
                disableInteractive
             >
                <IconButton
+                  data-testid="hover-action-analytics"
                   sx={styles.iconButton}
                   onClick={withStopPropagation(onAnalytics)}
                >
@@ -148,6 +153,7 @@ export const HoverActionIcons = ({
                disableInteractive
             >
                <IconButton
+                  data-testid="hover-action-questions"
                   sx={styles.iconButton}
                   onClick={withStopPropagation(onQuestions)}
                >
@@ -158,6 +164,7 @@ export const HoverActionIcons = ({
          {Boolean(onFeedback) && (
             <BrandedTooltip title="Feedback" placement="top" disableInteractive>
                <IconButton
+                  data-testid="hover-action-feedback"
                   sx={styles.iconButton}
                   onClick={withStopPropagation(onFeedback)}
                >
