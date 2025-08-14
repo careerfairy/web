@@ -116,6 +116,7 @@ type Props = {
    sx?: DialogProps["sx"]
    width?: number
    mobileButtonsHorizontal?: boolean
+   TransitionComponent?: DialogProps["TransitionComponent"]
 }
 
 const ConfirmationDialog: FC<Props> = (props) => {
@@ -131,6 +132,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
       secondaryAction,
       width,
       sx,
+      TransitionComponent,
    } = props
 
    const isMobile = useIsMobile()
@@ -146,6 +148,7 @@ const ConfirmationDialog: FC<Props> = (props) => {
          aria-labelledby="confirmation-dialog-title"
          aria-describedby="confirmation-dialog-description"
          maxWidth={width ? false : "xs"}
+         TransitionComponent={TransitionComponent}
          TransitionProps={{ unmountOnExit: true }}
          fullScreen={isMobile}
          PaperProps={{
