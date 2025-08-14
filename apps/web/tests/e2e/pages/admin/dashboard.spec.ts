@@ -1,63 +1,74 @@
 import { expect } from "@playwright/test"
 import { groupAdminFixture as test } from "../../fixtures"
+import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
 
 test.describe("Admin Dashboard", () => {
    test("Guides tile is visible on dashboard", async ({ groupPage }) => {
       // Verify we're on the dashboard
       await groupPage.assertGroupDashboardIsOpen()
 
-      // Check that the Guides card is visible
-      await expect(
-         groupPage.page.getByTestId("card-title").filter({ hasText: "Guides" })
-      ).toBeVisible()
+      // Wait for the Guides card to be visible using the existing pattern
+      await verifyGuidesCard(groupPage, "Guides")
 
-      // Check that the carousel navigation is present
-      await expect(groupPage.page.locator("button").first()).toBeVisible()
+      // Verify the first guide card is displayed (card 1 should be visible by default)
+      await expect(groupPage.page.getByTestId("guide-card-1")).toBeVisible()
 
-      // Verify the first guide card content is visible
-      await expect(
-         groupPage.page.getByText("Host live streams that attract and engage top talent")
-      ).toBeVisible()
+      // Verify the first guide's CTA button is visible
+      await expect(groupPage.page.getByTestId("guide-cta-1")).toBeVisible()
    })
 
-   test("Guides carousel navigation works", async ({ groupPage }) => {
+   test("Guides carousel has navigation controls", async ({ groupPage }) => {
       await groupPage.assertGroupDashboardIsOpen()
 
-      // Find the next button and click it
-      const nextButton = groupPage.page.locator("button").filter({ hasText: "" }).last()
-      await nextButton.click()
+      // Wait for Guides card to be loaded
+      await verifyGuidesCard(groupPage, "Guides")
 
-      // Verify second card content is visible
-      await expect(
-         groupPage.page.getByText("New live stream management experience")
-      ).toBeVisible()
+      // Verify navigation buttons are present
+      await expect(groupPage.page.getByTestId("guides-prev-button")).toBeVisible()
+      await expect(groupPage.page.getByTestId("guides-next-button")).toBeVisible()
 
-      // Click next again
-      await nextButton.click()
-
-      // Verify third card content is visible
-      await expect(
-         groupPage.page.getByText("Promote your offline events")
-      ).toBeVisible()
+      // Verify indicators are present (should have 3 indicators for 3 cards)
+      await expect(groupPage.page.getByTestId("guides-indicators")).toBeVisible()
+      await expect(groupPage.page.getByTestId("guides-indicator-0")).toBeVisible()
+      await expect(groupPage.page.getByTestId("guides-indicator-1")).toBeVisible()
+      await expect(groupPage.page.getByTestId("guides-indicator-2")).toBeVisible()
    })
 
-   test("Guides CTA buttons work", async ({ groupPage, page }) => {
+   test("Guides CTA buttons have correct text", async ({ groupPage }) => {
       await groupPage.assertGroupDashboardIsOpen()
 
-      // Test external link (first card)
-      const readGuideButton = page.getByRole("button", { name: "Read the full guide" })
-      await expect(readGuideButton).toBeVisible()
+      // Wait for Guides card
+      await verifyGuidesCard(groupPage, "Guides")
 
-      // Test internal navigation (second card) 
-      const nextButton = groupPage.page.locator("button").filter({ hasText: "" }).last()
-      await nextButton.click()
+      // Check first card CTA button text
+      await expect(groupPage.page.getByTestId("guide-cta-1")).toHaveText("Read the full guide")
 
-      const discoverButton = page.getByRole("button", { name: "Discover now" })
-      await expect(discoverButton).toBeVisible()
+      // Navigate to second card and check its CTA
+      await groupPage.page.getByTestId("guides-next-button").click()
+      await expect(groupPage.page.getByTestId("guide-cta-2")).toBeVisible()
+      await expect(groupPage.page.getByTestId("guide-cta-2")).toHaveText("Discover now")
 
-      // Test third CTA
-      await nextButton.click()
-      const talkToUsButton = page.getByRole("button", { name: "Talk to us" })
-      await expect(talkToUsButton).toBeVisible()
+      // Navigate to third card and check its CTA
+      await groupPage.page.getByTestId("guides-next-button").click()
+      await expect(groupPage.page.getByTestId("guide-cta-3")).toBeVisible()
+      await expect(groupPage.page.getByTestId("guide-cta-3")).toHaveText("Talk to us")
    })
 })
+
+/**
+ * Helper function to verify Guides card is visible, following the pattern from analytics tests
+ */
+async function verifyGuidesCard(
+   groupPage: GroupDashboardPage,
+   title: string
+): Promise<void> {
+   // Wait for card with title to be visible
+   const guidesCard = groupPage.page.getByTestId("card-custom")
+      .filter({ hasText: title })
+   
+   await expect(guidesCard).toBeVisible()
+   
+   // Verify the card title specifically
+   const cardTitle = guidesCard.getByTestId("card-title")
+   await expect(cardTitle).toHaveText(title)
+}
