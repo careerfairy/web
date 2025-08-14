@@ -129,8 +129,8 @@ const guideCards: GuideCard[] = [
    },
    {
       id: 2,
-      title: "New Live stream management experience",
-      text: "Discover the new Live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview.",
+      title: "New live stream management experience",
+      text: "Discover the new live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview",
       cta: "Discover now",
       url: "/group/[groupId]/admin/content/sparks",
       image: "/computer.png", // Using existing placeholder

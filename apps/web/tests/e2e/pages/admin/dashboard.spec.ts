@@ -29,7 +29,7 @@ test.describe("Admin Dashboard", () => {
 
       // Verify second card content is visible
       await expect(
-         groupPage.page.getByText("New Live stream management experience")
+         groupPage.page.getByText("New live stream management experience")
       ).toBeVisible()
 
       // Click next again
