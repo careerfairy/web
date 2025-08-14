@@ -1,15 +1,15 @@
 import { useRouter } from "next/router"
-import React, {
+import {
    createContext,
    Dispatch,
-   FC,
+   ReactNode,
    useCallback,
    useContext,
    useMemo,
    useState,
 } from "react"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import FeedbackDialog from "./feedback-dialog/FeedbackDialog"
+import { FeedbackDialogProvider } from "./feedback-dialog/FeedbackDialogProvider"
 
 export const SORT_DIRECTIONS = {
    Latest: "desc",
@@ -34,9 +34,13 @@ const initialValues: IFeedbackPageContext = {
 
 const FeedbackPageContext = createContext<IFeedbackPageContext>(initialValues)
 
-export const FeedbackPageProvider: FC<{
-   children: React.ReactNode
-}> = ({ children }) => {
+type FeedbackPageProviderProps = {
+   children: ReactNode
+}
+
+export const FeedbackPageProvider = ({
+   children,
+}: FeedbackPageProviderProps) => {
    const { group } = useGroup()
 
    const {
@@ -64,6 +68,21 @@ export const FeedbackPageProvider: FC<{
       void push(`/group/${group.id}/admin/analytics/live-streams/feedback`)
    }, [group.id, push])
 
+   const handleRatingQuestionClick = useCallback(
+      (ratingId: string) => {
+         void push(
+            `/group/${group.id}/admin/analytics/live-streams/feedback/${livestreamId}/question/${ratingId}`
+         )
+      },
+      [group.id, push, livestreamId]
+   )
+
+   const handleBackToFeedback = useCallback(() => {
+      void push(
+         `/group/${group.id}/admin/analytics/live-streams/feedback/${livestreamId}`
+      )
+   }, [group.id, push, livestreamId])
+
    const value = useMemo<IFeedbackPageContext>(
       () => ({
          handleOpenFeedbackDialog,
@@ -84,9 +103,12 @@ export const FeedbackPageProvider: FC<{
       <FeedbackPageContext.Provider value={value}>
          {children}
          {livestreamId ? (
-            <FeedbackDialog
+            <FeedbackDialogProvider
                livestreamId={livestreamId}
                feedbackQuestionId={feedbackQuestionId}
+               onRatingQuestionClick={handleRatingQuestionClick}
+               onBackToFeedback={handleBackToFeedback}
+               onCloseFeedbackDialog={handleCloseFeedbackDialog}
             />
          ) : null}
       </FeedbackPageContext.Provider>
