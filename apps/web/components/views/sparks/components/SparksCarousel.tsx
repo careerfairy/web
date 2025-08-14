@@ -14,7 +14,7 @@ const styles = sxStyles({
       // hack to ensure overflow visibility with parent padding
       paddingX: "16px",
       marginX: "-16px",
-      width: "calc(100% + 32px)",
+      width: "calc(100% + 16px)",
    },
    disableUserSelect: {
       userSelect: "none",
