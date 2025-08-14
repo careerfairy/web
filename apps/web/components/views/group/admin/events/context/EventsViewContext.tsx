@@ -11,6 +11,7 @@ import {
    useState,
 } from "react"
 import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
+import { FeedbackDialogProvider } from "../../analytics-new/feedback/feedback-dialog/FeedbackDialogProvider"
 import { StreamerLinksDialog } from "../enhanced-group-stream-card/StreamerLinksDialog"
 import { LivestreamEventStatus } from "../events-table-new/utils"
 import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
@@ -89,6 +90,12 @@ export const EventsViewProvider = ({
       useState<LivestreamEventPublicData | null>(null)
    const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
       useState<string | null>(null)
+   const [feedbackDialogLivestreamId, setFeedbackDialogLivestreamId] = useState<
+      string | null
+   >(null)
+   const [feedbackDialogQuestionId, setFeedbackDialogQuestionId] = useState<
+      string | null
+   >(null)
 
    const { push } = useRouter()
 
@@ -182,12 +189,10 @@ export const EventsViewProvider = ({
    }, [])
 
    const handleFeedback = useCallback((stat: LiveStreamStats) => {
-      // Open feedback/review feature for past livestreams
-      alert(
-         `Feedback for ${stat.livestream.isDraft ? "draft" : "live stream"}: ${
-            stat.livestream.id
-         }`
-      )
+      if (stat.livestream.isDraft) return
+      // Open feedback dialog for past livestreams
+      setFeedbackDialogLivestreamId(stat.livestream.id)
+      setFeedbackDialogQuestionId(null)
    }, [])
 
    const handleEdit = useCallback(
@@ -228,6 +233,19 @@ export const EventsViewProvider = ({
 
    const handleCloseStreamerLinksModal = useCallback(() => {
       setTargetLivestreamStreamerLinksId(null)
+   }, [])
+
+   const handleCloseFeedbackDialog = useCallback(() => {
+      setFeedbackDialogLivestreamId(null)
+      setFeedbackDialogQuestionId(null)
+   }, [])
+
+   const handleFeedbackRatingQuestionClick = useCallback((ratingId: string) => {
+      setFeedbackDialogQuestionId(ratingId)
+   }, [])
+
+   const handleFeedbackBackToFeedback = useCallback(() => {
+      setFeedbackDialogQuestionId(null)
    }, [])
 
    const value = useMemo<EventsViewContextValue>(
@@ -283,6 +301,13 @@ export const EventsViewProvider = ({
             companyCountryCode={group?.companyCountry?.id}
             openDialog={Boolean(targetLivestreamStreamerLinksId)}
             onClose={handleCloseStreamerLinksModal}
+         />
+         <FeedbackDialogProvider
+            livestreamId={feedbackDialogLivestreamId}
+            feedbackQuestionId={feedbackDialogQuestionId}
+            onCloseFeedbackDialog={handleCloseFeedbackDialog}
+            onRatingQuestionClick={handleFeedbackRatingQuestionClick}
+            onBackToFeedback={handleFeedbackBackToFeedback}
          />
       </EventsViewContext.Provider>
    )

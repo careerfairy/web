@@ -2,10 +2,9 @@ import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import { Box, Button, Skeleton, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import { FC } from "react"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
-import Link from "../../../../../common/Link"
+
 import {
    RatingWithLabel,
    RatingWithLabelSkeleton,
@@ -23,15 +22,16 @@ const styles = sxStyles({
       width: "150px",
    },
 })
+
 type FeedbackAnswersContentProps = {
    livestreamStats: LiveStreamStats
-   groupId: string
    feedbackQuestionId: string
 }
-export const RatingOverviewContent: FC<FeedbackAnswersContentProps> = ({
+
+export const RatingOverviewContent = ({
    livestreamStats,
    feedbackQuestionId,
-}) => {
+}: FeedbackAnswersContentProps) => {
    if (!feedbackQuestionId) return null
 
    return (
@@ -48,25 +48,25 @@ export const RatingOverviewContent: FC<FeedbackAnswersContentProps> = ({
 
 type FeedbackAnswersTitleProps = {
    livestreamStats: LiveStreamStats
-   groupId: string
    feedbackQuestionId: string
+   onBackToFeedback?: () => void
 }
-export const RatingOverviewTitle: FC<FeedbackAnswersTitleProps> = ({
+
+export const RatingOverviewTitle = ({
    livestreamStats,
-   groupId,
    feedbackQuestionId,
-}) => {
+   onBackToFeedback,
+}: FeedbackAnswersTitleProps) => {
    return (
       <Stack alignItems={"flex-start"} spacing={2}>
          <Button
-            component={Link}
             color="grey"
             startIcon={<ArrowBackIosNewRoundedIcon />}
-            href={`/group/${groupId}/admin/analytics/live-streams/feedback/${livestreamStats.livestream.id}`}
+            onClick={onBackToFeedback}
             sx={styles.goBackButton}
             size={"small"}
          >
-            Back to live stream’s feedback
+            Back to live stream&apos;s feedback
          </Button>
          {feedbackQuestionId ? (
             <SuspenseWithBoundary fallback={<RatingTitleSkeleton />}>
@@ -84,10 +84,11 @@ type RatingTitleProps = {
    feedbackQuestionId: string
    livestreamStats: LiveStreamStats
 }
-const RatingTitle: FC<RatingTitleProps> = ({
+
+const RatingTitle = ({
    livestreamStats,
    feedbackQuestionId,
-}) => {
+}: RatingTitleProps) => {
    const { data: feedbackQuestion } = useLivestreamRating(
       livestreamStats.livestream.id,
       feedbackQuestionId
@@ -115,7 +116,7 @@ const RatingTitle: FC<RatingTitleProps> = ({
    )
 }
 
-const RatingTitleSkeleton: FC = () => {
+const RatingTitleSkeleton = () => {
    return (
       <Stack width={"100%"} spacing={2}>
          <Typography variant="h4" width="100%" fontWeight={600}>
