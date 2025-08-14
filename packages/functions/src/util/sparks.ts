@@ -1,10 +1,10 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { Creator } from "@careerfairy/shared-lib/groups/creators"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { Timestamp } from "../api/firestoreAdmin"
-import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo, sparkRepo } from "../api/repositories"
-import { Creator } from "@careerfairy/shared-lib/groups/creators"
 import functions = require("firebase-functions")
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 /**
  * Adds the current timestamp to the "addedToFeedAt" field of a spark.
@@ -30,10 +30,8 @@ export const validateGroupSparks = async (group: Group) => {
 
       const { id: groupId, publicSparks, publicProfile } = groupPresenter
 
-      const minCreatorsToPublishSparks =
-         groupPresenter.getMinimumCreatorsToPublishSparks()
-      const minSparksPerCreatorToPublishSparks =
-         groupPresenter.getMinimumSparksPerCreatorToPublishSparks()
+      const minTotalPublishedSparksToMakeGroupSparksPublic =
+         groupPresenter.getMinimumTotalPublishedSparksToMakeGroupSparksPublic()
 
       // If the groups current plan has expired no need for the other validations and set publicSparks = false
       if (hasGroupPlanExpired(group)) {
@@ -61,73 +59,57 @@ export const validateGroupSparks = async (group: Group) => {
       // get all the creators from a group
       const creators: Creator[] = await groupRepo.getCreators(groupId)
 
-      // if the groups has 3 or more creators, validation continues
-      if (creators?.length >= minCreatorsToPublishSparks) {
+      // if the groups has {MINIMUM_CREATORS_TO_MAKE_GROUP_SPARKS_PUBLIC} or more creators, validation continues
+      if (creators?.length > 0) {
          // get all the sparks from a Group
          const sparks = await sparkRepo.getSparksByGroupId(groupId)
-         let sparksPerCreatorCounter = 0
+         let totalPublishedSparksCounter = 0
 
-         const isValid = creators?.some(({ id: creatorId }) => {
-            // filter all the public sparks per Creator
-            const numberOfPublicSparks = sparks?.filter(
-               (spark: Spark) =>
-                  spark.creator.id === creatorId && spark.published === true
-            ).length
+         creators.forEach(({ id: creatorId }) => {
+            // Count the number of published sparks for a specific creator
+            const numberOfPublishedSparksPerCreator =
+               sparks.filter(
+                  (spark) => spark.creator.id === creatorId && spark.published
+               ).length || 0
 
             functions.logger.log(
-               `Creator ${creatorId}, has ${numberOfPublicSparks} public Sparks`
+               `Creator ${creatorId}, has ${numberOfPublishedSparksPerCreator} published Sparks`
             )
 
-            if (numberOfPublicSparks >= minSparksPerCreatorToPublishSparks) {
-               sparksPerCreatorCounter++
-            }
-
-            return sparksPerCreatorCounter === minCreatorsToPublishSparks
+            totalPublishedSparksCounter += numberOfPublishedSparksPerCreator
          })
 
-         if (isValid) {
-            if (publicSparks) {
-               return functions.logger.log(
-                  `After validation, the group ${groupId} continues to have public sparks`
-               )
-            }
+         const isValid =
+            totalPublishedSparksCounter >=
+            minTotalPublishedSparksToMakeGroupSparksPublic
 
+         if (isValid && !publicSparks) {
             functions.logger.log(
-               `After validation, the group ${groupId} is able to have public sparks`
+               `After validation, the group ${groupId} is now able to have public sparks`
             )
             return groupRepo.updatePublicSparks(groupId, true)
          }
 
-         if (sparksPerCreatorCounter < minCreatorsToPublishSparks) {
-            // To be here, it means that the group has {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} or more creators
-            // but does not have at least {MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS} sparks for {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} different creators
-            // which means this group should not have their sparks public
-
-            // only update if needed
-            if (publicSparks) {
-               functions.logger.log(
-                  `After validation, the group ${groupId} does no longer have public sparks`
-               )
-               return groupRepo.updatePublicSparks(groupId, false)
-            }
-
+         if (isValid && publicSparks) {
             return functions.logger.log(
-               `After validation, the group ${groupId} has more than ${minSparksPerCreatorToPublishSparks} Creators but less than ${minCreatorsToPublishSparks} Sparks per Creator`
+               `After validation, the group ${groupId} continues to have public sparks`
             )
          }
+      } else {
+         /**
+          * To be here, it means that the group has less than {MINIMUM_CREATORS_TO_MAKE_GROUP_SPARKS_PUBLIC}
+          * which means this group should not have their sparks public
+          */
+
+         // only update if needed
+         if (publicSparks) {
+            return groupRepo.updatePublicSparks(groupId, false)
+         }
+
+         functions.logger.log(
+            `After validation, the group ${groupId} has no creators so it should not have public sparks`
+         )
       }
-
-      // To be here, it means that the group has less than {MINIMUM_CREATORS_TO_PUBLISH_SPARKS} creators
-      // which means this group should not have their sparks public
-
-      // only update if needed
-      if (publicSparks) {
-         return groupRepo.updatePublicSparks(groupId, false)
-      }
-
-      functions.logger.log(
-         `After validation, the group ${groupId} has less than ${minSparksPerCreatorToPublishSparks} Creators`
-      )
    } catch (error) {
       return functions.logger.error("Error during Spark validation", { error })
    }
