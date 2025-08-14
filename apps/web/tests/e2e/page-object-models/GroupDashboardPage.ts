@@ -597,4 +597,41 @@ export class GroupDashboardPage extends CommonPage {
 
       expect(this.page.locator(userRowSelector)).toBeVisible()
    }
+
+   /**
+    * Verify that the Guides card is visible on the dashboard
+    * */
+   public async assertGuidesCardVisible() {
+      await this.waitForAnalyticsCardVisible({
+         fields: {
+            title: "Guides",
+         },
+      })
+   }
+
+   /**
+    * Interact with the Guides carousel
+    * */
+   public async navigateGuidesCarousel() {
+      // Find the Guides card
+      const guidesCard = this.page.getByTestId("card-custom").filter({
+         has: this.page.getByTestId("card-title").filter({
+            hasText: "Guides"
+         })
+      })
+
+      // Verify initial card content
+      await expect(guidesCard.getByText("Host live streams that attract and engage top talent")).toBeVisible()
+
+      // Click next button to navigate carousel
+      const nextButton = guidesCard.locator('button').filter({
+         has: this.page.locator('[data-feather="chevron-right"]')
+      })
+      await nextButton.click()
+
+      // Verify second card content
+      await expect(guidesCard.getByText("New Live stream management experience")).toBeVisible()
+
+      return guidesCard
+   }
 }
