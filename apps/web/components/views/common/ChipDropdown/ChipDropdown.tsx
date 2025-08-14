@@ -28,6 +28,7 @@ import BrandedSwipeableDrawer from "../inputs/BrandedSwipeableDrawer"
 import { StyledHiddenInput } from "../inputs/StyledHiddenInput"
 import { useChipDropdownContext } from "./ChipDropdownContext"
 import { SearchInputPlugin } from "./plugins/SearchInputPlugin"
+import { chipDropdownReducer, initialStateFactory } from "./reducer"
 
 const popperContentVariants = {
    closed: {
@@ -61,7 +62,7 @@ const styles = sxStyles({
          m: "0px !important",
          color: (theme) => `${theme.palette.neutral[700]} !important`,
       },
-      maxWidth: "170px",
+      // maxWidth: "170px",
    },
    popper: {
       mt: "8px !important",
@@ -113,7 +114,7 @@ const styles = sxStyles({
       "& svg": {
          color: (theme) => `${theme.brand.white[50]} !important`,
       },
-      maxWidth: "250px !important",
+      // maxWidth: "250px !important",
    },
    applyText: {
       fontWeight: 400,
@@ -231,98 +232,6 @@ type ChipDropdownProps = {
    onOpen?: () => void
 }
 
-type ChipDropdownState = {
-   isOpen: boolean
-   isDirty: boolean
-   selectedMap: Record<string, boolean>
-}
-
-type ChipDropdownAction =
-   | { type: "TOGGLE_OPEN" }
-   | { type: "CLOSE_DROPDOWN" }
-   | { type: "CLICK_OPTION"; payload: { optionId: string; showApply: boolean } }
-   | { type: "APPLY_CHANGES"; payload: { closeOnApply: boolean } }
-   | { type: "RESET_CHANGES" }
-   | {
-        type: "DELETE_OPTION"
-        payload: { optionId: string; showApply: boolean }
-     }
-   | {
-        type: "SYNC_EXTERNAL_SELECTION"
-        payload: { selectedOptions?: string[] }
-     }
-
-const initialStateFactory = (
-   initialSelectedOptions?: string[]
-): ChipDropdownState => ({
-   isOpen: false,
-   isDirty: false,
-   selectedMap:
-      initialSelectedOptions?.reduce((acc, option) => {
-         acc[option] = true
-         return acc
-      }, {} as Record<string, boolean>) || {},
-})
-
-const chipDropdownReducer = (
-   state: ChipDropdownState,
-   action: ChipDropdownAction
-): ChipDropdownState => {
-   switch (action.type) {
-      case "TOGGLE_OPEN":
-         return { ...state, isOpen: !state.isOpen }
-      case "CLOSE_DROPDOWN":
-         return { ...state, isOpen: false }
-      case "CLICK_OPTION": {
-         const newSelectedMap = {
-            ...state.selectedMap,
-            [action.payload.optionId]:
-               !state.selectedMap[action.payload.optionId],
-         }
-         return {
-            ...state,
-            selectedMap: newSelectedMap,
-            isDirty: true,
-         }
-      }
-      case "APPLY_CHANGES":
-         return {
-            ...state,
-            isDirty: false,
-            isOpen: action.payload.closeOnApply ? false : state.isOpen,
-         }
-      case "RESET_CHANGES":
-         return {
-            ...state,
-            selectedMap: {},
-            isDirty: false,
-         }
-      case "DELETE_OPTION": {
-         const newSelectedMap = {
-            ...state.selectedMap,
-            [action.payload.optionId]: false,
-         }
-         return {
-            ...state,
-            selectedMap: newSelectedMap,
-            isDirty: true,
-         }
-      }
-      case "SYNC_EXTERNAL_SELECTION":
-         return {
-            ...state,
-            isDirty: false,
-            selectedMap:
-               action.payload.selectedOptions?.reduce((acc, optionId) => {
-                  acc[optionId] = true
-                  return acc
-               }, {} as Record<string, boolean>) || {},
-         }
-      default:
-         return state
-   }
-}
-
 export const ChipDropdown = ({
    label,
    options,
@@ -406,6 +315,26 @@ export const ChipDropdown = ({
       { truncatedText, plusCount, shouldShowTooltip: tooltipRequired },
    ] = useTextTruncation(itemsToTruncate, ", ")
 
+   // Compute a sizer text so the chip grows to fully fit the first selected item,
+   // and if there are more, include the trailing "+N" to reserve space for it.
+   const firstSelectedName = itemsToTruncate[0]
+   const hasPlus = Boolean(plusCount && plusCount > 0)
+   const rawSizer = hasPlus
+      ? `${firstSelectedName}, +${plusCount}`
+      : firstSelectedName
+
+   // Freeze sizer width during incremental +N changes to avoid small width jumps
+   // const sizerText = useMemo(() => {
+   //    if (!hasPlus) return firstSelectedName
+   //    const base = `${firstSelectedName}, +00` // reserve width for up to two digits
+   //    // Pad with non-breaking spaces if rawSizer is shorter than base
+   //    if (rawSizer.length >= base.length) return rawSizer
+   //    const padCount = base.length - rawSizer.length
+   //    return rawSizer + "\u00A0".repeat(padCount)
+   // }, [hasPlus, rawSizer, firstSelectedName])
+   const sizerText = rawSizer
+   console.log(`🚀 ~ ChipDropdown[${label}-sizerText]:`, sizerText)
+
    const displayChipLabel = useMemo(() => {
       if (forceLabel) return label
       if (itemsToTruncate.length === 0) return label
@@ -415,6 +344,11 @@ export const ChipDropdown = ({
       )
    }, [forceLabel, label, itemsToTruncate, truncatedText])
 
+   console.log(`🚀 ~ ChipDropdown[${label}-plusCount]:`, plusCount)
+   console.log(
+      `🚀 ~ ChipDropdown[${label}-displayChipLabel]:`,
+      displayChipLabel
+   )
    const tooltipFullLabel = useMemo(() => {
       const currentSelectedIds = showApply
          ? selectedOptions || []
@@ -565,36 +499,43 @@ export const ChipDropdown = ({
                      <Box sx={{ position: "relative" }}>
                         {/* Sizer Element */}
                         <Typography
+                           ref={textContainerCallbackRef}
                            component="span"
                            aria-hidden="true"
                            sx={{
                               visibility: "hidden",
                               whiteSpace: "nowrap",
+                              // position: "absolute",
+                              // top: 0,
+                              // left: 0,
+                              maxWidth: "170px",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "inline-flex", // allow intrinsic width based on content
                               // Inherits font styles from .MuiChip-label
                            }}
                         >
-                           {label} {/* Original label for sizing only */}
+                           {sizerText}
                         </Typography>
                         {/* Actual Display Element */}
                         <Typography
-                           ref={textContainerCallbackRef}
                            component="span"
                            sx={{
                               position: "absolute",
                               top: 0,
                               left: 0,
-                              width: "100%",
-                              height: "100%",
+                              // width: "100%",
+                              // height: "100%",
                               display: "flex", // Added to allow alignment of text and plusCount
                               alignItems: "center",
                               whiteSpace: "nowrap",
                               overflow: "hidden",
-                              textOverflow: "ellipsis",
+                              // textOverflow: "ellipsis",
                               // minWidth removed, sizing is handled by the sizer
                            }}
                         >
                            {displayChipLabel}
-                           {plusCount !== null && plusCount > 0 && (
+                           {plusCount > 0 && (
                               <Typography
                                  component="span"
                                  sx={{

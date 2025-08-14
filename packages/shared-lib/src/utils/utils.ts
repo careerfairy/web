@@ -698,6 +698,24 @@ export const calculateOptimalTruncation = (
          const itemToTruncate = items[numTextItems - 1]
          const prefixText = prefixItems.join(separator)
 
+         // Prefer dropping the last item and showing +N if that fits,
+         // instead of truncating the last item's text.
+
+         if (prefixItems.length > 0) {
+            const increasedPlusCount = plusCount + 1
+            const dropPlusString = `, +${increasedPlusCount}`
+            if (
+               ctx.measureText(prefixText + dropPlusString).width <=
+               containerWidth
+            ) {
+               return {
+                  truncatedText: prefixText.trimEnd(),
+                  plusCount: increasedPlusCount,
+                  shouldShowTooltip: true,
+               }
+            }
+         }
+
          if (itemToTruncate) {
             for (let j = itemToTruncate.length; j >= 1; j--) {
                const truncatedPart = itemToTruncate.substring(0, j) + "..."
