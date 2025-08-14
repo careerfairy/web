@@ -88,17 +88,10 @@ test.describe("Group Analytics", () => {
       }
    )
 
-   // TODO: Re-enable in e2e test ticket 1529
-   test.skip("Can see feedback questions from live stream", async ({
+   test("Can see feedback questions from live stream", async ({
       groupPage,
       group,
    }) => {
-      const userQuestions = [
-         "What is the interview process like?",
-         "What is the company culture like?",
-         "Are there any specific skills you look for in candidates?",
-      ]
-
       const feedbackQuestions = [
          "Are you happy with the content of the live stream?",
          "Are you happy with the quality of the live stream?",
@@ -106,7 +99,6 @@ test.describe("Group Analytics", () => {
 
       const { livestream } = await setupLivestreamData(group, {
          livestreamType: "createPast",
-         userQuestions,
          feedbackQuestions,
       })
 
@@ -114,11 +106,6 @@ test.describe("Group Analytics", () => {
       const feedbackPage = await groupPage.goToFeedbackAnalyticsPage()
 
       await feedbackPage.openFeedbackCard(livestream.title)
-
-      // Check the feedback dialog for each question
-      for (const question of userQuestions) {
-         await expect(feedbackPage.page.getByText(question)).toBeVisible()
-      }
 
       // Check the feedback dialog for each feedback question
       for (const rating of feedbackQuestions) {

@@ -57,6 +57,7 @@ type ResponsiveDialogProps = {
    TransitionComponent?: DialogProps["TransitionComponent"]
    SlideProps?: SwipeableDrawerProps["SlideProps"]
    TransitionProps?: DialogProps["TransitionProps"]
+   dataTestId?: string
 }
 
 /**
@@ -71,6 +72,7 @@ export const ResponsiveDialogLayout = ({
    TransitionComponent,
    SlideProps,
    TransitionProps,
+   dataTestId,
 }: ResponsiveDialogProps) => {
    const isMobile = useIsMobile()
 
@@ -81,6 +83,7 @@ export const ResponsiveDialogLayout = ({
             anchor="bottom"
             PaperProps={{
                sx: styles.drawer,
+               "data-testid": dataTestId,
             }}
             onOpen={() => {}}
             onClose={handleClose}
@@ -99,6 +102,7 @@ export const ResponsiveDialogLayout = ({
          onClose={handleClose}
          PaperProps={{
             sx: dialogPaperStyles,
+            "data-testid": dataTestId,
          }}
          fullWidth
          disableEnforceFocus
