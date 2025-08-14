@@ -90,7 +90,7 @@ export const useLivestreamDialog = (group: Group) => {
 
             await deleteLivestream(streamObj.id, "draftLivestreams")
             await replace(
-               `/group/${group.id}/admin/content/live-streams?eventId=${publishedStreamId}`
+               `/group/${group.id}/admin/content/live-streams?livestreamIdToPromote=${publishedStreamId}`
             )
          } catch (e) {
             setIsPublishing(false)
