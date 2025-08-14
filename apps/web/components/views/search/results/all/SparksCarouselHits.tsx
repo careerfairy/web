@@ -91,6 +91,8 @@ export const SparksCarouselHits = ({
             header={<SectionTitle title="Sparks" />}
             sparks={deserializedItems}
             handleSparksClicked={handleSparkClick}
+            containerSx={{ pl: 0, mr: -2 }}
+            headerSx={{ mr: 2 }}
          />
       </Box>
    )
