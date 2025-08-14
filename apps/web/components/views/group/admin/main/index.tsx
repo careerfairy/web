@@ -3,7 +3,7 @@ import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
 import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
-import AggregatedFeedbackCard from "./feedback/AggregatedFeedbackCard"
+import GuidesCard from "./guides/GuidesCard"
 import { MainPageProvider } from "./MainPageProvider"
 import { NextLivestreamCard } from "./next-livestream/NextLivestreamCard"
 import { AggregatedRegistrationSourcesCard } from "./registration-sources/AggregatedRegistrationSourcesCard"
@@ -40,7 +40,7 @@ const PageContent = () => {
                </Grid>
 
                <Grid xs={12} md={6} item style={styles.gridItem}>
-                  <AggregatedFeedbackCard />
+                  <GuidesCard />
                </Grid>
             </Grid>
          </Container>
