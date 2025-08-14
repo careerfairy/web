@@ -181,7 +181,11 @@ const Content = ({
                      : "(min-width: 601px) 100vw"
                }
             />
-            <IconButton onClick={onClose} sx={styles.closeIcon}>
+            <IconButton
+               data-testid="promote-livestream-dialog-close-button"
+               onClick={onClose}
+               sx={styles.closeIcon}
+            >
                <X />
             </IconButton>
          </Box>
