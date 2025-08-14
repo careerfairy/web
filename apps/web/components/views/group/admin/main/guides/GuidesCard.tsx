@@ -182,7 +182,7 @@ const GuidesCard = () => {
                   }}
                >
                   {guideCards.map((card) => (
-                     <Box key={card.id} sx={styles.card}>
+                     <Box key={card.id} sx={styles.card} data-testid={`guide-card-${card.id}`}>
                         <img
                            src={card.image}
                            alt={card.title}
@@ -198,6 +198,7 @@ const GuidesCard = () => {
                            variant="outlined"
                            sx={styles.ctaButton}
                            onClick={() => handleCTAClick(card)}
+                           data-testid={`guide-cta-${card.id}`}
                         >
                            {card.cta}
                         </Button>
@@ -210,6 +211,8 @@ const GuidesCard = () => {
                sx={[styles.navigationButton, styles.prevButton]}
                onClick={handlePrevious}
                disabled={currentIndex === 0}
+               data-testid="guides-prev-button"
+               aria-label="Previous guide"
             >
                <ChevronLeft size={20} />
             </Button>
@@ -218,11 +221,13 @@ const GuidesCard = () => {
                sx={[styles.navigationButton, styles.nextButton]}
                onClick={handleNext}
                disabled={currentIndex === guideCards.length - 1}
+               data-testid="guides-next-button"
+               aria-label="Next guide"
             >
                <ChevronRight size={20} />
             </Button>
 
-            <Box sx={styles.indicators}>
+            <Box sx={styles.indicators} data-testid="guides-indicators">
                {guideCards.map((_, index) => (
                   <Box
                      key={index}
@@ -231,6 +236,8 @@ const GuidesCard = () => {
                         index === currentIndex && { backgroundColor: "primary.main" },
                      ]}
                      onClick={() => handleIndicatorClick(index)}
+                     data-testid={`guides-indicator-${index}`}
+                     aria-label={`Go to guide ${index + 1}`}
                   />
                ))}
             </Box>
