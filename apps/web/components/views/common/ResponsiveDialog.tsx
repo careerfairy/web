@@ -3,7 +3,9 @@ import {
    Dialog,
    DialogActions,
    DialogContent,
+   DialogProps,
    DialogTitle,
+   SwipeableDrawerProps,
    SxProps,
 } from "@mui/material"
 import Box from "@mui/material/Box"
@@ -50,6 +52,11 @@ type ResponsiveDialogProps = {
    handleClose?: () => unknown
    open: boolean
    children: ReactNode
+   hideDragHandle?: boolean
+   dialogPaperStyles?: SxProps
+   TransitionComponent?: DialogProps["TransitionComponent"]
+   SlideProps?: SwipeableDrawerProps["SlideProps"]
+   TransitionProps?: DialogProps["TransitionProps"]
 }
 
 /**
@@ -59,6 +66,11 @@ export const ResponsiveDialogLayout = ({
    children,
    open,
    handleClose,
+   hideDragHandle,
+   dialogPaperStyles,
+   TransitionComponent,
+   SlideProps,
+   TransitionProps,
 }: ResponsiveDialogProps) => {
    const isMobile = useIsMobile()
 
@@ -73,6 +85,8 @@ export const ResponsiveDialogLayout = ({
             onOpen={() => {}}
             onClose={handleClose}
             disableEnforceFocus
+            hideDragHandle={hideDragHandle}
+            SlideProps={SlideProps}
          >
             {children}
          </BrandedSwipeableDrawer>
@@ -83,8 +97,13 @@ export const ResponsiveDialogLayout = ({
          open={open}
          maxWidth={"md"}
          onClose={handleClose}
+         PaperProps={{
+            sx: dialogPaperStyles,
+         }}
          fullWidth
          disableEnforceFocus
+         TransitionComponent={TransitionComponent}
+         TransitionProps={TransitionProps}
       >
          {children}
       </Dialog>
@@ -109,6 +128,7 @@ const Header = ({
             color="inherit"
             onClick={handleClose}
             aria-label="close"
+            className="close-button"
             sx={styles.closeButton}
          >
             <CloseIcon />
@@ -134,13 +154,20 @@ const Actions = ({ children }: Pick<ResponsiveDialogProps, "children">) => {
    return <DialogActions sx={styles.dialogActions}>{children}</DialogActions>
 }
 
-const Content = ({ children }: Pick<ResponsiveDialogProps, "children">) => {
+const Content = ({
+   children,
+   sx,
+}: Pick<ResponsiveDialogProps, "children"> & { sx?: SxProps }) => {
    const isMobile = useIsMobile()
 
    if (isMobile) {
-      return <Box sx={styles.dialogContent}>{children}</Box>
+      return <Box sx={combineStyles(styles.dialogContent, sx)}>{children}</Box>
    }
-   return <DialogContent sx={styles.dialogContent}>{children}</DialogContent>
+   return (
+      <DialogContent sx={combineStyles(styles.dialogContent, sx)}>
+         {children}
+      </DialogContent>
+   )
 }
 
 ResponsiveDialogLayout.Header = Header
