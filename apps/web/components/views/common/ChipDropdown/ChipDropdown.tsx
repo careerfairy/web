@@ -319,21 +319,9 @@ export const ChipDropdown = ({
    // and if there are more, include the trailing "+N" to reserve space for it.
    const firstSelectedName = itemsToTruncate[0]
    const hasPlus = Boolean(plusCount && plusCount > 0)
-   const rawSizer = hasPlus
+   const sizerText = hasPlus
       ? `${firstSelectedName}, +${plusCount}`
       : firstSelectedName
-
-   // Freeze sizer width during incremental +N changes to avoid small width jumps
-   // const sizerText = useMemo(() => {
-   //    if (!hasPlus) return firstSelectedName
-   //    const base = `${firstSelectedName}, +00` // reserve width for up to two digits
-   //    // Pad with non-breaking spaces if rawSizer is shorter than base
-   //    if (rawSizer.length >= base.length) return rawSizer
-   //    const padCount = base.length - rawSizer.length
-   //    return rawSizer + "\u00A0".repeat(padCount)
-   // }, [hasPlus, rawSizer, firstSelectedName])
-   const sizerText = rawSizer
-   console.log(`🚀 ~ ChipDropdown[${label}-sizerText]:`, sizerText)
 
    const displayChipLabel = useMemo(() => {
       if (forceLabel) return label
@@ -344,11 +332,6 @@ export const ChipDropdown = ({
       )
    }, [forceLabel, label, itemsToTruncate, truncatedText])
 
-   console.log(`🚀 ~ ChipDropdown[${label}-plusCount]:`, plusCount)
-   console.log(
-      `🚀 ~ ChipDropdown[${label}-displayChipLabel]:`,
-      displayChipLabel
-   )
    const tooltipFullLabel = useMemo(() => {
       const currentSelectedIds = showApply
          ? selectedOptions || []
@@ -505,9 +488,6 @@ export const ChipDropdown = ({
                            sx={{
                               visibility: "hidden",
                               whiteSpace: "nowrap",
-                              // position: "absolute",
-                              // top: 0,
-                              // left: 0,
                               maxWidth: "170px",
                               overflow: "hidden",
                               textOverflow: "ellipsis",
@@ -524,13 +504,10 @@ export const ChipDropdown = ({
                               position: "absolute",
                               top: 0,
                               left: 0,
-                              // width: "100%",
-                              // height: "100%",
                               display: "flex", // Added to allow alignment of text and plusCount
                               alignItems: "center",
                               whiteSpace: "nowrap",
                               overflow: "hidden",
-                              // textOverflow: "ellipsis",
                               // minWidth removed, sizing is handled by the sizer
                            }}
                         >
