@@ -83,17 +83,16 @@ export const validateGroupSparks = async (group: Group) => {
             totalPublishedSparksCounter >=
             minTotalPublishedSparksToMakeGroupSparksPublic
 
-         if (isValid && !publicSparks) {
+         if (isValid) {
             functions.logger.log(
-               `After validation, the group ${groupId} is now able to have public sparks`
+               `After validation, the group ${groupId} is now able to have public sparks setting publicSparks to true`
             )
             return groupRepo.updatePublicSparks(groupId, true)
-         }
-
-         if (isValid && publicSparks) {
-            return functions.logger.log(
-               `After validation, the group ${groupId} continues to have public sparks`
+         } else {
+            functions.logger.log(
+               `After validation, the group ${groupId} is not able to have public sparks setting publicSparks to false`
             )
+            return groupRepo.updatePublicSparks(groupId, false)
          }
       } else {
          /**

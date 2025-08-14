@@ -91,6 +91,26 @@ const SparksProgressIndicator = () => {
       void push(`/group/${groupPresenter.id}/admin/page`)
    }, [groupPresenter.id, push])
 
+   const calculateProgressPercentage = () => {
+      // If no minimum required, return 0%
+      if (minTotalPublishedSparksToMakeGroupSparksPublic === 0) {
+         return 0
+      }
+
+      // Calculate how many sparks we have (capped at the minimum required)
+      const actualPublishedSparks = Math.min(
+         numberOfPublishedSparksWithCreators,
+         minTotalPublishedSparksToMakeGroupSparksPublic
+      )
+
+      // Calculate percentage and round to nearest whole number
+      const percentage =
+         (actualPublishedSparks /
+            minTotalPublishedSparksToMakeGroupSparksPublic) *
+         100
+      return Math.round(percentage)
+   }
+
    return (
       <Box sx={styles.root}>
          <Stack spacing={2} sx={styles.info}>
@@ -124,18 +144,17 @@ const SparksProgressIndicator = () => {
             <ProgressIndicator
                id={groupPresenter.id}
                message={"Sparks published"}
-               progress={
-                  (Math.min(
-                     numberOfPublishedSparksWithCreators,
-                     minTotalPublishedSparksToMakeGroupSparksPublic
-                  ) /
-                     minTotalPublishedSparksToMakeGroupSparksPublic) *
-                  100
-               }
+               progress={calculateProgressPercentage()}
                isValid={
                   numberOfPublishedSparksWithCreators >=
                   minTotalPublishedSparksToMakeGroupSparksPublic
                }
+               currentValue={Math.min(
+                  // Cap the max value to the minimum required
+                  numberOfPublishedSparksWithCreators,
+                  minTotalPublishedSparksToMakeGroupSparksPublic
+               )}
+               maxValue={minTotalPublishedSparksToMakeGroupSparksPublic}
             />
          </Stack>
       </Box>
