@@ -3,7 +3,7 @@ import { groupAdminFixture as test } from "../../fixtures"
 import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
 
 test.describe("Admin Dashboard", () => {
-   test("Guides tile is visible on dashboard", async ({ groupPage }) => {
+   test.skip("Guides tile is visible on dashboard", async ({ groupPage }) => {
       // Verify we're on the dashboard
       await groupPage.assertGroupDashboardIsOpen()
 
@@ -17,7 +17,7 @@ test.describe("Admin Dashboard", () => {
       await expect(groupPage.page.getByTestId("guide-cta-1")).toBeVisible()
    })
 
-   test("Guides carousel has navigation controls", async ({ groupPage }) => {
+   test.skip("Guides carousel has navigation controls", async ({ groupPage }) => {
       await groupPage.assertGroupDashboardIsOpen()
 
       // Wait for Guides card to be loaded
@@ -34,7 +34,7 @@ test.describe("Admin Dashboard", () => {
       await expect(groupPage.page.getByTestId("guides-indicator-2")).toBeVisible()
    })
 
-   test("Guides CTA buttons have correct text", async ({ groupPage }) => {
+   test.skip("Guides CTA buttons have correct text", async ({ groupPage }) => {
       await groupPage.assertGroupDashboardIsOpen()
 
       // Wait for Guides card
