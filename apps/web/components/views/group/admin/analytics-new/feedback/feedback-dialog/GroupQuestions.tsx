@@ -1,24 +1,24 @@
+import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/livestreams"
+import { GroupQuestionOption } from "@careerfairy/shared-lib/src/groups"
+import ExpandLessIcon from "@mui/icons-material/ExpandLess"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import { Button } from "@mui/material"
 import { linearProgressClasses } from "@mui/material/LinearProgress"
 import { alpha } from "@mui/material/styles"
-import { FC, useState } from "react"
-import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/livestreams"
 import { collection, query, QueryConstraint, where } from "firebase/firestore"
+import { useState } from "react"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
-import useCountQuery from "../../../../../../custom-hook/useCountQuery"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import useLivestream from "../../../../../../custom-hook/live-stream/useLivestream"
-import { useFeedbackPageContext } from "../FeedbackPageProvider"
-import { GroupQuestionOption } from "@careerfairy/shared-lib/src/groups"
 import { sxStyles } from "../../../../../../../types/commonTypes"
+import useLivestream from "../../../../../../custom-hook/live-stream/useLivestream"
+import useCountQuery from "../../../../../../custom-hook/useCountQuery"
 import {
    CardVotes,
    CardVotesOption,
    SectionContainer,
    VoteOptionSkeleton,
 } from "./CardVotes"
-import { Button } from "@mui/material"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import ExpandLessIcon from "@mui/icons-material/ExpandLess"
+import { useFeedbackDialogContext } from "./FeedbackDialogProvider"
 
 const styles = sxStyles({
    entryRoot: {
@@ -44,10 +44,8 @@ const styles = sxStyles({
    },
 })
 
-type GroupQuestionsProps = {}
-
-const GroupQuestions: FC<GroupQuestionsProps> = () => {
-   const { livestreamId } = useFeedbackPageContext()
+const GroupQuestions = () => {
+   const { livestreamId } = useFeedbackDialogContext()
    const { group } = useGroup()
    const { data: livestream, status } = useLivestream(livestreamId)
 
@@ -80,11 +78,11 @@ type QuestionEntryProps = {
    groupId: string
 }
 
-const QuestionEntry: FC<QuestionEntryProps> = ({
+const QuestionEntry = ({
    question,
    livestreamId,
    groupId,
-}) => {
+}: QuestionEntryProps) => {
    const { count, loading } = useGroupQuestionsVotersCount(
       livestreamId,
       groupId,
@@ -154,13 +152,13 @@ type QuestionOptionProps = {
    totalVotes: number
 }
 
-const QuestionOption: FC<QuestionOptionProps> = ({
+const QuestionOption = ({
    option,
    groupId,
    questionId,
    livestreamId,
    totalVotes,
-}) => {
+}: QuestionOptionProps) => {
    const { count } = useGroupQuestionsVotersCount(
       livestreamId,
       groupId,
