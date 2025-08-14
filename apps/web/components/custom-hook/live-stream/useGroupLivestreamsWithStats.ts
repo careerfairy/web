@@ -1,8 +1,5 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import {
-   LivestreamEvent,
-   pickPublicDataFromLivestream,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
@@ -97,7 +94,14 @@ export const useGroupLivestreamsWithStats = (
       if (!groupId) return []
 
       try {
-         // Fetch published livestream stats using collection group query
+         // Fetch livestreams
+         const livestreamsQuery = query(
+            collection(firestore, "livestreams"),
+            where("groupIds", "array-contains", groupId),
+            where("test", "==", false)
+         ).withConverter(createGenericConverter<LivestreamEvent>())
+
+         // Fetch livestream stats
          const statsQuery = query(
             collectionGroup(firestore, "stats"),
             where("id", "==", "livestreamStats"),
@@ -105,24 +109,35 @@ export const useGroupLivestreamsWithStats = (
             where("livestream.test", "==", false)
          ).withConverter(createGenericConverter<LiveStreamStats>())
 
-         const statsSnapshot = await getDocs(statsQuery)
-         const publishedStats: LiveStreamStats[] = statsSnapshot.docs.map(
-            (doc) => ({
-               ...doc.data(),
-               livestream: {
-                  ...doc.data().livestream,
-                  isDraft: false,
-               },
-            })
-         )
-
          // Fetch draft livestreams
          const draftsQuery = query(
             collection(firestore, "draftLivestreams"),
             where("groupIds", "array-contains", groupId)
          ).withConverter(createGenericConverter<LivestreamEvent>())
 
-         const draftsSnapshot = await getDocs(draftsQuery)
+         const [livestreamsSnapshot, statsSnapshot, draftsSnapshot] =
+            await Promise.all([
+               getDocs(livestreamsQuery),
+               getDocs(statsQuery),
+               getDocs(draftsQuery),
+            ])
+
+         const livestreams = livestreamsSnapshot.docs.map((doc) => doc.data())
+
+         const livestreamStats: LiveStreamStats[] = statsSnapshot.docs.map(
+            (statsDoc) => {
+               const latestLivestreamData = livestreams.find(
+                  (livestream) =>
+                     livestream.id === statsDoc.data().livestream.id
+               )
+
+               return {
+                  ...statsDoc.data(),
+                  livestream:
+                     latestLivestreamData || statsDoc.data().livestream,
+               }
+            }
+         )
 
          // Transform drafts into stats format
          const draftStats: LiveStreamStats[] = draftsSnapshot.docs.map(
@@ -138,7 +153,7 @@ export const useGroupLivestreamsWithStats = (
                return {
                   ...mockStats,
                   livestream: {
-                     ...pickPublicDataFromLivestream(livestreamData),
+                     ...livestreamData,
                      isDraft: true,
                   },
                }
@@ -146,7 +161,7 @@ export const useGroupLivestreamsWithStats = (
          )
 
          // Combine all stats
-         return publishedStats.concat(draftStats)
+         return livestreamStats.concat(draftStats)
       } catch (error) {
          console.error("Error fetching group livestreams with stats:", error)
          throw error
