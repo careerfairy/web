@@ -847,6 +847,28 @@ export class LivestreamService {
    }
 
    /**
+    * Returns the query for livestream questions without executing it.
+    * Used with usePaginatedCollection for pagination.
+    * @param livestreamId - The unique identifier for the live stream.
+    * @returns Firestore query for questions ordered by votes descending, then by timestamp ascending.
+    */
+   getQuestions = async (livestreamId: string) => {
+      const questionsRef = query(
+         collection(
+            FirestoreInstance,
+            "livestreams",
+            livestreamId,
+            "questions"
+         ),
+         orderBy("votes", "desc"),
+         orderBy("timestamp", "asc")
+      ).withConverter(createGenericConverter<LivestreamQuestion>())
+
+      const questionsSnap = await getDocs(questionsRef)
+      return questionsSnap.docs.map((doc) => doc.data())
+   }
+
+   /**
     * Toggles the upvote status of a question.
     * @param livestreamRef - Livestream document reference.
     * @param questionId - Question ID.
