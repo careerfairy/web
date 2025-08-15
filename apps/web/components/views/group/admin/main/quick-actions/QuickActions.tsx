@@ -15,7 +15,7 @@ const styles = sxStyles({
    container: {
       display: "flex",
       justifyContent: "center",
-      marginBottom: 3,
+      marginBottom: 2, // 16px instead of 24px
    },
    buttonsStack: {
       width: "100%",
