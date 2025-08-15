@@ -120,7 +120,7 @@ const guideCards: GuideCard[] = [
       text: "Learn the three key stages before, during and after the event to plan effectively, present with impact and follow up for measurable recruitment results.",
       cta: "Read the full guide",
       url: "https://support.careerfairy.io/en/article/live-stream-your-way-to-top-talent-a-guide-to-engaging-gen-z-recruitment-1ifie4a/",
-      image: "/images/guides/events-guide.svg",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/livestream.png?alt=media&token=29355bf7-6ef0-4646-8291-5cf6f476fecc",
    },
    {
       id: 2,
