@@ -51,8 +51,10 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
       toolTip && setOpen(true)
    }
 
+   const isLoading = isLoadingUserData || isLoadingAuth
+
    const handleClick = useCallback(() => {
-      if (isLoadingUserData || isLoadingAuth) {
+      if (isLoading) {
          // only allow the user register action when the auth is fully loaded
          // otherwise, the user might be redirected to login
          // we could also make the button disabled, but the UI is already changing a
@@ -61,7 +63,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
          return
       }
       onRegisterClick(isFloating)
-   }, [isLoadingUserData, isLoadingAuth, onRegisterClick, isFloating])
+   }, [isLoading, onRegisterClick, isFloating])
 
    useEffect(() => {
       if (buttonDisabled && setIsDisabled) {
@@ -106,7 +108,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                      </StyledToolTip>
                   ) : null
                }
-               disabled={buttonDisabled}
+               disabled={buttonDisabled || isLoading}
                onClick={handleClick}
                disableElevation
                data-testid="livestream-registration-button"

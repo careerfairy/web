@@ -330,7 +330,8 @@ test.describe("Livestream Registration Signed In", () => {
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       // open page
-      await page.goto(`/portal/livestream/${livestream.id}`)
+      await livestreamDialogPage.openDialog()
+
       expect(await livestreamDialogPage.registrationButton.textContent()).toBe(
          "Join live stream"
       )
