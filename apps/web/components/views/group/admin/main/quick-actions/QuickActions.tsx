@@ -16,15 +16,16 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       marginBottom: 2, // 16px instead of 24px
+      width: "100%", // Take full width of parent
    },
    buttonsStack: {
-      width: "100%",
-      maxWidth: "800px", // Optional: limit maximum width for better UX
+      width: "100%", // Take full width of container
    },
    quickActionButton: {
       // Default state
       backgroundColor: (theme) => theme.brand.white[100], // white 100
       borderColor: "secondary.50", // purple 50
+      borderWidth: "1px", // 1px border thickness
       color: "neutral.800",
       borderRadius: "10px",
       textTransform: "none",
@@ -42,6 +43,7 @@ const styles = sxStyles({
       "&:disabled": {
          backgroundColor: (theme) => theme.brand.white[100],
          borderColor: "secondary.50",
+         borderWidth: "1px",
          color: "neutral.500",
          opacity: 0.7,
       },
