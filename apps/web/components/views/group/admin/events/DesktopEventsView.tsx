@@ -11,7 +11,7 @@ import {
    TableRow,
    Typography,
 } from "@mui/material"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
@@ -72,13 +72,13 @@ export const DesktopEventsView = ({
          itemsPerPage: ITEMS_PER_PAGE,
       })
 
-   const handleRowMouseEnter = (statKey: string) => {
+   const handleRowMouseEnter = useCallback((statKey: string) => {
       setHoveredRow(statKey)
-   }
+   }, [])
 
-   const handleRowMouseLeave = () => {
+   const handleRowMouseLeave = useCallback(() => {
       setHoveredRow(null)
-   }
+   }, [])
 
    return (
       <Box sx={eventsTableStyles.root}>
@@ -176,30 +176,23 @@ export const DesktopEventsView = ({
                   ) : (
                      currentPageData.map((stat) => {
                         const statKey = getEventStatsKey(stat)
-                        const isHovered = hoveredRow === statKey
-
                         return (
                            <EventTableRow
                               key={statKey}
                               stat={stat}
-                              isHovered={isHovered}
-                              onMouseEnter={() => handleRowMouseEnter(statKey)}
+                              isHovered={hoveredRow === statKey}
+                              statKey={statKey}
+                              onMouseEnter={handleRowMouseEnter}
                               onMouseLeave={handleRowMouseLeave}
-                              onEnterLiveStreamRoom={() =>
-                                 handleEnterLiveStreamRoom(stat)
-                              }
-                              onShareLiveStream={() =>
-                                 handleShareLiveStream(stat)
-                              }
-                              onShareRecording={() =>
-                                 handleShareRecording(stat)
-                              }
-                              onAnalytics={() => handleAnalytics(stat)}
-                              onQuestions={() => handleQuestions(stat)}
-                              onFeedback={() => handleFeedback(stat)}
-                              onEdit={() => handleEdit(stat)}
-                              onRegistrationsClick={() => handleAnalytics(stat)}
-                              onViewsClick={() => handleAnalytics(stat)}
+                              onEnterLiveStreamRoom={handleEnterLiveStreamRoom}
+                              onShareLiveStream={handleShareLiveStream}
+                              onShareRecording={handleShareRecording}
+                              onAnalytics={handleAnalytics}
+                              onQuestions={handleQuestions}
+                              onFeedback={handleFeedback}
+                              onEdit={handleEdit}
+                              onRegistrationsClick={handleAnalytics}
+                              onViewsClick={handleAnalytics}
                            />
                         )
                      })

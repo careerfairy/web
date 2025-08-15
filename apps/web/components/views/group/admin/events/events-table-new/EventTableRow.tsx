@@ -1,6 +1,7 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Box, styled, TableCell, TableRow, Typography } from "@mui/material"
 import { useRecordingViewsSWR } from "components/custom-hook/recordings/useRecordingViewsSWR"
+import { memo } from "react"
 import { Calendar, Eye, User } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { withStopPropagation } from "util/CommonUtil"
@@ -67,157 +68,174 @@ const CentredBox = styled(Box)({
 type EventTableRowProps = {
    stat: LiveStreamStats
    isHovered: boolean
-   onMouseEnter: () => void
-   onMouseLeave: () => void
-   onEnterLiveStreamRoom: () => void
-   onShareLiveStream: () => void
-   onShareRecording: () => void
-   onAnalytics: () => void
-   onQuestions: () => void
-   onFeedback: () => void
-   onEdit: () => void
-   onRegistrationsClick: () => void
-   onViewsClick: () => void
+   statKey: string
+   onMouseEnter: (statKey: string) => void
+   onMouseLeave: (statKey: string) => void
+   onEnterLiveStreamRoom: (stat: LiveStreamStats) => void
+   onShareLiveStream: (stat: LiveStreamStats) => void
+   onShareRecording: (stat: LiveStreamStats) => void
+   onAnalytics: (stat: LiveStreamStats) => void
+   onQuestions: (stat: LiveStreamStats) => void
+   onFeedback: (stat: LiveStreamStats) => void
+   onEdit: (stat: LiveStreamStats) => void
+   onRegistrationsClick: (stat: LiveStreamStats) => void
+   onViewsClick: (stat: LiveStreamStats) => void
 }
 
-export const EventTableRow = ({
-   stat,
-   isHovered,
-   onMouseEnter,
-   onMouseLeave,
-   onEnterLiveStreamRoom,
-   onShareLiveStream,
-   onShareRecording,
-   onAnalytics,
-   onQuestions,
-   onFeedback,
-   onEdit,
-   onRegistrationsClick,
-   onViewsClick,
-}: EventTableRowProps) => {
-   const eventStatus = getLivestreamEventStatus(stat.livestream)
-
-   const shouldFetchRecordingViews =
-      eventStatus === LivestreamEventStatus.RECORDING
-
-   const { totalViews, loading } = useRecordingViewsSWR(
-      shouldFetchRecordingViews ? stat.livestream.id : null
-   )
-
-   const viewValue = getViewValue(
-      eventStatus,
-      totalViews,
-      loading,
-      stat.generalStats?.numberOfParticipants
-   )
-
-   return (
-      <TableRow
-         sx={[styles.bodyRow, isHovered && styles.bodyRowHovered]}
-         onMouseEnter={onMouseEnter}
-         onMouseLeave={onMouseLeave}
-         onFocus={onMouseEnter}
-         onBlur={onMouseLeave}
-         onClick={withStopPropagation(onEdit)}
-      >
-         {/* Title Column */}
-         <TableCell variant="head" sx={styles.bodyCell}>
-            <CentredBox>
-               <EventCardPreview
-                  title={stat.livestream.title}
-                  speakers={stat.livestream.speakers}
-                  backgroundImageUrl={stat.livestream.backgroundImageUrl}
-                  showHoverActions={isHovered}
-                  eventStatus={eventStatus}
-                  onEnterLiveStreamRoom={onEnterLiveStreamRoom}
-                  onShareLiveStream={onShareLiveStream}
-                  onShareRecording={onShareRecording}
-                  onAnalytics={onAnalytics}
-                  onQuestions={onQuestions}
-                  onFeedback={onFeedback}
-                  onEdit={onEdit}
-               />
-            </CentredBox>
-         </TableCell>
-
-         {/* Date Column */}
-         <TableCell sx={styles.bodyCell}>
-            <CentredBox>
-               <TableHighlighter
-                  title="Live stream date"
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  color="neutral.600"
-                  cursor="default"
-               >
-                  <Box component={Calendar} size={16} />
-                  <Typography variant="small" whiteSpace="nowrap">
-                     {getEventDate(stat)}
-                  </Typography>
-               </TableHighlighter>
-            </CentredBox>
-         </TableCell>
-
-         {/* Registrations Column */}
-         <TableCell>
-            <CentredBox>
-               <TableHighlighter
-                  onClick={withStopPropagation(onRegistrationsClick)}
-                  title="Registrations"
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  color="neutral.600"
-                  width={92}
-                  cursor={
-                     eventStatus === LivestreamEventStatus.DRAFT
-                        ? "default"
-                        : "pointer"
-                  }
-               >
-                  <Box component={User} size={16} />
-                  <Typography variant="small">
-                     {eventStatus === LivestreamEventStatus.DRAFT
-                        ? "-"
-                        : stat.generalStats.numberOfRegistrations || 0}
-                  </Typography>
-               </TableHighlighter>
-            </CentredBox>
-         </TableCell>
-
-         {/* Views Column */}
-         <TableCell>
-            <CentredBox>
-               <TableHighlighter
-                  onClick={withStopPropagation(onViewsClick)}
-                  title="Views"
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  color="neutral.600"
-                  width={92}
-                  cursor={
-                     eventStatus === LivestreamEventStatus.DRAFT
-                        ? "default"
-                        : "pointer"
-                  }
-               >
-                  <Box component={Eye} size={16} />
-                  <Typography variant="small">{viewValue}</Typography>
-               </TableHighlighter>
-            </CentredBox>
-         </TableCell>
-
-         {/* Status Column */}
-         <TableCell sx={styles.bodyCell}>
-            <CentredBox gap={0.5}>
-               <Box p={1}>
-                  <StatusIcon status={eventStatus} size={20} />
-               </Box>
-               <QuickActionIcon stat={stat} eventStatus={eventStatus} />
-            </CentredBox>
-         </TableCell>
-      </TableRow>
-   )
+const areEqual = (
+   prev: EventTableRowProps,
+   next: EventTableRowProps
+): boolean => {
+   // Only re-render when hover state changes for this row, or when the stat object reference changes
+   return prev.isHovered === next.isHovered && prev.stat === next.stat
 }
+
+export const EventTableRow = memo(
+   ({
+      stat,
+      isHovered,
+      statKey,
+      onMouseEnter,
+      onMouseLeave,
+      onEnterLiveStreamRoom,
+      onShareLiveStream,
+      onShareRecording,
+      onAnalytics,
+      onQuestions,
+      onFeedback,
+      onEdit,
+      onRegistrationsClick,
+      onViewsClick,
+   }: EventTableRowProps) => {
+      const eventStatus = getLivestreamEventStatus(stat.livestream)
+
+      const shouldFetchRecordingViews =
+         eventStatus === LivestreamEventStatus.RECORDING
+
+      const { totalViews, loading } = useRecordingViewsSWR(
+         shouldFetchRecordingViews ? stat.livestream.id : null
+      )
+
+      const viewValue = getViewValue(
+         eventStatus,
+         totalViews,
+         loading,
+         stat.generalStats?.numberOfParticipants
+      )
+
+      return (
+         <TableRow
+            sx={[styles.bodyRow, isHovered && styles.bodyRowHovered]}
+            onMouseEnter={() => onMouseEnter(statKey)}
+            onMouseLeave={() => onMouseLeave(statKey)}
+            onFocus={() => onMouseEnter(statKey)}
+            onBlur={() => onMouseLeave(statKey)}
+            onClick={withStopPropagation(() => onEdit(stat))}
+         >
+            {/* Title Column */}
+            <TableCell variant="head" sx={styles.bodyCell}>
+               <CentredBox>
+                  <EventCardPreview
+                     title={stat.livestream.title}
+                     speakers={stat.livestream.speakers}
+                     backgroundImageUrl={stat.livestream.backgroundImageUrl}
+                     showHoverActions={isHovered}
+                     eventStatus={eventStatus}
+                     onEnterLiveStreamRoom={() => onEnterLiveStreamRoom(stat)}
+                     onShareLiveStream={() => onShareLiveStream(stat)}
+                     onShareRecording={() => onShareRecording(stat)}
+                     onAnalytics={() => onAnalytics(stat)}
+                     onQuestions={() => onQuestions(stat)}
+                     onFeedback={() => onFeedback(stat)}
+                     onEdit={() => onEdit(stat)}
+                  />
+               </CentredBox>
+            </TableCell>
+
+            {/* Date Column */}
+            <TableCell sx={styles.bodyCell}>
+               <CentredBox>
+                  <TableHighlighter
+                     title="Live stream date"
+                     direction="row"
+                     alignItems="center"
+                     spacing={1}
+                     color="neutral.600"
+                     cursor="default"
+                  >
+                     <Box component={Calendar} size={16} />
+                     <Typography variant="small" whiteSpace="nowrap">
+                        {getEventDate(stat)}
+                     </Typography>
+                  </TableHighlighter>
+               </CentredBox>
+            </TableCell>
+
+            {/* Registrations Column */}
+            <TableCell>
+               <CentredBox>
+                  <TableHighlighter
+                     onClick={withStopPropagation(() =>
+                        onRegistrationsClick(stat)
+                     )}
+                     title="Registrations"
+                     direction="row"
+                     alignItems="center"
+                     spacing={1}
+                     color="neutral.600"
+                     width={92}
+                     cursor={
+                        eventStatus === LivestreamEventStatus.DRAFT
+                           ? "default"
+                           : "pointer"
+                     }
+                  >
+                     <Box component={User} size={16} />
+                     <Typography variant="small">
+                        {eventStatus === LivestreamEventStatus.DRAFT
+                           ? "-"
+                           : stat.generalStats.numberOfRegistrations || 0}
+                     </Typography>
+                  </TableHighlighter>
+               </CentredBox>
+            </TableCell>
+
+            {/* Views Column */}
+            <TableCell>
+               <CentredBox>
+                  <TableHighlighter
+                     onClick={withStopPropagation(() => onViewsClick(stat))}
+                     title="Views"
+                     direction="row"
+                     alignItems="center"
+                     spacing={1}
+                     color="neutral.600"
+                     width={92}
+                     cursor={
+                        eventStatus === LivestreamEventStatus.DRAFT
+                           ? "default"
+                           : "pointer"
+                     }
+                  >
+                     <Box component={Eye} size={16} />
+                     <Typography variant="small">{viewValue}</Typography>
+                  </TableHighlighter>
+               </CentredBox>
+            </TableCell>
+
+            {/* Status Column */}
+            <TableCell sx={styles.bodyCell}>
+               <CentredBox gap={0.5}>
+                  <Box p={1}>
+                     <StatusIcon status={eventStatus} size={20} />
+                  </Box>
+                  <QuickActionIcon stat={stat} eventStatus={eventStatus} />
+               </CentredBox>
+            </TableCell>
+         </TableRow>
+      )
+   },
+   areEqual
+)
+
+EventTableRow.displayName = "EventTableRow"
