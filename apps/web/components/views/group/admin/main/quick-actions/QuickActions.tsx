@@ -26,12 +26,12 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.brand.white[100], // white 100
       borderColor: "secondary.50", // purple 50
       borderWidth: "1px", // 1px border thickness
+      borderStyle: "solid", // Specify border style
       color: "neutral.800",
       borderRadius: "10px",
       textTransform: "none",
       fontWeight: 500,
       padding: "15px 24px", // Increased padding to achieve 56px height
-      border: "1px solid",
       flex: 1, // Take equal width within the stack
       height: "56px", // Explicitly set height to 56px
       "&:hover": {
@@ -39,11 +39,13 @@ const styles = sxStyles({
          backgroundColor: "secondary.50", // purple 50
          borderColor: "secondary.50", // purple 50
          borderWidth: "1px",
+         borderStyle: "solid",
       },
       "&:disabled": {
          backgroundColor: (theme) => theme.brand.white[100],
          borderColor: "secondary.50",
          borderWidth: "1px",
+         borderStyle: "solid",
          color: "neutral.500",
          opacity: 0.7,
       },
@@ -72,9 +74,8 @@ export const QuickActions = () => {
    const handleSparkUpload = useCallback(() => {
       if (hasAccessToSparks) {
          dispatch(openSparkDialog())
-      } else {
-         push(`/group/${groupId}/admin/content/sparks`)
       }
+      push(`/group/${groupId}/admin/content/sparks`)
    }, [hasAccessToSparks, dispatch, push, groupId])
 
    // Only show on desktop
