@@ -69,10 +69,11 @@ const styles = sxStyles({
       minWidth: "32px",
       width: "32px",
       height: "32px",
-      borderRadius: "4px",
+      borderRadius: "50%", // Make it a perfect circle
       backgroundColor: "neutral.50",
       border: "none",
-      color: "neutral.900",
+      color: "neutral.600", // Use neutral 600 for icons
+      padding: 0, // Remove default padding
       "&:hover": {
          backgroundColor: "neutral.100",
       },
