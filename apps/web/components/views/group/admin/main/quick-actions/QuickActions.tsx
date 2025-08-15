@@ -29,9 +29,10 @@ const styles = sxStyles({
       borderRadius: "10px",
       textTransform: "none",
       fontWeight: 500,
-      padding: "12px 24px",
+      padding: "15px 24px", // Increased padding to achieve 56px height
       border: "1px solid",
       flex: 1, // Take equal width within the stack
+      height: "56px", // Explicitly set height to 56px
       "&:hover": {
          // Hover state
          backgroundColor: "secondary.50", // purple 50
