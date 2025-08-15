@@ -62,7 +62,6 @@ const styles = sxStyles({
          m: "0px !important",
          color: (theme) => `${theme.palette.neutral[700]} !important`,
       },
-      // maxWidth: "170px",
    },
    popper: {
       mt: "8px !important",
@@ -114,7 +113,6 @@ const styles = sxStyles({
       "& svg": {
          color: (theme) => `${theme.brand.white[50]} !important`,
       },
-      // maxWidth: "250px !important",
    },
    applyText: {
       fontWeight: 400,
