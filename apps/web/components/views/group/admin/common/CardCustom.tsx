@@ -27,6 +27,9 @@ const styles = sxStyles({
       width: "100%",
       display: "flex",
       flexDirection: "column",
+      boxShadow: "none", // Remove backdrop shadow
+      border: "1px solid",
+      borderColor: "secondary.50", // Add purple border using secondary.50
    },
    dropdownButton: {
       color: "black",
