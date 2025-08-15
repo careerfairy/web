@@ -9,7 +9,7 @@ const styles = sxStyles({
    carouselContainer: {
       position: "relative",
       minHeight: "390px", // Adjusted for minimum tile height minus header
-      padding: "16px", // Reduced from 24px
+      padding: "0px", // No padding around guide cards
    },
    carousel: {
       position: "relative",
