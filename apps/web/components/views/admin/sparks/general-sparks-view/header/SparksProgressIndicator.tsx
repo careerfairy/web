@@ -1,11 +1,12 @@
 import { Box, CircularProgress, Stack, Typography } from "@mui/material"
-import { sxStyles } from "../../../../../../types/commonTypes"
-import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import { Upload } from "react-feather"
-import CreateSparkButton from "../../components/CreateSparkButton"
-import React, { FC, useCallback, useMemo } from "react"
-import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
 import { useRouter } from "next/router"
+import { FC, useCallback, useMemo } from "react"
+import { Upload } from "react-feather"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import useGroupCreators from "../../../../../custom-hook/creator/useGroupCreators"
+import useGroupSparks from "../../../../../custom-hook/spark/useGroupSparks"
+import CreateSparkButton from "../../components/CreateSparkButton"
 
 const styles = sxStyles({
    root: {
@@ -64,12 +65,6 @@ const styles = sxStyles({
    },
 })
 
-type CreatorWithSparksNumber = {
-   creatorId: string
-   numberOfSparks: number
-   progress?: number
-}
-
 const SparksProgressIndicator = () => {
    const { push } = useRouter()
    const { groupPresenter } = useGroup()
@@ -78,67 +73,15 @@ const SparksProgressIndicator = () => {
       limit: groupPresenter.getMaxPublicSparks(),
    })
 
-   const minSparksPerCreator =
-      groupPresenter.getMinimumSparksPerCreatorToPublishSparks()
-   const minCreators = groupPresenter.getMinimumCreatorsToPublishSparks()
+   const { data: creators } = useGroupCreators(groupPresenter.id)
 
-   const creatorsToValidate = useMemo(() => {
-      // to get the number of public sparks per creator
-      const creatorsWithSparks = publicSparks.reduce<CreatorWithSparksNumber[]>(
-         (acc, spark) => {
-            const existingCreatorIndex = acc.findIndex(
-               ({ creatorId }) => creatorId === spark.creator.id
-            )
+   // Ensure at least that there is a creator associated with the published sparks (in case the creator is deleted)
+   const numberOfPublishedSparksWithCreators = publicSparks.filter((spark) =>
+      creators.some((creator) => creator.id === spark.creator.id)
+   ).length
 
-            if (existingCreatorIndex >= 0) {
-               acc[existingCreatorIndex] = {
-                  ...acc[existingCreatorIndex],
-                  numberOfSparks: acc[existingCreatorIndex]?.numberOfSparks + 1,
-               }
-            } else {
-               acc.push({
-                  creatorId: spark.creator.id,
-                  numberOfSparks: 1,
-               })
-            }
-
-            return acc
-         },
-         []
-      )
-
-      const sortedCreatorsWithSparks = creatorsWithSparks.sort(
-         (a, b) => b.numberOfSparks - a.numberOfSparks
-      )
-
-      // In case there are less than 3 creators, add an empty object for the missing elements
-      while (sortedCreatorsWithSparks.length < minSparksPerCreator) {
-         sortedCreatorsWithSparks.push({
-            creatorId: "",
-            numberOfSparks: 0,
-         })
-      }
-
-      // To get only the minimum creators need to publish sparks from the sorted array
-      // Add the progress percentage to each element of the array
-      return sortedCreatorsWithSparks
-         .slice(0, minCreators)
-         .map((creatorWithSparks) => {
-            const progress =
-               creatorWithSparks.numberOfSparks > minSparksPerCreator
-                  ? 100
-                  : Math.floor(
-                       (creatorWithSparks.numberOfSparks /
-                          minSparksPerCreator) *
-                          100
-                    )
-
-            return {
-               ...creatorWithSparks,
-               progress,
-            }
-         })
-   }, [minCreators, minSparksPerCreator, publicSparks])
+   const minTotalPublishedSparksToMakeGroupSparksPublic =
+      groupPresenter.getMinimumTotalPublishedSparksToMakeGroupSparksPublic()
 
    const companyPageProgress = useMemo(() => {
       return groupPresenter.getCompanyPageInitialProgress()
@@ -147,6 +90,26 @@ const SparksProgressIndicator = () => {
    const handleCompanyPageProgressClick = useCallback(() => {
       void push(`/group/${groupPresenter.id}/admin/page`)
    }, [groupPresenter.id, push])
+
+   const calculateProgressPercentage = () => {
+      // If no minimum required, return 0%
+      if (minTotalPublishedSparksToMakeGroupSparksPublic === 0) {
+         return 0
+      }
+
+      // Calculate how many sparks we have (capped at the minimum required)
+      const actualPublishedSparks = Math.min(
+         numberOfPublishedSparksWithCreators,
+         minTotalPublishedSparksToMakeGroupSparksPublic
+      )
+
+      // Calculate percentage and round to nearest whole number
+      const percentage =
+         (actualPublishedSparks /
+            minTotalPublishedSparksToMakeGroupSparksPublic) *
+         100
+      return Math.round(percentage)
+   }
 
    return (
       <Box sx={styles.root}>
@@ -178,53 +141,23 @@ const SparksProgressIndicator = () => {
                isValid={groupPresenter.publicProfile}
                onClick={handleCompanyPageProgressClick}
             />
-
-            {creatorsToValidate.map((creatorWithSparks, index) => (
-               <CreatorProgressIndicator
-                  key={index}
-                  creatorWithSparks={creatorWithSparks}
-                  index={index}
-                  minSparksPerCreator={minSparksPerCreator}
-               />
-            ))}
+            <ProgressIndicator
+               id={groupPresenter.id}
+               message={"Sparks published"}
+               progress={calculateProgressPercentage()}
+               isValid={
+                  numberOfPublishedSparksWithCreators >=
+                  minTotalPublishedSparksToMakeGroupSparksPublic
+               }
+               currentValue={Math.min(
+                  // Cap the max value to the minimum required
+                  numberOfPublishedSparksWithCreators,
+                  minTotalPublishedSparksToMakeGroupSparksPublic
+               )}
+               maxValue={minTotalPublishedSparksToMakeGroupSparksPublic}
+            />
          </Stack>
       </Box>
-   )
-}
-
-type CreatorProgressIndicatorProps = {
-   creatorWithSparks: CreatorWithSparksNumber
-   index: number
-   minSparksPerCreator: number
-}
-
-const CreatorProgressIndicator: FC<CreatorProgressIndicatorProps> = ({
-   creatorWithSparks,
-   index,
-   minSparksPerCreator,
-}) => {
-   const currentValue = useMemo(
-      () =>
-         creatorWithSparks.numberOfSparks > minSparksPerCreator
-            ? minSparksPerCreator
-            : creatorWithSparks.numberOfSparks,
-      [creatorWithSparks.numberOfSparks, minSparksPerCreator]
-   )
-
-   const isValid = useMemo(
-      () => creatorWithSparks.numberOfSparks >= minSparksPerCreator,
-      [creatorWithSparks.numberOfSparks, minSparksPerCreator]
-   )
-
-   return (
-      <ProgressIndicator
-         id={creatorWithSparks.creatorId}
-         message={`Creator ${index + 1}`}
-         progress={creatorWithSparks.progress}
-         isValid={isValid}
-         currentValue={currentValue}
-         maxValue={minSparksPerCreator}
-      />
    )
 }
 
@@ -256,7 +189,7 @@ const ProgressIndicator: FC<ProgressIndicatorProps> = ({
          key={id}
          spacing={1}
          sx={[styles.singleProgress, Boolean(onClick) && styles.clickable]}
-         onClick={Boolean(onClick) ? onClick : null}
+         onClick={onClick}
       >
          <Box sx={styles.circularProgress}>
             <CircularProgress

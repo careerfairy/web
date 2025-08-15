@@ -337,21 +337,10 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
    hasUnlimitedSparks() {
       return this.plan?.type == GroupPlanTypes.Tier3
    }
-   /**
-    * To get the minimum number of creators required to publish sparks for this specific group
-    * This amount may be different depending on the group agreements
-    */
-   getMinimumCreatorsToPublishSparks() {
-      return this.planConstants.sparks.MINIMUM_CREATORS_TO_PUBLISH_SPARKS
-   }
 
-   /**
-    * To get the minimum number of sparks required per creator to publish sparks for this specific group
-    * This amount may be different depending on the group agreements
-    */
-   getMinimumSparksPerCreatorToPublishSparks() {
+   getMinimumTotalPublishedSparksToMakeGroupSparksPublic() {
       return this.planConstants.sparks
-         .MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS
+         .MINIMUM_TOTAL_PUBLISHED_SPARKS_TO_MAKE_GROUP_SPARKS_PUBLIC
    }
 
    /**
