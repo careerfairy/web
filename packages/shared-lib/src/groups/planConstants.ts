@@ -24,10 +24,6 @@ type AnalyticsPlanConstants = {
    MINIMUM_DUMMY: number
 }
 interface SparksPlanConstants {
-   /** The minimum number of creators required to publish sparks. */
-   MINIMUM_CREATORS_TO_PUBLISH_SPARKS: number
-   /** The minimum number of sparks required per creator to publish sparks. */
-   MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: number
    /** The maximum number of public sparks for a specific group. */
    MAX_PUBLIC_SPARKS: number
    /** The maximum number of creators for a specific group. */
@@ -39,6 +35,8 @@ interface SparksPlanConstants {
     * This is optional as it only applies to the trial plan.
     */
    TRIAL_CREATION_PERIOD_MILLISECONDS?: number
+   /** The minimum number of published sparks required to make any of the group's sparks visible on the platform. */
+   MINIMUM_TOTAL_PUBLISHED_SPARKS_TO_MAKE_GROUP_SPARKS_PUBLIC: number
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -74,12 +72,11 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
       features: ESSENTIAL_FEATURES,
       sparks: {
-         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
-         MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
          MAX_PUBLIC_SPARKS: 6,
          MAX_SPARK_CREATOR_COUNT: 1,
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 75, // 2.5 months
          TRIAL_CREATION_PERIOD_MILLISECONDS: 1000 * 60 * 60 * 24 * 14, // 2 weeks
+         MINIMUM_TOTAL_PUBLISHED_SPARKS_TO_MAKE_GROUP_SPARKS_PUBLIC: 3,
       },
       jobs: {
          // Empty for now
@@ -99,11 +96,10 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
       features: ESSENTIAL_FEATURES,
       sparks: {
-         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
-         MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
          MAX_PUBLIC_SPARKS: 6,
          MAX_SPARK_CREATOR_COUNT: 4,
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
+         MINIMUM_TOTAL_PUBLISHED_SPARKS_TO_MAKE_GROUP_SPARKS_PUBLIC: 3,
       },
       jobs: {
          // Empty for now
@@ -123,11 +119,10 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
       features: ADVANCED_FEATURES,
       sparks: {
-         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
-         MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
          MAX_PUBLIC_SPARKS: 10,
          MAX_SPARK_CREATOR_COUNT: 7,
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
+         MINIMUM_TOTAL_PUBLISHED_SPARKS_TO_MAKE_GROUP_SPARKS_PUBLIC: 3,
       },
       analytics: {
          MINIMUM_DUMMY: 1,
@@ -151,11 +146,10 @@ export const PLAN_CONSTANTS: Record<GroupPlanType, PlanConstants> = {
       },
       features: PREMIUM_FEATURES,
       sparks: {
-         MINIMUM_CREATORS_TO_PUBLISH_SPARKS: 1,
-         MINIMUM_SPARKS_PER_CREATOR_TO_PUBLISH_SPARKS: 3,
          MAX_PUBLIC_SPARKS: 200, // Unlimited
          MAX_SPARK_CREATOR_COUNT: 200, // Unlimited
          PLAN_DURATION_MILLISECONDS: 1000 * 60 * 60 * 24 * 365, // 1 year
+         MINIMUM_TOTAL_PUBLISHED_SPARKS_TO_MAKE_GROUP_SPARKS_PUBLIC: 3,
       },
       analytics: {
          MINIMUM_DUMMY: 1,

@@ -334,7 +334,7 @@ exports.setRemoveUserJobApplication = customJobs.setRemoveUserJobApplication
 exports[FUNCTION_NAMES.startPlan] = groupPlans.startPlan
 exports[FUNCTION_NAMES.sendReminderToNearEndSparksTrialPlanCreationPeriod] =
    groupPlans.sendReminderToNearEndSparksTrialPlanCreationPeriod
-exports.checkExpiredPlans = groupPlans.checkExpiredPlans
+exports[FUNCTION_NAMES.checkExpiredPlans] = groupPlans.checkExpiredPlans
 exports.manualCheckExpiredPlans = groupPlans.manualCheckExpiredPlans
 // Search
 exports.fullIndexSync = search.fullIndexSync
