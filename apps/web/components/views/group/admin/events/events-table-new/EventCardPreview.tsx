@@ -114,7 +114,9 @@ export const EventCardPreview = ({
                width={116}
                height={64}
                style={styles.thumbnailImage}
-               quality={100}
+               quality={70}
+               loading="lazy"
+               sizes="116px"
             />
             <Stack
                sx={styles.contentContainer}
