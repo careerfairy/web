@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
 import useIsDesktop from "components/custom-hook/useIsDesktop"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
@@ -77,27 +77,33 @@ export const QuickActions = () => {
          <Stack direction="row" spacing={2}>
             <Button
                sx={styles.quickActionButton}
-               startIcon={<Briefcase size={20} />}
+               startIcon={<Briefcase size={24} />}
                onClick={handleJobCreation}
             >
-               Publish a job opening
+               <Typography variant="brandedBody">
+                  Publish a job opening
+               </Typography>
             </Button>
             
             <Button
                sx={styles.quickActionButton}
-               startIcon={<Radio size={20} />}
+               startIcon={<Radio size={24} />}
                onClick={handleLiveStreamCreation}
                disabled={isCreating}
             >
-               Create a live stream
+               <Typography variant="brandedBody">
+                  Create a live stream
+               </Typography>
             </Button>
             
             <Button
                sx={styles.quickActionButton}
-               startIcon={<PlayCircle size={20} />}
+               startIcon={<PlayCircle size={24} />}
                onClick={handleSparkUpload}
             >
-               Upload a Spark
+               <Typography variant="brandedBody">
+                  Upload a Spark
+               </Typography>
             </Button>
          </Stack>
       </Box>
