@@ -10,7 +10,6 @@ import {
    BarChart2,
    Edit2,
    ExternalLink,
-   Eye,
    MessageSquare,
    Trash2,
 } from "react-feather"
@@ -33,7 +32,6 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       handleEnterLiveStreamRoom,
       handleShareLiveStream,
       handleShareRecording,
-      handleViewRecording,
       handleAnalytics,
       handleQuestions,
       handleFeedback,
@@ -47,7 +45,6 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
    const {
       shouldShowEnterLiveStreamRoom,
       shouldShowShareLiveStream,
-      shouldShowViewRecording,
       shouldShowShareRecording,
       shouldShowAnalytics,
       shouldShowQuestions,
@@ -77,14 +74,14 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
          })
       }
 
-      // For Past events
-      if (shouldShowViewRecording) {
-         options.push({
-            label: "View recording",
-            icon: <Eye />,
-            handleClick: () => handleViewRecording(stat),
-         })
-      }
+      // // For Past events
+      // if (shouldShowViewRecording) {
+      //    options.push({
+      //       label: "View recording",
+      //       icon: <Eye />,
+      //       handleClick: () => handleViewRecording(stat),
+      //    })
+      // }
 
       if (shouldShowShareRecording) {
          options.push({
@@ -150,7 +147,6 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       eventStatus,
       shouldShowEnterLiveStreamRoom,
       shouldShowShareLiveStream,
-      shouldShowViewRecording,
       shouldShowShareRecording,
       shouldShowAnalytics,
       shouldShowQuestions,
@@ -159,7 +155,6 @@ export const MobileEventActionsMenu = ({ stat, open, onClose }: Props) => {
       handleEnterLiveStreamRoom,
       handleShareLiveStream,
       handleShareRecording,
-      handleViewRecording,
       handleAnalytics,
       handleQuestions,
       handleFeedback,
