@@ -128,7 +128,7 @@ const guideCards: GuideCard[] = [
       text: "Discover the new live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview",
       cta: "Discover now",
       url: "/group/[groupId]/admin/content/live-streams",
-      image: "/images/guides/livestream-guide.svg",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ls-management.png?alt=media&token=1bbe8e2b-b9fe-49b4-8d09-eef69cda8539",
    },
    {
       id: 3,
@@ -136,7 +136,7 @@ const guideCards: GuideCard[] = [
       text: "Showcase your career fairs, info sessions, and on-campus events to a targeted audience already engaged with your company. Increase registrations and attendance by leveraging our platform.",
       cta: "Talk to us",
       url: "https://meetings.hubspot.com/denis-lehn-koza/clientdemocallcalender",
-      image: "/images/guides/management-guide.svg",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/offline.png?alt=media&token=83692ead-e6f4-4d9d-b564-125101fbb79b",
    },
 ]
 
