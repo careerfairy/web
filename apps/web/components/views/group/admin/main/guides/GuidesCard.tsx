@@ -10,10 +10,12 @@ const styles = sxStyles({
       position: "relative",
       minHeight: "390px", // Adjusted for minimum tile height minus header
       padding: "0px", // No padding around guide cards
+      display: "flex",
+      flexDirection: "column",
    },
    carousel: {
       position: "relative",
-      height: "100%",
+      flex: 1,
       overflow: "hidden",
    },
    cardContainer: {
@@ -47,7 +49,6 @@ const styles = sxStyles({
       lineHeight: "20px",
       color: "text.secondary",
       marginBottom: "12px", // Bottom padding for text
-      flex: 1,
    },
    ctaButton: {
       height: "40px",
@@ -82,12 +83,10 @@ const styles = sxStyles({
       },
    },
    indicators: {
-      position: "absolute",
-      bottom: "16px",
-      left: "50%",
-      transform: "translateX(-50%)",
       display: "flex",
+      justifyContent: "center",
       gap: "8px",
+      marginTop: "12px", // 12px spacing from cards
    },
    indicator: {
       width: "12px",
