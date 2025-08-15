@@ -64,14 +64,7 @@ const styles = sxStyles({
          borderColor: "neutral.50",
       },
    },
-   navigationContainer: {
-      position: "absolute",
-      top: "16px",
-      right: "16px",
-      display: "flex",
-      gap: "8px",
-      zIndex: 2,
-   },
+
    navigationButton: {
       minWidth: "32px",
       width: "32px",
@@ -96,15 +89,17 @@ const styles = sxStyles({
       gap: "8px",
    },
    indicator: {
-      width: "8px",
-      height: "8px",
-      borderRadius: "50%",
-      backgroundColor: "neutral.200",
+      width: "12px",
+      height: "12px",
+      borderRadius: "6px",
+      backgroundColor: "neutral.100",
       cursor: "pointer",
-      transition: "background-color 0.2s",
-      "&.active": {
-         backgroundColor: "primary.main",
-      },
+      transition: "all 0.2s ease",
+   },
+   indicatorActive: {
+      width: "34px",
+      height: "12px",
+      backgroundColor: "neutral.400",
    },
 })
 
@@ -170,30 +165,42 @@ const GuidesCard = () => {
       }
    }
 
-   return (
-      <CardCustom title="Guides" sx={{ minHeight: "422px" }}>
-         <Box sx={styles.carouselContainer}>
-            <Box sx={styles.navigationContainer}>
-               <Button
-                  sx={styles.navigationButton}
-                  onClick={handlePrevious}
-                  disabled={currentIndex === 0}
-                  data-testid="guides-prev-button"
-                  aria-label="Previous guide"
-               >
-                  <ChevronLeft size={16} />
-               </Button>
+   const customAction = (
+      <Box sx={{ display: "flex", gap: "8px" }}>
+         <Button
+            sx={styles.navigationButton}
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            data-testid="guides-prev-button"
+            aria-label="Previous guide"
+         >
+            <ChevronLeft size={16} />
+         </Button>
 
-               <Button
-                  sx={styles.navigationButton}
-                  onClick={handleNext}
-                  disabled={currentIndex === guideCards.length - 1}
-                  data-testid="guides-next-button"
-                  aria-label="Next guide"
-               >
-                  <ChevronRight size={16} />
-               </Button>
-            </Box>
+         <Button
+            sx={styles.navigationButton}
+            onClick={handleNext}
+            disabled={currentIndex === guideCards.length - 1}
+            data-testid="guides-next-button"
+            aria-label="Next guide"
+         >
+            <ChevronRight size={16} />
+         </Button>
+      </Box>
+   )
+
+   return (
+      <CardCustom 
+         title="Guides" 
+         sx={{ 
+            minHeight: "422px",
+            "& .MuiCardContent-root": {
+               padding: "16px",
+            },
+         }}
+         customAction={customAction}
+      >
+         <Box sx={styles.carouselContainer}>
 
             <Box sx={styles.carousel}>
                <Box
@@ -234,7 +241,7 @@ const GuidesCard = () => {
                      key={index}
                      sx={[
                         styles.indicator,
-                        index === currentIndex && { backgroundColor: "primary.main" },
+                        index === currentIndex && styles.indicatorActive,
                      ]}
                      onClick={() => handleIndicatorClick(index)}
                      data-testid={`guides-indicator-${index}`}
