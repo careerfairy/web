@@ -6,6 +6,7 @@ import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
 import GuidesCard from "./guides/GuidesCard"
 import { MainPageProvider } from "./MainPageProvider"
 import { NextLivestreamCard } from "./next-livestream/NextLivestreamCard"
+import { QuickActions } from "./quick-actions"
 import { AggregatedRegistrationSourcesCard } from "./registration-sources/AggregatedRegistrationSourcesCard"
 
 const styles = sxStyles({
@@ -26,6 +27,7 @@ const PageContent = () => {
    return (
       <Box py={2}>
          <Container maxWidth={false}>
+            <QuickActions />
             <Grid container spacing={3}>
                <Grid xs={12} md={6} item style={styles.gridItem}>
                   <NextLivestreamCard />
