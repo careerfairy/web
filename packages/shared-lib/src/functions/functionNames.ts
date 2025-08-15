@@ -78,4 +78,5 @@ export const FUNCTION_NAMES = {
    syncUserLivestreamData: "syncUserLivestreamData_v2",
    onCreateLivestreamRatingAnswer: "onCreateLivestreamRatingAnswer_v2",
    syncLivestreamStats: "syncLivestreamStats_v2",
+   checkExpiredPlans: "checkExpiredPlans_v2",
 } as const
