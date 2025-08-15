@@ -17,23 +17,30 @@ const styles = sxStyles({
       justifyContent: "center",
       marginBottom: 3,
    },
+   buttonsStack: {
+      width: "100%",
+      maxWidth: "800px", // Optional: limit maximum width for better UX
+   },
    quickActionButton: {
-      backgroundColor: (theme) => theme.brand.white[100],
-      borderColor: "secondary.50", // Use secondary.50 for purple 50
+      // Default state
+      backgroundColor: (theme) => theme.brand.white[100], // white 100
+      borderColor: "secondary.50", // purple 50
       color: "neutral.800",
       borderRadius: "10px",
       textTransform: "none",
       fontWeight: 500,
       padding: "12px 24px",
-      minWidth: "200px",
       border: "1px solid",
+      flex: 1, // Take equal width within the stack
       "&:hover": {
-         backgroundColor: (theme) => theme.brand.white[200],
-         borderColor: "secondary.100", // Use secondary.100 for purple 100
+         // Hover state
+         backgroundColor: "secondary.50", // purple 50
+         borderColor: "secondary.50", // purple 50
+         borderWidth: "1px",
       },
       "&:disabled": {
          backgroundColor: (theme) => theme.brand.white[100],
-         borderColor: "secondary.50", // Use secondary.50 for purple 50
+         borderColor: "secondary.50",
          color: "neutral.500",
          opacity: 0.7,
       },
@@ -74,7 +81,7 @@ export const QuickActions = () => {
 
    return (
       <Box sx={styles.container}>
-         <Stack direction="row" spacing={2}>
+         <Stack direction="row" spacing={2} sx={styles.buttonsStack}>
             <Button
                sx={styles.quickActionButton}
                startIcon={<Briefcase size={24} />}
