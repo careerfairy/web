@@ -114,11 +114,13 @@ async function updateExpiredGroupPlans() {
          functions.logger
       )
 
-      const groups = expiringGroups.filter(
-         (group) =>
-            // Only want those whose have publicSparks = true or undefined values, those with false are already correct
-            group.publicSparks !== false
-      )
+      const groups =
+         expiringGroups?.filter(
+            (group) =>
+               // Only want those whose have publicSparks = true or undefined values, those with false are already correct
+               group.publicSparks !== false
+         ) ?? []
+
       // validateGroupSparks does the actual check and update if plan is already expired
       const updatePromises = groups.map(validateGroupSparks)
 
