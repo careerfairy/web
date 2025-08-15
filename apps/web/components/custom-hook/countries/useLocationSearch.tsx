@@ -68,11 +68,26 @@ export const useLocationSearch = (
       [searchValue]
    )
 
+   // Ensure immediate clearing on reset (no 200ms linger of old results)
+   // When the live search value becomes an empty string, sync the debounced
+   // value immediately so the SWR key resolves to null right away.
+   if (searchValue === "" && debouncedSearchValue !== "") {
+      setDebouncedSearchValue("")
+   }
+
+   // When there's no search value and no initial ids, we don't want to keep
+   // previous results lingering after a reset/open. Disable keepPreviousData
+   // in that specific state so SWR clears prior data when the key becomes null.
+   const shouldKeepPreviousData = Boolean(
+      debouncedSearchValue?.length || initialLocationIds?.length
+   )
+
    return useSWR<Omit<OptionGroup, "groupId">[]>(
       getKey({ searchValue: debouncedSearchValue, limit, initialLocationIds }),
       fetcher,
       {
          ...swrOptions,
+         keepPreviousData: shouldKeepPreviousData,
          suspense,
       }
    )
