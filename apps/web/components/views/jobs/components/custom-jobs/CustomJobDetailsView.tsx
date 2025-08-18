@@ -246,6 +246,7 @@ export const CustomJobDetails = ({
                companyName
             )
          )
+         .then(() => {})
          .catch(() => {
             errorLogAndNotify(
                new Error("Failed to increment custom job views"),

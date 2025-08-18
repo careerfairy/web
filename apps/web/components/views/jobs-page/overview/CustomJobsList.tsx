@@ -3,6 +3,7 @@ import { Box, CircularProgress, ListItem } from "@mui/material"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import JobCard from "components/views/common/jobs/JobCard"
+import { useAlgoliaEvents } from "hooks/useAlgoliaEvents"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { Fragment, useEffect, useRef } from "react"
@@ -35,8 +36,9 @@ type Props = {
 export const CustomJobsList = ({ customJobs }: Props) => {
    const isMobile = useIsMobile()
    const router = useRouter()
-   const { isValidating, nextPage, selectedJob, hasMore } =
+   const { isValidating, nextPage, selectedJob, hasMore, searchResultsData } =
       useJobsOverviewContext()
+   const { trackSearchResultClick } = useAlgoliaEvents()
 
    const { inView, ref } = useInView({
       rootMargin: "0px 0px 200px 0px",
@@ -53,6 +55,37 @@ export const CustomJobsList = ({ customJobs }: Props) => {
          nextPage()
       }
    }, [inView, nextPage, hasMore])
+
+   const handleJobClick = (customJob: CustomJob, position: number) => {
+      // Find which page contains this job to get the correct queryID
+      let searchPageData = null
+      let absolutePosition = position
+
+      if (searchResultsData) {
+         let accumulatedResults = 0
+         for (const pageData of searchResultsData) {
+            const pageSize = pageData.deserializedHits.length
+            if (position < accumulatedResults + pageSize) {
+               searchPageData = pageData
+               absolutePosition = position + 1 // Algolia positions are 1-indexed
+               break
+            }
+            accumulatedResults += pageSize
+         }
+      }
+
+      const queryID = searchPageData?.queryID
+
+      if (queryID) {
+         trackSearchResultClick({
+            index: "walterGoncalves_customJobs",
+            queryID,
+            objectID: customJob.id,
+            position: absolutePosition,
+            eventName: "Custom Job Search Result Clicked",
+         })
+      }
+   }
 
    return (
       <Fragment>
@@ -72,6 +105,7 @@ export const CustomJobsList = ({ customJobs }: Props) => {
                   // Prevents the page from scrolling to the top when the link is clicked
                   scroll={false}
                   key={idx}
+                  onClick={() => handleJobClick(customJob, idx)}
                >
                   <ListItem
                      sx={[

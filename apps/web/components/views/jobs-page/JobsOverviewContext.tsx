@@ -27,8 +27,13 @@ import {
    useRef,
    useState,
 } from "react"
-import { AlgoliaCustomJobResponse } from "types/algolia"
+import { AlgoliaCustomJobResponse, CustomJobSearchResult } from "types/algolia"
 import { deserializeAlgoliaSearchResponse } from "util/algolia"
+
+// Define the extended search response type to match what the hook returns
+type SearchDataWithDeserialized = SearchResponse<AlgoliaCustomJobResponse> & {
+   deserializedHits: CustomJobSearchResult[]
+}
 
 type JobsOverviewContextType = {
    selectedJob: CustomJob | undefined
@@ -60,6 +65,7 @@ type JobsOverviewContextType = {
    recommendedJobs: CustomJob[]
    isLoadingRecommendedJobs: boolean
    isLoadingJobs: boolean
+   searchResultsData: SearchDataWithDeserialized[] | undefined
 }
 
 const JobsOverviewContext = createContext<JobsOverviewContextType | undefined>(
@@ -295,6 +301,7 @@ export const JobsOverviewContextProvider = ({
          ),
          isLoadingRecommendedJobs,
          isLoadingJobs: isLoadingJobs,
+         searchResultsData: data,
       }
    }, [
       infiniteJobs,

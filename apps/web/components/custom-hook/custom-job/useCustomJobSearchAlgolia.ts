@@ -114,7 +114,10 @@ export const useCustomJobSearchAlgolia = (
          filters,
          page,
          replica,
-         pageLimit
+         pageLimit,
+         {
+            enableAnalytics: true, // Enable analytics to get queryID for click tracking
+         }
       )
 
       return {

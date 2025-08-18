@@ -114,6 +114,7 @@ const csp = {
       "*.analytics.google.com",
       "*.careerfairy.io",
       "*.cloudfunctions.net",
+      "insights.algolia.io",
       "*.facebook.com",
       "*.g.doubleclick.net",
       "*.google-analytics.com",
