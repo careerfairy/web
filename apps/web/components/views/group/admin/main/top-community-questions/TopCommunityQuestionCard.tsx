@@ -12,7 +12,7 @@ const styles = sxStyles({
       border: "1px solid",
       borderColor: "#E1E1E1",
       p: [1.5, 1.625],
-      bgcolor: "background.paper",
+      bgcolor: (theme) => theme.brand.white[300],
       height: "100%",
       justifyContent: "space-between",
    },
@@ -24,7 +24,7 @@ const styles = sxStyles({
    likesDisplay: {
       textTransform: "none",
       p: 0,
-      color: "neutral.400",
+      color: "neutral.600",
       "& svg": {
          width: "18px",
          height: "18px",
@@ -40,7 +40,7 @@ const styles = sxStyles({
    },
    date: {
       fontSize: "0.857rem",
-      color: (theme) => `${alpha(theme.palette.text.secondary, 0.4)}`,
+      color: "neutral.600",
       fontWeight: 400,
    },
 })
@@ -52,7 +52,7 @@ type Props = {
 export const TopCommunityQuestionCard: FC<Props> = ({ question }) => {
    return (
       <Stack sx={styles.questionItem} spacing={2.7}>
-         <Typography variant="brandedBody">{question.title}</Typography>
+         <Typography variant="brandedBody" color="neutral.800">{question.title}</Typography>
          <Box sx={styles.buttonsWrapper}>
             <Box sx={styles.likesDisplay}>
                <ThumbUpIcon />
