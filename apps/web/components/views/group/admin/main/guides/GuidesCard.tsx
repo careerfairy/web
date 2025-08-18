@@ -2,9 +2,7 @@ import { Box, Button, Stack, Typography } from "@mui/material"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "react-feather"
-import SwipeableViews from "react-swipeable-views"
 import { sxStyles } from "types/commonTypes"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import CardCustom from "../../common/CardCustom"
 
 const styles = sxStyles({
@@ -14,7 +12,16 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
    },
-
+   carousel: {
+      position: "relative",
+      flex: 1,
+      overflow: "hidden",
+   },
+   cardContainer: {
+      display: "flex",
+      transition: "transform 0.3s ease-in-out",
+      height: "100%",
+   },
    card: {
       minWidth: "100%",
       display: "flex",
@@ -134,7 +141,6 @@ const GuidesCard = () => {
    const [currentIndex, setCurrentIndex] = useState(0)
    const router = useRouter()
    const { groupId } = router.query
-   const isMobile = useIsMobile()
 
    const handlePrevious = () => {
       setCurrentIndex((prev) => (prev === 0 ? guideCards.length - 1 : prev - 1))
@@ -145,10 +151,6 @@ const GuidesCard = () => {
    }
 
    const handleIndicatorClick = (index: number) => {
-      setCurrentIndex(index)
-   }
-
-   const handleSwipeChange = (index: number) => {
       setCurrentIndex(index)
    }
 
@@ -200,37 +202,38 @@ const GuidesCard = () => {
       >
          <Box sx={styles.carouselContainer}>
 
-            <SwipeableViews
-               index={currentIndex}
-               onChangeIndex={handleSwipeChange}
-               enableMouseEvents={!isMobile}
-               disabled={!isMobile} // Only enable swipe on mobile
-               style={{ overflow: "visible" }}
-            >
-               {guideCards.map((card) => (
-                  <Box key={card.id} sx={styles.card} data-testid={`guide-card-${card.id}`}>
-                     <img
-                        src={card.image}
-                        alt={card.title}
-                        style={styles.cardImage}
-                     />
-                     <Typography variant="h6" sx={styles.cardTitle}>
-                        {card.title}
-                     </Typography>
-                     <Typography variant="body2" sx={styles.cardText}>
-                        {card.text}
-                     </Typography>
-                     <Button
-                        variant="outlined"
-                        sx={styles.ctaButton}
-                        onClick={() => handleCTAClick(card)}
-                        data-testid={`guide-cta-${card.id}`}
-                     >
-                        {card.cta}
-                     </Button>
-                  </Box>
-               ))}
-            </SwipeableViews>
+            <Box sx={styles.carousel}>
+               <Box
+                  sx={{
+                     ...styles.cardContainer,
+                     transform: `translateX(-${currentIndex * 100}%)`,
+                  }}
+               >
+                  {guideCards.map((card) => (
+                     <Box key={card.id} sx={styles.card} data-testid={`guide-card-${card.id}`}>
+                        <img
+                           src={card.image}
+                           alt={card.title}
+                           style={styles.cardImage}
+                        />
+                        <Typography variant="h6" sx={styles.cardTitle}>
+                           {card.title}
+                        </Typography>
+                        <Typography variant="body2" sx={styles.cardText}>
+                           {card.text}
+                        </Typography>
+                        <Button
+                           variant="outlined"
+                           sx={styles.ctaButton}
+                           onClick={() => handleCTAClick(card)}
+                           data-testid={`guide-cta-${card.id}`}
+                        >
+                           {card.cta}
+                        </Button>
+                     </Box>
+                  ))}
+               </Box>
+            </Box>
 
             <Box sx={styles.indicators} data-testid="guides-indicators">
                {guideCards.map((_, index) => (
