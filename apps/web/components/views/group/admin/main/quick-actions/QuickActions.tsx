@@ -37,9 +37,10 @@ const styles = sxStyles({
       "&:hover": {
          // Hover state
          backgroundColor: "secondary.50", // purple 50
-         borderColor: "secondary.50", // purple 50
+         borderColor: "secondary.400", // purple 400
          borderWidth: "1px",
          borderStyle: "solid",
+         color: "secondary.600", // purple 600
       },
       "&:disabled": {
          backgroundColor: (theme) => theme.brand.white[100],
