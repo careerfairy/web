@@ -192,9 +192,6 @@ const GuidesCard = () => {
             "& .MuiCardContent-root": {
                padding: "16px",
             },
-            "& .MuiCardHeader-root": {
-               padding: "16px",
-            },
          }}
          customAction={customAction}
       >
