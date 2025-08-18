@@ -35,6 +35,10 @@ const styles = sxStyles({
       borderRadius: "6px",
       cursor: "pointer",
       border: "1px solid transparent",
+      transition: (theme) =>
+         theme.transitions.create(["background-color", "border-color"], {
+            duration: theme.transitions.duration.short,
+         }),
       "&:hover": {
          backgroundColor: (theme) => theme.brand.white[400],
          borderColor: "secondary.200", // Purple 200
