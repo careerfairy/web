@@ -1,11 +1,10 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent, LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
+import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import { reducedRemoteCallsOptions } from "components/custom-hook/utils/useFunctionsSWRFetcher"
-import { collection, getDocs, limit, orderBy, query } from "firebase/firestore"
+import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore"
 import { useFirestore } from "reactfire"
 import useSWR from "swr"
-
-import { useGroupLivestreams } from "./useGroupLivestreams"
 
 export interface TopCommunityQuestion extends LivestreamQuestion {
    livestreamTitle?: string
@@ -13,8 +12,8 @@ export interface TopCommunityQuestion extends LivestreamQuestion {
 }
 
 /**
- * Custom hook to fetch the top 5 most liked community questions from all past livestreams
- * organized by a specific group. Results are memoized to avoid re-fetching on page refresh.
+ * Custom hook to fetch the top 5 most liked community questions from past livestreams
+ * organized by a specific group within the last 2 years. Results are memoized to avoid re-fetching on page refresh.
  *
  * @param groupId - The ID of the group to fetch questions for
  * @returns SWR response with the top 5 questions sorted by likes in descending order
@@ -22,25 +21,40 @@ export interface TopCommunityQuestion extends LivestreamQuestion {
 export const useTopCommunityQuestions = (groupId: string) => {
    const firestore = useFirestore()
 
-   // Fetch past livestreams for this group
-   const {
-      data: pastLivestreams,
-      isLoading: isLoadingStreams,
-      error: livestreamsError,
-   } = useGroupLivestreams(groupId, "past")
-
    const fetchTopQuestions = async (): Promise<TopCommunityQuestion[]> => {
-      // Return empty array if no groupId, still loading, or error occurred
-      if (
-         !groupId ||
-         isLoadingStreams ||
-         livestreamsError ||
-         !pastLivestreams?.length
-      ) {
+      // Return empty array if no groupId
+      if (!groupId) {
          return []
       }
 
       try {
+         // Calculate date 2 years ago
+         const twoYearsAgo = new Date()
+         twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2)
+
+         // Calculate the cutoff date for past streams (not upcoming)
+         const pastStreamCutoff = new Date(
+            Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS
+         )
+
+         // Fetch past livestreams from the last 2 years for this group
+         const livestreamsQuery = query(
+            collection(firestore, "livestreams"),
+            where("test", "==", false),
+            where("groupIds", "array-contains", groupId),
+            where("start", "<", pastStreamCutoff), // Only past streams
+            where("start", ">", twoYearsAgo), // Only from last 2 years
+            orderBy("start", "desc")
+         ).withConverter(createGenericConverter<LivestreamEvent>())
+
+         const livestreamsSnapshot = await getDocs(livestreamsQuery)
+         const pastLivestreams = livestreamsSnapshot.docs.map((doc) => doc.data())
+
+         // Return empty array if no livestreams found
+         if (!pastLivestreams?.length) {
+            return []
+         }
+
          // Collect all questions from all past livestreams with better error handling
          const allQuestionsPromises = pastLivestreams.map(
             async (livestream) => {
@@ -96,9 +110,7 @@ export const useTopCommunityQuestions = (groupId: string) => {
    }
 
    return useSWR<TopCommunityQuestion[]>(
-      groupId && !isLoadingStreams && !livestreamsError
-         ? `top-community-questions-${groupId}`
-         : null,
+      groupId ? `top-community-questions-${groupId}` : null,
       fetchTopQuestions,
       {
          ...reducedRemoteCallsOptions,
