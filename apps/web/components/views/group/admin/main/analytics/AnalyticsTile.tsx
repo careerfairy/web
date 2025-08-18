@@ -24,6 +24,8 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       gap: 1, // 8px between cards
+      px: 2, // 16px left and right padding
+      pb: 2, // 16px bottom padding
    },
    metricCard: {
       display: "flex",
