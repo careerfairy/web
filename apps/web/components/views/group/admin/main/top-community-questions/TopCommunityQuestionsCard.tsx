@@ -7,17 +7,17 @@ import CardCustom from "../../common/CardCustom"
 import { TopCommunityQuestionCard } from "./TopCommunityQuestionCard"
 
 const styles = sxStyles({
-   questionsContainer: {
+   questionsContainer: (theme) => ({
       display: "flex",
       flexDirection: "column",
       gap: 1,
       flex: 1,
       // Desktop only: max-height and overflow
-      [theme => theme.breakpoints.up('desktop')]: {
+      [theme.breakpoints.up("desktop")]: {
          maxHeight: "400px",
          overflowY: "auto",
       },
-   },
+   }),
    noQuestionsContainer: {
       backgroundColor: (theme) => theme.brand.white[200],
       borderRadius: "8px",
