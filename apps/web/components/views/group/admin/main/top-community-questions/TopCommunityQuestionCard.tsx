@@ -9,8 +9,6 @@ import { TopCommunityQuestion } from "components/custom-hook/live-stream/useTopC
 const styles = sxStyles({
    questionItem: {
       borderRadius: 2.5,
-      border: "1px solid",
-      borderColor: "#E1E1E1",
       p: [1.5, 1.625],
       bgcolor: (theme) => theme.brand.white[300],
       height: "100%",
