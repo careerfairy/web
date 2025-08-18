@@ -203,8 +203,8 @@ const GuidesCard = () => {
             <SwipeableViews
                index={currentIndex}
                onChangeIndex={handleSwipeChange}
-               enableMouseEvents={!isMobile}
-               disabled={!isMobile} // Only enable swipe on mobile
+               enableMouseEvents={false}
+               disableSwipe={!isMobile} // Only enable swipe on mobile
                style={{ overflow: "visible" }}
             >
                {guideCards.map((card) => (
