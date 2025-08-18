@@ -4,7 +4,7 @@ import { alpha } from "@mui/material/styles"
 import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
-import { TopCommunityQuestion } from "../../../../../../../components/custom-hook/live-stream/useTopCommunityQuestions"
+import { TopCommunityQuestion } from "components/custom-hook/live-stream/useTopCommunityQuestions"
 
 const styles = sxStyles({
    questionItem: {
