@@ -12,7 +12,9 @@ const styles = sxStyles({
       width: "100%",
       display: "flex",
       flexDirection: "column",
-      p: 2, // 16px padding for the tile
+      pt: 0, // 0px top padding
+      px: 0, // 0px left and right padding
+      pb: 2, // Keep bottom padding for spacing
    },
    title: {
       mb: 2, // 16px padding between title and cards
