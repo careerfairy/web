@@ -17,6 +17,11 @@ import { SortType } from "../../components/views/common/filter/FilterMenu"
 import algoliaSearchClient from "./AlgoliaInstance"
 import { initAlgoliaIndex } from "./util"
 
+export interface SearchOptions {
+   userToken?: string
+   enableAnalytics?: boolean
+}
+
 export interface IAlgoliaRepository {
    searchWishes(
       query: string,
@@ -27,7 +32,8 @@ export interface IAlgoliaRepository {
       filters: string,
       page: number,
       targetReplica?: LivestreamReplicaType,
-      itemsPerPage?: number
+      itemsPerPage?: number,
+      searchOptions?: SearchOptions
    ): Promise<SearchResponse<AlgoliaLivestreamResponse>>
 
    searchSparks(
@@ -35,14 +41,16 @@ export interface IAlgoliaRepository {
       filters: string,
       page: number,
       targetReplica?: SparkReplicaType,
-      itemsPerPage?: number
+      itemsPerPage?: number,
+      searchOptions?: SearchOptions
    ): Promise<SearchResponse<AlgoliaSparkResponse>>
    searchCompanies(
       query: string,
       filters: string,
       page: number,
       targetReplica?: CompanyReplicaType,
-      itemsPerPage?: number
+      itemsPerPage?: number,
+      searchOptions?: SearchOptions
    ): Promise<SearchResponse<AlgoliaCompanyResponse>>
 
    searchCustomJobs(
@@ -50,7 +58,8 @@ export interface IAlgoliaRepository {
       filters: string,
       page: number,
       targetReplica?: CustomJobReplicaType,
-      itemsPerPage?: number
+      itemsPerPage?: number,
+      searchOptions?: SearchOptions
    ): Promise<SearchResponse<AlgoliaCustomJobResponse>>
 }
 interface SearchWishesOptions {
@@ -103,7 +112,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
       filters: string,
       page: number,
       targetReplica?: LivestreamReplicaType,
-      itemsPerPage?: number
+      itemsPerPage?: number,
+      searchOptions?: SearchOptions
    ) {
       const index = initAlgoliaIndex(
          targetReplica ? targetReplica : "livestreams"
@@ -114,7 +124,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
          query,
          filters,
          page,
-         itemsPerPage
+         itemsPerPage,
+         searchOptions
       )
    }
 
@@ -123,7 +134,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
       filters: string,
       page: number,
       targetReplica?: SparkReplicaType,
-      itemsPerPage?: number
+      itemsPerPage?: number,
+      searchOptions?: SearchOptions
    ) {
       const index = initAlgoliaIndex(targetReplica ? targetReplica : "sparks")
 
@@ -132,7 +144,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
          query,
          filters,
          page,
-         itemsPerPage
+         itemsPerPage,
+         searchOptions
       )
    }
 
@@ -141,7 +154,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
       filters: string,
       page: number,
       targetReplica?: CompanyReplicaType,
-      itemsPerPage?: number
+      itemsPerPage?: number,
+      searchOptions?: SearchOptions
    ) {
       const index = initAlgoliaIndex(
          targetReplica ? targetReplica : "companies"
@@ -152,7 +166,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
          query,
          filters,
          page,
-         itemsPerPage
+         itemsPerPage,
+         searchOptions
       )
    }
 
@@ -161,7 +176,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
       filters: string,
       page: number,
       targetReplica?: CustomJobReplicaType,
-      itemsPerPage?: number
+      itemsPerPage?: number,
+      searchOptions?: SearchOptions
    ) {
       const index = initAlgoliaIndex(
          targetReplica ? targetReplica : "customJobs"
@@ -172,7 +188,8 @@ class AlgoliaRepository implements IAlgoliaRepository {
          query,
          filters,
          page,
-         itemsPerPage
+         itemsPerPage,
+         searchOptions
       )
    }
 }
@@ -185,7 +202,8 @@ const handleSearch = <AlgoliaResponseType>(
    query: string,
    filters: string,
    page: number,
-   itemsPerPage?: number
+   itemsPerPage?: number,
+   searchOptions?: SearchOptions
 ) => {
    const isTest = isTestEnvironment()
    const workflowId = getWorkflowId()
@@ -202,6 +220,9 @@ const handleSearch = <AlgoliaResponseType>(
       filters: (isTest ? `workflowId:${workflowId} AND ` : "") + filters,
       page,
       cacheable: !isTest, // Disable caching for test environments as time is limited
+      // Enable click analytics and user token for Algolia Recommend
+      ...(searchOptions?.enableAnalytics && { clickAnalytics: true }),
+      ...(searchOptions?.userToken && { userToken: searchOptions.userToken }),
    })
 }
 

@@ -6,6 +6,7 @@ import {
    LivestreamReplicaType,
 } from "@careerfairy/shared-lib/livestreams/search"
 import algoliaRepo from "data/algolia/AlgoliaRepository"
+import { useAlgoliaEvents } from "hooks/useAlgoliaEvents"
 import { DateTime } from "luxon"
 import { useCallback } from "react"
 import useSWRInfinite from "swr/infinite"
@@ -98,14 +99,20 @@ export const buildAlgoliaFilterString = (options: FilterOptions): string => {
  * A custom React hook used for performing searches of livestream events in Algolia.
  * @param  inputValue - The search string input by the user
  * @param  options - The filter options to apply to the search
+ * @param  targetReplica - The replica to search in
+ * @param  disable - Whether to disable the search
+ * @param  itemsPerPage - Number of items per page
+ * @param  enableAnalytics - Whether to enable click analytics for Algolia Recommend
  */
 export function useLivestreamSearchAlgolia(
    inputValue: string,
    options: FilterOptions,
    targetReplica?: LivestreamReplicaType,
    disable?: boolean,
-   itemsPerPage?: number
+   itemsPerPage?: number,
+   enableAnalytics?: boolean
 ) {
+   const { userToken } = useAlgoliaEvents()
    const getKey = useCallback(
       (pageIndex: number, previousPageData: Data | null): Key => {
          // If reached the end of the list, return null to stop fetching
@@ -129,7 +136,11 @@ export function useLivestreamSearchAlgolia(
          filters,
          page,
          replica,
-         pageLimit
+         pageLimit,
+         {
+            enableAnalytics,
+            userToken,
+         }
       )
 
       return {

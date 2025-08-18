@@ -150,6 +150,13 @@ export const AnalyticsEvents = {
 
    // Value Scoring
    Purchase: "Purchase",
+
+   // Algolia Events for Recommend
+   AlgoliaSearchResultClick: "algolia_search_result_click",
+   AlgoliaSearchResultsView: "algolia_search_results_view",
+   AlgoliaConversion: "algolia_conversion",
+   AlgoliaRecommendationClick: "algolia_recommendation_click",
+   AlgoliaRecommendationsView: "algolia_recommendations_view",
 } as const
 
 export type AnalyticsEvent =
