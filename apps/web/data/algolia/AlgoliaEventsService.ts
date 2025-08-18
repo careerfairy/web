@@ -5,34 +5,43 @@ import { analyticsTrackEvent } from "util/analyticsUtils"
 
 // Initialize insights client
 let insightsClient: InsightsClient | null = null
+let initializationPromise: Promise<InsightsClient> | null = null
 
 /**
  * Initialize Algolia Insights client for event tracking
  * This enables Algolia Recommend by tracking user interactions
  */
-export const initializeAlgoliaInsights = (): InsightsClient => {
-   if (insightsClient) {
-      return insightsClient
-   }
+export const initializeAlgoliaInsights =
+   async (): Promise<InsightsClient | null> => {
+      if (insightsClient) {
+         return insightsClient
+      }
 
-   // Dynamic import to avoid SSR issues
-   if (typeof window !== "undefined") {
-      import("search-insights").then((insights) => {
-         const client = insights.default
+      if (initializationPromise) {
+         return initializationPromise
+      }
 
-         client("init", {
-            appId: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
-            apiKey: process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY!,
-            useCookie: true,
-            cookieDuration: 30 * 24 * 60 * 60 * 1000, // 30 days
+      // Dynamic import to avoid SSR issues
+      if (typeof window !== "undefined") {
+         initializationPromise = import("search-insights").then((insights) => {
+            const client = insights.default
+
+            client("init", {
+               appId: process.env.NEXT_PUBLIC_ALGOLIA_APP_ID!,
+               apiKey: process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY!,
+               useCookie: true,
+               cookieDuration: 30 * 24 * 60 * 60 * 1000, // 30 days
+            })
+
+            insightsClient = client
+            return client
          })
 
-         insightsClient = client
-      })
-   }
+         return initializationPromise
+      }
 
-   return insightsClient!
-}
+      return null
+   }
 
 /**
  * Generate a unique user token for Algolia events
@@ -70,10 +79,32 @@ export const generateUserToken = (
  * Supports Algolia Recommend by sending click, view, and conversion events
  */
 export class AlgoliaEventsService {
-   private insights: InsightsClient
+   private insights: InsightsClient | null = null
+   private initializationPromise: Promise<InsightsClient | null> | null = null
 
    constructor() {
-      this.insights = initializeAlgoliaInsights()
+      this.initializeClient()
+   }
+
+   private async initializeClient() {
+      if (!this.initializationPromise) {
+         this.initializationPromise = initializeAlgoliaInsights()
+      }
+
+      this.insights = await this.initializationPromise
+   }
+
+   private async ensureInitialized(): Promise<InsightsClient | null> {
+      if (this.insights) {
+         return this.insights
+      }
+
+      if (!this.initializationPromise) {
+         this.initializationPromise = initializeAlgoliaInsights()
+      }
+
+      this.insights = await this.initializationPromise
+      return this.insights
    }
 
    /**
@@ -95,11 +126,19 @@ export class AlgoliaEventsService {
       userToken: string
       eventName?: string
    }) => {
-      if (!this.insights || isTestEnvironment()) return
+      if (isTestEnvironment()) return
 
+      console.log("🚀 ~ AlgoliaEventsService ~ eventName:", eventName)
       try {
+         const insights = await this.ensureInitialized()
+
+         if (!insights) {
+            console.warn("Algolia insights client not initialized")
+            return
+         }
+
          // Send to Algolia
-         this.insights("clickedObjectIDsAfterSearch", {
+         insights("clickedObjectIDsAfterSearch", {
             index,
             eventName,
             queryID,
@@ -109,6 +148,7 @@ export class AlgoliaEventsService {
          })
 
          // Also track in your existing analytics
+         console.log("🚀 ~ AlgoliaEventsService ~ track:")
          analyticsTrackEvent(AnalyticsEvents.AlgoliaSearchResultClick, {
             index,
             queryID,
@@ -138,10 +178,17 @@ export class AlgoliaEventsService {
       userToken: string
       eventName?: string
    }) => {
-      if (!this.insights || isTestEnvironment()) return
+      if (isTestEnvironment()) return
 
       try {
-         this.insights("viewedObjectIDs", {
+         const insights = await this.ensureInitialized()
+
+         if (!insights) {
+            console.warn("Algolia insights client not initialized")
+            return
+         }
+
+         insights("viewedObjectIDs", {
             index,
             eventName,
             objectIDs,
@@ -178,12 +225,19 @@ export class AlgoliaEventsService {
       eventName: string
       value?: number
    }) => {
-      if (!this.insights || isTestEnvironment()) return
+      if (isTestEnvironment()) return
 
       try {
+         const insights = await this.ensureInitialized()
+
+         if (!insights) {
+            console.warn("Algolia insights client not initialized")
+            return
+         }
+
          if (queryID) {
             // Conversion after search
-            this.insights("convertedObjectIDsAfterSearch", {
+            insights("convertedObjectIDsAfterSearch", {
                index,
                eventName,
                queryID,
@@ -193,7 +247,7 @@ export class AlgoliaEventsService {
             })
          } else {
             // Conversion without search
-            this.insights("convertedObjectIDs", {
+            insights("convertedObjectIDs", {
                index,
                eventName,
                objectIDs,
@@ -229,10 +283,17 @@ export class AlgoliaEventsService {
       userToken: string
       eventName?: string
    }) => {
-      if (!this.insights || isTestEnvironment()) return
+      if (isTestEnvironment()) return
 
       try {
-         this.insights("clickedObjectIDs", {
+         const insights = await this.ensureInitialized()
+
+         if (!insights) {
+            console.warn("Algolia insights client not initialized")
+            return
+         }
+
+         insights("clickedObjectIDs", {
             index,
             eventName,
             objectIDs: [objectID],
@@ -263,10 +324,17 @@ export class AlgoliaEventsService {
       userToken: string
       eventName?: string
    }) => {
-      if (!this.insights || isTestEnvironment()) return
+      if (isTestEnvironment()) return
 
       try {
-         this.insights("viewedObjectIDs", {
+         const insights = await this.ensureInitialized()
+
+         if (!insights) {
+            console.warn("Algolia insights client not initialized")
+            return
+         }
+
+         insights("viewedObjectIDs", {
             index,
             eventName,
             objectIDs,
