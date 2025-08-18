@@ -8,6 +8,7 @@ import { MainPageProvider } from "./MainPageProvider"
 import { NextLivestreamCard } from "./next-livestream/NextLivestreamCard"
 import { QuickActions } from "./quick-actions"
 import { AggregatedRegistrationSourcesCard } from "./registration-sources/AggregatedRegistrationSourcesCard"
+import { TopCommunityQuestionsCard } from "./top-community-questions/TopCommunityQuestionsCard"
 
 const styles = sxStyles({
    gridItem: {
@@ -39,6 +40,10 @@ const PageContent = () => {
 
                <Grid xs={12} md={6} item style={styles.gridItem}>
                   <AggregatedRegistrationSourcesCard />
+               </Grid>
+
+               <Grid xs={12} md={6} item style={styles.gridItem}>
+                  <TopCommunityQuestionsCard />
                </Grid>
 
                <Grid xs={12} md={6} item style={styles.gridItem}>
