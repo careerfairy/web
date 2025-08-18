@@ -3,21 +3,10 @@ import { FC } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useTopCommunityQuestions } from "components/custom-hook/live-stream/useTopCommunityQuestions"
+import CardCustom from "../../common/CardCustom"
 import { TopCommunityQuestionCard } from "./TopCommunityQuestionCard"
 
 const styles = sxStyles({
-   container: {
-      backgroundColor: "background.paper",
-      borderRadius: "12px",
-      p: 3,
-      height: "100%",
-      display: "flex",
-      flexDirection: "column",
-   },
-   title: {
-      fontWeight: 600,
-      mb: 2,
-   },
    questionsContainer: {
       display: "flex",
       flexDirection: "column",
@@ -70,11 +59,7 @@ export const TopCommunityQuestionsCard: FC = () => {
    const hasQuestions = topQuestions && topQuestions.length > 0
 
    return (
-      <Box sx={styles.container}>
-         <Typography variant="brandedH5" sx={styles.title}>
-            Top community questions
-         </Typography>
-
+      <CardCustom title="Top community questions">
          {error ? (
             <Box sx={styles.noQuestionsContainer}>
                <Box gap="8px" sx={styles.noQuestionsCopyContainer}>
@@ -132,6 +117,6 @@ export const TopCommunityQuestionsCard: FC = () => {
                </Box>
             </Box>
          )}
-      </Box>
+      </CardCustom>
    )
 }
