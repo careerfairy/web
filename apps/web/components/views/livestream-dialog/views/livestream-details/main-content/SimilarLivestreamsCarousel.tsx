@@ -61,6 +61,16 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
       return null
    }
 
+   const scrollToHero = () => {
+      const element = document.getElementById("live-stream-dialog-hero")
+      if (element) {
+         element.parentElement.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+            inline: "end",
+         })
+      }
+   }
    return (
       <Section>
          <Box>
@@ -70,7 +80,9 @@ const SimilarLivestreamsContent: FC<SimilarLivestreamsCarouselProps> = ({
                   title={null} // We already have the section title above
                   events={similarEvents}
                   location={`livestream-dialog-similar-events-carousel-${currentLivestream.id}`}
+                  onCardClick={scrollToHero}
                   isRecommended
+                  isLink
                   isEmbedded
                   styling={{
                      padding: false,
