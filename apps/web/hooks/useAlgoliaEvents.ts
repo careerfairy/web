@@ -15,7 +15,7 @@ export const useAlgoliaEvents = () => {
    const { userData } = useAuth()
 
    // Generate user token based on authentication state
-   const userToken = generateUserToken(userData?.id, fingerPrintId)
+   const userToken = generateUserToken(userData?.authId, fingerPrintId)
 
    const trackSearchResultClick = useCallback(
       ({
