@@ -12,9 +12,10 @@ const styles = sxStyles({
       width: "100%",
       display: "flex",
       flexDirection: "column",
-      pt: 0, // 0px top padding
-      px: 0, // 0px left and right padding
-      pb: 2, // Keep bottom padding for spacing
+      p: 0, // Remove all padding
+      "& .MuiCardContent-root": {
+         p: 0, // Override CardCustom internal padding
+      },
    },
    title: {
       mb: 2, // 16px padding between title and cards
