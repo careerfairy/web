@@ -13,7 +13,7 @@ export interface TopCommunityQuestion extends LivestreamQuestion {
 
 /**
  * Custom hook to fetch the top 5 most liked community questions from past livestreams
- * organized by a specific group within the last 2 years. Results are memoized to avoid re-fetching on page refresh.
+ * organized by a specific group within the last 1 year. Results are memoized to avoid re-fetching on page refresh.
  *
  * @param groupId - The ID of the group to fetch questions for
  * @returns SWR response with the top 5 questions sorted by likes in descending order
@@ -28,22 +28,22 @@ export const useTopCommunityQuestions = (groupId: string) => {
       }
 
       try {
-         // Calculate date 2 years ago
-         const twoYearsAgo = new Date()
-         twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2)
+         // Calculate date 1 year ago
+         const oneYearAgo = new Date()
+         oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
 
          // Calculate the cutoff date for past streams (not upcoming)
          const pastStreamCutoff = new Date(
             Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS
          )
 
-         // Fetch past livestreams from the last 2 years for this group
+         // Fetch past livestreams from the last 1 year for this group
          const livestreamsQuery = query(
             collection(firestore, "livestreams"),
             where("test", "==", false),
             where("groupIds", "array-contains", groupId),
             where("start", "<", pastStreamCutoff), // Only past streams
-            where("start", ">", twoYearsAgo), // Only from last 2 years
+            where("start", ">", oneYearAgo), // Only from last 1 year
             orderBy("start", "desc")
          ).withConverter(createGenericConverter<LivestreamEvent>())
 
