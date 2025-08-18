@@ -12,6 +12,11 @@ const styles = sxStyles({
       flexDirection: "column",
       gap: 1,
       flex: 1,
+      // Desktop only: max-height and overflow
+      [theme => theme.breakpoints.up('desktop')]: {
+         maxHeight: "400px",
+         overflowY: "auto",
+      },
    },
    noQuestionsContainer: {
       backgroundColor: (theme) => theme.brand.white[200],
