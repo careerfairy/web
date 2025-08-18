@@ -8,7 +8,6 @@ import CardCustom from "../../common/CardCustom"
 const styles = sxStyles({
    carouselContainer: {
       position: "relative",
-      minHeight: "390px", // Adjusted for minimum tile height minus header
       padding: "0px", // No padding around guide cards
       display: "flex",
       flexDirection: "column",
@@ -25,11 +24,11 @@ const styles = sxStyles({
    },
    card: {
       minWidth: "100%",
-      height: "322px",
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
       padding: 0, // No card padding
+      marginBottom: "12px", // 12px margin between card and navigation dots
    },
    cardImage: {
       width: "100%",
@@ -86,7 +85,6 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       gap: "8px",
-      marginTop: "12px", // 12px spacing from cards
    },
    indicator: {
       width: "12px",
@@ -124,7 +122,7 @@ const guideCards: GuideCard[] = [
    {
       id: 2,
       title: "New live stream management experience",
-      text: "Discover the new live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview",
+      text: "Discover the new live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview.",
       cta: "Discover now",
       url: "/group/[groupId]/admin/content/live-streams",
       image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ls-management.png?alt=media&token=1bbe8e2b-b9fe-49b4-8d09-eef69cda8539",
@@ -192,8 +190,7 @@ const GuidesCard = () => {
    return (
       <CardCustom 
          title="Guides" 
-         sx={{ 
-            minHeight: "422px",
+         sx={{
             "& .MuiCardContent-root": {
                padding: "16px",
             },
