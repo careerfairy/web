@@ -1,6 +1,6 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import firebase from "firebase/compat/app"
 import { useMemo } from "react"
 import { livestreamRepo } from "../../data/RepositoryInstances"
