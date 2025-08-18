@@ -1,9 +1,8 @@
-import { Box, Grid, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import { FC } from "react"
-import QuestionIcon from "components/views/common/icons/QuestionIcon"
 import { sxStyles } from "types/commonTypes"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useTopCommunityQuestions } from "../../../../custom-hook/live-stream/useTopCommunityQuestions"
+import { useTopCommunityQuestions } from "components/custom-hook/live-stream/useTopCommunityQuestions"
 import { TopCommunityQuestionCard } from "./TopCommunityQuestionCard"
 
 const styles = sxStyles({
@@ -62,7 +61,11 @@ const styles = sxStyles({
 
 export const TopCommunityQuestionsCard: FC = () => {
    const { group } = useGroup()
-   const { data: topQuestions, isLoading } = useTopCommunityQuestions(group.id)
+   const {
+      data: topQuestions,
+      isLoading,
+      error,
+   } = useTopCommunityQuestions(group?.id || "")
 
    const hasQuestions = topQuestions && topQuestions.length > 0
 
@@ -71,11 +74,28 @@ export const TopCommunityQuestionsCard: FC = () => {
          <Typography variant="brandedH5" sx={styles.title}>
             Top community questions
          </Typography>
-         
-         {hasQuestions ? (
+
+         {error ? (
+            <Box sx={styles.noQuestionsContainer}>
+               <Box gap="8px" sx={styles.noQuestionsCopyContainer}>
+                  <Typography variant="brandedH5" sx={styles.noQuestionsCopy}>
+                     Unable to load questions
+                  </Typography>
+                  <Typography
+                     variant="brandedBody"
+                     sx={styles.noQuestionsCopy2}
+                  >
+                     Please try refreshing the page.
+                  </Typography>
+               </Box>
+            </Box>
+         ) : hasQuestions ? (
             <Box sx={styles.questionsContainer}>
                {topQuestions.map((question) => (
-                  <TopCommunityQuestionCard key={question.id} question={question} />
+                  <TopCommunityQuestionCard
+                     key={question.id}
+                     question={question}
+                  />
                ))}
             </Box>
          ) : isLoading ? (
@@ -102,8 +122,12 @@ export const TopCommunityQuestionsCard: FC = () => {
                   <Typography variant="brandedH5" sx={styles.noQuestionsCopy}>
                      No questions yet
                   </Typography>
-                  <Typography variant="brandedBody" sx={styles.noQuestionsCopy2}>
-                     Your top questions will appear here once you publish a live stream and your community starts asking.
+                  <Typography
+                     variant="brandedBody"
+                     sx={styles.noQuestionsCopy2}
+                  >
+                     Your top questions will appear here once you publish a live
+                     stream and your community starts asking.
                   </Typography>
                </Box>
             </Box>
