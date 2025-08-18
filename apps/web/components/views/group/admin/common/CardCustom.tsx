@@ -45,7 +45,7 @@ const styles = sxStyles({
    },
    cardHeader: {
       paddingX: (theme) => theme.spacing(3),
-      paddingBottom: (theme) => theme.spacing(1),
+      paddingBottom: (theme) => theme.spacing(2),
    },
    tooltip: {
       marginTop: (theme) => theme.spacing(1),
