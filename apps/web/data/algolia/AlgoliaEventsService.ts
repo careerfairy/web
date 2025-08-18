@@ -48,11 +48,11 @@ export const initializeAlgoliaInsights =
  * Uses existing user ID or generates anonymous token
  */
 export const generateUserToken = (
-   userId?: string,
+   userAuthId?: string,
    fingerPrintId?: string
 ): string => {
-   if (userId) {
-      return `user_${userId}`
+   if (userAuthId) {
+      return `user_${userAuthId}`
    }
 
    if (fingerPrintId) {
@@ -128,7 +128,6 @@ export class AlgoliaEventsService {
    }) => {
       if (isTestEnvironment()) return
 
-      console.log("🚀 ~ AlgoliaEventsService ~ eventName:", eventName)
       try {
          const insights = await this.ensureInitialized()
 
@@ -140,11 +139,11 @@ export class AlgoliaEventsService {
          // Send to Algolia
          insights("clickedObjectIDsAfterSearch", {
             index,
-            eventName,
+            eventName: AnalyticsEvents.AlgoliaSearchResultClick,
             queryID,
             objectIDs: [objectID],
             positions: [position],
-            userToken,
+            userToken, // TODO: pass authenticatedUserToken as well
          })
 
          // Also track in your existing analytics
