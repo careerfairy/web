@@ -36,10 +36,11 @@ const styles = sxStyles({
       height: "56px", // Explicitly set height to 56px
       "&:hover": {
          // Hover state
-         backgroundColor: "secondary.50", // purple 50
-         borderColor: "secondary.50", // purple 50
+         backgroundColor: (theme) => theme.brand.white[300], // White 300
+         borderColor: "secondary.300", // Purple 300
          borderWidth: "1px",
          borderStyle: "solid",
+         color: "neutral.800", // Neutral 800
       },
       "&:disabled": {
          backgroundColor: (theme) => theme.brand.white[100],
