@@ -1,4 +1,3 @@
-import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import { useAuth } from "HOCs/AuthProvider"
 import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
@@ -26,6 +25,7 @@ import AboutLivestream from "./main-content/AboutLivestream"
 import Jobs from "./main-content/Jobs"
 import Questions from "./main-content/Questions"
 import Section from "./main-content/Section"
+import SimilarLivestreamsCarousel from "./main-content/SimilarLivestreamsCarousel"
 import Speakers from "./main-content/Speakers"
 
 const styles = sxStyles({
@@ -148,7 +148,7 @@ const LivestreamDetailsView = () => {
                            </Section>
                         </Section>
                         {hasJobs ? (
-                           <Section navOffset={44} ref={jobsRef}>
+                           <Section ref={jobsRef}>
                               <Jobs presenter={livestreamPresenter} />
                            </Section>
                         ) : null}
@@ -161,9 +161,9 @@ const LivestreamDetailsView = () => {
                               <Questions livestream={livestream} />
                            </Section>
                         )}
-                        {isFloatingActionButton ? (
-                           <FloatingButtonOffset />
-                        ) : null}
+                        <SimilarLivestreamsCarousel
+                           currentLivestream={livestream}
+                        />
                      </MainContent>
                   )}
                </MainContentNavigation>
@@ -182,7 +182,5 @@ const LivestreamDetailsView = () => {
       />
    )
 }
-
-const FloatingButtonOffset = () => <Box height={90} />
 
 export default LivestreamDetailsView

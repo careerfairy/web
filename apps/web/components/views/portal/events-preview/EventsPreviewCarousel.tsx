@@ -177,6 +177,7 @@ export type EventsProps = {
    preventPaddingSlide?: boolean
    onClickSeeMore?: () => void
    disableAutoPlay?: boolean
+   isLink?: boolean
 }
 
 const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
@@ -206,6 +207,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
          header,
          preventPaddingSlide = false,
          disableAutoPlay,
+         isLink,
       } = props
 
       const allStyles = { ...defaultStyling, ...styling }
@@ -400,6 +402,7 @@ const EventsPreviewCarousel = React.forwardRef<ChildRefType, EventsProps>(
                                                 (disableAutoPlay &&
                                                    shouldDisableAutoPlay(index))
                                              }
+                                             isLink={isLink}
                                              muted={muted}
                                              setMuted={setMuted}
                                              onCardClick={
