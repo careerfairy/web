@@ -7,15 +7,24 @@ import CardCustom from "../../common/CardCustom"
 import { TopCommunityQuestionCard } from "./TopCommunityQuestionCard"
 
 const styles = sxStyles({
+   cardContainer: (theme) => ({
+      // Desktop only: max-height for the entire tile
+      [theme.breakpoints.up("desktop")]: {
+         maxHeight: "400px",
+         display: "flex",
+         flexDirection: "column",
+         overflow: "hidden",
+      },
+   }),
    questionsContainer: (theme) => ({
       display: "flex",
       flexDirection: "column",
       gap: 1,
       flex: 1,
-      // Desktop only: max-height and overflow
+      // Desktop only: enable scrolling when content overflows
       [theme.breakpoints.up("desktop")]: {
-         maxHeight: "400px",
          overflowY: "auto",
+         minHeight: 0, // Allow flex child to shrink
       },
    }),
    noQuestionsContainer: {
@@ -64,7 +73,7 @@ export const TopCommunityQuestionsCard: FC = () => {
    const hasQuestions = topQuestions && topQuestions.length > 0
 
    return (
-      <CardCustom title="Top community questions">
+      <CardCustom title="Top community questions" sx={styles.cardContainer}>
          {error ? (
             <Box sx={styles.noQuestionsContainer}>
                <Box gap="8px" sx={styles.noQuestionsCopyContainer}>
