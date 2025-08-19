@@ -42,6 +42,7 @@ export type EventPreviewCardProps = {
    selectInput?: React.ReactNode
    selected?: boolean
    disableTracking?: boolean
+   isLink?: boolean
 } & AdditionalContextProps
 
 const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
@@ -150,11 +151,12 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       ])
 
       const isLink =
-         !isInTalentGuidePage &&
-         props.event &&
-         !props.onCardClick &&
-         !props.disableClick &&
-         !isPlaceholderEvent
+         props.isLink ||
+         (!isInTalentGuidePage &&
+            props.event &&
+            !props.onCardClick &&
+            !props.disableClick &&
+            !isPlaceholderEvent)
 
       if (isLink) {
          return (
@@ -164,6 +166,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                {...linkProps}
                shallow
                scroll={false}
+               onClick={props.onCardClick}
             >
                <EventPreviewCardProvider
                   {...props}

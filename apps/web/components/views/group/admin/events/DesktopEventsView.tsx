@@ -11,7 +11,12 @@ import {
    TableRow,
    Typography,
 } from "@mui/material"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect } from "react"
+import { useDispatch } from "react-redux"
+import {
+   clearHoveredRow,
+   setHoveredRow,
+} from "../../../../../store/reducers/eventsTableReducer"
 import useClientSidePagination from "../../../../custom-hook/utils/useClientSidePagination"
 import { StyledPagination } from "../common/CardCustom"
 import { useEventsView } from "./context/EventsViewContext"
@@ -49,15 +54,14 @@ export const DesktopEventsView = ({
       statusFilter,
       setStatusFilter,
       resetFilters,
-      handleEnterLiveStreamRoom,
-      handleShareLiveStream,
-      handleAnalytics,
-      handleQuestions,
-      handleFeedback,
-      handleEdit,
-      handleShareRecording,
    } = useEventsView()
-   const [hoveredRow, setHoveredRow] = useState<string | null>(null)
+
+   // Reset filters when component unmounts
+   useEffect(() => {
+      return () => {
+         resetFilters()
+      }
+   }, [resetFilters])
 
    // Reset filters when component unmounts
    useEffect(() => {
@@ -71,14 +75,6 @@ export const DesktopEventsView = ({
          data: stats,
          itemsPerPage: ITEMS_PER_PAGE,
       })
-
-   const handleRowMouseEnter = useCallback((statKey: string) => {
-      setHoveredRow(statKey)
-   }, [])
-
-   const handleRowMouseLeave = useCallback(() => {
-      setHoveredRow(null)
-   }, [])
 
    return (
       <Box sx={eventsTableStyles.root}>
@@ -174,28 +170,7 @@ export const DesktopEventsView = ({
                         </TableCell>
                      </TableRow>
                   ) : (
-                     currentPageData.map((stat) => {
-                        const statKey = getEventStatsKey(stat)
-                        return (
-                           <EventTableRow
-                              key={statKey}
-                              stat={stat}
-                              isHovered={hoveredRow === statKey}
-                              statKey={statKey}
-                              onMouseEnter={handleRowMouseEnter}
-                              onMouseLeave={handleRowMouseLeave}
-                              onEnterLiveStreamRoom={handleEnterLiveStreamRoom}
-                              onShareLiveStream={handleShareLiveStream}
-                              onShareRecording={handleShareRecording}
-                              onAnalytics={handleAnalytics}
-                              onQuestions={handleQuestions}
-                              onFeedback={handleFeedback}
-                              onEdit={handleEdit}
-                              onRegistrationsClick={handleAnalytics}
-                              onViewsClick={handleAnalytics}
-                           />
-                        )
-                     })
+                     <Rows currentPageData={currentPageData} />
                   )}
                </TableBody>
             </Table>
@@ -216,5 +191,60 @@ export const DesktopEventsView = ({
             </Stack>
          )}
       </Box>
+   )
+}
+
+type RowsProps = {
+   currentPageData: LiveStreamStats[]
+}
+
+const Rows = ({ currentPageData }: RowsProps) => {
+   const {
+      handleEnterLiveStreamRoom,
+      handleShareLiveStream,
+      handleAnalytics,
+      handleQuestions,
+      handleFeedback,
+      handleEdit,
+      handleShareRecording,
+   } = useEventsView()
+
+   const dispatch = useDispatch()
+
+   const handleRowMouseEnter = useCallback(
+      (statKey: string) => {
+         dispatch(setHoveredRow(statKey))
+      },
+      [dispatch]
+   )
+
+   const handleRowMouseLeave = useCallback(() => {
+      dispatch(clearHoveredRow())
+   }, [dispatch])
+
+   return (
+      <>
+         {currentPageData.map((stat) => {
+            const statKey = getEventStatsKey(stat)
+            return (
+               <EventTableRow
+                  key={statKey}
+                  stat={stat}
+                  statKey={statKey}
+                  onMouseEnter={handleRowMouseEnter}
+                  onMouseLeave={handleRowMouseLeave}
+                  onEnterLiveStreamRoom={handleEnterLiveStreamRoom}
+                  onShareLiveStream={handleShareLiveStream}
+                  onShareRecording={handleShareRecording}
+                  onAnalytics={handleAnalytics}
+                  onQuestions={handleQuestions}
+                  onFeedback={handleFeedback}
+                  onEdit={handleEdit}
+                  onRegistrationsClick={handleAnalytics}
+                  onViewsClick={handleAnalytics}
+               />
+            )
+         })}
+      </>
    )
 }
