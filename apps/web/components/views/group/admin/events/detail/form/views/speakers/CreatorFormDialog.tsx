@@ -110,7 +110,7 @@ const CreatorFormDialog = ({
    }
 
    const { handleSubmit: handleCreatorSubmit } = useCreatorFormSubmit(
-      group.id,
+      creator?.groupId || group.id,
       onSuccessfulSubmit
    )
 

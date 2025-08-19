@@ -81,8 +81,12 @@ const SpeakersCard = ({
       <Box sx={[styles.wrapper, !speaker.email && styles.alertBorder]}>
          <Box sx={styles.moreMenu}>
             <MoreMenuWithEditAndRemoveOptions
-               labels={["Edit speaker's details", "Remove speaker"]}
-               handleEdit={handleEdit}
+               labels={
+                  handleEdit
+                     ? ["Edit speaker's details", "Remove speaker"]
+                     : ["Remove speaker"]
+               }
+               handleEdit={handleEdit ? handleEdit : undefined}
                handleRemove={handleRemove}
             />
          </Box>
@@ -138,25 +142,6 @@ const SpeakersCard = ({
                            <LinkedIn htmlColor="#e5e5e5" />
                         )}
                      </Stack>
-                     {speaker.email ? (
-                        <Typography
-                           fontSize="16px"
-                           color="neutral.400"
-                           lineHeight="27px"
-                        >
-                           {speaker.email}
-                        </Typography>
-                     ) : (
-                        <Typography
-                           fontSize="16px"
-                           color="#FE9B0E"
-                           lineHeight="27px"
-                           fontWeight={500}
-                        >
-                           Missing email address. Please edit this speaker to
-                           add it.
-                        </Typography>
-                     )}
                   </Stack>
                </Stack>
             </Stack>

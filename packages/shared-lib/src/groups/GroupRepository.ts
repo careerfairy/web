@@ -283,6 +283,13 @@ export interface IGroupRepository {
    getCreators(groupId: string): Promise<Creator[]>
 
    /**
+    * Gets all creators from multiple groups
+    * @param groupIds array of group IDs to get creators from
+    * @returns A Promise that resolves with an array of creators from all groups.
+    */
+   getCreatorsFromMultipleGroups(groupIds: string[]): Promise<Creator[]>
+
+   /**
     * Gets all group creators that have at least two public content (live streams or sparks)
     * Example: 1 live stream and 1 spark; 2 live streams and 0 sparks; 0 live streams and 2 sparks
     * @param groupId the group to get creators from
@@ -1149,7 +1156,29 @@ export class FirebaseGroupRepository
          .collection("creators")
          .get()
 
-      return mapFirestoreDocuments<Creator>(snaps)
+      return mapFirestoreDocuments<Creator>(snaps) || []
+   }
+
+   async getCreatorsFromMultipleGroups(groupIds: string[]): Promise<Creator[]> {
+      if (!groupIds.length) return []
+
+      const creatorSnapshots = await Promise.all(
+         groupIds.map((groupId) =>
+            this.firestore
+               .collection("careerCenterData")
+               .doc(groupId)
+               .collection("creators")
+               .get()
+         )
+      )
+
+      const allCreators: Creator[] = []
+      for (const snapshot of creatorSnapshots) {
+         const creators = mapFirestoreDocuments<Creator>(snapshot) || []
+         allCreators.push(...creators)
+      }
+
+      return allCreators
    }
 
    async getMentorsForLevels(

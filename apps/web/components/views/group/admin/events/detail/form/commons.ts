@@ -12,7 +12,6 @@ import { Timestamp } from "firebase/firestore"
 import get from "lodash/get"
 import has from "lodash/has"
 import isArray from "lodash/isArray"
-import isEqual from "lodash/isEqual"
 import omit from "lodash/omit"
 import set from "lodash/set"
 import { LivestreamFormQuestionsTabValues, LivestreamFormValues } from "./types"
@@ -158,6 +157,7 @@ const formValuesLivestreamEventPropertyMap = [
    ["general.hidden", "hidden"],
    ["general.company", "company"],
    ["general.companyLogoUrl", "companyLogoUrl"],
+   ["general.panelLogoUrl", "panelLogoUrl"],
    ["general.backgroundImageUrl", "backgroundImageUrl"],
    ["general.summary", "summary"],
    ["general.startDate", "start"],
@@ -248,18 +248,24 @@ export const mapFormValuesToLivestreamObject = (
          mappedRegistrationQuestions as LivestreamGroupQuestionsMap
    }
 
+   // Reflect groupIds from the selected hosts, keeping the primary first
    if (
-      formValues.questions.hosts.length > 1 &&
-      !isEqual(
-         formValues.questions.hosts.map((host) => host.groupId).sort(),
-         formValues.general.groupIds.sort()
-      )
+      has(formValues, "questions.hosts") &&
+      formValues.questions.hosts.length > 0
    ) {
-      const otherHosts = formValues.questions.hosts
-         .filter((host) => host.groupId !== formValues.general.groupIds[0])
+      const primaryGroupId = formValues.general?.groupIds?.[0]
+      const selectedHostIds = (formValues.questions?.hosts || [])
          .map((host) => host.groupId)
+         .filter(Boolean)
 
-      result.groupIds = [formValues.general.groupIds[0], ...otherHosts]
+      const groupIdsFromHosts = primaryGroupId
+         ? [
+              primaryGroupId,
+              ...selectedHostIds.filter((id) => id !== primaryGroupId),
+           ]
+         : selectedHostIds
+
+      result.groupIds = groupIdsFromHosts
    }
 
    if (formValues.general.title) {
