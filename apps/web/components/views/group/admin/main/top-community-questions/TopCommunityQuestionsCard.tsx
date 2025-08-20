@@ -17,7 +17,7 @@ const styles = sxStyles({
       },
    }),
    container: {
-      p: 2,
+      p: "16px", // Explicitly set to 16px
    },
    questionsScrollContainer: (theme) => ({
       // Desktop only: enable scrolling when content overflows
