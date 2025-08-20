@@ -1,5 +1,6 @@
 import { Box, Button, Stack, Typography } from "@mui/material"
 import Image from "next/legacy/image"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "react-feather"
@@ -110,6 +111,7 @@ type GuideCard = {
    cta: string
    url: string
    image: string
+   isExternal: boolean
 }
 
 const guideCards: GuideCard[] = [
@@ -120,6 +122,7 @@ const guideCards: GuideCard[] = [
       cta: "Read the full guide",
       url: "https://support.careerfairy.io/en/article/live-stream-your-way-to-top-talent-a-guide-to-engaging-gen-z-recruitment-1ifie4a/",
       image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/livestream.png?alt=media&token=29355bf7-6ef0-4646-8291-5cf6f476fecc",
+      isExternal: true,
    },
    {
       id: 2,
@@ -128,6 +131,7 @@ const guideCards: GuideCard[] = [
       cta: "Discover now",
       url: "/group/[groupId]/admin/content/live-streams",
       image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ls-management.png?alt=media&token=1bbe8e2b-b9fe-49b4-8d09-eef69cda8539",
+      isExternal: false,
    },
    {
       id: 3,
@@ -136,6 +140,7 @@ const guideCards: GuideCard[] = [
       cta: "Talk to us",
       url: "https://meetings.hubspot.com/denis-lehn-koza/clientdemocallcalender",
       image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/offline.png?alt=media&token=83692ead-e6f4-4d9d-b564-125101fbb79b",
+      isExternal: true,
    },
 ]
 
@@ -156,13 +161,11 @@ const GuidesCard = () => {
       setCurrentIndex(index)
    }
 
-   const handleCTAClick = (card: GuideCard) => {
-      if (card.url.startsWith("http")) {
-         window.open(card.url, "_blank", "noopener,noreferrer")
-      } else {
-         const url = card.url.replace("[groupId]", groupId as string)
-         router.push(url)
+   const getResolvedUrl = (card: GuideCard): string => {
+      if (card.isExternal) {
+         return card.url
       }
+      return card.url.replace("[groupId]", groupId as string)
    }
 
    const customAction = (
@@ -232,7 +235,10 @@ const GuidesCard = () => {
                         <Button
                            variant="outlined"
                            sx={styles.ctaButton}
-                           onClick={() => handleCTAClick(card)}
+                           component={Link}
+                           href={getResolvedUrl(card)}
+                           target={card.isExternal ? "_blank" : undefined}
+                           rel={card.isExternal ? "noopener noreferrer" : undefined}
                            data-testid={`guide-cta-${card.id}`}
                         >
                            {card.cta}
