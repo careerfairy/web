@@ -4,6 +4,7 @@ import { sxStyles } from "types/commonTypes"
 import CardCustom from "../../common/CardCustom"
 import { useTopCommunityQuestions } from "components/custom-hook/group/useTopCommunityQuestions"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
    container: {
@@ -123,9 +124,9 @@ export const TopCommunityQuestionsCard = () => {
                            </Typography>
                         </Box>
                         
-                        {question.livestreamTitle && (
+                        {question.timestamp && (
                            <Typography sx={styles.timeText}>
-                              {question.livestreamTitle}
+                              {DateUtil.getTimeAgo(question.timestamp.toDate())}
                            </Typography>
                         )}
                      </Stack>
