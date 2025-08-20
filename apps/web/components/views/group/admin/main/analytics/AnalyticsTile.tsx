@@ -5,6 +5,7 @@ import { sxStyles } from "types/commonTypes"
 import { totalPeopleReached } from "../../common/util"
 import { AggregatedTalentPoolValue } from "./AggregatedTalentPoolValue"
 import CardCustom from "../../common/CardCustom"
+import Link from "components/views/common/Link"
 
 const styles = sxStyles({
    container: {
@@ -34,6 +35,8 @@ const styles = sxStyles({
       borderRadius: "6px",
       cursor: "pointer",
       border: "1px solid transparent",
+      textDecoration: "none",
+      color: "inherit",
       transition: (theme) =>
          theme.transitions.create(["background-color", "border-color"], {
             duration: theme.transitions.duration.short,
@@ -41,6 +44,13 @@ const styles = sxStyles({
       "&:hover": {
          backgroundColor: (theme) => theme.brand.white[400],
          borderColor: "secondary.200", // Purple 200
+         textDecoration: "none",
+      },
+      "&:focus": {
+         textDecoration: "none",
+         outline: "none",
+         backgroundColor: (theme) => theme.brand.white[400],
+         borderColor: "secondary.200",
       },
    },
    iconContainer: {
@@ -80,12 +90,12 @@ type MetricCardProps = {
    icon: React.ReactNode
    label: string
    value: React.ReactNode
-   onClick?: () => void
+   href?: string
 }
 
-const MetricCard = ({ icon, label, value, onClick }: MetricCardProps) => {
-   return (
-      <Box sx={styles.metricCard} onClick={onClick}>
+const MetricCard = ({ icon, label, value, href }: MetricCardProps) => {
+   const content = (
+      <>
          <Box sx={styles.iconContainer}>
             <Box sx={styles.icon}>{icon}</Box>
          </Box>
@@ -100,29 +110,22 @@ const MetricCard = ({ icon, label, value, onClick }: MetricCardProps) => {
          <Box sx={styles.chevronIcon}>
             <ChevronRight size={20} strokeWidth={2.5} />
          </Box>
-      </Box>
+      </>
    )
+
+   if (href) {
+      return (
+         <Box sx={styles.metricCard} component={Link} href={href}>
+            {content}
+         </Box>
+      )
+   }
+
+   return <Box sx={styles.metricCard}>{content}</Box>
 }
 
 export const AnalyticsTile = () => {
    const { group, stats } = useGroup()
-
-   const handleTalentReachedClick = () => {
-      // Navigate to analytics page or relevant section
-      window.location.href = `/group/${group.id}/admin/analytics`
-   }
-
-   const handleRegistrationsClick = () => {
-      // Navigate to analytics page or relevant section
-      window.location.href = `/group/${group.id}/admin/analytics`
-   }
-
-   const handleTalentPoolClick = () => {
-      // Navigate to talent pool if not a university group
-      if (!group.universityCode) {
-         window.location.href = `/group/${group.id}/admin/talent-pool`
-      }
-   }
 
    return (
       <CardCustom sx={styles.container} title="Analytics">
@@ -131,19 +134,23 @@ export const AnalyticsTile = () => {
                icon={<User strokeWidth={2.5} />}
                label="Talent reached"
                value={totalPeopleReached(stats)}
-               onClick={handleTalentReachedClick}
+               href={`/group/${group.id}/admin/analytics`}
             />
             <MetricCard
                icon={<CheckCircle strokeWidth={2.5} />}
                label="Total registrations"
                value={stats?.generalStats?.numberOfRegistrations ?? 0}
-               onClick={handleRegistrationsClick}
+               href={`/group/${group.id}/admin/analytics`}
             />
             <MetricCard
                icon={<Users strokeWidth={2.5} />}
                label="Talent pool size"
                value={<AggregatedTalentPoolValue />}
-               onClick={handleTalentPoolClick}
+               href={
+                  !group.universityCode
+                     ? `/group/${group.id}/admin/talent-pool`
+                     : undefined
+               }
             />
          </Box>
       </CardCustom>
