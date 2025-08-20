@@ -1,10 +1,10 @@
 import { Box, Stack, Typography } from "@mui/material"
-import { format } from "date-fns"
+import format from "date-fns/format"
 import { ThumbsUp } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CardCustom from "../../common/CardCustom"
 import { useTopCommunityQuestions } from "components/custom-hook/group/useTopCommunityQuestions"
-import { useGroupContext } from "../../GroupContext"
+import { useGroup } from "layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    container: {
@@ -63,8 +63,8 @@ const styles = sxStyles({
 })
 
 export const TopCommunityQuestionsCard = () => {
-   const { groupId } = useGroupContext()
-   const { data: questions, isLoading, error } = useTopCommunityQuestions(groupId)
+   const { group } = useGroup()
+   const { data: questions, isLoading, error } = useTopCommunityQuestions(group.id)
 
    const renderContent = () => {
       if (isLoading) {
