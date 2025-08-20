@@ -63,58 +63,71 @@ export const getStaticProps: GetStaticProps = async ({
    params,
    preview = false,
 }) => {
-   const { companyCaseStudy, moreCompanyCaseStudies } =
-      await caseStudyRepo.getCaseStudyAndMoreCaseStudies(
-         params.slug as string,
-         preview
-      )
+   try {
+      const { companyCaseStudy, moreCompanyCaseStudies } =
+         await caseStudyRepo.getCaseStudyAndMoreCaseStudies(
+            params.slug as string,
+            preview
+         )
 
-   if (!companyCaseStudy) {
+      if (!companyCaseStudy) {
+         return {
+            notFound: true,
+         }
+      }
+
+      const parsedMoreCompanyCaseStudies = []
+
+      for (const moreCaseStudy of moreCompanyCaseStudies) {
+         const parsed = await parseCaseStudy(moreCaseStudy)
+         parsedMoreCompanyCaseStudies.push(parsed)
+      }
+
+      const parsedCaseStudyData = await parseCaseStudy(companyCaseStudy)
+
+      return {
+         props: {
+            preview,
+            companyCaseStudy: parsedCaseStudyData,
+            moreCompanyCaseStudies: parsedMoreCompanyCaseStudies || [],
+         },
+         revalidate: 60,
+      }
+   } catch (error) {
+      console.error("Error in getStaticProps for case study:", error)
       return {
          notFound: true,
       }
-   }
-
-   let parsedMoreCompanyCaseStudies = []
-
-   for (const moreCaseStudy of moreCompanyCaseStudies) {
-      const parsed = await parseCaseStudy(moreCaseStudy)
-      parsedMoreCompanyCaseStudies.push(parsed)
-   }
-
-   const parsedCaseStudyData = await parseCaseStudy(companyCaseStudy)
-
-   return {
-      props: {
-         preview,
-         companyCaseStudy: parsedCaseStudyData,
-         moreCompanyCaseStudies: parsedMoreCompanyCaseStudies || [],
-      },
-      revalidate: 60,
    }
 }
 
 export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
    let paths = []
 
-   if (process.env.APP_ENV !== "test") {
-      const caseStudies = await caseStudyRepo.getAllCaseStudiesWithSlug()
+   try {
+      if (process.env.APP_ENV !== "test") {
+         const caseStudies = await caseStudyRepo.getAllCaseStudiesWithSlug()
 
-      if (locales) {
-         for (const locale of locales) {
-            paths = [
-               ...paths,
-               ...caseStudies.map((caseStudy) => ({
-                  params: { slug: caseStudy.slug },
-                  locale,
-               })),
-            ]
+         if (locales) {
+            for (const locale of locales) {
+               paths = [
+                  ...paths,
+                  ...caseStudies.map((caseStudy) => ({
+                     params: { slug: caseStudy.slug },
+                     locale,
+                  })),
+               ]
+            }
+         } else {
+            paths = caseStudies.map((caseStudy) => ({
+               params: { slug: caseStudy.slug },
+            }))
          }
-      } else {
-         paths = caseStudies.map((caseStudy) => ({
-            params: { slug: caseStudy.slug },
-         }))
       }
+   } catch (error) {
+      console.error("Error in getStaticPaths for case studies:", error)
+      // Return empty paths on error to prevent build failure
+      paths = []
    }
 
    return {
