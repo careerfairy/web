@@ -7,9 +7,26 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
+   cardContainer: (theme) => ({
+      // Desktop only: max-height for the entire tile
+      [theme.breakpoints.up("desktop")]: {
+         maxHeight: "400px",
+         display: "flex",
+         flexDirection: "column",
+         overflow: "hidden",
+      },
+   }),
    container: {
       p: 2,
    },
+   questionsScrollContainer: (theme) => ({
+      // Desktop only: enable scrolling when content overflows
+      [theme.breakpoints.up("desktop")]: {
+         overflowY: "auto",
+         flex: 1,
+         minHeight: 0, // Allow flex child to shrink
+      },
+   }),
    questionCard: (theme) => ({
       border: `1px solid ${theme.brand.white[500]}`,
       backgroundColor: theme.brand.white[300], // Updated background color
@@ -104,41 +121,43 @@ export const TopCommunityQuestionsCard = () => {
 
       return (
          <Box sx={styles.container}>
-            <Stack spacing={1}>
-               {questions.map((question, index) => (
-                  <Box key={`${question.id}-${index}`} sx={styles.questionCard}>
-                     <Typography variant="medium" sx={styles.questionText}>
-                        {question.title}
-                     </Typography>
-                     
-                     <Stack 
-                        direction="row" 
-                        justifyContent="space-between" 
-                        alignItems="center" 
-                        mt={1}
-                     >
-                        <Box sx={styles.likesContainer}>
-                           <ThumbsUp style={styles.icon} />
-                           <Typography sx={styles.likesText}>
-                              {question.votes || 0} likes
-                           </Typography>
-                        </Box>
+            <Box sx={styles.questionsScrollContainer}>
+               <Stack spacing={1}>
+                  {questions.map((question, index) => (
+                     <Box key={`${question.id}-${index}`} sx={styles.questionCard}>
+                        <Typography variant="medium" sx={styles.questionText}>
+                           {question.title}
+                        </Typography>
                         
-                        {question.timestamp && (
-                           <Typography sx={styles.timeText}>
-                              {DateUtil.getTimeAgo(question.timestamp.toDate())}
-                           </Typography>
-                        )}
-                     </Stack>
-                  </Box>
-               ))}
-            </Stack>
+                        <Stack 
+                           direction="row" 
+                           justifyContent="space-between" 
+                           alignItems="center" 
+                           mt={1}
+                        >
+                           <Box sx={styles.likesContainer}>
+                              <ThumbsUp style={styles.icon} />
+                              <Typography sx={styles.likesText}>
+                                 {question.votes || 0} likes
+                              </Typography>
+                           </Box>
+                           
+                           {question.timestamp && (
+                              <Typography sx={styles.timeText}>
+                                 {DateUtil.getTimeAgo(question.timestamp.toDate())}
+                              </Typography>
+                           )}
+                        </Stack>
+                     </Box>
+                  ))}
+               </Stack>
+            </Box>
          </Box>
       )
    }
 
    return (
-      <CardCustom title="Top community questions">
+      <CardCustom title="Top community questions" sx={styles.cardContainer}>
          {renderContent()}
       </CardCustom>
    )
