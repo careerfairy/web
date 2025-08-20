@@ -12,25 +12,25 @@ const styles = sxStyles({
       width: "100%",
       display: "flex",
       flexDirection: "column",
-      p: 0, // Remove all padding
+      p: 0,
       "& .MuiCardContent-root": {
-         p: 0, // Override CardCustom internal padding
+         p: 0,
       },
    },
    title: {
-      mb: 2, // 16px padding between title and cards
+      mb: 2,
    },
    cardsContainer: {
       display: "flex",
       flexDirection: "column",
-      gap: 1, // 8px between cards
-      px: 2, // 16px left and right padding
-      pb: 2, // 16px bottom padding
+      gap: 1,
+      px: 2,
+      pb: 2,
    },
    metricCard: {
       display: "flex",
       alignItems: "center",
-      p: 1.5, // 12px padding
+      p: 1.5,
       backgroundColor: (theme) => theme.brand.white[300],
       borderRadius: "6px",
       cursor: "pointer",
@@ -43,7 +43,7 @@ const styles = sxStyles({
          }),
       "&:hover": {
          backgroundColor: (theme) => theme.brand.white[400],
-         borderColor: "secondary.200", // Purple 200
+         borderColor: "secondary.200",
          textDecoration: "none",
       },
       "&:focus": {
@@ -57,22 +57,22 @@ const styles = sxStyles({
       width: 40,
       height: 40,
       borderRadius: "50%",
-      backgroundColor: "secondary.50", // purple 50
+      backgroundColor: "secondary.50",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      mr: 1.5, // 12px gap
+      mr: 1.5,
    },
    icon: {
       width: 24,
       height: 24,
-      color: "secondary.600", // purple 600
+      color: "secondary.600",
    },
    textContainer: {
       display: "flex",
       flexDirection: "column",
       flex: 1,
-      mr: 1.5, // 12px gap before chevron
+      mr: 1.5,
    },
    metricLabel: {
       color: "neutral.600",
