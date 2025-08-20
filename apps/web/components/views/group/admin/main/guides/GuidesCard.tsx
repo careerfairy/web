@@ -1,4 +1,5 @@
 import { Box, Button, Stack, Typography } from "@mui/material"
+import Image from "next/legacy/image"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "react-feather"
@@ -30,11 +31,12 @@ const styles = sxStyles({
       padding: 0, // No card padding
       marginBottom: "12px", // 12px margin between card and navigation dots
    },
-   cardImage: {
+   cardImageWrapper: {
       width: "100%",
       height: "140px",
-      objectFit: "cover",
+      position: "relative",
       borderRadius: "8px",
+      overflow: "hidden",
       marginBottom: "12px", // Bottom padding for image
    },
    cardTitle: {
@@ -211,11 +213,16 @@ const GuidesCard = () => {
                >
                   {guideCards.map((card) => (
                      <Box key={card.id} sx={styles.card} data-testid={`guide-card-${card.id}`}>
-                        <img
-                           src={card.image}
-                           alt={card.title}
-                           style={styles.cardImage}
-                        />
+                        <Box sx={styles.cardImageWrapper}>
+                           <Image
+                              src={card.image}
+                              alt={card.title}
+                              width={300}
+                              height={140}
+                              objectFit="cover"
+                              draggable={false}
+                           />
+                        </Box>
                         <Typography variant="h6" sx={styles.cardTitle}>
                            {card.title}
                         </Typography>
