@@ -87,8 +87,7 @@ type MetricCardProps = {
 
 const MetricCard = ({ icon, label, value, onClick }: MetricCardProps) => {
    return (
-      <Box sx={styles.
-              } onClick={onClick}>
+      <Box sx={styles.metricCard} onClick={onClick}>
          <Box sx={styles.iconContainer}>
             <Box sx={styles.icon}>
                {React.cloneElement(icon as React.ReactElement, {

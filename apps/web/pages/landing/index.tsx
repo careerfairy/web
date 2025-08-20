@@ -60,27 +60,35 @@ export const getStaticProps: GetStaticProps = async ({
          notFound: true,
       }
    }
-   const [marketingPage, allFieldsOfStudy] = await Promise.all([
-      marketingPageRepo.getMarketingPage({
-         slug: hookLandingPage,
-         preview,
-         locale,
-      }),
-      marketingPageRepo.getFieldsOfStudyWithMarketingPages(),
-   ])
+   
+   try {
+      const [marketingPage, allFieldsOfStudy] = await Promise.all([
+         marketingPageRepo.getMarketingPage({
+            slug: hookLandingPage,
+            preview,
+            locale,
+         }),
+         marketingPageRepo.getFieldsOfStudyWithMarketingPages(),
+      ])
 
-   if (!marketingPage) {
+      if (!marketingPage) {
+         return {
+            notFound: true,
+         }
+      }
+      return {
+         props: {
+            preview,
+            serverPage: marketingPage.serializeToPlainObject(),
+            allFieldsOfStudy: allFieldsOfStudy,
+         },
+         revalidate: 60,
+      }
+   } catch (error) {
+      console.error("Error in getStaticProps for landing index:", error)
       return {
          notFound: true,
       }
-   }
-   return {
-      props: {
-         preview,
-         serverPage: marketingPage.serializeToPlainObject(),
-         allFieldsOfStudy: allFieldsOfStudy,
-      },
-      revalidate: 60,
    }
 }
 

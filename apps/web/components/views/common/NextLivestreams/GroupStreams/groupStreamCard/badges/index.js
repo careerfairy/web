@@ -3,7 +3,7 @@ import WhatshotIcon from "@mui/icons-material/Whatshot"
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople"
 import LanguageIcon from "@mui/icons-material/Language"
 import { Chip, Tooltip } from "@mui/material"
-import ConditionalWrapper from "../../../../ConditionalWrapper"
+import { ConditionalWrapper } from "../../../../ConditionalWrapper"
 
 const styles = {
    warningChip: {
@@ -61,7 +61,7 @@ export const LanguageBadge = ({
 }) => {
    return streamLanguage ? (
       <ConditionalWrapper
-         condition={!Boolean(noTip)}
+         condition={!noTip}
          wrapper={(children) => (
             <Tooltip
                placement="top"

@@ -11,7 +11,10 @@ if (!hygraphUrl || !hygraphToken || !hygraphPreviewToken) {
       !hygraphPreviewToken && "HYGRAPH_TALENT_GUIDE_PREVIEW_TOKEN",
    ].filter(Boolean)
 
-   if (process.env.APP_ENV !== "test") {
+   console.warn(`Missing Hygraph environment variables: ${missingConfigs.join(", ")}`)
+   
+   // Don't throw during build time - let individual services handle the error
+   if (process.env.APP_ENV !== "test" && process.env.NODE_ENV === "production" && typeof window !== "undefined") {
       throw new Error(
          `Missing Hygraph environment variables: ${missingConfigs.join(", ")}`
       )
@@ -31,6 +34,11 @@ if (!hygraphUrl || !hygraphToken || !hygraphPreviewToken) {
  * The client also includes a request middleware to automatically add the stage to every request.
  */
 export const createTalentGuideClient = (preview: boolean) => {
+   // Return null if configuration is missing to allow graceful handling
+   if (!hygraphUrl || !hygraphToken || !hygraphPreviewToken) {
+      return null
+   }
+
    const token = preview ? hygraphPreviewToken : hygraphToken
    const stage = preview ? "DRAFT" : "PUBLISHED"
 

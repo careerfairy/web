@@ -23,10 +23,17 @@ import {
  * @class
  */
 export class TalentGuideBackendService {
-   private client: GraphQLClient
+   private client: GraphQLClient | null
 
    constructor({ preview = false }: { preview?: boolean } = {}) {
       this.client = createTalentGuideClient(preview)
+   }
+
+   private checkClient(): GraphQLClient {
+      if (!this.client) {
+         throw new Error("TalentGuideBackendService: Hygraph client is not configured. Missing environment variables.")
+      }
+      return this.client
    }
 
    /**
@@ -41,7 +48,7 @@ export class TalentGuideBackendService {
          }
       `
 
-      const data = await this.client.request<TalentGuideSlugsResponse>(query)
+      const data = await this.checkClient().request<TalentGuideSlugsResponse>(query)
 
       return data.pages.map((guide: { slug: string }) => guide.slug)
    }
@@ -58,7 +65,7 @@ export class TalentGuideBackendService {
             }
          }
       `
-      const { pages } = await this.client.request<TalentGuideRootPageResponse>(
+      const { pages } = await this.checkClient().request<TalentGuideRootPageResponse>(
          query,
          {
             slug: "levels",
@@ -80,7 +87,7 @@ export class TalentGuideBackendService {
          }
       `
 
-      const { page } = await this.client.request<TalentGuideModulePageResponse>(
+      const { page } = await this.checkClient().request<TalentGuideModulePageResponse>(
          query,
          {
             slug,
@@ -110,7 +117,7 @@ export class TalentGuideBackendService {
          }
       `
 
-      const data = await this.client.request<{
+      const data = await this.checkClient().request<{
          pages: Page<TalentGuideModule>[]
       }>(query, {
          locale: forcedLocale,

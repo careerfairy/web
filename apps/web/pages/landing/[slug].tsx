@@ -45,51 +45,64 @@ export const getStaticProps: GetStaticProps = async ({
    preview = false,
    locale,
 }) => {
-   const marketingPage = await marketingPageRepo.getMarketingPage({
-      slug: params.slug as string,
-      preview,
-      locale,
-   })
+   try {
+      const marketingPage = await marketingPageRepo.getMarketingPage({
+         slug: params.slug as string,
+         preview,
+         locale,
+      })
 
-   if (!marketingPage) {
+      if (!marketingPage) {
+         return {
+            notFound: true,
+         }
+      }
+
+      return {
+         props: {
+            preview,
+            marketingLandingPagePlainObject:
+               marketingPage.serializeToPlainObject(),
+         },
+         revalidate: 60,
+      }
+   } catch (error) {
+      console.error("Error in getStaticProps for landing page:", error)
       return {
          notFound: true,
       }
-   }
-
-   return {
-      props: {
-         preview,
-         marketingLandingPagePlainObject:
-            marketingPage.serializeToPlainObject(),
-      },
-      revalidate: 60,
    }
 }
 
 export async function getStaticPaths({ locales }) {
    let paths = []
 
-   if (process.env.APP_ENV !== "test") {
-      const marketingPages = await marketingPageRepo
-         .getAllMarketingPageSlugs()
-         .then((slugs) => slugs.filter(({ slug }) => slug !== hookLandingPage))
+   try {
+      if (process.env.APP_ENV !== "test") {
+         const marketingPages = await marketingPageRepo
+            .getAllMarketingPageSlugs()
+            .then((slugs) => slugs.filter(({ slug }) => slug !== hookLandingPage))
 
-      if (locales) {
-         for (const locale of locales) {
-            paths = [
-               ...paths,
-               ...marketingPages.map((marketingPage) => ({
-                  params: { slug: marketingPage.slug },
-                  locale,
-               })),
-            ]
+         if (locales) {
+            for (const locale of locales) {
+               paths = [
+                  ...paths,
+                  ...marketingPages.map((marketingPage) => ({
+                     params: { slug: marketingPage.slug },
+                     locale,
+                  })),
+               ]
+            }
+         } else {
+            paths = marketingPages.map((caseStudy) => ({
+               params: { slug: caseStudy.slug },
+            }))
          }
-      } else {
-         paths = marketingPages.map((caseStudy) => ({
-            params: { slug: caseStudy.slug },
-         }))
       }
+   } catch (error) {
+      console.error("Error in getStaticPaths for landing pages:", error)
+      // Return empty paths on error to prevent build failure
+      paths = []
    }
 
    return {
