@@ -1,5 +1,4 @@
 import { Box, Typography } from "@mui/material"
-import React from "react"
 import { User, CheckCircle, Users, ChevronRight } from "react-feather"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { sxStyles } from "types/commonTypes"
@@ -88,11 +87,7 @@ const MetricCard = ({ icon, label, value, onClick }: MetricCardProps) => {
    return (
       <Box sx={styles.metricCard} onClick={onClick}>
          <Box sx={styles.iconContainer}>
-            <Box sx={styles.icon}>
-               {React.cloneElement(icon as React.ReactElement, {
-                  strokeWidth: 2.5,
-               })}
-            </Box>
+            <Box sx={styles.icon}>{icon}</Box>
          </Box>
          <Box sx={styles.textContainer}>
             <Typography variant="brandedBody" sx={styles.metricLabel}>
@@ -133,19 +128,19 @@ export const AnalyticsTile = () => {
       <CardCustom sx={styles.container} title="Analytics">
          <Box sx={styles.cardsContainer}>
             <MetricCard
-               icon={<User />}
+               icon={<User strokeWidth={2.5} />}
                label="Talent reached"
                value={totalPeopleReached(stats)}
                onClick={handleTalentReachedClick}
             />
             <MetricCard
-               icon={<CheckCircle />}
+               icon={<CheckCircle strokeWidth={2.5} />}
                label="Total registrations"
                value={stats?.generalStats?.numberOfRegistrations ?? 0}
                onClick={handleRegistrationsClick}
             />
             <MetricCard
-               icon={<Users />}
+               icon={<Users strokeWidth={2.5} />}
                label="Talent pool size"
                value={<AggregatedTalentPoolValue />}
                onClick={handleTalentPoolClick}
