@@ -1,83 +1,123 @@
-import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
-import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore"
-import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { LivestreamEvent, LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
+import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
+import { reducedRemoteCallsOptions } from "components/custom-hook/utils/useFunctionsSWRFetcher"
+import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore"
+import { useFirestore } from "reactfire"
 import useSWR from "swr"
-import { errorLogAndNotify } from "util/CommonUtil"
 
-interface TopCommunityQuestion extends LivestreamQuestion {
+export interface TopCommunityQuestion extends LivestreamQuestion {
    livestreamTitle?: string
-   livestreamDate?: Date
+   livestreamCompany?: string
 }
 
 /**
- * Custom hook to fetch the top 5 most liked questions from all livestreams 
- * organized by a company within the last year
- * @param groupId - The unique identifier for the group/company
- * @returns The top 5 questions with most likes, sorted by likes in descending order
+ * Custom hook to fetch the top 5 most liked community questions from past livestreams
+ * organized by a specific group within the last 1 year. Results are memoized to avoid re-fetching on page refresh.
+ *
+ * @param groupId - The ID of the group to fetch questions for
+ * @returns SWR response with the top 5 questions sorted by likes in descending order
  */
-export const useTopCommunityQuestions = (groupId: string | null) => {
-   return useSWR(
-      groupId ? ["topCommunityQuestions", groupId] : null,
-      async () => {
-         if (!groupId) return []
+export const useTopCommunityQuestions = (groupId: string) => {
+   const firestore = useFirestore()
 
-         // Get all livestreams for the group from the last year
+   const fetchTopQuestions = async (): Promise<TopCommunityQuestion[]> => {
+      // Return empty array if no groupId
+      if (!groupId) {
+         return []
+      }
+
+      try {
+         // Calculate date 1 year ago
          const oneYearAgo = new Date()
          oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
 
-         const livestreamsQuery = query(
-            collection(FirestoreInstance, "livestreams"),
-            where("groupId", "==", groupId),
-            where("startTime", ">=", oneYearAgo)
+         // Calculate the cutoff date for past streams (not upcoming)
+         const pastStreamCutoff = new Date(
+            Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS
          )
 
+         // Fetch past livestreams from the last 1 year for this group
+         const livestreamsQuery = query(
+            collection(firestore, "livestreams"),
+            where("test", "==", false),
+            where("groupIds", "array-contains", groupId),
+            where("start", "<", pastStreamCutoff), // Only past streams
+            where("start", ">", oneYearAgo), // Only from last 1 year
+            orderBy("start", "desc")
+         ).withConverter(createGenericConverter<LivestreamEvent>())
+
          const livestreamsSnapshot = await getDocs(livestreamsQuery)
-         
-         if (livestreamsSnapshot.empty) {
+         const pastLivestreams = livestreamsSnapshot.docs.map((doc) => doc.data())
+
+         // Return empty array if no livestreams found
+         if (!pastLivestreams?.length) {
             return []
          }
 
-         // Collect all questions from all livestreams
-         const allQuestions: TopCommunityQuestion[] = []
+         // Collect all questions from all past livestreams with better error handling
+         const allQuestionsPromises = pastLivestreams.map(
+            async (livestream) => {
+               try {
+                  // Ensure livestream has valid id
+                  if (!livestream?.id) return []
 
-         for (const livestreamDoc of livestreamsSnapshot.docs) {
-            const livestreamData = livestreamDoc.data()
-            
-            const questionsQuery = query(
-               collection(FirestoreInstance, "livestreams", livestreamDoc.id, "questions"),
-               orderBy("votes", "desc")
-            ).withConverter(createGenericConverter<LivestreamQuestion>())
+                  const questionsQuery = query(
+                     collection(
+                        firestore,
+                        "livestreams",
+                        livestream.id,
+                        "questions"
+                     ),
+                     orderBy("votes", "desc"),
+                     limit(10) // Get top 10 from each stream to ensure we have enough data
+                  ).withConverter(createGenericConverter<LivestreamQuestion>())
 
-            const questionsSnapshot = await getDocs(questionsQuery)
-            
-            questionsSnapshot.docs.forEach(questionDoc => {
-               const questionData = questionDoc.data()
-               if (questionData.votes > 0) { // Only include questions with likes
-                  allQuestions.push({
-                     ...questionData,
-                     livestreamTitle: livestreamData.title,
-                     livestreamDate: livestreamData.startTime?.toDate()
-                  })
+                  const questionsSnapshot = await getDocs(questionsQuery)
+
+                  return questionsSnapshot.docs.map((doc) => ({
+                     ...doc.data(),
+                     livestreamTitle: livestream.title || "Unknown Event",
+                     livestreamCompany: livestream.company || "Unknown Company",
+                  }))
+               } catch (streamError) {
+                  // Log error but don't fail the entire operation
+                  console.warn(
+                     `Failed to fetch questions for livestream ${livestream?.id}:`,
+                     streamError
+                  )
+                  return []
                }
-            })
-         }
+            }
+         )
+
+         const allQuestionsArrays = await Promise.all(allQuestionsPromises)
+         const allQuestions = allQuestionsArrays.flat()
 
          // Sort all questions by votes in descending order and take top 5
-         return allQuestions
+         const topQuestions = allQuestions
+            .filter(
+               (question) => question && typeof question.votes === "number"
+            ) // Ensure valid questions
             .sort((a, b) => (b.votes || 0) - (a.votes || 0))
             .slice(0, 5)
-      },
+
+         return topQuestions
+      } catch (error) {
+         console.warn("Error fetching top community questions:", error)
+         return []
+      }
+   }
+
+   return useSWR<TopCommunityQuestion[]>(
+      groupId ? `top-community-questions-${groupId}` : null,
+      fetchTopQuestions,
       {
-         revalidateOnFocus: false,
-         revalidateOnReconnect: false,
-         revalidateIfStale: false,
-         dedupingInterval: 300000, // 5 minutes
-         onError: (err) => {
-            errorLogAndNotify(err, {
-               message: "Error in useTopCommunityQuestions",
-               groupId,
-            })
+         ...reducedRemoteCallsOptions,
+         // Cache for 5 minutes to avoid unnecessary re-fetching
+         dedupingInterval: 5 * 60 * 1000,
+         onError: (error) => {
+            console.warn("SWR error in useTopCommunityQuestions:", error)
          },
       }
    )

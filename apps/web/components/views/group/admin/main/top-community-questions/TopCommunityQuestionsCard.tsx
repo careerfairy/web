@@ -1,5 +1,4 @@
 import { Box, Stack, Typography } from "@mui/material"
-import format from "date-fns/format"
 import { ThumbsUp } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CardCustom from "../../common/CardCustom"
@@ -124,9 +123,9 @@ export const TopCommunityQuestionsCard = () => {
                            </Typography>
                         </Box>
                         
-                        {question.livestreamDate && (
+                        {question.livestreamTitle && (
                            <Typography sx={styles.timeText}>
-                              {format(question.livestreamDate, "MMM d, yyyy")}
+                              {question.livestreamTitle}
                            </Typography>
                         )}
                      </Stack>
