@@ -18,6 +18,9 @@ const styles = sxStyles({
          paddingX: "16px",
          paddingBottom: "16px",
       },
+      "& .MuiCardContent-root": {
+         paddingX: "16px",
+      },
    }),
    container: {
       p: 0,
