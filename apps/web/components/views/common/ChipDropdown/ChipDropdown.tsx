@@ -45,6 +45,7 @@ const popperContentVariants = {
 
 const styles = sxStyles({
    chip: {
+      transition: "all 300ms",
       p: "8px 12px 8px 16px",
       backgroundColor: "neutral.50",
       "& .MuiChip-label": {
