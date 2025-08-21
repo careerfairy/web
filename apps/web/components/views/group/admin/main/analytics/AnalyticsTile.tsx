@@ -140,7 +140,7 @@ export const AnalyticsTile = () => {
                icon={<CheckCircle strokeWidth={2.5} />}
                label="Total registrations"
                value={stats?.generalStats?.numberOfRegistrations ?? 0}
-               href={`/group/${group.id}/admin/analytics/live-streams`}
+               href={`/group/${group.id}/admin/analytics/live-streams/overview`}
             />
             <MetricCard
                icon={<Users strokeWidth={2.5} />}
