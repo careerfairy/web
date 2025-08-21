@@ -95,10 +95,16 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
       useUploadGroupBanner(groupId)
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const [objectUrl, setObjectUrl] = useState<string | null>(null)
+   
+   console.log("CompanyBanner render - objectUrl:", objectUrl)
 
    const setImage = (file, imageSetter) => {
+      console.log("setImage called with file:", file)
       const newFile = Array.isArray(file) ? file[0] : file
-      imageSetter(URL.createObjectURL(newFile))
+      console.log("Creating object URL for file:", newFile)
+      const objectURL = URL.createObjectURL(newFile)
+      console.log("Object URL created:", objectURL)
+      imageSetter(objectURL)
    }
 
    const {
