@@ -142,7 +142,7 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
                key={`update-${groupId}-company-banner`}
                cropType="rectangle"
                cropBoxResizable
-               aspectRatio={5 / 1} // Banner aspect ratio (2880x576 ≈ 5:1)
+               aspectRatio={6 / 1} // Banner aspect ratio (2880x480 ≈ 6:1)
                titleIcon={<Upload />}
                backButtonText="Cancel"
             />
