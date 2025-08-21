@@ -1,5 +1,3 @@
-import { useSelector } from "react-redux"
-
 // material-ui
 import { Badge, IconButton } from "@mui/material"
 import Tooltip from "@mui/material/Tooltip"
@@ -8,7 +6,6 @@ import { Bell } from "react-feather"
 // project imports
 import useMenuState from "../../../components/custom-hook/useMenuState"
 import { maybePluralize } from "../../../components/helperFunctions/HelperFunctions"
-import { notificationsSelector } from "../../../store/selectors/groupSelectors"
 import { sxStyles } from "../../../types/commonTypes"
 import Notifications from "./Notifications"
 
@@ -34,10 +31,11 @@ const styles = sxStyles({
       lineHeight: 0,
    },
 })
+
+const notifications = []
+
 const NotificationsButton = () => {
    const { handleClick, handleClose, anchorEl } = useMenuState()
-
-   const notifications = useSelector(notificationsSelector)
 
    return (
       <>

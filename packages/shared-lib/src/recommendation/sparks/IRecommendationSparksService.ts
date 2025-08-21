@@ -62,7 +62,7 @@ export default class RecommendationSparksServiceCore {
                userId: user?.id || "N/A",
                userCountriesOfInterest: user?.countriesOfInterest || [],
                userUniversityCountryCode: user?.universityCountryCode || "N/A",
-               userUniversityCode: user?.university.code || "N/A",
+               userUniversityCode: user?.university?.code || "N/A",
                userFieldOfStudyId: user?.fieldOfStudy?.id || "N/A",
             },
             sparkMetaData: sortedRecommendedSparks.map((e) => ({
