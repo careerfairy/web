@@ -76,6 +76,30 @@ const styles = sxStyles({
       opacity: 0.95,
       background: `linear-gradient(0deg, rgba(247, 248, 252, 0.96) 0%, rgba(247, 248, 252, 0.96) 100%), lightgray 50% / cover no-repeat`,
    },
+   cropperSlider: {
+      color: (theme) => theme.palette.primary[600],
+      "& .MuiSlider-rail": {
+         opacity: 0.5,
+         boxShadow: "inset 0px 0px 4px -2px #000",
+         backgroundColor: (theme) => theme.palette.neutral[100],
+      },
+      "& .MuiSlider-thumb": {
+         backgroundColor: (theme) => theme.brand.white[50],
+         border: "2px solid currentColor",
+         "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+            boxShadow: "inherit",
+         },
+         "&::before": {
+            display: "none",
+         },
+      },
+   },
+   cropperApplyButton: {
+      backgroundColor: (theme) => theme.palette.primary[600],
+      "&:hover": {
+         backgroundColor: (theme) => theme.palette.primary[700],
+      },
+   },
 })
 
 type CompanyBannerProps = {
@@ -87,7 +111,7 @@ const bannerImageValidator = getImageDimensionsValidator({
    maxHeight: BANNER_IMAGE_SPECS.maxHeight,
    maxWidth: BANNER_IMAGE_SPECS.maxWidth,
    minHeight: BANNER_IMAGE_SPECS.minHeight,
-   minWidth: BANNER_IMAGE_SPECS.minWidth,
+   minWidth: 600, // Reduced from 800px to be less restrictive
 })
 
 const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
@@ -95,16 +119,10 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
       useUploadGroupBanner(groupId)
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const [objectUrl, setObjectUrl] = useState<string | null>(null)
-   
-   console.log("CompanyBanner render - objectUrl:", objectUrl)
 
    const setImage = (file, imageSetter) => {
-      console.log("setImage called with file:", file)
       const newFile = Array.isArray(file) ? file[0] : file
-      console.log("Creating object URL for file:", newFile)
-      const objectURL = URL.createObjectURL(newFile)
-      console.log("Object URL created:", objectURL)
-      imageSetter(objectURL)
+      imageSetter(URL.createObjectURL(newFile))
    }
 
    const {
@@ -114,12 +132,8 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
       acceptedFileTypes: BANNER_IMAGE_SPECS.allowedFormats,
       maxFileSize: BANNER_IMAGE_SPECS.maxSize, // Use the spec value
       multiple: false,
-      onValidated: (file) => {
-         console.log("onValidated callback triggered with file:", file)
-         setImage(file, setObjectUrl)
-      },
-      // Temporarily remove custom validation to debug
-      // customValidations: [bannerImageValidator],
+      onValidated: (file) => setImage(file, setObjectUrl),
+      customValidations: [bannerImageValidator],
    })
 
    const handleCloseCropImageDialog = () => {
@@ -155,6 +169,8 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
                aspectRatio={6 / 1} // Banner aspect ratio (2880x480 ≈ 6:1)
                titleIcon={<Upload />}
                backButtonText="Cancel"
+               cropperSlideSx={styles.cropperSlider}
+               applyButtonSx={styles.cropperApplyButton}
             />
          ) : null}
          <FileUploader {...bannerUploaderProps}>
@@ -175,7 +191,7 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
 const DefaultLabel: FC = () => {
    return (
       <>
-         <Typography zIndex={1}>Recommended size: 2880x576px</Typography>
+         <Typography zIndex={1}>Recommended size: 2880x480px</Typography>
          <Button
             size="small"
             color="secondary"
