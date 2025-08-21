@@ -10,7 +10,7 @@ import CardCustom from "../../common/CardCustom"
 const styles = sxStyles({
    carouselContainer: {
       position: "relative",
-      padding: "0px", // No padding around guide cards
+      padding: "0px",
       display: "flex",
       flexDirection: "column",
    },
@@ -29,8 +29,8 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
-      padding: 0, // No card padding
-      marginBottom: "12px", // 12px margin between card and navigation dots
+      padding: 0,
+      marginBottom: "12px",
    },
    cardImageWrapper: {
       width: "100%",
@@ -38,19 +38,19 @@ const styles = sxStyles({
       position: "relative",
       borderRadius: "8px",
       overflow: "hidden",
-      marginBottom: "12px", // Bottom padding for image
+      marginBottom: "12px",
    },
    cardTitle: {
       fontWeight: 600,
       fontSize: "16px",
       lineHeight: "24px",
-      marginBottom: "12px", // Bottom padding for title
+      marginBottom: "12px",
    },
    cardText: {
       fontSize: "14px",
       lineHeight: "20px",
       color: "text.secondary",
-      marginBottom: "12px", // Bottom padding for text
+      marginBottom: "12px",
    },
    ctaButton: {
       height: "40px",
@@ -61,7 +61,7 @@ const styles = sxStyles({
       textTransform: "none",
       fontSize: "14px",
       fontWeight: 500,
-      padding: "0 16px", // Dynamic width with padding
+      padding: "0 16px",
       "&:hover": {
          backgroundColor: (theme) => theme.brand.black[400],
          borderColor: "neutral.50",
@@ -72,11 +72,11 @@ const styles = sxStyles({
       minWidth: "32px",
       width: "32px",
       height: "32px",
-      borderRadius: "50%", // Make it a perfect circle
+      borderRadius: "50%",
       backgroundColor: "neutral.50",
       border: "none",
-      color: "neutral.600", // Use neutral 600 for icons
-      padding: 0, // Remove default padding
+      color: "neutral.600",
+      padding: 0,
       "&:hover": {
          backgroundColor: "neutral.100",
       },
