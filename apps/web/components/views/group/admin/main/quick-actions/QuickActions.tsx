@@ -15,32 +15,30 @@ const styles = sxStyles({
    container: {
       display: "flex",
       justifyContent: "center",
-      marginBottom: 2, // 16px instead of 24px
-      width: "100%", // Take full width of parent
+      marginBottom: 2,
+      width: "100%",
    },
    buttonsStack: {
-      width: "100%", // Take full width of container
+      width: "100%",
    },
    quickActionButton: {
-      // Default state
-      backgroundColor: (theme) => theme.brand.white[100], // white 100
-      borderColor: "secondary.50", // purple 50
-      borderWidth: "1px", // 1px border thickness
-      borderStyle: "solid", // Specify border style
+      backgroundColor: (theme) => theme.brand.white[100],
+      borderColor: "secondary.50",
+      borderWidth: "1px",
+      borderStyle: "solid",
       color: "neutral.800",
       borderRadius: "10px",
       textTransform: "none",
       fontWeight: 500,
-      padding: "15px 24px", // Increased padding to achieve 56px height
-      flex: 1, // Take equal width within the stack
-      height: "56px", // Explicitly set height to 56px
+      padding: "15px 24px",
+      flex: 1,
+      height: "56px",
       "&:hover": {
-         // Hover state
-         backgroundColor: (theme) => theme.brand.white[300], // White 300
-         borderColor: "secondary.300", // Purple 300
+         backgroundColor: (theme) => theme.brand.white[300],
+         borderColor: "secondary.300",
          borderWidth: "1px",
          borderStyle: "solid",
-         color: "neutral.800", // Neutral 800
+         color: "neutral.800",
       },
       "&:disabled": {
          backgroundColor: (theme) => theme.brand.white[100],
