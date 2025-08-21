@@ -9,7 +9,13 @@ const GeneratedComponent = () => {
 
 const generateSiteMap = async (basePath: string): Promise<string> => {
    try {
-      const sitemapLink = process.env.WEBFLOW_URL + `/sitemap.xml`
+      const webflowUrl = process.env.WEBFLOW_URL
+      if (!webflowUrl) {
+         console.warn("WEBFLOW_URL not defined, returning empty sitemap")
+         return siteMapXmlWrapper(mapWebFlowToSiteMap([]))
+      }
+      
+      const sitemapLink = webflowUrl + `/sitemap.xml`
       // Fetch the sitemap links using the constructed link
       const links: string[] = await GetSitemapLinks(sitemapLink)
 
