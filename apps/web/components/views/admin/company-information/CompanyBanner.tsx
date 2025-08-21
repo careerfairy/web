@@ -114,8 +114,12 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
       acceptedFileTypes: BANNER_IMAGE_SPECS.allowedFormats,
       maxFileSize: BANNER_IMAGE_SPECS.maxSize, // Use the spec value
       multiple: false,
-      onValidated: (file) => setImage(file, setObjectUrl),
-      customValidations: [bannerImageValidator],
+      onValidated: (file) => {
+         console.log("onValidated callback triggered with file:", file)
+         setImage(file, setObjectUrl)
+      },
+      // Temporarily remove custom validation to debug
+      // customValidations: [bannerImageValidator],
    })
 
    const handleCloseCropImageDialog = () => {
