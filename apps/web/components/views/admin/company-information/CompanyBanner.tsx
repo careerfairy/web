@@ -1,10 +1,12 @@
 import { BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { Avatar, Box, BoxProps, Button, Stack, Typography } from "@mui/material"
+import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
 import useUploadGroupBanner from "components/custom-hook/group/useUploadGroupBanner"
 import useFileUploader from "components/custom-hook/useFileUploader"
 import FileUploader from "components/views/common/FileUploader"
 import { getImageDimensionsValidator } from "components/views/common/FileUploader/validations"
-import { FC } from "react"
+import ImageCropperDialog from "components/views/common/ImageCropperDialog"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { FC, useState, useCallback } from "react"
 import { Upload } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -91,48 +93,83 @@ const bannerImageValidator = getImageDimensionsValidator({
 const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
    const { handleUploadImage: handleUploadBanner } =
       useUploadGroupBanner(groupId)
+   const { successNotification, errorNotification } = useSnackbarNotifications()
+   const [objectUrl, setObjectUrl] = useState<string | null>(null)
+
+   const setImage = (file, imageSetter) => {
+      const newFile = Array.isArray(file) ? file[0] : file
+      imageSetter(URL.createObjectURL(newFile))
+   }
 
    const {
       fileUploaderProps: bannerUploaderProps,
       dragActive: bannerDragActive,
    } = useFileUploader({
       acceptedFileTypes: BANNER_IMAGE_SPECS.allowedFormats,
-      maxFileSize: 10, // MB
+      maxFileSize: BANNER_IMAGE_SPECS.maxSize, // Use the spec value
       multiple: false,
-      onValidated: (file) => {
-         const newFile = Array.isArray(file) ? file[0] : file
-         return handleUploadBanner(newFile)
-      },
+      onValidated: (file) => setImage(file, setObjectUrl),
       customValidations: [bannerImageValidator],
    })
 
+   const handleCloseCropImageDialog = () => {
+      setObjectUrl(null)
+   }
+
+   const handleCropperImageSubmit = useCallback(
+      async (image: File) => {
+         try {
+            await handleUploadBanner(image)
+            successNotification("Company banner has been successfully updated")
+            setObjectUrl(null)
+         } catch (error) {
+            errorNotification(error.message || "Failed to upload banner image")
+         }
+      },
+      [handleUploadBanner, successNotification, errorNotification]
+   )
+
    return (
-      <FileUploader {...bannerUploaderProps}>
-         <Box
-            sx={[
-               styles.companyBanner,
-               (bannerDragActive || !url) && styles.imageLabelVisible,
-            ]}
-         >
-            <BannerPreview url={url} />
-            <BannerUploadCTA url={url} />
-         </Box>
-      </FileUploader>
+      <>
+         {objectUrl ? (
+            <ImageCropperDialog
+               title="Upload company banner"
+               fileName={undefined}
+               imageSrc={objectUrl}
+               open={Boolean(objectUrl)}
+               handleClose={handleCloseCropImageDialog}
+               onSubmit={handleCropperImageSubmit}
+               key={`update-${groupId}-company-banner`}
+               cropType="rectangle"
+               cropBoxResizable
+               aspectRatio={5 / 1} // Banner aspect ratio (2880x576 ≈ 5:1)
+               titleIcon={<Upload />}
+               backButtonText="Cancel"
+            />
+         ) : null}
+         <FileUploader {...bannerUploaderProps}>
+            <Box
+               sx={[
+                  styles.companyBanner,
+                  (bannerDragActive || !url) && styles.imageLabelVisible,
+               ]}
+            >
+               <BannerPreview url={url} />
+               <BannerUploadCTA url={url} />
+            </Box>
+         </FileUploader>
+      </>
    )
 }
 
-type DefaultLabelProps = {
-   sx: BoxProps["sx"]
-}
-
-const DefaultLabel: FC<DefaultLabelProps> = ({ sx }) => {
+const DefaultLabel: FC = () => {
    return (
       <>
          <Typography zIndex={1}>Recommended size: 2880x576px</Typography>
          <Button
             size="small"
             color="secondary"
-            sx={sx}
+            sx={styles.uploadPictureButton}
             variant="outlined"
             endIcon={<Upload size={18} />}
          >
@@ -151,7 +188,7 @@ const BannerPreview: FC<BannerPreviewProps> = ({ url }) => {
       <Box className="banner-preview">
          <Box sx={styles.companyBannerUploadArea}>
             <BannerImage url={url} />
-            {url ? null : <DefaultLabel sx={styles.uploadPictureButton} />}
+            {url ? null : <DefaultLabel />}
          </Box>
       </Box>
    )
@@ -168,7 +205,7 @@ const BannerUploadCTA: FC<BannerPreviewProps> = ({ url }) => {
       <Stack className="banner-upload-cta" sx={styles.companyBannerUploadArea}>
          <BannerImage url={url} />
          <Box sx={styles.greyOverlay} />
-         <DefaultLabel sx={styles.uploadPictureButton} />
+         <DefaultLabel />
       </Stack>
    )
 }
