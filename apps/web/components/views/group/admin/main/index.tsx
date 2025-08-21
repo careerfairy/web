@@ -41,7 +41,6 @@ const PageContent = () => {
                <Grid xs={12} md={4} item style={styles.gridItem}>
                   <AggregatedRegistrationSourcesCard />
                </Grid>
-
                <Grid xs={12} md={4} item style={styles.gridItem}>
                   <TopCommunityQuestionsCard />
                </Grid>

@@ -4,6 +4,7 @@ import { firestoreReducer } from "redux-firestore"
 import adminSparksReducer from "./adminSparksReducer"
 import authReducer from "./authReducer"
 import emotesReducer from "./emotesReducer"
+import eventsTableReducer from "./eventsTableReducer"
 import firebaseReducer from "./firebaseReducer"
 import generalLayoutReducer from "./generalLayoutReducer"
 import groupAnalyticsReducer from "./groupAnalyticsReducer"
@@ -44,6 +45,7 @@ const reducers = {
    talentGuide: talentGuideReducer,
    profileSettings: profileSettingsReducer,
    userSignUp: userSignUpReducer,
+   eventsTable: eventsTableReducer,
 } as const // only way to get type inference on firebaseReducer
 
 export default combineReducers<typeof reducers>(reducers)
