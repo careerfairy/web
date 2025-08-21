@@ -16,7 +16,7 @@ const styles = sxStyles({
       },
    }),
    container: {
-      p: "16px",
+      p: 0,
    },
    questionsScrollContainer: (theme) => ({
       [theme.breakpoints.up("desktop")]: {
