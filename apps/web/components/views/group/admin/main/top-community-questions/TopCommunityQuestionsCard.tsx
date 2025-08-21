@@ -14,6 +14,10 @@ const styles = sxStyles({
          flexDirection: "column",
          overflow: "hidden",
       },
+      "& .MuiCardHeader-root": {
+         paddingX: "16px",
+         paddingBottom: "16px",
+      },
    }),
    container: {
       p: 0,
