@@ -77,7 +77,7 @@ const styles = sxStyles({
       background: `linear-gradient(0deg, rgba(247, 248, 252, 0.96) 0%, rgba(247, 248, 252, 0.96) 100%), lightgray 50% / cover no-repeat`,
    },
    cropperSlider: {
-      color: (theme) => theme.palette.primary[600],
+      color: (theme) => theme.palette.secondary[600], // Using purple instead of turquoise
       "& .MuiSlider-rail": {
          opacity: 0.5,
          boxShadow: "inset 0px 0px 4px -2px #000",
@@ -95,9 +95,9 @@ const styles = sxStyles({
       },
    },
    cropperApplyButton: {
-      backgroundColor: (theme) => theme.palette.primary[600],
+      backgroundColor: (theme) => theme.palette.secondary[600], // Using purple instead of turquoise
       "&:hover": {
-         backgroundColor: (theme) => theme.palette.primary[700],
+         backgroundColor: (theme) => theme.palette.secondary[700],
       },
    },
 })
