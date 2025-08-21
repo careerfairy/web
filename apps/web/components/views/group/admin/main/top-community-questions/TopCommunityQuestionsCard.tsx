@@ -17,6 +17,9 @@ const styles = sxStyles({
    }),
    container: {
       p: 0,
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
    },
    questionsScrollContainer: (theme) => ({
       [theme.breakpoints.up("desktop")]: {
@@ -65,6 +68,11 @@ const styles = sxStyles({
       borderRadius: "12px",
       p: 1.5,
       textAlign: "center",
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
    }),
    emptyTitle: {
       color: "neutral.800",
