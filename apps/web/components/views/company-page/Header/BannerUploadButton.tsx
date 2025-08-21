@@ -68,7 +68,7 @@ const BannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
    const { errorNotification, successNotification } = useSnackbarNotifications()
    const [objectUrl, setObjectUrl] = useState<string | null>(null)
 
-   const setImage = (file, imageSetter) => {
+   const setImage = (file: File | File[], imageSetter: (url: string) => void) => {
       const newFile = Array.isArray(file) ? file[0] : file
       imageSetter(URL.createObjectURL(newFile))
    }
@@ -93,8 +93,8 @@ const BannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
             await handleUploadBannerPhoto(image)
             successNotification("Company banner has been successfully updated")
             setObjectUrl(null)
-         } catch (error) {
-            errorNotification(error.message || "Failed to upload banner image")
+         } catch (error: any) {
+            errorNotification(error?.message || "Failed to upload banner image")
          }
       },
       [handleUploadBannerPhoto, successNotification, errorNotification]

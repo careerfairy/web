@@ -31,19 +31,23 @@ const BannerIllustration = () => {
    const { group, groupPresenter, editMode } = useCompanyPage()
 
    const { 
-      handleUploadImage: handleUploadBannerPhoto, 
-      isLoading: isMutating,
-      progress: uploadProgress,
-      uploading: isUploading
+      handleUploadImage, 
+      isLoading,
+      progress,
+      uploading
    } = useUploadGroupBanner(group.id)
+
+   const handleUploadBannerPhoto = async (photo: File): Promise<void> => {
+      await handleUploadImage(photo)
+   }
 
    return (
       <Box sx={styles.imageWrapper}>
-         {isUploading ? (
+         {uploading ? (
             <LinearProgress
                sx={styles.progress}
                variant="determinate"
-               value={uploadProgress}
+               value={progress}
             />
          ) : null}
          <BackgroundImage
@@ -58,16 +62,14 @@ const BannerIllustration = () => {
          <Box sx={styles.buttonWrapper}>
             {editMode ? (
                <BannerUploadButton
-                  disabled={isUploading || isMutating}
+                  disabled={uploading || isLoading}
                   handleUploadBannerPhoto={handleUploadBannerPhoto}
-                  loading={isUploading || isMutating}
+                  loading={uploading || isLoading}
                />
             ) : null}
          </Box>
       </Box>
    )
 }
-
-
 
 export default BannerIllustration
