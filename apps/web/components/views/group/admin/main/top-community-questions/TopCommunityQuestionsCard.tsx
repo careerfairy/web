@@ -8,7 +8,6 @@ import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
    cardContainer: (theme) => ({
-      // Desktop only: max-height for the entire tile
       [theme.breakpoints.up("desktop")]: {
          maxHeight: "400px",
          display: "flex",
@@ -17,27 +16,26 @@ const styles = sxStyles({
       },
    }),
    container: {
-      p: "16px", // Explicitly set to 16px
+      p: "16px",
    },
    questionsScrollContainer: (theme) => ({
-      // Desktop only: enable scrolling when content overflows
       [theme.breakpoints.up("desktop")]: {
          overflowY: "auto",
          flex: 1,
-         minHeight: 0, // Allow flex child to shrink
+         minHeight: 0,
       },
    }),
    questionCard: (theme) => ({
       border: `1px solid ${theme.brand.white[500]}`,
-      backgroundColor: theme.brand.white[300], // Updated background color
+      backgroundColor: theme.brand.white[300],
       borderRadius: "12px",
       p: 1.5,
-      mb: 1, // 8px margin between cards
+      mb: 1,
    }),
    questionText: {
       wordBreak: "break-word",
       whiteSpace: "pre-line",
-      color: "neutral.800", // Updated text color
+      color: "neutral.800",
    },
    likesContainer: {
       display: "flex",
@@ -45,17 +43,17 @@ const styles = sxStyles({
       gap: 1,
    },
    likesText: {
-      color: "neutral.600", // Updated likes text color
+      color: "neutral.600",
       fontSize: "14px",
    },
    timeText: {
-      color: "neutral.600", // Updated time color
+      color: "neutral.600",
       fontSize: "12px",
    },
    icon: {
       width: 14,
       height: 14,
-      color: "neutral.600", // Updated icon color
+      color: "neutral.600",
    },
    emptyState: {
       textAlign: "center",
