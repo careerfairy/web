@@ -1,4 +1,6 @@
 import { Box, Button, Stack, Typography } from "@mui/material"
+import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "react-feather"
@@ -8,12 +10,13 @@ import CardCustom from "../../common/CardCustom"
 const styles = sxStyles({
    carouselContainer: {
       position: "relative",
-      minHeight: "390px", // Adjusted for minimum tile height minus header
-      padding: "16px", // Reduced from 24px
+      padding: "0px", // No padding around guide cards
+      display: "flex",
+      flexDirection: "column",
    },
    carousel: {
       position: "relative",
-      height: "100%",
+      flex: 1,
       overflow: "hidden",
    },
    cardContainer: {
@@ -23,17 +26,18 @@ const styles = sxStyles({
    },
    card: {
       minWidth: "100%",
-      height: "322px",
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-start",
       padding: 0, // No card padding
+      marginBottom: "12px", // 12px margin between card and navigation dots
    },
-   cardImage: {
+   cardImageWrapper: {
       width: "100%",
       height: "140px",
-      objectFit: "cover",
+      position: "relative",
       borderRadius: "8px",
+      overflow: "hidden",
       marginBottom: "12px", // Bottom padding for image
    },
    cardTitle: {
@@ -47,7 +51,6 @@ const styles = sxStyles({
       lineHeight: "20px",
       color: "text.secondary",
       marginBottom: "12px", // Bottom padding for text
-      flex: 1,
    },
    ctaButton: {
       height: "40px",
@@ -64,22 +67,16 @@ const styles = sxStyles({
          borderColor: "neutral.50",
       },
    },
-   navigationContainer: {
-      position: "absolute",
-      top: "16px",
-      right: "16px",
-      display: "flex",
-      gap: "8px",
-      zIndex: 2,
-   },
+
    navigationButton: {
       minWidth: "32px",
       width: "32px",
       height: "32px",
-      borderRadius: "4px",
+      borderRadius: "50%", // Make it a perfect circle
       backgroundColor: "neutral.50",
       border: "none",
-      color: "neutral.900",
+      color: "neutral.600", // Use neutral 600 for icons
+      padding: 0, // Remove default padding
       "&:hover": {
          backgroundColor: "neutral.100",
       },
@@ -88,23 +85,22 @@ const styles = sxStyles({
       },
    },
    indicators: {
-      position: "absolute",
-      bottom: "16px",
-      left: "50%",
-      transform: "translateX(-50%)",
       display: "flex",
+      justifyContent: "center",
       gap: "8px",
    },
    indicator: {
-      width: "8px",
-      height: "8px",
-      borderRadius: "50%",
-      backgroundColor: "neutral.200",
+      width: "12px",
+      height: "12px",
+      borderRadius: "6px",
+      backgroundColor: "neutral.100",
       cursor: "pointer",
-      transition: "background-color 0.2s",
-      "&.active": {
-         backgroundColor: "primary.main",
-      },
+      transition: "all 0.2s ease",
+   },
+   indicatorActive: {
+      width: "34px",
+      height: "12px",
+      backgroundColor: "neutral.400",
    },
 })
 
@@ -115,6 +111,7 @@ type GuideCard = {
    cta: string
    url: string
    image: string
+   isExternal: boolean
 }
 
 const guideCards: GuideCard[] = [
@@ -124,15 +121,17 @@ const guideCards: GuideCard[] = [
       text: "Learn the three key stages before, during and after the event to plan effectively, present with impact and follow up for measurable recruitment results.",
       cta: "Read the full guide",
       url: "https://support.careerfairy.io/en/article/live-stream-your-way-to-top-talent-a-guide-to-engaging-gen-z-recruitment-1ifie4a/",
-      image: "/images/guides/events-guide.svg",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/livestream.png?alt=media&token=29355bf7-6ef0-4646-8291-5cf6f476fecc",
+      isExternal: true,
    },
    {
       id: 2,
       title: "New live stream management experience",
-      text: "Discover the new live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview",
+      text: "Discover the new live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview.",
       cta: "Discover now",
       url: "/group/[groupId]/admin/content/live-streams",
-      image: "/images/guides/livestream-guide.svg",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ls-management.png?alt=media&token=1bbe8e2b-b9fe-49b4-8d09-eef69cda8539",
+      isExternal: false,
    },
    {
       id: 3,
@@ -140,7 +139,8 @@ const guideCards: GuideCard[] = [
       text: "Showcase your career fairs, info sessions, and on-campus events to a targeted audience already engaged with your company. Increase registrations and attendance by leveraging our platform.",
       cta: "Talk to us",
       url: "https://meetings.hubspot.com/denis-lehn-koza/clientdemocallcalender",
-      image: "/images/guides/management-guide.svg",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/offline.png?alt=media&token=83692ead-e6f4-4d9d-b564-125101fbb79b",
+      isExternal: true,
    },
 ]
 
@@ -161,39 +161,51 @@ const GuidesCard = () => {
       setCurrentIndex(index)
    }
 
-   const handleCTAClick = (card: GuideCard) => {
-      if (card.url.startsWith("http")) {
-         window.open(card.url, "_blank", "noopener,noreferrer")
-      } else {
-         const url = card.url.replace("[groupId]", groupId as string)
-         router.push(url)
+   const getResolvedUrl = (card: GuideCard): string => {
+      if (card.isExternal) {
+         return card.url
       }
+      return card.url.replace("[groupId]", groupId as string)
    }
 
-   return (
-      <CardCustom title="Guides" sx={{ minHeight: "422px" }}>
-         <Box sx={styles.carouselContainer}>
-            <Box sx={styles.navigationContainer}>
-               <Button
-                  sx={styles.navigationButton}
-                  onClick={handlePrevious}
-                  disabled={currentIndex === 0}
-                  data-testid="guides-prev-button"
-                  aria-label="Previous guide"
-               >
-                  <ChevronLeft size={16} />
-               </Button>
+   const customAction = (
+      <Box sx={{ display: "flex", gap: "8px" }}>
+         <Button
+            sx={styles.navigationButton}
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+            data-testid="guides-prev-button"
+            aria-label="Previous guide"
+         >
+            <ChevronLeft size={16} />
+         </Button>
 
-               <Button
-                  sx={styles.navigationButton}
-                  onClick={handleNext}
-                  disabled={currentIndex === guideCards.length - 1}
-                  data-testid="guides-next-button"
-                  aria-label="Next guide"
-               >
-                  <ChevronRight size={16} />
-               </Button>
-            </Box>
+         <Button
+            sx={styles.navigationButton}
+            onClick={handleNext}
+            disabled={currentIndex === guideCards.length - 1}
+            data-testid="guides-next-button"
+            aria-label="Next guide"
+         >
+            <ChevronRight size={16} />
+         </Button>
+      </Box>
+   )
+
+   return (
+      <CardCustom 
+         title="Guides" 
+         sx={{
+            "& .MuiCardContent-root": {
+               padding: "16px",
+            },
+            "& .MuiCardHeader-root": {
+               padding: "16px",
+            },
+         }}
+         customAction={customAction}
+      >
+         <Box sx={styles.carouselContainer}>
 
             <Box sx={styles.carousel}>
                <Box
@@ -204,11 +216,16 @@ const GuidesCard = () => {
                >
                   {guideCards.map((card) => (
                      <Box key={card.id} sx={styles.card} data-testid={`guide-card-${card.id}`}>
-                        <img
-                           src={card.image}
-                           alt={card.title}
-                           style={styles.cardImage}
-                        />
+                        <Box sx={styles.cardImageWrapper}>
+                           <Image
+                              src={card.image}
+                              alt={card.title}
+                              width={300}
+                              height={140}
+                              objectFit="cover"
+                              draggable={false}
+                           />
+                        </Box>
                         <Typography variant="h6" sx={styles.cardTitle}>
                            {card.title}
                         </Typography>
@@ -218,7 +235,10 @@ const GuidesCard = () => {
                         <Button
                            variant="outlined"
                            sx={styles.ctaButton}
-                           onClick={() => handleCTAClick(card)}
+                           component={Link}
+                           href={getResolvedUrl(card)}
+                           target={card.isExternal ? "_blank" : undefined}
+                           rel={card.isExternal ? "noopener noreferrer" : undefined}
                            data-testid={`guide-cta-${card.id}`}
                         >
                            {card.cta}
@@ -234,7 +254,7 @@ const GuidesCard = () => {
                      key={index}
                      sx={[
                         styles.indicator,
-                        index === currentIndex && { backgroundColor: "primary.main" },
+                        index === currentIndex && styles.indicatorActive,
                      ]}
                      onClick={() => handleIndicatorClick(index)}
                      data-testid={`guides-indicator-${index}`}
