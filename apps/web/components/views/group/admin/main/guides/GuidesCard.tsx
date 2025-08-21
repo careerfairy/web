@@ -220,10 +220,10 @@ const GuidesCard = () => {
                            <Image
                               src={card.image}
                               alt={card.title}
-                              width={300}
-                              height={140}
-                              objectFit="cover"
+                              fill
+                              style={{ objectFit: "cover" }}
                               draggable={false}
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                            />
                         </Box>
                         <Typography variant="h6" sx={styles.cardTitle}>
