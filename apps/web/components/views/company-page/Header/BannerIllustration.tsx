@@ -9,7 +9,7 @@ import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotificati
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import BackgroundImage from "../../../views/common/BackgroundImage"
 import { useCompanyPage } from "../index"
-import BannerUploadButtonWithCropper from "./BannerUploadButtonWithCropper"
+import BannerUploadButton from "./BannerUploadButton"
 
 const styles = sxStyles({
    imageWrapper: {
@@ -81,11 +81,10 @@ const BannerIllustration = () => {
          />
          <Box sx={styles.buttonWrapper}>
             {editMode ? (
-               <BannerUploadButtonWithCropper
+               <BannerUploadButton
                   disabled={isUploading || isMutating}
                   handleUploadBannerPhoto={handleUploadBannerPhoto}
                   loading={isUploading || isMutating}
-                  bannerImageUrl={group.bannerImageUrl}
                />
             ) : null}
          </Box>

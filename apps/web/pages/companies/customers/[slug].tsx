@@ -98,22 +98,27 @@ export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
    let paths = []
 
    if (process.env.APP_ENV !== "test") {
-      const caseStudies = await caseStudyRepo.getAllCaseStudiesWithSlug()
+      try {
+         const caseStudies = await caseStudyRepo.getAllCaseStudiesWithSlug()
 
-      if (locales) {
-         for (const locale of locales) {
-            paths = [
-               ...paths,
-               ...caseStudies.map((caseStudy) => ({
-                  params: { slug: caseStudy.slug },
-                  locale,
-               })),
-            ]
+         if (locales) {
+            for (const locale of locales) {
+               paths = [
+                  ...paths,
+                  ...caseStudies.map((caseStudy) => ({
+                     params: { slug: caseStudy.slug },
+                     locale,
+                  })),
+               ]
+            }
+         } else {
+            paths = caseStudies.map((caseStudy) => ({
+               params: { slug: caseStudy.slug },
+            }))
          }
-      } else {
-         paths = caseStudies.map((caseStudy) => ({
-            params: { slug: caseStudy.slug },
-         }))
+      } catch (error) {
+         console.error("Failed to fetch case studies:", error)
+         // Return empty paths on error to allow build to continue
       }
    }
 

@@ -113,7 +113,15 @@ const getStaticProps: GetStaticProps = async (ctx) => {
       url = `/${url}`
    }
 
-   const fetchUrl = process.env.WEBFLOW_URL + url
+   const webflowUrl = process.env.WEBFLOW_URL
+   if (!webflowUrl) {
+      console.warn("WEBFLOW_URL not defined")
+      return {
+         notFound: true,
+      }
+   }
+   
+   const fetchUrl = webflowUrl + url
 
    // Fetch HTML
    const res = await axios(fetchUrl).catch((err) => {

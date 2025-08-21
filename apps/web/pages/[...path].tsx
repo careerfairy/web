@@ -10,7 +10,16 @@ export { getStaticProps }
 
 export const getStaticPaths: GetStaticPaths<{ path: string[] }> = async () => {
    // Fetch links from Webflow sitemap
-   const sitemapLink = process.env.WEBFLOW_URL + `/sitemap.xml`
+   const webflowUrl = process.env.WEBFLOW_URL
+   if (!webflowUrl) {
+      console.warn("WEBFLOW_URL not defined, returning empty paths")
+      return {
+         paths: [],
+         fallback: `blocking`,
+      }
+   }
+   
+   const sitemapLink = webflowUrl + `/sitemap.xml`
    const links = await GetSitemapLinks(sitemapLink).catch((err: any) => {
       console.error(err)
       return []
