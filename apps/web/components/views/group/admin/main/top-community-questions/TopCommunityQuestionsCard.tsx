@@ -77,7 +77,7 @@ const styles = sxStyles({
    emptyTitle: {
       color: "neutral.800",
       fontWeight: 500,
-      mb: 1,
+      mb: "12px",
    },
    emptyText: {
       color: "neutral.600",
