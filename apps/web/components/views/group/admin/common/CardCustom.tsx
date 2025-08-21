@@ -27,6 +27,9 @@ const styles = sxStyles({
       width: "100%",
       display: "flex",
       flexDirection: "column",
+      boxShadow: "none",
+      border: "1px solid",
+      borderColor: "secondary.50",
    },
    dropdownButton: {
       color: "black",
