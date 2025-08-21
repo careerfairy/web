@@ -2,10 +2,11 @@ import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
-import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
-import AggregatedFeedbackCard from "./feedback/AggregatedFeedbackCard"
+import { AnalyticsTile } from "./analytics/AnalyticsTile"
+import GuidesCard from "./guides/GuidesCard"
 import { MainPageProvider } from "./MainPageProvider"
 import { NextLivestreamCard } from "./next-livestream/NextLivestreamCard"
+import { QuickActions } from "./quick-actions"
 import { AggregatedRegistrationSourcesCard } from "./registration-sources/AggregatedRegistrationSourcesCard"
 
 const styles = sxStyles({
@@ -26,13 +27,14 @@ const PageContent = () => {
    return (
       <Box py={2}>
          <Container maxWidth={false}>
+            <QuickActions />
             <Grid container spacing={3}>
-               <Grid xs={12} md={6} item style={styles.gridItem}>
+               <Grid xs={12} md={7} item style={styles.gridItem}>
                   <NextLivestreamCard />
                </Grid>
 
-               <Grid xs={12} md={6} item style={styles.gridItem}>
-                  <AggregatedAnalytics />
+               <Grid xs={12} md={5} item style={styles.gridItem}>
+                  <AnalyticsTile />
                </Grid>
 
                <Grid xs={12} md={6} item style={styles.gridItem}>
@@ -40,7 +42,7 @@ const PageContent = () => {
                </Grid>
 
                <Grid xs={12} md={6} item style={styles.gridItem}>
-                  <AggregatedFeedbackCard />
+                  <GuidesCard />
                </Grid>
             </Grid>
          </Container>
