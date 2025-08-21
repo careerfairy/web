@@ -22,7 +22,7 @@ const bannerImageValidator = getImageDimensionsValidator({
    maxHeight: BANNER_IMAGE_SPECS.maxHeight,
    maxWidth: BANNER_IMAGE_SPECS.maxWidth,
    minHeight: BANNER_IMAGE_SPECS.minHeight,
-   minWidth: 600, // Reduced from 800px to be less restrictive
+   minWidth: 600,
 })
 
 const styles = sxStyles({
@@ -35,7 +35,7 @@ const styles = sxStyles({
       },
    },
    cropperSlider: {
-      color: (theme) => theme.palette.secondary[600], // Using purple instead of turquoise
+      color: (theme) => theme.palette.secondary[600],
       "& .MuiSlider-rail": {
          opacity: 0.5,
          boxShadow: "inset 0px 0px 4px -2px #000",
@@ -53,7 +53,7 @@ const styles = sxStyles({
       },
    },
    cropperApplyButton: {
-      backgroundColor: (theme) => theme.palette.secondary[600], // Using purple instead of turquoise
+      backgroundColor: (theme) => theme.palette.secondary[600],
       "&:hover": {
          backgroundColor: (theme) => theme.palette.secondary[700],
       },
@@ -113,7 +113,7 @@ const BannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
                key={`update-company-banner`}
                cropType="rectangle"
                cropBoxResizable
-               aspectRatio={6 / 1} // Banner aspect ratio (2880x480 ≈ 6:1)
+               aspectRatio={6 / 1}
                titleIcon={<Upload />}
                backButtonText="Cancel"
                cropperSlideSx={styles.cropperSlider}

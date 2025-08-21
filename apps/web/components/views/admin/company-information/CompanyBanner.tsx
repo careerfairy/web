@@ -77,7 +77,7 @@ const styles = sxStyles({
       background: `linear-gradient(0deg, rgba(247, 248, 252, 0.96) 0%, rgba(247, 248, 252, 0.96) 100%), lightgray 50% / cover no-repeat`,
    },
    cropperSlider: {
-      color: (theme) => theme.palette.secondary[600], // Using purple instead of turquoise
+      color: (theme) => theme.palette.secondary[600],
       "& .MuiSlider-rail": {
          opacity: 0.5,
          boxShadow: "inset 0px 0px 4px -2px #000",
@@ -95,7 +95,7 @@ const styles = sxStyles({
       },
    },
    cropperApplyButton: {
-      backgroundColor: (theme) => theme.palette.secondary[600], // Using purple instead of turquoise
+      backgroundColor: (theme) => theme.palette.secondary[600],
       "&:hover": {
          backgroundColor: (theme) => theme.palette.secondary[700],
       },
@@ -111,7 +111,7 @@ const bannerImageValidator = getImageDimensionsValidator({
    maxHeight: BANNER_IMAGE_SPECS.maxHeight,
    maxWidth: BANNER_IMAGE_SPECS.maxWidth,
    minHeight: BANNER_IMAGE_SPECS.minHeight,
-   minWidth: 600, // Reduced from 800px to be less restrictive
+   minWidth: 600,
 })
 
 const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
@@ -166,7 +166,7 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
                key={`update-${groupId}-company-banner`}
                cropType="rectangle"
                cropBoxResizable
-               aspectRatio={6 / 1} // Banner aspect ratio (2880x480 ≈ 6:1)
+               aspectRatio={6 / 1}
                titleIcon={<Upload />}
                backButtonText="Cancel"
                cropperSlideSx={styles.cropperSlider}
