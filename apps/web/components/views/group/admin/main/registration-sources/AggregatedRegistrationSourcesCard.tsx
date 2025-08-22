@@ -18,7 +18,7 @@ const CARD_OPTIONS = [
    "All live streams",
 ] as const
 
-const TITLE = "Registration Sources Overview"
+const TITLE = "Registration sources overview"
 
 export const AggregatedRegistrationSourcesCard = () => {
    const { pastLivestream, nextLivestream } = useMainPageContext()
