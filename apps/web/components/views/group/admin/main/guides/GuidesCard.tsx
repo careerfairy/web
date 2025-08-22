@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -121,7 +121,7 @@ const guideCards: GuideCard[] = [
       text: "Learn the three key stages before, during and after the event to plan effectively, present with impact and follow up for measurable recruitment results.",
       cta: "Read the full guide",
       url: "https://support.careerfairy.io/en/article/live-stream-your-way-to-top-talent-a-guide-to-engaging-gen-z-recruitment-1ifie4a/",
-      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/livestream.png?alt=media&token=29355bf7-6ef0-4646-8291-5cf6f476fecc",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/Live-stream-tips-source.png?alt=media&token=39866924-a874-4c16-b27f-44c88cbd6d23",
       isExternal: true,
    },
    {
@@ -130,7 +130,7 @@ const guideCards: GuideCard[] = [
       text: "Discover the new live stream management experience, designed to enhance your workflow with easily accessible metrics, streamlined navigation, and a clearer overview.",
       cta: "Discover now",
       url: "/group/[groupId]/admin/content/live-streams",
-      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/ls-management.png?alt=media&token=1bbe8e2b-b9fe-49b4-8d09-eef69cda8539",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/New%20live%20stream%20management.png?alt=media&token=0edfb6cd-6b50-4906-9a10-f42f38c8ac45",
       isExternal: false,
    },
    {
@@ -139,7 +139,7 @@ const guideCards: GuideCard[] = [
       text: "Showcase your career fairs, info sessions, and on-campus events to a targeted audience already engaged with your company. Increase registrations and attendance by leveraging our platform.",
       cta: "Talk to us",
       url: "https://meetings.hubspot.com/denis-lehn-koza/clientdemocallcalender",
-      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/offline.png?alt=media&token=83692ead-e6f4-4d9d-b564-125101fbb79b",
+      image: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/Promote-offline-events-source.png?alt=media&token=541d0521-0cdd-497c-9583-6d63186efa8e",
       isExternal: true,
    },
 ]
@@ -193,8 +193,8 @@ const GuidesCard = () => {
    )
 
    return (
-      <CardCustom 
-         title="Guides" 
+      <CardCustom
+         title="Guides"
          sx={{
             "& .MuiCardContent-root": {
                padding: "16px",
@@ -206,7 +206,6 @@ const GuidesCard = () => {
          customAction={customAction}
       >
          <Box sx={styles.carouselContainer}>
-
             <Box sx={styles.carousel}>
                <Box
                   sx={{
@@ -215,7 +214,11 @@ const GuidesCard = () => {
                   }}
                >
                   {guideCards.map((card) => (
-                     <Box key={card.id} sx={styles.card} data-testid={`guide-card-${card.id}`}>
+                     <Box
+                        key={card.id}
+                        sx={styles.card}
+                        data-testid={`guide-card-${card.id}`}
+                     >
                         <Box sx={styles.cardImageWrapper}>
                            <Image
                               src={card.image}
@@ -238,7 +241,11 @@ const GuidesCard = () => {
                            component={Link}
                            href={getResolvedUrl(card)}
                            target={card.isExternal ? "_blank" : undefined}
-                           rel={card.isExternal ? "noopener noreferrer" : undefined}
+                           rel={
+                              card.isExternal
+                                 ? "noopener noreferrer"
+                                 : undefined
+                           }
                            data-testid={`guide-cta-${card.id}`}
                         >
                            {card.cta}
