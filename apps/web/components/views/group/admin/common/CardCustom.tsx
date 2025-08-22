@@ -41,11 +41,11 @@ const styles = sxStyles({
       fontWeight: 600,
    },
    cardContent: {
-      paddingX: (theme) => theme.spacing(3),
+      paddingX: (theme) => theme.spacing(2),
       paddingTop: 0,
    },
    cardHeader: {
-      paddingX: (theme) => theme.spacing(3),
+      paddingX: (theme) => theme.spacing(2),
       paddingBottom: (theme) => theme.spacing(1),
    },
    tooltip: {
