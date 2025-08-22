@@ -27,7 +27,6 @@ const styles = sxStyles({
       height: "100%",
       display: "flex",
       flexDirection: "column",
-      maxHeight: "400px",
    },
    questionsScrollContainer: (theme) => ({
       [theme.breakpoints.up("desktop")]: {
@@ -96,7 +95,11 @@ const styles = sxStyles({
 
 export const TopCommunityQuestionsCard = () => {
    const { group } = useGroup()
-   const { data: questions, isLoading, error } = useTopCommunityQuestions(group.id)
+   const {
+      data: questions,
+      isLoading,
+      error,
+   } = useTopCommunityQuestions(group.id)
 
    const renderContent = () => {
       if (isLoading) {
@@ -127,7 +130,8 @@ export const TopCommunityQuestionsCard = () => {
                      No questions yet
                   </Typography>
                   <Typography sx={styles.emptyText}>
-                     Your top questions will appear here once you publish a live stream and your community starts asking.
+                     Your top questions will appear here once you publish a live
+                     stream and your community starts asking.
                   </Typography>
                </Box>
             </Box>
@@ -139,15 +143,18 @@ export const TopCommunityQuestionsCard = () => {
             <Box sx={styles.questionsScrollContainer}>
                <Stack spacing={1}>
                   {questions.map((question, index) => (
-                     <Box key={`${question.id}-${index}`} sx={styles.questionCard}>
+                     <Box
+                        key={`${question.id}-${index}`}
+                        sx={styles.questionCard}
+                     >
                         <Typography variant="medium" sx={styles.questionText}>
                            {question.title}
                         </Typography>
-                        
-                        <Stack 
-                           direction="row" 
-                           justifyContent="space-between" 
-                           alignItems="center" 
+
+                        <Stack
+                           direction="row"
+                           justifyContent="space-between"
+                           alignItems="center"
                            mt={1}
                         >
                            <Box sx={styles.likesContainer}>
@@ -156,10 +163,12 @@ export const TopCommunityQuestionsCard = () => {
                                  {question.votes || 0} likes
                               </Typography>
                            </Box>
-                           
-                           {question.timestamp && (
+
+                           {Boolean(question.timestamp) && (
                               <Typography sx={styles.timeText}>
-                                 {DateUtil.getTimeAgo(question.timestamp.toDate())}
+                                 {DateUtil.getTimeAgo(
+                                    question.timestamp.toDate()
+                                 )}
                               </Typography>
                            )}
                         </Stack>
