@@ -7,26 +7,15 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
-   cardContainer: (theme) => ({
-      [theme.breakpoints.up("desktop")]: {
-         maxHeight: "400px",
-         display: "flex",
-         flexDirection: "column",
-         overflow: "hidden",
-      },
-      "& .MuiCardHeader-root": {
-         paddingX: (theme) => `${theme.spacing(2)} !important`,
-         paddingBottom: "16px",
-      },
-      "& .MuiCardContent-root": {
-         paddingX: (theme) => theme.spacing(2),
-      },
-   }),
    container: {
       p: 0,
       height: "100%",
       display: "flex",
       flexDirection: "column",
+      maxHeight: {
+         md: "400px",
+         xs: "100%",
+      },
    },
    questionsScrollContainer: (theme) => ({
       [theme.breakpoints.up("desktop")]: {
@@ -181,8 +170,6 @@ export const TopCommunityQuestionsCard = () => {
    }
 
    return (
-      <CardCustom title="Top community questions" sx={styles.cardContainer}>
-         {renderContent()}
-      </CardCustom>
+      <CardCustom title="Top community questions">{renderContent()}</CardCustom>
    )
 }
