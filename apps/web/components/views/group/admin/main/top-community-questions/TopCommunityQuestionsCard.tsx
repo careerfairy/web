@@ -27,6 +27,7 @@ const styles = sxStyles({
       height: "100%",
       display: "flex",
       flexDirection: "column",
+      maxHeight: "400px",
    },
    questionsScrollContainer: (theme) => ({
       [theme.breakpoints.up("desktop")]: {
@@ -80,6 +81,7 @@ const styles = sxStyles({
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
+      height: "100%",
    }),
    emptyTitle: {
       color: "neutral.800",
