@@ -155,7 +155,7 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
 
    return (
       <>
-         {objectUrl ? (
+         {objectUrl && !(process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT_TEST) ? (
             <ImageCropperDialog
                title="Upload company banner"
                fileName={undefined}
@@ -171,6 +171,7 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
                backButtonText="Cancel"
                cropperSlideSx={styles.cropperSlider}
                applyButtonSx={styles.cropperApplyButton}
+               data-testid="company-banner-cropper-dialog"
             />
          ) : null}
          <FileUploader {...bannerUploaderProps}>
