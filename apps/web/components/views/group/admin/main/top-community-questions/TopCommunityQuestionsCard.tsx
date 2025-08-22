@@ -15,11 +15,11 @@ const styles = sxStyles({
          overflow: "hidden",
       },
       "& .MuiCardHeader-root": {
-         paddingX: "16px",
+         paddingX: (theme) => `${theme.spacing(2)} !important`,
          paddingBottom: "16px",
       },
       "& .MuiCardContent-root": {
-         paddingX: "16px",
+         paddingX: (theme) => theme.spacing(2),
       },
    }),
    container: {
