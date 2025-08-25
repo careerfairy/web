@@ -57,16 +57,26 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "row",
       gap: 1,
+      // hack to ensure overflow visibility with parent padding
+      paddingX: "16px",
+      marginX: "-16px",
+      width: "calc(100% + 32px)", // Account for parent container padding (16px on each side)
    },
 })
 
 interface Props {
    speakers?: Speaker[]
    title?: string
+   subtitleType?: "position" | "company"
    onClick?: () => void
 }
 
-const Speakers: FC<Props> = ({ speakers, title = "Speakers", ...props }) => {
+const Speakers: FC<Props> = ({
+   speakers,
+   title = "Speakers",
+   subtitleType = "position",
+   ...props
+}) => {
    if (!speakers) {
       return null
    }
@@ -76,7 +86,12 @@ const Speakers: FC<Props> = ({ speakers, title = "Speakers", ...props }) => {
          {title ? <SectionTitle>{title}</SectionTitle> : null}
          <HorizontalScroll sx={styles.speakersWrapper}>
             {speakers.map((speaker) => (
-               <SpeakerCard key={speaker.id} speaker={speaker} {...props} />
+               <SpeakerCard
+                  key={speaker.id}
+                  speaker={speaker}
+                  subtitleType={subtitleType}
+                  {...props}
+               />
             ))}
          </HorizontalScroll>
       </Box>
@@ -85,10 +100,15 @@ const Speakers: FC<Props> = ({ speakers, title = "Speakers", ...props }) => {
 
 type SpeakerCardProps = {
    speaker: Speaker
+   subtitleType?: "position" | "company"
    onClick?: () => void
 }
 
-const SpeakerCard: FC<SpeakerCardProps> = ({ speaker, onClick }) => {
+const SpeakerCard: FC<SpeakerCardProps> = ({
+   speaker,
+   subtitleType = "position",
+   onClick,
+}) => {
    const { goToSpeakerDetails } = useLiveStreamDialog()
    const displayName = `${speaker.firstName ?? ""} ${speaker.lastName ?? ""}`
 
@@ -134,7 +154,9 @@ const SpeakerCard: FC<SpeakerCardProps> = ({ speaker, onClick }) => {
                   whiteSpace="nowrap"
                   variant="small"
                >
-                  {speaker.position}
+                  {subtitleType === "position"
+                     ? speaker.position
+                     : speaker.companyName}
                </Typography>
             </Stack>
          </Stack>

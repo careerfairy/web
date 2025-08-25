@@ -40,7 +40,9 @@ const ButtonElement = () => {
             <RegisterButton
                label={
                   registered
-                     ? "You attended this live stream"
+                     ? livestreamPresenter.isPanel
+                        ? "You attended this event"
+                        : "You attended this live stream"
                      : "Recording Not Available"
                }
                toolTip={registered ? undefined : denyRecordingText}
@@ -66,10 +68,24 @@ const ButtonElement = () => {
    }
 
    if (livestreamPresenter.isLive()) {
-      return <RegisterButton label="Join live stream" />
+      return (
+         <RegisterButton
+            label={
+               livestreamPresenter.isPanel ? "Join event" : "Join live stream"
+            }
+         />
+      )
    }
 
-   return <RegisterButton label="Register to live stream" />
+   return (
+      <RegisterButton
+         label={
+            livestreamPresenter.isPanel
+               ? "Register to event"
+               : "Register to live stream"
+         }
+      />
+   )
 }
 
 type LinkTextProps = {

@@ -74,6 +74,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly denyRecordingAccess: boolean,
       public readonly hasJobs: boolean,
       public readonly useOldUI: boolean,
+      public readonly isPanel: boolean,
 
       // ATS Jobs
       /**
@@ -323,6 +324,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess ?? false,
          livestream.hasJobs ?? false,
          livestream.useOldUI ?? false,
+         livestream.isPanel ?? false,
          livestream.jobs ?? [],
          livestream.targetCountries ?? [],
          livestream.targetUniversities ?? [],
@@ -390,6 +392,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess,
          livestream.hasJobs,
          livestream.useOldUI,
+         livestream.isPanel,
          livestream.jobs,
          livestream.targetCountries,
          livestream.targetUniversities,
@@ -496,6 +499,7 @@ export class LivestreamPresenter extends BaseModel {
          parentLivestream: this.parentLivestream,
          denyRecordingAccess: this.denyRecordingAccess,
          triGrams: this.triGrams,
+         isPanel: this.isPanel,
       }
    }
 }

@@ -509,6 +509,7 @@ export interface Speaker extends Identifiable {
    linkedInUrl?: string
    roles: CreatorRole[]
    groupId?: string
+   companyName?: string
 }
 
 export interface LiveSpeaker extends Identifiable {
