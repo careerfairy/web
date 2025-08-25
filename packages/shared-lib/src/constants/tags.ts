@@ -52,10 +52,6 @@ export const BusinessFunctionsTags = {
       id: "Operations",
       name: "Operations",
    },
-   Other: {
-      id: "Other",
-      name: "Other",
-   },
    ProductManagement: {
       id: "ProductManagement",
       name: "Product management",
@@ -67,6 +63,10 @@ export const BusinessFunctionsTags = {
    SupplyChainLogistics: {
       id: "SupplyChainLogistics",
       name: "Supply chain & logistics",
+   },
+   Other: {
+      id: "Other",
+      name: "Other",
    },
 } as const
 
