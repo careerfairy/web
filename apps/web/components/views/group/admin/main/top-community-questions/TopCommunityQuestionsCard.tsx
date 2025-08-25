@@ -1,10 +1,10 @@
 import { Box, Stack, Typography } from "@mui/material"
-import { ThumbsUp } from "react-feather"
-import { sxStyles } from "types/commonTypes"
-import CardCustom from "../../common/CardCustom"
 import { useTopCommunityQuestions } from "components/custom-hook/group/useTopCommunityQuestions"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { ThumbsUp } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
+import CardCustom from "../../common/CardCustom"
 
 const styles = sxStyles({
    container: {
@@ -12,18 +12,12 @@ const styles = sxStyles({
       height: "100%",
       display: "flex",
       flexDirection: "column",
+      overflow: "scroll",
       maxHeight: {
          md: "400px",
          xs: "100%",
       },
    },
-   questionsScrollContainer: (theme) => ({
-      [theme.breakpoints.up("desktop")]: {
-         overflowY: "auto",
-         flex: 1,
-         minHeight: 0,
-      },
-   }),
    questionCard: (theme) => ({
       border: `1px solid ${theme.brand.white[500]}`,
       backgroundColor: theme.brand.white[300],
@@ -129,7 +123,7 @@ export const TopCommunityQuestionsCard = () => {
 
       return (
          <Box sx={styles.container}>
-            <Box sx={styles.questionsScrollContainer}>
+            <Box>
                <Stack spacing={1}>
                   {questions.map((question, index) => (
                      <Box
@@ -170,6 +164,11 @@ export const TopCommunityQuestionsCard = () => {
    }
 
    return (
-      <CardCustom title="Top community questions">{renderContent()}</CardCustom>
+      <CardCustom
+         cardContentSx={{ height: "100%" }}
+         title="Top community questions"
+      >
+         {renderContent()}
+      </CardCustom>
    )
 }
