@@ -19,6 +19,37 @@ import { LivestreamStats } from "./LivestreamStats"
 
 const styles = sxStyles({
    noLivestreamCopy: { color: (theme) => theme.palette.grey[500] },
+   noLivestreamContainer: {
+      backgroundColor: theme => theme.brand.white?.[300] || "#FAFAFE",
+      borderRadius: "12px",
+      p: 3,
+      textAlign: "center",
+   },
+   noLivestreamTitle: {
+      color: "neutral.800",
+      fontSize: "16px",
+      fontWeight: 600,
+      lineHeight: "24px",
+      mb: 1,
+   },
+   noLivestreamSubtitle: {
+      color: "neutral.800", 
+      fontSize: "16px",
+      fontWeight: 400,
+      lineHeight: "24px",
+      mb: 3,
+   },
+   scheduleButton: {
+      backgroundColor: "secondary.600", // Purple 600
+      color: theme => theme.brand.white?.[50] || "#FFFFFF", // White 50
+      borderRadius: "8px",
+      px: 3,
+      py: 1.5,
+      textTransform: "none",
+      "&:hover": {
+         backgroundColor: "secondary.700", // Purple 700
+      },
+   },
    card: {
       width: "100%",
    },
@@ -293,23 +324,23 @@ const LoadingSkeleton = () => {
 const NoLivestreams = () => {
    const { createDraftLivestream, isCreating } = useLivestreamRouting()
    return (
-      <Box>
-         <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
-            Looks like you don&apos;t have any upcoming live stream.
-            <br />
-            Start creating your next live stream now!
+      <Box sx={styles.noLivestreamContainer}>
+         <Typography sx={styles.noLivestreamTitle}>
+            No upcoming live streams
          </Typography>
 
-         <Box mt={2} mb={3} display="flex" justifyContent="center">
-            <LoadingButton
-               color="secondary"
-               variant="contained"
-               onClick={createDraftLivestream}
-               loading={isCreating}
-            >
-               Create New Live Stream
-            </LoadingButton>
-         </Box>
+         <Typography sx={styles.noLivestreamSubtitle}>
+            Schedule your next live stream to engage your audience. Once published it will appear here.
+         </Typography>
+
+         <LoadingButton
+            sx={styles.scheduleButton}
+            onClick={createDraftLivestream}
+            loading={isCreating}
+            variant="contained"
+         >
+            Schedule a live stream
+         </LoadingButton>
       </Box>
    )
 }
