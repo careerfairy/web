@@ -52,8 +52,8 @@ const styles = sxStyles({
       textAlign: "center",
       py: 4,
    },
-   emptyCard: {
-      backgroundColor: "neutral.50",
+   emptyCard: (theme) => ({
+      backgroundColor: theme.brand.white[300],
       borderRadius: "8px",
       px: 2,
       py: 7,
@@ -65,13 +65,13 @@ const styles = sxStyles({
       alignItems: "center",
       gap: 2.5,
       height: "100%",
-   },
+   }),
    emptyTitle: {
-      color: "neutral.700",
+      color: "neutral.800",
       fontWeight: 600,
    },
    emptyText: {
-      color: "neutral.700",
+      color: "neutral.800",
    },
 })
 
@@ -109,7 +109,7 @@ export const TopCommunityQuestionsCard = () => {
             <Box sx={styles.container}>
                <Box sx={styles.emptyCard}>
                   <Typography variant="small" sx={styles.emptyTitle}>
-                     No Questions Yet
+                     No questions yet
                   </Typography>
                   <Typography variant="small" sx={styles.emptyText}>
                      Your top questions will appear here once your community starts asking.
