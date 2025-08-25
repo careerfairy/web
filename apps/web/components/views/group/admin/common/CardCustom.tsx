@@ -14,13 +14,13 @@ import {
    tooltipClasses,
    TooltipProps,
 } from "@mui/material"
+import { styled } from "@mui/material/styles"
 import { type Options } from "@sentry/types"
 import useMenuState from "components/custom-hook/useMenuState"
 import { FC, useCallback, useMemo, useState } from "react"
 import { ChevronDown, ChevronRight } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import Link from "../../../common/Link"
-import { styled } from "@mui/material/styles"
 
 const styles = sxStyles({
    card: {
@@ -73,6 +73,7 @@ type Props = {
    optionsHandler?: OptionsProps["handler"]
    helpTooltip?: string
    sx?: SxProps<Theme>
+   cardContentSx?: SxProps<Theme>
    customAction?: React.ReactNode
    disableTypography?: boolean
    children: React.ReactNode
@@ -89,6 +90,7 @@ const CardCustom: FC<Props> = ({
    helpTooltip,
    subHeader,
    sx,
+   cardContentSx,
    customAction,
    disableTypography = false,
 }) => {
@@ -123,7 +125,7 @@ const CardCustom: FC<Props> = ({
             disableTypography={disableTypography}
             subheader={<span data-testid="card-subheader">{subHeader}</span>}
          />
-         <CardContent sx={styles.cardContent}>
+         <CardContent sx={combineStyles(styles.cardContent, cardContentSx)}>
             <span data-testid="card-value">{children}</span>
          </CardContent>
       </Card>
