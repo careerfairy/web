@@ -59,7 +59,7 @@ const styles = sxStyles({
    subtitle: {
       display: { xs: "flex", md: "block" },
       flexDirection: "column",
-
+      minHeight: "73.5px",
       fontSize: "14px",
       color: (theme) => theme.palette.neutral[500],
       fontWeight: 400,
