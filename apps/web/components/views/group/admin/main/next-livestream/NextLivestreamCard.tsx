@@ -144,11 +144,7 @@ const styles = sxStyles({
       gap: 1,
       p: 1,
    },
-   metricIcon: {
-      width: 16,
-      height: 16,
-      color: "secondary.main",
-   },
+
    metricContent: {
       display: "flex",
       flexDirection: "column",
@@ -307,6 +303,182 @@ const LoadingSkeleton = () => {
             </Grid>
          </Grid>
       </CardCustom>
+   )
+}
+
+// Upcoming Livestream Variant Component
+const UpcomingLivestreamVariant = ({ livestream }: { livestream: LivestreamEvent }) => {
+   return (
+      <CardActionArea sx={styles.upcomingCardWrapper}>
+         <Stack sx={styles.upcomingCardContent}>
+            {/* Hero Image Section */}
+            <HeroSection livestream={livestream} />
+            
+            {/* Company Name */}
+            <CompanySection livestream={livestream} />
+            
+            {/* Description Section */}
+            <Stack sx={styles.descriptionWrapper} spacing={1}>
+               <LivestreamTitle livestream={livestream} />
+               <LivestreamSummary livestream={livestream} />
+               
+               {/* Metrics and Buttons Section */}
+               <MetricsAndButtonsSection livestream={livestream} />
+            </Stack>
+         </Stack>
+      </CardActionArea>
+   )
+}
+
+const HeroSection = ({ livestream }: { livestream: LivestreamEvent }) => {
+   const backgroundImageUrl = livestream.backgroundImageUrl 
+      ? getResizedUrl(livestream.backgroundImageUrl, 400, 250)
+      : placeholderBanner
+   
+   return (
+      <Box sx={styles.heroSection}>
+         <Box
+            component="img"
+            src={backgroundImageUrl}
+            alt={livestream.title || "Livestream background"}
+            sx={styles.backgroundImage}
+            className="backgroundImage"
+         />
+      </Box>
+   )
+}
+
+const CompanySection = ({ livestream }: { livestream: LivestreamEvent }) => {
+   return (
+      <Box sx={styles.headerWrapper}>
+         <CircularLogo
+            src={livestream?.companyLogoUrl}
+            alt={`logo of company ${livestream?.company}`}
+            size={65}
+         />
+         <Box sx={styles.companyNameWrapper}>
+            <Typography variant="small" sx={styles.companyName}>
+               {livestream?.company}
+            </Typography>
+         </Box>
+      </Box>
+   )
+}
+
+const LivestreamTitle = ({ livestream }: { livestream: LivestreamEvent }) => {
+   return (
+      <Typography
+         variant="brandedBody"
+         color="text.primary"
+         sx={styles.title}
+      >
+         {livestream?.title || "Untitled Live Stream"}
+      </Typography>
+   )
+}
+
+const LivestreamSummary = ({ livestream }: { livestream: LivestreamEvent }) => {
+   return (
+      <Typography
+         variant="small"
+         color="text.secondary"
+         sx={styles.summary}
+      >
+         {livestream?.summary || "No description provided"}
+      </Typography>
+   )
+}
+
+const MetricsAndButtonsSection = ({ livestream }: { livestream: LivestreamEvent }) => {
+   return (
+      <Box sx={styles.metricsSection}>
+         {/* Metrics Row */}
+         <Box sx={styles.metricsRow}>
+            <TalentReachedMetric livestreamId={livestream.id} />
+            <RegistrationsMetric livestreamId={livestream.id} />
+            <QuestionsMetric livestreamId={livestream.id} />
+         </Box>
+         
+         {/* Buttons Row */}
+         <Box sx={styles.buttonsRow}>
+            <Button sx={styles.shareButton} variant="outlined">
+               <Share size={14} />
+               <Typography sx={styles.shareButtonText}>
+                  Share with your audience
+               </Typography>
+            </Button>
+            <GoToLivestreamButton livestreamId={livestream.id} />
+         </Box>
+      </Box>
+   )
+}
+
+// Metric Components
+const TalentReachedMetric = ({ livestreamId }: { livestreamId: string }) => {
+   const data = useFirestoreDocument<LiveStreamStats>("livestreams", [
+      livestreamId,
+      "stats",
+      "livestreamStats",
+   ])
+
+   const talentReached = data.data ? totalPeopleReachedByLivestreamStat(data.data) : 0
+
+   return (
+      <Box sx={styles.metricItem}>
+         <User size={16} color="#6749EA" />
+         <Box sx={styles.metricContent}>
+            <Typography sx={styles.metricLabel}>Talent reached</Typography>
+            <Typography sx={styles.metricValue}>
+               <SuspenseWithBoundary fallback="0" hide>
+                  {talentReached}
+               </SuspenseWithBoundary>
+            </Typography>
+         </Box>
+      </Box>
+   )
+}
+
+const RegistrationsMetric = ({ livestreamId }: { livestreamId: string }) => {
+   const { group } = useGroup()
+   const data = useFirestoreDocument<LiveStreamStats>("livestreams", [
+      livestreamId,
+      "stats", 
+      "livestreamStats",
+   ])
+
+   let count = data.data?.generalStats?.numberOfRegistrations ?? 0
+   if (
+      group.universityId &&
+      data.data?.universityStats?.[group.universityId]?.numberOfRegistrations
+   ) {
+      count = data.data.universityStats[group.universityId].numberOfRegistrations
+   }
+
+   return (
+      <Box sx={styles.metricItem}>
+         <BarChart size={16} color="#6749EA" />
+         <Box sx={styles.metricContent}>
+            <Typography sx={styles.metricLabel}>Registrations</Typography>
+            <Typography sx={styles.metricValue}>
+               <SuspenseWithBoundary fallback="0" hide>
+                  {count}
+               </SuspenseWithBoundary>
+            </Typography>
+         </Box>
+      </Box>
+   )
+}
+
+const QuestionsMetric = ({ livestreamId }: { livestreamId: string }) => {
+   // For now, showing placeholder as questions stat implementation needs to be added
+   return (
+      <Box sx={styles.metricItem}>
+         <MessageCircle size={16} color="#6749EA" />
+         <Box sx={styles.metricContent}>
+            <Typography sx={styles.metricLabel}>Total questions</Typography>
+            <Typography sx={styles.metricValue}>0</Typography>
+         </Box>
+      </Box>
    )
 }
 
