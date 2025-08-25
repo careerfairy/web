@@ -52,27 +52,26 @@ const styles = sxStyles({
       textAlign: "center",
       py: 4,
    },
-   emptyCard: (theme) => ({
-      border: `1px solid ${theme.brand.white[500]}`,
-      backgroundColor: theme.brand.white[300],
-      borderRadius: "12px",
-      p: 1.5,
+   emptyCard: {
+      backgroundColor: "neutral.50",
+      borderRadius: "8px",
+      px: 2,
+      py: 7,
       textAlign: "center",
       flex: 1,
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
+      gap: 2.5,
       height: "100%",
-   }),
+   },
    emptyTitle: {
-      color: "neutral.800",
-      fontWeight: 500,
-      mb: "12px",
+      color: "neutral.700",
+      fontWeight: 600,
    },
    emptyText: {
-      color: "neutral.600",
-      fontSize: "14px",
+      color: "neutral.700",
    },
 })
 
@@ -109,12 +108,11 @@ export const TopCommunityQuestionsCard = () => {
          return (
             <Box sx={styles.container}>
                <Box sx={styles.emptyCard}>
-                  <Typography variant="medium" sx={styles.emptyTitle}>
-                     No questions yet
+                  <Typography variant="small" sx={styles.emptyTitle}>
+                     No Questions Yet
                   </Typography>
-                  <Typography sx={styles.emptyText}>
-                     Your top questions will appear here once you publish a live
-                     stream and your community starts asking.
+                  <Typography variant="small" sx={styles.emptyText}>
+                     Your top questions will appear here once your community starts asking.
                   </Typography>
                </Box>
             </Box>
