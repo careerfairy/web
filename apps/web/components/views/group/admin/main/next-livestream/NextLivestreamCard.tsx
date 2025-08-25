@@ -1,24 +1,13 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { LoadingButton } from "@mui/lab"
-import { Box, Button, Grid, Skeleton, Typography, Stack, Card, CardContent } from "@mui/material"
+import { Box, Grid, Skeleton, Typography } from "@mui/material"
 import { useCallback, useMemo } from "react"
-import { CheckCircle, User, BarChart, MessageCircle, Share, Video } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import DateUtil from "util/DateUtil"
-import { useFirestoreDocument } from "components/custom-hook/utils/useFirestoreDocument"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { totalPeopleReachedByLivestreamStat } from "../../common/util"
 import CardCustom from "../../common/CardCustom"
 import { useLivestreamRouting } from "../../events/useLivestreamRouting"
 import { useMainPageContext } from "../MainPageProvider"
-import { GoToLivestreamButton } from "./GoToLivestreamButton"
-import { LivestreamChips } from "./LivestreamChips"
-import { LivestreamStats } from "./LivestreamStats"
 
 const styles = sxStyles({
-   noLivestreamCopy: { color: (theme) => theme.palette.grey[500] },
    noLivestreamContainer: {
       backgroundColor: theme => theme.brand.white?.[300] || "#FAFAFE",
       borderRadius: "12px",
@@ -48,73 +37,6 @@ const styles = sxStyles({
       textTransform: "none",
       "&:hover": {
          backgroundColor: "secondary.700", // Purple 700
-      },
-   },
-   card: {
-      width: "100%",
-   },
-   cardContent: {
-      paddingX: (theme) => theme.spacing(3),
-      paddingTop: 0,
-   },
-   cardEmpty: {
-      "& .MuiCardContent-root": {
-         height: "100%",
-         display: "flex",
-         alignItems: "center",
-         justifyContent: "center",
-      },
-   },
-   cardCustom: {
-      ".MuiCardContent-root": {
-         height: "80%",
-         paddingBottom: 0,
-         display: "flex",
-         flexDirection: "column",
-      },
-   },
-   cardTitleTypographyProps: {
-      fontWeight: 500,
-   },
-   cardHeader: {
-      paddingX: (theme) => theme.spacing(3),
-      paddingBottom: (theme) => theme.spacing(1),
-   },
-   cardTitleProps: {
-      fontWeight: 400,
-      fontSize: "0.929rem",
-      color: (t) => t.palette.grey[600],
-      paddingTop: (t) => t.spacing(1),
-   },
-   draftStatusText: {
-      marginLeft: "auto",
-      fontWeight: 600,
-      fontSize: "0.813rem",
-      color: (theme) => theme.palette.gold.main,
-   },
-   publishedStatusText: {
-      marginLeft: "auto",
-      fontWeight: 600,
-      fontSize: "0.813rem",
-      color: (theme) => theme.palette.primary.main,
-   },
-   publishedStatusIcon: {
-      color: "#00d2aa",
-      marginLeft: "5px",
-   },
-   title: {
-      fontWeight: 600,
-      fontSize: "1.714rem",
-   },
-   date: {
-      fontWeight: 400,
-      fontSize: "1.071rem",
-   },
-   buttonManage: {
-      border: "none",
-      textTransform: "none",
-      "&:hover": {
-         border: "none",
       },
    },
 })
@@ -184,119 +106,22 @@ export const NextLivestreamCard = () => {
    }
 
    if (noLivestreams()) {
-      return (
-         <CardCustom title={undefined} sx={styles.cardEmpty}>
-            <NoLivestreams />
-         </CardCustom>
-      )
+      return <NoLivestreams />
    }
 
+   // TODO: Implement new upcoming livestream variant
+   // For now, return a placeholder until the new variant is implemented
    return (
-      <CardCustom sx={styles.cardCustom} title={<TitleBar />}>
-         <LivestreamDetails livestream={livestream} />
-      </CardCustom>
-   )
-}
-
-const LivestreamDetails = ({ livestream }: { livestream: LivestreamEvent }) => {
-   return (
-      <>
-         <Box sx={{ flex: 1 }}>
-            <Box display="flex" mt={2}>
-               <Typography sx={styles.date}>
-                  {livestream.start
-                     ? DateUtil.eventPreviewDate(livestream.start.toDate())
-                     : "Future Date"}
-               </Typography>
-            </Box>
-            <Box mt={1}>
-               <Typography variant="h5" sx={styles.title}>
-                  {livestream.title?.length > 0
-                     ? livestream.title
-                     : "Untitled Live Stream"}
-               </Typography>
-            </Box>
-
-            <LivestreamStats livestream={livestream} />
-            <LivestreamChips livestream={livestream} />
-         </Box>
-         <Box sx={{ flex: "none" }}>
-            <Actions livestream={livestream} />
-         </Box>
-      </>
-   )
-}
-
-const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
-   const { isDraft, isCloseToLivestreamStart } = useNextLivestreamCardLogic()
-   const { editLivestream } = useLivestreamRouting()
-
-   const onManageLivestream = useCallback(() => {
-      livestream.isDraft = isDraft()
-      return editLivestream(livestream.id)
-   }, [isDraft, livestream, editLivestream])
-
-   return (
-      <Box textAlign="right" my={2}>
-         {isDraft() ? (
-            <Button
-               color="secondary"
-               variant="contained"
-               onClick={onManageLivestream}
-            >
-               Manage your live stream
-            </Button>
-         ) : isCloseToLivestreamStart() ? (
-            <>
-               <Button
-                  color="secondary"
-                  variant="outlined"
-                  sx={styles.buttonManage}
-                  onClick={onManageLivestream}
-               >
-                  Manage your live stream
-               </Button>
-               <GoToLivestreamButton livestreamId={livestream.id} />
-            </>
-         ) : (
-            <Button
-               color="secondary"
-               variant="contained"
-               onClick={onManageLivestream}
-            >
-               Manage your live stream
-            </Button>
-         )}
-      </Box>
-   )
-}
-
-const TitleBar = () => {
-   const { isDraft } = useNextLivestreamCardLogic()
-
-   return (
-      <Box display="flex" alignItems="center">
-         <Typography sx={styles.cardTitleProps}>
-            Your next live stream
+      <Box sx={{ p: 3, textAlign: "center" }}>
+         <Typography variant="h6">Upcoming livestream variant coming soon</Typography>
+         <Typography color="text.secondary" mt={1}>
+            Livestream: {livestream.title || "Untitled"}
          </Typography>
-
-         {isDraft() ? <DraftStatus /> : <PublishedStatus />}
       </Box>
    )
 }
 
-const DraftStatus = () => {
-   return <Typography sx={styles.draftStatusText}>Draft</Typography>
-}
 
-const PublishedStatus = () => {
-   return (
-      <>
-         <Typography sx={styles.publishedStatusText}>Published</Typography>
-         <CheckCircle style={styles.publishedStatusIcon} width={16} />
-      </>
-   )
-}
 
 const LoadingSkeleton = () => {
    return (
