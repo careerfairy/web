@@ -59,12 +59,33 @@ export const useTextTruncation = (
       }
    }, [element, width, fontStyle])
 
+   const effectiveWidth = useMemo(() => {
+      if (!element) return width || 0
+
+      let measured = width || 0
+      if (measured <= 0) {
+         const rectWidth = element.getBoundingClientRect?.().width || 0
+         if (rectWidth > 0) measured = rectWidth
+      }
+      if (measured <= 0) {
+         const scrollWidth = (element as HTMLElement).scrollWidth || 0
+         if (scrollWidth > 0) measured = scrollWidth
+      }
+      if (measured <= 0) {
+         const parent = element.parentElement
+         const parentWidth =
+            parent?.getBoundingClientRect?.().width || parent?.clientWidth || 0
+         if (parentWidth > 0) measured = parentWidth
+      }
+      return measured
+   }, [element, width])
+
    const result = useMemo(() => {
-      if (!element || !width || !items || items.length === 0) {
+      if (!element || !effectiveWidth || !items || items.length === 0) {
          const joinedItems = items?.join(separator) || ""
          return {
             truncatedText: joinedItems.trimEnd(),
-            plusCount: null,
+            plusCount: 0,
             shouldShowTooltip: false,
          }
       }
@@ -73,8 +94,8 @@ export const useTextTruncation = (
       if (ctx) {
          ctx.font = fontStyle
       }
-      return calculateOptimalTruncation(ctx, items, width, separator)
-   }, [items, width, separator, element, fontStyle])
+      return calculateOptimalTruncation(ctx, items, effectiveWidth, separator)
+   }, [items, effectiveWidth, separator, element, fontStyle])
 
    return [ref, result, fontStyle]
 }

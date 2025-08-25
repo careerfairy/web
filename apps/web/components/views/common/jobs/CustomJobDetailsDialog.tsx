@@ -281,7 +281,7 @@ export const InlineCustomJobDetailsContent = (
          hideCTAButtons
          suspense={false}
       >
-         <Stack spacing={0} alignItems={"space-between"} height={"100%"}>
+         <Stack spacing={0} justifyContent={"space-between"} height={"100%"}>
             <Box sx={styles.inlineContentWrapper}>
                <Content
                   {...props}
