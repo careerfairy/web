@@ -17,6 +17,12 @@ const styles = sxStyles({
          md: "400px",
          xs: "100%",
       },
+      scrollbarWidth: "none" /* Firefox */,
+      msOverflowStyle: "none" /* Internet Explorer 10+ */,
+      "&::-webkit-scrollbar": {
+         /* WebKit */ width: 0,
+         height: 0,
+      },
    },
    questionCard: (theme) => ({
       border: `1px solid ${theme.brand.white[500]}`,
