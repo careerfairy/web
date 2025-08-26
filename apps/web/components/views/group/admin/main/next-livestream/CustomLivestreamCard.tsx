@@ -74,12 +74,15 @@ const CustomLivestreamCard = forwardRef<HTMLDivElement, CustomLivestreamCardProp
       })
 
       const isPast = checkIfPast(event)
-      const isPlaceholderEvent = event?.id.includes("placeholderEvent")
+      const isPlaceholderEvent = event?.id.includes("placeholderEvent") || false
+
+      if (!event) {
+         return null
+      }
 
       return (
          <Box>
             <EventPreviewCardProvider
-               event={event}
                livestream={event}
                isPlaceholderEvent={isPlaceholderEvent}
                hasRegistered={hasRegistered}
