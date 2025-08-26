@@ -16,9 +16,9 @@ export const makeGroupCompanyPageUrl = (
 }
 
 export const makeLivestreamEventDetailsInviteUrl = (
-   livestreamId,
-   referralCode
-) => {
+   livestreamId: string,
+   referralCode?: string
+): string => {
    return (
       makeLivestreamEventDetailsUrl(livestreamId, {
          overrideBaseUrl: getBaseUrl(),
