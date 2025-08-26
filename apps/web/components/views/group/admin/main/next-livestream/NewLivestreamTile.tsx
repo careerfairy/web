@@ -169,11 +169,11 @@ type UpcomingVariantProps = {
 }
 
 function getUserJoiningLinkType(
-   userData: UserData,
+   userData: UserData | null,
    groupId: string,
-   adminGroups: AdminGroupsClaim
-) {
-   if (!userData) {
+   adminGroups: AdminGroupsClaim | null
+): string {
+   if (!userData || !adminGroups) {
       return "main-streamer"
    }
 
@@ -213,7 +213,7 @@ const UpcomingVariant = ({ livestream }: UpcomingVariantProps) => {
          .getLivestreamSecureToken(livestream.id)
          .then((doc) => {
             if (doc.exists) {
-               let secureToken: string = doc.data().value
+               const secureToken: string = doc.data().value
                const type = getUserJoiningLinkType(
                   userData,
                   groupId as string,
