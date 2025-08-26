@@ -6,7 +6,7 @@ import { AnalyticsTile } from "./analytics/AnalyticsTile"
 import GuidesCard from "./guides/GuidesCard"
 import { MainPageProvider } from "./MainPageProvider"
 import { NewLivestreamTile } from "./next-livestream/NewLivestreamTile"
-import { QuickActions } from "./quick-actions/QuickActions"
+import { QuickActions } from "./quick-actions"
 import { AggregatedRegistrationSourcesCard } from "./registration-sources/AggregatedRegistrationSourcesCard"
 import { TopCommunityQuestionsCard } from "./top-community-questions/TopCommunityQuestionsCard"
 
