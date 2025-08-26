@@ -5,8 +5,8 @@ import { sxStyles } from "types/commonTypes"
 import { AnalyticsTile } from "./analytics/AnalyticsTile"
 import GuidesCard from "./guides/GuidesCard"
 import { MainPageProvider } from "./MainPageProvider"
-import { NextLivestreamCard } from "./next-livestream/NextLivestreamCard"
-import { QuickActions } from "./quick-actions"
+import { NewLivestreamTile } from "./next-livestream/NewLivestreamTile"
+import { QuickActions } from "./quick-actions/QuickActions"
 import { AggregatedRegistrationSourcesCard } from "./registration-sources/AggregatedRegistrationSourcesCard"
 import { TopCommunityQuestionsCard } from "./top-community-questions/TopCommunityQuestionsCard"
 
@@ -31,7 +31,7 @@ const PageContent = () => {
             <QuickActions />
             <Grid container spacing={3}>
                <Grid xs={12} md={7} item style={styles.gridItem}>
-                  <NextLivestreamCard />
+                  <NewLivestreamTile />
                </Grid>
 
                <Grid xs={12} md={5} item style={styles.gridItem}>
