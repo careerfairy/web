@@ -1,5 +1,4 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { LoadingButton } from "@mui/lab"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import { Eye, User, MessageSquare } from "react-feather"
 import { useCallback, useState } from "react"
@@ -9,14 +8,15 @@ import { useLivestreamRouting } from "../../events/useLivestreamRouting"
 import { useMainPageContext } from "../MainPageProvider"
 import CustomLivestreamCard from "./CustomLivestreamCard"
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
-import { useAuth } from "HOCs/AuthProvider"
-import { useRouter } from "next/router"
-import { firebaseServiceInstance } from "data/firebase/FirebaseService"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { buildStreamerLink } from "util/streamUtil"
-import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/users"
-import { makeLivestreamEventDetailsInviteUrl } from "util/makeUrls"
-import { useCopyToClipboard } from "react-use"
+// Temporarily commenting out complex imports to isolate build issue
+// import { useAuth } from "HOCs/AuthProvider"
+// import { useRouter } from "next/router"
+// import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+// import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+// import { buildStreamerLink } from "util/streamUtil"
+// import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/users"
+// import { makeLivestreamEventDetailsInviteUrl } from "util/makeUrls"
+// import { useCopyToClipboard } from "react-use"
 
 const styles = sxStyles({
    // No upcoming variant styles
@@ -152,14 +152,14 @@ const NoUpcomingVariant = () => {
          <Typography variant="brandedBody" sx={styles.noUpcomingSubtitle}>
             Schedule your next live stream to engage your audience. Once published it will appear here.
          </Typography>
-         <LoadingButton
+         <Button
             variant="contained"
             onClick={createDraftLivestream}
-            loading={isCreating}
+            disabled={isCreating}
             sx={styles.scheduleButton}
          >
-            Schedule a live stream
-         </LoadingButton>
+            {isCreating ? "Creating..." : "Schedule a live stream"}
+         </Button>
       </CardCustom>
    )
 }
@@ -168,91 +168,18 @@ type UpcomingVariantProps = {
    livestream: LivestreamEvent
 }
 
-function getUserJoiningLinkType(
-   userData: UserData | null,
-   groupId: string,
-   adminGroups: AdminGroupsClaim | null
-): string {
-   if (userData?.isAdmin) {
-      return "main-streamer"
-   }
-
-   if (!userData || !adminGroups) {
-      return "main-streamer"
-   }
-
-   const role = adminGroups[groupId as string]
-
-   if (role?.role === "OWNER") {
-      return "main-streamer"
-   }
-
-   return "joining-streamer"
-}
+// Temporarily simplified to isolate build issues
 
 const UpcomingVariant = ({ livestream }: UpcomingVariantProps) => {
-   const { userData, adminGroups } = useAuth()
-   const router = useRouter()
-   const { groupId } = router.query
-   const { successNotification, errorNotification } = useSnackbarNotifications()
-   const [_, copyToClipboard] = useCopyToClipboard()
-   const [enterRoomLoading, setEnterRoomLoading] = useState(false)
-
    const handleShareClick = useCallback(() => {
-      try {
-         const eventUrl = makeLivestreamEventDetailsInviteUrl(
-            livestream.id,
-            userData?.referralCode
-         )
-
-         copyToClipboard(eventUrl)
-         successNotification(
-            "Live stream link has been copied to your clipboard",
-            "Copied"
-         )
-      } catch (error) {
-         errorNotification(error, "Failed to copy link")
-      }
-   }, [copyToClipboard, livestream.id, successNotification, userData?.referralCode, errorNotification])
+      // Simplified - just show alert for now
+      alert("Share functionality temporarily disabled for debugging")
+   }, [])
 
    const handleEnterRoomClick = useCallback(() => {
-      setEnterRoomLoading(true)
-      firebaseServiceInstance
-         .getLivestreamSecureToken(livestream.id)
-         .then((doc) => {
-            if (doc.exists) {
-               const secureToken: string = doc.data().value
-               const type = getUserJoiningLinkType(
-                  userData,
-                  groupId as string,
-                  adminGroups
-               )
-
-               window
-                  .open(
-                     buildStreamerLink(type, livestream.id, secureToken),
-                     "_blank"
-                  )
-                  ?.focus()
-            } else {
-               errorNotification(
-                  "Live stream doesn't have a secure token",
-                  "Failed to redirect to the live stream",
-                  {
-                     livestreamId: livestream.id,
-                  }
-               )
-            }
-         })
-         .catch((e) => {
-            errorNotification(e, "Failed to redirect to the live stream", {
-               livestreamId: livestream.id,
-            })
-         })
-         .finally(() => {
-            setEnterRoomLoading(false)
-         })
-   }, [adminGroups, errorNotification, groupId, livestream.id, userData])
+      // Simplified - just show alert for now  
+      alert("Enter room functionality temporarily disabled for debugging")
+   }, [])
 
    // Mock data for now - these should come from the livestream analytics
    const mockMetrics = {
@@ -300,14 +227,13 @@ const UpcomingVariant = ({ livestream }: UpcomingVariantProps) => {
                >
                   Share with your audience
                </Button>
-               <LoadingButton
+               <Button
                   variant="contained"
                   onClick={handleEnterRoomClick}
-                  loading={enterRoomLoading}
                   sx={styles.enterRoomButton}
                >
                   Enter the live stream room
-               </LoadingButton>
+               </Button>
             </Stack>
          </Box>
       </CardCustom>
