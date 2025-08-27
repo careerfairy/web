@@ -32,6 +32,7 @@ import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
+import { PanelsSection } from "./PanelsSection/PanelsSection"
 import RecentLivestreamsSection from "./RecentLivestreamsGrid"
 import { StreamsSection } from "./StreamsSection"
 
@@ -46,6 +47,12 @@ const styles = sxStyles({
       flex: 1,
       display: "flex",
       marginX: { xs: 2, md: 3 },
+   },
+   panelsRoot: {
+      flex: 1,
+      display: "flex",
+      marginX: { xs: 2, md: 3 },
+      mt: { xs: 2, md: 3 },
    },
    search: {
       flex: 1,
@@ -353,6 +360,10 @@ const NextLiveStreamsWithFilter = ({
                </Box>
             </Box>
          </Container>
+
+         <Box sx={styles.panelsRoot}>
+            <PanelsSection />
+         </Box>
 
          <StreamsSection
             value={initialTabValue}
