@@ -364,6 +364,7 @@ exports.markQuestionAsDone = streaming.markQuestionAsDone
 exports.toggleHandRaise = streaming.toggleHandRaise
 exports[FUNCTION_NAMES.upsertLivestreamSpeaker] =
    streaming.upsertLivestreamSpeaker
+exports[FUNCTION_NAMES.updateCreatorRoles] = streaming.updateCreatorRoles
 exports.createCTA = streaming.createCTA
 exports.deleteCTA = streaming.deleteCTA
 exports.updateCTA = streaming.updateCTA

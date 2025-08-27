@@ -9,7 +9,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { CircularProgress } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
-import useGroupCreators from "components/custom-hook/creator/useGroupCreators"
+import { useHostsCreatorsSWR } from "components/custom-hook/creator/useHostsCreatorsSWR"
 import useGroupCustomJobs from "components/custom-hook/custom-job/useGroupCustomJobs"
 import { Formik } from "formik"
 import { ReactNode } from "react"
@@ -23,7 +23,10 @@ import {
    LivestreamFormValues,
 } from "./types"
 import { livestreamFormValidationSchema } from "./validationSchemas"
-import { FeedbackQuestionFormValues, getFeedbackQuestionFormInitialValues } from "./views/questions/commons"
+import {
+   FeedbackQuestionFormValues,
+   getFeedbackQuestionFormInitialValues,
+} from "./views/questions/commons"
 import { useFeedbackQuestions } from "./views/questions/useFeedbackQuestions"
 
 const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
@@ -31,6 +34,7 @@ const formGeneralTabInitialValues: LivestreamFormGeneralTabValues = {
    hidden: false,
    company: "",
    companyLogoUrl: "",
+   panelLogoUrl: "",
    backgroundImageUrl: "",
    startDate: null,
    duration: null,
@@ -66,20 +70,15 @@ const formJobsTabInitialValues: LivestreamFormJobsTabValues = {
    customJobs: [],
 }
 
-const formInitialValues: LivestreamFormValues = {
-   general: { ...formGeneralTabInitialValues },
-   speakers: { ...formSpeakersTabInitialValues },
-   questions: { ...formQuestionsTabInitialValues },
-   jobs: { ...formJobsTabInitialValues },
-}
-
 const getFormInitialValues = (group?: Group): LivestreamFormValues => {
    const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
       registrationQuestions: {
          values: [],
          options: [],
       },
-      feedbackQuestions: getFeedbackQuestionFormInitialValues(group?.universityName),
+      feedbackQuestions: getFeedbackQuestionFormInitialValues(
+         group?.universityName
+      ),
       hosts: [],
    }
 
@@ -235,7 +234,7 @@ const convertLivestreamObjectToForm = ({
       general: general,
       speakers: {
          values,
-         options: creators,
+         options: [], // Empty initially, Speakers component will populate reactively
          creatorsIds: livestream.creatorsIds,
       },
       questions: {
@@ -267,7 +266,9 @@ type Props = {
 
 const LivestreamFormikProvider = ({ livestream, group, children }: Props) => {
    const { userData } = useAuth()
-   const { data: creators } = useGroupCreators(group?.id)
+   const { data: creators } = useHostsCreatorsSWR(
+      livestream?.groupIds || [group?.id]
+   )
    const { groupQuestions, questionsLoaded } = useGroupQuestions(group?.id)
    const { feedbackQuestions } = useFeedbackQuestions(
       livestream.id,

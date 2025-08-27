@@ -45,6 +45,7 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          )
          .notRequired(),
       companyLogoUrl: yup.string().notRequired(),
+      panelLogoUrl: yup.string().notRequired(),
       backgroundImageUrl: yup
          .string()
          .required("Please provide a banner image"),

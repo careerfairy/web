@@ -173,22 +173,6 @@ const getOptionElement = (speaker: Creator, isMobile: boolean) => (
                      {speaker.position}
                   </Typography>
                )}
-
-               {Boolean(speaker.position && speaker.email && !isMobile) && (
-                  <Divider orientation="vertical" flexItem />
-               )}
-
-               {Boolean(speaker.email) && (
-                  <Typography
-                     sx={[
-                        styles.optionInfo,
-                        styles.ellipsis,
-                        styles.speakerInfo,
-                     ]}
-                  >
-                     {speaker.email}
-                  </Typography>
-               )}
             </Stack>
          )}
       </Stack>

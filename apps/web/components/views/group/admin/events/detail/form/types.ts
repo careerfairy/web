@@ -23,6 +23,7 @@ export type LivestreamFormGeneralTabValues = {
    hidden: boolean
    company?: string
    companyLogoUrl?: string
+   panelLogoUrl?: string
    backgroundImageUrl: string
    startDate: Date
    duration: number
