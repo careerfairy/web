@@ -33,9 +33,7 @@ const styles = sxStyles({
       right: `${CORNER_PADDING}px`,
    },
    bottomLeftSection: {
-      position: "absolute",
-      bottom: `${CORNER_PADDING}px`,
-      left: `${CORNER_PADDING}px`,
+      left: 0,
    },
    bottomRightSection: {
       position: "absolute",
@@ -55,14 +53,7 @@ type SmallPanelCardProps = {
 
 export const SmallPanelCard = ({ event }: SmallPanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
-   //    const baseSmallDesktop = useMediaQuery<Theme>((theme) =>
-   //     theme.breakpoints.between(988, 1280)
-   //  )
-   //  const tinyDesktop = useMediaQuery<Theme>((theme) =>
-   //     theme.breakpoints.between(899, 988)
-   //  )
 
-   //  const smallDesktop = baseSmallDesktop || tinyDesktop
    const { data: groups } = useGroupsByIds(event.groupIds, false)
 
    const hostLogos =
@@ -102,9 +93,10 @@ export const SmallPanelCard = ({ event }: SmallPanelCardProps) => {
             </Box>
 
             {/* Bottom Left - Panel Image */}
-            <Box sx={styles.bottomLeftSection}>
-               <PanelTitleImage imageUrl={event.panelLogoUrl} />
-            </Box>
+            <PanelTitleImage
+               imageUrl={event.panelLogoUrl}
+               sx={styles.bottomLeftSection}
+            />
 
             {/* Bottom Right - Host Avatars */}
             <Box sx={styles.bottomRightSection}>

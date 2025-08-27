@@ -1,10 +1,11 @@
-import { Stack, Theme, Typography, useMediaQuery } from "@mui/material"
+import { Button, Stack, Theme, Typography, useMediaQuery } from "@mui/material"
 import { useUpcomingPanelEventsSWR } from "components/custom-hook/panels/useUpcomingPanelEventsSWR"
 import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import { RectanglePanelCard } from "components/views/panels/cards/RectanglePanelCard"
 import { SmallPanelCard } from "components/views/panels/cards/SmallPanelCard"
 import useEmblaCarousel from "embla-carousel-react"
 import { WheelGesturesPlugin } from "embla-carousel-wheel-gestures"
+import Link from "next/link"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -22,6 +23,11 @@ const styles = sxStyles({
    },
    rectanglePanelCard: {
       minWidth: "365px",
+   },
+   panelDescription: {
+      color: "neutral.600",
+      textDecoration: "underline",
+      textDecorationSkipInk: "none",
    },
 })
 
@@ -46,13 +52,28 @@ export const PanelsSection = () => {
 
    return (
       <Stack spacing={1} sx={styles.root}>
-         <Typography
-            variant={isMobile ? "small" : "medium"}
-            fontWeight={600}
-            color="neutral.800"
-         >
-            Discover new panels
-         </Typography>
+         <Stack direction="row" justifyContent="space-between">
+            <Typography
+               variant={isMobile ? "small" : "medium"}
+               fontWeight={600}
+               color="neutral.800"
+            >
+               Discover new panels
+            </Typography>
+            {!isMobile ? (
+               <Button
+                  component={Link}
+                  href="/panels"
+                  shallow
+                  scroll={false}
+                  sx={{ p: 0 }}
+               >
+                  <Typography variant="small" sx={styles.panelDescription}>
+                     Find out all about panels
+                  </Typography>
+               </Button>
+            ) : null}
+         </Stack>
 
          <GenericCarousel
             emblaRef={emblaRef}
