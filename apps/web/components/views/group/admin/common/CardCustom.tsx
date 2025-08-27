@@ -13,6 +13,7 @@ import {
    Tooltip,
    tooltipClasses,
    TooltipProps,
+   Typography,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
 import { type Options } from "@sentry/types"
@@ -36,9 +37,7 @@ const styles = sxStyles({
       textTransform: "none",
       paddingRight: (theme) => theme.spacing(2),
    },
-   cardTitleTypographyProps: {
-      variant: "brandedH5",
-   },
+
    cardContent: {
       paddingX: (theme) => theme.spacing(2),
       paddingTop: 0,
@@ -117,9 +116,12 @@ const CardCustom: FC<Props> = ({
       <Card data-testid="card-custom" sx={mergedSxProps}>
          <CardHeader
             sx={styles.cardHeader}
-            title={<span data-testid="card-title">{title}</span>}
+            title={
+               <Typography variant="brandedH5" data-testid="card-title">
+                  {title}
+               </Typography>
+            }
             action={action}
-            titleTypographyProps={styles.cardTitleTypographyProps}
             disableTypography={disableTypography}
             subheader={<span data-testid="card-subheader">{subHeader}</span>}
          />
