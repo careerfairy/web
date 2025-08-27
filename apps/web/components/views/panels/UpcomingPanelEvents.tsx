@@ -37,12 +37,13 @@ const styles = sxStyles({
       gap: { xs: 1.5, md: 4 },
    },
    headerSection: {
-      gap: 1.5,
+      gap: 3,
       maxWidth: { xs: "100%", md: "284px" },
       p: {
          xs: "8px 4px 0px 4px",
          md: 0,
       },
+      justifyContent: "center",
    },
    headerTitle: {
       color: (theme) => theme.brand.white[100],
@@ -54,6 +55,7 @@ const styles = sxStyles({
          xs: "14px",
          md: "16px",
       },
+      lineHeight: "24px",
    },
    ctaButton: {
       minWidth: "260px",
@@ -172,7 +174,11 @@ const PanelEvents = ({ events }: PanelEventsProps) => {
       <Stack direction="row" sx={styles.panelsSection}>
          {events.length > 1 && events.length <= 3
             ? events.map((event) => (
-                 <SquarePanelCard fullHeight event={event} key={event.id} />
+                 <SquarePanelCard
+                    event={event}
+                    key={event.id}
+                    fullRegistrationStatus={events.length === 2}
+                 />
               ))
             : null}
          {events.length === 1

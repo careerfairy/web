@@ -33,7 +33,7 @@ const styles = sxStyles({
       position: "absolute",
       inset: "-3.36% -3.37%",
       backgroundSize: "cover",
-      backgroundPosition: "center",
+      backgroundPosition: "right center",
       borderRadius: "12px",
       transition: "transform 0.3s ease-in-out",
       "&::before": {

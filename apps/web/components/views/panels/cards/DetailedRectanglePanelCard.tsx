@@ -11,7 +11,7 @@ import {
    PanelTitleImage,
 } from "./base/PanelCardBase"
 
-const CARD_HEIGHT = 276
+const CARD_HEIGHT = 275
 
 const styles = sxStyles({
    root: {
@@ -145,10 +145,7 @@ export const DetailedRectanglePanelCard = ({
             </Box>
 
             <Box sx={styles.bottomRightSection}>
-               <PanelRegistrationStatus
-                  isRegistered={isRegistered}
-                  variant="small"
-               />
+               <PanelRegistrationStatus isRegistered={isRegistered} />
             </Box>
          </Box>
       </PanelCardBase>

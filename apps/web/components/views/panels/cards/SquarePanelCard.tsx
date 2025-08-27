@@ -11,7 +11,7 @@ import {
    PanelTitleImage,
 } from "./base/PanelCardBase"
 
-const CARD_HEIGHT = 276
+const CARD_HEIGHT = 275
 
 const styles = sxStyles({
    root: {
@@ -73,11 +73,13 @@ const styles = sxStyles({
 type SquarePanelCardProps = {
    event: LivestreamEvent
    fullHeight?: boolean
+   fullRegistrationStatus?: boolean
 }
 
 export const SquarePanelCard = ({
    event,
    fullHeight,
+   fullRegistrationStatus,
 }: SquarePanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
 
@@ -115,7 +117,7 @@ export const SquarePanelCard = ({
             <Box sx={styles.topSection}>
                <PanelRegistrationStatus
                   isRegistered={isRegistered}
-                  variant="small"
+                  variant={fullRegistrationStatus ? "default" : "small"}
                />
                <Box sx={styles.dateBadgeOverride}>
                   <PanelDateBadge
