@@ -91,6 +91,7 @@ export const VerticalPanelCard = ({ event }: VerticalPanelCardProps) => {
             "&::after": {
                background: "none",
             },
+            backgroundPosition: "right center",
          }}
       >
          <Box sx={styles.content}>
