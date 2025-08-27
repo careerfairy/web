@@ -42,7 +42,7 @@ export const useNextLivestreamsSWR = (options?: Options) => {
             where("test", "==", false),
             ...(isPanel
                ? [where("isPanel", "==", true)]
-               : [where("isPanel", "!=", true)]),
+               : [where("isPanel", "in", [false, null])]),
             orderBy("start", "asc"),
             ...(includeHidden ? [] : [where("hidden", "==", false)]),
             firestoreLimit(limit)

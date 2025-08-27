@@ -125,15 +125,6 @@ export const PanelCardBase = ({
    })
 
    const handleClick = () => {
-      const dialogLink = buildDialogLink({
-         router,
-         link: {
-            type: "livestreamDetails",
-            livestreamId: event.id,
-         },
-         originSource: "panels-section",
-      })
-
       void router.push(dialogLink, undefined, {
          shallow: true,
          scroll: false,

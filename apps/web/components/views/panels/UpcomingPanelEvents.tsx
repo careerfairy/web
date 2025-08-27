@@ -112,12 +112,10 @@ type UpcomingPanelEventsProps = {
 export const UpcomingPanelEvents = ({
    serverSidePanels,
 }: UpcomingPanelEventsProps) => {
-   const { data: allPanelEvents, isLoading } = useUpcomingPanelEventsSWR({
+   const { data: upcomingPanelEvents, isLoading } = useUpcomingPanelEventsSWR({
       initialData: serverSidePanels,
       limit: MAX_PANEL_EVENTS,
    })
-
-   const upcomingPanelEvents = allPanelEvents?.slice(0, MAX_PANEL_EVENTS) ?? []
 
    if (!upcomingPanelEvents?.length && !isLoading) {
       return null
