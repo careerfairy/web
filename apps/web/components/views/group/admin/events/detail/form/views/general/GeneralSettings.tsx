@@ -10,6 +10,7 @@ import EstimatedDurationSelect from "./components/EstimatedDurationSelect"
 import LanguageSelect from "./components/LanguageSelect"
 import LogoUploader from "./components/LogoUploader"
 import MakeExclusiveSwitch from "./components/MakeExclusiveSwitch"
+import { PanelLogoUploader } from "./components/PanelLogoUploader"
 import StartDateTimePicker from "./components/StartDateTimePicker"
 
 const styles = sxStyles({
@@ -33,7 +34,7 @@ const SUMMARY_PLACEHOLDER = `Describe your live stream
 
 const GeneralSettings = () => {
    const isMobile = useIsMobile()
-   const { isCohostedEvent } = useLivestreamCreationContext()
+   const { isCohostedEvent, livestream } = useLivestreamCreationContext()
 
    return (
       <>
@@ -48,6 +49,7 @@ const GeneralSettings = () => {
             placeholder="Insert your live stream title"
             requiredText="(required)"
          />
+         {livestream.isPanel ? <PanelLogoUploader /> : null}
          {isCohostedEvent ? (
             <Stack
                sx={[

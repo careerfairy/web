@@ -253,6 +253,21 @@ export interface LivestreamEvent extends Identifiable {
     * If true, SMS notifications are enabled for the live stream
     */
    smsEnabled?: boolean
+
+   /**
+    * If true, the livestream is a panel and has multiple hosts
+    */
+   isPanel?: boolean
+
+   /**
+    * The logo of the panel
+    */
+   panelLogoUrl?: string
+
+   /**
+    * The trailer url of the panel
+    */
+   panelTrailerUrl?: string
 }
 
 export const LivestreamModes = {

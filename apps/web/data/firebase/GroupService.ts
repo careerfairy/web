@@ -1,3 +1,4 @@
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import {
    GroupClientEventsPayload,
    GroupEventClient,
@@ -19,6 +20,19 @@ export class GroupService {
       )({
          events: data,
       })
+   }
+
+   // Update a creator's roles in a specific host group (server-side authorized)
+   updateCreatorRolesForLivestream = async (args: {
+      livestreamId: string
+      targetGroupId: string
+      creatorId: string
+      roles: string[]
+   }) => {
+      return httpsCallable(
+         this.functions,
+         FUNCTION_NAMES.updateCreatorRoles
+      )(args)
    }
 }
 
