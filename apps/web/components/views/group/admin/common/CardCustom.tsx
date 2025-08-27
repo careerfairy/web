@@ -37,9 +37,7 @@ const styles = sxStyles({
       paddingRight: (theme) => theme.spacing(2),
    },
    cardTitleTypographyProps: {
-      fontSize: "1.28571rem", // 18px - matches brandedH5
-      lineHeight: 1.55556,
-      fontWeight: 600,
+      variant: "brandedH5",
    },
    cardContent: {
       paddingX: (theme) => theme.spacing(2),
