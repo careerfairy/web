@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
@@ -8,7 +9,6 @@ import {
    PanelDateBadge,
    PanelHostAvatars,
    PanelRegistrationStatus,
-   PanelTitleImage,
 } from "./base/PanelCardBase"
 
 const CARD_HEIGHT = 242
@@ -45,13 +45,6 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       gap: 1.5,
-   },
-   titleImageOverride: {
-      position: "static",
-      bottom: "auto",
-      left: "auto",
-      width: "86px",
-      height: "35px",
    },
    hostsContainer: {
       display: "flex",
@@ -112,13 +105,19 @@ export const VerticalPanelCard = ({ event }: VerticalPanelCardProps) => {
                   <PanelHostAvatars size={28} logoUrls={hostLogos} />
                </Box>
                <Box sx={styles.titleImageContainer}>
-                  <PanelTitleImage
-                     imageUrl={event.panelLogoUrl}
-                     sx={styles.titleImageOverride}
-                     titleImageSx={{
-                        backgroundPosition: "center",
-                     }}
-                  />
+                  {event.panelLogoUrl ? (
+                     <img
+                        src={event.panelLogoUrl}
+                        alt="Panel logo"
+                        style={{
+                           maxWidth: "129px",
+                           height: "auto",
+                           objectFit: "contain",
+                           objectPosition: "center",
+                           display: "block",
+                        }}
+                     />
+                  ) : null}
                </Box>
             </Box>
          </Box>

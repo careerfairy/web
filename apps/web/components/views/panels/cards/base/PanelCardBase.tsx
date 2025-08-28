@@ -185,48 +185,6 @@ export const PanelDateBadge = ({
    )
 }
 
-export const PanelTitleImage = ({
-   imageUrl,
-   sx,
-   titleImageSx,
-}: {
-   imageUrl?: string
-   sx?: SxProps<Theme>
-   titleImageSx?: SxProps<Theme>
-}) => {
-   const styles = sxStyles({
-      titleImageContainer: {
-         position: "absolute",
-         bottom: "6px",
-         left: "6px",
-         width: "77px",
-         height: "30px",
-         display: "flex",
-         alignItems: "center",
-         justifyContent: "center",
-      },
-      titleImage: {
-         width: "100%",
-         height: "100%",
-         backgroundImage: imageUrl ? `url(${imageUrl})` : "none",
-         backgroundSize: "contain",
-         backgroundPosition: "bottom",
-         backgroundRepeat: "no-repeat",
-         objectFit: "contain",
-      },
-   })
-
-   if (!imageUrl) {
-      return null
-   }
-
-   return (
-      <Box sx={combineStyles(styles.titleImageContainer, sx)}>
-         <Box sx={combineStyles(styles.titleImage, titleImageSx)} />
-      </Box>
-   )
-}
-
 const PanelHostAvatar = ({
    logoUrl,
    size = 28,

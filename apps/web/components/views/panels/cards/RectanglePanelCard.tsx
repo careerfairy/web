@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
@@ -8,7 +9,6 @@ import {
    PanelDateBadge,
    PanelHostAvatars,
    PanelRegistrationStatus,
-   PanelTitleImage,
 } from "./base/PanelCardBase"
 
 const CARD_HEIGHT = 178
@@ -42,17 +42,18 @@ const styles = sxStyles({
       top: "auto",
       right: "auto",
    },
-   titleImageOverride: {
-      position: "static",
-      bottom: "auto",
-      left: "auto",
-      width: "128px",
-      height: "61px",
-   },
    titleImageContainer: {
       display: "flex",
       justifyContent: "flex-start",
       alignItems: "flex-end",
+      width: "100%",
+   },
+   titleImage: {
+      maxWidth: "129px", // Consistent max width for all images
+      height: "auto", // Height adjusts automatically to maintain aspect ratio
+      objectFit: "contain", // Ensures image fits within bounds without distortion
+      objectPosition: "bottom left", // Positions image at bottom left
+      display: "block", // Removes any inline spacing issues
    },
    hostsContainer: {
       display: "flex",
@@ -102,10 +103,19 @@ export const RectanglePanelCard = ({ event }: RectanglePanelCardProps) => {
 
             <Box sx={styles.bottomSection}>
                <Box sx={styles.titleImageContainer}>
-                  <PanelTitleImage
-                     imageUrl={event.panelLogoUrl}
-                     sx={styles.titleImageOverride}
-                  />
+                  {event.panelLogoUrl ? (
+                     <img
+                        src={event.panelLogoUrl}
+                        alt="Panel logo"
+                        style={{
+                           maxWidth: "116px",
+                           height: "auto",
+                           objectFit: "contain",
+                           objectPosition: "bottom left",
+                           display: "block",
+                        }}
+                     />
+                  ) : null}
                </Box>
                <Box sx={styles.hostsContainer}>
                   <PanelHostAvatars size={28} logoUrls={hostLogos} />

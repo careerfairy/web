@@ -1,5 +1,13 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   Skeleton,
+   Stack,
+   Theme,
+   Typography,
+   useMediaQuery,
+} from "@mui/material"
 import { useUpcomingPanelEventsSWR } from "components/custom-hook/panels/useUpcomingPanelEventsSWR"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Link from "next/link"
@@ -101,7 +109,7 @@ const styles = sxStyles({
       width: "100%",
       height: {
          xs: "440px",
-         md: "100%",
+         md: "275px",
       },
       borderRadius: "16px",
    },
@@ -141,6 +149,19 @@ type PanelEventsProps = {
 const PanelEvents = ({ events }: PanelEventsProps) => {
    const isMobile = useIsMobile()
 
+   // Logic to determine if the small desktop layout should be used, its very specific to the number of events
+   // and the size of the card. Changes the layout of the hosts and image to column based on the
+   // number of events and screen width so images and hosts are not cut off.
+   const maxWidthSmallDesktop = events?.length === 3 ? 1475 : 1185
+   const baseSmallDesktop = useMediaQuery<Theme>((theme) =>
+      theme.breakpoints.between(988, maxWidthSmallDesktop)
+   )
+   const tinyDesktop = useMediaQuery<Theme>((theme) =>
+      theme.breakpoints.between(899, 988)
+   )
+
+   const smallDesktop = baseSmallDesktop || tinyDesktop
+
    const renderMobileLayout = () => {
       if (events.length === 1) {
          return <RectanglePanelCard event={events[0]} key={events[0].id} />
@@ -178,6 +199,7 @@ const PanelEvents = ({ events }: PanelEventsProps) => {
                     event={event}
                     key={event.id}
                     fullRegistrationStatus={events.length === 2}
+                    stackedBottomSection={smallDesktop}
                  />
               ))
             : null}

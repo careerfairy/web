@@ -1,5 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Theme, useMediaQuery } from "@mui/material"
+import { Box } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
 import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import { sxStyles } from "types/commonTypes"
@@ -8,7 +9,6 @@ import {
    PanelDateBadge,
    PanelHostAvatars,
    PanelRegistrationStatus,
-   PanelTitleImage,
 } from "./base/PanelCardBase"
 
 const CARD_HEIGHT = 275
@@ -48,11 +48,15 @@ const styles = sxStyles({
    },
    titleImageOverride: {
       position: "static",
-      height: "55px",
-      maxWidth: "123.75px",
-      maxHeight: "55px",
-      flex: "1 0 0",
+      height: "38px",
       aspectRatio: "9/4",
+      maxWidth: "141px",
+      backgroundSize: "contain",
+      backgroundPosition: "bottom",
+      backgroundRepeat: "no-repeat",
+   },
+   titleImageOverrideSmallDesktop: {
+      maxWidth: "129px",
    },
    titleImageContainer: {
       display: "flex",
@@ -74,23 +78,16 @@ type SquarePanelCardProps = {
    event: LivestreamEvent
    fullHeight?: boolean
    fullRegistrationStatus?: boolean
+   stackedBottomSection?: boolean
 }
 
 export const SquarePanelCard = ({
    event,
    fullHeight,
    fullRegistrationStatus,
+   stackedBottomSection,
 }: SquarePanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
-
-   const baseSmallDesktop = useMediaQuery<Theme>((theme) =>
-      theme.breakpoints.between(988, 1280)
-   )
-   const tinyDesktop = useMediaQuery<Theme>((theme) =>
-      theme.breakpoints.between(899, 988)
-   )
-
-   const smallDesktop = baseSmallDesktop || tinyDesktop
 
    const { data: groups } = useGroupsByIds(event.groupIds, false)
 
@@ -130,19 +127,30 @@ export const SquarePanelCard = ({
             <Box
                sx={[
                   styles.bottomSection,
-                  smallDesktop ? styles.bottomSectionSmallDesktop : {},
+                  stackedBottomSection ? styles.bottomSectionSmallDesktop : {},
                ]}
             >
                <Box sx={styles.titleImageContainer}>
-                  <PanelTitleImage
-                     imageUrl={event.panelLogoUrl}
-                     sx={styles.titleImageOverride}
-                  />
+                  {event.panelLogoUrl ? (
+                     <img
+                        src={event.panelLogoUrl}
+                        alt="Panel logo"
+                        style={{
+                           maxWidth: stackedBottomSection ? "100px" : "141px",
+                           height: "auto",
+                           objectFit: "contain",
+                           objectPosition: "bottom left",
+                           display: "block",
+                        }}
+                     />
+                  ) : null}
                </Box>
                <Box
                   sx={[
                      styles.hostsContainer,
-                     smallDesktop ? styles.hostsContainerSmallDesktop : {},
+                     stackedBottomSection
+                        ? styles.hostsContainerSmallDesktop
+                        : {},
                   ]}
                >
                   <PanelHostAvatars size={28} logoUrls={hostLogos} />

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Typography } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
@@ -8,7 +9,6 @@ import {
    PanelDateBadge,
    PanelHostAvatars,
    PanelRegistrationStatus,
-   PanelTitleImage,
 } from "./base/PanelCardBase"
 
 const CARD_HEIGHT = 275
@@ -54,17 +54,10 @@ const styles = sxStyles({
       top: "auto",
       right: "auto",
    },
-   titleImageOverride: {
-      position: "static",
-      bottom: "auto",
-      left: "auto",
-      width: "153px",
-      height: "62px",
-   },
    titleImageContainer: {
       display: "flex",
       justifyContent: "flex-start",
-      alignItems: "center",
+      alignItems: "flex-end",
       width: "192px",
       height: "75px",
    },
@@ -127,10 +120,19 @@ export const DetailedRectanglePanelCard = ({
 
             <Box sx={styles.leftSection}>
                <Box sx={styles.titleImageContainer}>
-                  <PanelTitleImage
-                     imageUrl={event.panelLogoUrl}
-                     sx={styles.titleImageOverride}
-                  />
+                  {event.panelLogoUrl ? (
+                     <img
+                        src={event.panelLogoUrl}
+                        alt="Panel logo"
+                        style={{
+                           maxWidth: "192px",
+                           height: "auto",
+                           objectFit: "contain",
+                           objectPosition: "bottom left",
+                           display: "block",
+                        }}
+                     />
+                  ) : null}
                </Box>
 
                {event.summary ? (
