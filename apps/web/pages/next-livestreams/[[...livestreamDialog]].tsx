@@ -35,7 +35,9 @@ const NextLivestreamsPage: NextPage<
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-   const userCountryCode = (ctx.req.headers["x-country-code"] as string) || null
+   const userCountryCode =
+      (ctx.req.headers["x-vercel-ip-country"] as string) || null
+
    const [firstParam] = ctx.params?.livestreamDialog || []
 
    // If firstParam exists, and it is not 'livestream', we assume it's a group ID,
