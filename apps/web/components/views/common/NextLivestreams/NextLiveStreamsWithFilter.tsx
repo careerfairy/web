@@ -15,7 +15,9 @@ import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import { useUpcomingPanelEventsSWR } from "components/custom-hook/panels/useUpcomingPanelEventsSWR"
 import { isInIframe } from "components/helperFunctions/HelperFunctions"
+import { motion } from "framer-motion"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -106,7 +108,7 @@ const NextLiveStreamsWithFilter = ({
    const router = useRouter()
    const { query, push } = router
    const { handlePartnerEventClick } = usePartnership()
-
+   const { data: panels } = useUpcomingPanelEventsSWR()
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const [inputValue, setInputValue] = useState("")
    const [debouncedInputValue, setDebouncedInputValue] = useState("")
@@ -361,9 +363,18 @@ const NextLiveStreamsWithFilter = ({
             </Box>
          </Container>
 
-         <Box sx={styles.panelsRoot}>
-            <PanelsSection />
-         </Box>
+         {panels && panels.length > 0 ? (
+            <motion.div
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.4, ease: "easeOut" }}
+               style={{ width: "100%" }}
+            >
+               <Box sx={styles.panelsRoot}>
+                  <PanelsSection panels={panels} />
+               </Box>
+            </motion.div>
+         ) : null}
 
          <StreamsSection
             value={initialTabValue}

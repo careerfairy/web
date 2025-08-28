@@ -1,5 +1,5 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Button, Stack, Theme, Typography, useMediaQuery } from "@mui/material"
-import { useUpcomingPanelEventsSWR } from "components/custom-hook/panels/useUpcomingPanelEventsSWR"
 import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import { RectanglePanelCard } from "components/views/panels/cards/RectanglePanelCard"
 import { SmallPanelCard } from "components/views/panels/cards/SmallPanelCard"
@@ -30,10 +30,10 @@ const styles = sxStyles({
       textDecorationSkipInk: "none",
    },
 })
-
-export const PanelsSection = () => {
-   const { data: panels } = useUpcomingPanelEventsSWR()
-
+type Props = {
+   panels: LivestreamEvent[]
+}
+export const PanelsSection = ({ panels }: Props) => {
    const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down(989))
 
    const [emblaRef, emblaApi] = useEmblaCarousel(

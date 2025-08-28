@@ -101,7 +101,7 @@ export const SmallPanelCard = ({ event }: SmallPanelCardProps) => {
                      src={event.panelLogoUrl}
                      alt="Panel logo"
                      style={{
-                        maxWidth: "93px", // Appropriate size for small card
+                        maxWidth: "80px", // Appropriate size for small card
                         height: "auto",
                         objectFit: "contain",
                         objectPosition: "bottom left",
