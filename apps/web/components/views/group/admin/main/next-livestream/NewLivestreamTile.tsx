@@ -168,14 +168,13 @@ type UpcomingVariantProps = {
 }
 
 const UpcomingVariant = ({ livestream }: UpcomingVariantProps) => {
-   const { user } = useAuth()
+   const { userData } = useAuth()
    const router = useRouter()
    const { showSuccessSnackbar, showErrorSnackbar } = useSnackbarNotifications()
    const [, copyToClipboard] = useCopyToClipboard()
 
    const handleShareClick = useCallback(async () => {
       try {
-         const userData = user as UserData
          const adminGroupsClaim = userData?.customClaims?.adminGroups as AdminGroupsClaim
          const referralCode = adminGroupsClaim?.[0]?.referralCode
 
@@ -187,7 +186,7 @@ const UpcomingVariant = ({ livestream }: UpcomingVariantProps) => {
          console.error("Error sharing livestream:", error)
          showErrorSnackbar("Failed to copy link")
       }
-   }, [livestream.id, user, copyToClipboard, showSuccessSnackbar, showErrorSnackbar])
+   }, [livestream.id, userData, copyToClipboard, showSuccessSnackbar, showErrorSnackbar])
 
    const handleEnterRoomClick = useCallback(async () => {
       try {
