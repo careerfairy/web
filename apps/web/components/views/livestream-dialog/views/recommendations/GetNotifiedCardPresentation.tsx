@@ -138,7 +138,7 @@ type Props = {
    /** Company logo URL */
    companyLogoUrl: string
    /** Panel logo URL. Only used if the livestream is a panel. */
-   panelLogoUrl: string
+   panelLogoUrl?: string
    /** Job title or event title */
    title: string
    /** Banner image URL */
