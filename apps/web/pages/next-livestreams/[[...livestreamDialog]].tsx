@@ -1,17 +1,16 @@
-import React from "react"
-import ScrollToTop from "../../components/views/common/ScrollToTop"
-import NextLiveStreamsWithFilter from "../../components/views/common/NextLivestreams/NextLiveStreamsWithFilter"
-import SEO from "../../components/util/SEO"
-import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import {
    GetServerSidePropsContext,
    InferGetServerSidePropsType,
    NextPage,
 } from "next"
+import SEO from "../../components/util/SEO"
+import NextLiveStreamsWithFilter from "../../components/views/common/NextLivestreams/NextLiveStreamsWithFilter"
+import ScrollToTop from "../../components/views/common/ScrollToTop"
 import {
-   getLivestreamDialogData,
    LivestreamDialogLayout,
+   getLivestreamDialogData,
 } from "../../components/views/livestream-dialog"
+import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import { convertQueryParamsToString } from "../../util/serverUtil"
 
 const NextLivestreamsPage: NextPage<
@@ -25,7 +24,10 @@ const NextLivestreamsPage: NextPage<
             title={"CareerFairy | Upcoming Livestreams"}
          />
          <GenericDashboardLayout pageDisplayName={"Live streams"}>
-            <NextLiveStreamsWithFilter initialTabValue={"upcomingEvents"} />
+            <NextLiveStreamsWithFilter
+               initialTabValue={"upcomingEvents"}
+               userCountryCode={props.userCountryCode}
+            />
          </GenericDashboardLayout>
          <ScrollToTop hasBottomNavBar />
       </LivestreamDialogLayout>
@@ -33,13 +35,12 @@ const NextLivestreamsPage: NextPage<
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+   const userCountryCode = (ctx.req.headers["x-country-code"] as string) || null
    const [firstParam] = ctx.params?.livestreamDialog || []
 
    // If firstParam exists, and it is not 'livestream', we assume it's a group ID,
    // and we need to redirect it to the new group route.
    if (firstParam && firstParam !== "livestream") {
-      const res = ctx.res
-
       // Extract and stringify the query parameters, if any.
       delete ctx.query.livestreamDialog // Remove the livestreamDialog query param
 
@@ -60,6 +61,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    return {
       props: {
          livestreamDialogData: await getLivestreamDialogData(ctx),
+         userCountryCode,
       },
    }
 }

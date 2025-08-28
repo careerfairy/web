@@ -100,15 +100,19 @@ const getQueryVariables = (query: ParsedUrlQuery) => {
 
 type Props = {
    initialTabValue?: "upcomingEvents" | "pastEvents"
+   userCountryCode?: string
 }
 
 const NextLiveStreamsWithFilter = ({
    initialTabValue = "upcomingEvents",
+   userCountryCode,
 }: Props) => {
    const router = useRouter()
    const { query, push } = router
    const { handlePartnerEventClick } = usePartnership()
-   const { data: panels } = useUpcomingPanelEventsSWR()
+   const { data: panels } = useUpcomingPanelEventsSWR({
+      userCountryCode,
+   })
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const [inputValue, setInputValue] = useState("")
    const [debouncedInputValue, setDebouncedInputValue] = useState("")
