@@ -7,7 +7,10 @@ import {
    Typography,
 } from "@mui/material"
 import { styled } from "@mui/material/styles"
-import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+} from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { motion } from "framer-motion"
 import Image from "next/image"
@@ -17,7 +20,7 @@ import {
    X as CloseIcon,
    Download as DownloadIcon,
 } from "react-feather"
-import { combineStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 // Card container
 const StyledCard = styled(motion(Card))(({ theme }) => ({
@@ -117,12 +120,25 @@ const AnimatedCircularLogo = motion(CircularLogo)
 const AnimatedCalendarIcon = motion(CalendarIcon)
 const AnimatedTypography = motion(Typography)
 
+const styles = sxStyles({
+   panelLogoContainer: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-start",
+      marginBottom: 0,
+      maxWidth: { xs: "72px", md: "110px" },
+      width: "100%",
+   },
+})
+
 /** Props for the presentation component that handles UI */
 type Props = {
    /** Company name to display */
    companyName: string
    /** Company logo URL */
    companyLogoUrl: string
+   /** Panel logo URL. Only used if the livestream is a panel. */
+   panelLogoUrl: string
    /** Job title or event title */
    title: string
    /** Banner image URL */
@@ -156,6 +172,7 @@ type Props = {
 export const GetNotifiedCardPresentation = ({
    companyName,
    companyLogoUrl,
+   panelLogoUrl,
    title,
    bannerImageUrl,
    eventDateString,
@@ -222,46 +239,65 @@ export const GetNotifiedCardPresentation = ({
                alignItems={isDesktop && isExpanded ? "center" : "flex-start"}
             >
                {/* Company info */}
-               <Box
-                  sx={{
-                     display: "flex",
-                     alignItems: "center",
-                     width: "100%",
-                     gap: 1,
-                     justifyContent:
-                        isDesktop && isExpanded ? "center" : "flex-start",
-                  }}
-               >
-                  <AnimatedCircularLogo
+               {panelLogoUrl ? (
+                  <Box sx={styles.panelLogoContainer}>
+                     <Image
+                        src={getResizedUrl(panelLogoUrl, "lg")}
+                        alt="Panel Logo"
+                        width={297}
+                        height={120}
+                        style={{
+                           width: "100%",
+                           height: "auto",
+                        }}
+                        priority
+                        sizes="(max-width: 768px) 216px, 297px"
+                     />
+                  </Box>
+               ) : (
+                  <Box
+                     sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100%",
+                        gap: 1,
+                        justifyContent:
+                           isDesktop && isExpanded ? "center" : "flex-start",
+                     }}
+                  >
+                     <AnimatedCircularLogo
+                        layout={animateLayout}
+                        src={companyLogoUrl}
+                        alt={`${companyName} logo`}
+                        size={28}
+                     />
+                     <Typography
+                        component={motion.div}
+                        layout={animateLayout}
+                        variant="small"
+                        color="text.secondary"
+                        fontWeight={600}
+                        sx={getMaxLineStyles(1)}
+                     >
+                        {companyName}
+                     </Typography>
+                  </Box>
+               )}
+
+               {/* Title */}
+               {!panelLogoUrl && (
+                  <AnimatedTypography
                      layout={animateLayout}
-                     src={companyLogoUrl}
-                     alt={`${companyName} logo`}
-                     size={28}
-                  />
-                  <Typography
-                     component={motion.div}
-                     layout={animateLayout}
-                     variant="small"
-                     color="text.secondary"
+                     variant="medium"
+                     color="text.primary"
                      fontWeight={600}
+                     width="100%"
+                     align={isDesktop && isExpanded ? "center" : "left"}
                      sx={getMaxLineStyles(1)}
                   >
-                     {companyName}
-                  </Typography>
-               </Box>
-
-               {/* Job title */}
-               <AnimatedTypography
-                  layout={animateLayout}
-                  variant="medium"
-                  color="text.primary"
-                  fontWeight={600}
-                  width="100%"
-                  align={isDesktop && isExpanded ? "center" : "left"}
-                  sx={getMaxLineStyles(1)}
-               >
-                  {title}
-               </AnimatedTypography>
+                     {title}
+                  </AnimatedTypography>
+               )}
 
                {/* Event date */}
                <Box

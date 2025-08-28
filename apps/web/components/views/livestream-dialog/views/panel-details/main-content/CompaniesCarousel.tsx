@@ -12,7 +12,7 @@ import { CompaniesCarouselSkeleton } from "./CompaniesCarouselSkeleton"
 const styles = sxStyles({
    companyCard: {
       backgroundColor: "common.white",
-      border: (theme) => `1px solid ${theme.palette.neutral[100]}`,
+      border: (theme) => `1px solid ${theme.brand.purple[50]}`,
       borderRadius: "16px",
       overflow: "hidden",
       width: "254px",
