@@ -2,11 +2,11 @@ import { BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/groups/GroupPresente
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
 import useUploadGroupBanner from "components/custom-hook/group/useUploadGroupBanner"
 import useFileUploader from "components/custom-hook/useFileUploader"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import FileUploader from "components/views/common/FileUploader"
 import { getImageDimensionsValidator } from "components/views/common/FileUploader/validations"
 import ImageCropperDialog from "components/views/common/ImageCropperDialog"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import { FC, useState, useCallback } from "react"
+import { FC, useCallback, useState } from "react"
 import { Upload } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -120,7 +120,10 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
    const { successNotification, errorNotification } = useSnackbarNotifications()
    const [objectUrl, setObjectUrl] = useState<string | null>(null)
 
-   const setImage = (file: File | File[], imageSetter: (url: string) => void) => {
+   const setImage = (
+      file: File | File[],
+      imageSetter: (url: string) => void
+   ) => {
       const newFile = Array.isArray(file) ? file[0] : file
       imageSetter(URL.createObjectURL(newFile))
    }
@@ -155,7 +158,7 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
 
    return (
       <>
-         {objectUrl && !(process.env.NODE_ENV === 'test' || process.env.PLAYWRIGHT_TEST) ? (
+         {objectUrl ? (
             <ImageCropperDialog
                title="Upload company banner"
                fileName={undefined}
