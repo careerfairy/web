@@ -289,7 +289,8 @@ const sendAttendeesReminder = async (
             if (
                !livestreamPresenter.isTest() &&
                !livestreamPresenter.isLive() &&
-               livestreamPresenter.streamHasFinished()
+               livestreamPresenter.streamHasFinished() &&
+               !livestream.isPanel
             ) {
                functions.logger.log(
                   `Detected livestream ${livestreamPresenter.title} has ended yesterday`
@@ -318,9 +319,15 @@ const sendAttendeesReminder = async (
                   )
                }
             } else {
-               functions.logger.log(
-                  `The livestream ${livestreamPresenter.title} has not ended yet`
-               )
+               if (livestream.isPanel) {
+                  functions.logger.log(
+                     `Livestream ${livestreamPresenter.title} is a panel, skipping followup`
+                  )
+               } else {
+                  functions.logger.log(
+                     `The livestream ${livestreamPresenter.title} has not ended yet`
+                  )
+               }
             }
             return await acc
          }, Promise.resolve([]))

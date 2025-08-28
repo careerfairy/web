@@ -405,7 +405,7 @@ exports.schedule1HourReminderEmails = remindersNew.schedule1HourReminderEmails
 exports.schedule24HoursReminderEmails =
    remindersNew.schedule24HoursReminderEmails
 // For testing Reminders
-exports.manualReminderEmails_v3 = remindersNew.manualReminderEmails
+exports.manualReminderEmails = remindersNew.manualReminderEmails
 
 // Followups
 exports.sendFollowupToNonAttendees = followups.sendFollowupToNonAttendees

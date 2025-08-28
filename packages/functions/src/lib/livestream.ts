@@ -153,21 +153,25 @@ export const getStreamsByDateWithRegisteredStudents = async (
       .where("start", ">=", filterStartDate)
       .where("start", "<=", filterEndDate)
       .where("test", "==", false)
-      .where("isPanel", "in", [false, null])
 
    if (options?.excludeHidden) {
       query = query.where("hidden", "==", false)
    }
 
    return query.get().then((querySnapshot) => {
-      const streams = querySnapshot.docs?.map(
-         (doc) =>
-            ({
-               id: doc.id,
-               ...doc.data(),
-            } as LivestreamEvent)
-      )
+      const streams = querySnapshot.docs
+         ?.map(
+            (doc) =>
+               ({
+                  id: doc.id,
+                  ...doc.data(),
+               } as LivestreamEvent)
+         )
+         ?.filter((stream) => stream.isPanel !== true)
 
+      streams?.forEach((stream) =>
+         console.log("🚀 ~ streams ~ stream:", stream?.id)
+      )
       return addUsersDataOnStreams(streams, options?.skimData)
    })
 }

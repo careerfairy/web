@@ -190,7 +190,7 @@ export const manualReminderEmails = onRequest(
          .reminderTemplateId as ReminderTemplateId
 
       const reminder = reminderConfigs[reminderTemplateId]
-
+      // test
       if (!reminder) {
          res.status(400).send(
             `Invalid query param 'reminderTemplateId'. Valid values are: ${Object.keys(
