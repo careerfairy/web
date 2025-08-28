@@ -8,15 +8,14 @@ import { useLivestreamRouting } from "../../events/useLivestreamRouting"
 import { useMainPageContext } from "../MainPageProvider"
 import CustomLivestreamCard from "./CustomLivestreamCard"
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
-// Temporarily commenting out complex imports to isolate build issue
-// import { useAuth } from "HOCs/AuthProvider"
-// import { useRouter } from "next/router"
-// import { firebaseServiceInstance } from "data/firebase/FirebaseService"
-// import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-// import { buildStreamerLink } from "util/streamUtil"
-// import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/users"
-// import { makeLivestreamEventDetailsInviteUrl } from "util/makeUrls"
-// import { useCopyToClipboard } from "react-use"
+import { useAuth } from "HOCs/AuthProvider"
+import { useRouter } from "next/router"
+import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { buildStreamerLink } from "util/streamUtil"
+import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/users"
+import { makeLivestreamEventDetailsInviteUrl } from "util/makeUrls"
+import { useCopyToClipboard } from "react-use"
 
 const styles = sxStyles({
    // No upcoming variant styles
@@ -168,24 +167,47 @@ type UpcomingVariantProps = {
    livestream: LivestreamEvent
 }
 
-// Temporarily simplified to isolate build issues
-
 const UpcomingVariant = ({ livestream }: UpcomingVariantProps) => {
-   const handleShareClick = useCallback(() => {
-      // Simplified - just show alert for now
-      alert("Share functionality temporarily disabled for debugging")
-   }, [])
+   const { user } = useAuth()
+   const router = useRouter()
+   const { showSuccessSnackbar, showErrorSnackbar } = useSnackbarNotifications()
+   const [, copyToClipboard] = useCopyToClipboard()
 
-   const handleEnterRoomClick = useCallback(() => {
-      // Simplified - just show alert for now  
-      alert("Enter room functionality temporarily disabled for debugging")
-   }, [])
+   const handleShareClick = useCallback(async () => {
+      try {
+         const userData = user as UserData
+         const adminGroupsClaim = userData?.customClaims?.adminGroups as AdminGroupsClaim
+         const referralCode = adminGroupsClaim?.[0]?.referralCode
 
-   // Mock data for now - these should come from the livestream analytics
-   const mockMetrics = {
-      talentReached: 1234,
-      registrations: 89,
-      totalQuestions: 45,
+         const shareUrl = makeLivestreamEventDetailsInviteUrl(livestream.id, referralCode)
+         
+         await copyToClipboard(shareUrl)
+         showSuccessSnackbar("Link copied to clipboard!")
+      } catch (error) {
+         console.error("Error sharing livestream:", error)
+         showErrorSnackbar("Failed to copy link")
+      }
+   }, [livestream.id, user, copyToClipboard, showSuccessSnackbar, showErrorSnackbar])
+
+   const handleEnterRoomClick = useCallback(async () => {
+      try {
+         const streamerLink = await buildStreamerLink(livestream.id)
+         if (streamerLink) {
+            router.push(streamerLink)
+         } else {
+            showErrorSnackbar("Unable to enter live stream room")
+         }
+      } catch (error) {
+         console.error("Error entering livestream room:", error)
+         showErrorSnackbar("Failed to enter live stream room")
+      }
+   }, [livestream.id, router, showErrorSnackbar])
+
+   // Get actual metrics from the livestream - using mock data as fallback
+   const metrics = {
+      talentReached: livestream.analytics?.talentReached || 0,
+      registrations: livestream.analytics?.registrations || 0,
+      totalQuestions: livestream.analytics?.totalQuestions || 0,
    }
 
    return (
@@ -204,17 +226,17 @@ const UpcomingVariant = ({ livestream }: UpcomingVariantProps) => {
                <MetricCard
                   icon={<Eye strokeWidth={2} />}
                   name="Talent reached"
-                  value={mockMetrics.talentReached}
+                  value={metrics.talentReached}
                />
                <MetricCard
                   icon={<User strokeWidth={2} />}
                   name="Registrations"
-                  value={mockMetrics.registrations}
+                  value={metrics.registrations}
                />
                <MetricCard
                   icon={<MessageSquare strokeWidth={2} />}
                   name="Questions"
-                  value={mockMetrics.totalQuestions}
+                  value={metrics.totalQuestions}
                />
             </Stack>
 
