@@ -2,7 +2,6 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    Button,
-   Skeleton,
    Stack,
    Theme,
    Typography,
@@ -10,6 +9,8 @@ import {
 } from "@mui/material"
 import { useUpcomingPanelEventsSWR } from "components/custom-hook/panels/useUpcomingPanelEventsSWR"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { SlideUpWithStaggeredChildrenAnimation } from "components/util/framer-animations"
+import { motion } from "framer-motion"
 import Link from "next/link"
 import { Fragment } from "react"
 import { ChevronRight } from "react-feather"
@@ -105,39 +106,37 @@ const styles = sxStyles({
       alignItems: "center",
       gap: "4px",
    },
-   skeleton: {
-      width: "100%",
-      height: {
-         xs: "440px",
-         md: "275px",
-      },
-      borderRadius: "16px",
-   },
 })
 
 type UpcomingPanelEventsProps = {
    serverSidePanels?: LivestreamEvent[]
+   userCountryCode?: string
 }
 
 export const UpcomingPanelEvents = ({
    serverSidePanels,
+   userCountryCode,
 }: UpcomingPanelEventsProps) => {
-   const { data: upcomingPanelEvents, isLoading } = useUpcomingPanelEventsSWR({
+   const { data: upcomingPanelEvents } = useUpcomingPanelEventsSWR({
       initialData: serverSidePanels,
       limit: MAX_PANEL_EVENTS,
+      userCountryCode,
    })
 
-   if (!upcomingPanelEvents?.length && !isLoading) {
+   if (!upcomingPanelEvents?.length) {
       return null
    }
 
    return (
       <Box sx={styles.wrapper} id="upcoming-panel-events">
-         {isLoading ? (
-            <PanelEventsSkeleton />
-         ) : (
+         <motion.div
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={SlideUpWithStaggeredChildrenAnimation}
+         >
             <PanelEvents events={upcomingPanelEvents} />
-         )}
+         </motion.div>
       </Box>
    )
 }
@@ -269,19 +268,5 @@ const PanelsMobileCTA = () => {
             <ChevronRight size={24} style={{ marginLeft: "0px" }} />
          </Stack>
       </Fragment>
-   )
-}
-
-const PanelEventsSkeleton = () => {
-   const isMobile = useIsMobile()
-
-   return (
-      <Stack direction={isMobile ? "column" : "row"} sx={styles.mainCard}>
-         <PanelsHeader showCTA={!isMobile} />
-         <Box width="100%" minHeight="100%">
-            <Skeleton variant="rectangular" sx={styles.skeleton} />
-         </Box>
-         {isMobile ? <PanelsMobileCTA /> : null}
-      </Stack>
    )
 }

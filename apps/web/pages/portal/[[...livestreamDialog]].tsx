@@ -209,7 +209,9 @@ const PortalPage = ({
                                  limit={20}
                               />
                            )}
-                           <UpcomingPanelEvents />
+                           <UpcomingPanelEvents
+                              userCountryCode={userCountryCode}
+                           />
                            <RecommendedCustomJobs
                               userCountryCode={userCountryCode}
                            />
