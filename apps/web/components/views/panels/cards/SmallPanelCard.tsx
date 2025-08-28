@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
@@ -8,7 +9,6 @@ import {
    PanelDateBadge,
    PanelHostAvatars,
    PanelRegistrationStatus,
-   PanelTitleImage,
 } from "./base/PanelCardBase"
 
 const CORNER_PADDING = 6
@@ -33,7 +33,9 @@ const styles = sxStyles({
       right: `${CORNER_PADDING}px`,
    },
    bottomLeftSection: {
-      left: 0,
+      position: "absolute",
+      bottom: `${CORNER_PADDING}px`,
+      left: `${CORNER_PADDING}px`,
    },
    bottomRightSection: {
       position: "absolute",
@@ -93,10 +95,21 @@ export const SmallPanelCard = ({ event }: SmallPanelCardProps) => {
             </Box>
 
             {/* Bottom Left - Panel Image */}
-            <PanelTitleImage
-               imageUrl={event.panelLogoUrl}
-               sx={styles.bottomLeftSection}
-            />
+            <Box sx={styles.bottomLeftSection}>
+               {event.panelLogoUrl ? (
+                  <img
+                     src={event.panelLogoUrl}
+                     alt="Panel logo"
+                     style={{
+                        maxWidth: "93px", // Appropriate size for small card
+                        height: "auto",
+                        objectFit: "contain",
+                        objectPosition: "bottom left",
+                        display: "block",
+                     }}
+                  />
+               ) : null}
+            </Box>
 
             {/* Bottom Right - Host Avatars */}
             <Box sx={styles.bottomRightSection}>
