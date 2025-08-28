@@ -138,6 +138,17 @@ export const sendLivestreamNoShowReminder = onRequest(
             return
          }
 
+         if (livestream.isPanel) {
+            functions.logger.error(
+               `Livestream ${livestreamId} is a panel, skipping reminder task`
+            )
+
+            res.status(403).send(
+               "Livestream is a panel, skipping reminder task"
+            )
+            return
+         }
+
          const livestreamPresenter =
             LivestreamPresenter.createFromDocument(livestream)
 

@@ -162,7 +162,7 @@ exports.fetchStripePrice = stripe.fetchStripePrice
 exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
 
 // Livestreams
-exports.sendLivestreamRegistrationConfirmationEmail_v6 =
+exports[FUNCTION_NAMES.sendLivestreamRegistrationConfirmationEmail] =
    livestreams.livestreamRegistrationConfirmationEmail
 exports[FUNCTION_NAMES.sendPhysicalEventRegistrationConfirmationEmail] =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
@@ -405,7 +405,7 @@ exports.schedule1HourReminderEmails = remindersNew.schedule1HourReminderEmails
 exports.schedule24HoursReminderEmails =
    remindersNew.schedule24HoursReminderEmails
 // For testing Reminders
-exports.manualReminderEmails = remindersNew.manualReminderEmails
+exports.manualReminderEmails_v3 = remindersNew.manualReminderEmails
 
 // Followups
 exports.sendFollowupToNonAttendees = followups.sendFollowupToNonAttendees

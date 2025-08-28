@@ -99,6 +99,16 @@ export const livestreamRegistrationConfirmationEmail = onCall(
          }
       }
 
+      if (livestream.isPanel) {
+         functions.logger.error(
+            `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
+         )
+         throw new HttpsError(
+            "invalid-argument",
+            "Panels registration confirmation emails are not allowed."
+         )
+      }
+
       const eventGroups = await groupRepo.getGroupsByIds(livestream.groupIds)
 
       const groupWithoutUniCode = eventGroups.find(
@@ -223,6 +233,16 @@ export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
    if (!livestream) {
       logger.error("Livestream not found")
       throw new HttpsError("not-found", "Livestream not found")
+   }
+
+   if (livestream.isPanel) {
+      functions.logger.error(
+         `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
+      )
+      throw new HttpsError(
+         "invalid-argument",
+         "Panels registration confirmation emails are not allowed."
+      )
    }
 
    if (!user) {

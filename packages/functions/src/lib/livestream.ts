@@ -153,6 +153,7 @@ export const getStreamsByDateWithRegisteredStudents = async (
       .where("start", ">=", filterStartDate)
       .where("start", "<=", filterEndDate)
       .where("test", "==", false)
+      .where("isPanel", "in", [false, null])
 
    if (options?.excludeHidden) {
       query = query.where("hidden", "==", false)
