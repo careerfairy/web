@@ -1,11 +1,7 @@
 import { Box, LinearProgress } from "@mui/material"
-import useSWRMutation from "swr/mutation"
-import { v4 as uuid } from "uuid"
 import { placeholderBanner } from "../../../../constants/images"
-import { groupRepo } from "../../../../data/RepositoryInstances"
 import { sxStyles } from "../../../../types/commonTypes"
-import useFirebaseUpload from "../../../custom-hook/useFirebaseUpload"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import useUploadGroupBanner from "../../../custom-hook/group/useUploadGroupBanner"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import BackgroundImage from "../../../views/common/BackgroundImage"
 import { useCompanyPage } from "../index"
@@ -34,40 +30,24 @@ const styles = sxStyles({
 const BannerIllustration = () => {
    const { group, groupPresenter, editMode } = useCompanyPage()
 
-   const [uploadFile, uploadProgress, isUploading] = useFirebaseUpload()
+   const { 
+      handleUploadImage, 
+      isLoading,
+      progress,
+      uploading
+   } = useUploadGroupBanner(group.id)
 
-   const { successNotification, errorNotification } = useSnackbarNotifications()
-
-   const { trigger, isMutating } = useSWRMutation(
-      `update-group-${group.id}-banner-image`,
-      handleUpdateBannerImage,
-      {
-         onSuccess: () => {
-            successNotification("Banner image has been successfully updated")
-         },
-         onError: (err) => {
-            errorNotification(err.message)
-         },
-         throwOnError: false, // We don't want to throw an error, we want to handle it ourselves in the onError callback above
-      }
-   )
-
-   const handleUploadBannerPhoto = async (photo: File) => {
-      const bannerImageId = uuid()
-      const downloadURL = await uploadFile(
-         photo,
-         groupPresenter.getGroupBannerStorageImagePath(bannerImageId)
-      )
-      return trigger({ groupId: group.id, bannerImageUrl: downloadURL })
+   const handleUploadBannerPhoto = async (photo: File): Promise<void> => {
+      await handleUploadImage(photo)
    }
 
    return (
       <Box sx={styles.imageWrapper}>
-         {isUploading ? (
+         {uploading ? (
             <LinearProgress
                sx={styles.progress}
                variant="determinate"
-               value={uploadProgress}
+               value={progress}
             />
          ) : null}
          <BackgroundImage
@@ -82,24 +62,14 @@ const BannerIllustration = () => {
          <Box sx={styles.buttonWrapper}>
             {editMode ? (
                <BannerUploadButton
-                  disabled={isUploading || isMutating}
+                  disabled={uploading || isLoading}
                   handleUploadBannerPhoto={handleUploadBannerPhoto}
-                  loading={isUploading || isMutating}
+                  loading={uploading || isLoading}
                />
             ) : null}
          </Box>
       </Box>
    )
 }
-
-type Arguments = {
-   groupId: string
-   bannerImageUrl: string
-}
-
-const handleUpdateBannerImage = (
-   _: string,
-   { arg: { bannerImageUrl, groupId } }: { arg: Arguments }
-) => groupRepo.updateGroupBannerPhoto(groupId, bannerImageUrl)
 
 export default BannerIllustration
