@@ -93,6 +93,16 @@ const WelcomeDialogContainer = dynamic(
    }
 )
 
+const UpcomingPanelEvents = dynamic(
+   () =>
+      import("../../components/views/panels/UpcomingPanelEvents").then(
+         (mod) => ({ default: mod.UpcomingPanelEvents })
+      ),
+   {
+      ssr: false,
+   }
+)
+
 const styles = sxStyles({
    welcomeTextContainer: {
       ml: 2,
@@ -199,6 +209,9 @@ const PortalPage = ({
                                  limit={20}
                               />
                            )}
+                           <UpcomingPanelEvents
+                              userCountryCode={userCountryCode}
+                           />
                            <RecommendedCustomJobs
                               userCountryCode={userCountryCode}
                            />
