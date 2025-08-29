@@ -75,14 +75,16 @@ const styles = sxStyles({
       },
    },
    noLivestreamsContainer: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 1,
+      px: 2,
+      pb: 2,
       height: "100%",
-      width: "100%",
    },
    noLivestreamsCard: {
       backgroundColor: (theme) => theme.brand.white[300],
       borderRadius: "8px",
-      height: "100%",
-      width: "100%",
       px: 1,
       py: 4,
       display: "flex",
@@ -91,6 +93,7 @@ const styles = sxStyles({
       justifyContent: "center",
       textAlign: "center",
       gap: 2,
+      flex: 1,
    },
    noLivestreamsTitle: {
       color: "neutral.800",
