@@ -13,7 +13,6 @@ import { LivestreamChips } from "./LivestreamChips"
 import { LivestreamStats } from "./LivestreamStats"
 
 const styles = sxStyles({
-   noLivestreamCopy: { color: (theme) => theme.palette.grey[500] },
    card: {
       width: "100%",
    },
@@ -50,7 +49,6 @@ const styles = sxStyles({
       color: (t) => t.palette.grey[600],
       paddingTop: (t) => t.spacing(1),
    },
-
    publishedStatusText: {
       marginLeft: "auto",
       fontWeight: 600,
@@ -74,6 +72,49 @@ const styles = sxStyles({
       textTransform: "none",
       "&:hover": {
          border: "none",
+      },
+   },
+   noLivestreamsContainer: {
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      p: 3,
+   },
+   noLivestreamsCard: {
+      backgroundColor: (theme) => theme.brand.white[300],
+      borderRadius: "12px",
+      p: 3,
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      gap: 2,
+   },
+   noLivestreamsTitle: {
+      color: "neutral.800",
+      fontWeight: 600,
+   },
+   noLivestreamsSubtitle: {
+      color: "neutral.800",
+      fontWeight: 400,
+      maxWidth: "400px",
+   },
+   noLivestreamsButton: {
+      backgroundColor: (theme) => theme.brand.purple[600],
+      color: (theme) => theme.brand.white[50],
+      borderRadius: "8px",
+      textTransform: "none",
+      px: 3,
+      py: 1.5,
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.purple[700],
+      },
+      "&:disabled": {
+         backgroundColor: (theme) => theme.brand.purple[300],
+         color: (theme) => theme.brand.white[200],
       },
    },
 })
@@ -254,21 +295,22 @@ const LoadingSkeleton = () => {
 const NoLivestreams = () => {
    const { createDraftLivestream, isCreating } = useLivestreamRouting()
    return (
-      <Box>
-         <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
-            Looks like you don&apos;t have any upcoming live stream.
-            <br />
-            Start creating your next live stream now!
-         </Typography>
+      <Box sx={styles.noLivestreamsContainer}>
+         <Box sx={styles.noLivestreamsCard}>
+            <Typography variant="medium" sx={styles.noLivestreamsTitle}>
+               No upcoming live streams
+            </Typography>
+            
+            <Typography variant="medium" sx={styles.noLivestreamsSubtitle}>
+               Schedule your next live stream to engage your audience. Once published it will appear here.
+            </Typography>
 
-         <Box mt={2} mb={3} display="flex" justifyContent="center">
             <LoadingButton
-               color="secondary"
-               variant="contained"
+               sx={styles.noLivestreamsButton}
                onClick={createDraftLivestream}
                loading={isCreating}
             >
-               Create New Live Stream
+               Schedule a live stream
             </LoadingButton>
          </Box>
       </Box>
