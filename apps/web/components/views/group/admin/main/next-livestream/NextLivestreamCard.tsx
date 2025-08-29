@@ -76,9 +76,7 @@ const styles = sxStyles({
    },
    noLivestreamsContainer: {
       height: "100%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
+      p: 2,
    },
    noLivestreamsCard: {
       backgroundColor: (theme) => theme.brand.white[300],
@@ -293,7 +291,7 @@ const NoLivestreams = () => {
 
             <LoadingButton
                variant="contained"
-               color="primary"
+               color="secondary"
                onClick={createDraftLivestream}
                loading={isCreating}
             >
