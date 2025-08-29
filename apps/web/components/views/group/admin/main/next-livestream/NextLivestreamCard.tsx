@@ -50,12 +50,7 @@ const styles = sxStyles({
       color: (t) => t.palette.grey[600],
       paddingTop: (t) => t.spacing(1),
    },
-   draftStatusText: {
-      marginLeft: "auto",
-      fontWeight: 600,
-      fontSize: "0.813rem",
-      color: (theme) => theme.palette.gold.main,
-   },
+
    publishedStatusText: {
       marginLeft: "auto",
       fontWeight: 600,
@@ -84,35 +79,19 @@ const styles = sxStyles({
 })
 
 export const useNextLivestreamCardLogic = () => {
-   const { nextDraft, nextLivestream } = useMainPageContext()
+   const { nextLivestream } = useMainPageContext()
 
    const noLivestreams = useCallback(() => {
-      return nextDraft === null && nextLivestream === null
-   }, [nextLivestream, nextDraft])
+      return nextLivestream === null
+   }, [nextLivestream])
 
    const isLoading = useCallback(() => {
-      return nextDraft === undefined || nextLivestream === undefined
-   }, [nextDraft, nextLivestream])
-
-   const isDraft = useCallback(() => {
-      if (nextDraft && !nextLivestream) {
-         return true
-      }
-
-      if (
-         nextDraft &&
-         nextDraft.start.toDate() > new Date() && // is a future date
-         nextDraft.start.toDate() < nextLivestream.start.toDate() // draft is sonner than the livestream
-      ) {
-         return true
-      }
-
-      return false
-   }, [nextDraft, nextLivestream])
+      return nextLivestream === undefined
+   }, [nextLivestream])
 
    const livestream = useMemo(() => {
-      return isDraft() ? nextDraft : nextLivestream
-   }, [isDraft, nextDraft, nextLivestream])
+      return nextLivestream
+   }, [nextLivestream])
 
    /**
     * Checks if the livestream is about to start
@@ -133,10 +112,9 @@ export const useNextLivestreamCardLogic = () => {
          livestream,
          noLivestreams,
          isLoading,
-         isDraft,
          isCloseToLivestreamStart,
       }),
-      [isCloseToLivestreamStart, isDraft, isLoading, livestream, noLivestreams]
+      [isCloseToLivestreamStart, isLoading, livestream, noLivestreams]
    )
 }
 
@@ -192,25 +170,17 @@ const LivestreamDetails = ({ livestream }: { livestream: LivestreamEvent }) => {
 }
 
 const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
-   const { isDraft, isCloseToLivestreamStart } = useNextLivestreamCardLogic()
+   const { isCloseToLivestreamStart } = useNextLivestreamCardLogic()
    const { editLivestream } = useLivestreamRouting()
 
    const onManageLivestream = useCallback(() => {
-      livestream.isDraft = isDraft()
+      livestream.isDraft = false
       return editLivestream(livestream.id)
-   }, [isDraft, livestream, editLivestream])
+   }, [livestream, editLivestream])
 
    return (
       <Box textAlign="right" my={2}>
-         {isDraft() ? (
-            <Button
-               color="secondary"
-               variant="contained"
-               onClick={onManageLivestream}
-            >
-               Manage your live stream
-            </Button>
-         ) : isCloseToLivestreamStart() ? (
+         {isCloseToLivestreamStart() ? (
             <>
                <Button
                   color="secondary"
@@ -236,22 +206,18 @@ const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
 }
 
 const TitleBar = () => {
-   const { isDraft } = useNextLivestreamCardLogic()
-
    return (
       <Box display="flex" alignItems="center">
          <Typography sx={styles.cardTitleProps}>
             Your next live stream
          </Typography>
 
-         {isDraft() ? <DraftStatus /> : <PublishedStatus />}
+         <PublishedStatus />
       </Box>
    )
 }
 
-const DraftStatus = () => {
-   return <Typography sx={styles.draftStatusText}>Draft</Typography>
-}
+
 
 const PublishedStatus = () => {
    return (

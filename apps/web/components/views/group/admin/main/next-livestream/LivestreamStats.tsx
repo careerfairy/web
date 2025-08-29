@@ -5,15 +5,13 @@ import { useFirestoreDocument } from "components/custom-hook/utils/useFirestoreD
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Briefcase, User } from "react-feather"
-import { useNextLivestreamCardLogic } from "./NextLivestreamCard"
+
 
 export const LivestreamStats = ({
    livestream,
 }: {
    livestream: LivestreamEvent
 }) => {
-   const { isDraft } = useNextLivestreamCardLogic()
-
    const applications = (
       <Box display="flex" alignItems="center">
          <Briefcase width={20} />
@@ -22,10 +20,6 @@ export const LivestreamStats = ({
          </Typography>
       </Box>
    )
-
-   if (isDraft()) {
-      return <Box mt={2}>{applications}</Box>
-   }
 
    return (
       <Box display="flex" sx={{ flexWrap: "wrap" }}>
