@@ -169,9 +169,6 @@ export const getStreamsByDateWithRegisteredStudents = async (
          )
          ?.filter((stream) => stream.isPanel !== true)
 
-      streams?.forEach((stream) =>
-         console.log("🚀 ~ streams ~ stream:", stream?.id)
-      )
       return addUsersDataOnStreams(streams, options?.skimData)
    })
 }
