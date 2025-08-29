@@ -3,6 +3,7 @@ import {
    LivestreamEvent,
    getEarliestEventBufferTime,
 } from "@careerfairy/shared-lib/livestreams"
+import { useAuth } from "HOCs/AuthProvider"
 import {
    collection,
    limit as firestoreLimit,
@@ -15,34 +16,45 @@ import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 
+// Allowed countries for panel events
+const ALLOWED_COUNTRIES = ["AT", "CH", "DE", "LI"]
+
 type Options = {
+   initialData?: LivestreamEvent[]
    suspense?: boolean
    limit?: number
+   userCountryCode?: string
    includeHidden?: boolean
-   filters?: {
-      isPanel?: boolean
-   }
-   initialData?: LivestreamEvent[]
 }
 
-export const useNextLivestreamsSWR = (options?: Options) => {
-   const limit = options?.limit ?? 10
-   const suspense = options?.suspense ?? false
-   const includeHidden = options?.includeHidden ?? false
-   const isPanel = options?.filters?.isPanel ?? false
-   const initialData = options?.initialData ?? []
+export const useUpcomingPanelEventsSWR = (options?: Options) => {
+   const { userData } = useAuth()
    const firestore = useFirestore()
 
+   // Determine the user's country code with priority: userData.countryIsoCode > options.userCountryCode
+   const userCountryCode = userData?.countryIsoCode || options?.userCountryCode
+
+   // Check if user's country is in the allowed list
+   const isCountryAllowed = userCountryCode
+      ? ALLOWED_COUNTRIES.includes(userCountryCode)
+      : false
+
+   // Create conditional SWR key - null if country not allowed, otherwise include country code
+   const swrKey = isCountryAllowed ? `panels-${userCountryCode}` : null
+
+   const limit = options?.limit ?? 10
+   const suspense = options?.suspense ?? false
+   const includeHidden = options?.includeHidden ?? true // TODO: remove this before release
+   const initialData = options?.initialData ?? []
+
    return useSWR<LivestreamEvent[]>(
-      "next-livestreams",
+      swrKey,
       async () => {
          const livestreamsQuery = query(
             collection(firestore, "livestreams"),
             where("start", ">", getEarliestEventBufferTime()),
             where("test", "==", false),
-            ...(isPanel
-               ? [where("isPanel", "==", true)]
-               : [where("isPanel", "in", [false, null])]),
+            where("isPanel", "==", true),
             orderBy("start", "asc"),
             ...(includeHidden ? [] : [where("hidden", "==", false)]),
             firestoreLimit(limit)
@@ -56,7 +68,7 @@ export const useNextLivestreamsSWR = (options?: Options) => {
          suspense,
          fallbackData: initialData,
          onError: (error) =>
-            errorLogAndNotify(error, "Failed to fetch next livestreams"),
+            errorLogAndNotify(error, "Failed to fetch upcoming panel events"),
       }
    )
 }
