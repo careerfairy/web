@@ -77,11 +77,11 @@ const styles = sxStyles({
    noLivestreamsContainer: {
       height: "100%",
       p: 2,
+      width: "100%",
    },
    noLivestreamsCard: {
       backgroundColor: (theme) => theme.brand.white[300],
-      borderRadius: "12px",
-      p: 3,
+      borderRadius: "8px",
       height: "100%",
       width: "100%",
       display: "flex",
