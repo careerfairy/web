@@ -102,7 +102,6 @@ const styles = sxStyles({
    noLivestreamsSubtitle: {
       color: "neutral.800",
       fontWeight: 400,
-      maxWidth: "400px",
    },
 
 })
