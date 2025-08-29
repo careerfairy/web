@@ -85,23 +85,21 @@ const styles = sxStyles({
    noLivestreamsCard: {
       backgroundColor: (theme) => theme.brand.white[300],
       borderRadius: "8px",
-      px: 1,
-      py: 4,
+      px: 3,
+      py: 6,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
       textAlign: "center",
-      gap: 2,
+      gap: 3,
       flex: 1,
    },
    noLivestreamsTitle: {
       color: "neutral.800",
-      fontWeight: 600,
    },
    noLivestreamsSubtitle: {
-      color: "neutral.800",
-      fontWeight: 400,
+      color: "neutral.600",
    },
 
 })
@@ -284,11 +282,11 @@ const NoLivestreams = () => {
    return (
       <Box sx={styles.noLivestreamsContainer}>
          <Box sx={styles.noLivestreamsCard}>
-            <Typography variant="medium" sx={styles.noLivestreamsTitle}>
+            <Typography variant="brandedH4" sx={styles.noLivestreamsTitle}>
                No upcoming live streams
             </Typography>
             
-            <Typography variant="medium" sx={styles.noLivestreamsSubtitle}>
+            <Typography variant="brandedBody" sx={styles.noLivestreamsSubtitle}>
                Schedule your next live stream to engage your audience. Once published it will appear here.
             </Typography>
 
