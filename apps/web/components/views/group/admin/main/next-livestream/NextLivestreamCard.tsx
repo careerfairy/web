@@ -76,7 +76,6 @@ const styles = sxStyles({
    },
    noLivestreamsContainer: {
       height: "100%",
-      p: 2,
       width: "100%",
    },
    noLivestreamsCard: {
@@ -84,6 +83,8 @@ const styles = sxStyles({
       borderRadius: "8px",
       height: "100%",
       width: "100%",
+      px: 1,
+      py: 4,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
