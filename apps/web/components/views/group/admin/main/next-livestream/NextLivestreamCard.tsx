@@ -79,13 +79,13 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      p: 3,
    },
    noLivestreamsCard: {
       backgroundColor: (theme) => theme.brand.white[300],
       borderRadius: "12px",
       p: 3,
       height: "100%",
+      width: "100%",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -102,21 +102,7 @@ const styles = sxStyles({
       fontWeight: 400,
       maxWidth: "400px",
    },
-   noLivestreamsButton: {
-      backgroundColor: (theme) => theme.brand.purple[600],
-      color: (theme) => theme.brand.white[50],
-      borderRadius: "8px",
-      textTransform: "none",
-      px: 3,
-      py: 1.5,
-      "&:hover": {
-         backgroundColor: (theme) => theme.brand.purple[700],
-      },
-      "&:disabled": {
-         backgroundColor: (theme) => theme.brand.purple[300],
-         color: (theme) => theme.brand.white[200],
-      },
-   },
+
 })
 
 export const useNextLivestreamCardLogic = () => {
@@ -306,7 +292,8 @@ const NoLivestreams = () => {
             </Typography>
 
             <LoadingButton
-               sx={styles.noLivestreamsButton}
+               variant="contained"
+               color="primary"
                onClick={createDraftLivestream}
                loading={isCreating}
             >
