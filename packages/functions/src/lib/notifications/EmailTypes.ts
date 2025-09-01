@@ -27,6 +27,7 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    SPARKS_END_SUBSCRIPTION: "sparks_end_subscription",
    SPARKS_END_CONTENT_CREATION_PERIOD: "sparks_end_content_creation_period",
    LIVE_STREAM_REGISTRATION_F2F: "live_stream_registration_confirmation_f2f",
+   PANEL_REGISTRATION: "panel_registration_confirmation",
 } as const satisfies Record<string, string>
 
 export type CustomerIoEmailTemplateId =
@@ -54,6 +55,11 @@ export type LivestreamRegistrationTemplateData = {
    sparks: SparkData[]
    calendar: CalendarData
 }
+
+export type PanelRegistrationTemplateData =
+   LivestreamRegistrationTemplateData & {
+      url: string
+   }
 
 export type LivestreamRegistrationF2FTemplateData = {
    livestream: {
@@ -182,6 +188,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION]: SparksPlanTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_CONTENT_CREATION_PERIOD]: SparksPlanTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_REGISTRATION_F2F]: LivestreamRegistrationF2FTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REGISTRATION]: PanelRegistrationTemplateData
 }
 
 /**

@@ -16,6 +16,7 @@ import {
    prepareEmailSpeakers,
 } from "@careerfairy/shared-lib/email/helpers"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { logger } from "firebase-functions/v2"
 import {
    onDocumentCreated,
@@ -99,18 +100,6 @@ export const livestreamRegistrationConfirmationEmail = onCall(
          }
       }
 
-      if (livestream.isPanel) {
-         functions.logger.warn(
-            `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
-         )
-
-         return {
-            status: 200,
-            message:
-               "Livestream is a panel, skipping registration confirmation email",
-         }
-      }
-
       const eventGroups = await groupRepo.getGroupsByIds(livestream.groupIds)
 
       const groupWithoutUniCode = eventGroups.find(
@@ -186,22 +175,32 @@ export const livestreamRegistrationConfirmationEmail = onCall(
 
       try {
          // Send email using notification repository
+         const templateId = livestream.isPanel
+            ? CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REGISTRATION
+            : CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION
+
+         // TODO: Replace with correct URL
+         const livestreamUrl = makeLivestreamEventDetailsUrl(livestream.id)
+
+         const templateData = {
+            livestream: {
+               title: livestream.title,
+               company: group.universityName,
+               start: formattedStartDate,
+               companyBannerImageUrl:
+                  livestream.backgroundImageUrl || group.bannerImageUrl,
+               ...(livestream.isPanel ? { url: livestreamUrl } : {}),
+            },
+            jobs: emailJobs,
+            speakers: emailSpeakers,
+            sparks: emailSparks,
+            calendar: emailCalendar,
+         }
+
          const result = await notificationService.sendEmailNotifications([
             {
-               templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION,
-               templateData: {
-                  livestream: {
-                     title: livestream.title,
-                     company: group.universityName,
-                     start: formattedStartDate,
-                     companyBannerImageUrl:
-                        livestream.backgroundImageUrl || group.bannerImageUrl,
-                  },
-                  jobs: emailJobs,
-                  speakers: emailSpeakers,
-                  sparks: emailSparks,
-                  calendar: emailCalendar,
-               },
+               templateId: templateId,
+               templateData: templateData,
                identifiers: {
                   id: userAuthId,
                },
