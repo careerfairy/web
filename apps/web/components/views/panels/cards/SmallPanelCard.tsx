@@ -2,7 +2,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
-import useGroupsByIds from "components/custom-hook/useGroupsByIds"
+import { usePanelGroupsByIds } from "components/custom-hook/panels/usePanelGroupsByIds"
 import { sxStyles } from "types/commonTypes"
 import {
    PanelCardBase,
@@ -12,14 +12,12 @@ import {
 } from "./base/PanelCardBase"
 
 const CORNER_PADDING = 6
-const CARD_MIN_WIDTH = 180
 const CARD_MAX_WIDTH = 208
 const CARD_MIN_HEIGHT = 119
 
 const styles = sxStyles({
    content: {
-      minWidth: `${CARD_MIN_WIDTH}px`,
-      maxWidth: `${CARD_MAX_WIDTH}px`,
+      minWidth: `${CARD_MAX_WIDTH}px`,
       minHeight: `${CARD_MIN_HEIGHT}px`,
    },
    topLeftSection: {
@@ -56,7 +54,7 @@ type SmallPanelCardProps = {
 export const SmallPanelCard = ({ event }: SmallPanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
 
-   const { data: groups } = useGroupsByIds(event.groupIds, false)
+   const { data: groups } = usePanelGroupsByIds(event.groupIds)
 
    const hostLogos =
       groups?.map((group) => group.logoUrl)?.filter(Boolean) ?? []

@@ -2,7 +2,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
-import useGroupsByIds from "components/custom-hook/useGroupsByIds"
+import { usePanelGroupsByIds } from "components/custom-hook/panels/usePanelGroupsByIds"
 import { sxStyles } from "types/commonTypes"
 import {
    PanelCardBase,
@@ -89,7 +89,7 @@ export const SquarePanelCard = ({
 }: SquarePanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
 
-   const { data: groups } = useGroupsByIds(event.groupIds, false)
+   const { data: groups } = usePanelGroupsByIds(event.groupIds)
 
    const hostLogos =
       groups?.map((group) => group.logoUrl)?.filter(Boolean) ?? []

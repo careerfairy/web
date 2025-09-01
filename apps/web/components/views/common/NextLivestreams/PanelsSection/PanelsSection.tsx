@@ -29,12 +29,38 @@ const styles = sxStyles({
       textDecoration: "underline",
       textDecorationSkipInk: "none",
    },
+   linkButton: {
+      p: 0,
+      minWidth: "auto",
+      textTransform: "none",
+      backgroundColor: "transparent",
+      boxShadow: "none",
+      "&:hover": {
+         backgroundColor: "transparent",
+         boxShadow: "none",
+      },
+      "&:active": {
+         backgroundColor: "transparent",
+         boxShadow: "none",
+      },
+      "&:focus": {
+         backgroundColor: "transparent",
+         boxShadow: "none",
+      },
+      "& .MuiTouchRipple-root": {
+         display: "none",
+      },
+   },
 })
+
 type Props = {
    panels: LivestreamEvent[]
 }
+
 export const PanelsSection = ({ panels }: Props) => {
-   const isMobile = useMediaQuery<Theme>((theme) => theme.breakpoints.down(989))
+   const isMobile = useMediaQuery<Theme>((theme) =>
+      theme.breakpoints.down(1052)
+   )
 
    const [emblaRef, emblaApi] = useEmblaCarousel(
       {
@@ -66,7 +92,7 @@ export const PanelsSection = ({ panels }: Props) => {
                   href="/panels"
                   shallow
                   scroll={false}
-                  sx={{ p: 0 }}
+                  sx={styles.linkButton}
                >
                   <Typography variant="small" sx={styles.panelDescription}>
                      Find out all about panels

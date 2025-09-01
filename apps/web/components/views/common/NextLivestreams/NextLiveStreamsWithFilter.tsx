@@ -110,9 +110,12 @@ const NextLiveStreamsWithFilter = ({
    const router = useRouter()
    const { query, push } = router
    const { handlePartnerEventClick } = usePartnership()
+
    const { data: panels } = useUpcomingPanelEventsSWR({
       userCountryCode,
+      limit: 2,
    })
+
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const [inputValue, setInputValue] = useState("")
    const [debouncedInputValue, setDebouncedInputValue] = useState("")
@@ -374,9 +377,11 @@ const NextLiveStreamsWithFilter = ({
                transition={{ duration: 0.4, ease: "easeOut" }}
                style={{ width: "100%" }}
             >
-               <Box sx={styles.panelsRoot}>
-                  <PanelsSection panels={panels} />
-               </Box>
+               <Container maxWidth="xl" disableGutters>
+                  <Box sx={styles.panelsRoot}>
+                     <PanelsSection panels={panels} />
+                  </Box>
+               </Container>
             </motion.div>
          ) : null}
 
