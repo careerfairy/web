@@ -11,8 +11,11 @@ import { SendEmailRequestOptions } from "customerio-node/dist/lib/api/requests"
  */
 export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_REGISTRATION: "live_stream_registration_confirmation",
+   PANEL_REMINDER_48H: "panel_reminder_48h",
    LIVESTREAM_REMINDER_24H: "live_stream_reminder_24h",
    LIVESTREAM_REMINDER_1H: "live_stream_reminder_1h",
+   PANEL_REMINDER_6H: "panel_reminder_6h",
+   PANEL_REMINDER_7M: "panel_reminder_7min",
    LIVESTREAM_REMINDER_5M: "live_stream_reminder_5min",
    LIVESTREAM_REMINDER_NO_SHOW: "live_stream_reminder_no_show",
    LIVESTREAM_FOLLOWUP_ATTENDEES: "live_stream_followup_attendees",
@@ -79,6 +82,23 @@ export type LivestreamRegistrationF2FTemplateData = {
  */
 export type ReminderTemplateData = {
    livestream: {
+      company: string
+      bannerImageUrl: string
+      companyLogoUrl: string
+      start: string
+      title: string
+      url: string
+      companyPageUrl: string
+   }
+   calendar: {
+      google: string
+      outlook: string
+      apple: string
+   }
+}
+
+export type PanelReminderTemplateData = {
+   panel: {
       company: string
       bannerImageUrl: string
       companyLogoUrl: string
@@ -172,8 +192,11 @@ export type SparksPlanTemplateData = {
  */
 export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION]: LivestreamRegistrationTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_48H]: PanelReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_6H]: PanelReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_1H]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_7M]: PanelReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_5M]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES]: ReminderFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES]: ReminderFollowUpTemplateData
