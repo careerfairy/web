@@ -100,13 +100,15 @@ export const livestreamRegistrationConfirmationEmail = onCall(
       }
 
       if (livestream.isPanel) {
-         functions.logger.error(
+         functions.logger.warn(
             `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
          )
-         throw new HttpsError(
-            "invalid-argument",
-            "Panels registration confirmation emails are not allowed."
-         )
+
+         return {
+            status: 200,
+            message:
+               "Livestream is a panel, skipping registration confirmation email",
+         }
       }
 
       const eventGroups = await groupRepo.getGroupsByIds(livestream.groupIds)
@@ -236,13 +238,14 @@ export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
    }
 
    if (livestream.isPanel) {
-      functions.logger.error(
+      functions.logger.warn(
          `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
       )
-      throw new HttpsError(
-         "invalid-argument",
-         "Panels registration confirmation emails are not allowed."
-      )
+      return {
+         status: 200,
+         message:
+            "Livestream is a panel, skipping registration confirmation email",
+      }
    }
 
    if (!user) {
