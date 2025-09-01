@@ -13,14 +13,15 @@ import {
    Tooltip,
    tooltipClasses,
    TooltipProps,
+   Typography,
 } from "@mui/material"
+import { styled } from "@mui/material/styles"
 import { type Options } from "@sentry/types"
 import useMenuState from "components/custom-hook/useMenuState"
 import { FC, useCallback, useMemo, useState } from "react"
 import { ChevronDown, ChevronRight } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import Link from "../../../common/Link"
-import { styled } from "@mui/material/styles"
 
 const styles = sxStyles({
    card: {
@@ -36,15 +37,13 @@ const styles = sxStyles({
       textTransform: "none",
       paddingRight: (theme) => theme.spacing(2),
    },
-   cardTitleTypographyProps: {
-      fontWeight: 500,
-   },
+
    cardContent: {
-      paddingX: (theme) => theme.spacing(3),
+      paddingX: (theme) => theme.spacing(2),
       paddingTop: 0,
    },
    cardHeader: {
-      paddingX: (theme) => theme.spacing(3),
+      paddingX: (theme) => theme.spacing(2),
       paddingBottom: (theme) => theme.spacing(1),
    },
    tooltip: {
@@ -71,6 +70,7 @@ type Props = {
    optionsHandler?: OptionsProps["handler"]
    helpTooltip?: string
    sx?: SxProps<Theme>
+   cardContentSx?: SxProps<Theme>
    customAction?: React.ReactNode
    disableTypography?: boolean
    children: React.ReactNode
@@ -87,6 +87,7 @@ const CardCustom: FC<Props> = ({
    helpTooltip,
    subHeader,
    sx,
+   cardContentSx,
    customAction,
    disableTypography = false,
 }) => {
@@ -115,13 +116,16 @@ const CardCustom: FC<Props> = ({
       <Card data-testid="card-custom" sx={mergedSxProps}>
          <CardHeader
             sx={styles.cardHeader}
-            title={<span data-testid="card-title">{title}</span>}
+            title={
+               <Typography variant="brandedH5" data-testid="card-title">
+                  {title}
+               </Typography>
+            }
             action={action}
-            titleTypographyProps={styles.cardTitleTypographyProps}
             disableTypography={disableTypography}
             subheader={<span data-testid="card-subheader">{subHeader}</span>}
          />
-         <CardContent sx={styles.cardContent}>
+         <CardContent sx={combineStyles(styles.cardContent, cardContentSx)}>
             <span data-testid="card-value">{children}</span>
          </CardContent>
       </Card>
