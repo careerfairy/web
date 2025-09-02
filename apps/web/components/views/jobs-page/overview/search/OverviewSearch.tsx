@@ -20,6 +20,12 @@ const styles = sxStyles({
       transition: `top 100ms ease-out`,
    },
    searchBy: {
+      overflowX: "scroll",
+      scrollbarWidth: "none",
+      msOverflowStyle: "none",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
       px: {
          xs: "16px",
          sm: "16px",
