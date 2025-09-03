@@ -42,6 +42,7 @@ export const InteractionSources = {
    Talent_Guide: "Talent_Guide",
    Email_Live_Stream_Reminder_24h: "Email_Live_Stream_Reminder_24h",
    Job_Header: "Job_Header",
+   Panels_Overview_Page: "Panels_Overview_Page",
 } as const
 
 export type InteractionSourcesType =

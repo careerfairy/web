@@ -46,18 +46,6 @@ const styles = sxStyles({
       top: "auto",
       right: "auto",
    },
-   titleImageOverride: {
-      position: "static",
-      height: "38px",
-      aspectRatio: "9/4",
-      maxWidth: "141px",
-      backgroundSize: "contain",
-      backgroundPosition: "bottom",
-      backgroundRepeat: "no-repeat",
-   },
-   titleImageOverrideSmallDesktop: {
-      maxWidth: "129px",
-   },
    titleImageContainer: {
       display: "flex",
       justifyContent: "flex-start",
@@ -79,6 +67,7 @@ type SquarePanelCardProps = {
    fullHeight?: boolean
    fullRegistrationStatus?: boolean
    stackedBottomSection?: boolean
+   onCardClick?: (livestreamId: string) => void
 }
 
 export const SquarePanelCard = ({
@@ -86,6 +75,7 @@ export const SquarePanelCard = ({
    fullHeight,
    fullRegistrationStatus,
    stackedBottomSection,
+   onCardClick,
 }: SquarePanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
 
@@ -97,6 +87,7 @@ export const SquarePanelCard = ({
    return (
       <PanelCardBase
          event={event}
+         onCardClick={onCardClick}
          rootSx={[styles.root, fullHeight ? { height: "100%" } : {}]}
          backgroundSx={{
             "&::before": {

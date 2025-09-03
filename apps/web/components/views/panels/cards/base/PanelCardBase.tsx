@@ -103,6 +103,7 @@ type PanelCardBase = {
    rootSx?: SxProps<Theme>
    contentSx?: SxProps<Theme>
    backgroundSx?: SxProps<Theme>
+   onCardClick?: (panelId: string) => void
 }
 
 export const PanelCardBase = ({
@@ -111,6 +112,7 @@ export const PanelCardBase = ({
    rootSx,
    contentSx,
    backgroundSx,
+   onCardClick,
 }: PanelCardBase) => {
    const imageUrl = event.backgroundImageUrl
    const router = useRouter()
@@ -125,19 +127,24 @@ export const PanelCardBase = ({
    })
 
    const handleClick = () => {
-      void router.push(dialogLink, undefined, {
+      if (onCardClick) {
+         return onCardClick?.(event.id)
+      }
+      router.push(dialogLink, undefined, {
          shallow: true,
          scroll: false,
       })
    }
+
+   const isLink = !onCardClick
 
    return (
       <Box
          key={event.id}
          sx={combineStyles(styles.panelCard, rootSx, { position: "relative" })}
          onClick={handleClick}
-         component={Link}
-         href={dialogLink}
+         component={isLink ? Link : Box}
+         href={isLink ? dialogLink : undefined}
          shallow
          scroll={false}
       >

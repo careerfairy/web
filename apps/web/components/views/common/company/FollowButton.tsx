@@ -94,7 +94,9 @@ const AuthedFollowButton: FC<Props> = ({
          }
       )
 
-   const handleClick = () => {
+   const handleClick = (event: React.MouseEvent) => {
+      event.stopPropagation()
+      event.preventDefault()
       if (authenticatedUser) {
          return trigger({
             userData,

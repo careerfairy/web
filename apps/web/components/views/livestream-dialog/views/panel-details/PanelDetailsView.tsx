@@ -3,39 +3,15 @@ import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import useGroupsByIds from "../../../../custom-hook/useGroupsByIds"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { CompaniesCarousel } from "../../../common/company/CompaniesCarousel"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import useRegistrationHandler from "../../useRegistrationHandler"
 import ActionButton from "../livestream-details/action-button/ActionButton"
 import Speakers from "../livestream-details/main-content/Speakers"
 import { MobileDateAndTime } from "./DateAndTime"
 import { HeroSection } from "./hero/HeroSection"
-import { CompaniesCarousel } from "./main-content/CompaniesCarousel"
 
 const styles = sxStyles({
-   title: {
-      color: "common.white",
-      textTransform: "uppercase",
-      fontFamily: "Roboto Slab",
-      fontWeight: 400,
-      textShadow:
-         "-1.186px 1.186px 0px #000000, -2.372px 2.372px 0px #000000, -3.559px 3.559px 0px #000000",
-      fontSize: { xs: "27.648px", md: "37.957px" },
-      lineHeight: { xs: "32px", md: "42px" },
-      "& .title-large": {
-         fontSize: { xs: "36.288px", md: "49.819px" },
-         lineHeight: { xs: "36px", md: "46px" },
-         display: "block",
-      },
-   },
-
-   avatarGroup: {
-      "& .MuiAvatar-root": {
-         width: { xs: 28, md: 36 },
-         height: { xs: 28, md: 36 },
-         border: "2px solid white",
-      },
-   },
-
    mainContainer: {
       backgroundColor: "common.white",
       borderRadius: "12px 12px 0 0",
@@ -58,7 +34,6 @@ const styles = sxStyles({
       color: "neutral.800",
       fontWeight: 600,
    },
-
    aboutText: {
       color: "neutral.700",
    },
@@ -71,7 +46,9 @@ const PanelDetailsView = () => {
    const { handleRegisterClick } = useRegistrationHandler()
 
    const isMobile = useIsMobile()
-   const [heroRef, heroInView] = useInView()
+   const [heroRef, heroInView] = useInView({
+      threshold: 0.1,
+   })
 
    const isFloatingActionButton = isMobile || !heroInView
 
@@ -92,8 +69,6 @@ const PanelDetailsView = () => {
          <HeroSection
             companies={participatingCompanies}
             ref={heroRef}
-            isFloatingActionButton={isFloatingActionButton}
-            heroInView={heroInView}
             isLoading={status === "loading"}
          />
 

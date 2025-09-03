@@ -24,6 +24,7 @@ const SearchPageContent = () => {
          <SearchField type="backButton" />
          <SearchResults />
          <LivestreamDialog
+            key={selectedLivestreamId}
             open={Boolean(selectedLivestreamId)}
             livestreamId={selectedLivestreamId || ""}
             handleClose={handleCloseLivestreamDialog}

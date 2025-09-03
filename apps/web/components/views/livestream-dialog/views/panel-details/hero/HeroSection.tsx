@@ -84,13 +84,11 @@ const styles = sxStyles({
 
 type HeroProps = {
    companies: Group[]
-   isFloatingActionButton: boolean
-   heroInView: boolean
    isLoading?: boolean
 }
 
 export const HeroSection = forwardRef<HTMLDivElement, HeroProps>(
-   ({ companies, isFloatingActionButton, heroInView, isLoading }, ref) => {
+   ({ companies, isLoading }, ref) => {
       const {
          livestream,
          livestreamPresenter,
@@ -187,14 +185,13 @@ export const HeroSection = forwardRef<HTMLDivElement, HeroProps>(
                        ))}
                </Box>
 
-               {!isFloatingActionButton && (
+               {!isMobile && (
                   <ActionButton
                      livestreamPresenter={livestreamPresenter}
                      onRegisterClick={handleRegisterClick}
                      canWatchRecording={false}
-                     isFloating={isFloatingActionButton}
+                     isFloating={isMobile}
                      userEmailFromServer={serverUserEmail}
-                     heroVisible={heroInView}
                   />
                )}
             </Box>
