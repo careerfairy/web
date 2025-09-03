@@ -20,6 +20,8 @@ import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { deserializeGroupClient, mapFromServerSide } from "util/serverUtil"
 
+const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
+
 const styles = sxStyles({
    pageContainer: {
       backgroundColor: (theme) => theme.brand.white[100],
@@ -174,10 +176,15 @@ export const getServerSideProps: GetServerSideProps<
          serializeGroup(company)
       )
 
+      // TODO: Handle CF in second iteration of the panels
+      const serializedCompaniesWithoutCF = serializedCompanies.filter(
+         (company) => company.id !== CF_GROUP_ID
+      )
+
       return {
          props: {
             serverSidePanelEvents: panelsWithoutModerators,
-            serverSideCompanies: serializedCompanies,
+            serverSideCompanies: serializedCompaniesWithoutCF,
             serverSideRecentLivestreams: serializedRecentLivestreams,
          },
       }

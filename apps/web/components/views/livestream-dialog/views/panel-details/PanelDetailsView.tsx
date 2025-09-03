@@ -1,4 +1,5 @@
 import { Box, Card, Stack, Typography } from "@mui/material"
+import LinkifyText from "components/util/LinkifyText"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import useGroupsByIds from "../../../../custom-hook/useGroupsByIds"
@@ -36,8 +37,11 @@ const styles = sxStyles({
    },
    aboutText: {
       color: "neutral.700",
+      whiteSpace: "pre-line",
    },
 })
+
+const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
 
 const PanelDetailsView = () => {
    const { livestream, livestreamPresenter, serverUserEmail } =
@@ -58,6 +62,16 @@ const PanelDetailsView = () => {
       false // disable suspense to avoid blocking render
    )
 
+   // TODO: Handle CF in second iteration of the panels
+   const participantsWithoutCF = participatingCompanies?.filter(
+      (company) => company.id !== CF_GROUP_ID
+   )
+
+   // TODO: Handle moderators on second iteration of the panels
+   const speakersWithoutModerator = livestream?.speakers?.filter(
+      (speaker) => speaker.position !== "Moderator"
+   )
+
    return (
       <Box
          sx={{
@@ -67,7 +81,7 @@ const PanelDetailsView = () => {
          }}
       >
          <HeroSection
-            companies={participatingCompanies}
+            companies={participantsWithoutCF}
             ref={heroRef}
             isLoading={status === "loading"}
          />
@@ -86,7 +100,7 @@ const PanelDetailsView = () => {
                      Meet the experts
                   </Typography>
                   <Speakers
-                     speakers={livestream?.speakers}
+                     speakers={speakersWithoutModerator}
                      title=""
                      subtitleType="company"
                   />
@@ -99,9 +113,11 @@ const PanelDetailsView = () => {
                   <Typography variant="brandedBody" sx={styles.sectionTitle}>
                      About this event
                   </Typography>
-                  <Typography variant="medium" sx={styles.aboutText}>
-                     {livestream?.summary}
-                  </Typography>
+                  <LinkifyText>
+                     <Typography variant="medium" sx={styles.aboutText}>
+                        {livestream?.summary}
+                     </Typography>
+                  </LinkifyText>
                </Stack>
             </Card>
 
@@ -109,7 +125,7 @@ const PanelDetailsView = () => {
             <Card sx={styles.sectionCard}>
                <Stack spacing={1.5}>
                   <CompaniesCarousel
-                     companies={participatingCompanies}
+                     companies={participantsWithoutCF}
                      isLoading={status === "loading"}
                      title={
                         <Typography

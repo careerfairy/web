@@ -168,7 +168,7 @@ export const SpeakerCard = ({
    const isMobile = useIsMobile()
    const displayName = `${speaker.firstName ?? ""} ${speaker.lastName ?? ""}`
    const mentorPageLink = buildMentorPageLink({
-      universityName: company?.universityName,
+      universityName: company?.universityName ?? speaker.companyName ?? "",
       firstName: speaker.firstName ?? "",
       lastName: speaker.lastName ?? "",
       creatorId: speaker.id,

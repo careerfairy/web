@@ -3,7 +3,9 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { Stack, Typography } from "@mui/material"
+import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { useAuth } from "HOCs/AuthProvider"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -32,11 +34,26 @@ export default function NotForYouSection({
    recentLivestreams,
    handleOpenLivestreamDialog,
 }: NotForYouSectionProps) {
+   const { authenticatedUser, userData } = useAuth()
+   const hasInterests = Boolean(
+      authenticatedUser?.email || userData?.interestsIds
+   )
+
+   const { events: recommendedEvents } = useRecommendedEvents({
+      limit: 10,
+   })
+
+   const showingRecommended = hasInterests && Boolean(recommendedEvents?.length)
+   const eventsToShow = showingRecommended
+      ? recommendedEvents
+      : recentLivestreams
+
    return (
       <Stack sx={styles.carouselWrapper}>
          <EventsPreviewCarousel
-            events={recentLivestreams}
+            events={eventsToShow}
             location={ImpressionLocation.panelsOverviewPage}
+            isRecommended={showingRecommended}
             onCardClick={(livestreamId) => {
                handleOpenLivestreamDialog(livestreamId)
             }}
