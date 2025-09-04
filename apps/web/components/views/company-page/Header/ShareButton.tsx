@@ -67,7 +67,9 @@ const ShareButton = () => {
             size={"medium"}
             color={"primary"}
             startIcon={
-               <ShareArrowIcon sx={{ stroke: "primary.600", fill: "none" }} />
+               <ShareArrowIcon
+                  sx={{ color: (theme) => theme.brand.turquoise[600] }}
+               />
             }
          >
             Share
