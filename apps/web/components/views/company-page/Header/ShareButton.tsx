@@ -66,7 +66,9 @@ const ShareButton = () => {
             variant={"outlined"}
             size={"medium"}
             color={"primary"}
-            startIcon={<ShareArrowIcon sx={{ color: "primary.600" }} />}
+            startIcon={
+               <ShareArrowIcon sx={{ stroke: "primary.600", fill: "none" }} />
+            }
          >
             Share
          </Button>
