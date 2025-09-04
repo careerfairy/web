@@ -407,10 +407,10 @@ exports.schedule24HoursReminderEmails =
 // Reminders - Panels
 exports.schedule7MinutesReminderEmails =
    remindersNew.schedulePanels7MinutesReminderEmails
-exports.schedulePanels6HoursReminderEmails =
-   remindersNew.schedulePanels6HoursReminderEmails
-exports.schedulePanels48HoursReminderEmails =
-   remindersNew.schedulePanels48HoursReminderEmails
+exports.schedulePanels24HoursReminderEmails =
+   remindersNew.schedulePanels24HoursReminderEmails
+exports.schedulePanels1HourReminderEmails =
+   remindersNew.schedulePanels1HourReminderEmails
 // For testing Reminders
 exports.manualReminderEmails = remindersNew.manualReminderEmails
 

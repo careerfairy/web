@@ -162,6 +162,7 @@ export const getStreamsByDateWithRegisteredStudents = async (
    if (options?.excludeHidden) {
       query = query.where("hidden", "==", false)
    }
+
    const panelsFilter = (stream: Pick<LivestreamEvent, "isPanel">) => {
       if (options?.panelsOnly) {
          return stream.isPanel === true

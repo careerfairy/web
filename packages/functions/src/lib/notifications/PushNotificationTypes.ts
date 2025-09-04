@@ -5,6 +5,7 @@ import { SendPushRequestOptions } from "customerio-node/dist/lib/api/requests"
  */
 export const CUSTOMERIO_PUSH_TEMPLATES = {
    LIVESTREAM_START: "live_stream_start",
+   PANEL_START: "panel_start",
 } as const satisfies Record<string, string>
 
 export type CustomerIoPushMessageType =
@@ -30,6 +31,7 @@ export interface LivestreamStartPushMessageData extends BasePushMessageData {
  */
 export type CustomerIoPushMessageData = {
    [CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START]: LivestreamStartPushMessageData
+   [CUSTOMERIO_PUSH_TEMPLATES.PANEL_START]: LivestreamStartPushMessageData
 }
 
 export type PushNotificationRequestData<T extends CustomerIoPushMessageType> = {

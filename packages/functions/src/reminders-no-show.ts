@@ -2,19 +2,27 @@ import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import {
    getAuthUidFromUserLivestreamData,
    LivestreamEvent,
+   UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { Timestamp } from "firebase-admin/firestore"
 import * as functions from "firebase-functions"
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { DateTime } from "luxon"
 import functionsAxios from "./api/axios"
-import { livestreamsRepo, notificationService } from "./api/repositories"
-import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
+import {
+   groupRepo,
+   livestreamsRepo,
+   notificationService,
+} from "./api/repositories"
+import {
+   CUSTOMERIO_EMAIL_TEMPLATES,
+   NoShowReminderTemplateData,
+   PanelNoShowReminderTemplateData,
+} from "./lib/notifications/EmailTypes"
 import { logAndThrow } from "./lib/validations"
-import { getWebBaseUrl } from "./util"
+import { formatLivestreamDate, getWebBaseUrl } from "./util"
 
 // Magic numbers for reminder timing
 const JOIN_REMINDER_DELAY_MINUTES = 7
@@ -57,13 +65,6 @@ export const onLivestreamStartScheduleNoShowReminder = onDocumentUpdated(
                `No existing reminder task for livestream ${livestreamId}, triggering reminder function`
             )
 
-            if (newValue.isPanel) {
-               functions.logger.info(
-                  `Livestream ${livestreamId} is a panel, skipping reminder function`
-               )
-               return null
-            }
-
             // Call the HTTP function that will handle the waiting and sending
             void functionsAxios.post(
                `/${FUNCTION_NAMES.sendLivestreamNoShowReminder}`,
@@ -98,10 +99,25 @@ export const sendLivestreamNoShowReminder = onRequest(
             return
          }
 
+         let templateId:
+            | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW
+            | typeof CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_NO_SHOW =
+            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW
+
+         // Get the livestream data
+         const livestream = await livestreamsRepo.getById(livestreamId)
+
+         if (livestream.isPanel) {
+            functions.logger.info(
+               `Livestream ${livestreamId} is a panel, using panel reminder template`
+            )
+            templateId = CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_NO_SHOW
+         }
+
          // Check if a reminder task already exists for this livestream
          const existingTask = await livestreamsRepo.getReminderTask(
             livestreamId,
-            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW
+            templateId
          )
 
          if (existingTask) {
@@ -124,8 +140,7 @@ export const sendLivestreamNoShowReminder = onRequest(
 
          await livestreamsRepo.createReminderTask(livestreamId, {
             scheduledFor: Timestamp.fromDate(scheduledFor.toJSDate()),
-            reminderTaskId:
-               CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
+            reminderTaskId: templateId,
          })
 
          // Wait for the specified minutes
@@ -137,22 +152,8 @@ export const sendLivestreamNoShowReminder = onRequest(
             `Processing ${JOIN_REMINDER_DELAY_MINUTES}-minute reminder for livestream ${livestreamId}`
          )
 
-         // Get the livestream data
-         const livestream = await livestreamsRepo.getById(livestreamId)
-
          if (!livestream) {
             res.status(404).send(`Livestream ${livestreamId} not found`)
-            return
-         }
-
-         if (livestream.isPanel) {
-            functions.logger.warn(
-               `Livestream ${livestreamId} is a panel, skipping reminder task`
-            )
-
-            res.status(200).send(
-               "Livestream is a panel, skipping reminder task"
-            )
             return
          }
 
@@ -164,14 +165,10 @@ export const sendLivestreamNoShowReminder = onRequest(
                `Livestream ${livestreamId} is not live, cancelling reminder task`
             )
 
-            await livestreamsRepo.updateReminderTask(
-               livestreamId,
-               CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
-               {
-                  status: "cancelled",
-                  cancelledAt: Timestamp.now(),
-               }
-            )
+            await livestreamsRepo.updateReminderTask(livestreamId, templateId, {
+               status: "cancelled",
+               cancelledAt: Timestamp.now(),
+            })
 
             res.status(200).send(
                "Livestream is not live, cancelling reminder task"
@@ -190,47 +187,58 @@ export const sendLivestreamNoShowReminder = onRequest(
             )
 
             // Mark the task as completed in Firestore
-            await livestreamsRepo.updateReminderTask(
-               livestreamId,
-               CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
-               {
-                  status: "completed",
-                  completedAt: Timestamp.now(),
-                  results: { successful: 0, failed: 0 },
-               }
-            )
+            await livestreamsRepo.updateReminderTask(livestreamId, templateId, {
+               status: "completed",
+               completedAt: Timestamp.now(),
+               results: { successful: 0, failed: 0 },
+            })
 
             res.status(200).send("No users to notify")
             return
          }
 
-         const livestreamUrl = addUtmTagsToLink({
-            link: `${getWebBaseUrl()}/portal/livestream/${livestreamId}`,
-            content: livestream.title,
-            campaign: "reminder-no-show",
-         })
+         const livestreamUrl = `${getWebBaseUrl()}/portal/livestream/${livestreamId}`
+
+         let companyPageUrl = ""
+         const companyNames = []
+
+         if (livestream.isPanel) {
+            const groups = await groupRepo.getGroupsByIds(livestream.groupIds)
+
+            for (const group of groups) {
+               if (
+                  group.publicProfile &&
+                  group.id === livestream.groupIds.at(0)
+               ) {
+                  companyPageUrl = group.careerPageUrl
+               }
+
+               companyNames.push(group.universityName)
+            }
+         }
 
          // Send notification to each user
          const { successful, failed } =
             await notificationService.sendEmailNotifications(
                usersToNotify.map((data) => {
+                  const templateData =
+                     templateId ===
+                     CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_NO_SHOW
+                        ? buildPanelNoShowTemplateData(
+                             livestream,
+                             data,
+                             livestreamUrl,
+                             companyNames,
+                             companyPageUrl
+                          )
+                        : buildLivestreamNoShowTemplateData(
+                             livestream,
+                             livestreamUrl
+                          )
+
                   return {
-                     templateId:
-                        CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
-                     templateData: {
-                        livestream: {
-                           company: livestream.company,
-                           companyLogoUrl: livestream.companyLogoUrl,
-                           title: livestream.title,
-                           url: livestreamUrl,
-                        },
-                        speaker1: {
-                           firstName: livestream.speakers?.[0]?.firstName || "",
-                        },
-                        speaker2: {
-                           firstName: livestream.speakers?.[1]?.firstName || "",
-                        },
-                     },
+                     templateId,
+                     templateData,
                      identifiers: {
                         id: getAuthUidFromUserLivestreamData(data),
                      },
@@ -244,15 +252,11 @@ export const sendLivestreamNoShowReminder = onRequest(
          )
 
          // Mark the task as completed in Firestore
-         await livestreamsRepo.updateReminderTask(
-            livestreamId,
-            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW,
-            {
-               status: "completed",
-               completedAt: Timestamp.now(),
-               results: { successful, failed },
-            }
-         )
+         await livestreamsRepo.updateReminderTask(livestreamId, templateId, {
+            status: "completed",
+            completedAt: Timestamp.now(),
+            results: { successful, failed },
+         })
 
          res.status(200).send({
             message: "Reminder emails sent successfully",
@@ -267,3 +271,46 @@ export const sendLivestreamNoShowReminder = onRequest(
       }
    }
 )
+
+// Template data builders
+const buildLivestreamNoShowTemplateData = (
+   livestream: LivestreamEvent,
+   livestreamUrl: string
+): NoShowReminderTemplateData => ({
+   livestream: {
+      company: livestream.company,
+      companyLogoUrl: livestream.companyLogoUrl,
+      title: livestream.title,
+      url: livestreamUrl,
+   },
+   speaker1: {
+      firstName: livestream.speakers?.[0]?.firstName || "",
+   },
+   speaker2: {
+      firstName: livestream.speakers?.[1]?.firstName || "",
+   },
+})
+
+const buildPanelNoShowTemplateData = (
+   livestream: LivestreamEvent,
+   userLivestreamData: UserLivestreamData,
+   livestreamUrl: string,
+   companyNames: string[],
+   companyPageUrl: string
+): PanelNoShowReminderTemplateData => ({
+   panel: {
+      companyLogoUrl: livestream.companyLogoUrl,
+      title: livestream.title,
+      url: livestreamUrl,
+      bannerImageUrl: livestream.backgroundImageUrl,
+      start: formatLivestreamDate(
+         livestream.start.toDate(),
+         userLivestreamData.user.timezone || "Europe/Zurich"
+      ),
+      companyPageUrl: companyPageUrl,
+   },
+   speakers: livestream.speakers?.map((speaker) => ({
+      firstName: speaker.firstName,
+   })),
+   companies: companyNames,
+})

@@ -46,9 +46,9 @@ type ReminderTemplates = Pick<
    | "LIVESTREAM_REMINDER_5M"
    | "LIVESTREAM_REMINDER_1H"
    | "LIVESTREAM_REMINDER_24H"
-   | "PANEL_REMINDER_6H"
+   | "PANEL_REMINDER_24H"
    | "PANEL_REMINDER_7M"
-   | "PANEL_REMINDER_48H"
+   | "PANEL_REMINDER_1H"
 >
 
 type ReminderTemplateId = ReminderTemplates[keyof ReminderTemplates]
@@ -84,7 +84,7 @@ const PanelReminder7Min = {
    templateId: CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_7M,
    scheduleEmailMinutesBefore: 7,
    reminderUtmCampaign: "reminder-7min-panel",
-   // 7 minutes before the livestream starts
+   // 7 minutes before the panel starts
    getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 7),
 } as const satisfies ReminderConfig
 
@@ -96,12 +96,12 @@ const Reminder1Hour = {
    getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 60),
 } as const satisfies ReminderConfig
 
-const PanelReminder6Hours = {
-   templateId: CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_6H,
-   scheduleEmailMinutesBefore: 360,
-   reminderUtmCampaign: "reminder-6h-panel",
-   // 6 hours before the livestream starts
-   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 360),
+const PanelReminder1Hour = {
+   templateId: CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_1H,
+   scheduleEmailMinutesBefore: 60,
+   reminderUtmCampaign: "reminder-1h-panel",
+   // 1 hour before the panel starts
+   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 60),
 } as const satisfies ReminderConfig
 
 const Reminder24Hours = {
@@ -112,12 +112,12 @@ const Reminder24Hours = {
    getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 1440),
 } as const satisfies ReminderConfig
 
-const PanelReminder48Hours = {
-   templateId: CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_48H,
-   scheduleEmailMinutesBefore: 2880,
+const PanelReminder24Hours = {
+   templateId: CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_24H,
+   scheduleEmailMinutesBefore: 1440,
    reminderUtmCampaign: "reminder-24h-panel",
-   // 2 days before the livestream starts
-   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 2880),
+   // 1 day before the panel starts
+   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 1440),
 } as const satisfies ReminderConfig
 
 const reminderConfigs = {
@@ -125,8 +125,8 @@ const reminderConfigs = {
    [Reminder1Hour.templateId]: Reminder1Hour,
    [Reminder24Hours.templateId]: Reminder24Hours,
    [PanelReminder7Min.templateId]: PanelReminder7Min,
-   [PanelReminder48Hours.templateId]: PanelReminder48Hours,
-   [PanelReminder6Hours.templateId]: PanelReminder6Hours,
+   [PanelReminder1Hour.templateId]: PanelReminder1Hour,
+   [PanelReminder24Hours.templateId]: PanelReminder24Hours,
 } as const
 
 const scheduleOptions = {
@@ -222,12 +222,12 @@ export const schedulePanels7MinutesReminderEmails = onSchedule(
    }
 )
 
-export const schedulePanels6HoursReminderEmails = onSchedule(
+export const schedulePanels1HourReminderEmails = onSchedule(
    scheduleOptions,
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
-      const fromDate = PanelReminder6Hours.getStartDate()
+      const fromDate = PanelReminder1Hour.getStartDate()
       const toDate = addMinutesDate(fromDate, reminderScheduleRange)
 
       const streams = await getStreamsByDateWithRegisteredStudents(
@@ -236,16 +236,16 @@ export const schedulePanels6HoursReminderEmails = onSchedule(
          { panelsOnly: true }
       )
 
-      return handleReminder(streams, PanelReminder6Hours)
+      return handleReminder(streams, PanelReminder1Hour)
    }
 )
 
-export const schedulePanels48HoursReminderEmails = onSchedule(
+export const schedulePanels24HoursReminderEmails = onSchedule(
    scheduleOptions,
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
-      const fromDate = PanelReminder48Hours.getStartDate()
+      const fromDate = PanelReminder24Hours.getStartDate()
       const toDate = addMinutesDate(fromDate, reminderScheduleRange)
 
       const streams = await getStreamsByDateWithRegisteredStudents(
@@ -254,7 +254,7 @@ export const schedulePanels48HoursReminderEmails = onSchedule(
          { panelsOnly: true }
       )
 
-      return handleReminder(streams, PanelReminder48Hours)
+      return handleReminder(streams, PanelReminder24Hours)
    }
 )
 

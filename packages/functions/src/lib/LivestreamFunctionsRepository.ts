@@ -234,7 +234,11 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
 
    createLivestreamStartPushNotifications(
-      livestream: LivestreamEvent
+      livestream: LivestreamEvent,
+      options?: {
+         getTitle: (livestream: LivestreamEvent) => string
+         getBody: (livestream: LivestreamEvent) => string
+      }
    ): Promise<void>
 
    /**
@@ -411,7 +415,11 @@ export class LivestreamFunctionsRepository
    }
 
    async createLivestreamStartPushNotifications(
-      livestream: LivestreamEvent
+      livestream: LivestreamEvent,
+      options?: {
+         getTitle: (livestream: LivestreamEvent) => string
+         getBody: (livestream: LivestreamEvent) => string
+      }
    ): Promise<void> {
       functions.logger.log(
          `Started creating live stream start push notifications for live stream ${livestream.id}`
@@ -444,8 +452,12 @@ export class LivestreamFunctionsRepository
          const messages = tokens.map<ExpoPushMessage>((pushToken) => ({
             to: pushToken,
             sound: "default",
-            title: "Live Stream Starting",
-            body: `${livestream.title} is starting now: Join before it ends!`,
+            title: options?.getTitle
+               ? options.getTitle(livestream)
+               : "Live Stream Starting",
+            body: options?.getBody
+               ? options.getBody(livestream)
+               : `${livestream.title} is starting now: Join before it ends!`,
             data: {
                livestreamId: livestream.id,
                type: "livestream_start",

@@ -16,7 +16,6 @@ import {
    prepareEmailSpeakers,
 } from "@careerfairy/shared-lib/email/helpers"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { logger } from "firebase-functions/v2"
 import {
    onDocumentCreated,
@@ -36,6 +35,8 @@ import {
 import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailAttachment,
+   LivestreamRegistrationTemplateData,
+   PanelRegistrationTemplateData,
 } from "./lib/notifications/EmailTypes"
 
 export const getLivestreamICalendarEvent = onRequest(async (req, res) => {
@@ -179,23 +180,44 @@ export const livestreamRegistrationConfirmationEmail = onCall(
             ? CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REGISTRATION
             : CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION
 
-         // TODO: Replace with correct URL
-         const livestreamUrl = makeLivestreamEventDetailsUrl(livestream.id)
+         const livestreamUrl = `${getWebBaseUrl()}/portal/livestream/${
+            livestream.id
+         }`
 
-         const templateData = {
-            livestream: {
-               title: livestream.title,
-               company: group.universityName,
-               start: formattedStartDate,
-               companyBannerImageUrl:
-                  livestream.backgroundImageUrl || group.bannerImageUrl,
-               ...(livestream.isPanel ? { url: livestreamUrl } : {}),
-            },
-            jobs: emailJobs,
-            speakers: emailSpeakers,
-            sparks: emailSparks,
-            calendar: emailCalendar,
+         // Helper function to create template data with strict typing
+         const createTemplateData = (
+            isPanel: boolean
+         ):
+            | LivestreamRegistrationTemplateData
+            | PanelRegistrationTemplateData => {
+            const baseData = {
+               livestream: {
+                  title: livestream.title,
+                  company: group.universityName,
+                  start: formattedStartDate,
+                  companyBannerImageUrl:
+                     livestream.backgroundImageUrl || group.bannerImageUrl,
+               },
+               jobs: emailJobs,
+               speakers: emailSpeakers,
+               sparks: emailSparks,
+               calendar: emailCalendar,
+            }
+
+            if (isPanel) {
+               return {
+                  ...baseData,
+                  livestream: {
+                     ...baseData.livestream,
+                     url: livestreamUrl,
+                  },
+               } satisfies PanelRegistrationTemplateData
+            }
+
+            return baseData satisfies LivestreamRegistrationTemplateData
          }
+
+         const templateData = createTemplateData(livestream.isPanel)
 
          const result = await notificationService.sendEmailNotifications([
             {
