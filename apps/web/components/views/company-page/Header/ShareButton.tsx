@@ -72,6 +72,7 @@ const ShareButton = () => {
                      color: (theme) => theme.brand.tq[600],
                      "& path": {
                         stroke: "currentColor !important",
+                        fill: "none",
                      },
                   }}
                />
