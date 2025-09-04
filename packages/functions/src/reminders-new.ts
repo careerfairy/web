@@ -392,7 +392,8 @@ const handleSendEmails = async (
 
       if (
          reminder.templateId ===
-         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H
+            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H ||
+         CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_24H
       ) {
          info(`This is a ${reminder.templateId} reminder, attaching ICS file`)
          // Generate ICS file content
@@ -441,7 +442,10 @@ const handleSendEmails = async (
          ? `${getHost()}/company/${companyNameSlugify(
               streamGroup.universityName
            )}?interactionSource=${
-              InteractionSources.Email_Live_Stream_Reminder_24h
+              reminder.templateId ===
+              CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H
+                 ? InteractionSources.Email_Live_Stream_Reminder_24h
+                 : InteractionSources.Email_Panel_Reminder_24h
            }`
          : ""
 

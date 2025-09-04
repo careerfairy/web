@@ -41,7 +41,7 @@ export const InteractionSources = {
    Sparks_Feed: "Sparks_Feed",
    Talent_Guide: "Talent_Guide",
    Email_Live_Stream_Reminder_24h: "Email_Live_Stream_Reminder_24h",
-   Email_Panel_Reminder_48h: "Email_Panel_Reminder_48h",
+   Email_Panel_Reminder_24h: "Email_Panel_Reminder_24h",
    Job_Header: "Job_Header",
 } as const
 
