@@ -1,4 +1,4 @@
-import ShareIcon from "@mui/icons-material/ShareOutlined"
+import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
 import Button from "@mui/material/Button"
 import { Fragment } from "react"
 import { useCompanyPage } from "../"
@@ -66,7 +66,7 @@ const ShareButton = () => {
             variant={"outlined"}
             size={"medium"}
             color={"primary"}
-            startIcon={<ShareIcon />}
+            startIcon={<ShareArrowIcon sx={{ color: "primary.600" }} />}
          >
             Share
          </Button>
