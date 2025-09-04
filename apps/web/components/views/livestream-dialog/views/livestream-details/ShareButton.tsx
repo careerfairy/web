@@ -61,7 +61,12 @@ const ShareButton: FC<Props> = ({ livestream }) => {
             <IconButton color="info" onClick={handleClick}>
                <ShareArrowIcon
                   fontSize="inherit"
-                  sx={{ color: (theme) => theme.brand.white[50] }}
+                  sx={{
+                     color: (theme) => theme.brand.white[50],
+                     "& path": {
+                        stroke: "currentColor !important",
+                     },
+                  }}
                />
             </IconButton>
          </Tooltip>
