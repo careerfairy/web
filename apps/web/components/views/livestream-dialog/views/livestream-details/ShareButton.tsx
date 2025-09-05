@@ -1,6 +1,6 @@
 import { FC, useCallback } from "react"
 import { IconButton, Tooltip } from "@mui/material"
-import ShareIcon from "@mui/icons-material/ShareOutlined"
+import ShareArrowIcon from "components/views/common/icons/ShareArrowIcon"
 import { useCopyToClipboard } from "react-use"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import { makeLivestreamEventDetailsInviteUrl } from "../../../../../util/makeUrls"
@@ -30,7 +30,7 @@ type Props = {
 const ShareButton: FC<Props> = ({ livestream }) => {
    const { userData } = useAuth()
    const { successNotification } = useSnackbarNotifications()
-   const [_, copyEventLinkToClipboard] = useCopyToClipboard()
+   const [, copyEventLinkToClipboard] = useCopyToClipboard()
 
    const handleClick = useCallback(() => {
       const eventUrl = makeLivestreamEventDetailsInviteUrl(
@@ -59,7 +59,16 @@ const ShareButton: FC<Props> = ({ livestream }) => {
       <Box sx={styles.root}>
          <Tooltip title="Share">
             <IconButton color="info" onClick={handleClick}>
-               <ShareIcon fontSize="inherit" />
+               <ShareArrowIcon
+                  fontSize="inherit"
+                  sx={{
+                     color: (theme) => theme.brand.white[50],
+                     "& path": {
+                        stroke: "currentColor !important",
+                        fill: "none",
+                     },
+                  }}
+               />
             </IconButton>
          </Tooltip>
       </Box>

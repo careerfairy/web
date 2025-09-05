@@ -31,14 +31,10 @@ type Props = {
 export const GenericNavList = ({ isDark }: Props) => {
    const isMobile = useIsMobile()
    const isFullScreen = useSparksFeedIsFullScreen()
-   const { isMobile: isGenericDashboardMobile, userCountryCode } =
-      useGenericDashboard()
+   const { isMobile: isGenericDashboardMobile } = useGenericDashboard()
 
    // Use the hook with its internal filtering
-   const filteredNavLinks = useNavLinks(
-      isGenericDashboardMobile,
-      userCountryCode
-   )
+   const filteredNavLinks = useNavLinks(isGenericDashboardMobile)
 
    return isMobile || isFullScreen ? (
       <BottomNavBar links={filteredNavLinks} isDark={isDark} />
