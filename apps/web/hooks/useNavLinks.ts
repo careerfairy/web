@@ -1,17 +1,11 @@
-import {
-   swissGermanCountryFilters,
-   userIsTargetedLevels,
-} from "@careerfairy/shared-lib/countries/filters"
-import { useAuth } from "HOCs/AuthProvider"
 import { CompanyIcon } from "components/views/common/icons"
 import { HomeIcon } from "components/views/common/icons/HomeIcon"
 import { JobsIcon } from "components/views/common/icons/JobsIcon"
-import { LevelsIcon } from "components/views/common/icons/LevelsIcon"
+
 import { LiveStreamsIcon } from "components/views/common/icons/LiveStreamsIcon"
 import { RecordingIcon } from "components/views/common/icons/RecordingIcon"
 import { SparksIcon } from "components/views/common/icons/SparksIcon"
 import { useMemo } from "react"
-import useUserCountryCode from "../components/custom-hook/useUserCountryCode"
 import { INavLink } from "../layouts/types"
 
 // Constants for reusable nav paths
@@ -32,38 +26,12 @@ export const PastLivestreamsPath: INavLink = {
 }
 
 /**
- * Hook that provides filtered navigation links based on user permissions and country
+ * Hook that provides navigation links based on device type
  * @param isMobile - Whether the screen is mobile
- * @param serverUserCountryCode - Optional server-side country code (takes precedence)
- * @returns Array of filtered navigation links
+ * @returns Array of navigation links
  */
-export const useNavLinks = (
-   isMobile: boolean,
-   serverUserCountryCode?: string
-) => {
-   const { userData } = useAuth()
-   const { userCountryCode: ipBasedUserCountryCode } = useUserCountryCode(
-      !serverUserCountryCode?.length && !userData?.countryIsoCode?.length
-   )
-
-   const userCountryCode =
-      serverUserCountryCode ||
-      userData?.countryIsoCode ||
-      ipBasedUserCountryCode
-
+export const useNavLinks = (isMobile: boolean) => {
    return useMemo(() => {
-      const userCountry = userData
-         ? userData.countryIsoCode || userData.universityCountryCode
-         : userCountryCode
-
-      const disabledLevels = !(userData
-         ? userIsTargetedLevels(userData)
-         : swissGermanCountryFilters.includes(userCountry))
-
-      const disabledCompanies =
-         isMobile &&
-         (!userCountry || swissGermanCountryFilters.includes(userCountry))
-
       // Define base navigation links
       const links: INavLink[] = [
          {
@@ -114,24 +82,14 @@ export const useNavLinks = (
               ]
             : []),
          {
-            id: "levels",
-            href: `/levels`,
-            pathname: `/levels`,
-            Icon: LevelsIcon,
-            title: "Levels",
-            disabled: disabledLevels,
-         },
-         {
             id: "company",
             href: `/companies`,
             pathname: `/companies`,
             Icon: CompanyIcon,
             title: "Companies",
-            disabled: disabledCompanies,
          },
       ]
 
-      // Apply filtering
-      return links.filter((link) => !link.disabled)
-   }, [isMobile, userData, userCountryCode])
+      return links
+   }, [isMobile])
 }
