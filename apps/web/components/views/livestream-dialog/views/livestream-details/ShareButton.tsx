@@ -65,6 +65,7 @@ const ShareButton: FC<Props> = ({ livestream }) => {
                      color: (theme) => theme.brand.white[50],
                      "& path": {
                         stroke: "currentColor !important",
+                        fill: "none",
                      },
                   }}
                />
