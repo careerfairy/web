@@ -59,12 +59,14 @@ type RectanglePanelCardProps = {
    event: LivestreamEvent
    contentSx?: SxProps<Theme>
    onCardClick?: (livestreamId: string) => void
+   contentSx?: SxProps<Theme>
 }
 
 export const RectanglePanelCard = ({
    event,
    contentSx,
    onCardClick,
+   contentSx,
 }: RectanglePanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
 
