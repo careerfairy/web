@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box } from "@mui/material"
+import { Box, SxProps, Theme } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
-import useGroupsByIds from "components/custom-hook/useGroupsByIds"
-import { sxStyles } from "types/commonTypes"
+import { usePanelGroupsByIds } from "components/custom-hook/panels/usePanelGroupsByIds"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import {
    PanelCardBase,
    PanelDateBadge,
@@ -64,12 +64,16 @@ const styles = sxStyles({
 
 type RectanglePanelCardProps = {
    event: LivestreamEvent
+   contentSx?: SxProps<Theme>
 }
 
-export const RectanglePanelCard = ({ event }: RectanglePanelCardProps) => {
+export const RectanglePanelCard = ({
+   event,
+   contentSx,
+}: RectanglePanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
 
-   const { data: groups } = useGroupsByIds(event.groupIds, false)
+   const { data: groups } = usePanelGroupsByIds(event.groupIds)
 
    const hostLogos =
       groups?.map((group) => group.logoUrl)?.filter(Boolean) ?? []
@@ -90,7 +94,7 @@ export const RectanglePanelCard = ({ event }: RectanglePanelCardProps) => {
             },
          }}
       >
-         <Box sx={styles.content}>
+         <Box sx={combineStyles(styles.content, contentSx)}>
             <Box sx={styles.topSection}>
                <PanelRegistrationStatus isRegistered={isRegistered} />
                <Box sx={styles.dateBadgeOverride}>
