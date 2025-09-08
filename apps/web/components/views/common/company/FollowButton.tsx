@@ -182,6 +182,7 @@ const FollowButton: FC<Props> = ({
          <AuthedFollowButton
             group={group}
             interactionSource={interactionSource}
+            showStartIcon={showStartIcon}
             {...mergedProps}
          />
       )

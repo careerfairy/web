@@ -32,6 +32,7 @@ const upsertSpeakerSchema: yup.SchemaOf<UpsertSpeakerRequest> = yup.object({
          lastName: baseCreatorShape.lastName,
          position: baseCreatorShape.position,
          linkedInUrl: baseCreatorShape.linkedInUrl,
+         companyName: baseCreatorShape.companyName.nullable(),
          roles: yup
             .array()
             .of(yup.mixed<CreatorRole>().oneOf(Object.values(CreatorRoles))),
@@ -121,6 +122,7 @@ export const upsertLivestreamSpeaker = onCall(
                      story: speaker.background,
                      linkedInUrl: speaker.linkedInUrl,
                      position: speaker.position,
+                     companyName: speaker.companyName,
                   }
                )
             }

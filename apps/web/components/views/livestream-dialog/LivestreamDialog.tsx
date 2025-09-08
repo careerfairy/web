@@ -171,6 +171,11 @@ const views = [
       loadingComponent: () => <LivestreamDetailsViewSkeleton />,
    }),
    createView({
+      key: "panel-details",
+      viewPath: "panel-details/PanelDetailsView",
+      loadingComponent: () => <LivestreamDetailsViewSkeleton />,
+   }),
+   createView({
       key: "register-data-consent",
       viewPath: "data-consent/RegisterDataConsentView",
       loadingComponent: () => <RegisterDataConsentViewSkeleton />,
@@ -646,6 +651,21 @@ const Content: FC<ContentProps> = ({
       ]
    )
 
+   const displayedIndex = useMemo(() => {
+      // If we're showing the details view, check if we should show panel-details
+      if (activeViewIndex === getActiveViewIndexFromPage("details")) {
+         // Use client-side data if available, otherwise use server-side data
+         const isPanel = livestream
+            ? livestream.isPanel
+            : serverSideLivestream?.isPanel
+
+         if (isPanel) {
+            return views.findIndex((v) => v.key === "panel-details")
+         }
+      }
+      return activeViewIndex
+   }, [activeViewIndex, livestream, serverSideLivestream])
+
    return (
       <DialogContext.Provider value={contextValue}>
          {isRedirecting ? (
@@ -657,7 +677,7 @@ const Content: FC<ContentProps> = ({
                slideStyle={styles.slide}
                disabled
                axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-               index={activeViewIndex}
+               index={displayedIndex}
             >
                {views.map(
                   ({ key, component: View, skeleton: Skeleton }, index) => (
@@ -665,7 +685,7 @@ const Content: FC<ContentProps> = ({
                         sx={styles.fullHeight}
                         key={key}
                         value={index}
-                        activeValue={activeViewIndex}
+                        activeValue={displayedIndex}
                      >
                         {livestream ? <View /> : <Skeleton />}
                      </AnimatedTabPanel>
