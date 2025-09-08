@@ -448,13 +448,13 @@ export default class DateUtil {
    }
 
    /**
-    * Formats a date to show the day and month in "X of Month" format.
-    * Example: "24 of August"
+    * Formats a date to show the day and month in "Day Month" format.
+    * Example: "24 August"
     *
     * @param {Date | number} JSDate - The JavaScript Date object or timestamp to be formatted.
     * @return {string} - The formatted date string.
     */
    static formatDayOfMonth(JSDate: Date | number): string {
-      return dayjs(JSDate).format("D [of] MMMM")
+      return dayjs(JSDate).format("D MMMM")
    }
 }
