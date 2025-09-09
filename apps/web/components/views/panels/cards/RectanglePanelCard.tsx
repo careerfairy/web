@@ -48,13 +48,6 @@ const styles = sxStyles({
       alignItems: "flex-end",
       width: "100%",
    },
-   titleImage: {
-      maxWidth: "129px", // Consistent max width for all images
-      height: "auto", // Height adjusts automatically to maintain aspect ratio
-      objectFit: "contain", // Ensures image fits within bounds without distortion
-      objectPosition: "bottom left", // Positions image at bottom left
-      display: "block", // Removes any inline spacing issues
-   },
    hostsContainer: {
       display: "flex",
       gap: 0.5,
@@ -65,11 +58,13 @@ const styles = sxStyles({
 type RectanglePanelCardProps = {
    event: LivestreamEvent
    contentSx?: SxProps<Theme>
+   onCardClick?: (livestreamId: string) => void
 }
 
 export const RectanglePanelCard = ({
    event,
    contentSx,
+   onCardClick,
 }: RectanglePanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
 
@@ -81,6 +76,7 @@ export const RectanglePanelCard = ({
    return (
       <PanelCardBase
          event={event}
+         onCardClick={onCardClick}
          backgroundSx={{
             "&::before": {
                background: `

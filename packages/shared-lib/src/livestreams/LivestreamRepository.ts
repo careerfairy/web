@@ -437,6 +437,8 @@ export interface ILivestreamRepository {
       livestreamId: string,
       enabled: boolean
    ): Promise<void>
+
+   getAllPanels(): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -919,6 +921,7 @@ export class FirebaseLivestreamRepository
          title: event.title || null,
          companyLogoUrl: event.companyLogoUrl || null,
          backgroundImageUrl: event.backgroundImageUrl || null,
+         reasonsToJoinLivestream_v2: event.reasonsToJoinLivestream_v2 || [],
          speakers: event.speakers || [],
          creatorsIds: event.creatorsIds || [],
          summary: event.summary || null,
@@ -944,6 +947,7 @@ export class FirebaseLivestreamRepository
          type: event.type || null,
          universities: event.universities || [],
          triGrams: event.triGrams || {},
+         panelLogoUrl: event.panelLogoUrl || null,
       }
    }
 
@@ -1772,6 +1776,18 @@ export class FirebaseLivestreamRepository
       return livestreamRef.update({
          smsEnabled: enabled,
       })
+   }
+
+   async getAllPanels(limit?: number): Promise<LivestreamEvent[]> {
+      const docs = await this.firestore
+         .collection("livestreams")
+         .where("isPanel", "==", true)
+         .where("hidden", "==", true)
+         .orderBy("start", "asc")
+         .limit(limit)
+         .get()
+
+      return mapFirestoreDocuments<LivestreamEvent>(docs)
    }
 
    private async handlePromiseAllSettled<T>(

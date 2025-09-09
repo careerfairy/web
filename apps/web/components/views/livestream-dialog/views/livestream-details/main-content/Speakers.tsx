@@ -26,17 +26,20 @@ const styles = sxStyles({
       border: `1px solid ${theme.palette.secondary[50]}`,
       background: theme.brand.white[200],
       mb: 0.5,
-      "& .avatar": {
-         borderRadius: "70px",
-         minWidth: "48px !important",
-         minHeight: "48px !important",
-         border: `1.5px solid ${theme.brand.white[400]} !important`,
-      },
       ":hover": {
          borderColor: theme.palette.secondary[100],
          background: theme.brand.white[400],
          cursor: "pointer",
       },
+   }),
+   avatarWrapper: (theme) => ({
+      position: "relative",
+      width: 48,
+      height: 48,
+      borderRadius: "70px",
+      overflow: "hidden",
+      border: `1.5px solid ${theme.brand.white[400]}`,
+      flexShrink: 0,
    }),
    speakerNameWrapper: {
       justifyContent: "center",
@@ -128,17 +131,16 @@ const SpeakerCard: FC<SpeakerCardProps> = ({
                goToSpeakerDetails(speaker.id)
             }}
          >
-            <Box minWidth={48} minHeight={48}>
+            <Box sx={styles.avatarWrapper}>
                <Image
                   className="avatar"
-                  width={48}
-                  height={48}
+                  fill
                   src={
                      getResizedUrl(speaker.avatar, "lg") || speakerPlaceholder
                   }
-                  objectFit="cover"
                   alt={displayName}
                   draggable={false}
+                  style={{ objectFit: "cover" }}
                />
             </Box>
             <Stack sx={styles.speakerNameWrapper}>
@@ -167,14 +169,13 @@ const SpeakerCard: FC<SpeakerCardProps> = ({
 const SpeakerCardSkeleton: FC = () => {
    return (
       <Stack spacing={1} direction="row" sx={styles.speakerWrapper}>
-         <Box minWidth={48} minHeight={48}>
+         <Box sx={styles.avatarWrapper}>
             <Image
                className="avatar"
-               width={48}
-               height={48}
+               fill
                src={speakerPlaceholder}
-               objectFit="cover"
                alt={"Speaker Placeholder"}
+               style={{ objectFit: "cover" }}
             />
          </Box>
          <Stack>

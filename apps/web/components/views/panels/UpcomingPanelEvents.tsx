@@ -228,11 +228,11 @@ const PanelsHeader = ({ showCTA = false }: { showCTA?: boolean }) => {
       <Stack sx={styles.headerSection}>
          <Stack spacing={!showCTA ? "4px" : "8px"}>
             <Typography variant="brandedH3" sx={styles.headerTitle}>
-               Hear what they wish they knew
+               CareerFairy Master&nbsp;Class
             </Typography>
             <Typography variant="small" sx={styles.headerDescription}>
-               Live conversations with employees from top companies who&apos;ve
-               faced the future you&apos;re worried about.
+               &quot;What skills matter&quot; &amp; &quot;What comes next&quot;
+               - answered by the mentors from 6 key employers
             </Typography>
          </Stack>
 
@@ -249,7 +249,7 @@ const PanelsCTA = () => {
          sx={styles.ctaButton}
          endIcon={<ChevronRight size={18} />}
       >
-         <Typography variant="medium">Discover all about panels</Typography>
+         <Typography variant="medium">Learn more</Typography>
       </Button>
    )
 }
