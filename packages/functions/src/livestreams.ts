@@ -85,7 +85,7 @@ export const getLivestreamICalendarEvent = onRequest(async (req, res) => {
 
 export const livestreamRegistrationConfirmationEmail = onCall(
    async (request) => {
-      logger.info("🚀 ~ Livestream registration confirmation email: v6.0")
+      logger.info("🚀 ~ Livestream registration confirmation email: v7.0")
       const host = request.rawRequest.headers.origin || "https://careerfairy.io"
       const userAuthId = request.auth?.uid
       // Fetch the live stream data
@@ -232,12 +232,16 @@ export const livestreamRegistrationConfirmationEmail = onCall(
          ])
 
          logger.info(
-            "🚀 ~ Livestream registration confirmation email sent",
+            `🚀 ~ ${
+               livestream.isPanel ? "Panel" : "Livestream"
+            } registration confirmation email sent`,
             result
          )
          return {
             status: 200,
-            data: "Livestream registration confirmation email sent",
+            data: `${
+               livestream.isPanel ? "Panel" : "Livestream"
+            } registration confirmation email sent`,
          }
       } catch (error) {
          logger.error("Error sending registration confirmation email", error)

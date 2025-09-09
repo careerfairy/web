@@ -48,10 +48,13 @@ export const onLivestreamStartScheduleNoShowReminder = onDocumentUpdated(
                `Livestream ${livestreamId} has started, checking if reminder task already exists`
             )
 
+            const reminderTaskId = newValue?.isPanel
+               ? CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_NO_SHOW
+               : CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW
             // Check if a reminder task already exists for this livestream
             const task = await livestreamsRepo.getReminderTask(
                livestreamId,
-               CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW
+               reminderTaskId
             )
 
             if (task) {
@@ -107,7 +110,7 @@ export const sendLivestreamNoShowReminder = onRequest(
          // Get the livestream data
          const livestream = await livestreamsRepo.getById(livestreamId)
 
-         if (livestream.isPanel) {
+         if (livestream?.isPanel) {
             functions.logger.info(
                `Livestream ${livestreamId} is a panel, using panel reminder template`
             )
