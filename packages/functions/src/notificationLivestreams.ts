@@ -28,15 +28,15 @@ export const notifyUsersWhenLivestreamStarts = onDocumentUpdated(
          if (hasLivestreamStarted(previousValue, newValue)) {
             newValue.id = event.params.livestreamId
 
-            if (newValue.isPanel) {
-               functions.logger.warn(
-                  `Livestream ${newValue.id} is a panel, skipping notifications`
-               )
-               return
+            const options = {
+               getTitle: () => "Master Class is live!",
+               getBody: (livestream) =>
+                  `${livestream.title} is starting. Join now to learn from the best!`,
             }
 
             await livestreamsRepo.createLivestreamStartPushNotifications(
-               newValue
+               newValue,
+               newValue.isPanel ? options : null
             )
          }
       } catch (error) {
@@ -69,13 +69,6 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
 
             const livestream = newValue
 
-            if (livestream.isPanel) {
-               functions.logger.warn(
-                  `Livestream ${livestream.id} is a panel, skipping notifications`
-               )
-               return
-            }
-
             const registeredUsers = await livestreamsRepo.getLivestreamUsers(
                newValue.id,
                "registered"
@@ -96,10 +89,14 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
                campaign: "livestream_start",
             })
 
+            const templateId = livestream.isPanel
+               ? CUSTOMERIO_PUSH_TEMPLATES.PANEL_START
+               : CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START
+
             const { successful, failed } =
                await notificationService.sendPushNotifications(
                   registeredUsers.map((user) => ({
-                     templateId: CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START,
+                     templateId: templateId,
                      templateData: {
                         live_stream_title: livestream.title,
                         company_logo_url: livestream.companyLogoUrl,
