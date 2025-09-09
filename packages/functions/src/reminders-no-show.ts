@@ -57,6 +57,13 @@ export const onLivestreamStartScheduleNoShowReminder = onDocumentUpdated(
                `No existing reminder task for livestream ${livestreamId}, triggering reminder function`
             )
 
+            if (newValue.isPanel) {
+               functions.logger.info(
+                  `Livestream ${livestreamId} is a panel, skipping reminder function`
+               )
+               return null
+            }
+
             // Call the HTTP function that will handle the waiting and sending
             void functionsAxios.post(
                `/${FUNCTION_NAMES.sendLivestreamNoShowReminder}`,
@@ -135,6 +142,17 @@ export const sendLivestreamNoShowReminder = onRequest(
 
          if (!livestream) {
             res.status(404).send(`Livestream ${livestreamId} not found`)
+            return
+         }
+
+         if (livestream.isPanel) {
+            functions.logger.warn(
+               `Livestream ${livestreamId} is a panel, skipping reminder task`
+            )
+
+            res.status(200).send(
+               "Livestream is a panel, skipping reminder task"
+            )
             return
          }
 

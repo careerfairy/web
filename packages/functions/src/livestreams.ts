@@ -99,6 +99,18 @@ export const livestreamRegistrationConfirmationEmail = onCall(
          }
       }
 
+      if (livestream.isPanel) {
+         functions.logger.warn(
+            `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
+         )
+
+         return {
+            status: 200,
+            message:
+               "Livestream is a panel, skipping registration confirmation email",
+         }
+      }
+
       const eventGroups = await groupRepo.getGroupsByIds(livestream.groupIds)
 
       const groupWithoutUniCode = eventGroups.find(
@@ -223,6 +235,17 @@ export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
    if (!livestream) {
       logger.error("Livestream not found")
       throw new HttpsError("not-found", "Livestream not found")
+   }
+
+   if (livestream.isPanel) {
+      functions.logger.warn(
+         `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
+      )
+      return {
+         status: 200,
+         message:
+            "Livestream is a panel, skipping registration confirmation email",
+      }
    }
 
    if (!user) {
