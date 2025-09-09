@@ -264,7 +264,7 @@ const PanelsMobileCTA = () => {
             sx={styles.mobileCta}
             direction="row"
          >
-            <Typography variant="small">Discover all about panels</Typography>
+            <Typography variant="small">Learn more</Typography>
             <ChevronRight size={24} style={{ marginLeft: "0px" }} />
          </Stack>
       </Fragment>

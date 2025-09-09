@@ -65,7 +65,7 @@ const ShareButton: FC<Props> = ({ livestream }) => {
       })
 
       successNotification(
-         "Panel link has been copied to your clipboard",
+         "Master Class link has been copied to your clipboard",
          "Copied"
       )
    }, [
