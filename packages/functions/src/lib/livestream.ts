@@ -159,13 +159,15 @@ export const getStreamsByDateWithRegisteredStudents = async (
    }
 
    return query.get().then((querySnapshot) => {
-      const streams = querySnapshot.docs?.map(
-         (doc) =>
-            ({
-               id: doc.id,
-               ...doc.data(),
-            } as LivestreamEvent)
-      )
+      const streams = querySnapshot.docs
+         ?.map(
+            (doc) =>
+               ({
+                  id: doc.id,
+                  ...doc.data(),
+               } as LivestreamEvent)
+         )
+         ?.filter((stream) => stream.isPanel !== true)
 
       return addUsersDataOnStreams(streams, options?.skimData)
    })

@@ -28,6 +28,13 @@ export const notifyUsersWhenLivestreamStarts = onDocumentUpdated(
          if (hasLivestreamStarted(previousValue, newValue)) {
             newValue.id = event.params.livestreamId
 
+            if (newValue.isPanel) {
+               functions.logger.warn(
+                  `Livestream ${newValue.id} is a panel, skipping notifications`
+               )
+               return
+            }
+
             await livestreamsRepo.createLivestreamStartPushNotifications(
                newValue
             )
@@ -61,6 +68,13 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
             newValue.id = event.params.livestreamId
 
             const livestream = newValue
+
+            if (livestream.isPanel) {
+               functions.logger.warn(
+                  `Livestream ${livestream.id} is a panel, skipping notifications`
+               )
+               return
+            }
 
             const registeredUsers = await livestreamsRepo.getLivestreamUsers(
                newValue.id,
