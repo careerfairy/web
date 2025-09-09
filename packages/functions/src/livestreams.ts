@@ -35,6 +35,8 @@ import {
 import {
    CUSTOMERIO_EMAIL_TEMPLATES,
    EmailAttachment,
+   LivestreamRegistrationTemplateData,
+   PanelRegistrationTemplateData,
 } from "./lib/notifications/EmailTypes"
 
 export const getLivestreamICalendarEvent = onRequest(async (req, res) => {
@@ -83,7 +85,7 @@ export const getLivestreamICalendarEvent = onRequest(async (req, res) => {
 
 export const livestreamRegistrationConfirmationEmail = onCall(
    async (request) => {
-      logger.info("🚀 ~ Livestream registration confirmation email: v6.0")
+      logger.info("🚀 ~ Livestream registration confirmation email: v7.0")
       const host = request.rawRequest.headers.origin || "https://careerfairy.io"
       const userAuthId = request.auth?.uid
       // Fetch the live stream data
@@ -96,18 +98,6 @@ export const livestreamRegistrationConfirmationEmail = onCall(
          return {
             status: 404,
             message: "Livestream not found",
-         }
-      }
-
-      if (livestream.isPanel) {
-         functions.logger.warn(
-            `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
-         )
-
-         return {
-            status: 200,
-            message:
-               "Livestream is a panel, skipping registration confirmation email",
          }
       }
 
@@ -186,22 +176,53 @@ export const livestreamRegistrationConfirmationEmail = onCall(
 
       try {
          // Send email using notification repository
+         const templateId = livestream.isPanel
+            ? CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REGISTRATION
+            : CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION
+
+         const livestreamUrl = `${getWebBaseUrl()}/portal/livestream/${
+            livestream.id
+         }`
+
+         // Helper function to create template data with strict typing
+         const createTemplateData = (
+            isPanel: boolean
+         ):
+            | LivestreamRegistrationTemplateData
+            | PanelRegistrationTemplateData => {
+            const baseData = {
+               livestream: {
+                  title: livestream.title,
+                  company: group.universityName,
+                  start: formattedStartDate,
+                  companyBannerImageUrl:
+                     livestream.backgroundImageUrl || group.bannerImageUrl,
+               },
+               jobs: emailJobs,
+               speakers: emailSpeakers,
+               sparks: emailSparks,
+               calendar: emailCalendar,
+            }
+
+            if (isPanel) {
+               return {
+                  ...baseData,
+                  livestream: {
+                     ...baseData.livestream,
+                     url: livestreamUrl,
+                  },
+               } satisfies PanelRegistrationTemplateData
+            }
+
+            return baseData satisfies LivestreamRegistrationTemplateData
+         }
+
+         const templateData = createTemplateData(livestream.isPanel)
+
          const result = await notificationService.sendEmailNotifications([
             {
-               templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION,
-               templateData: {
-                  livestream: {
-                     title: livestream.title,
-                     company: group.universityName,
-                     start: formattedStartDate,
-                     companyBannerImageUrl:
-                        livestream.backgroundImageUrl || group.bannerImageUrl,
-                  },
-                  jobs: emailJobs,
-                  speakers: emailSpeakers,
-                  sparks: emailSparks,
-                  calendar: emailCalendar,
-               },
+               templateId: templateId,
+               templateData: templateData,
                identifiers: {
                   id: userAuthId,
                },
@@ -211,12 +232,16 @@ export const livestreamRegistrationConfirmationEmail = onCall(
          ])
 
          logger.info(
-            "🚀 ~ Livestream registration confirmation email sent",
+            `🚀 ~ ${
+               livestream.isPanel ? "Panel" : "Livestream"
+            } registration confirmation email sent`,
             result
          )
          return {
             status: 200,
-            data: "Livestream registration confirmation email sent",
+            data: `${
+               livestream.isPanel ? "Panel" : "Livestream"
+            } registration confirmation email sent`,
          }
       } catch (error) {
          logger.error("Error sending registration confirmation email", error)

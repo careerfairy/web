@@ -35,6 +35,8 @@ import { isLocalEnvironment } from "./util"
 type FollowUpTemplateId =
    | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
    | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_ATTENDEES
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_NON_ATTENDEES
 
 export const sendReminderEmailAboutApplicationLink = onCall(
    {
@@ -280,7 +282,7 @@ const sendAttendeesReminder = async (
          : await livestreamsRepo.getYesterdayLivestreams()
 
       if (yesterdayLivestreams.length) {
-         const livestreamsToRemind = await yesterdayLivestreams.reduce<
+         const allLivestreamsToRemind = await yesterdayLivestreams.reduce<
             Promise<LiveStreamEventWithUsersLivestreamData[]>
          >(async (acc, livestream) => {
             const livestreamPresenter =
@@ -289,8 +291,7 @@ const sendAttendeesReminder = async (
             if (
                !livestreamPresenter.isTest() &&
                !livestreamPresenter.isLive() &&
-               livestreamPresenter.streamHasFinished() &&
-               !livestream.isPanel
+               livestreamPresenter.streamHasFinished()
             ) {
                functions.logger.log(
                   `Detected livestream ${livestreamPresenter.title} has ended yesterday`
@@ -319,18 +320,22 @@ const sendAttendeesReminder = async (
                   )
                }
             } else {
-               if (livestream.isPanel) {
-                  functions.logger.log(
-                     `Livestream ${livestreamPresenter.title} is a panel, skipping followup`
-                  )
-               } else {
-                  functions.logger.log(
-                     `The livestream ${livestreamPresenter.title} has not ended yet`
-                  )
-               }
+               functions.logger.log(
+                  `The livestream ${livestreamPresenter.title} has not ended yet`
+               )
             }
             return await acc
          }, Promise.resolve([]))
+
+         const livestreamsToRemind =
+            allLivestreamsToRemind?.filter(
+               (livestream) => !livestream.isPanel
+            ) ?? []
+
+         const panelsToRemind =
+            allLivestreamsToRemind?.filter(
+               (livestream) => livestream.isPanel
+            ) ?? []
 
          const groupsByEventIds: Record<string, Group> = {}
 
@@ -339,7 +344,7 @@ const sendAttendeesReminder = async (
          const livestreamJobs: Record<string, CustomJob[]> = {}
 
          await Promise.all(
-            livestreamsToRemind.map((event) =>
+            allLivestreamsToRemind.map((event) =>
                groupRepo.getGroupsByIds(event.groupIds).then((groups) => {
                   groupsByEventIds[event.id] =
                      groups.find((group) => !group.universityCode) ??
@@ -357,7 +362,7 @@ const sendAttendeesReminder = async (
             }
          )
 
-         const livestreamJobsPromises = livestreamsToRemind.map(
+         const livestreamJobsPromises = allLivestreamsToRemind.map(
             async (event) => {
                livestreamJobs[event.id] = event.hasJobs
                   ? (await customJobRepo.getCustomJobsByLivestreamId(
@@ -379,18 +384,32 @@ const sendAttendeesReminder = async (
             },
          }
 
-         const emailTemplates = getEmailTemplateMessages(
+         const livestreamTemplates = getEmailTemplateMessages(
             templateId,
             livestreamsToRemind,
             additionalData
          )
+
+         const panelTemplateId =
+            templateId ===
+            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
+               ? CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_ATTENDEES
+               : CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_NON_ATTENDEES
+
+         const panelTemplates = getEmailTemplateMessages(
+            panelTemplateId,
+            panelsToRemind,
+            additionalData
+         )
+
+         const emailTemplates = [...livestreamTemplates, ...panelTemplates]
 
          const result = await notificationService.sendEmailNotifications(
             emailTemplates
          )
 
          functions.logger.info(
-            `Sent followup emails for ${livestreamsToRemind.length} livestreams. Success: ${result.successful}, Failed: ${result.failed}`
+            `Sent followup emails for ${livestreamsToRemind.length} livestreams and ${panelsToRemind.length} panels. Success: ${result.successful}, Failed: ${result.failed}`
          )
       } else {
          functions.logger.log("No livestream has ended yesterday")
