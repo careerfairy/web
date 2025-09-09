@@ -1,41 +1,18 @@
 import { Box, Card, Stack, Typography } from "@mui/material"
+import LinkifyText from "components/util/LinkifyText"
 import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
 import useGroupsByIds from "../../../../custom-hook/useGroupsByIds"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
+import { CompaniesCarousel } from "../../../common/company/CompaniesCarousel"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import useRegistrationHandler from "../../useRegistrationHandler"
 import ActionButton from "../livestream-details/action-button/ActionButton"
 import Speakers from "../livestream-details/main-content/Speakers"
 import { MobileDateAndTime } from "./DateAndTime"
 import { HeroSection } from "./hero/HeroSection"
-import { CompaniesCarousel } from "./main-content/CompaniesCarousel"
 
 const styles = sxStyles({
-   title: {
-      color: "common.white",
-      textTransform: "uppercase",
-      fontFamily: "Roboto Slab",
-      fontWeight: 400,
-      textShadow:
-         "-1.186px 1.186px 0px #000000, -2.372px 2.372px 0px #000000, -3.559px 3.559px 0px #000000",
-      fontSize: { xs: "27.648px", md: "37.957px" },
-      lineHeight: { xs: "32px", md: "42px" },
-      "& .title-large": {
-         fontSize: { xs: "36.288px", md: "49.819px" },
-         lineHeight: { xs: "36px", md: "46px" },
-         display: "block",
-      },
-   },
-
-   avatarGroup: {
-      "& .MuiAvatar-root": {
-         width: { xs: 28, md: 36 },
-         height: { xs: 28, md: 36 },
-         border: "2px solid white",
-      },
-   },
-
    mainContainer: {
       backgroundColor: "common.white",
       borderRadius: "12px 12px 0 0",
@@ -58,11 +35,13 @@ const styles = sxStyles({
       color: "neutral.800",
       fontWeight: 600,
    },
-
    aboutText: {
       color: "neutral.700",
+      whiteSpace: "pre-line",
    },
 })
+
+const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
 
 const PanelDetailsView = () => {
    const { livestream, livestreamPresenter, serverUserEmail } =
@@ -71,7 +50,9 @@ const PanelDetailsView = () => {
    const { handleRegisterClick } = useRegistrationHandler()
 
    const isMobile = useIsMobile()
-   const [heroRef, heroInView] = useInView()
+   const [heroRef, heroInView] = useInView({
+      threshold: 0.1,
+   })
 
    const isFloatingActionButton = isMobile || !heroInView
 
@@ -79,6 +60,16 @@ const PanelDetailsView = () => {
    const { data: participatingCompanies, status } = useGroupsByIds(
       livestream?.groupIds || [],
       false // disable suspense to avoid blocking render
+   )
+
+   // TODO: Handle CF in second iteration of the panels
+   const participantsWithoutCF = participatingCompanies?.filter(
+      (company) => company.id !== CF_GROUP_ID
+   )
+
+   // TODO: Handle moderators on second iteration of the panels
+   const speakersWithoutModerator = livestream?.speakers?.filter(
+      (speaker) => speaker.position !== "Moderator"
    )
 
    return (
@@ -90,10 +81,8 @@ const PanelDetailsView = () => {
          }}
       >
          <HeroSection
-            companies={participatingCompanies}
+            companies={participantsWithoutCF}
             ref={heroRef}
-            isFloatingActionButton={isFloatingActionButton}
-            heroInView={heroInView}
             isLoading={status === "loading"}
          />
 
@@ -111,7 +100,7 @@ const PanelDetailsView = () => {
                      Meet the experts
                   </Typography>
                   <Speakers
-                     speakers={livestream?.speakers}
+                     speakers={speakersWithoutModerator}
                      title=""
                      subtitleType="company"
                   />
@@ -124,9 +113,11 @@ const PanelDetailsView = () => {
                   <Typography variant="brandedBody" sx={styles.sectionTitle}>
                      About this event
                   </Typography>
-                  <Typography variant="medium" sx={styles.aboutText}>
-                     {livestream?.summary}
-                  </Typography>
+                  <LinkifyText>
+                     <Typography variant="medium" sx={styles.aboutText}>
+                        {livestream?.summary}
+                     </Typography>
+                  </LinkifyText>
                </Stack>
             </Card>
 
@@ -134,7 +125,7 @@ const PanelDetailsView = () => {
             <Card sx={styles.sectionCard}>
                <Stack spacing={1.5}>
                   <CompaniesCarousel
-                     companies={participatingCompanies}
+                     companies={participantsWithoutCF}
                      isLoading={status === "loading"}
                      title={
                         <Typography

@@ -84,7 +84,7 @@ export const PanelsSection = ({ panels }: Props) => {
                fontWeight={600}
                color="neutral.800"
             >
-               Discover new panels
+               Discover new Master Classes
             </Typography>
             {!isMobile ? (
                <Button
@@ -95,7 +95,7 @@ export const PanelsSection = ({ panels }: Props) => {
                   sx={styles.linkButton}
                >
                   <Typography variant="small" sx={styles.panelDescription}>
-                     Find out all about panels
+                     Learn more
                   </Typography>
                </Button>
             ) : null}

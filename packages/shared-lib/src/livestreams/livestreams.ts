@@ -828,6 +828,7 @@ export enum ImpressionLocation {
    nextLivestreamsSearchBar = "next-livestreams-search-bar", // nextLivestreamsSearchBar
    portalHeroContentCarousel = "portal-hero-content-carousel", // portalHeroContentCarousel
    portalSearchResults = "portal-search-results", // portalSearchResults
+   panelsOverviewPage = "panels-overview-page", // panelsOverviewPage
    unknown = "unknown", // unknown
 }
 

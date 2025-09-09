@@ -1,4 +1,4 @@
-import { Box, Card, Typography } from "@mui/material"
+import { Box, Card, Typography, useTheme } from "@mui/material"
 import { Calendar, Clock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
@@ -66,17 +66,19 @@ export const HeroDateAndTime = ({ eventDate }: Props) => {
 }
 
 export const MobileDateAndTime = ({ eventDate }: Props) => {
+   const theme = useTheme()
+
    return (
       <Card sx={styles.mobileDateTimeCard}>
          <Box sx={styles.mobileDateTimeRow}>
             <Box sx={styles.mobileDateTimeItem}>
-               <Calendar size={20} color="#1f1f23" />
+               <Calendar size={20} color={theme.palette.neutral[900]} />
                <Typography variant="medium" sx={styles.mobileDateTimeText}>
                   {DateUtil.formatDayOfMonth(eventDate)}
                </Typography>
             </Box>
             <Box sx={styles.mobileDateTimeItem}>
-               <Clock size={20} color="#1f1f23" />
+               <Clock size={20} color={theme.palette.neutral[900]} />
                <Typography variant="medium" sx={styles.mobileDateTimeText}>
                   {DateUtil.getPrettyTime(eventDate)}
                </Typography>

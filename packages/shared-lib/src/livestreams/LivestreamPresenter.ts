@@ -124,7 +124,8 @@ export class LivestreamPresenter extends BaseModel {
       // For breakout rooms
       public index?: number,
       // For breakout rooms
-      public parentLivestream?: LivestreamEventPublicData
+      public parentLivestream?: LivestreamEventPublicData,
+      public panelLogoUrl?: string
    ) {
       super()
    }
@@ -344,7 +345,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.lastUpdatedAuthorInfo ?? null,
          livestream.author ?? null,
          livestream.index ?? null,
-         livestream.parentLivestream ?? null
+         livestream.parentLivestream ?? null,
+         livestream.panelLogoUrl ?? null
       )
    }
 
@@ -412,7 +414,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.lastUpdatedAuthorInfo,
          livestream.author,
          livestream.index,
-         livestream.parentLivestream
+         livestream.parentLivestream,
+         livestream.panelLogoUrl
       )
 
       // If the livestream is recommended, we need to set the flag
@@ -442,7 +445,9 @@ export class LivestreamPresenter extends BaseModel {
          id: this.id,
          title: this.title,
          summary: this.summary,
+         reasonsToJoinLivestream_v2: this.reasonsToJoinLivestream_v2,
          backgroundImageUrl: this.backgroundImageUrl,
+         panelLogoUrl: this.panelLogoUrl,
          company: this.company,
          companyId: this.companyId,
          companyLogoUrl: this.companyLogoUrl,
