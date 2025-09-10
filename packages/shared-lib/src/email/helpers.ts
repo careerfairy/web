@@ -3,6 +3,7 @@ import { CustomJob } from "../customJobs/customJobs"
 import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
+   Speaker,
 } from "../livestreams"
 import { Spark } from "../sparks/sparks"
 import { SparkInteractionSources } from "../sparks/telemetry"
@@ -54,20 +55,26 @@ export function generateCalendarData(
 export const prepareEmailSpeakers = (
    livestream: LivestreamEvent,
    baseUrl: string,
-   utmCampaign: string
+   utmCampaign: string,
+   options?: {
+      filter?: (speaker: Speaker) => boolean
+   }
 ) => {
    const livestreamSpeakers = livestream.speakers ?? []
 
-   return livestreamSpeakers.slice(0, 4).map((speaker) => {
-      return getSpeakerEmailData(speaker, {
-         baseUrl,
-         livestreamId: livestream.id,
-         utmParams: {
-            campaign: utmCampaign,
-            content: livestream.title,
-         },
+   return livestreamSpeakers
+      .filter(options?.filter ?? (() => true))
+      .slice(0, 4)
+      .map((speaker) => {
+         return getSpeakerEmailData(speaker, {
+            baseUrl,
+            livestreamId: livestream.id,
+            utmParams: {
+               campaign: utmCampaign,
+               content: livestream.title,
+            },
+         })
       })
-   })
 }
 
 /**
