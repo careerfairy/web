@@ -55,19 +55,38 @@ export default function PanelsPage({
 
    const { authenticatedUser } = useAuth()
    const { push, query, pathname } = useRouter()
-   const [selectedPanelId, setSelectedPanelId] = useState<string | null>(
-      query.selectedPanelId as string | null
+   const [selectedId, setSelectedId] = useState<string | null>(
+      (query.selectedPanelId as string | null) ||
+         (query.selectedLivestreamId as string | null)
    )
 
-   const handleOpenLivestreamDialog = useCallback(
-      (livestreamId: string) => {
-         setSelectedPanelId(livestreamId)
+   const handleOpenPanelDialog = useCallback(
+      (panelId: string) => {
+         setSelectedId(panelId)
          void push(
             {
                pathname: pathname,
                query: {
                   ...query,
-                  selectedPanelId: livestreamId,
+                  selectedPanelId: panelId,
+               },
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [query, push, pathname]
+   )
+
+   const handleOpenLivestreamDialog = useCallback(
+      (livestreamId: string) => {
+         setSelectedId(livestreamId)
+         void push(
+            {
+               pathname: pathname,
+               query: {
+                  ...query,
+                  selectedLivestreamId: livestreamId,
                },
             },
             undefined,
@@ -78,9 +97,14 @@ export default function PanelsPage({
    )
 
    const handleCloseLivestreamDialog = useCallback(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { selectedPanelId: _, ...restOfQuery } = query
-      setSelectedPanelId(null)
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      const {
+         selectedPanelId: _p,
+         selectedLivestreamId: _l,
+         ...restOfQuery
+      } = query
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+      setSelectedId(null)
       void push(
          {
             pathname: pathname,
@@ -98,7 +122,7 @@ export default function PanelsPage({
                <HeroSection
                   panelEvents={deserializedPanelEvents}
                   companies={companies}
-                  handleOpenLivestreamDialog={handleOpenLivestreamDialog}
+                  handleOpenLivestreamDialog={handleOpenPanelDialog}
                />
                <WhosThisForSection />
                <SpeakersSection
@@ -111,7 +135,7 @@ export default function PanelsPage({
                <WhatYouTakeAwaySection />
                <RegisterNowSection
                   panelEvents={deserializedPanelEvents}
-                  handleOpenLivestreamDialog={handleOpenLivestreamDialog}
+                  handleOpenLivestreamDialog={handleOpenPanelDialog}
                />
                <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
@@ -120,14 +144,14 @@ export default function PanelsPage({
             </Stack>
          </GenericDashboardLayout>
          <LivestreamDialog
-            key={selectedPanelId}
-            open={Boolean(selectedPanelId)}
-            livestreamId={selectedPanelId || ""}
+            key={selectedId}
+            open={Boolean(selectedId)}
+            livestreamId={selectedId || ""}
             handleClose={handleCloseLivestreamDialog}
             mode="stand-alone"
             initialPage={"details"}
             serverUserEmail={authenticatedUser?.email || ""}
-            providedOriginSource={`panels-overview-page-${selectedPanelId}`}
+            providedOriginSource={`panels-overview-page-${selectedId}`}
          />
       </>
    )

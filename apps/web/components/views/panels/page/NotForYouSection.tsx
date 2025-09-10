@@ -54,8 +54,8 @@ export default function NotForYouSection({
             events={eventsToShow}
             location={ImpressionLocation.panelsOverviewPage}
             isRecommended={showingRecommended}
-            onCardClick={(livestreamId) => {
-               handleOpenLivestreamDialog(livestreamId)
+            onCardClick={(event) => {
+               handleOpenLivestreamDialog(event.id)
             }}
             styling={{ viewportSx: styles.viewport }}
             title={
