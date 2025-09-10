@@ -161,6 +161,7 @@ const LivestreamDetailsView = () => {
                               <Questions livestream={livestream} />
                            </Section>
                         )}
+
                         <SimilarLivestreamsCarousel
                            currentLivestream={livestream}
                         />
