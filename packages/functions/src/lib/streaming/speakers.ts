@@ -7,17 +7,17 @@ import {
    LivestreamEvent,
    UpsertSpeakerRequest,
 } from "@careerfairy/shared-lib/livestreams"
-import { onCall } from "firebase-functions/https"
+import { HttpsError, onCall } from "firebase-functions/v2/https"
 import * as yup from "yup"
 import { groupRepo, livestreamsRepo } from "../../api/repositories"
-import { middlewares } from "../../middlewares/middlewares"
-import { dataValidation, livestreamExists } from "../../middlewares/validations"
-import { validateLivestreamToken } from "../validations"
+import { withMiddlewares } from "../../middlewares-gen2/onCall/middleware"
+import {
+   dataValidationMiddleware,
+   livestreamExistsMiddleware,
+   userIsLivestreamAdminMiddleware,
+} from "../../middlewares-gen2/onCall/validations"
+import { validateLivestreamToken, validateUserIsCFAdmin } from "../validations"
 import functions = require("firebase-functions")
-
-type Context = {
-   livestream: LivestreamEvent
-}
 
 // @ts-ignore: Suppress TypeScript error for roles field
 const upsertSpeakerSchema: yup.SchemaOf<UpsertSpeakerRequest> = yup.object({
@@ -32,6 +32,7 @@ const upsertSpeakerSchema: yup.SchemaOf<UpsertSpeakerRequest> = yup.object({
          lastName: baseCreatorShape.lastName,
          position: baseCreatorShape.position,
          linkedInUrl: baseCreatorShape.linkedInUrl,
+         companyName: baseCreatorShape.companyName.nullable(),
          roles: yup
             .array()
             .of(yup.mixed<CreatorRole>().oneOf(Object.values(CreatorRoles))),
@@ -40,14 +41,17 @@ const upsertSpeakerSchema: yup.SchemaOf<UpsertSpeakerRequest> = yup.object({
       .required(),
 })
 
-type Data = UpsertSpeakerRequest & Context
-
 export const upsertLivestreamSpeaker = onCall(
-   middlewares<Data>(
-      dataValidation(upsertSpeakerSchema),
-      livestreamExists(),
+   withMiddlewares(
+      [
+         dataValidationMiddleware(upsertSpeakerSchema),
+         livestreamExistsMiddleware(),
+      ],
       async (request) => {
-         const { livestreamId, livestreamToken, speaker } = request.data
+         const { livestreamId, livestreamToken, speaker, livestream } =
+            request.data as UpsertSpeakerRequest & {
+               livestream: LivestreamEvent
+            }
 
          functions.logger.info("Upserting livestream speaker", {
             livestreamId,
@@ -56,11 +60,12 @@ export const upsertLivestreamSpeaker = onCall(
 
          await validateLivestreamToken(
             request.auth?.token?.email,
-            request.middlewares?.livestream,
+            livestream,
             livestreamToken
          )
 
          const isEditing = Boolean(speaker.id)
+
          if (isEditing) {
             functions.logger.info("Editing existing speaker", {
                speakerId: speaker.id,
@@ -70,9 +75,42 @@ export const upsertLivestreamSpeaker = onCall(
             const existingCreator = await groupRepo.getCreatorById(speaker.id)
 
             if (existingCreator && existingCreator.groupId) {
-               functions.logger.info("Existing creator found", {
-                  existingCreator,
-               })
+               functions.logger.info(
+                  "Existing creator found - checking permissions",
+                  {
+                     existingCreator,
+                  }
+               )
+
+               // Check if user has permission to edit group creators
+               const lsGroupIds: string[] = livestream?.groupIds || []
+               let hasPermission = false
+
+               // Check if user is CF admin
+               try {
+                  await validateUserIsCFAdmin(request.auth?.token?.email)
+                  hasPermission = true
+               } catch (e) {
+                  // User is not CF admin, check group admin status
+               }
+
+               // Check if user is admin of any of the livestream's host groups
+               if (!hasPermission && lsGroupIds.length > 0) {
+                  const adminGroups = request.auth?.token?.adminGroups || {}
+                  const userAdminGroupIds = Object.keys(adminGroups)
+
+                  hasPermission = userAdminGroupIds.some((groupId) =>
+                     lsGroupIds.includes(groupId)
+                  )
+               }
+
+               if (!hasPermission) {
+                  throw new HttpsError(
+                     "permission-denied",
+                     "Not authorized to edit group speakers on this livestream"
+                  )
+               }
+
                await groupRepo.updateCreatorInGroup(
                   existingCreator.groupId,
                   existingCreator.id,
@@ -84,6 +122,7 @@ export const upsertLivestreamSpeaker = onCall(
                      story: speaker.background,
                      linkedInUrl: speaker.linkedInUrl,
                      position: speaker.position,
+                     companyName: speaker.companyName,
                   }
                )
             }
@@ -102,9 +141,66 @@ export const upsertLivestreamSpeaker = onCall(
                livestreamId,
                speaker,
             })
-            // Only add Speaker as an adhoc speaker
+            // Anyone can add ad-hoc speakers - no permission check needed
             return livestreamsRepo.addAdHocSpeaker(livestreamId, speaker)
          }
+      }
+   )
+)
+
+type UpdateCreatorRolesInput = {
+   livestreamId: string
+   targetGroupId: string
+   creatorId: string
+   roles: CreatorRole[]
+}
+
+export const updateCreatorRoles = onCall<UpdateCreatorRolesInput>(
+   withMiddlewares(
+      [
+         dataValidationMiddleware(
+            yup
+               .object({
+                  livestreamId: yup.string().required(),
+                  targetGroupId: yup.string().required(),
+                  creatorId: yup.string().required(),
+                  roles: yup
+                     .array()
+                     .of(
+                        yup
+                           .mixed<CreatorRole>()
+                           .oneOf(Object.values(CreatorRoles))
+                     )
+                     .required(),
+               })
+               .required()
+         ),
+         livestreamExistsMiddleware(),
+         userIsLivestreamAdminMiddleware(),
+      ],
+      async (request) => {
+         const { targetGroupId, creatorId, roles, livestream } =
+            request.data as UpdateCreatorRolesInput & {
+               livestream: LivestreamEvent
+               isCFAdmin: boolean
+               isLivestreamHostAdmin: boolean
+            }
+
+         const lsGroupIds: string[] = livestream?.groupIds || []
+         if (!lsGroupIds.includes(targetGroupId)) {
+            throw new HttpsError(
+               "permission-denied",
+               "Target group is not a co-host of this livestream"
+            )
+         }
+
+         await groupRepo.updateCreatorRolesInGroup(
+            targetGroupId,
+            creatorId,
+            roles
+         )
+
+         return { ok: true }
       }
    )
 )

@@ -10,6 +10,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LiveStreamEventWithUsersLivestreamData,
    LivestreamEvent,
+   Speaker,
    getAuthUidFromUserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
@@ -35,6 +36,8 @@ import { isLocalEnvironment } from "./util"
 type FollowUpTemplateId =
    | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
    | typeof CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_ATTENDEES
+   | typeof CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_NON_ATTENDEES
 
 export const sendReminderEmailAboutApplicationLink = onCall(
    {
@@ -174,7 +177,10 @@ export const sendManualFollowup = onRequest(async (req, res) => {
 const getEmailTemplateMessages = (
    templateId: FollowUpTemplateId,
    streams: LiveStreamEventWithUsersLivestreamData[],
-   additionalData: LivestreamFollowUpAdditionalData
+   additionalData: LivestreamFollowUpAdditionalData,
+   options?: {
+      filter?: (speaker: Speaker) => boolean
+   }
 ): EmailNotificationRequestData<FollowUpTemplateId>[] => {
    const host = isLocalEnvironment()
       ? "http://localhost:3000"
@@ -185,7 +191,8 @@ const getEmailTemplateMessages = (
 
    streams.forEach((stream) => {
       const streamGroup = additionalData.groups.groupsByLivestreamId[stream.id]
-      const speakers = stream.speakers ?? []
+      const speakers =
+         stream.speakers?.filter(options?.filter ?? (() => true)) ?? []
 
       const groupSparks = additionalData.groups.groupSparks[streamGroup.id]
          .sort((sparkA, sparkB) => {
@@ -280,7 +287,7 @@ const sendAttendeesReminder = async (
          : await livestreamsRepo.getYesterdayLivestreams()
 
       if (yesterdayLivestreams.length) {
-         const livestreamsToRemind = await yesterdayLivestreams.reduce<
+         const allLivestreamsToRemind = await yesterdayLivestreams.reduce<
             Promise<LiveStreamEventWithUsersLivestreamData[]>
          >(async (acc, livestream) => {
             const livestreamPresenter =
@@ -325,6 +332,16 @@ const sendAttendeesReminder = async (
             return await acc
          }, Promise.resolve([]))
 
+         const livestreamsToRemind =
+            allLivestreamsToRemind?.filter(
+               (livestream) => !livestream.isPanel
+            ) ?? []
+
+         const panelsToRemind =
+            allLivestreamsToRemind?.filter(
+               (livestream) => livestream.isPanel
+            ) ?? []
+
          const groupsByEventIds: Record<string, Group> = {}
 
          const groupSparks: Record<string, Spark[]> = {}
@@ -332,7 +349,7 @@ const sendAttendeesReminder = async (
          const livestreamJobs: Record<string, CustomJob[]> = {}
 
          await Promise.all(
-            livestreamsToRemind.map((event) =>
+            allLivestreamsToRemind.map((event) =>
                groupRepo.getGroupsByIds(event.groupIds).then((groups) => {
                   groupsByEventIds[event.id] =
                      groups.find((group) => !group.universityCode) ??
@@ -350,7 +367,7 @@ const sendAttendeesReminder = async (
             }
          )
 
-         const livestreamJobsPromises = livestreamsToRemind.map(
+         const livestreamJobsPromises = allLivestreamsToRemind.map(
             async (event) => {
                livestreamJobs[event.id] = event.hasJobs
                   ? (await customJobRepo.getCustomJobsByLivestreamId(
@@ -372,18 +389,35 @@ const sendAttendeesReminder = async (
             },
          }
 
-         const emailTemplates = getEmailTemplateMessages(
+         const livestreamTemplates = getEmailTemplateMessages(
             templateId,
             livestreamsToRemind,
             additionalData
          )
+
+         const panelTemplateId =
+            templateId ===
+            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES
+               ? CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_ATTENDEES
+               : CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_NON_ATTENDEES
+
+         const panelTemplates = getEmailTemplateMessages(
+            panelTemplateId,
+            panelsToRemind,
+            additionalData,
+            {
+               filter: (speaker) => speaker.position !== "Moderator",
+            }
+         )
+
+         const emailTemplates = [...livestreamTemplates, ...panelTemplates]
 
          const result = await notificationService.sendEmailNotifications(
             emailTemplates
          )
 
          functions.logger.info(
-            `Sent followup emails for ${livestreamsToRemind.length} livestreams. Success: ${result.successful}, Failed: ${result.failed}`
+            `Sent followup emails for ${livestreamsToRemind.length} livestreams and ${panelsToRemind.length} panels. Success: ${result.successful}, Failed: ${result.failed}`
          )
       } else {
          functions.logger.log("No livestream has ended yesterday")

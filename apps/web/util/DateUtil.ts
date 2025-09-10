@@ -3,7 +3,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat"
 import calendar from "dayjs/plugin/calendar"
 import duration from "dayjs/plugin/duration"
 import relativeTime from "dayjs/plugin/relativeTime"
-import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
+import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
 import updateLocale from "dayjs/plugin/updateLocale"
 import utc from "dayjs/plugin/utc"
 
@@ -445,5 +445,16 @@ export default class DateUtil {
     */
    static formatFullDateWithTime(JSDate: Date | number): string {
       return dayjs(JSDate).format("D MMMM YYYY, HH:mm")
+   }
+
+   /**
+    * Formats a date to show the day and month in "Day Month" format.
+    * Example: "24 August"
+    *
+    * @param {Date | number} JSDate - The JavaScript Date object or timestamp to be formatted.
+    * @return {string} - The formatted date string.
+    */
+   static formatDayOfMonth(JSDate: Date | number): string {
+      return dayjs(JSDate).format("D MMMM")
    }
 }

@@ -58,7 +58,7 @@ const containerAnimationVariants: Variants = {
 let hasSeenStaggerAnimation = false
 
 export const SpeakersList = () => {
-   const { userData, isLoggedIn } = useAuth()
+   const { userData, isLoggedIn, adminGroups } = useAuth()
    const { selectSpeaker, joinLiveStreamWithUser, editSpeaker } =
       useHostProfileSelection()
    const livestream = useLivestreamData()
@@ -72,6 +72,25 @@ export const SpeakersList = () => {
          ...(livestream?.adHocSpeakers || []),
       ]
    }, [livestream.speakers, livestream.adHocSpeakers])
+
+   const canEditSpeaker = (speaker: Speaker) => {
+      // CF admins can always edit any speaker
+      if (userData?.isAdmin) {
+         return true
+      }
+
+      // Ad-hoc speakers (no groupId) can be edited by anyone
+      if (!speaker.groupId) {
+         return true
+      }
+
+      // Check if user is an admin of the speaker's group
+      if (speaker.groupId && adminGroups) {
+         return speaker.groupId in adminGroups
+      }
+
+      return false
+   }
 
    const isSpeakerInUse = (
       speaker: Speaker,
@@ -112,12 +131,15 @@ export const SpeakersList = () => {
                      <HostProfileButton
                         onClick={() =>
                            isEditMode
-                              ? editSpeaker(speaker)
+                              ? canEditSpeaker(speaker)
+                                 ? editSpeaker(speaker)
+                                 : undefined
                               : selectSpeaker(speaker)
                         }
                         speaker={speaker}
                         profileInUse={isSpeakerInUse(speaker, remoteUsers)}
                         isEditMode={isEditMode}
+                        canEdit={canEditSpeaker(speaker)}
                      />
                   </ItemAnimation>
                ))}

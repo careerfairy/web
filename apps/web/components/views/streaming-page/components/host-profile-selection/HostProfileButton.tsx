@@ -9,7 +9,7 @@ import {
    alpha,
 } from "@mui/material"
 import CircularLogo from "components/views/common/logos/CircularLogo"
-import { Edit2 } from "react-feather"
+import { Edit2, Lock } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { getFormattedName } from "../../util"
 import { BrandedTooltip } from "../BrandedTooltip"
@@ -78,6 +78,7 @@ type Props = {
    speaker: Pick<Speaker, "id" | "firstName" | "lastName" | "avatar">
    profileInUse?: boolean
    isEditMode?: boolean
+   canEdit?: boolean
 }
 
 export const HostProfileButton = ({
@@ -85,6 +86,7 @@ export const HostProfileButton = ({
    speaker,
    profileInUse,
    isEditMode,
+   canEdit = true,
 }: Props) => {
    return (
       <BrandedTooltip
@@ -104,7 +106,7 @@ export const HostProfileButton = ({
             >
                <Grow in={isEditMode}>
                   <Box sx={styles.editOverlay}>
-                     <Edit2 />
+                     {canEdit ? <Edit2 /> : <Lock />}
                   </Box>
                </Grow>
             </CircularLogo>

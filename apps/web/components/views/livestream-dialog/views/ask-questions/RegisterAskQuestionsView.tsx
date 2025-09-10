@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { Field, Form, Formik } from "formik"
+import Image from "next/image"
 import { useEffect, useState } from "react"
 import * as Yup from "yup"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
@@ -81,6 +82,14 @@ const styles = sxStyles({
       pb: 2,
       marginTop: -1,
    },
+   panelLogoContainer: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-start",
+      marginBottom: 0,
+      maxWidth: { xs: "180px", md: "244px" },
+      width: "100%",
+   },
 })
 
 const RegisterAskQuestionsView = () => {
@@ -118,15 +127,32 @@ const RegisterAskQuestionsView = () => {
                sx={styles.heroContent}
             >
                <Stack spacing={{ xs: 0.5, md: 3 }} sx={styles.heroContentStack}>
-                  <CircularLogo
-                     src={getResizedUrl(livestream.companyLogoUrl, "lg")}
-                     alt={livestream.company}
-                     size={isMobile ? 80 : 104}
-                  />
+                  {livestream.isPanel && livestream.panelLogoUrl ? (
+                     <Box sx={styles.panelLogoContainer}>
+                        <Image
+                           src={getResizedUrl(livestream.panelLogoUrl, "lg")}
+                           alt="Panel Logo"
+                           width={297}
+                           height={120}
+                           style={{
+                              width: "100%",
+                              height: "auto",
+                           }}
+                           priority
+                           sizes="(max-width: 768px) 216px, 297px"
+                        />
+                     </Box>
+                  ) : (
+                     <CircularLogo
+                        src={getResizedUrl(livestream.companyLogoUrl, "lg")}
+                        alt={livestream.company}
+                        size={isMobile ? 80 : 104}
+                     />
+                  )}
                   <HeroTitle>
                      What questions should
                      <br />
-                     the speaker answer?
+                     the speakers answer?
                   </HeroTitle>
                </Stack>
             </HeroContent>

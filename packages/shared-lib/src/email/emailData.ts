@@ -29,6 +29,7 @@ export type SpeakerData = {
    avatarUrl: string
    url: string
    linkedInUrl: string
+   company: string
 }
 
 export type SparkData = {
@@ -113,6 +114,7 @@ export const getSpeakerEmailData = (
       name: `${speaker.firstName} ${speaker.lastName}`,
       position: speaker.position,
       avatarUrl: speaker.avatar,
+      company: speaker.companyName,
       url: addUtmTagsToLink({
          link: `${options.baseUrl || defaultBaseUrl}/portal/livestream/${
             options.livestreamId

@@ -1,9 +1,9 @@
-import { Group } from "@careerfairy/shared-lib/groups"
 import { CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import { useFieldsOfStudy } from "components/custom-hook/useCollection"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { customJobRepo, groupRepo } from "data/RepositoryInstances"
+import { groupService } from "data/firebase/GroupService"
+import { customJobRepo } from "data/RepositoryInstances"
 import { FormikErrors } from "formik"
 import cloneDeep from "lodash/cloneDeep"
 import omit from "lodash/omit"
@@ -117,8 +117,7 @@ export const useAutoSave = () => {
       async (
          previousSpeakers: LivestreamFormSpeakersTabValues["values"],
          newSpeakers: Speaker[],
-         options: LivestreamFormSpeakersTabValues["options"],
-         groupId: Group["id"]
+         options: LivestreamFormSpeakersTabValues["options"]
       ) => {
          const removedSpeakers = previousSpeakers?.filter(
             (prevSpeaker) =>
@@ -141,11 +140,12 @@ export const useAutoSave = () => {
 
          const deletePromises = removedSpeakersThatAreCreators?.map(
             async (speakerCreator) =>
-               groupRepo.updateCreatorRolesInGroup(
-                  groupId,
-                  speakerCreator.id,
-                  speakerCreator.roles
-               )
+               groupService.updateCreatorRolesForLivestream({
+                  livestreamId: livestream.id,
+                  targetGroupId: speakerCreator.groupId,
+                  creatorId: speakerCreator.id,
+                  roles: speakerCreator.roles,
+               })
          )
 
          const addedSpeakers = newSpeakers?.filter(
@@ -161,17 +161,20 @@ export const useAutoSave = () => {
          )
 
          const updatePromises = speakersThatAreCreators?.map(
-            async (speakerCreator) =>
-               groupRepo.updateCreatorRolesInGroup(
-                  groupId,
-                  speakerCreator.id,
-                  speakerCreator.roles
-               )
+            async (speakerCreator) => {
+               // And update in the creator's own group via server-side callable
+               groupService.updateCreatorRolesForLivestream({
+                  livestreamId: livestream.id,
+                  targetGroupId: speakerCreator.groupId,
+                  creatorId: speakerCreator.id,
+                  roles: speakerCreator.roles,
+               })
+            }
          )
 
          await Promise.all([...deletePromises, ...updatePromises])
       },
-      []
+      [livestream.id]
    )
 
    const updateFeedbackQuestions = useCallback(
@@ -263,8 +266,7 @@ export const useAutoSave = () => {
          updateCreatorsRoles(
             previousSpeakers,
             mappedObject.speakers,
-            newValues.speakers.options,
-            livestream.groupIds[0]
+            newValues.speakers.options
          )
 
          if (newValues?.questions?.feedbackQuestions?.length > 0) {
@@ -282,7 +284,6 @@ export const useAutoSave = () => {
       [
          allFieldsOfStudy,
          firebaseService,
-         livestream.groupIds,
          livestream.id,
          targetLivestreamCollection,
          updateCreatorsRoles,
