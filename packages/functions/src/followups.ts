@@ -10,6 +10,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LiveStreamEventWithUsersLivestreamData,
    LivestreamEvent,
+   Speaker,
    getAuthUidFromUserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
@@ -176,7 +177,10 @@ export const sendManualFollowup = onRequest(async (req, res) => {
 const getEmailTemplateMessages = (
    templateId: FollowUpTemplateId,
    streams: LiveStreamEventWithUsersLivestreamData[],
-   additionalData: LivestreamFollowUpAdditionalData
+   additionalData: LivestreamFollowUpAdditionalData,
+   options?: {
+      filter?: (speaker: Speaker) => boolean
+   }
 ): EmailNotificationRequestData<FollowUpTemplateId>[] => {
    const host = isLocalEnvironment()
       ? "http://localhost:3000"
@@ -187,7 +191,8 @@ const getEmailTemplateMessages = (
 
    streams.forEach((stream) => {
       const streamGroup = additionalData.groups.groupsByLivestreamId[stream.id]
-      const speakers = stream.speakers ?? []
+      const speakers =
+         stream.speakers?.filter(options?.filter ?? (() => true)) ?? []
 
       const groupSparks = additionalData.groups.groupSparks[streamGroup.id]
          .sort((sparkA, sparkB) => {
@@ -399,7 +404,10 @@ const sendAttendeesReminder = async (
          const panelTemplates = getEmailTemplateMessages(
             panelTemplateId,
             panelsToRemind,
-            additionalData
+            additionalData,
+            {
+               filter: (speaker) => speaker.position !== "Moderator",
+            }
          )
 
          const emailTemplates = [...livestreamTemplates, ...panelTemplates]

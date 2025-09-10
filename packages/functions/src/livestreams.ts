@@ -119,7 +119,10 @@ export const livestreamRegistrationConfirmationEmail = onCall(
       const emailSpeakers = prepareEmailSpeakers(
          livestream,
          host,
-         "eventRegistration"
+         "eventRegistration",
+         {
+            filter: (speaker) => speaker.position !== "Moderator",
+         }
       )
 
       const emailJobs = prepareEmailJobs(
@@ -297,7 +300,10 @@ export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
    const emailSpeakers = prepareEmailSpeakers(
       livestream,
       host,
-      "eventRegistration"
+      "eventRegistration",
+      {
+         filter: (speaker) => speaker.position !== "Moderator",
+      }
    )
 
    const emailJobs = prepareEmailJobs(

@@ -312,8 +312,10 @@ const buildPanelNoShowTemplateData = (
       ),
       companyPageUrl: companyPageUrl,
    },
-   speakers: livestream.speakers?.map((speaker) => ({
-      firstName: speaker.firstName,
-   })),
+   speakers: livestream.speakers
+      ?.filter?.((speaker) => speaker.position !== "Moderator")
+      ?.map((speaker) => ({
+         firstName: speaker.firstName,
+      })),
    companies: companyNames,
 })
