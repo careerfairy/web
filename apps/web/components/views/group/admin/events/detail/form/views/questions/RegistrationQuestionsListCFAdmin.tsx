@@ -70,7 +70,9 @@ const RegistrationQuestionsListForCFAdmin = () => {
             isOptionEqualToValue={(option, value) =>
                option.groupId === value.groupId
             }
-            getOptionLabel={(group: Group) => group.universityName}
+            getOptionLabel={(group: Group) =>
+               group.universityName || "Untitled"
+            }
             onChange={async (_, value) => {
                const registrationQuestionsFiltered =
                   questions.registrationQuestions.values.filter((question) =>
@@ -88,17 +90,33 @@ const RegistrationQuestionsListForCFAdmin = () => {
                group.groupId === currentGroup.groupId
             }
             renderTags={(value: Group[], getTagProps) => {
-               const sortedValues = value.sort((a, b) =>
-                  a.universityName.localeCompare(b.universityName)
+               // Keep original indices to ensure getTagProps({ index }) maps to the correct item
+               const withIndex = value.map((g, idx) => ({ option: g, idx }))
+
+               const currentGroupId = currentGroup.groupId
+
+               const current = withIndex.filter(
+                  ({ option }) => option.groupId === currentGroupId
                )
-               return sortedValues.map((option, index) => {
-                  const isDisabled: boolean =
-                     option.groupId === currentGroup.groupId
+               const rest = withIndex.filter(
+                  ({ option }) => option.groupId !== currentGroupId
+               )
+
+               const ordered = [...current, ...rest]
+
+               return ordered.map(({ option, idx }) => {
+                  const isCurrent = option.groupId === currentGroupId
+                  const isNonDeletable = isCurrent
+                  const tagProps = getTagProps({ index: idx })
+
                   return (
                      <Chip
                         key={option.groupId}
-                        {...getTagProps({ index })}
-                        disabled={isDisabled}
+                        {...tagProps}
+                        disabled={isNonDeletable}
+                        onDelete={
+                           isNonDeletable ? undefined : tagProps.onDelete
+                        }
                         label={option.universityName}
                         sx={[
                            {
@@ -106,7 +124,7 @@ const RegistrationQuestionsListForCFAdmin = () => {
                                  option.groupId
                               )} !important`,
                            },
-                           Boolean(isDisabled) && {
+                           isNonDeletable && {
                               opacity: "0.5 !important",
                            },
                         ]}

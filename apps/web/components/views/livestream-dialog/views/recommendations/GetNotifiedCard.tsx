@@ -65,6 +65,9 @@ export const GetNotifiedCard = ({
                companyLogoUrl={livestream.companyLogoUrl}
                title={livestream.title}
                bannerImageUrl={livestream.backgroundImageUrl}
+               panelLogoUrl={
+                  livestream.isPanel ? livestream.panelLogoUrl : null
+               }
                eventDateString={formatLivestreamDate(
                   livestream?.start || new Date()
                )}

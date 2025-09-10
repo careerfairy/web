@@ -1,5 +1,6 @@
 import { Creator, CreatorRole } from "@careerfairy/shared-lib/groups/creators"
 import useUploadCreatorAvatar from "components/custom-hook/creator/useUploadCreatorAvatar"
+import useGroup from "components/custom-hook/group/useGroup"
 import { groupRepo } from "data/RepositoryInstances"
 import { useCallback, useMemo } from "react"
 
@@ -48,6 +49,7 @@ const useCreatorFormSubmit = (
 ): UseCreatorFormSubmit => {
    const { handleUploadFile, isLoading, uploading, progress } =
       useUploadCreatorAvatar(groupId)
+   const { data: group } = useGroup(groupId, true)
 
    const handleSubmit = useCallback<UseCreatorFormSubmit["handleSubmit"]>(
       async (values, { setFieldError }) => {
@@ -81,6 +83,7 @@ const useCreatorFormSubmit = (
                story: values.story,
                id: values.id,
                roles: values.roles,
+               companyName: group?.universityName,
             })
          } else {
             creator = await groupRepo.addCreatorToGroup(groupId, {
@@ -92,6 +95,7 @@ const useCreatorFormSubmit = (
                linkedInUrl: values.linkedInUrl,
                story: values.story,
                roles: values.roles,
+               companyName: group?.universityName,
             })
          }
 
@@ -99,7 +103,7 @@ const useCreatorFormSubmit = (
             onSubmited(creator)
          }
       },
-      [groupId, handleUploadFile, onSubmited]
+      [groupId, group?.universityName, handleUploadFile, onSubmited]
    )
 
    return useMemo<UseCreatorFormSubmit>(

@@ -1,8 +1,10 @@
 import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { logger } from "firebase-functions/v2"
 import { HttpsError } from "firebase-functions/v2/https"
 import {
+   validateLivestreamExists,
    validateUserIsCFAdmin,
    validateUserIsGroupAdmin as validateUserIsGroupAdminFn,
 } from "../../lib/validations"
@@ -52,6 +54,11 @@ type WithCFAdminData = {
    userData: UserData
 }
 
+type WithLivestreamAdminData = {
+   isCFAdmin: boolean
+   isLivestreamHostAdmin: boolean
+}
+
 export function userIsCFAdminMiddleware<
    TInput = Record<string, any>
 >(): Middleware<TInput, TInput & WithCFAdminData> {
@@ -88,6 +95,72 @@ export function userAuthExistsMiddleware<
       return next({
          ...request,
          data: request.data,
+      })
+   }
+}
+
+/**
+ * Middleware to validate if the user is an admin of any of the livestream's host groups or a CF admin
+ *
+ * Throws an exception if user is not allowed
+ *
+ * Assumes request.data.livestream exists (from livestreamExistsMiddleware)
+ *
+ * This middleware preserves the original input type while adding WithLivestreamAdminData
+ */
+export function userIsLivestreamAdminMiddleware<
+   TInput extends { livestream: LivestreamEvent }
+>(): Middleware<TInput, TInput & WithLivestreamAdminData> {
+   return async (request, next) => {
+      // Check if user is authenticated
+      if (!request.auth) {
+         logger.error("User is not authenticated")
+         throw new HttpsError("unauthenticated", "User must be authenticated")
+      }
+
+      const { livestream } = request.data
+      const lsGroupIds: string[] = livestream?.groupIds || []
+
+      // Check if user is CF admin
+      let isCFAdmin = false
+      try {
+         await validateUserIsCFAdmin(request.auth.token.email)
+         isCFAdmin = true
+      } catch (e) {
+         // User is not CF admin, continue to check group admin status
+      }
+
+      // Check if user is admin of any of the livestream's host groups
+      let isLivestreamHostAdmin = false
+      if (!isCFAdmin && lsGroupIds.length > 0) {
+         const adminGroups = request.auth.token.adminGroups || {}
+         const userAdminGroupIds = Object.keys(adminGroups)
+
+         isLivestreamHostAdmin = userAdminGroupIds.some((groupId) =>
+            lsGroupIds.includes(groupId)
+         )
+      }
+
+      // If user is neither CF admin nor livestream host admin, throw error
+      if (!isCFAdmin && !isLivestreamHostAdmin) {
+         logger.error("User is not authorized to perform this action", {
+            email: request.auth.token.email,
+            livestreamId: livestream.id,
+            groupIds: lsGroupIds,
+         })
+         throw new HttpsError(
+            "permission-denied",
+            "Not authorized to perform this action on this livestream"
+         )
+      }
+
+      return next({
+         ...request,
+         data: {
+            ...request.data,
+            isCFAdmin,
+            isLivestreamHostAdmin,
+         },
       })
    }
 }
@@ -154,5 +227,25 @@ export function dataValidationMiddleware<
             error instanceof Error ? error.message : "Invalid data format"
          )
       }
+   }
+}
+
+/**
+ * Middleware to ensure the provided livestreamId exists and attach the livestream to request.data
+ */
+export function livestreamExistsMiddleware<
+   TInput extends { livestreamId: string }
+>(): Middleware<TInput, TInput & { livestream: LivestreamEvent }> {
+   return async (request, next) => {
+      const livestream = await validateLivestreamExists(
+         request.data.livestreamId
+      )
+      return next({
+         ...request,
+         data: {
+            ...(request.data as TInput),
+            livestream,
+         },
+      })
    }
 }

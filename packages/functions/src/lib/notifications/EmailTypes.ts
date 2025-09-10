@@ -17,6 +17,13 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    LIVESTREAM_REMINDER_NO_SHOW: "live_stream_reminder_no_show",
    LIVESTREAM_FOLLOWUP_ATTENDEES: "live_stream_followup_attendees",
    LIVESTREAM_FOLLOWUP_NON_ATTENDEES: "live_stream_followup_non_attendees",
+   PANEL_REMINDER_1H: "panel_reminder_1h",
+   PANEL_REMINDER_24H: "panel_reminder_24h",
+   PANEL_REMINDER_7M: "panel_reminder_7min",
+   PANEL_REMINDER_NO_SHOW: "panel_reminder_no_show",
+   PANEL_FOLLOWUP_ATTENDEES: "panel_followup_attendees",
+   PANEL_FOLLOWUP_NON_ATTENDEES: "panel_followup_non_attendees",
+   PANEL_REGISTRATION: "panel_registration_confirmation",
    APPLY_TO_JOB_LATER: "apply_to_job_later",
    WELCOME_TO_CAREERFAIRY: "welcome_to_careerfairy",
    PIN_VALIDATION: "pin_validation",
@@ -39,6 +46,15 @@ type BaseLivestreamData = {
    url: string
 }
 
+type BasePanelData = {
+   bannerImageUrl: string
+   companyLogoUrl: string
+   start: string
+   title: string
+   url: string
+   companyPageUrl: string
+}
+
 /**
  * Message data for livestream registration confirmation emails
  */
@@ -48,6 +64,20 @@ export type LivestreamRegistrationTemplateData = {
       company: string
       start: string
       companyBannerImageUrl: string
+   }
+   jobs: JobData[]
+   speakers: SpeakerData[]
+   sparks: SparkData[]
+   calendar: CalendarData
+}
+
+export type PanelRegistrationTemplateData = {
+   livestream: {
+      title: string
+      company: string
+      start: string
+      companyBannerImageUrl: string
+      url: string
    }
    jobs: JobData[]
    speakers: SpeakerData[]
@@ -96,6 +126,14 @@ export type NoShowReminderTemplateData = {
    speaker2: {
       firstName: string
    }
+}
+
+export type PanelNoShowReminderTemplateData = {
+   panel: BasePanelData
+   companies: string[]
+   speakers: {
+      firstName: string
+   }[]
 }
 
 /**
@@ -166,22 +204,29 @@ export type SparksPlanTemplateData = {
  */
 export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION]: LivestreamRegistrationTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_1H]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_24H]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_1H]: ReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_7M]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_5M]: ReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_ATTENDEES]: ReminderFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_FOLLOWUP_NON_ATTENDEES]: ReminderFollowUpTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_ATTENDEES]: ReminderFollowUpTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_FOLLOWUP_NON_ATTENDEES]: ReminderFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.APPLY_TO_JOB_LATER]: ApplicationLinkFollowUpTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.WELCOME_TO_CAREERFAIRY]: null
    [CUSTOMERIO_EMAIL_TEMPLATES.PIN_VALIDATION]: PinValidationTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.PASSWORD_RESET]: PasswordResetTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.GROUP_INVITATION]: GroupInvitationTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW]: NoShowReminderTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_NO_SHOW]: PanelNoShowReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISH]: LivestreamPublishedTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_START_SUBSCRIPTION]: SparksPlanTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION]: SparksPlanTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_CONTENT_CREATION_PERIOD]: SparksPlanTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_REGISTRATION_F2F]: LivestreamRegistrationF2FTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REGISTRATION]: PanelRegistrationTemplateData
 }
 
 /**

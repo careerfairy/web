@@ -1,4 +1,3 @@
-import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import { useAuth } from "HOCs/AuthProvider"
 import useCustomJobsCount from "components/custom-hook/custom-job/useCustomJobsCount"
@@ -162,7 +161,10 @@ const LivestreamDetailsView = () => {
                               <Questions livestream={livestream} />
                            </Section>
                         )}
-                        <SimilarLivestreamsCarousel currentLivestream={livestream} />
+
+                        <SimilarLivestreamsCarousel
+                           currentLivestream={livestream}
+                        />
                      </MainContent>
                   )}
                </MainContentNavigation>

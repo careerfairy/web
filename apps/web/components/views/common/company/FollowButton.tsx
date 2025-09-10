@@ -94,7 +94,9 @@ const AuthedFollowButton: FC<Props> = ({
          }
       )
 
-   const handleClick = () => {
+   const handleClick = (event: React.MouseEvent) => {
+      event.stopPropagation()
+      event.preventDefault()
       if (authenticatedUser) {
          return trigger({
             userData,
@@ -182,6 +184,7 @@ const FollowButton: FC<Props> = ({
          <AuthedFollowButton
             group={group}
             interactionSource={interactionSource}
+            showStartIcon={showStartIcon}
             {...mergedProps}
          />
       )

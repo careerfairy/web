@@ -5,7 +5,7 @@ import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
-import Image from "next/legacy/image"
+import Image from "next/image"
 import { FC } from "react"
 import { NICE_SCROLLBAR_STYLES } from "../../../../../../constants/layout"
 import { sxStyles } from "../../../../../../types/commonTypes"
@@ -26,17 +26,20 @@ const styles = sxStyles({
       border: `1px solid ${theme.palette.secondary[50]}`,
       background: theme.brand.white[200],
       mb: 0.5,
-      "& .avatar": {
-         borderRadius: "70px",
-         minWidth: "48px !important",
-         minHeight: "48px !important",
-         border: `1.5px solid ${theme.brand.white[400]} !important`,
-      },
       ":hover": {
          borderColor: theme.palette.secondary[100],
          background: theme.brand.white[400],
          cursor: "pointer",
       },
+   }),
+   avatarWrapper: (theme) => ({
+      position: "relative",
+      width: 48,
+      height: 48,
+      borderRadius: "70px",
+      overflow: "hidden",
+      border: `1.5px solid ${theme.brand.white[400]}`,
+      flexShrink: 0,
    }),
    speakerNameWrapper: {
       justifyContent: "center",
@@ -57,16 +60,26 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "row",
       gap: 1,
+      // hack to ensure overflow visibility with parent padding
+      paddingX: "16px",
+      marginX: "-16px",
+      width: "calc(100% + 32px)", // Account for parent container padding (16px on each side)
    },
 })
 
 interface Props {
    speakers?: Speaker[]
    title?: string
+   subtitleType?: "position" | "company"
    onClick?: () => void
 }
 
-const Speakers: FC<Props> = ({ speakers, title = "Speakers", ...props }) => {
+const Speakers: FC<Props> = ({
+   speakers,
+   title = "Speakers",
+   subtitleType = "position",
+   ...props
+}) => {
    if (!speakers) {
       return null
    }
@@ -76,7 +89,12 @@ const Speakers: FC<Props> = ({ speakers, title = "Speakers", ...props }) => {
          {title ? <SectionTitle>{title}</SectionTitle> : null}
          <HorizontalScroll sx={styles.speakersWrapper}>
             {speakers.map((speaker) => (
-               <SpeakerCard key={speaker.id} speaker={speaker} {...props} />
+               <SpeakerCard
+                  key={speaker.id}
+                  speaker={speaker}
+                  subtitleType={subtitleType}
+                  {...props}
+               />
             ))}
          </HorizontalScroll>
       </Box>
@@ -85,10 +103,15 @@ const Speakers: FC<Props> = ({ speakers, title = "Speakers", ...props }) => {
 
 type SpeakerCardProps = {
    speaker: Speaker
+   subtitleType?: "position" | "company"
    onClick?: () => void
 }
 
-const SpeakerCard: FC<SpeakerCardProps> = ({ speaker, onClick }) => {
+const SpeakerCard: FC<SpeakerCardProps> = ({
+   speaker,
+   subtitleType = "position",
+   onClick,
+}) => {
    const { goToSpeakerDetails } = useLiveStreamDialog()
    const displayName = `${speaker.firstName ?? ""} ${speaker.lastName ?? ""}`
 
@@ -108,17 +131,16 @@ const SpeakerCard: FC<SpeakerCardProps> = ({ speaker, onClick }) => {
                goToSpeakerDetails(speaker.id)
             }}
          >
-            <Box minWidth={48} minHeight={48}>
+            <Box sx={styles.avatarWrapper}>
                <Image
                   className="avatar"
-                  width={48}
-                  height={48}
+                  fill
                   src={
                      getResizedUrl(speaker.avatar, "lg") || speakerPlaceholder
                   }
-                  objectFit="cover"
                   alt={displayName}
                   draggable={false}
+                  style={{ objectFit: "cover" }}
                />
             </Box>
             <Stack sx={styles.speakerNameWrapper}>
@@ -134,7 +156,9 @@ const SpeakerCard: FC<SpeakerCardProps> = ({ speaker, onClick }) => {
                   whiteSpace="nowrap"
                   variant="small"
                >
-                  {speaker.position}
+                  {subtitleType === "position"
+                     ? speaker.position
+                     : speaker.companyName}
                </Typography>
             </Stack>
          </Stack>
@@ -145,14 +169,13 @@ const SpeakerCard: FC<SpeakerCardProps> = ({ speaker, onClick }) => {
 const SpeakerCardSkeleton: FC = () => {
    return (
       <Stack spacing={1} direction="row" sx={styles.speakerWrapper}>
-         <Box minWidth={48} minHeight={48}>
+         <Box sx={styles.avatarWrapper}>
             <Image
                className="avatar"
-               width={48}
-               height={48}
+               fill
                src={speakerPlaceholder}
-               objectFit="cover"
                alt={"Speaker Placeholder"}
+               style={{ objectFit: "cover" }}
             />
          </Box>
          <Stack>

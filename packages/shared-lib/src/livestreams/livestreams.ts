@@ -253,6 +253,21 @@ export interface LivestreamEvent extends Identifiable {
     * If true, SMS notifications are enabled for the live stream
     */
    smsEnabled?: boolean
+
+   /**
+    * If true, the livestream is a panel and has multiple hosts
+    */
+   isPanel?: boolean
+
+   /**
+    * The logo of the panel
+    */
+   panelLogoUrl?: string
+
+   /**
+    * The trailer url of the panel
+    */
+   panelTrailerUrl?: string
 }
 
 export const LivestreamModes = {
@@ -494,6 +509,7 @@ export interface Speaker extends Identifiable {
    linkedInUrl?: string
    roles: CreatorRole[]
    groupId?: string
+   companyName?: string
 }
 
 export interface LiveSpeaker extends Identifiable {
@@ -812,6 +828,7 @@ export enum ImpressionLocation {
    nextLivestreamsSearchBar = "next-livestreams-search-bar", // nextLivestreamsSearchBar
    portalHeroContentCarousel = "portal-hero-content-carousel", // portalHeroContentCarousel
    portalSearchResults = "portal-search-results", // portalSearchResults
+   panelsOverviewPage = "panels-overview-page", // panelsOverviewPage
    unknown = "unknown", // unknown
 }
 

@@ -137,6 +137,11 @@ type GetStreamsByDateWithRegisteredStudentsOptions = {
     * If true, the data will be skimmed to only include the needed fields.
     */
    skimData?: boolean
+
+   /**
+    * If true, only panels will be considered. Otherwise panels are excluded.
+    */
+   panelsOnly?: boolean
 }
 
 /**
@@ -158,14 +163,24 @@ export const getStreamsByDateWithRegisteredStudents = async (
       query = query.where("hidden", "==", false)
    }
 
+   const panelsFilter = (stream: Pick<LivestreamEvent, "isPanel">) => {
+      if (options?.panelsOnly) {
+         return stream.isPanel === true
+      }
+
+      return stream.isPanel !== true
+   }
+
    return query.get().then((querySnapshot) => {
-      const streams = querySnapshot.docs?.map(
-         (doc) =>
-            ({
-               id: doc.id,
-               ...doc.data(),
-            } as LivestreamEvent)
-      )
+      const streams = querySnapshot.docs
+         ?.map(
+            (doc) =>
+               ({
+                  id: doc.id,
+                  ...doc.data(),
+               } as LivestreamEvent)
+         )
+         ?.filter(panelsFilter)
 
       return addUsersDataOnStreams(streams, options?.skimData)
    })

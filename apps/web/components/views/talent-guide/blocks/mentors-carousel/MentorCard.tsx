@@ -17,6 +17,10 @@ const styles = sxStyles({
       userSelect: "none",
       cursor: "pointer",
       borderRadius: "8px",
+      "&:hover": {
+         boxShadow: "0 0 12px 0 rgba(20, 20, 20, 0.08)",
+         borderColor: (theme) => theme.brand.purple[100],
+      },
    },
    bannerContainer: {
       position: "relative",

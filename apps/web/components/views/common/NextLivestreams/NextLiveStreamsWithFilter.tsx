@@ -15,7 +15,9 @@ import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
+import { useUpcomingPanelEventsSWR } from "components/custom-hook/panels/useUpcomingPanelEventsSWR"
 import { isInIframe } from "components/helperFunctions/HelperFunctions"
+import { motion } from "framer-motion"
 import { useRouter } from "next/router"
 import { ParsedUrlQuery } from "querystring"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
@@ -32,6 +34,7 @@ import LivestreamSearch from "../../group/admin/common/LivestreamSearch"
 import { buildDialogLink } from "../../livestream-dialog"
 import Filter, { FilterEnum } from "../filter/Filter"
 import NoResultsMessage from "./NoResultsMessage"
+import { PanelsSection } from "./PanelsSection/PanelsSection"
 import RecentLivestreamsSection from "./RecentLivestreamsGrid"
 import { StreamsSection } from "./StreamsSection"
 
@@ -46,6 +49,12 @@ const styles = sxStyles({
       flex: 1,
       display: "flex",
       marginX: { xs: 2, md: 3 },
+   },
+   panelsRoot: {
+      flex: 1,
+      display: "flex",
+      marginX: { xs: 2, md: 3 },
+      mt: { xs: 2, md: 3 },
    },
    search: {
       flex: 1,
@@ -91,14 +100,21 @@ const getQueryVariables = (query: ParsedUrlQuery) => {
 
 type Props = {
    initialTabValue?: "upcomingEvents" | "pastEvents"
+   userCountryCode?: string
 }
 
 const NextLiveStreamsWithFilter = ({
    initialTabValue = "upcomingEvents",
+   userCountryCode,
 }: Props) => {
    const router = useRouter()
    const { query, push } = router
    const { handlePartnerEventClick } = usePartnership()
+
+   const { data: panels } = useUpcomingPanelEventsSWR({
+      userCountryCode,
+      limit: 2,
+   })
 
    const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const [inputValue, setInputValue] = useState("")
@@ -353,6 +369,21 @@ const NextLiveStreamsWithFilter = ({
                </Box>
             </Box>
          </Container>
+
+         {panels && panels.length > 0 ? (
+            <motion.div
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.4, ease: "easeOut" }}
+               style={{ width: "100%" }}
+            >
+               <Container maxWidth="xl" disableGutters>
+                  <Box sx={styles.panelsRoot}>
+                     <PanelsSection panels={panels} />
+                  </Box>
+               </Container>
+            </motion.div>
+         ) : null}
 
          <StreamsSection
             value={initialTabValue}

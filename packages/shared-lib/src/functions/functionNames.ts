@@ -29,16 +29,19 @@ export const FUNCTION_NAMES = {
    createNewUserAccount: "createNewUserAccount_v5",
 
    // Streaming functions
-   upsertLivestreamSpeaker: "upsertLivestreamSpeaker_v2",
+   upsertLivestreamSpeaker: "upsertLivestreamSpeaker_v3",
    deleteLivestream: "deleteLivestream",
+   updateCreatorRoles: "updateCreatorRoles",
    // Reminders functions
    onLivestreamStartScheduleNoShowReminder:
       "onLivestreamStartScheduleNoShowReminder",
-   sendLivestreamNoShowReminder: "sendLivestreamNoShowReminder",
+   sendLivestreamNoShowReminder: "sendLivestreamNoShowReminder_v2",
 
    // Livestream functions
+   sendLivestreamRegistrationConfirmationEmail:
+      "sendLivestreamRegistrationConfirmationEmail_v7",
    sendPhysicalEventRegistrationConfirmationEmail:
-      "sendPhysicalEventRegistrationConfirmationEmail",
+      "sendPhysicalEventRegistrationConfirmationEmail_v2",
    getRecommendedEvents: "getRecommendedEvents_v7",
    getRecommendedJobs: "getRecommendedJobs_v2",
 

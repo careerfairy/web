@@ -46,6 +46,9 @@ type ReminderTemplates = Pick<
    | "LIVESTREAM_REMINDER_5M"
    | "LIVESTREAM_REMINDER_1H"
    | "LIVESTREAM_REMINDER_24H"
+   | "PANEL_REMINDER_24H"
+   | "PANEL_REMINDER_7M"
+   | "PANEL_REMINDER_1H"
 >
 
 type ReminderTemplateId = ReminderTemplates[keyof ReminderTemplates]
@@ -77,11 +80,27 @@ const Reminder5Min = {
    getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes),
 } as const satisfies ReminderConfig
 
+const PanelReminder7Min = {
+   templateId: CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_7M,
+   scheduleEmailMinutesBefore: 7,
+   reminderUtmCampaign: "reminder-7min-panel",
+   // 7 minutes before the panel starts
+   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 7),
+} as const satisfies ReminderConfig
+
 const Reminder1Hour = {
    templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_1H,
    scheduleEmailMinutesBefore: 60,
    reminderUtmCampaign: "reminder-1h",
    // 1 hour before the livestream starts
+   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 60),
+} as const satisfies ReminderConfig
+
+const PanelReminder1Hour = {
+   templateId: CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_1H,
+   scheduleEmailMinutesBefore: 60,
+   reminderUtmCampaign: "reminder-1h-panel",
+   // 1 hour before the panel starts
    getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 60),
 } as const satisfies ReminderConfig
 
@@ -93,10 +112,21 @@ const Reminder24Hours = {
    getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 1440),
 } as const satisfies ReminderConfig
 
+const PanelReminder24Hours = {
+   templateId: CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_24H,
+   scheduleEmailMinutesBefore: 1440,
+   reminderUtmCampaign: "reminder-24h-panel",
+   // 1 day before the panel starts
+   getStartDate: () => addMinutesDate(new Date(), reminderBufferMinutes + 1440),
+} as const satisfies ReminderConfig
+
 const reminderConfigs = {
    [Reminder5Min.templateId]: Reminder5Min,
    [Reminder1Hour.templateId]: Reminder1Hour,
    [Reminder24Hours.templateId]: Reminder24Hours,
+   [PanelReminder7Min.templateId]: PanelReminder7Min,
+   [PanelReminder1Hour.templateId]: PanelReminder1Hour,
+   [PanelReminder24Hours.templateId]: PanelReminder24Hours,
 } as const
 
 const scheduleOptions = {
@@ -171,6 +201,60 @@ export const schedule24HoursReminderEmails = onSchedule(
       )
 
       await handleReminder(streams, Reminder24Hours)
+   }
+)
+
+export const schedulePanels7MinutesReminderEmails = onSchedule(
+   scheduleOptions,
+   async () => {
+      log(`Current time: ${new Date().toLocaleString()}`)
+
+      const fromDate = PanelReminder7Min.getStartDate()
+      const toDate = addMinutesDate(fromDate, reminderScheduleRange)
+
+      const streams = await getStreamsByDateWithRegisteredStudents(
+         fromDate,
+         toDate,
+         { panelsOnly: true }
+      )
+
+      return handleReminder(streams, PanelReminder7Min)
+   }
+)
+
+export const schedulePanels1HourReminderEmails = onSchedule(
+   scheduleOptions,
+   async () => {
+      log(`Current time: ${new Date().toLocaleString()}`)
+
+      const fromDate = PanelReminder1Hour.getStartDate()
+      const toDate = addMinutesDate(fromDate, reminderScheduleRange)
+
+      const streams = await getStreamsByDateWithRegisteredStudents(
+         fromDate,
+         toDate,
+         { panelsOnly: true }
+      )
+
+      return handleReminder(streams, PanelReminder1Hour)
+   }
+)
+
+export const schedulePanels24HoursReminderEmails = onSchedule(
+   scheduleOptions,
+   async () => {
+      log(`Current time: ${new Date().toLocaleString()}`)
+
+      const fromDate = PanelReminder24Hours.getStartDate()
+      const toDate = addMinutesDate(fromDate, reminderScheduleRange)
+
+      const streams = await getStreamsByDateWithRegisteredStudents(
+         fromDate,
+         toDate,
+         { panelsOnly: true }
+      )
+
+      return handleReminder(streams, PanelReminder24Hours)
    }
 )
 
@@ -308,7 +392,8 @@ const handleSendEmails = async (
 
       if (
          reminder.templateId ===
-         CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H
+            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H ||
+         CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_24H
       ) {
          info(`This is a ${reminder.templateId} reminder, attaching ICS file`)
          // Generate ICS file content
@@ -357,7 +442,10 @@ const handleSendEmails = async (
          ? `${getHost()}/company/${companyNameSlugify(
               streamGroup.universityName
            )}?interactionSource=${
-              InteractionSources.Email_Live_Stream_Reminder_24h
+              reminder.templateId ===
+              CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H
+                 ? InteractionSources.Email_Live_Stream_Reminder_24h
+                 : InteractionSources.Email_Panel_Reminder_24h
            }`
          : ""
 

@@ -206,7 +206,7 @@ const MoreMenuWithEditAndRemoveOptions = ({
       ...(handleRemove
          ? [
               {
-                 label: labels[1],
+                 label: labels[1] || labels[0],
                  icon: <DeleteIcon />,
                  handleClick: handleRemove,
                  menuItemSxProps: styles.deleteMenuItem,

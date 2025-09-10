@@ -1,0 +1,7 @@
+export { default as HeroSection } from "./HeroSection"
+export { default as NotForYouSection } from "./NotForYouSection"
+export { default as ParticipatingCompaniesSection } from "./ParticipatingCompaniesSection"
+export { default as RegisterNowSection } from "./RegisterNowSection"
+export { default as SpeakersSection } from "./SpeakersSection"
+export { default as WhatYouTakeAwaySection } from "./WhatYouTakeAwaySection"
+export { default as WhosThisForSection } from "./WhosThisForSection"
