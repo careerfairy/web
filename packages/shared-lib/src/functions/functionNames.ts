@@ -70,6 +70,9 @@ export const FUNCTION_NAMES = {
    getGroupTalentEngagement: "getGroupTalentEngagement",
    getTotalUsersMatchingTargeting: "getTotalUsersMatchingTargeting",
 
+   // Slack Notifications
+   notifySlackWhenSparksTrialStarts: "notifySlackWhenSparksTrialStarts",
+
    // -- Trigger functions -- //
    /**
     * Note:

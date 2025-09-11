@@ -161,6 +161,68 @@ export const notifyLivestreamRecordingCreated = (
    })
 }
 
+export const notifySparksTrialStarted = (
+   webhookUrl: string,
+   params: {
+      groupName: string
+      groupId: string
+      startedAt: Date
+      expiresAt?: Date | null
+      startedBy?: string | null
+   }
+) => {
+   const adminLink = `https://www.careerfairy.io/group/${params.groupId}/admin/content/sparks`
+
+   const body: Record<string, string> = {
+      Group: params.groupName,
+      Plan: "trial",
+      "Started At": formatEventStartDate(params.startedAt),
+      ...(params.expiresAt
+         ? { "Expires At": formatEventStartDate(params.expiresAt) }
+         : {}),
+      ...(params.startedBy ? { "Started By": params.startedBy } : {}),
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `Sparks Trial Started:\n*${params.groupName}*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+            accessory: {
+               type: "image",
+               image_url:
+                  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Fcalendar.png?alt=media&token=f86c0885-7def-435e-b1d3-5dce3f75c1f6",
+               alt_text: "Sparks Trial",
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Admin Sparks Page",
+                  },
+                  url: adminLink,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
 function formatEventStartDate(date) {
    const luxonDate = DateTime.fromJSDate(date)
    return luxonDate.toLocaleString(DateTime.DATETIME_FULL)
