@@ -33,6 +33,7 @@ const upsertSpeakerSchema: yup.SchemaOf<UpsertSpeakerRequest> = yup.object({
          position: baseCreatorShape.position,
          linkedInUrl: baseCreatorShape.linkedInUrl,
          companyName: baseCreatorShape.companyName.nullable(),
+         companyLogoUrl: baseCreatorShape.companyLogoUrl.nullable(),
          roles: yup
             .array()
             .of(yup.mixed<CreatorRole>().oneOf(Object.values(CreatorRoles))),
@@ -64,7 +65,34 @@ export const upsertLivestreamSpeaker = onCall(
             livestreamToken
          )
 
-         const isEditing = Boolean(speaker.id)
+         // Backfill company fields from group if missing and groupId is present
+         let speakerToSave = speaker
+         if (
+            speaker?.groupId &&
+            (!speaker?.companyName || !speaker?.companyLogoUrl)
+         ) {
+            try {
+               console.log("Backfilling company fields from group", {
+                  groupId: speaker.groupId,
+               })
+               const group = await groupRepo.getGroupById(speaker.groupId)
+               speakerToSave = {
+                  ...speaker,
+                  companyName: group?.universityName,
+                  companyLogoUrl: group?.logoUrl,
+               }
+            } catch (e) {
+               functions.logger.warn(
+                  "Could not backfill company fields from group",
+                  {
+                     groupId: speaker.groupId,
+                     error: (e as Error)?.message,
+                  }
+               )
+            }
+         }
+
+         const isEditing = Boolean(speakerToSave.id)
 
          if (isEditing) {
             functions.logger.info("Editing existing speaker", {
@@ -72,7 +100,9 @@ export const upsertLivestreamSpeaker = onCall(
             })
 
             // check if speaker is related to an existing Creator
-            const existingCreator = await groupRepo.getCreatorById(speaker.id)
+            const existingCreator = await groupRepo.getCreatorById(
+               speakerToSave.id
+            )
 
             if (existingCreator && existingCreator.groupId) {
                functions.logger.info(
@@ -115,14 +145,19 @@ export const upsertLivestreamSpeaker = onCall(
                   existingCreator.groupId,
                   existingCreator.id,
                   {
-                     avatarUrl: speaker.avatar,
-                     firstName: speaker.firstName,
-                     lastName: speaker.lastName,
-                     id: speaker.id,
-                     story: speaker.background,
-                     linkedInUrl: speaker.linkedInUrl,
-                     position: speaker.position,
-                     companyName: speaker.companyName,
+                     avatarUrl: speakerToSave.avatar,
+                     firstName: speakerToSave.firstName,
+                     lastName: speakerToSave.lastName,
+                     id: speakerToSave.id,
+                     story: speakerToSave.background,
+                     linkedInUrl: speakerToSave.linkedInUrl,
+                     position: speakerToSave.position,
+                     ...(speakerToSave.companyName && {
+                        companyName: speakerToSave.companyName,
+                     }),
+                     ...(speakerToSave.companyLogoUrl && {
+                        companyLogoUrl: speakerToSave.companyLogoUrl,
+                     }),
                   }
                )
             }
@@ -130,19 +165,19 @@ export const upsertLivestreamSpeaker = onCall(
             // Update the livestream speaker
             functions.logger.info("Updating livestream speaker", {
                livestreamId,
-               speaker,
+               speaker: speakerToSave,
             })
             return livestreamsRepo.updateLivestreamSpeaker(
                livestreamId,
-               speaker
+               speakerToSave
             )
          } else {
             functions.logger.info("Adding new ad hoc speaker", {
                livestreamId,
-               speaker,
+               speaker: speakerToSave,
             })
             // Anyone can add ad-hoc speakers - no permission check needed
-            return livestreamsRepo.addAdHocSpeaker(livestreamId, speaker)
+            return livestreamsRepo.addAdHocSpeaker(livestreamId, speakerToSave)
          }
       }
    )
