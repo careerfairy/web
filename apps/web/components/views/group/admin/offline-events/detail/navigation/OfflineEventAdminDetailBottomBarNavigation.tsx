@@ -4,6 +4,7 @@ import {
    IconButton,
    SwipeableDrawer,
    Typography,
+   useTheme,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ElementType, useState } from "react"
@@ -42,7 +43,7 @@ const styles = sxStyles({
       },
    },
    navigationButtonMobile: {
-      backgroundColor: "#F6F6FA",
+      backgroundColor: (theme) => theme.brand.white[400],
       padding: 0,
       svg: {
          stroke: "black",
@@ -52,6 +53,21 @@ const styles = sxStyles({
       opacity: {
          xs: "20%",
          md: "initial",
+      },
+   },
+   swipeableDrawer: {
+      ".MuiPaper-root": {
+         borderTopLeftRadius: 12,
+         borderTopRightRadius: 12,
+         paddingBottom: 3,
+      },
+      ul: {
+         display: "flex",
+         flexDirection: "column",
+      },
+      "* > *": {
+         textAlign: "center",
+         alignItems: "center",
       },
    },
 })
@@ -135,32 +151,19 @@ const OfflineEventAdminDetailBottomBarNavigation = () => {
 
 const InvalidAlertMobile = () => {
    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+   const theme = useTheme()
 
    return (
       <Box>
          <IconButton sx={{ padding: 0 }} onClick={() => setIsDrawerOpen(true)}>
-            <Info color="#FE9B0E" />
+            <Info color={theme.brand.warning[600]} />
          </IconButton>
          <SwipeableDrawer
             anchor="bottom"
             onClose={() => setIsDrawerOpen(false)}
             onOpen={() => null}
             open={isDrawerOpen}
-            sx={{
-               ".MuiPaper-root": {
-                  borderTopLeftRadius: 12,
-                  borderTopRightRadius: 12,
-                  paddingBottom: 3,
-               },
-               ul: {
-                  display: "flex",
-                  flexDirection: "column",
-               },
-               "* > *": {
-                  textAlign: "center",
-                  alignItems: "center",
-               },
-            }}
+            sx={styles.swipeableDrawer}
          >
             <Box sx={{ p: 2 }}>
                <Typography variant="medium">

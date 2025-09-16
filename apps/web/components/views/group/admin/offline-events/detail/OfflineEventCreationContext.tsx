@@ -15,7 +15,6 @@ import { TAB_VALUES } from "./form/types"
 import { useOfflineEventFormValues } from "./form/useOfflineEventFormValues"
 import { useTabNavigationAndValidation } from "./navigation/useTabNavigationAndValidation"
 
-// TODO: Remove many of these properties, not needed for offline events
 type OfflineEventCreationContextType = {
    offlineEvent: OfflineEvent
    targetOfflineEventCollection: "offlineEvents"
@@ -25,7 +24,6 @@ type OfflineEventCreationContextType = {
    navPreviousTab: () => void
    navNextTab: () => void
    navigateWithValidationCheck: (newTabValue: TAB_VALUES) => void
-   setAlertState: Dispatch<SetStateAction<boolean>>
    isValidationDialogOpen: boolean
    handleValidationOpenDialog: () => void
    handleValidationCloseDialog: () => void
@@ -62,7 +60,6 @@ export const OfflineEventCreationContextProvider = ({
       navPreviousTab,
       navNextTab,
       navigateWithValidationCheck,
-      setAlertState,
       isValidationDialogOpen,
       handleValidationOpenDialog,
       handleValidationCloseDialog,
@@ -91,7 +88,6 @@ export const OfflineEventCreationContextProvider = ({
          navPreviousTab,
          navNextTab,
          navigateWithValidationCheck,
-         setAlertState,
          isValidationDialogOpen,
          handleValidationOpenDialog,
          handleValidationCloseDialog,
@@ -112,7 +108,6 @@ export const OfflineEventCreationContextProvider = ({
       navPreviousTab,
       navNextTab,
       navigateWithValidationCheck,
-      setAlertState,
       isValidationDialogOpen,
       handleValidationOpenDialog,
       handleValidationCloseDialog,
