@@ -63,6 +63,12 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
                   pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/sparks`,
                   title: "Sparks",
                },
+               {
+                  id: "offline-events",
+                  href: `/${BASE_HREF_PATH}/${group.id}/admin/content/offline-events`,
+                  pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/offline-events`,
+                  title: "Offline events",
+               },
             ],
          },
          analytics: {

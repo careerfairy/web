@@ -499,6 +499,17 @@ service cloud.firestore {
             allow write: if false;
         }
 
+        match /offlineEvents/{offlineEvent} {
+
+            function userIsGroupAdmin() {
+                // we need to fetch the document, its only present in request.resource for create/update operations
+                let doc = get(/databases/$(database)/documents/offlineEvents/$(offlineEvent)).data;
+                return request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(doc.groupIds);
+            }
+            allow read: if true;
+            allow write: if userIsGroupAdmin() || isCFAdmin();
+        }
+
         match /livestreams/{livestream} {
             function userIsGroupAdmin() {
                 // we need to fetch the document, its only present in request.resource for create/update operations

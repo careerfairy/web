@@ -3,9 +3,10 @@ import { JOB_DIALOG_QUERY_KEYS } from "components/custom-hook/custom-job/useJobD
 import { useAppDispatch } from "components/custom-hook/store"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
+import { useOfflineEventRouting } from "components/views/group/admin/offline-events/useOfflineEventRouting"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
-import { Radio as LiveStreamsIcon } from "react-feather"
+import { Calendar, Radio as LiveStreamsIcon } from "react-feather"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { JobsIcon } from "../../components/views/common/icons/JobsIcon"
 import { SparksIcon } from "../../components/views/common/icons/SparksIcon"
@@ -30,6 +31,8 @@ export const CreateMenu = ({
    menuProps,
 }: CreateMenuProps) => {
    const { createDraftLivestream, isCreating } = useLivestreamRouting()
+   const { createDraftOfflineEvent, isCreating: isCreatingOfflineEvent } =
+      useOfflineEventRouting()
    const { query, push } = useRouter()
    const hasAccessToSparks = useHasAccessToSparks()
    const groupId = query.groupId as string
@@ -63,6 +66,19 @@ export const CreateMenu = ({
             },
          },
          {
+            label: "Offline event",
+            icon: <Calendar size={16} />,
+            handleClick: () => {
+               if (isCreatingOfflineEvent) {
+                  return
+               }
+
+               createDraftOfflineEvent()
+               push(`/group/${groupId}/admin/content/offline-events`)
+               handleClose()
+            },
+         },
+         {
             label: "Job opening",
             icon: <JobsIcon />,
             handleClick: () => {
@@ -81,6 +97,8 @@ export const CreateMenu = ({
          push,
          groupId,
          dispatch,
+         isCreatingOfflineEvent,
+         createDraftOfflineEvent,
       ]
    )
 
