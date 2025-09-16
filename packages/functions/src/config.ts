@@ -12,6 +12,8 @@ const config = {
          "https://hooks.slack.com/services/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",
       livestreamCreated:
          "https://hooks.slack.com/services/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",
+      sparksTrialStarted:
+         "https://hooks.slack.com/services/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",
    },
 
    // Firebase Hosting Domain
@@ -24,10 +26,11 @@ if (process.env.NODE_ENV !== "production") {
    // avoid real slack notifications during development/testing
    // all messages are sent to #test-slack-integrations
    const testSlackIntegrationsChannel =
-      "https://hooks.slack.com/services/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"
+      "https://hooks.slack.com/services/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"
 
    config.slackWebhooks.livestreamAlerts = testSlackIntegrationsChannel
    config.slackWebhooks.livestreamCreated = testSlackIntegrationsChannel
+   config.slackWebhooks.sparksTrialStarted = testSlackIntegrationsChannel
 
    // Target the firebase functions emulator when loading the bundles
    // locally, no need to use cache (firebase hosting)
