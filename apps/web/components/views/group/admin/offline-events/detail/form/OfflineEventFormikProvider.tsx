@@ -1,0 +1,124 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import { AuthorInfo } from "@careerfairy/shared-lib/livestreams"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import FirebaseService from "data/firebase/FirebaseService"
+import { Formik } from "formik"
+import { DateTime } from "luxon"
+import { ReactNode } from "react"
+import { OfflineEventFormValues } from "./types"
+import { offlineEventFormValidationSchema } from "./validationSchemas"
+
+const formGeneralTabInitialValues: OfflineEventFormValues["general"] = {
+   title: "",
+   description: "",
+   city: null,
+   street: "",
+   targetAudience: {
+      universities: [],
+      levelOfStudies: [],
+      fieldOfStudies: [],
+   },
+   registrationUrl: "",
+   startAt: DateTime.now().plus({ hour: 1 }).toJSDate(),
+   backgroundImageUrl: "",
+   hidden: false,
+}
+
+export const getFormInitialValues = (): OfflineEventFormValues => {
+   return {
+      general: { ...formGeneralTabInitialValues },
+   }
+}
+
+export const buildDraftOfflineEventObject = (
+   values: OfflineEventFormValues,
+   group: Group,
+   author: AuthorInfo,
+   firebase: FirebaseService
+): OfflineEvent => {
+   return {
+      id: null,
+      title: values.general.title,
+      description: values.general.description,
+      targetAudience: values.general.targetAudience,
+      registrationUrl: values.general.registrationUrl,
+      backgroundImageUrl: values.general.backgroundImageUrl,
+      hidden: values.general.hidden,
+      company: {
+         name: group.universityName,
+         groupId: group.id,
+      },
+      address: {
+         countryISOCode: group.companyCountry,
+         cityISOCode: values.general.city,
+         street: values.general.street,
+      },
+      status: "draft",
+      industries: group.companyIndustries,
+      author: author,
+      startAt: firebase.getFirebaseTimestamp(values.general.startAt),
+      createdAt: firebase.getFirebaseTimestamp(new Date()),
+      updatedAt: firebase.getFirebaseTimestamp(new Date()),
+      lastUpdatedBy: author,
+   }
+}
+
+type ConvertOfflineEventObjectToFormArgs = {
+   offlineEvent: OfflineEvent | null
+}
+
+const convertOfflineEventObjectToForm = ({
+   offlineEvent,
+}: ConvertOfflineEventObjectToFormArgs): OfflineEventFormValues => {
+   const general: OfflineEventFormValues["general"] = {
+      title: offlineEvent?.title || formGeneralTabInitialValues.title,
+      description:
+         offlineEvent?.description || formGeneralTabInitialValues.description,
+      city:
+         offlineEvent?.address?.cityISOCode || formGeneralTabInitialValues.city,
+      street:
+         offlineEvent?.address?.street || formGeneralTabInitialValues.street,
+      targetAudience:
+         offlineEvent?.targetAudience ||
+         formGeneralTabInitialValues.targetAudience,
+      registrationUrl:
+         offlineEvent?.registrationUrl ||
+         formGeneralTabInitialValues.registrationUrl,
+      startAt:
+         offlineEvent?.startAt?.toDate() || formGeneralTabInitialValues.startAt,
+      backgroundImageUrl:
+         offlineEvent?.backgroundImageUrl ||
+         formGeneralTabInitialValues.backgroundImageUrl,
+      hidden: offlineEvent?.hidden || formGeneralTabInitialValues.hidden,
+   }
+
+   return {
+      general,
+   }
+}
+
+type Props = {
+   offlineEvent: OfflineEvent
+   group: Group
+   children: ReactNode
+}
+
+const OfflineEventFormikProvider = ({ offlineEvent, children }: Props) => {
+   const formValues: OfflineEventFormValues = offlineEvent
+      ? convertOfflineEventObjectToForm({
+           offlineEvent,
+        })
+      : getFormInitialValues()
+
+   return (
+      <Formik<OfflineEventFormValues>
+         initialValues={formValues}
+         onSubmit={undefined}
+         validationSchema={offlineEventFormValidationSchema}
+      >
+         {children}
+      </Formik>
+   )
+}
+
+export default OfflineEventFormikProvider

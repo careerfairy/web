@@ -1,0 +1,88 @@
+import { sxStyles } from "@careerfairy/shared-ui"
+import { Box, Tab, Tabs } from "@mui/material"
+import { Info } from "react-feather"
+import { useOfflineEventCreationContext } from "../OfflineEventCreationContext"
+import { TAB_VALUES } from "../form/types"
+
+const styles = sxStyles({
+   alertIconWrapper: {
+      width: "16px",
+      height: "16px",
+      marginRight: "6px",
+      alignContent: "center",
+      marginBottom: "-4px",
+   },
+})
+
+const getStyles = (hasError: boolean) => {
+   const conditionalErrorColor = hasError ? "#FE9B0E" : "#6749EA"
+
+   return sxStyles({
+      tabs: {
+         width: "100%",
+         "*": {
+            textTransform: "none !important",
+            fontWeight: "400 !important",
+            fontSize: {
+               md: "16px !important",
+            },
+         },
+         ".Mui-selected": {
+            fontWeight: "600 !important",
+            color: `${conditionalErrorColor} !important`,
+         },
+         ".MuiTabs-indicator": {
+            position: "absolute",
+            backgroundColor: `${conditionalErrorColor} !important`,
+         },
+         ".MuiTouchRipple-child": {
+            backgroundColor: "#EBEBEF !important",
+         },
+         ".MuiTab-root": {
+            minHeight: "48px !important",
+         },
+      },
+   })
+}
+
+const TabAlertIcon = () => (
+   <Box sx={styles.alertIconWrapper}>
+      <Info size={16} color="#FE9B0E" strokeWidth={3} />
+   </Box>
+)
+
+const OfflineEventAdminDetailTopBarNavigation = () => {
+   const {
+      shouldShowAlertIndicator,
+      tabValue,
+      navigateWithValidationCheck,
+      shouldShowAlertIndicatorOnTab,
+      isGeneralTabInvalid,
+   } = useOfflineEventCreationContext()
+
+   const styles = getStyles(shouldShowAlertIndicatorOnTab[tabValue])
+
+   return (
+      <Tabs
+         value={tabValue}
+         onChange={(_, newValue) => {
+            navigateWithValidationCheck(newValue)
+         }}
+         aria-label="Offline Event Creation Form Tabs"
+         sx={styles.tabs}
+      >
+         <Tab
+            label="General"
+            value={TAB_VALUES.GENERAL}
+            icon={
+               isGeneralTabInvalid && shouldShowAlertIndicator ? (
+                  <TabAlertIcon />
+               ) : undefined
+            }
+            iconPosition="start"
+         />
+      </Tabs>
+   )
+}
+
+export default OfflineEventAdminDetailTopBarNavigation
