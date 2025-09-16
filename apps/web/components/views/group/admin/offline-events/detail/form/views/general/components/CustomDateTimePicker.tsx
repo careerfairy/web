@@ -3,7 +3,6 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { useField } from "formik"
-import { useRef } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -77,11 +76,8 @@ const styles = sxStyles({
    },
 })
 
-type CustomInputFieldProps = {
-   fieldName: string
-}
-
-const CustomInputField = (params, { fieldName }: CustomInputFieldProps) => {
+const CustomInputField = (params: { fieldName: string }) => {
+   const fieldName = params.fieldName
    const [{ onBlur }, ,] = useField(fieldName)
 
    return (
@@ -100,69 +96,52 @@ const CustomInputField = (params, { fieldName }: CustomInputFieldProps) => {
    )
 }
 
-type StartDateTimePickerProps = {
-   fieldName?: string
-   label?: string
-   toolbarTitle?: string
+type CustomDateTimePickerProps = {
+   fieldName: string
+   label: string
+   toolbarTitle: string
 }
-
-const StartDateTimePicker = ({
-   fieldName = "general.startDate",
-   label = "Start date",
-   toolbarTitle = "Select live stream start date",
-}: StartDateTimePickerProps) => {
+const CustomDateTimePicker = ({
+   fieldName,
+   label,
+   toolbarTitle,
+}: CustomDateTimePickerProps) => {
    const isMobile = useIsMobile()
    const [field, , helpers] = useField(fieldName)
-   const anchorRef = useRef<HTMLDivElement>(null)
 
    const layoutStyles = isMobile
       ? styles.datePickerMobile
       : styles.datePickerDesktop
 
    return (
-      <div ref={anchorRef}>
-         <DateTimePicker
-            name={fieldName}
-            label={label}
-            localeText={isMobile ? { toolbarTitle } : null}
-            disablePast
-            ampm={false}
-            openTo="day"
-            viewRenderers={{
-               // @ts-ignore
-               hours: renderMultiSectionDigitalClockTimeView,
-               // @ts-ignore
-               minutes: renderMultiSectionDigitalClockTimeView,
-            }}
-            format={"dd/MM/yyyy HH:mm"}
-            slotProps={{
-               layout: {
-                  sx: layoutStyles,
-               },
-               popper: {
-                  anchorEl: anchorRef.current,
-                  placement: "bottom-start",
-                  modifiers: [
-                     {
-                        name: "preventOverflow",
-                        enabled: true,
-                        options: {
-                           boundary: "viewport",
-                        },
-                     },
-                  ],
-               },
-            }}
-            slots={{
-               textField: (params) => CustomInputField(params, { fieldName }),
-            }}
-            value={field.value}
-            onChange={async (newValue) => {
-               await helpers.setValue(newValue)
-            }}
-         />
-      </div>
+      <DateTimePicker
+         name={fieldName}
+         label={label}
+         localeText={isMobile ? { toolbarTitle: toolbarTitle } : null}
+         disablePast
+         ampm={false}
+         openTo="day"
+         viewRenderers={{
+            // @ts-ignore
+            hours: renderMultiSectionDigitalClockTimeView,
+            // @ts-ignore
+            minutes: renderMultiSectionDigitalClockTimeView,
+         }}
+         format={"dd/MM/yyyy HH:mm"}
+         slotProps={{
+            layout: {
+               sx: layoutStyles,
+            },
+         }}
+         slots={{
+            textField: () => <CustomInputField fieldName={fieldName} />,
+         }}
+         value={field.value}
+         onChange={async (newValue) => {
+            await helpers.setValue(newValue)
+         }}
+      />
    )
 }
 
-export default StartDateTimePicker
+export default CustomDateTimePicker

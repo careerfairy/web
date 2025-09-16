@@ -58,12 +58,12 @@ const BrandedTextField = styled(
                   component="span"
                   display="flex"
                   alignItems="center center"
-                  columnGap={1}
+                  columnGap={0.5}
                   rowGap={0}
                >
                   <span> {props.label} </span>
                   {props.requiredText ? (
-                     <span>{props.requiredText}</span>
+                     <span className="required-text">{props.requiredText}</span>
                   ) : null}
                   {props.tooltipText ? (
                      <span className="branded-tooltip">
@@ -88,11 +88,19 @@ const BrandedTextField = styled(
    {
       shouldForwardProp: (prop) =>
          prop !== "tooltipText" &&
-         prop !== "requiredText" &&
+         // prop !== "requiredText" && // TODO: check if we need this
          prop !== "tooltipPlacement" &&
          prop !== "autocomplete",
    }
 )(({ theme, error }) => ({
+   "& .required-text": {
+      color: (theme) => theme.palette.neutral[500],
+      fontFamily: "Poppins",
+      fontSize: "12px",
+      fontStyle: "normal",
+      fontWeight: 400,
+      lineHeight: "20px",
+   },
    "& label": {
       color: theme.palette.mode === "dark" ? undefined : "#9999B1",
       maxWidth: "calc(100% - 48px)",
