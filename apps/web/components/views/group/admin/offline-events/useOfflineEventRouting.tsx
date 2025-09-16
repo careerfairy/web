@@ -3,13 +3,10 @@ import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-eve
 import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import { DateTime } from "luxon"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
-import {
-   buildDraftOfflineEventObject,
-   getFormInitialValues,
-} from "./detail/form/OfflineEventFormikProvider"
 
 type Result = {
    /**
@@ -47,14 +44,49 @@ export const useOfflineEventRouting = (): Result => {
          authUid: authenticatedUser?.uid,
       }
 
-      const initialValues = getFormInitialValues()
+      // TODO: In next stack there will be dedicated functions in the form provider for building the initial values
+      const initialValues = {
+         title: "",
+         description: "",
+         city: null,
+         street: "",
+         targetAudience: {
+            universities: [],
+            levelOfStudies: [],
+            fieldOfStudies: [],
+         },
+         registrationUrl: "",
+         startAt: DateTime.now().plus({ hour: 1 }).toJSDate(),
+         backgroundImageUrl: "",
+         hidden: false,
+      }
 
-      const draftOfflineEvent: OfflineEvent = buildDraftOfflineEventObject(
-         initialValues,
-         group,
-         author,
-         firebase
-      )
+      // TODO: In next stack there will be dedicated functions in the form provider for building the draft offline event
+      const draftOfflineEvent: OfflineEvent = {
+         id: null,
+         title: initialValues.title,
+         description: initialValues.description,
+         targetAudience: initialValues.targetAudience,
+         registrationUrl: initialValues.registrationUrl,
+         backgroundImageUrl: initialValues.backgroundImageUrl,
+         hidden: initialValues.hidden,
+         company: {
+            name: group.universityName,
+            groupId: group.id,
+         },
+         address: {
+            countryISOCode: group.companyCountry,
+            cityISOCode: initialValues.city,
+            street: initialValues.street,
+         },
+         status: "draft",
+         industries: group.companyIndustries,
+         author: author,
+         startAt: firebase.getFirebaseTimestamp(initialValues.startAt),
+         createdAt: firebase.getFirebaseTimestamp(new Date()),
+         updatedAt: firebase.getFirebaseTimestamp(new Date()),
+         lastUpdatedBy: author,
+      }
 
       try {
          const draftOfflineEventId = await firebase.createOfflineEvent(

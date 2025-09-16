@@ -102,7 +102,6 @@ export const QuickActions = () => {
                   Publish a job opening
                </Typography>
             </Button>
-
             <Button
                sx={styles.quickActionButton}
                startIcon={<Radio size={24} />}
@@ -113,7 +112,6 @@ export const QuickActions = () => {
                   Schedule a live stream
                </Typography>
             </Button>
-
             <Button
                sx={styles.quickActionButton}
                startIcon={<Radio size={24} />}
@@ -124,7 +122,6 @@ export const QuickActions = () => {
                   Schedule an offline event
                </Typography>
             </Button>
-
             <Button
                sx={styles.quickActionButton}
                startIcon={<PlayCircle size={24} />}
