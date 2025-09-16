@@ -4,7 +4,6 @@ import { CheckCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useOfflineEventCreationContext } from "./OfflineEventCreationContext"
-import { usePublishOfflineEvent } from "./form/usePublishOfflineEvent"
 
 const styles = sxStyles({
    button: {
@@ -21,10 +20,15 @@ export const PublishConfirmation = ({
 }: PublishConfirmationProps) => {
    const theme = useTheme()
    const { offlineEvent, group } = useOfflineEventCreationContext()
-   const { isPublishing, publishOfflineEvent } = usePublishOfflineEvent()
+   // TODO: add publish offline event back in last stack
+   // const { isPublishing, publishOfflineEvent } = usePublishOfflineEvent()
+   const isPublishing = false
 
    const handlePublishClick = useCallback(async () => {
       try {
+         const publishOfflineEvent = async () => {
+            console.log("publishOfflineEvent")
+         }
          await publishOfflineEvent()
       } catch (error) {
          errorLogAndNotify(error, {
@@ -35,7 +39,7 @@ export const PublishConfirmation = ({
       } finally {
          handleCancelClick()
       }
-   }, [publishOfflineEvent, handleCancelClick, offlineEvent, group])
+   }, [handleCancelClick, offlineEvent, group])
 
    return (
       <Stack
