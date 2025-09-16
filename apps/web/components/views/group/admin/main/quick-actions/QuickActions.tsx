@@ -10,6 +10,7 @@ import { useCallback } from "react"
 import { Briefcase, PlayCircle, Radio } from "react-feather"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
+import { useCanGroupCreateOfflineEvents } from "../../offline-events/useCanGroupCreateOfflineEvents"
 
 const styles = sxStyles({
    container: {
@@ -59,6 +60,8 @@ export const QuickActions = () => {
    const { push, query } = useRouter()
    const hasAccessToSparks = useHasAccessToSparks()
    const dispatch = useAppDispatch()
+
+   const canGroupCreateOfflineEvents = useCanGroupCreateOfflineEvents()
 
    const groupId = query.groupId as string
 
@@ -112,16 +115,18 @@ export const QuickActions = () => {
                   Schedule a live stream
                </Typography>
             </Button>
-            <Button
-               sx={styles.quickActionButton}
-               startIcon={<Radio size={24} />}
-               onClick={handleOfflineEventCreation}
-               disabled={isCreatingOfflineEvent}
-            >
-               <Typography variant="brandedBody">
-                  Schedule an offline event
-               </Typography>
-            </Button>
+            {canGroupCreateOfflineEvents ? (
+               <Button
+                  sx={styles.quickActionButton}
+                  startIcon={<Radio size={24} />}
+                  onClick={handleOfflineEventCreation}
+                  disabled={isCreatingOfflineEvent}
+               >
+                  <Typography variant="brandedBody">
+                     Publish an offline event
+                  </Typography>
+               </Button>
+            ) : null}
             <Button
                sx={styles.quickActionButton}
                startIcon={<PlayCircle size={24} />}
