@@ -1,3 +1,54 @@
+import { Group } from "@careerfairy/shared-lib/groups"
+import * as functions from "firebase-functions"
+import { onDocumentUpdated } from "firebase-functions/v2/firestore"
+import { notifySparksTrialStarted } from "./api/slack"
+import config from "./config"
+import { defaultTriggerRunTimeConfig } from "./lib/triggers/util"
+
+export const notifySlackWhenSparksTrialStarts = onDocumentUpdated(
+   {
+      ...defaultTriggerRunTimeConfig,
+      document: "careerCenterData/{groupId}",
+   },
+   async (event) => {
+      try {
+         const before = event.data.before.data() as Group
+         const after = event.data.after.data() as Group
+
+         if (!after) return
+
+         const beforeType = before?.plan?.type
+         const afterType = after?.plan?.type
+         const beforeStartedAt = before?.plan?.startedAt
+         const afterStartedAt = after?.plan?.startedAt
+
+         const transitionedToTrial =
+            beforeType !== "trial" && afterType === "trial"
+
+         const justGotStartTimestamp = !!afterStartedAt && !beforeStartedAt
+
+         if (transitionedToTrial && justGotStartTimestamp) {
+            await notifySparksTrialStarted(
+               config.slackWebhooks.sparksTrialStarted,
+               {
+                  groupName: after.universityName ?? event.params.groupId,
+                  groupId: event.params.groupId,
+                  startedAt: afterStartedAt.toDate?.(),
+                  expiresAt: after?.plan?.expiresAt?.toDate?.(),
+                  startedBy: undefined,
+               }
+            )
+         } else {
+            functions.logger.log(
+               "Skipping trial start notification - no qualifying transition"
+            )
+         }
+      } catch (e) {
+         functions.logger.error("error in notifySlackWhenSparksTrialStarts", e)
+      }
+   }
+)
+
 import { logger } from "firebase-functions"
 import { onSchedule } from "firebase-functions/v2/scheduler"
 import { userRepo } from "./api/repositories"
