@@ -120,11 +120,6 @@ const AudienceTargetingContent = () => {
                label: "By university",
                placeholder: "Select university",
             }}
-            lazyConfig={{
-               initialRenderCount: 15, // Show 15 universities initially
-               loadMoreCount: 10, // Load 10 more when scrolling
-               scrollThreshold: 20, // Load more when 20px from bottom
-            }}
          />
          <MultiChipSelect
             id="general.targetAudience.fieldOfStudies"
@@ -160,7 +155,7 @@ const AudienceTargeting = () => {
       <SuspenseWithBoundary>
          <FormSectionHeader
             title="Target Students"
-            subtitle="Select the target audience for this offline event"
+            subtitle="Select the target audience for this event"
             divider
          />
          <AudienceTargetingContent />

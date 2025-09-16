@@ -71,9 +71,9 @@ const StyledLazyBrandedAutocomplete = styled(
       ...props
    }: StyledLazyBrandedAutocompleteProps) => {
       const {
-         initialRenderCount = 50,
-         loadMoreCount = 25,
-         scrollThreshold = 100,
+         initialRenderCount = 30,
+         loadMoreCount = 30,
+         scrollThreshold = 10,
       } = lazyConfig
 
       const [visibleCount, setVisibleCount] = useState(initialRenderCount)

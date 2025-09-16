@@ -51,7 +51,7 @@ const MakeExclusiveSwitch = () => {
                   <Typography>Make Exclusive</Typography>
                   <BrandedTooltip
                      title={
-                        "By enabling this you are making this stream only visible to hosts"
+                        "By enabling this you are making this offline event only visible to your career center admins"
                      }
                      onClick={(event) => {
                         event.preventDefault()

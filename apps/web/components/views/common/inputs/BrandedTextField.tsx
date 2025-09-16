@@ -88,7 +88,6 @@ const BrandedTextField = styled(
    {
       shouldForwardProp: (prop) =>
          prop !== "tooltipText" &&
-         // prop !== "requiredText" && // TODO: check if we need this
          prop !== "tooltipPlacement" &&
          prop !== "autocomplete",
    }

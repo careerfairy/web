@@ -243,14 +243,6 @@ const LazyMultiChipSelect = <T extends BaseOption>({
       }
    }, [options, setFieldValue, value, selectAllFieldLabel, selectAllOption, id])
 
-   // Default lazy loading configuration optimized for large datasets
-   const defaultLazyConfig: LazyLoadingConfig = {
-      initialRenderCount: 100, // Show 100 items initially
-      loadMoreCount: 50, // Load 50 more items when scrolling
-      scrollThreshold: 50, // Load more when 50px from bottom
-      ...lazyConfig,
-   }
-
    return (
       <LazyFormBrandedAutocomplete
          name={id}
@@ -293,7 +285,7 @@ const LazyMultiChipSelect = <T extends BaseOption>({
          limit={limit}
          disableCloseOnSelect={disableCloseOnSelect}
          renderTags={renderTags}
-         lazyConfig={defaultLazyConfig}
+         lazyConfig={lazyConfig}
          getOptionElement={getOptionElement}
          initialOptionSection={selectAllOptionComponent}
       />

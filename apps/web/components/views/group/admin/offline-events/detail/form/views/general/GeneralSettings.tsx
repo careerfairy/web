@@ -6,6 +6,9 @@ import StartDateTimePicker from "components/views/group/admin/events/detail/form
 import GroupCityDropdown from "./components/GroupCityDropdown"
 import MakeExclusiveSwitch from "./components/MakeExclusiveSwitch"
 
+const DESCRIPTION_PLACEHOLDER =
+   "E.g., Join us for an engaging offline event where we showcase the vibrant culture at [Company], a top player in the [industry]. Our team of [XYZ] dedicated professionals will share insights into their daily experiences. The event will feature a 30-minute presentation followed by a 30-minute Q&A session, allowing you to connect directly with our consultants and learn more about their roles."
+
 export const GeneralSettings = () => {
    return (
       <>
@@ -17,7 +20,7 @@ export const GeneralSettings = () => {
          <FormBrandedTextField
             name="general.title"
             label="Event name"
-            placeholder="Insert your offline event title"
+            placeholder="E.g., Discover the internship opportunities in our IT transformation team!"
             requiredText="(required)"
          />
          <BannerImageSelect
@@ -41,25 +44,25 @@ export const GeneralSettings = () => {
          <GroupCityDropdown
             fieldName="general.city"
             label="City"
-            placeholder="E.g., Zurich"
+            placeholder="E.g., Bern, Switzerland"
             requiredText={"(required)"}
          />
          <FormBrandedTextField
             name="general.street"
             label="Address"
-            placeholder="Enter the event address"
+            placeholder="E.g., Max-Daetwyler-Platz, 2"
             requiredText="(required)"
          />
          <FormBrandedTextField
             name="general.registrationUrl"
-            label="Registration URL"
-            placeholder="https://example.com/register"
+            label="Registration Link"
+            placeholder="E.g., careerpage.com/event"
             requiredText="(required)"
          />
          <FormBrandedTextField
             name="general.description"
-            label="Description"
-            placeholder="Describe your offline event"
+            label="Event description"
+            placeholder={DESCRIPTION_PLACEHOLDER}
             multiline
             rows={4}
             requiredText="(required)"
