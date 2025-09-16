@@ -1,15 +1,16 @@
-import { CityOption } from "@careerfairy/shared-lib/countries/types"
 import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
-import { UniversityOption } from "@careerfairy/shared-lib/offline-events/offline-events"
+import {
+   OfflineEvent,
+   UniversityOption,
+} from "@careerfairy/shared-lib/offline-events/offline-events"
 
 export type OfflineEventFormGeneralTabValues = {
    title: string
    description: string
-   city: CityOption
-   street: string
+   address: OfflineEvent["address"]
    targetAudience: {
       universities: UniversityOption[]
       levelOfStudies: LevelOfStudy[]

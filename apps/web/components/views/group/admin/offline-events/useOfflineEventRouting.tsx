@@ -24,7 +24,7 @@ type Result = {
     * using the created id
     * @returns void
     */
-   createDraftOfflineEvent: () => Promise<void>
+   createDraftOfflineEvent: () => Promise<boolean>
    /**
     * Whether the offline event is being created
     * @returns boolean
@@ -67,17 +67,26 @@ export const useOfflineEventRouting = (): Result => {
       )
 
       try {
-         const draftOfflineEventId =
-            await offlineEventService.createOfflineEvent(
-               draftOfflineEvent,
-               author
+         return offlineEventService
+            .createOfflineEvent(draftOfflineEvent, author)
+            .then(async (eventId) => {
+               return offlineEventService
+                  .decreaseGroupAvailableOfflineEvents(group.id)
+                  .then(async () => Promise.resolve(eventId))
+                  .catch((error) => {
+                     errorLogAndNotify(error, {
+                        message:
+                           "Failed to decrease group available offline events",
+                        groupId: group.id,
+                        draftOfflineEventId: eventId,
+                     })
+                  })
+            })
+            .then((eventId) =>
+               router.push({
+                  pathname: `/group/${group.id}/admin/content/offline-events/${eventId}`,
+               })
             )
-
-         await offlineEventService.decreaseGroupAvailableOfflineEvents(group.id)
-
-         router.push({
-            pathname: `/group/${group.id}/admin/content/offline-events/${draftOfflineEventId}`,
-         })
       } catch (error) {
          errorLogAndNotify(error, {
             message: "Failed to create draft offline event",

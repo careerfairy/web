@@ -148,6 +148,17 @@ export const AnalyticsEvents = {
    LivestreamChatOpen: "livestream_chat_open",
    ToggleTheme: "toggle_theme",
 
+   // Offline Events
+
+   /**
+    * Dispatched when the offline event share button is clicked
+    */
+   OfflineEventShare: "offline_event_share",
+   /**
+    * Dispatched when the offline event view is loaded
+    */
+   OfflineEventView: "offline_event_view",
+
    // Value Scoring
    Purchase: "Purchase",
 } as const

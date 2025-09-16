@@ -30,7 +30,7 @@ const styles = sxStyles({
 
 export const PublishButton = () => {
    const isMobile = useIsMobile()
-   const { isValid } = useOfflineEventFormValues()
+   const { isValid, dirty } = useOfflineEventFormValues()
    const { isAutoSaving } = useOfflineEventAutoSaveContext()
    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
@@ -50,7 +50,7 @@ export const PublishButton = () => {
             variant="contained"
             color="secondary"
             sx={styles.button}
-            disabled={!isValid || isAutoSaving}
+            disabled={!isValid || isAutoSaving || !dirty}
             onClick={handlePublishButtonClick}
          >
             Publish

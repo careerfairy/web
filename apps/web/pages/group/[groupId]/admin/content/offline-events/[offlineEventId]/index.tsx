@@ -2,7 +2,10 @@ import useAdminGroup from "components/custom-hook/useAdminGroup"
 import { BackToOfflineEventsHeader } from "components/views/group/admin/offline-events/detail/BackToOfflineEventsHeader"
 import { OfflineEventAutoSaveContextProvider } from "components/views/group/admin/offline-events/detail/OfflineEventAutoSaveContext"
 import { OfflineEventCreationContextProvider } from "components/views/group/admin/offline-events/detail/OfflineEventCreationContext"
+import { OfflineEventTopActions } from "components/views/group/admin/offline-events/detail/OfflineEventTopActions"
+import OfflineEventForm from "components/views/group/admin/offline-events/detail/form/OfflineEventForm"
 import OfflineEventFormikProvider from "components/views/group/admin/offline-events/detail/form/OfflineEventFormikProvider"
+import OfflineEventAdminDetailBottomBarNavigation from "components/views/group/admin/offline-events/detail/navigation/OfflineEventAdminDetailBottomBarNavigation"
 import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
 import { NextPage } from "next"
 import { useRouter } from "next/router"
@@ -47,7 +50,7 @@ const OfflineEventLayoutWrapper = ({
 }
 
 const OfflineEventAdminDetailsPage: NextPageWithLayout = () => {
-   return <div>FORM PLACEHOLDER</div>
+   return <OfflineEventForm />
 }
 
 OfflineEventAdminDetailsPage.getLayout = function getLayout(
@@ -57,15 +60,13 @@ OfflineEventAdminDetailsPage.getLayout = function getLayout(
       titleComponent: (router) => (
          <BackToOfflineEventsHeader groupId={router.query.groupId as string} />
       ),
-      // TODO: add all top bar components back in last stack
-      // topBarAction: <OfflineEventTopActions />,
-      // topBarNavigation: <OfflineEventAdminDetailTopBarNavigation />,
-      // bottomBarNavigation: <OfflineEventAdminDetailBottomBarNavigation />,
+      topBarAction: <OfflineEventTopActions />,
       backgroundColor: "#FDFDFD",
       dashboardHeadTitle: "CareerFairy | Editing Offline Event of ",
       wrapper: (layoutContent) => (
          <OfflineEventLayoutWrapper>{layoutContent}</OfflineEventLayoutWrapper>
       ),
+      bottomBarNavigation: <OfflineEventAdminDetailBottomBarNavigation />,
    })(page)
 }
 

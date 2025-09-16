@@ -14,6 +14,7 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import { mapFromServerSide } from "../../util/serverUtil"
 
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
@@ -23,11 +24,22 @@ import CategoryTagsContent from "components/views/common/tags/CategoryTagsConten
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
+import {
+   OFFLINE_EVENT_DIALOG_KEY,
+   OfflineEventDialog,
+} from "components/views/portal/offline-events/OfflineEventDialog"
+import { OfflineEvents } from "components/views/portal/offline-events/OfflineEvents"
 import { SparksLoadingFallback } from "components/views/portal/sparks/SparksLoadingFallback"
 import { SearchProvider } from "components/views/search/SearchContext"
 import { SearchField } from "components/views/search/SearchField"
 import { TagsCarouselSkeleton } from "components/views/tags/TagsCarouselSkeleton"
+import { offlineEventService } from "data/firebase/OfflineEventService"
 import { sxStyles } from "types/commonTypes"
+import {
+   deserializeDocument,
+   SerializedDocument,
+   serializeDocument,
+} from "util/firebaseSerializer"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
@@ -122,6 +134,7 @@ const PortalPage = ({
    livestreamDialogData,
    userCountryCode,
    customJobDialogData,
+   serializedOfflineEvent,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
@@ -215,6 +228,9 @@ const PortalPage = ({
                            <RecommendedCustomJobs
                               userCountryCode={userCountryCode}
                            />
+                           {userCountryCode?.toUpperCase() === "DE" && (
+                              <OfflineEvents />
+                           )}
                            <FeaturedCompanies />
 
                            <UserSparksCarousel
@@ -249,6 +265,11 @@ const PortalPage = ({
                <WelcomeDialogContainer />
             </Fragment>
          </GenericDashboardLayout>
+         <OfflineEventDialog
+            eventFromServer={deserializeDocument(
+               serializedOfflineEvent as SerializedDocument<OfflineEvent>
+            )}
+         />
       </Fragment>
    )
 }
@@ -294,7 +315,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const userCountryCode =
       (ctx.req.headers["x-vercel-ip-country"] as string) || null
 
+   const offlineEventId = ctx.query[OFFLINE_EVENT_DIALOG_KEY] as string
+
    const promises = []
+
    promises.push(
       livestreamRepo.getUpcomingEvents(20),
       livestreamRepo.getPastEventsFrom({
@@ -302,7 +326,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          limit: 6,
       }),
       getLivestreamDialogData(ctx),
-      getCustomJobDialogData(ctx, DIALOG_SOURCE)
+      getCustomJobDialogData(ctx, DIALOG_SOURCE),
+      offlineEventService.getById(offlineEventId)
    )
 
    const results = await Promise.allSettled(promises)
@@ -312,6 +337,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       pastEvents,
       livestreamDialogData,
       customJobDialogData,
+      offlineEventData,
    ] = results.map((result) =>
       result.status === "fulfilled" ? result.value : null
    )
@@ -330,6 +356,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          customJobDialogData,
          livestreamDialogData,
          userCountryCode,
+         serializedOfflineEvent: serializeDocument(offlineEventData),
       },
    }
 }

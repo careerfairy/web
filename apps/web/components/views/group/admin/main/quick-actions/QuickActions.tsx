@@ -84,9 +84,9 @@ export const QuickActions = () => {
       push(`/group/${groupId}/admin/content/sparks`)
    }, [hasAccessToSparks, dispatch, push, groupId])
 
-   const handleOfflineEventCreation = useCallback(() => {
+   const handleOfflineEventCreation = useCallback(async () => {
       if (isCreatingOfflineEvent) return
-      createDraftOfflineEvent()
+      await createDraftOfflineEvent()
    }, [createDraftOfflineEvent, isCreatingOfflineEvent])
 
    // Only show on desktop

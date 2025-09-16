@@ -1,8 +1,8 @@
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { useMemo } from "react"
 import { useFormContext } from "react-hook-form"
-import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 
 type Props = {
    name: string
