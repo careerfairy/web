@@ -1,5 +1,4 @@
 import { ReactNode, createContext, useContext, useMemo } from "react"
-import { useAutoSave } from "./form/useAutoSave"
 
 type OfflineEventAutoSaveContextType = {
    isAutoSaving: boolean
@@ -16,7 +15,9 @@ type OfflineEventAutoSaveContextProviderType = {
 export const OfflineEventAutoSaveContextProvider = ({
    children,
 }: OfflineEventAutoSaveContextProviderType) => {
-   const { isAutoSaving } = useAutoSave()
+   // TODO: add auto save back in last stack
+   // const { isAutoSaving } = useAutoSave()
+   const isAutoSaving = false
 
    const value = useMemo(() => ({ isAutoSaving }), [isAutoSaving])
 

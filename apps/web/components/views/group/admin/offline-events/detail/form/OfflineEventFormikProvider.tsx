@@ -1,4 +1,4 @@
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import { AuthorInfo } from "@careerfairy/shared-lib/livestreams"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import FirebaseService from "data/firebase/FirebaseService"
@@ -37,6 +37,7 @@ export const buildDraftOfflineEventObject = (
    firebase: FirebaseService
 ): OfflineEvent => {
    return {
+      group: pickPublicDataFromGroup(group),
       id: null,
       title: values.general.title,
       description: values.general.description,
@@ -44,10 +45,6 @@ export const buildDraftOfflineEventObject = (
       registrationUrl: values.general.registrationUrl,
       backgroundImageUrl: values.general.backgroundImageUrl,
       hidden: values.general.hidden,
-      company: {
-         name: group.universityName,
-         groupId: group.id,
-      },
       address: {
          countryISOCode: group.companyCountry,
          cityISOCode: values.general.city,

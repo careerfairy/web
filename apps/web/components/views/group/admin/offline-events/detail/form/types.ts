@@ -6,9 +6,7 @@ import {
 import { UniversityOption } from "@careerfairy/shared-lib/offline-events/offline-events"
 
 export type OfflineEventFormGeneralTabValues = {
-   // id?: string
    title: string
-   // TODO: For cityIsoCode we may have to store the id and name
    description: string
    city: CityOption
    street: string

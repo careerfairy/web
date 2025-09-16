@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react"
 import { OfflineEventFormGeneralTabValues, TAB_VALUES } from "../form/types"
+import { offlineEventFormGeneralTabSchema } from "../form/validationSchemas"
 
 export const useTabNavigationAndValidation = (
    generalValues: OfflineEventFormGeneralTabValues
@@ -8,12 +9,11 @@ export const useTabNavigationAndValidation = (
    const [tabToNavigateTo, setTabToNavigateTo] = useState<TAB_VALUES>(
       TAB_VALUES.GENERAL
    )
-   const [alertState, setAlertState] = useState(false)
-   console.log("🚀 ~ useTabNavigationAndValidation ~ alertState:", alertState)
+
    const [isValidationDialogOpen, setIsValidationDialogOpen] = useState(false)
 
    const isGeneralTabInvalid =
-      !generalValues.title || !generalValues.description
+      !offlineEventFormGeneralTabSchema.isValidSync(generalValues)
 
    const shouldShowAlertIndicatorOnTab = useMemo(
       () => ({
@@ -62,7 +62,6 @@ export const useTabNavigationAndValidation = (
       navPreviousTab,
       navNextTab,
       navigateWithValidationCheck,
-      setAlertState,
       isValidationDialogOpen,
       handleValidationOpenDialog,
       handleValidationCloseDialog,
