@@ -1,6 +1,7 @@
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import FormSectionHeader from "components/views/group/admin/events/detail/form/FormSectionHeader"
 
+import { Box } from "@mui/material"
 import BannerImageSelect from "components/views/group/admin/events/detail/form/views/general/components/BannerImageSelect"
 import StartDateTimePicker from "components/views/group/admin/events/detail/form/views/general/components/StartDateTimePicker"
 import GroupCityDropdown from "./components/GroupCityDropdown"
@@ -23,19 +24,21 @@ export const GeneralSettings = () => {
             placeholder="E.g., Discover the internship opportunities in our IT transformation team!"
             requiredText="(required)"
          />
-         <BannerImageSelect
-            fieldName="general.backgroundImageUrl"
-            emptyBannerLabel="Upload your event banner image"
-            recommendedSizeLabel="Recommended size: 1920x1080"
-            withCropper={true}
-            cropperConfig={{
-               title: "Upload event banner image",
-               type: "rectangle",
-               aspectRatio: 16 / 9,
-               cropBoxResizable: true,
-               key: "offline-event-banner-cropper",
-            }}
-         />
+         <Box>
+            <BannerImageSelect
+               fieldName="general.backgroundImageUrl"
+               emptyBannerLabel="Upload your event banner image"
+               recommendedSizeLabel="Recommended size: 1920x1080"
+               withCropper={true}
+               cropperConfig={{
+                  title: "Upload event banner image",
+                  type: "rectangle",
+                  aspectRatio: 16 / 9,
+                  cropBoxResizable: true,
+                  key: "offline-event-banner-cropper",
+               }}
+            />
+         </Box>
          <StartDateTimePicker
             fieldName="general.startAt"
             label="Event date"
