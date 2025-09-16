@@ -544,6 +544,14 @@ class FirebaseService {
       return ref.update(toUpdate)
    }
 
+   decreaseGroupAvailableOfflineEvents = (groupId: string) => {
+      const ref = this.firestore.collection("careerCenterData").doc(groupId)
+
+      return ref.update({
+         availableOfflineEvents: firebase.firestore.FieldValue.increment(-1),
+      })
+   }
+
    deleteCareerCenterFromAllUsers = (careerCenterId) => {
       const batch = this.firestore.batch()
       // get all relevant users

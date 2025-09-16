@@ -3,6 +3,7 @@ import { JOB_DIALOG_QUERY_KEYS } from "components/custom-hook/custom-job/useJobD
 import { useAppDispatch } from "components/custom-hook/store"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
+import { useCanGroupCreateOfflineEvents } from "components/views/group/admin/offline-events/useCanGroupCreateOfflineEvents"
 import { useOfflineEventRouting } from "components/views/group/admin/offline-events/useOfflineEventRouting"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
@@ -35,11 +36,12 @@ export const CreateMenu = ({
       useOfflineEventRouting()
    const { query, push } = useRouter()
    const hasAccessToSparks = useHasAccessToSparks()
+   const canGroupCreateOfflineEvents = useCanGroupCreateOfflineEvents()
    const groupId = query.groupId as string
    const dispatch = useAppDispatch()
 
-   const createMenuOptions = useMemo<MenuOption[]>(
-      () => [
+   const createMenuOptions = useMemo<MenuOption[]>(() => {
+      const options: MenuOption[] = [
          {
             label: "Live stream",
             icon: isCreating ? (
@@ -65,7 +67,10 @@ export const CreateMenu = ({
                handleClose()
             },
          },
-         {
+      ]
+
+      if (canGroupCreateOfflineEvents) {
+         options.push({
             label: "Offline event",
             icon: <Calendar size={16} />,
             handleClick: () => {
@@ -77,30 +82,33 @@ export const CreateMenu = ({
                push(`/group/${groupId}/admin/content/offline-events`)
                handleClose()
             },
+         })
+      }
+
+      options.push({
+         label: "Job opening",
+         icon: <JobsIcon />,
+         handleClick: () => {
+            push(
+               `/group/${groupId}/admin/jobs?${JOB_DIALOG_QUERY_KEYS.jobDialog}=true`
+            )
+            handleClose()
          },
-         {
-            label: "Job opening",
-            icon: <JobsIcon />,
-            handleClick: () => {
-               push(
-                  `/group/${groupId}/admin/jobs?${JOB_DIALOG_QUERY_KEYS.jobDialog}=true`
-               )
-               handleClose()
-            },
-         },
-      ],
-      [
-         isCreating,
-         createDraftLivestream,
-         handleClose,
-         hasAccessToSparks,
-         push,
-         groupId,
-         dispatch,
-         isCreatingOfflineEvent,
-         createDraftOfflineEvent,
-      ]
-   )
+      })
+
+      return options
+   }, [
+      isCreating,
+      createDraftLivestream,
+      handleClose,
+      hasAccessToSparks,
+      push,
+      groupId,
+      dispatch,
+      isCreatingOfflineEvent,
+      createDraftOfflineEvent,
+      canGroupCreateOfflineEvents,
+   ])
 
    return (
       <BrandedResponsiveMenu

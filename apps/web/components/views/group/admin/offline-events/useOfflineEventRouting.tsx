@@ -37,6 +37,15 @@ export const useOfflineEventRouting = (): Result => {
    const [isCreating, setIsCreating] = useState(false)
 
    const handleCreateDraftOfflineEvent = async () => {
+      if (group.availableOfflineEvents <= 0) {
+         errorLogAndNotify(new Error("Error creating draft offline event"), {
+            message:
+               "Error creating draft offline event, no available offline events",
+            groupId: group.id,
+         })
+         return
+      }
+
       setIsCreating(true)
 
       const author: AuthorInfo = {
@@ -93,6 +102,8 @@ export const useOfflineEventRouting = (): Result => {
             draftOfflineEvent,
             author
          )
+
+         await firebase.decreaseGroupAvailableOfflineEvents(group.id)
 
          router.push({
             pathname: `/group/${group.id}/admin/content/offline-events/${draftOfflineEventId}`,
