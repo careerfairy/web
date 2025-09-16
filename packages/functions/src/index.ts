@@ -174,6 +174,10 @@ exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent_v3 = livestreams.getLivestreamICalendarEvent
 
+// Sparks Trial Notifications
+exports[FUNCTION_NAMES.notifySlackWhenSparksTrialStarts] =
+   notificationOnboardings.notifySlackWhenSparksTrialStarts
+
 // Tags
 exports.fetchTagsContentHits = tags.fetchContentHits
 
