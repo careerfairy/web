@@ -51,7 +51,7 @@ export const FUNCTION_NAMES = {
    // Sparks functions
    removeAndSyncUserSparkNotification: "removeAndSyncUserSparkNotification_v4",
    createUserSparksFeedEventNotifications:
-      "createUserSparksFeedEventNotifications_v4",
+      "createUserSparksFeedEventNotifications_v5",
    createSparksFeedEventNotifications: "createSparksFeedEventNotifications",
    getSparksFeed: "getSparksFeed_v12",
 
