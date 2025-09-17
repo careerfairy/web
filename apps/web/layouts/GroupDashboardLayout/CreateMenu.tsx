@@ -74,12 +74,12 @@ export const CreateMenu = ({
          options.push({
             label: "Offline event",
             icon: <Calendar size={16} />,
-            handleClick: () => {
+            handleClick: async () => {
                if (isCreatingOfflineEvent) {
                   return
                }
 
-               createDraftOfflineEvent()
+               await createDraftOfflineEvent()
                push(`/group/${groupId}/admin/content/offline-events`)
                handleClose()
             },
