@@ -35,7 +35,6 @@ import {
 import { UPCOMING_STREAM_THRESHOLD_MILLISECONDS } from "@careerfairy/shared-lib/livestreams/constants"
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
-import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import {
    TalentProfile,
@@ -544,14 +543,6 @@ class FirebaseService {
       return ref.update(toUpdate)
    }
 
-   decreaseGroupAvailableOfflineEvents = (groupId: string) => {
-      const ref = this.firestore.collection("careerCenterData").doc(groupId)
-
-      return ref.update({
-         availableOfflineEvents: firebase.firestore.FieldValue.increment(-1),
-      })
-   }
-
    deleteCareerCenterFromAllUsers = (careerCenterId) => {
       const batch = this.firestore.batch()
       // get all relevant users
@@ -942,40 +933,6 @@ class FirebaseService {
       })
 
       return batch.commit()
-   }
-
-   //OFFLINE_EVENTS
-
-   createOfflineEvent = async (offlineEvent, author) => {
-      const ref = this.firestore.collection("offlineEvents").doc()
-
-      offlineEvent.id = ref.id
-      offlineEvent.author = author
-      offlineEvent.createdAt = this.getServerTimestamp()
-      offlineEvent.updatedAt = this.getServerTimestamp()
-      offlineEvent.lastUpdatedBy = author
-
-      await ref.set(offlineEvent)
-      return ref.id
-   }
-
-   updateOfflineEvent = async (
-      offlineEvent: Partial<OfflineEvent>,
-      author: AuthorInfo
-   ) => {
-      const ref = this.firestore
-         .collection("offlineEvents")
-         .doc(offlineEvent.id)
-
-      offlineEvent.lastUpdatedBy = author
-      offlineEvent.updatedAt = this.getServerTimestamp() as Timestamp
-
-      await ref.update(offlineEvent)
-   }
-
-   deleteOfflineEvent = async (offlineEventId) => {
-      const ref = this.firestore.collection("offlineEvents").doc(offlineEventId)
-      await ref.delete()
    }
 
    //SCHEDULED_LIVESTREAMS

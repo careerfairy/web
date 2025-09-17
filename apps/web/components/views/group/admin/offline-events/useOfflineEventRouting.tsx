@@ -2,6 +2,7 @@ import { AuthorInfo } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { offlineEventService } from "data/firebase/OfflineEventService"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { DateTime } from "luxon"
 import { useRouter } from "next/router"
@@ -98,12 +99,13 @@ export const useOfflineEventRouting = (): Result => {
       }
 
       try {
-         const draftOfflineEventId = await firebase.createOfflineEvent(
-            draftOfflineEvent,
-            author
-         )
+         const draftOfflineEventId =
+            await offlineEventService.createOfflineEvent(
+               draftOfflineEvent,
+               author
+            )
 
-         await firebase.decreaseGroupAvailableOfflineEvents(group.id)
+         await offlineEventService.decreaseGroupAvailableOfflineEvents(group.id)
 
          router.push({
             pathname: `/group/${group.id}/admin/content/offline-events/${draftOfflineEventId}`,
