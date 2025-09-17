@@ -23,6 +23,7 @@ import CategoryTagsContent from "components/views/common/tags/CategoryTagsConten
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { OfflineEvents } from "components/views/portal/offline-events/OfflineEvents"
 import { SparksLoadingFallback } from "components/views/portal/sparks/SparksLoadingFallback"
 import { SearchProvider } from "components/views/search/SearchContext"
 import { SearchField } from "components/views/search/SearchField"
@@ -215,6 +216,7 @@ const PortalPage = ({
                            <RecommendedCustomJobs
                               userCountryCode={userCountryCode}
                            />
+                           <OfflineEvents />
                            <FeaturedCompanies />
 
                            <UserSparksCarousel
