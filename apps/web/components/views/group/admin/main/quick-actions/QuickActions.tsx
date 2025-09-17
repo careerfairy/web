@@ -8,7 +8,7 @@ import { useOfflineEventRouting } from "components/views/group/admin/offline-eve
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
-import { Briefcase, PlayCircle, Radio } from "react-feather"
+import { Briefcase, Calendar, PlayCircle, Radio } from "react-feather"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
 
@@ -30,7 +30,7 @@ const styles = sxStyles({
       color: "neutral.800",
       borderRadius: "10px",
       textTransform: "none",
-      fontWeight: 500,
+      fontWeight: 400,
       padding: "15px 24px",
       flex: 1,
       height: "56px",
@@ -119,7 +119,7 @@ export const QuickActions = () => {
             {canGroupCreateOfflineEvents ? (
                <Button
                   sx={styles.quickActionButton}
-                  startIcon={<Radio size={24} />}
+                  startIcon={<Calendar size={24} />}
                   onClick={handleOfflineEventCreation}
                   disabled={isCreatingOfflineEvent}
                >
