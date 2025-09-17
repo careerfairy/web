@@ -41,6 +41,10 @@ const LIMIT = 3
  * This endpoint will be called by Customer.io.
  */
 export const customerIORecommendedJobsWebhook = onRequest(
+   {
+      memory: "512MiB",
+      concurrency: 20,
+   },
    withMiddlewares(
       [
          customerIOWebhookSignatureMiddleware(
