@@ -3,12 +3,12 @@ import { JOB_DIALOG_QUERY_KEYS } from "components/custom-hook/custom-job/useJobD
 import { useAppDispatch } from "components/custom-hook/store"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
-import { useCanGroupCreateOfflineEvents } from "components/views/group/admin/offline-events/useCanGroupCreateOfflineEvents"
 import { useOfflineEventRouting } from "components/views/group/admin/offline-events/useOfflineEventRouting"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
 import { Calendar, Radio as LiveStreamsIcon } from "react-feather"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
+import { useGroup } from "."
 import { JobsIcon } from "../../components/views/common/icons/JobsIcon"
 import { SparksIcon } from "../../components/views/common/icons/SparksIcon"
 import BrandedResponsiveMenu, {
@@ -36,7 +36,8 @@ export const CreateMenu = ({
       useOfflineEventRouting()
    const { query, push } = useRouter()
    const hasAccessToSparks = useHasAccessToSparks()
-   const canGroupCreateOfflineEvents = useCanGroupCreateOfflineEvents()
+   const { groupPresenter } = useGroup()
+   const canGroupCreateOfflineEvents = groupPresenter.canCreateOfflineEvents()
    const groupId = query.groupId as string
    const dispatch = useAppDispatch()
 

@@ -5,12 +5,12 @@ import useIsDesktop from "components/custom-hook/useIsDesktop"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useOfflineEventRouting } from "components/views/group/admin/offline-events/useOfflineEventRouting"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { Briefcase, PlayCircle, Radio } from "react-feather"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
 import { sxStyles } from "types/commonTypes"
-import { useCanGroupCreateOfflineEvents } from "../../offline-events/useCanGroupCreateOfflineEvents"
 
 const styles = sxStyles({
    container: {
@@ -60,8 +60,9 @@ export const QuickActions = () => {
    const { push, query } = useRouter()
    const hasAccessToSparks = useHasAccessToSparks()
    const dispatch = useAppDispatch()
+   const { groupPresenter } = useGroup()
 
-   const canGroupCreateOfflineEvents = useCanGroupCreateOfflineEvents()
+   const canGroupCreateOfflineEvents = groupPresenter.canCreateOfflineEvents()
 
    const groupId = query.groupId as string
 
