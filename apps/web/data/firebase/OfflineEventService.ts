@@ -30,11 +30,13 @@ export class OfflineEventService {
          "offlineEvents"
       ).withConverter(createGenericConverter<OfflineEvent>())
 
+      const now = Timestamp.now()
+
       const eventData: Omit<OfflineEvent, "id"> = {
          ...offlineEvent,
          author,
-         createdAt: Timestamp.now(),
-         updatedAt: Timestamp.now(),
+         createdAt: now,
+         updatedAt: now,
          lastUpdatedBy: author,
       } as Omit<OfflineEvent, "id">
 
