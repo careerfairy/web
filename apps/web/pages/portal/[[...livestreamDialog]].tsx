@@ -186,6 +186,7 @@ const PortalPage = ({
                               color="neutral.900"
                               fontWeight={700}
                            >
+                              TODO REMOVE:{" "}
                               {userData?.firstName
                                  ? `Welcome, ${userData?.firstName}!`
                                  : "Nice to see you!"}
