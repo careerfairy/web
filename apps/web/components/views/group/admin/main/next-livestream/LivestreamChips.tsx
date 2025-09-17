@@ -34,10 +34,10 @@ const ChipsLine = ({ livestream }: { livestream: LivestreamEvent }) => {
 
    // show more chips on larger screens
    const chipsToDisplay = useMemo(() => {
-      if (xl) return 2
-      if (xs) return 0
+      if (xl) return 3
+      if (xs) return 1
 
-      return 1
+      return 2
    }, [xl, xs])
 
    return (
@@ -76,7 +76,7 @@ type EventTagsProps = {
 const EventTags = ({ tagIds, chipsToDisplay }: EventTagsProps) => {
    return (
       <>
-         {tagIds.slice(0, chipsToDisplay).map((tagId) => (
+         {tagIds.slice(0, chipsToDisplay - 1).map((tagId) => (
             <WhiteTagChip
                key={tagId}
                variant="filled"
