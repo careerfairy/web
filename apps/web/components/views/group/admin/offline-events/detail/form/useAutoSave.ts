@@ -1,6 +1,7 @@
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { useAuth } from "HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { offlineEventService } from "data/firebase/OfflineEventService"
 import { useSnackbar } from "notistack"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import isEqual from "react-fast-compare"
@@ -54,7 +55,7 @@ export const useAutoSave = () => {
             ),
          }
 
-         await firebaseService.updateOfflineEvent(updateData, author)
+         await offlineEventService.updateOfflineEvent(updateData, author)
       },
       [offlineEvent.id, userData, firebaseService, author, offlineEvent.address]
    )
