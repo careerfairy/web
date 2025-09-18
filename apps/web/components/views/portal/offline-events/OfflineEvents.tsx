@@ -1,21 +1,19 @@
-import { Box, Stack, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
+import { useRouter } from "next/router"
+import { useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { OfflineEvent, OfflineEventCard } from "./OfflineEventCard"
+import { OfflineEventDialog } from "./OfflineEventDialog"
 
 const styles = sxStyles({
    wrapper: {
-      px: { xs: 2, md: 2 },
+      pl: { xs: 2, md: 2 },
       pb: { xs: 3, md: 3 },
       width: "100%",
    },
-   header: {
-      pl: 2,
-      pr: 2,
-      mb: 1,
-   },
    carouselContainer: {
-      px: { xs: 2, md: 2 },
+      position: "static",
    },
    headerRight: {
       pr: 2,
@@ -52,25 +50,39 @@ const dummyEvents: OfflineEvent[] = [
    },
 ]
 
-type Props = {
-   title?: string
-}
+export const OfflineEvents = () => {
+   const router = useRouter()
 
-export const OfflineEvents = ({ title = "Offline events" }: Props) => {
+   const selectedEventId = useMemo(() => {
+      const param = router.query.offlineEvent
+      return Array.isArray(param) ? param[0] : param
+   }, [router.query])
+
+   const selectedEvent = useMemo(() => {
+      return dummyEvents.find((e) => e.id === selectedEventId)
+   }, [selectedEventId])
+
+   const handleClose = useCallback(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { offlineEvent, ...rest } = router.query
+      void router.push(
+         {
+            pathname: router.pathname,
+            query: rest,
+         },
+         undefined,
+         { shallow: true, scroll: false }
+      )
+   }, [router])
+
    return (
-      <Stack spacing={1.5} sx={styles.wrapper}>
+      <Box sx={styles.wrapper}>
          <ContentCarousel
             slideWidth={317}
             headerTitle={
-               <Box sx={styles.header}>
-                  <Typography
-                     variant="brandedH4"
-                     fontWeight={600}
-                     color="neutral.800"
-                  >
-                     {title}
-                  </Typography>
-               </Box>
+               <Typography variant="brandedH4" fontWeight={600}>
+                  Events near you
+               </Typography>
             }
             containerSx={styles.carouselContainer}
             headerRightSx={styles.headerRight}
@@ -82,6 +94,11 @@ export const OfflineEvents = ({ title = "Offline events" }: Props) => {
                )
             )}
          </ContentCarousel>
-      </Stack>
+         <OfflineEventDialog
+            open={Boolean(selectedEventId)}
+            event={selectedEvent}
+            onClose={handleClose}
+         />
+      </Box>
    )
 }

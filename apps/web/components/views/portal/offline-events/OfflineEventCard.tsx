@@ -1,6 +1,9 @@
 import { Box, Stack, Typography } from "@mui/material"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/router"
 import { Calendar, MapPin } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -50,10 +53,11 @@ const styles = sxStyles({
    title: {
       px: 2,
       color: "neutral.800",
+      height: "47px",
+      ...getMaxLineStyles(2),
    },
    detailRow: {
       px: 2,
-      //   width: "100%",
       display: "flex",
       alignItems: "center",
       gap: 1,
@@ -74,6 +78,7 @@ type Props = {
 }
 
 export const OfflineEventCard = ({ event }: Props) => {
+   const { pathname } = useRouter()
    const {
       bannerUrl,
       companyLogoUrl,
@@ -84,7 +89,18 @@ export const OfflineEventCard = ({ event }: Props) => {
    } = event
 
    return (
-      <Box sx={styles.card} data-name="Offline event card">
+      <Box
+         component={Link}
+         href={{
+            pathname,
+            query: {
+               offlineEvent: event.id,
+            },
+         }}
+         shallow
+         sx={styles.card}
+         data-name="Offline event card"
+      >
          <Box sx={styles.bannerWrapper}>
             <Image
                src={bannerUrl}
@@ -95,8 +111,8 @@ export const OfflineEventCard = ({ event }: Props) => {
             />
          </Box>
 
-         <Stack sx={styles.content} spacing={1.5}>
-            <Box sx={styles.row}>
+         <Stack sx={styles.content}>
+            <Box sx={styles.row} pt={1}>
                <CircularLogo
                   src={companyLogoUrl}
                   alt={`${companyName} logo`}
@@ -108,6 +124,7 @@ export const OfflineEventCard = ({ event }: Props) => {
             </Box>
 
             <Typography
+               pt={1}
                variant="brandedBody"
                sx={styles.title}
                fontWeight={600}
@@ -115,14 +132,14 @@ export const OfflineEventCard = ({ event }: Props) => {
                {title}
             </Typography>
 
-            <Box sx={styles.detailRow}>
+            <Box pt={1} sx={styles.detailRow}>
                <Box component={MapPin} sx={styles.icon} />
                <Typography variant="small" sx={styles.detailText}>
                   {location}
                </Typography>
             </Box>
 
-            <Box sx={styles.detailRow}>
+            <Box pt={1} sx={styles.detailRow}>
                <Box component={Calendar} sx={styles.icon} />
                <Typography variant="small" sx={styles.detailText}>
                   {dateLabel}
