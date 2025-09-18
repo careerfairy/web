@@ -1,5 +1,6 @@
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { offlineEventService } from "data/firebase/OfflineEventService"
 import { useSnackbar } from "notistack"
 import { useCallback, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -55,7 +56,7 @@ export const usePublishOfflineEvent = () => {
          }
 
          // Update the offline event in Firebase
-         await firebaseService.updateOfflineEvent(publishData, author)
+         await offlineEventService.updateOfflineEvent(publishData, author)
 
          enqueueSnackbar("Offline event published successfully!", {
             variant: "success",
