@@ -1,7 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
-import useIsMobile from "components/custom-hook/useIsMobile"
 import Image from "next/image"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -87,7 +86,6 @@ export default function HeroSection({
    handleOpenLivestreamDialog,
 }: HeroSectionProps) {
    const theme = useTheme()
-   const isMobile = useIsMobile()
    const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"))
    // Refs used to measure the hero container and the overlapping panels area
    const heroRef = useRef<HTMLDivElement | null>(null)
@@ -173,17 +171,19 @@ export default function HeroSection({
          </Box>
          <Stack spacing={1.5}>
             <Stack sx={styles.logoContainer}>
-               <Box>
-                  <Image
-                     src="/panels/masterclass-logo.svg"
-                     alt="Masterclass Logo"
-                     width={isMobile ? 258 : 425}
-                     height={isMobile ? 54 : 88}
-                  />
-               </Box>
+               <Typography
+                  variant="h2"
+                  sx={{
+                     fontWeight: 600,
+                     color: "#244D49",
+                     textAlign: "center",
+                  }}
+               >
+                  Consulting
+               </Typography>
                <Typography variant="medium" sx={styles.brandTagline}>
-                  Live sessions on the most important topics to start job hunt
-                  season with confidence.
+                  Live sessions from top consulting companies to land your dream
+                  job.
                </Typography>
             </Stack>
 
