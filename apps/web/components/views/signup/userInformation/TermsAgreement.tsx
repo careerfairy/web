@@ -35,7 +35,7 @@ const TermsAgreement = ({
             control={
                <Checkbox
                   name="agreeTerm"
-                  placeholder="Confirm Password"
+                  // placeholder="Confirm Password"
                   onChange={onChange}
                   onBlur={onBlur}
                   checked={value}

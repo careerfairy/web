@@ -1,8 +1,8 @@
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
+import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 import { useMemo } from "react"
 import { useFormContext } from "react-hook-form"
-import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { ControlledBrandedAutoComplete } from "components/views/common/inputs/ControlledBrandedAutoComplete"
 
 type Props = {
    name: string
@@ -34,7 +34,7 @@ export const StudyDomainSelector = ({ name, collection }: Props) => {
          name={name}
          options={options}
          autocompleteProps={{
-            placeholder: "Select from the following list",
+            // placeholder: "Select from the following list",
             id: name,
             disabled: isSubmitting,
             disableClearable: true,
