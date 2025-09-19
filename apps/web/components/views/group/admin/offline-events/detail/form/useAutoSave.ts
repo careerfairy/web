@@ -50,7 +50,7 @@ export const useAutoSave = () => {
                newValues.general?.startAt ?? ""
             ),
          }
-
+         // TODO: remove something here?
          await offlineEventService.updateOfflineEvent(updateData, author)
       },
       [offlineEvent.id, author, firebaseService, userData]
