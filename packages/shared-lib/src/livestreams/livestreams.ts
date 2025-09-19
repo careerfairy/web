@@ -829,6 +829,7 @@ export enum ImpressionLocation {
    portalHeroContentCarousel = "portal-hero-content-carousel", // portalHeroContentCarousel
    portalSearchResults = "portal-search-results", // portalSearchResults
    panelsOverviewPage = "panels-overview-page", // panelsOverviewPage
+   consultingOverviewPage = "consulting-overview-page", // consultingOverviewPage
    unknown = "unknown", // unknown
 }
 

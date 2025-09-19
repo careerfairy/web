@@ -439,6 +439,8 @@ export interface ILivestreamRepository {
    ): Promise<void>
 
    getAllPanels(): Promise<LivestreamEvent[]>
+
+   getAllConsultingEvents(): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -1785,6 +1787,19 @@ export class FirebaseLivestreamRepository
          .where("hidden", "==", true)
          .orderBy("start", "asc")
          .limit(limit)
+         .get()
+
+      return mapFirestoreDocuments<LivestreamEvent>(docs)
+   }
+
+   async getAllConsultingEvents(limit?: number): Promise<LivestreamEvent[]> {
+      const docs = await this.firestore
+         .collection("livestreams")
+         .where("businessFunctionsTagIds", "array-contains", "Consulting")
+         .where("hidden", "==", false)
+         .where("test", "==", false)
+         .orderBy("start", "asc")
+         .limit(limit || 50)
          .get()
 
       return mapFirestoreDocuments<LivestreamEvent>(docs)
