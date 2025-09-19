@@ -1,6 +1,17 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
+import {
+   Box,
+   Grid,
+   Stack,
+   Typography,
+   useMediaQuery,
+   useTheme,
+} from "@mui/material"
+import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Image from "next/image"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -75,13 +86,15 @@ const styles = sxStyles({
 })
 
 interface HeroSectionProps {
-   panelEvents: LivestreamEvent[]
+   panelEvents?: LivestreamEvent[]
+   consultingLivestreams?: LivestreamEvent[]
    companies: Group[]
    handleOpenLivestreamDialog: (livestreamId: string) => void
 }
 
 export default function HeroSection({
    panelEvents,
+   consultingLivestreams,
    companies,
    handleOpenLivestreamDialog,
 }: HeroSectionProps) {
@@ -202,16 +215,39 @@ export default function HeroSection({
             direction={{ xs: "column", md: "row" }}
             sx={styles.panelsGrid}
          >
-            {panelEvents.map((panel: LivestreamEvent) => {
-               return (
-                  <ReasonsToJoinPanelCard
-                     key={panel.id}
-                     panel={panel}
-                     companies={companies}
-                     handleOpenLivestreamDialog={handleOpenLivestreamDialog}
-                  />
-               )
-            })}
+            {consultingLivestreams ? (
+               // Display consulting livestreams in a 2x2 grid
+               <Grid container spacing={2} sx={{ width: "100%" }}>
+                  {consultingLivestreams.map(
+                     (livestream: LivestreamEvent, index: number) => (
+                        <Grid key={livestream.id} item xs={12} sm={6}>
+                           <EventPreviewCard
+                              event={{ ...livestream, triGrams: {} }}
+                              index={index}
+                              totalElements={consultingLivestreams.length}
+                              location={ImpressionLocation.nextLivestreams}
+                              onCardClick={(e) => {
+                                 e.preventDefault()
+                                 handleOpenLivestreamDialog(livestream.id)
+                              }}
+                           />
+                        </Grid>
+                     )
+                  )}
+               </Grid>
+            ) : (
+               // Display panels (original behavior)
+               panelEvents?.map((panel: LivestreamEvent) => {
+                  return (
+                     <ReasonsToJoinPanelCard
+                        key={panel.id}
+                        panel={panel}
+                        companies={companies}
+                        handleOpenLivestreamDialog={handleOpenLivestreamDialog}
+                     />
+                  )
+               })
+            )}
          </Stack>
       </Stack>
    )
