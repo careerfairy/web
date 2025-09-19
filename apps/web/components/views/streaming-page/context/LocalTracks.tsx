@@ -109,9 +109,12 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
    const micReady = Boolean(shouldStream && firstMicId)
    const microphoneTrack = useLocalMicrophoneTrack(micReady, {
       microphoneId: firstMicId,
-      encoderConfig: withHighQuality ? "high_quality_stereo" : undefined,
+      encoderConfig: withHighQuality
+         ? "high_quality_stereo"
+         : "speech_standard",
       AEC: true,
       ANS: true,
+      AGC: false,
    })
 
    const disableNoiseSuppression = useCallback(() => {
