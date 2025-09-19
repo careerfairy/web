@@ -132,6 +132,7 @@ export default function ConsultingPage({
                      (livestream) => livestream.speakers || []
                   )}
                   companies={companies}
+                  variant="consulting"
                />
                <ParticipatingCompaniesSection
                   companies={companies}

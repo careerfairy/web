@@ -2,6 +2,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { Speaker } from "@careerfairy/shared-lib/livestreams"
 import { Box, Grid, Stack, Typography } from "@mui/material"
 import Image from "next/image"
+import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import SpeakerCard from "./components/SpeakerCard"
 
@@ -102,12 +103,33 @@ const styles = sxStyles({
 interface SpeakersSectionProps {
    speakers: Speaker[]
    companies: Group[]
+   variant?: "panels" | "consulting"
+}
+
+// Utility function to shuffle array using Fisher-Yates algorithm
+function shuffleArray<T>(array: T[]): T[] {
+   const shuffled = [...array]
+   for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+   }
+   return shuffled
 }
 
 export default function SpeakersSection({
    speakers,
    companies,
+   variant = "panels",
 }: SpeakersSectionProps) {
+   // For consulting variant, randomly select and shuffle 6 speakers
+   const displayedSpeakers = useMemo(() => {
+      if (variant === "consulting") {
+         // First shuffle all speakers, then take the first 6
+         const shuffledSpeakers = shuffleArray(speakers)
+         return shuffledSpeakers.slice(0, 6)
+      }
+      return speakers
+   }, [speakers, variant])
    return (
       <Stack sx={styles.section}>
          <Stack sx={styles.sectionTitleWrapper} spacing={1.5}>
@@ -123,7 +145,7 @@ export default function SpeakersSection({
             </Typography>
          </Stack>
 
-         {speakers?.length > 0 && (
+         {displayedSpeakers?.length > 0 && (
             <Box sx={styles.speakersWrapper}>
                {/* Visual support images - positioned absolutely behind speakers grid */}
                <Box aria-hidden sx={styles.visualSupportContainer}>
@@ -152,7 +174,7 @@ export default function SpeakersSection({
                   spacing={1}
                   sx={{ position: "relative", zIndex: 1 }}
                >
-                  {speakers.map((speaker, speakerIndex) => {
+                  {displayedSpeakers.map((speaker, speakerIndex) => {
                      const company = companies.find(
                         (company) => company.id === speaker.groupId
                      )
