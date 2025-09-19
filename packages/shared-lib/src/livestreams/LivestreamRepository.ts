@@ -1796,13 +1796,13 @@ export class FirebaseLivestreamRepository
       const docs = await this.firestore
          .collection("livestreams")
          .where("businessFunctionsTagIds", "array-contains", "Consulting")
-         .where("hidden", "==", false)
          .where("test", "==", false)
          .orderBy("start", "asc")
          .limit(limit || 50)
          .get()
 
       return mapFirestoreDocuments<LivestreamEvent>(docs)
+         .filter(event => !event.hidden)
    }
 
    private async handlePromiseAllSettled<T>(
