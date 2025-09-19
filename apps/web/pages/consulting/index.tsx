@@ -35,17 +35,19 @@ const styles = sxStyles({
 })
 
 type ConsultingPageProps = {
-   serverSidePanelEvents: any[]
+   serverSideConsultingLivestreams: any[]
    serverSideCompanies: SerializedGroup[]
    serverSideRecentLivestreams: any[]
 }
 
 export default function ConsultingPage({
-   serverSidePanelEvents,
+   serverSideConsultingLivestreams,
    serverSideCompanies,
    serverSideRecentLivestreams,
 }: ConsultingPageProps) {
-   const deserializedPanelEvents = mapFromServerSide(serverSidePanelEvents)
+   const deserializedConsultingLivestreams = mapFromServerSide(
+      serverSideConsultingLivestreams
+   )
    const deserializedRecentLivestreams = mapFromServerSide(
       serverSideRecentLivestreams
    )
@@ -120,21 +122,21 @@ export default function ConsultingPage({
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
                <HeroSection
-                  panelEvents={deserializedPanelEvents}
+                  consultingLivestreams={deserializedConsultingLivestreams}
                   companies={companies}
                   handleOpenLivestreamDialog={handleOpenPanelDialog}
                />
                <WhosThisForSection />
                <SpeakersSection
-                  speakers={deserializedPanelEvents.flatMap(
-                     (panel) => panel.speakers || []
+                  speakers={deserializedConsultingLivestreams.flatMap(
+                     (livestream) => livestream.speakers || []
                   )}
                   companies={companies}
                />
                <ParticipatingCompaniesSection companies={companies} />
                <WhatYouTakeAwaySection />
                <RegisterNowSection
-                  panelEvents={deserializedPanelEvents}
+                  panelEvents={deserializedConsultingLivestreams}
                   handleOpenLivestreamDialog={handleOpenPanelDialog}
                />
                <NotForYouSection
@@ -161,15 +163,22 @@ export const getServerSideProps: GetServerSideProps<
    ConsultingPageProps
 > = async () => {
    try {
-      // Fetch all data in parallel
-      const [recentLivestreams, allPanels] = await Promise.all([
+      // Fetch upcoming events and recent livestreams in parallel
+      const [allUpcomingEvents, recentLivestreams] = await Promise.all([
+         livestreamRepo.getUpcomingEvents(50), // Get more events to filter from
          livestreamRepo.getUpcomingEvents(10),
-         livestreamRepo.getAllPanels(),
       ])
 
-      // Extract unique groupIds from all panels
-      const allGroupIds = allPanels
-         .flatMap((panel) => panel.groupIds || [])
+      // Filter for consulting industry livestreams (max 4)
+      const consultingLivestreams = (allUpcomingEvents || [])
+         .filter((livestream) =>
+            livestream.companyIndustries?.includes("ManagementConsulting")
+         )
+         .slice(0, 4) // Limit to 4 livestreams
+
+      // Extract unique groupIds from consulting livestreams
+      const allGroupIds = consultingLivestreams
+         .flatMap((livestream) => livestream.groupIds || [])
          .filter((groupId, index, array) => array.indexOf(groupId) === index) // Remove duplicates
 
       // Fetch companies from the groupIds
@@ -179,35 +188,38 @@ export const getServerSideProps: GetServerSideProps<
             : []
 
       // Serialize events for server-side props
-      const serializedPanelEvents = allPanels.map((panel) =>
-         LivestreamPresenter.serializeDocument(panel)
+      const serializedConsultingLivestreams = consultingLivestreams.map(
+         (livestream) => LivestreamPresenter.serializeDocument(livestream)
       )
 
-      // TODO: Handle moderators on second iteration of the panels
-      const panelsWithoutModerators = serializedPanelEvents.map((panel) => {
-         panel.speakers = panel.speakers?.filter(
-            (speaker) => speaker.position !== "Moderator"
-         )
-         return {
-            ...panel,
-            speakers: panel.speakers,
+      // Filter out moderators from speakers
+      const livestreamsWithoutModerators = serializedConsultingLivestreams.map(
+         (livestream) => {
+            livestream.speakers = livestream.speakers?.filter(
+               (speaker) => speaker.position !== "Moderator"
+            )
+            return {
+               ...livestream,
+               speakers: livestream.speakers,
+            }
          }
-      })
-      const serializedRecentLivestreams = recentLivestreams.map((stream) =>
-         LivestreamPresenter.serializeDocument(stream)
+      )
+
+      const serializedRecentLivestreams = (recentLivestreams || []).map(
+         (stream) => LivestreamPresenter.serializeDocument(stream)
       )
       const serializedCompanies = companies.map((company) =>
          serializeGroup(company)
       )
 
-      // TODO: Handle CF in second iteration of the panels
+      // Filter out CareerFairy company
       const serializedCompaniesWithoutCF = serializedCompanies.filter(
          (company) => company.id !== CF_GROUP_ID
       )
 
       return {
          props: {
-            serverSidePanelEvents: panelsWithoutModerators,
+            serverSideConsultingLivestreams: livestreamsWithoutModerators,
             serverSideCompanies: serializedCompaniesWithoutCF,
             serverSideRecentLivestreams: serializedRecentLivestreams,
          },
@@ -217,7 +229,7 @@ export const getServerSideProps: GetServerSideProps<
 
       return {
          props: {
-            serverSidePanelEvents: [],
+            serverSideConsultingLivestreams: [],
             serverSideCompanies: [],
             serverSideRecentLivestreams: [],
          },
