@@ -192,7 +192,7 @@ export default function HeroSection({
                   <Typography variant="medium">Free online sessions</Typography>
                </Box>
                <Box sx={styles.tagChip}>
-                  <Typography variant="medium">October 16 & 20</Typography>
+                  <Typography variant="medium">Top companies</Typography>
                </Box>
             </Stack>
          </Stack>
