@@ -133,7 +133,10 @@ export default function ConsultingPage({
                   )}
                   companies={companies}
                />
-               <ParticipatingCompaniesSection companies={companies} />
+               <ParticipatingCompaniesSection
+                  companies={companies}
+                  variant="consulting"
+               />
                <WhatYouTakeAwaySection />
                <RegisterNowSection
                   panelEvents={deserializedConsultingLivestreams}
