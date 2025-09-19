@@ -38,6 +38,7 @@ import {
 import { MobileUtils } from "util/mobile.utils"
 import ErrorProvider from "../HOCs/ErrorProvider"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+import OfflineEventDialogProvider from "../HOCs/OfflineEventDialogProvider"
 import TutorialProvider from "../HOCs/TutorialProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
 import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
@@ -121,11 +122,17 @@ function MyApp(props) {
                                                 <UserRewardsNotifications>
                                                    <SparksFeedTrackerProvider>
                                                       <CompaniesTrackerProvider>
-                                                         {getLayout(
-                                                            <Component
-                                                               {...pageProps}
-                                                            />
-                                                         )}
+                                                         <OfflineEventDialogProvider
+                                                            pageProps={
+                                                               pageProps
+                                                            }
+                                                         >
+                                                            {getLayout(
+                                                               <Component
+                                                                  {...pageProps}
+                                                               />
+                                                            )}
+                                                         </OfflineEventDialogProvider>
                                                       </CompaniesTrackerProvider>
                                                    </SparksFeedTrackerProvider>
                                                 </UserRewardsNotifications>

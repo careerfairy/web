@@ -23,12 +23,18 @@ import CategoryTagsContent from "components/views/common/tags/CategoryTagsConten
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
+import { OfflineEventDialog } from "components/views/portal/offline-events/OfflineEventDialog"
 import { OfflineEvents } from "components/views/portal/offline-events/OfflineEvents"
 import { SparksLoadingFallback } from "components/views/portal/sparks/SparksLoadingFallback"
 import { SearchProvider } from "components/views/search/SearchContext"
 import { SearchField } from "components/views/search/SearchField"
 import { TagsCarouselSkeleton } from "components/views/tags/TagsCarouselSkeleton"
+import { offlineEventService } from "data/firebase/OfflineEventService"
 import { sxStyles } from "types/commonTypes"
+import {
+   deserializeTimestamps,
+   serializeTimestamps,
+} from "util/firebaseTimestamps"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
@@ -123,6 +129,7 @@ const PortalPage = ({
    livestreamDialogData,
    userCountryCode,
    customJobDialogData,
+   serializedOfflineEvent,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const router = useRouter()
@@ -251,6 +258,9 @@ const PortalPage = ({
                <WelcomeDialogContainer />
             </Fragment>
          </GenericDashboardLayout>
+         <OfflineEventDialog
+            eventFromServer={deserializeTimestamps(serializedOfflineEvent)}
+         />
       </Fragment>
    )
 }
@@ -296,7 +306,10 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const userCountryCode =
       (ctx.req.headers["x-vercel-ip-country"] as string) || null
 
+   const offlineEventId = ctx.query.offlineEventId as string
+
    const promises = []
+
    promises.push(
       livestreamRepo.getUpcomingEvents(20),
       livestreamRepo.getPastEventsFrom({
@@ -304,7 +317,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          limit: 6,
       }),
       getLivestreamDialogData(ctx),
-      getCustomJobDialogData(ctx, DIALOG_SOURCE)
+      getCustomJobDialogData(ctx, DIALOG_SOURCE),
+      offlineEventService.getById(offlineEventId)
    )
 
    const results = await Promise.allSettled(promises)
@@ -314,6 +328,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       pastEvents,
       livestreamDialogData,
       customJobDialogData,
+      offlineEventData,
    ] = results.map((result) =>
       result.status === "fulfilled" ? result.value : null
    )
@@ -332,6 +347,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          customJobDialogData,
          livestreamDialogData,
          userCountryCode,
+         serializedOfflineEvent: serializeTimestamps(offlineEventData),
       },
    }
 }

@@ -1,3 +1,4 @@
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Box, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
@@ -6,16 +7,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { Calendar, MapPin } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-
-export type OfflineEvent = {
-   id: string
-   bannerUrl: string
-   companyLogoUrl: string
-   companyName: string
-   title: string
-   location: string
-   dateLabel: string
-}
+import DateUtil from "util/DateUtil"
 
 const styles = sxStyles({
    card: {
@@ -79,14 +71,7 @@ type Props = {
 
 export const OfflineEventCard = ({ event }: Props) => {
    const { pathname } = useRouter()
-   const {
-      bannerUrl,
-      companyLogoUrl,
-      companyName,
-      title,
-      location,
-      dateLabel,
-   } = event
+   const { backgroundImageUrl, company, title, address, startAt } = event
 
    return (
       <Box
@@ -103,7 +88,7 @@ export const OfflineEventCard = ({ event }: Props) => {
       >
          <Box sx={styles.bannerWrapper}>
             <Image
-               src={bannerUrl}
+               src={backgroundImageUrl}
                alt={`${title} banner`}
                fill
                style={{ objectFit: "cover" }}
@@ -114,12 +99,12 @@ export const OfflineEventCard = ({ event }: Props) => {
          <Stack sx={styles.content}>
             <Box sx={styles.row} pt={1}>
                <CircularLogo
-                  src={companyLogoUrl}
-                  alt={`${companyName} logo`}
+                  src={company?.logoUrl || ""}
+                  alt={`${company.name} logo`}
                   size={28}
                />
                <Typography variant="brandedBody" sx={styles.companyName}>
-                  {companyName}
+                  {company.name}
                </Typography>
             </Box>
 
@@ -135,14 +120,14 @@ export const OfflineEventCard = ({ event }: Props) => {
             <Box pt={1} sx={styles.detailRow}>
                <Box component={MapPin} sx={styles.icon} />
                <Typography variant="small" sx={styles.detailText}>
-                  {location}
+                  {address.street} {address.cityISOCode.name}
                </Typography>
             </Box>
 
             <Box pt={1} sx={styles.detailRow}>
                <Box component={Calendar} sx={styles.icon} />
                <Typography variant="small" sx={styles.detailText}>
-                  {dateLabel}
+                  {DateUtil.getPrettyDateWithoutHourDayjs(startAt.toDate())}
                </Typography>
             </Box>
          </Stack>

@@ -6,6 +6,7 @@ import {
    collection,
    deleteDoc,
    doc,
+   getDoc,
    increment,
    setDoc,
    updateDoc,
@@ -14,6 +15,18 @@ import { FirestoreInstance } from "./FirebaseInstance"
 
 export class OfflineEventService {
    constructor(private readonly firestore: typeof FirestoreInstance) {}
+
+   async getById(eventId: string) {
+      if (!eventId) return null
+
+      const docRef = doc(
+         FirestoreInstance,
+         "offlineEvents",
+         eventId
+      ).withConverter(createGenericConverter<OfflineEvent>())
+      const docSnap = await getDoc(docRef)
+      return docSnap.data()
+   }
 
    /**
     * Creates a new offline event
