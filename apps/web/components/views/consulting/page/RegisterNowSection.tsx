@@ -1,6 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
-import { RectangleConsultingCard } from "components/views/consulting/cards/RectangleConsultingCard"
+import { RectangleConsultingCard } from "../cards/RectangleConsultingCard"
 import { sxStyles } from "types/commonTypes"
 import { SquareConsultingCard } from "../cards/SquareConsultingCard"
 
