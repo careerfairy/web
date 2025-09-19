@@ -1,15 +1,14 @@
-import { CityOption } from "@careerfairy/shared-lib/countries/types"
 import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
 import { UniversityOption } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { AddressAutofillFeatureSuggestion } from "@mapbox/search-js-core"
 
 export type OfflineEventFormGeneralTabValues = {
    title: string
    description: string
-   city: CityOption
-   street: string
+   street: AddressAutofillFeatureSuggestion
    targetAudience: {
       universities: UniversityOption[]
       levelOfStudies: LevelOfStudy[]

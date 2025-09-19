@@ -45,11 +45,7 @@ export const useAutoSave = () => {
             registrationUrl: newValues.general?.registrationUrl ?? "",
             hidden: newValues.general?.hidden ?? false,
             backgroundImageUrl: newValues.general?.backgroundImageUrl ?? "",
-            address: {
-               countryISOCode: offlineEvent.address?.countryISOCode,
-               cityISOCode: newValues.general?.city,
-               street: newValues.general?.street ?? "",
-            },
+            street: newValues.general?.street ?? null,
             startAt: firebaseService.getFirebaseTimestamp(
                newValues.general?.startAt ?? ""
             ),
@@ -57,7 +53,7 @@ export const useAutoSave = () => {
 
          await offlineEventService.updateOfflineEvent(updateData, author)
       },
-      [offlineEvent.id, userData, firebaseService, author, offlineEvent.address]
+      [offlineEvent.id, author, firebaseService, userData]
    )
 
    const handleAutoSave = useCallback(async () => {

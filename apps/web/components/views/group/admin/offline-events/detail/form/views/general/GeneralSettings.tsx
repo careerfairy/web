@@ -1,16 +1,25 @@
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import FormSectionHeader from "components/views/group/admin/events/detail/form/FormSectionHeader"
 
+import { AddressAutofillOptions } from "@mapbox/search-js-core"
 import { Box } from "@mui/material"
+import FormLocationAutoFill from "components/views/common/inputs/FormLocationAutoFill"
 import BannerImageSelect from "components/views/group/admin/events/detail/form/views/general/components/BannerImageSelect"
 import StartDateTimePicker from "components/views/group/admin/events/detail/form/views/general/components/StartDateTimePicker"
-import GroupCityDropdown from "./components/GroupCityDropdown"
+import { useOfflineEventCreationContext } from "../../../OfflineEventCreationContext"
 import MakeExclusiveSwitch from "./components/MakeExclusiveSwitch"
 
 const DESCRIPTION_PLACEHOLDER =
    "E.g., Join us for an engaging offline event where we showcase the vibrant culture at [Company], a top player in the [industry]. Our team of [XYZ] dedicated professionals will share insights into their daily experiences. The event will feature a 30-minute presentation followed by a 30-minute Q&A session, allowing you to connect directly with our consultants and learn more about their roles."
 
 export const GeneralSettings = () => {
+   const { group } = useOfflineEventCreationContext()
+
+   const options: Partial<AddressAutofillOptions> = {
+      country: group.companyCountry?.id,
+      streets: false,
+   }
+
    return (
       <>
          <FormSectionHeader
@@ -44,17 +53,12 @@ export const GeneralSettings = () => {
             label="Event date"
             toolbarTitle="Select offline event start date"
          />
-         <GroupCityDropdown
-            fieldName="general.city"
-            label="City"
-            placeholder="E.g., Bern, Switzerland"
-            requiredText={"(required)"}
-         />
-         <FormBrandedTextField
+         <FormLocationAutoFill
             name="general.street"
             label="Address"
-            placeholder="E.g., Max-Daetwyler-Platz, 2"
+            placeholder="E.g., Max-Daetwyler-Platz 2"
             requiredText="(required)"
+            options={options}
          />
          <FormBrandedTextField
             name="general.registrationUrl"

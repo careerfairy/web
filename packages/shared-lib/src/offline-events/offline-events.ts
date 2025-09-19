@@ -1,5 +1,5 @@
+import { AddressAutofillFeatureSuggestion } from "@mapbox/search-js-core"
 import { Identifiable } from "../commonTypes"
-import { CityOption, CountryOption } from "../countries/types"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
 import { GroupOption, PublicGroup } from "../groups"
@@ -17,7 +17,7 @@ export interface OfflineEvent extends Identifiable {
    author: AuthorInfo
    title: string
    description: string
-   address: OfflineEventAddress
+   street: AddressAutofillFeatureSuggestion
    industries: GroupOption[]
    targetAudience: OfflineEventTargetAudience
    status: OfflineEventStatus
@@ -34,10 +34,4 @@ export interface OfflineEventTargetAudience {
    universities: UniversityOption[]
    levelOfStudies: LevelOfStudy[]
    fieldOfStudies: FieldOfStudy[]
-}
-
-export interface OfflineEventAddress {
-   countryISOCode: CountryOption
-   cityISOCode: CityOption
-   street: string
 }
