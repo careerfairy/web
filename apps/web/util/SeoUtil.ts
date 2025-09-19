@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import { getResizedUrl } from "../components/helperFunctions/HelperFunctions"
 import { SeoProps } from "../components/util/SEO"
@@ -44,4 +45,53 @@ const getStreamText = (stream: LivestreamEvent): string => {
    return `${stream.title || ""} ${stream.company || ""} ${
       stream.summary || ""
    }`
+}
+
+export const getOfflineEventMetaInfo = (event: OfflineEvent): SeoProps => {
+   const eventDate = event?.startAt?.toDate?.()
+      ? event.startAt.toDate()
+      : new Date()
+
+   const monthAndDay = DateUtil.monthAndDay(eventDate)
+
+   const plainDescription = (event?.description || "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+
+   const keywords = [
+      event?.title,
+      event?.company?.name,
+      event?.address?.cityISOCode?.name,
+      event?.address?.countryISOCode?.name,
+      ...(event?.industries?.map((i) => i?.name).filter(Boolean) || []),
+      "offline event",
+      "CareerFairy",
+   ]
+      .filter(Boolean)
+      .join(",")
+
+   return {
+      title: `${event?.title} - ${monthAndDay} | CareerFairy`,
+      image: {
+         url: getResizedUrl(event?.backgroundImageUrl, "sm"),
+         width: 400,
+         height: 400,
+      },
+      description: getSubstringWithEllipsis(
+         `${event?.title || ""} - ${plainDescription}`,
+         160
+      ),
+      twitter: {
+         cardType: "summary_large_image",
+         site: "@FairyCareer",
+         handle: "@FairyCareer",
+      },
+      additionalMetaTags: [
+         {
+            name: "keywords",
+            content: `${keywords},careerfairy,career,fairy,fairycareer,CareerFairy,Career Fair`,
+         },
+      ],
+   }
 }

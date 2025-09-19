@@ -14,6 +14,7 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import { mapFromServerSide } from "../../util/serverUtil"
 
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 import { SparkInteractionSources } from "@careerfairy/shared-lib/sparks/telemetry"
 import { useAvailableTagsByHits } from "components/custom-hook/tags/useAvailableTagsByHits"
@@ -33,6 +34,7 @@ import { offlineEventService } from "data/firebase/OfflineEventService"
 import { sxStyles } from "types/commonTypes"
 import {
    deserializeTimestamps,
+   SerializeTimestamps,
    serializeTimestamps,
 } from "util/firebaseTimestamps"
 import {
@@ -259,7 +261,9 @@ const PortalPage = ({
             </Fragment>
          </GenericDashboardLayout>
          <OfflineEventDialog
-            eventFromServer={deserializeTimestamps(serializedOfflineEvent)}
+            eventFromServer={deserializeTimestamps(
+               serializedOfflineEvent as SerializeTimestamps<OfflineEvent>
+            )}
          />
       </Fragment>
    )
@@ -306,7 +310,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const userCountryCode =
       (ctx.req.headers["x-vercel-ip-country"] as string) || null
 
-   const offlineEventId = ctx.query.offlineEventId as string
+   const offlineEventId = ctx.query.offlineEvent as string
 
    const promises = []
 

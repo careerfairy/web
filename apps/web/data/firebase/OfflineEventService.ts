@@ -7,6 +7,7 @@ import {
    deleteDoc,
    doc,
    getDoc,
+   getDocs,
    increment,
    setDoc,
    updateDoc,
@@ -26,6 +27,15 @@ export class OfflineEventService {
       ).withConverter(createGenericConverter<OfflineEvent>())
       const docSnap = await getDoc(docRef)
       return docSnap.data()
+   }
+
+   async getMany() {
+      const collectionRef = collection(
+         FirestoreInstance,
+         "offlineEvents"
+      ).withConverter(createGenericConverter<OfflineEvent>())
+      const docsSnap = await getDocs(collectionRef)
+      return docsSnap.docs.map((doc) => doc.data())
    }
 
    /**

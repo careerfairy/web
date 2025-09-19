@@ -10,7 +10,9 @@ import {
    alpha,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import SanitizedHTML from "components/util/SanitizedHTML"
+import SEO from "components/util/SEO"
 import { BasicShareIcon } from "components/views/common/icons/BasicShareIcon"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import {
@@ -18,15 +20,18 @@ import {
    SlideUpTransition,
 } from "components/views/common/transitions"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
+import { offlineEventService } from "data/firebase/OfflineEventService"
 import { groupRepo } from "data/RepositoryInstances"
 import Image from "next/image"
 import Link from "next/link"
-import { useCallback, useState } from "react"
+import { useRouter } from "next/router"
+import { useCallback } from "react"
 import { Calendar, ChevronLeft, ChevronRight, MapPin, X } from "react-feather"
 import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
+import { getOfflineEventMetaInfo } from "util/SeoUtil"
 
 const styles = sxStyles({
    header: {
@@ -96,11 +101,6 @@ const styles = sxStyles({
       alignItems: "flex-start",
       flex: 1,
    },
-   metaRow: {
-      display: "flex",
-      alignItems: "center",
-      gap: 1,
-   },
    icon: {
       color: "neutral.700",
       width: 18,
@@ -149,7 +149,6 @@ const styles = sxStyles({
          )} 0%, ${alpha(theme.palette.common.white, 0.98)} 78%)`,
       display: "flex",
       justifyContent: "center",
-      zIndex: 1,
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
@@ -168,36 +167,66 @@ type Props = {
 }
 
 export const OfflineEventDialog = ({ eventFromServer }: Props) => {
-   const [open, setOpen] = useState(Boolean(eventFromServer))
+   const { push, query, pathname } = useRouter()
    const isMobile = useIsMobile()
+   const isMounted = useIsMounted()
+
+   const { data: event } = useSWR(
+      query.offlineEvent ? ["event", query.offlineEvent] : null,
+      () => offlineEventService.getById(query.offlineEvent as string),
+      {
+         fallbackData:
+            eventFromServer?.id === query.offlineEvent ? eventFromServer : null,
+      }
+   )
 
    const handleClose = useCallback(() => {
-      setOpen(false)
-   }, [])
+      const newQuery = {
+         ...query,
+      }
+
+      delete newQuery.offlineEvent
+
+      push(
+         {
+            pathname,
+            query: newQuery,
+         },
+         undefined,
+         {
+            shallow: true,
+         }
+      )
+   }, [push, query, pathname])
 
    return (
-      <Dialog
-         open={open}
-         onClose={handleClose}
-         TransitionComponent={
-            isMobile ? SlideLeftTransition : SlideUpTransition
-         }
-         maxWidth="md"
-         fullWidth
-         fullScreen={isMobile}
-         closeAfterTransition={true}
-         PaperProps={{
-            sx: styles.dialogPaper,
-         }}
-         sx={{
-            ...NICE_SCROLLBAR_STYLES,
-         }}
-         TransitionProps={{
-            unmountOnExit: true,
-         }}
-      >
-         <Content event={eventFromServer} onClose={handleClose} />
-      </Dialog>
+      <>
+         {event ? <SEO {...getOfflineEventMetaInfo(event)} /> : null}
+         <Dialog
+            open={Boolean(event)}
+            onClose={handleClose}
+            disablePortal
+            TransitionComponent={
+               isMobile ? SlideLeftTransition : SlideUpTransition
+            }
+            maxWidth="md"
+            fullWidth
+            fullScreen={isMobile}
+            PaperProps={{
+               sx: styles.dialogPaper,
+            }}
+            sx={{
+               ...NICE_SCROLLBAR_STYLES,
+            }}
+            TransitionProps={{
+               unmountOnExit: true,
+               // WHat this does is skips the slide up animation when loading the page for the first time, so it appears like the dialog is already open for ssr
+               appear: isMounted,
+            }}
+         >
+            <Content event={event} onClose={handleClose} />
+         </Dialog>
+      </>
    )
 }
 
@@ -262,7 +291,7 @@ const Content = ({
          </Box>
 
          <Stack sx={styles.content}>
-            <Typography variant="brandedH4" fontWeight={600}>
+            <Typography variant="desktopBrandedH4" fontWeight={600} px={1}>
                {title}
             </Typography>
 
@@ -340,18 +369,16 @@ const Content = ({
             </Box>
 
             <Box sx={styles.stickyCta}>
-               {registrationUrl ? (
-                  <Button
-                     variant="contained"
-                     color="primary"
-                     size="large"
-                     href={registrationUrl}
-                     target="_blank"
-                     rel="noopener noreferrer"
-                  >
-                     Register to event
-                  </Button>
-               ) : null}
+               <Button
+                  variant="contained"
+                  color="primary"
+                  size="large"
+                  href={registrationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+               >
+                  Register to event
+               </Button>
             </Box>
          </Stack>
       </Box>

@@ -109,7 +109,7 @@ export const OfflineEventCard = ({ event }: Props) => {
             </Box>
 
             <Typography
-               pt={1}
+               mt={1}
                variant="brandedBody"
                sx={styles.title}
                fontWeight={600}

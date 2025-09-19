@@ -80,6 +80,7 @@ export const serializeTimestamps = <T extends Record<string, any>>(
 export const deserializeTimestamps = <T extends Record<string, any>>(
    obj: T
 ): DeserializeTimestamps<T> => {
+   if (obj === null || obj === undefined) return null
    const convertValue = (value: unknown): unknown => {
       if (
          typeof value === "object" &&
