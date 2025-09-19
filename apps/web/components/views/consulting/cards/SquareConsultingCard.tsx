@@ -2,6 +2,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
 import { useUserIsRegistered } from "components/custom-hook/live-stream/useUserIsRegistered"
+import useGroupsByIds from "components/custom-hook/useGroupsByIds"
 import { sxStyles } from "types/commonTypes"
 import {
    ConsultingCardBase,
@@ -75,14 +76,9 @@ export const SquareConsultingCard = ({
    onCardClick,
 }: SquareConsultingCardProps) => {
    const { isRegistered } = useUserIsRegistered(event.id)
-   const consultingCompanies = event.groupIds || []
+   const { data: groups } = useGroupsByIds(event.groupIds)
 
-   const companyLogoUrls = consultingCompanies
-      .map((groupId) => {
-         // This would need to be populated with actual company data
-         return "" // Placeholder - in real implementation, fetch company logos
-      })
-      .filter(Boolean)
+   const companyLogoUrls = groups?.map((group) => group.logoUrl).filter(Boolean) || []
 
    return (
       <ConsultingCardBase
