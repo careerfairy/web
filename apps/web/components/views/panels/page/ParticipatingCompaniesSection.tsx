@@ -75,11 +75,20 @@ const styles = sxStyles({
 
 interface ParticipatingCompaniesSectionProps {
    companies: Group[]
+   variant?: "panels" | "consulting"
 }
 
 export default function ParticipatingCompaniesSection({
    companies,
+   variant = "panels",
 }: ParticipatingCompaniesSectionProps) {
+   // For consulting variant, limit to 4 companies and use 2x2 grid
+   const displayedCompanies =
+      variant === "consulting" ? companies.slice(0, 4) : companies
+   const gridItemProps =
+      variant === "consulting"
+         ? { xs: 6, sm: 6 } // 2x2 grid for consulting
+         : { xs: 6, sm: 4 } // 2x3 grid for panels
    return (
       <Stack sx={styles.section}>
          <Stack sx={styles.sectionTitleWrapper} spacing={1.5}>
@@ -122,12 +131,11 @@ export default function ParticipatingCompaniesSection({
                spacing={1}
                sx={{ position: "relative", zIndex: 1 }}
             >
-               {companies.map((company) => (
+               {displayedCompanies.map((company) => (
                   <Grid
                      key={company.id}
                      item
-                     xs={6}
-                     sm={4}
+                     {...gridItemProps}
                      sx={{
                         display: "flex",
                         justifyContent: "center",
