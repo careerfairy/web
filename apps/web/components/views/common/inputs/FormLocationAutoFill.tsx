@@ -23,7 +23,7 @@ const AddressAutofill = dynamic(
    }
 )
 
-const DEFAULT_OPTIONS = {
+const DEFAULT_OPTIONS: Partial<AddressAutofillOptions> = {
    country: "ch",
    // Using streets as true, would show us street results (not full addresses) and these when selected
    // seem to not fire AddressAutofill.onRetrieve events, so for streets we cannot get any data of the
