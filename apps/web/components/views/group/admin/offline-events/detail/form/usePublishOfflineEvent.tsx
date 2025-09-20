@@ -1,6 +1,7 @@
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { offlineEventService } from "data/firebase/OfflineEventService"
+import { useRouter } from "next/router"
 import { useSnackbar } from "notistack"
 import { useCallback, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
@@ -9,6 +10,7 @@ import { buildDraftOfflineEventObject } from "./OfflineEventFormikProvider"
 import { useOfflineEventFormValues } from "./useOfflineEventFormValues"
 
 export const usePublishOfflineEvent = () => {
+   const router = useRouter()
    const firebaseService = useFirebaseService()
    const { values, isValid } = useOfflineEventFormValues()
    const { offlineEvent, group, author } = useOfflineEventCreationContext()
@@ -56,14 +58,20 @@ export const usePublishOfflineEvent = () => {
          }
 
          // Update the offline event in Firebase
-         await offlineEventService.updateOfflineEvent(publishData, author)
+         await offlineEventService
+            .updateOfflineEvent(publishData, author)
+            .then(() => {
+               enqueueSnackbar("Offline event published successfully!", {
+                  variant: "success",
+               })
+               router.push(`/group/${group.id}/admin/content/offline-events`)
+            })
 
-         enqueueSnackbar("Offline event published successfully!", {
-            variant: "success",
-         })
+         // enqueueSnackbar("Offline event published successfully!", {
+         //    variant: "success",
+         // })
 
-         // TODO: Add navigation or other post-publish actions here
-         // For example, redirect to the events list or refresh the page
+         // router.push(`/group/${group.id}/admin/content/offline-events`)
       } catch (error) {
          errorLogAndNotify(error, {
             message: "Failed to publish offline event",
@@ -84,6 +92,7 @@ export const usePublishOfflineEvent = () => {
       group,
       author,
       firebaseService,
+      router,
    ])
 
    return { isPublishing, publishOfflineEvent }
