@@ -152,21 +152,18 @@ const TargetTalent: FC = () => {
                            value={values.targetedUniversities}
                            disableCloseOnSelect
                            multiple
+                           placeholder="haiii"
                            disabled={values.targetedCountries.length === 0}
                            limit={maxUniversities}
                            onChange={(_, selected) => {
                               setFieldValue("targetedUniversities", selected)
                            }}
-                           textFieldProps={{
-                              ...getTextFieldProps(
-                                 targetUniversityLabel,
-                                 "targetedUniversities",
-                                 touched,
-                                 errors
-                              ),
-                              placeholder:
-                                 "Please first select your target countries",
-                           }}
+                           textFieldProps={getTextFieldProps(
+                              targetUniversityLabel,
+                              "targetedUniversities",
+                              touched,
+                              errors
+                           )}
                         />
                      )}
 
