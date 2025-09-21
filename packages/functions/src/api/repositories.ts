@@ -45,6 +45,10 @@ import {
    CustomJobFunctionsRepository,
    ICustomJobFunctionsRepository,
 } from "../lib/CustomJobFunctionsRepository"
+import {
+   IOfflineEventFunctionsRepository,
+   OfflineEventFunctionsRepository,
+} from "../lib/OfflineEventFunctionsRepository"
 import { groupEventsHandler } from "../lib/bigQuery/group/GroupBigQueryServices"
 import {
    sparkEventsHandler,
@@ -145,3 +149,6 @@ export const customJobRepo: ICustomJobFunctionsRepository =
 
 export const emailNotificationsRepo: IEmailNotificationRepository =
    new EmailNotificationFunctionsRepository(firestore as any)
+
+export const offlineEventRepo: IOfflineEventFunctionsRepository =
+   new OfflineEventFunctionsRepository(firestore as any, FieldValue)

@@ -1,3 +1,4 @@
+import { pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import { AuthorInfo } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { useAuth } from "HOCs/AuthProvider"
@@ -72,8 +73,8 @@ export const useOfflineEventRouting = (): Result => {
       }
 
       // TODO: In next stack there will be dedicated functions in the form provider for building the draft offline event
-      const draftOfflineEvent: OfflineEvent = {
-         id: null,
+      const draftOfflineEvent: Partial<OfflineEvent> = {
+         group: pickPublicDataFromGroup(group),
          title: initialValues.title,
          description: initialValues.description,
          targetAudience: initialValues.targetAudience,

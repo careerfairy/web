@@ -1,11 +1,15 @@
 import firebase from "firebase/compat/app"
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
+import { Create } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
 import { AuthorInfo } from "../livestreams"
 import { OfflineEvent } from "./offline-events"
 
 export interface IOfflineEventRepository {
-   createOfflineEvent(event: OfflineEvent, author: AuthorInfo): Promise<void>
+   createOfflineEvent(
+      event: Create<OfflineEvent>,
+      author: AuthorInfo
+   ): Promise<void>
 
    updateOfflineEvent(
       event: Partial<OfflineEvent>,
@@ -28,7 +32,7 @@ export class FirebaseOfflineEventRepository
       super()
    }
 
-   async createOfflineEvent(event: OfflineEvent, author: AuthorInfo) {
+   async createOfflineEvent(event: Create<OfflineEvent>, author: AuthorInfo) {
       const ref = this.firestore.collection(this.COLLECTION_NAME).doc()
       const now = this.fieldValue.serverTimestamp() as Timestamp
 
