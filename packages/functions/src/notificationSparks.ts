@@ -114,11 +114,6 @@ export const createUserSparksFeedEventNotifications = onCall<{
    async (request) => {
       const { userId } = request.data as { userId: string }
 
-      console.log(
-         "🚀 ~ createUserSparksFeedEventNotifications -> Request data:",
-         request.data
-      )
-
       try {
          return handleCreateUsersSparksNotifications(
             firestore,
