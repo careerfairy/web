@@ -3,11 +3,11 @@ import { AuthorInfo } from "@careerfairy/shared-lib/livestreams"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import {
    Timestamp,
-   addDoc,
    collection,
    deleteDoc,
    doc,
    increment,
+   setDoc,
    updateDoc,
 } from "firebase/firestore"
 import { FirestoreInstance } from "./FirebaseInstance"
@@ -25,23 +25,23 @@ export class OfflineEventService {
       offlineEvent: Partial<OfflineEvent>,
       author: AuthorInfo
    ) {
-      const collectionRef = collection(
-         FirestoreInstance,
-         "offlineEvents"
+      const newDocRef = doc(
+         collection(FirestoreInstance, "offlineEvents")
       ).withConverter(createGenericConverter<OfflineEvent>())
 
       const now = Timestamp.now()
 
-      const eventData: Omit<OfflineEvent, "id"> = {
+      const eventData: Partial<OfflineEvent> = {
          ...offlineEvent,
+         id: newDocRef.id,
          author,
          createdAt: now,
          updatedAt: now,
          lastUpdatedBy: author,
-      } as Omit<OfflineEvent, "id">
+      }
 
-      const docRef = await addDoc(collectionRef, eventData)
-      return docRef.id
+      await setDoc(newDocRef, eventData)
+      return newDocRef.id
    }
 
    /**
