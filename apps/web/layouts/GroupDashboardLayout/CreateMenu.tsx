@@ -80,7 +80,6 @@ export const CreateMenu = ({
                }
 
                await createDraftOfflineEvent()
-               push(`/group/${groupId}/admin/content/offline-events`)
                handleClose()
             },
          })
