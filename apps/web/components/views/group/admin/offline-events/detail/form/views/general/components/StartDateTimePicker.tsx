@@ -144,7 +144,6 @@ const StartDateTimePicker = ({
                },
                popper: {
                   anchorEl: anchorRef.current,
-                  placement: "bottom-start",
                   modifiers: [
                      {
                         name: "preventOverflow",
