@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app"
+import "firebase/compat/firestore"
 import { CreateWishFormValues, Wish, Rating, FlagReason } from "./wishes"
 
 export interface IWishRepository {

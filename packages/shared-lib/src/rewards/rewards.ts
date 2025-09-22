@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app"
+import "firebase/compat/firestore"
 import { Identifiable } from "../commonTypes"
 import { LivestreamEventPublicData } from "../livestreams"
 import { UserPublicData } from "../users"

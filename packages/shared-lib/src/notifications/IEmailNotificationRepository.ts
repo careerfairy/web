@@ -1,5 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore"
 import firebase from "firebase/compat/app"
+import "firebase/compat/firestore"
 import { DocumentData } from "firebase/firestore"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,
