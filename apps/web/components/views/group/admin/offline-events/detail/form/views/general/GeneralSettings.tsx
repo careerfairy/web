@@ -43,7 +43,7 @@ export const GeneralSettings = () => {
                cropperConfig={{
                   title: "Upload event banner image",
                   type: "rectangle",
-                  aspectRatio: 16 / 9,
+                  aspectRatio: 3 / 2,
                   cropBoxResizable: true,
                   key: "offline-event-banner-cropper",
                }}
