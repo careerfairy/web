@@ -86,6 +86,15 @@ const convertOfflineEventObjectToForm = ({
    }
 }
 
+export const convertFormValuesToOfflineEventObject = (
+   values: OfflineEventFormValues,
+   group: Group,
+   author: AuthorInfo,
+   firebase: FirebaseService
+): OfflineEvent => {
+   return buildDraftOfflineEventObject(values, group, author, firebase)
+}
+
 type Props = {
    offlineEvent: OfflineEvent
    group: Group
