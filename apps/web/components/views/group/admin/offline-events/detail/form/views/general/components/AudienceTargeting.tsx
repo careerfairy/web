@@ -9,8 +9,8 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import {
    useFieldsOfStudy,
    useLevelsOfStudy,
-   useUniversityCountries,
 } from "components/custom-hook/useCollection"
+import { useUniversitiesByCountry } from "components/custom-hook/useUniversitiesByCountry"
 import LazyMultiChipSelect from "components/views/common/inputs/LazyMultiChipSelect"
 import { useCallback, useMemo } from "react"
 import FormSectionHeader from "../../../../../../events/detail/form/FormSectionHeader"
@@ -52,15 +52,21 @@ const getUniversityOptions = (
    return universityOptions
 }
 
-const AudienceTargetingContent = () => {
+type Props = {
+   countryCode: string
+}
+
+const AudienceTargetingContent = ({ countryCode }: Props) => {
    const {
       values: { general },
    } = useOfflineEventFormValues()
+
    const {
       data: universitiesByCountry,
       isLoading: universitiesByCountryLoading,
       error: universitiesByCountryError,
-   } = useUniversityCountries()
+   } = useUniversitiesByCountry(countryCode)
+
    const {
       data: allFieldsOfStudy,
       isLoading: allFieldsOfStudyLoading,
@@ -130,9 +136,7 @@ const AudienceTargetingContent = () => {
             textFieldProps={{
                label: "By field of study",
                placeholder: "Select fields of study",
-               required: true,
             }}
-            selectAllFieldLabel="Any field of study"
          />
          <MultiChipSelect
             id="general.targetAudience.levelOfStudies"
@@ -143,14 +147,13 @@ const AudienceTargetingContent = () => {
             textFieldProps={{
                label: "By level of study",
                placeholder: "Select levels of study",
-               required: true,
             }}
          />
       </>
    )
 }
 
-const AudienceTargeting = () => {
+const AudienceTargeting = ({ countryCode }: Props) => {
    return (
       <SuspenseWithBoundary>
          <FormSectionHeader
@@ -158,7 +161,7 @@ const AudienceTargeting = () => {
             subtitle="Select the target audience for this event"
             divider
          />
-         <AudienceTargetingContent />
+         <AudienceTargetingContent countryCode={countryCode} />
       </SuspenseWithBoundary>
    )
 }

@@ -79,18 +79,9 @@ const offlineEventFormGeneralTabSchema = yup.object().shape({
       .required("Please select an address")
       .nullable(),
    targetAudience: yup.object().shape({
-      universities: yup
-         .array<UniversityOption>()
-         .required()
-         .min(1, "Please select at least one university"),
-      levelOfStudies: yup
-         .array<LevelOfStudy>()
-         .required()
-         .min(1, "Please select at least one level of study"),
-      fieldOfStudies: yup
-         .array<FieldOfStudy>()
-         .required()
-         .min(1, "Please select at least one field of study"),
+      universities: yup.array<UniversityOption>().optional(),
+      levelOfStudies: yup.array<LevelOfStudy>().optional(),
+      fieldOfStudies: yup.array<FieldOfStudy>().optional(),
    }),
    registrationUrl: yup
       .string()
