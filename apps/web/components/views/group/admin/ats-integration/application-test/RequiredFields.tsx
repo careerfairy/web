@@ -1,4 +1,4 @@
-import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 import RemoteUserList from "./RemoteUserList"
 import { ReactNode } from "react"
 

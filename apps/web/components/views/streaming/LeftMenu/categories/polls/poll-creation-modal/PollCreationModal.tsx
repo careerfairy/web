@@ -23,7 +23,7 @@ import { useFormik, getIn } from "formik"
 import * as yup from "yup"
 import Stack from "@mui/material/Stack"
 import { errorLogAndNotify } from "../../../../../../../util/CommonUtil"
-import { LivestreamPoll } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
 
 const validationSchema = yup.object({
    question: yup

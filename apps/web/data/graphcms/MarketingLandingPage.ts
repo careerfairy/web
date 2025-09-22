@@ -1,4 +1,4 @@
-import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
+import { BaseModel } from "@careerfairy/shared-lib/BaseModel"
 import {
    HygraphResponseCompanyLogosValue,
    HygraphResponseCompanyValues,
@@ -12,7 +12,7 @@ import {
    HygraphResponseTestimonialValue,
    HygraphResponseTextBlock,
 } from "../../types/cmsTypes"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
+import { FieldOfStudy } from "@careerfairy/shared-lib/marketing/MarketingUser"
 
 export class MarketingLandingPage extends BaseModel {
    constructor(

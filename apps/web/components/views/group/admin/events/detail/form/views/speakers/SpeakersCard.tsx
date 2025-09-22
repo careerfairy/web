@@ -1,5 +1,5 @@
 import { UpdateCreatorData } from "@careerfairy/shared-lib/groups/creators"
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { LinkedIn } from "@mui/icons-material"
 import { Box, Button, Divider, Link, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"

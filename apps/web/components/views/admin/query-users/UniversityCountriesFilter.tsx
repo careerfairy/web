@@ -1,8 +1,8 @@
 import React from "react"
 import { TextField } from "@mui/material"
 import VirtualizedAutocomplete from "../../common/VirtualizedAutocomplete"
-import { UniversityCountry } from "@careerfairy/shared-lib/dist/universities"
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { UniversityCountry } from "@careerfairy/shared-lib/universities"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 
 interface Props {
    universityCountries: UniversityCountry[]

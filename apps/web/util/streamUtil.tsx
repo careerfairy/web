@@ -1,7 +1,7 @@
 import {
    LivestreamEvent,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { getBaseUrl } from "../components/helperFunctions/HelperFunctions"
 import { DeviceOption } from "../types/streaming"

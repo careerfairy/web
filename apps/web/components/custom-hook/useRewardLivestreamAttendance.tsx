@@ -5,9 +5,9 @@ import {
    localStorageReferralCode,
 } from "../../constants/localStorageKeys"
 import * as Sentry from "@sentry/nextjs"
-import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/dist/rewards"
+import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/rewards"
 import { useAuth } from "../../HOCs/AuthProvider"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { rewardService } from "data/firebase/RewardService"
 
 const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {

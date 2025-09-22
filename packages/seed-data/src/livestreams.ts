@@ -1,14 +1,14 @@
-import { CreatorRoles } from "@careerfairy/shared-lib/dist/groups/creators"
+import { CreatorRoles } from "@careerfairy/shared-lib/groups/creators"
 import {
    EventRating,
    LivestreamEvent,
    LivestreamQuestion,
    Speaker,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { createLiveStreamStatsDoc } from "@careerfairy/shared-lib/dist/livestreams/stats"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { livestreamTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
+} from "@careerfairy/shared-lib/livestreams"
+import { createLiveStreamStatsDoc } from "@careerfairy/shared-lib/livestreams/stats"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { faker } from "@faker-js/faker"
 import * as admin from "firebase-admin"
 import { v4 as uuidv4 } from "uuid"

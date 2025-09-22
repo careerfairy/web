@@ -1,5 +1,5 @@
-import GroupSeed from "@careerfairy/seed-data/dist/groups"
-import UserSeed from "@careerfairy/seed-data/dist/users"
+import GroupSeed from "@careerfairy/seed-data/groups"
+import UserSeed from "@careerfairy/seed-data/users"
 import { expect } from "@playwright/test"
 import { groupAdminFixture as test } from "../../fixtures"
 import { AdminSignupPage } from "../../page-object-models/AdminSignupPage"

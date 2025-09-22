@@ -1,11 +1,11 @@
 import {
    clearAuthData,
    clearFirestoreData,
-} from "@careerfairy/seed-data/dist/emulators"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import { EngageBadgeLevel3 } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+} from "@careerfairy/seed-data/emulators"
+import UserSeed from "@careerfairy/seed-data/users"
+import { EngageBadgeLevel3 } from "@careerfairy/shared-lib/badges/EngageBadges"
+import { UserData } from "@careerfairy/shared-lib/users"
+import UserPresenter from "@careerfairy/shared-lib/users/UserPresenter"
 import { test as base, expect } from "@playwright/test"
 import { credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"

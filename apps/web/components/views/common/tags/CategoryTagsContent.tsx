@@ -2,7 +2,7 @@ import {
    TagValuesLookup,
    getGroupedTags,
 } from "@careerfairy/shared-lib/constants/tags"
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Stack } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 

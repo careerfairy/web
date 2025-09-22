@@ -4,7 +4,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import {
    convertGroupQuestionOptionsToSortedArray,
    GroupQuestion,
-} from "@careerfairy/shared-lib/dist/groups"
+} from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
    whiteBox: {

@@ -4,7 +4,7 @@ import EventsPreview, {
    EventsTypes,
 } from "../../views/portal/events-preview/EventsPreview"
 import React from "react"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
+import { FieldOfStudy } from "@careerfairy/shared-lib/marketing/MarketingUser"
 import useUpcomingStreamsByFieldOfStudy from "../../custom-hook/useUpcomingStreamsByFieldOfStudy"
 import { HygraphResponseEventsSection } from "../../../types/cmsTypes"
 

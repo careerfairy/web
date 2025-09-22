@@ -1,6 +1,6 @@
 import { doc } from "firebase/firestore"
 import { useFirestore, useFirestoreDocData } from "reactfire"
-import { UserATSDocument } from "@careerfairy/shared-lib/dist/users"
+import { UserATSDocument } from "@careerfairy/shared-lib/users"
 
 /**
  * Fetch ATS relations from the user

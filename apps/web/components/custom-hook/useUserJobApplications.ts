@@ -1,9 +1,9 @@
-import { Job, PUBLIC_JOB_STATUSES } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Job, PUBLIC_JOB_STATUSES } from "@careerfairy/shared-lib/ats/Job"
 import { useMemo } from "react"
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore, useFirestoreCollectionData } from "reactfire"
-import { UserJobApplicationDocument } from "@careerfairy/shared-lib/dist/users"
-import { JobStatus } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import { UserJobApplicationDocument } from "@careerfairy/shared-lib/users"
+import { JobStatus } from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
 
 type Result = {
    data: UserJobApplicationDocument[]

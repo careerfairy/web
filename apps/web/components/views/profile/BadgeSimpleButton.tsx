@@ -1,6 +1,6 @@
 import { Button, Tooltip, useMediaQuery } from "@mui/material"
 import React from "react"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
 import BadgeIcon from "../common/BadgeIcon"
 
 const styles = {

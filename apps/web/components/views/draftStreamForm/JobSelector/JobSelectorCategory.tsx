@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useEffect, useMemo } from "react"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
 import Section from "components/views/common/Section"
 import ATSFormSection from "./ATSFormSection"

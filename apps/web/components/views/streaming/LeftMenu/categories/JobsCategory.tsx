@@ -5,7 +5,7 @@ import {
 } from "materialUI/GlobalContainers"
 import WorkIcon from "@mui/icons-material/Work"
 import { memo } from "react"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import JobList from "./jobs/JobList"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import Box from "@mui/material/Box"

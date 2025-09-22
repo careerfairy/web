@@ -18,7 +18,7 @@ import {
    HygraphResponseButton,
    HygraphResponseMarketingSignup,
 } from "../../../types/cmsTypes"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
+import { FieldOfStudy } from "@careerfairy/shared-lib/marketing/MarketingUser"
 import { useRouter } from "next/router"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import CmsImage from "../image"

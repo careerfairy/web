@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
 import { useRouter } from "next/router"

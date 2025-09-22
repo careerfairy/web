@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { livestreamRepo } from "../../data/RepositoryInstances"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 
 /**
  *  To get events for the specific fields of study

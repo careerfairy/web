@@ -1,7 +1,7 @@
 import { SECONDS_TO_AUTO_PLAY_LIVESTREAM } from "@careerfairy/shared-lib/livestreams/constants"
 import { RecordingToken } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { useRecordingTokenSWR } from "components/custom-hook/recordings/useRecordingTokenSWR"
 import useIsMobile from "components/custom-hook/useIsMobile"

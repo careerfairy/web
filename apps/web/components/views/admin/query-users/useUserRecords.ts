@@ -3,7 +3,7 @@ import useSWR from "swr"
 import {
    BigQueryUserQueryOptions,
    BigQueryUserResponse,
-} from "@careerfairy/shared-lib/dist/bigQuery/types"
+} from "@careerfairy/shared-lib/bigQuery/types"
 import useFunctionsSWRFetcher, {
    reducedRemoteCallsOptions,
 } from "components/custom-hook/utils/useFunctionsSWRFetcher"

@@ -1,6 +1,5 @@
 import { Badge, BadgeProps, styled } from "@mui/material"
-
-import { shouldForwardProp } from "@careerfairy/shared-ui"
+import { shouldForwardProp } from "types/commonTypes"
 
 const positionTransforms: Record<string, string> = {
    topRight: "scale(1) translate(30%, -30%)",

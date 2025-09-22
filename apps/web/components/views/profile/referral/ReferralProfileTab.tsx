@@ -21,10 +21,10 @@ import {
    getTimeFromNow,
 } from "../../../helperFunctions/HelperFunctions"
 import * as Sentry from "@sentry/nextjs"
-import { getHumanStringDescriptionForAction } from "@careerfairy/shared-lib/dist/rewards"
+import { getHumanStringDescriptionForAction } from "@careerfairy/shared-lib/rewards"
 import BadgeSimpleButton from "../BadgeSimpleButton"
 import BadgeProgress from "./BadgeProgress"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/badges/NetworkBadges"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { useAuth } from "../../../../HOCs/AuthProvider"

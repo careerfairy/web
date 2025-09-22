@@ -1,5 +1,5 @@
 import { linkedInRegex } from "@careerfairy/shared-lib/constants/forms"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { TextField } from "@mui/material"
 import { useCallback } from "react"
 import { useDebounce } from "react-use"

@@ -1,4 +1,4 @@
-import { UserJobApplicationDocument } from "@careerfairy/shared-lib/dist/users"
+import { UserJobApplicationDocument } from "@careerfairy/shared-lib/users"
 import Card from "@mui/material/Card"
 import { CardContent, CardHeader, Divider, Typography } from "@mui/material"
 import React, { useMemo } from "react"

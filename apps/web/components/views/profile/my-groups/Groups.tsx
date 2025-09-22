@@ -23,9 +23,9 @@ import { groupRepo } from "../../../../data/RepositoryInstances"
 import Autocomplete from "@mui/material/Autocomplete"
 import match from "autosuggest-highlight/match"
 import parse from "autosuggest-highlight/parse"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { Group } from "@careerfairy/shared-lib/groups"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
-import { UserAdminGroup } from "@careerfairy/shared-lib/dist/users"
+import { UserAdminGroup } from "@careerfairy/shared-lib/users"
 import { Search as FindIcon } from "react-feather"
 
 const useStyles = makeStyles((theme) => ({

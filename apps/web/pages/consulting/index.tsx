@@ -182,7 +182,10 @@ export const getServerSideProps: GetServerSideProps<
          await Promise.all([
             livestreamRepo.getUpcomingEvents(50), // Get more events to filter from
             livestreamRepo.getUpcomingEvents(10),
-            livestreamRepo.getPastEventsFrom({ limit: 50 }), // Get past events for recordings carousel
+            livestreamRepo.getPastEventsFrom({ 
+            fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Past year
+            limit: 50 
+         }), // Get past events for recordings carousel
          ])
 
       // Filter for consulting industry livestreams (max 4)

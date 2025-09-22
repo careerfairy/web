@@ -2,7 +2,7 @@ import {
    FieldOfStudyCategories,
    FieldOfStudyCategory,
 } from "@careerfairy/shared-lib/fieldOfStudy"
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Box, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"

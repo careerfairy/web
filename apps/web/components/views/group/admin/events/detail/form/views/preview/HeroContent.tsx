@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Box, Container } from "@mui/material"
 import Image from "next/legacy/image"
 import { ReactNode } from "react"

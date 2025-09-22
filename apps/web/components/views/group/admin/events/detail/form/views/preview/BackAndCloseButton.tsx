@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import { Box, IconButton } from "@mui/material"
 

@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { GroupQuestion } from "@careerfairy/shared-lib/groups"
 import { colorsArray } from "../util/colors"
 import { useTheme } from "@mui/material/styles"
 import {
    getGeneralUserBreakdownStats,
    getUserBreakdownStatsBasedOnGroupQuestions,
    UserBreakdownStats,
-} from "@careerfairy/shared-lib/dist/groups/analytics"
+} from "@careerfairy/shared-lib/groups/analytics"
 
 interface ChartData {
    datasets: {

@@ -1,4 +1,4 @@
-import { shouldForwardProp } from "@careerfairy/shared-ui"
+import { shouldForwardProp } from "types/commonTypes"
 import { IconButton, styled } from "@mui/material"
 import { ComponentProps } from "react"
 

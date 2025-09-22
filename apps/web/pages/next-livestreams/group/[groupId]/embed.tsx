@@ -1,5 +1,5 @@
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEventSerialized } from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { LivestreamEventSerialized } from "@careerfairy/shared-lib/livestreams"
 import { useTheme } from "@mui/material/styles"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import HeadWithMeta from "components/page/HeadWithMeta"
