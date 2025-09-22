@@ -18,7 +18,6 @@ export interface OfflineEvent extends Identifiable {
    title: string
    description: string
    address: OfflineEventAddress
-   company: OfflineEventCompany
    industries: GroupOption[]
    targetAudience: OfflineEventTargetAudience
    status: OfflineEventStatus
@@ -35,11 +34,6 @@ export interface OfflineEventTargetAudience {
    universities: UniversityOption[]
    levelOfStudies: LevelOfStudy[]
    fieldOfStudies: FieldOfStudy[]
-}
-
-export interface OfflineEventCompany {
-   name: string
-   groupId: string
 }
 
 export interface OfflineEventAddress {
