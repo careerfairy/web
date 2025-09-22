@@ -1,3 +1,4 @@
+import { Box } from "@mui/material"
 import { renderMultiSectionDigitalClockTimeView } from "@mui/x-date-pickers"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -122,47 +123,52 @@ const StartDateTimePicker = ({
       : styles.datePickerDesktop
 
    return (
-      <DateTimePicker
-         name={fieldName}
-         label={label}
-         localeText={isMobile ? { toolbarTitle } : null}
-         disablePast
-         ampm={false}
-         openTo="day"
-         ref={anchorRef}
-         viewRenderers={{
-            // @ts-ignore
-            hours: renderMultiSectionDigitalClockTimeView,
-            // @ts-ignore
-            minutes: renderMultiSectionDigitalClockTimeView,
-         }}
-         format={"dd/MM/yyyy HH:mm"}
-         slotProps={{
-            layout: {
-               sx: layoutStyles,
-            },
-            popper: {
-               anchorEl: anchorRef.current,
-               placement: "bottom-start",
-               modifiers: [
-                  {
-                     name: "preventOverflow",
-                     enabled: true,
-                     options: {
-                        boundary: "viewport",
+      <Box ref={anchorRef}>
+         <DateTimePicker
+            name={fieldName}
+            label={label}
+            localeText={isMobile ? { toolbarTitle } : null}
+            disablePast
+            ampm={false}
+            openTo="day"
+            viewRenderers={{
+               // @ts-ignore
+               hours: renderMultiSectionDigitalClockTimeView,
+               // @ts-ignore
+               minutes: renderMultiSectionDigitalClockTimeView,
+            }}
+            format={"dd/MM/yyyy HH:mm"}
+            slotProps={{
+               layout: {
+                  sx: layoutStyles,
+               },
+               popper: {
+                  anchorEl: anchorRef.current,
+                  placement: "bottom-start",
+                  modifiers: [
+                     {
+                        name: "preventOverflow",
+                        enabled: true,
+                        options: {
+                           boundary: "viewport",
+                        },
                      },
-                  },
-               ],
-            },
-         }}
-         slots={{
-            textField: (params) => CustomInputField(params, { fieldName }),
-         }}
-         value={field.value}
-         onChange={async (newValue) => {
-            await helpers.setValue(newValue)
-         }}
-      />
+                  ],
+               },
+            }}
+            slots={{
+               textField: (params) =>
+                  CustomInputField(
+                     { ...params, ref: anchorRef },
+                     { fieldName }
+                  ),
+            }}
+            value={field.value}
+            onChange={async (newValue) => {
+               await helpers.setValue(newValue)
+            }}
+         />
+      </Box>
    )
 }
 
