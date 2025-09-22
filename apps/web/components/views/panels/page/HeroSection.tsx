@@ -216,11 +216,11 @@ export default function HeroSection({
             sx={styles.panelsGrid}
          >
             {consultingLivestreams ? (
-               // Display consulting livestreams in a 2x2 grid
+               // Display consulting livestreams in a 2x3 grid
                <Grid container spacing={2} sx={{ width: "100%" }}>
                   {consultingLivestreams.map(
                      (livestream: LivestreamEvent, index: number) => (
-                        <Grid key={livestream.id} item xs={12} sm={6}>
+                        <Grid key={livestream.id} item xs={12} sm={6} md={4}>
                            <EventPreviewCard
                               event={{ ...livestream, triGrams: {} }}
                               index={index}

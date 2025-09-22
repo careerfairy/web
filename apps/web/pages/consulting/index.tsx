@@ -188,12 +188,12 @@ export const getServerSideProps: GetServerSideProps<
          }), // Get past events for recordings carousel
          ])
 
-      // Filter for consulting industry livestreams (max 4)
+      // Filter for consulting industry livestreams (max 6)
       const consultingLivestreams = (allUpcomingEvents || [])
          .filter((livestream) =>
             livestream.companyIndustries?.includes("ManagementConsulting")
          )
-         .slice(0, 4) // Limit to 4 livestreams
+         .slice(0, 6) // Limit to 6 livestreams
 
       // Filter for past consulting industry livestream recordings (max 8)
       const pastConsultingLivestreams = (allPastEvents || [])
