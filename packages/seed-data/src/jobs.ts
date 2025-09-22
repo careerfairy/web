@@ -1,14 +1,14 @@
 import {
    FirebaseCustomJobRepository,
    ICustomJobRepository,
-} from "@careerfairy/shared-lib/customJobs/CustomJobRepository"
+} from "@careerfairy/shared-lib/dist/customJobs/CustomJobRepository"
 
 import {
    CustomJob,
    JobType,
    jobTypeOptions,
-} from "@careerfairy/shared-lib/customJobs/customJobs"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+} from "@careerfairy/shared-lib/dist/customJobs/customJobs"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import { faker } from "@faker-js/faker"
 import { randomInt } from "crypto"
 import * as admin from "firebase-admin"

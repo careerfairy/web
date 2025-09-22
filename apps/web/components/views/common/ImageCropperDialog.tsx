@@ -15,7 +15,7 @@ import {
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { dataURLtoFile } from "components/helperFunctions/HelperFunctions"
-import "cropperjs/cropper.css"
+import "cropperjs/dist/cropper.css"
 import { ReactNode, useCallback, useRef, useState } from "react"
 import Cropper, { ReactCropperElement, ReactCropperProps } from "react-cropper"
 import { Image as ImageIcon, X as XIcon } from "react-feather"
