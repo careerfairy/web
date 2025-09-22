@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app"
+import "firebase/compat/firestore"
 import { Identifiable } from "./commonTypes"
 import QuerySnapshot = firebase.firestore.QuerySnapshot
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot

@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app"
+import "firebase/compat/firestore"
 import uniqBy from "lodash/uniqBy"
 import { DateTime } from "luxon"
 import BaseFirebaseRepository, {
