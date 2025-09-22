@@ -2,7 +2,6 @@ import { Box, DialogContent, Stack, Typography } from "@mui/material"
 import React from "react"
 import { sxStyles } from "types/commonTypes"
 import { MicVolume } from "./MicVolume"
-import { NoiseSuppression } from "./NoiseSuppression"
 import { TempCameraSetup } from "./TempCameraSetup"
 import { VideoEffects } from "./VideoEffects"
 import { TempCameraSelect, TempMicrophoneSelect } from "./temp-device-select"
@@ -29,7 +28,7 @@ export const Body = () => {
                <Box pb={1.5} />
                <MicVolume />
                <Box pb={1.5} />
-               <NoiseSuppression />
+               {/* <NoiseSuppression /> */}
             </Box>
             <Box>
                <MenuHeading>Video settings</MenuHeading>
