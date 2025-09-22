@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { expect, Locator, Page } from "@playwright/test"
 import { sleep } from "../utils"
 

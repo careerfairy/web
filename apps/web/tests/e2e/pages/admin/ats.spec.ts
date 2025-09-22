@@ -1,11 +1,11 @@
 /* eslint-disable no-empty-pattern */
 import GroupSeed from "@careerfairy/seed-data/groups"
 import LivestreamSeed from "@careerfairy/seed-data/livestreams"
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import {
    LivestreamEvent,
    LivestreamJobAssociation,
-} from "@careerfairy/shared-lib/livestreams"
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { expect } from "@playwright/test"
 import { groupAdminFixture as test } from "../../fixtures"
 import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"

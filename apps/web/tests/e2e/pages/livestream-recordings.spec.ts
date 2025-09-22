@@ -4,8 +4,8 @@ import {
    clearAuthData,
    clearFirestoreData,
 } from "@careerfairy/seed-data/emulators"
-import { MAX_DAYS_TO_SHOW_RECORDING } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { MAX_DAYS_TO_SHOW_RECORDING } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { expect } from "@playwright/test"
 import { credentials } from "../../constants"
 import { signedInFixture as test } from "../fixtures"

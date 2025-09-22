@@ -7,9 +7,9 @@ import LivestreamSeed, {
    createLivestreamGroupQuestions,
 } from "@careerfairy/seed-data/livestreams"
 import UserSeed from "@careerfairy/seed-data/users"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { test as base, expect } from "@playwright/test"
 import { credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"
