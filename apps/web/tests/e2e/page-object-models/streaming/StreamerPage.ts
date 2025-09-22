@@ -1,7 +1,7 @@
 import {
    CreateLivestreamPollRequest,
    Speaker,
-} from "@careerfairy/shared-lib/livestreams"
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { expect } from "@playwright/test"
 import { getFormattedName } from "components/views/streaming-page/util"
 import { pdfSamplePath, streaming } from "tests/constants"
