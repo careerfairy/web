@@ -27,7 +27,7 @@
          "type": "string"
       },
       {
-         "name": "created",
+         "name": "startedAt",
          "type": "timestamp"
       },
       {
