@@ -8,8 +8,8 @@ import {
    SavedRecruiter,
    UserData,
    UserDataAnalytics,
-} from "@careerfairy/shared-lib/users"
-import { chunkArray } from "@careerfairy/shared-lib/utils"
+} from "@careerfairy/shared-lib/dist/users"
+import { chunkArray } from "@careerfairy/shared-lib/dist/utils"
 import { faker } from "@faker-js/faker"
 import { capitalizeFirstLetter, getRandomInt } from "./utils/utils"
 

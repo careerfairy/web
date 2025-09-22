@@ -3,14 +3,14 @@ import {
    GROUP_DASHBOARD_ROLE,
    type GroupATSAccountDocument,
    type GroupATSIntegrationTokensDocument,
-} from "@careerfairy/shared-lib/groups"
-import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+} from "@careerfairy/shared-lib/dist/groups"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 import {
    FirebaseGroupRepository,
    IGroupRepository,
-} from "@careerfairy/shared-lib/groups/GroupRepository"
-import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/livestreams"
-import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/users"
+} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
+import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/dist/users"
 import { faker } from "@faker-js/faker"
 import { auth, fieldValue, firestore } from "./lib/firebase"
 import {

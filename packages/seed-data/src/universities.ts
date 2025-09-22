@@ -1,5 +1,5 @@
 import { firestore } from "./lib/firebase"
-import { universityCountriesArray } from "@careerfairy/shared-lib/universities"
+import { universityCountriesArray } from "@careerfairy/shared-lib/dist/universities"
 import { v4 as uuidv4 } from "uuid"
 
 interface UniversitiesSeed {
