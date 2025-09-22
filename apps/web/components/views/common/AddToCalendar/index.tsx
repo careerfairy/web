@@ -2,6 +2,8 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    createCalendarEvent,
    getLivestreamICSDownloadUrl,
+   getLivestreamsICSDownloadUrl,
+   makeMultipleEventsUrls,
    makeUrls,
 } from "@careerfairy/shared-lib/utils/utils"
 import { Avatar } from "@mui/material"
@@ -69,7 +71,15 @@ const CalendarLink = memo(function CalendarLink({
 
 type Props = {
    children: (handler: (event: SyntheticEvent) => void) => ReactNode
-   event: LivestreamEvent
+   /**
+    * Single event (legacy prop). If provided together with `events`, `events` takes precedence.
+    */
+   event?: LivestreamEvent
+   /**
+    * Optional array of events. When provided with more than one event, selecting Apple/Outlook
+    * will trigger downloads for all events' ICS files.
+    */
+   events?: LivestreamEvent[]
    filename: string
    /**
     *
@@ -81,26 +91,38 @@ type Props = {
 export const AddToCalendar = memo(function AddToCalendar({
    children,
    event,
+   events,
    filename = "download",
    onCalendarClick,
 }: Props) {
    const [anchorEl, setAnchorEl] = useState(null)
 
+   const allEvents = useMemo(() => {
+      if (events?.length > 0) return events
+      return event ? [event] : []
+   }, [event, events])
+
+   const isMultiple = allEvents.length > 1
+
    const urls = useMemo(() => {
       const overrideBaseUrl = getBaseUrl()
       try {
-         return makeUrls(
+         const calendarEvents = allEvents.map((ev) =>
             createCalendarEvent(
-               event,
+               ev,
                {
                   medium: "add-to-calendar-register-confirmation",
                },
                {
                   overrideBaseUrl,
                }
-            ),
-            errorLogAndNotify
+            )
          )
+         if (isMultiple) {
+            return makeMultipleEventsUrls(calendarEvents, errorLogAndNotify)
+         } else {
+            return makeUrls(calendarEvents[0], errorLogAndNotify)
+         }
       } catch (error) {
          return {
             google: "#",
@@ -109,14 +131,18 @@ export const AddToCalendar = memo(function AddToCalendar({
             ics: "#",
          }
       }
-   }, [event])
+   }, [allEvents, isMultiple])
 
    const handleClick = useCallback(
       (e: SyntheticEvent) => {
-         dataLayerLivestreamEvent(AnalyticsEvents.EventAddToCalendar, event)
+         if (allEvents.length === 0) return
+         // fire analytics for each event
+         allEvents.forEach((ev) =>
+            dataLayerLivestreamEvent(AnalyticsEvents.EventAddToCalendar, ev)
+         )
          setAnchorEl(e.currentTarget)
       },
-      [event]
+      [allEvents]
    )
 
    const handleClose = useCallback((e?: SyntheticEvent) => {
@@ -133,12 +159,81 @@ export const AddToCalendar = memo(function AddToCalendar({
       [onCalendarClick, handleClose]
    )
 
-   const handleMobileClick = useCallback(() => {
-      window.open(getLivestreamICSDownloadUrl(event.id, shouldUseEmulators()))
-   }, [event.id])
+   const openMultipleTabs = useCallback((urls: string[]) => {
+      urls.forEach((url, index) => {
+         setTimeout(() => {
+            window.open(url, "_blank", "noopener,noreferrer")
+         }, index * 300) // 300ms delay between each tab to try to prevent blocking by browser
+      })
+   }, [])
 
-   const options: MenuOption[] = useMemo(
-      () => [
+   const handleMobileClick = useCallback(() => {
+      if (allEvents.length === 0) return
+      if (isMultiple) {
+         const ids = allEvents.map((ev) => ev.id)
+         window.open(getLivestreamsICSDownloadUrl(ids, shouldUseEmulators()))
+      } else {
+         window.open(
+            getLivestreamICSDownloadUrl(allEvents[0].id, shouldUseEmulators())
+         )
+      }
+   }, [allEvents, isMultiple])
+
+   const options: MenuOption[] = useMemo(() => {
+      if (isMultiple) {
+         return [
+            {
+               label: "Apple Calendar",
+               icon: <Avatar sx={styles.avatar} src={appleIcon} />,
+               handleClick: handleItemClick,
+               wrapperComponent: (props) => (
+                  <CalendarLink
+                     href={urls.ics}
+                     download={filename}
+                     {...props}
+                  />
+               ),
+            },
+            {
+               label: "Google",
+               icon: <Avatar sx={styles.avatar} src={googleIcon} />,
+               handleClick: () => {
+                  openMultipleTabs(urls.google as string[])
+                  handleItemClick()
+               },
+            },
+            {
+               label: "Outlook",
+               icon: <Avatar sx={styles.avatar} src={outlookYellowIcon} />,
+               handleClick: handleItemClick,
+               wrapperComponent: (props) => (
+                  <CalendarLink
+                     href={urls.ics}
+                     download={filename}
+                     {...props}
+                  />
+               ),
+            },
+            {
+               label: "Outlook Web App",
+               icon: <Avatar sx={styles.avatar} src={outlookBlueIcon} />,
+               handleClick: () => {
+                  openMultipleTabs(urls.outlook as string[])
+                  handleItemClick()
+               },
+            },
+            {
+               label: "Yahoo",
+               icon: <Avatar sx={styles.avatar} src={yahooIcon} />,
+               handleClick: () => {
+                  openMultipleTabs(urls.yahoo as string[])
+                  handleItemClick()
+               },
+            },
+         ]
+      }
+
+      return [
          {
             label: "Apple Calendar",
             icon: <Avatar sx={styles.avatar} src={appleIcon} />,
@@ -152,7 +247,7 @@ export const AddToCalendar = memo(function AddToCalendar({
             icon: <Avatar sx={styles.avatar} src={googleIcon} />,
             handleClick: handleItemClick,
             wrapperComponent: (props) => (
-               <CalendarLink href={urls.google} {...props} />
+               <CalendarLink href={urls.google as string} {...props} />
             ),
          },
          {
@@ -168,7 +263,7 @@ export const AddToCalendar = memo(function AddToCalendar({
             icon: <Avatar sx={styles.avatar} src={outlookBlueIcon} />,
             handleClick: handleItemClick,
             wrapperComponent: (props) => (
-               <CalendarLink href={urls.outlook} {...props} />
+               <CalendarLink href={urls.outlook as string} {...props} />
             ),
          },
          {
@@ -176,12 +271,11 @@ export const AddToCalendar = memo(function AddToCalendar({
             icon: <Avatar sx={styles.avatar} src={yahooIcon} />,
             handleClick: handleItemClick,
             wrapperComponent: (props) => (
-               <CalendarLink href={urls.yahoo} {...props} />
+               <CalendarLink href={urls.yahoo as string} {...props} />
             ),
          },
-      ],
-      [urls, filename, handleItemClick]
-   )
+      ]
+   }, [isMultiple, urls, filename, handleItemClick, openMultipleTabs])
 
    if (MobileUtils.webViewPresence()) {
       return <>{children(handleMobileClick)}</>

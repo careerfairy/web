@@ -440,6 +440,9 @@ const Content: FC<ContentProps> = ({
 
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
+                  // Trigger success animation even when questions are disabled
+                  setIsRecommendationsListVisible(false)
+                  setShowingSuccessAnimation(true)
                   view = "recommendations"
                }
                setActiveViewIndex(views.findIndex((v) => v.key === view))
@@ -452,6 +455,8 @@ const Content: FC<ContentProps> = ({
          setActiveViewIndex,
          isPageMode,
          livestream?.questionsDisabled,
+         setIsRecommendationsListVisible,
+         setShowingSuccessAnimation,
          push,
          router,
          livestreamId,

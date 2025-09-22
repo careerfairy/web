@@ -13,7 +13,7 @@ import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
 import { customJobRepo } from "data/RepositoryInstances"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { useRouter } from "next/router"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { trackLevelsLivestreamRegistrationCompleted } from "store/reducers/talentGuideReducer"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { useAuth } from "../../../HOCs/AuthProvider"
@@ -46,6 +46,7 @@ export default function useRegistrationHandler() {
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
    const isInTalentGuidePage = useIsInTalentGuide()
+   const { registrationState, registrationDispatch } = useLiveStreamDialog()
    const dispatch = useAppDispatch()
    const firebase = useFirebaseService()
    const {
@@ -56,6 +57,34 @@ export default function useRegistrationHandler() {
 
    const refetchRegisteredStreams = useRefetchRegisteredStreams()
    const isAlreadyRegistered = useUserIsRegistered(livestream.id)
+
+   const selectedLivestreams = useMemo(
+      () => registrationState.selectedLivestreams ?? [],
+      [registrationState.selectedLivestreams]
+   )
+
+   const isLivestreamSelected = useCallback(
+      (id: string) => selectedLivestreams.some((ls) => ls.id === id),
+      [selectedLivestreams]
+   )
+
+   const toggleLivestreamSelection = useCallback(
+      (event: LivestreamEvent) =>
+         registrationDispatch({
+            type: "toggle-selected-livestream",
+            payload: event,
+         }),
+      [registrationDispatch]
+   )
+
+   const setLivestreamSelections = useCallback(
+      (events: LivestreamEvent[]) =>
+         registrationDispatch({
+            type: "set-selected-livestreams",
+            payload: events,
+         }),
+      [registrationDispatch]
+   )
 
    /**
     * Initiate the registration process
@@ -213,112 +242,142 @@ export default function useRegistrationHandler() {
       async (
          userData,
          authenticatedUser,
-         livestream: LivestreamEvent,
+         currentLivestream: LivestreamEvent,
          groupsWithPolicies: GroupWithPolicy[],
          userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
       ) => {
          try {
-            const hasAlreadyRegistered =
-               await livestreamService.checkCategoryData(firebase, {
-                  livestream,
-                  userData,
-               })
+            const targetIds = selectedLivestreams?.length
+               ? selectedLivestreams.map((e) => e.id)
+               : [currentLivestream.id]
 
-            if (!hasAlreadyRegistered) {
-               await registerToLivestream(
-                  livestream.id,
-                  userData,
-                  groupsWithPolicies,
-                  userAnsweredLivestreamGroupQuestions,
-                  {
-                     isRecommended,
-                     ...(currentSparkId && { sparkId: currentSparkId }),
-                     originSource,
-                  }
-               )
+            // Avoid writing the same company's policy multiple times across the batch
+            const writtenPolicyGroupIds = new Set<string>()
 
-               // Do not await this call, it is not critical for the user experience
-               sendRegistrationConfirmationEmail(
-                  authenticatedUser,
-                  userData,
-                  livestream
-               ).catch((e) => {
-                  errorLogAndNotify(e, {
-                     message: "Failed to send confirmation email",
-                     user: authenticatedUser,
-                     livestream,
+            for (const id of targetIds) {
+               const targetLivestream =
+                  id === currentLivestream.id
+                     ? currentLivestream
+                     : await livestreamService.getById(id)
+
+               const hasAlreadyRegistered =
+                  await livestreamService.checkCategoryData(firebase, {
+                     livestream: targetLivestream,
+                     userData,
                   })
-               })
 
-               // Increase livestream popularity
-               recommendationServiceInstance.registerEvent(livestream, userData)
-
-               try {
-                  let formattedJobs: JobData[] = []
-
-                  if (livestream.hasJobs) {
-                     const livestreamJobs =
-                        await customJobRepo.getCustomJobsByLivestreamId(
-                           livestream.id
-                        )
-
-                     formattedJobs = prepareEmailJobs(
-                        livestream,
-                        getBaseUrl(),
-                        livestreamJobs,
-                        "eventRegistration"
+               if (!hasAlreadyRegistered) {
+                  // Only include policy groups relevant to this event and not yet written
+                  const policyGroupsForEvent = (groupsWithPolicies || [])
+                     .filter((g) =>
+                        (targetLivestream?.groupIds || []).includes(g.id)
                      )
-                  }
+                     .filter((g) => !writtenPolicyGroupIds.has(g.id))
 
-                  dataLayerLivestreamEvent(
-                     AnalyticsEvents.EventRegistrationComplete,
-                     livestream,
+                  await registerToLivestream(
+                     id,
+                     userData,
+                     policyGroupsForEvent,
+                     userAnsweredLivestreamGroupQuestions,
                      {
-                        // Sending jobs here instead of inside the dataLayerLivestreamEvent
-                        // as this requires additional data fetching
-                        jobs: formattedJobs,
+                        isRecommended,
+                        ...(currentSparkId && { sparkId: currentSparkId }),
+                        originSource,
                      }
                   )
-               } catch (error) {
-                  errorLogAndNotify(error, {
-                     message: "Failed to send registration complete event",
-                     user: authenticatedUser,
-                     livestream,
-                  })
-               }
 
-               if (isInTalentGuidePage) {
-                  dispatch(
-                     trackLevelsLivestreamRegistrationCompleted({
-                        livestreamId: livestream.id,
-                        livestreamTitle: livestream.title,
-                     })
+                  // Mark policies as written to prevent duplicates across events
+                  policyGroupsForEvent.forEach((g) =>
+                     writtenPolicyGroupIds.add(g.id)
                   )
-               }
-            }
 
-            // after registration, remove from this user's sparks notification the existing notification related to this event
-            // Not critical for user experience, so we don't await this
-            sparkService
-               .removeAndSyncUserSparkNotification({
-                  userId: userData.userEmail,
-                  groupId:
-                     livestream.groupIds?.[0] || livestream.author?.groupId,
-               })
-               .catch((e) => {
-                  errorLogAndNotify(e, {
-                     message: "Failed to remove spark notification",
-                     user: authenticatedUser,
-                     livestream,
+                  // Do not await this call, it is not critical for the user experience
+                  sendRegistrationConfirmationEmail(
+                     authenticatedUser,
+                     userData,
+                     targetLivestream
+                  ).catch((e) => {
+                     errorLogAndNotify(e, {
+                        message: "Failed to send confirmation email",
+                        user: authenticatedUser,
+                        livestream: targetLivestream,
+                     })
                   })
-               })
+
+                  // Increase livestream popularity
+                  recommendationServiceInstance.registerEvent(
+                     targetLivestream,
+                     userData
+                  )
+
+                  try {
+                     let formattedJobs: JobData[] = []
+
+                     if (targetLivestream.hasJobs) {
+                        const livestreamJobs =
+                           await customJobRepo.getCustomJobsByLivestreamId(id)
+
+                        formattedJobs = prepareEmailJobs(
+                           targetLivestream,
+                           getBaseUrl(),
+                           livestreamJobs,
+                           "eventRegistration"
+                        )
+                     }
+
+                     dataLayerLivestreamEvent(
+                        AnalyticsEvents.EventRegistrationComplete,
+                        targetLivestream,
+                        {
+                           // Sending jobs here instead of inside the dataLayerLivestreamEvent
+                           // as this requires additional data fetching
+                           jobs: formattedJobs,
+                        }
+                     )
+                  } catch (error) {
+                     errorLogAndNotify(error, {
+                        message: "Failed to send registration complete event",
+                        user: authenticatedUser,
+                        livestream: targetLivestream,
+                     })
+                  }
+
+                  if (isInTalentGuidePage) {
+                     dispatch(
+                        trackLevelsLivestreamRegistrationCompleted({
+                           livestreamId: id,
+                           livestreamTitle: targetLivestream.title,
+                        })
+                     )
+                  }
+               }
+
+               // after registration, remove from this user's sparks notification the existing notification related to this event
+               // Not critical for user experience, so we don't await this
+               sparkService
+                  .removeAndSyncUserSparkNotification({
+                     userId: userData.userEmail,
+                     groupId:
+                        targetLivestream.groupIds?.[0] ||
+                        targetLivestream.author?.groupId,
+                  })
+                  .catch((e) => {
+                     errorLogAndNotify(e, {
+                        message: "Failed to remove spark notification",
+                        user: authenticatedUser,
+                        livestream: selectedLivestreams?.length
+                           ? selectedLivestreams.map((e) => e.id)
+                           : [currentLivestream?.id],
+                     })
+                  })
+            }
 
             refetchRegisteredStreams()
          } catch (e) {
             errorLogAndNotify(e, {
                message: "Error registering to livestream",
                user: authenticatedUser,
-               livestream,
+               livestreams: selectedLivestreams.map((e) => e.id),
             })
          }
       },
@@ -329,6 +388,7 @@ export default function useRegistrationHandler() {
          registerToLivestream,
          refetchRegisteredStreams,
          sendRegistrationConfirmationEmail,
+         selectedLivestreams,
       ]
    )
 
@@ -337,5 +397,10 @@ export default function useRegistrationHandler() {
       registrationStatus,
       redirectToLogin,
       completeRegistrationProcess,
+      // Livestream selection API
+      selectedLivestreams,
+      isLivestreamSelected,
+      toggleLivestreamSelection,
+      setLivestreamSelections,
    }
 }

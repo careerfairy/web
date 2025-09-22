@@ -83,6 +83,59 @@ export const getLivestreamICalendarEvent = onRequest(async (req, res) => {
    }
 })
 
+export const getLivestreamsICalendarEvents = onRequest(async (req, res) => {
+   setCORSHeaders(req, res)
+   const multipleLivestreamIdsParam =
+      (req.query.eventIds as string) || undefined
+   const campaign = req.query.utm_campaign as string
+
+   try {
+      if (!multipleLivestreamIdsParam) {
+         res.status(400).send("Missing eventIds parameter")
+         return
+      }
+
+      const ids = multipleLivestreamIdsParam
+         .split(",")
+         .map((id) => id.trim())
+         .filter(Boolean)
+
+      if (ids.length === 0) {
+         res.status(400).send("Missing eventIds parameter")
+         return
+      }
+
+      const refs = ids.map((id) => firestore.collection("livestreams").doc(id))
+      const snapshots = await firestore.getAll(...refs)
+
+      const existingLivestreams: LivestreamEvent[] = snapshots
+         .filter((snap) => snap.exists)
+         .map((snap) => snap.data() as LivestreamEvent)
+
+      if (existingLivestreams.length === 0) {
+         res.status(404).send("Live streams not found")
+         return
+      }
+
+      const cal = ical()
+      existingLivestreams.forEach((livestream) => {
+         const props = generateCalendarEventProperties(
+            livestream,
+            campaign ? { campaign } : undefined
+         )
+         cal.createEvent(props)
+      })
+
+      cal.serve(res)
+   } catch (e) {
+      functions.logger.warn(
+         "An error has occurred creating the ICalendar events (multiple)",
+         e
+      )
+      res.sendStatus(500)
+   }
+})
+
 export const livestreamRegistrationConfirmationEmail = onCall(
    async (request) => {
       logger.info("🚀 ~ Livestream registration confirmation email: v7.0")

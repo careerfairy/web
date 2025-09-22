@@ -101,6 +101,7 @@ export const DesktopView = () => {
       setIsRecommendationsListVisible,
       isRecommendationsListVisible,
       closeDialog,
+      registrationState,
    } = useLiveStreamDialog()
 
    const { events, loading: loadingEvents } = useRecommendedEvents({
@@ -130,6 +131,9 @@ export const DesktopView = () => {
                   <GetNotifiedCard
                      isExpanded={!isRecommendationsListVisible}
                      livestream={livestream}
+                     registeredLivestreams={
+                        registrationState.selectedLivestreams
+                     }
                      animateLayout
                   />
                   {isRecommendationsListVisible ? null : (
