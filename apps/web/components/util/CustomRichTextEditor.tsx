@@ -1,7 +1,7 @@
 import { forwardRef, useMemo } from "react"
 import ReactQuill, { Quill, ReactQuillProps } from "react-quill"
-import "react-quill/dist/quill.bubble.css"
-import "react-quill/dist/quill.snow.css"
+import "react-quill/quill.bubble.css"
+import "react-quill/quill.snow.css"
 
 export type CustomRichTextEditorProps = ReactQuillProps & {
    name: string

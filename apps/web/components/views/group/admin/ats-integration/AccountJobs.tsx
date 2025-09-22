@@ -6,11 +6,11 @@ import MaterialTable, {
    Query,
    QueryResult,
 } from "@material-table/core"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
 import Box from "@mui/material/Box"
 import SanitizedHTML from "../../../../util/SanitizedHTML"
 import { Typography } from "@mui/material"
-import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
+import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/ats/Functions"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { useATSAccount } from "./ATSAccountContextProvider"

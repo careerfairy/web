@@ -2,7 +2,7 @@ import React, { memo } from "react"
 import AutoSizer from "react-virtualized-auto-sizer"
 import { FixedSizeList } from "react-window"
 import User from "./User"
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 
 interface Props {
    audience: UserLivestreamData[]

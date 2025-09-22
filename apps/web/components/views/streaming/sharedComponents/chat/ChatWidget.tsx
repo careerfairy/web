@@ -1,4 +1,4 @@
-import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import { Box, Button, Collapse, IconButton, TextField } from "@mui/material"
 import { grey } from "@mui/material/colors"

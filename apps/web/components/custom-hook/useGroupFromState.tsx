@@ -1,5 +1,5 @@
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo } from "react"
 

@@ -1,4 +1,4 @@
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 
 export const formatToOptionArray = (
    selectedIds: string[],

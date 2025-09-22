@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { useMemo } from "react"
 import { Event } from "schema-dts"

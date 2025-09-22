@@ -8,7 +8,7 @@ import {
 } from "../../../signup/utils"
 import MultiCheckboxSelect from "../MultiCheckboxSelect"
 import React, { useCallback } from "react"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { useRouter } from "next/router"
 
 type Props = {

@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Box, Fab, IconButton, useTheme } from "@mui/material"
 import { Eye } from "react-feather"
 

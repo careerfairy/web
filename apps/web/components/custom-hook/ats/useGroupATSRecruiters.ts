@@ -3,11 +3,11 @@ import { useMemo } from "react"
 import {
    ATSPaginatedResults,
    RecruitersFunctionCallOptions,
-} from "@careerfairy/shared-lib/dist/ats/Functions"
+} from "@careerfairy/shared-lib/ats/Functions"
 import useFunctionsSWRFetcher, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
-import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 
 const useGroupATSRecruiters = (
    groupId: string,

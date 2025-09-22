@@ -1,4 +1,4 @@
-import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
+import { HighLight } from "@careerfairy/shared-lib/highlights/Highlight"
 import Box from "@mui/material/Box"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"

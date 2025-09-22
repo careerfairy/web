@@ -11,9 +11,9 @@ import {
    LivestreamGroupQuestion,
    LivestreamGroupQuestions,
    LivestreamGroupQuestionsMap,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
-import { convertDictToDocArray } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+} from "@careerfairy/shared-lib/livestreams"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
+import { convertDictToDocArray } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    FormikErrors,
    FormikHandlers,

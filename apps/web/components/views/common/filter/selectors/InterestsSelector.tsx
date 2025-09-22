@@ -7,7 +7,7 @@ import {
 } from "../../../signup/utils"
 import React, { useCallback } from "react"
 import { useInterests } from "../../../../custom-hook/useCollection"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { useRouter } from "next/router"
 
 type Props = {

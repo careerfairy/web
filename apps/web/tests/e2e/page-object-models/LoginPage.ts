@@ -1,4 +1,4 @@
-import UserSeed from "@careerfairy/seed-data/dist/users"
+import UserSeed from "@careerfairy/seed-data/users"
 import { Locator, Page } from "@playwright/test"
 import { credentials } from "../../constants"
 

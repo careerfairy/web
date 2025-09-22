@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import ShareIcon from "@mui/icons-material/ShareOutlined"
 import { IconButton } from "@mui/material"
 import Box from "@mui/material/Box"

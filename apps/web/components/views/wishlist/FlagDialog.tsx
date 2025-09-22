@@ -10,7 +10,7 @@ import {
    FormHelperText,
    TextField,
 } from "@mui/material"
-import { FlagReason } from "@careerfairy/shared-lib/dist/wishes"
+import { FlagReason } from "@careerfairy/shared-lib/wishes"
 import * as yup from "yup"
 import { Formik } from "formik"
 import Stack from "@mui/material/Stack"

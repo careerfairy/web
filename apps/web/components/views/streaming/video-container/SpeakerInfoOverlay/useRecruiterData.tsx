@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
+import { SavedRecruiter } from "@careerfairy/shared-lib/users"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { GENERAL_ERROR } from "components/util/constants"
 import { useSnackbar } from "notistack"

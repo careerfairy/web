@@ -6,7 +6,7 @@ import {
    NetworkQuality,
 } from "agora-rtc-sdk-ng"
 import { IRemoteStream, LocalStream } from "../../types/streaming"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 export interface RtcContextInterface {
    remoteStreams: IRemoteStream[]

@@ -15,7 +15,7 @@ import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import GroupLogo from "../../common/GroupLogo"
 import Stack from "@mui/material/Stack"
 import { groupRepo } from "../../../../../../data/RepositoryInstances"
-import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/livestreams"
 import { Form, Formik } from "formik"
 import {
    checkIfUserHasAnsweredAllLivestreamGroupQuestions,

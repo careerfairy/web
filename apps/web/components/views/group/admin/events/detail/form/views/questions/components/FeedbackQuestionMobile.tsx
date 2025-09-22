@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Button, Stack, Typography } from "@mui/material"
 import { Formik } from "formik"
 import { useCallback, useMemo, useState } from "react"

@@ -38,6 +38,17 @@ export function combineStyles(...styles: SxProps[]) {
 }
 
 /**
+ * Utility function for styled components to prevent forwarding custom props
+ * @param customProps Custom props that shouldn't be passed forward (React warnings as unknown prop).
+ */
+export const shouldForwardProp =
+   <TCustomProps extends Record<string, unknown>>(
+      customProps: ReadonlyArray<keyof TCustomProps>
+   ) =>
+   (prop: string): boolean =>
+      !customProps.includes(prop)
+
+/**
  * All ours possible colors
  */
 export type IColors =

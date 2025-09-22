@@ -1,6 +1,6 @@
 import { Button, Tooltip } from "@mui/material"
 import React, { memo } from "react"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
 import BadgeIcon from "../common/BadgeIcon"
 import isEqual from "react-fast-compare"
 import IconButton from "@mui/material/IconButton"

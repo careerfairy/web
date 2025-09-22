@@ -1,11 +1,11 @@
 import {
    University,
    UniversityCountry,
-} from "@careerfairy/shared-lib/dist/universities"
+} from "@careerfairy/shared-lib/universities"
 import { useEffect, useState } from "react"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import { dynamicSort } from "@careerfairy/shared-lib/utils"
 
 const useUniversitiesByCountryCodes = (
    selectedCountriesIds: string[]

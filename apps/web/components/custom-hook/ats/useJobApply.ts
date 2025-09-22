@@ -1,8 +1,8 @@
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    userAlreadyAppliedForJob,
    UserData,
-} from "@careerfairy/shared-lib/dist/users"
+} from "@careerfairy/shared-lib/users"
 import * as Sentry from "@sentry/nextjs"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { AnalyticsEvents } from "util/analyticsConstants"

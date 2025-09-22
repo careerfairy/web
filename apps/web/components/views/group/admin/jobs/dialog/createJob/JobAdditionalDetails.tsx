@@ -12,7 +12,7 @@ import SteppedDialog, {
 import GBLocale from "date-fns/locale/en-GB"
 import { MutableRefObject, useCallback, useEffect, useState } from "react"
 import DatePicker from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
+import "react-datepicker/react-datepicker.css"
 import { Briefcase, Calendar as CalendarIcon } from "react-feather"
 import { useFormContext } from "react-hook-form"
 import { sxStyles } from "types/commonTypes"

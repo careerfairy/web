@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Dialog, DialogContent } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import {

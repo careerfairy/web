@@ -1,6 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { chunkArray } from "@careerfairy/shared-lib/utils"
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Stack } from "@mui/material"
 import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFollowingCompanies"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"

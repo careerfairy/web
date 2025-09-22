@@ -12,7 +12,7 @@ import useStreamRef from "../../../custom-hook/useStreamRef"
 import { EventRating } from "@careerfairy/shared-lib/src/livestreams"
 import NormalRating from "./NormalRating"
 import SentimentRating from "./SentimentRating"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 const useStyles = makeStyles((theme) => ({

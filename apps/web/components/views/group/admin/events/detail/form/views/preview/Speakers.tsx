@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"

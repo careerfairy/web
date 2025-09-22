@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { Locator, Page, expect } from "@playwright/test"
 import { CommonPage } from "./CommonPage"

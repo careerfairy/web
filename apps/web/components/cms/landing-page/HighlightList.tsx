@@ -3,7 +3,7 @@ import Box from "@mui/material/Box"
 import { sxStyles } from "../../../types/commonTypes"
 import HighlightsCarousel from "../../views/portal/HighlightsCarousel"
 import React, { useMemo } from "react"
-import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
+import { HighLight } from "@careerfairy/shared-lib/highlights/Highlight"
 import Container from "@mui/material/Container"
 import { Typography } from "@mui/material"
 

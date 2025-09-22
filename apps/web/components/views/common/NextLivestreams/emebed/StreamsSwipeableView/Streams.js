@@ -5,7 +5,7 @@ import { isEmpty, isLoaded } from "react-redux-firebase"
 import EmbedStreamCard from "../../../stream-cards/EmbedStreamCard"
 import useInfiniteScrollClientWithHandlers from "../../../../../custom-hook/useInfiniteScrollClientWithHandlers"
 import Fade from "@stahl.luke/react-reveal/Fade"
-import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
+import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    streamsContainer: {

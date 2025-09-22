@@ -1,6 +1,6 @@
 import { FunctionsInstance } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
-import { MarketingUserCreationFields } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
+import { MarketingUserCreationFields } from "@careerfairy/shared-lib/marketing/MarketingUser"
 
 export class MarketingService {
    constructor(

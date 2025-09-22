@@ -1,4 +1,4 @@
-import { fromDateFirestoreFn } from "@careerfairy/shared-lib/dist/firebaseTypes"
+import { fromDateFirestoreFn } from "@careerfairy/shared-lib/firebaseTypes"
 import { isServer } from "components/helperFunctions/HelperFunctions"
 import firebase from "firebase/compat/app"
 import "firebase/compat/auth"

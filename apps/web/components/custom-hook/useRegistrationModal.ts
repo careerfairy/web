@@ -1,5 +1,5 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserReminderType } from "@careerfairy/shared-lib/dist/users"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserReminderType } from "@careerfairy/shared-lib/users"
 import { useAuth } from "HOCs/AuthProvider"
 import { useUserReminders } from "HOCs/UserReminderProvider"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"

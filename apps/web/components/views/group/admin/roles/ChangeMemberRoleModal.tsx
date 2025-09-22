@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
-import { GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/dist/groups"
+import { GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"

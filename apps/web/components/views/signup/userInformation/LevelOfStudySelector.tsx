@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from "react"
 import { useLevelsOfStudy } from "../../../custom-hook/useCollection"
 import { FormikHelpers } from "formik"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import SingleListSelect from "../../common/SingleListSelect"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../data/RepositoryInstances"

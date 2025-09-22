@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Grid } from "@mui/material"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { ESTIMATED_DURATIONS } from "../../../commons"

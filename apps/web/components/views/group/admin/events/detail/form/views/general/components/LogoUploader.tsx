@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Box } from "@mui/material"
 import useUploadLivestreamLogo from "components/custom-hook/live-stream/useUploadLivestreamLogo"
 import AspectRatio from "components/views/common/AspectRatio"

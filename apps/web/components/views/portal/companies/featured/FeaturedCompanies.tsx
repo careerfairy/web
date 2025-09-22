@@ -1,5 +1,5 @@
 import { FieldOfStudyCategoryMap } from "@careerfairy/shared-lib/fieldOfStudy"
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Box, Divider, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useFeaturedGroupsSWR } from "components/custom-hook/group/useFeaturedGroupsSWR"

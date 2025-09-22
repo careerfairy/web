@@ -1,4 +1,4 @@
-import { sxStyles } from "@careerfairy/shared-ui"
+import { sxStyles } from "types/commonTypes"
 import { Button } from "@mui/material"
 import Link from "next/link"
 import { useRouter } from "next/router"
