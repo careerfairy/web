@@ -3,7 +3,10 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { useField } from "formik"
+import { useRef } from "react"
 import { sxStyles } from "types/commonTypes"
+
+const FIELD_NAME = "general.startDate"
 
 const styles = sxStyles({
    datePickerDesktop: (theme) => ({
@@ -76,8 +79,11 @@ const styles = sxStyles({
    },
 })
 
-const CustomInputField = (params) => {
-   const fieldName = "general.startDate"
+type CustomInputFieldProps = {
+   fieldName: string
+}
+
+const CustomInputField = (params, { fieldName }: CustomInputFieldProps) => {
    const [{ onBlur }, ,] = useField(fieldName)
 
    return (
@@ -96,11 +102,20 @@ const CustomInputField = (params) => {
    )
 }
 
-const StartDateTimePicker = () => {
-   const fieldName = "general.startDate"
+type StartDateTimePickerProps = {
+   fieldName?: string
+   label?: string
+   toolbarTitle?: string
+}
 
+const StartDateTimePicker = ({
+   fieldName = FIELD_NAME,
+   label = "Start date",
+   toolbarTitle = "Select live stream start date",
+}: StartDateTimePickerProps) => {
    const isMobile = useIsMobile()
    const [field, , helpers] = useField(fieldName)
+   const anchorRef = useRef<HTMLDivElement>(null)
 
    const layoutStyles = isMobile
       ? styles.datePickerMobile
@@ -109,13 +124,12 @@ const StartDateTimePicker = () => {
    return (
       <DateTimePicker
          name={fieldName}
-         label="Start date"
-         localeText={
-            isMobile ? { toolbarTitle: "Select live stream start date" } : null
-         }
+         label={label}
+         localeText={isMobile ? { toolbarTitle } : null}
          disablePast
          ampm={false}
          openTo="day"
+         ref={anchorRef}
          viewRenderers={{
             // @ts-ignore
             hours: renderMultiSectionDigitalClockTimeView,
@@ -127,9 +141,22 @@ const StartDateTimePicker = () => {
             layout: {
                sx: layoutStyles,
             },
+            popper: {
+               anchorEl: anchorRef.current,
+               placement: "bottom-start",
+               modifiers: [
+                  {
+                     name: "preventOverflow",
+                     enabled: true,
+                     options: {
+                        boundary: "viewport",
+                     },
+                  },
+               ],
+            },
          }}
          slots={{
-            textField: CustomInputField,
+            textField: (params) => CustomInputField(params, { fieldName }),
          }}
          value={field.value}
          onChange={async (newValue) => {

@@ -6,7 +6,6 @@ import {
    LivestreamGroupQuestionsMap,
    Speaker,
 } from "@careerfairy/shared-lib/livestreams"
-import { DateTime } from "luxon"
 import { v4 as uuidv4 } from "uuid"
 import { languageCodes } from "../../helperFunctions/streamFormFunctions"
 
@@ -37,7 +36,7 @@ export const getLivestreamInitialValues = (group: Group) => ({
    companyId: "",
    title: "",
    groupIds: [],
-   start: DateTime.now().plus({ days: 1 }).toJSDate(),
+   start: new Date(),
    groupQuestionsMap: {},
    duration: 60,
    hidden: false,
