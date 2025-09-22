@@ -42,7 +42,7 @@ export const useOfflineEventRouting = (): Result => {
       if (group.availableOfflineEvents <= 0) {
          errorLogAndNotify(new Error("Error creating draft offline event"), {
             message:
-               "Error creating draft offline event, no available offline events",
+               "Draft offline event could not be created: no available offline event slots for this group",
             groupId: group.id,
          })
          return
