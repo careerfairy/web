@@ -348,10 +348,10 @@ export class SparksService {
    }
 
    async createUserSparksFeedEventNotifications(userId: string) {
-      return httpsCallable<string, void>(
+      return httpsCallable<{ userId: string }, void>(
          this.functions,
          FUNCTION_NAMES.createUserSparksFeedEventNotifications
-      )(userId)
+      )({ userId })
    }
 
    async fetchPublicSparksNotifications() {
