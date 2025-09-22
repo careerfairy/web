@@ -11,6 +11,7 @@ import {
    WhatYouTakeAwaySection,
    WhosThisForSection,
 } from "components/views/panels/page"
+import PastLivestreamsCarousel from "components/views/panels/page/PastLivestreamsCarousel"
 import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
@@ -38,18 +39,23 @@ type ConsultingPageProps = {
    serverSideConsultingLivestreams: any[]
    serverSideCompanies: SerializedGroup[]
    serverSideRecentLivestreams: any[]
+   serverSidePastConsultingLivestreams: any[]
 }
 
 export default function ConsultingPage({
    serverSideConsultingLivestreams,
    serverSideCompanies,
    serverSideRecentLivestreams,
+   serverSidePastConsultingLivestreams,
 }: ConsultingPageProps) {
    const deserializedConsultingLivestreams = mapFromServerSide(
       serverSideConsultingLivestreams
    )
    const deserializedRecentLivestreams = mapFromServerSide(
       serverSideRecentLivestreams
+   )
+   const deserializedPastConsultingLivestreams = mapFromServerSide(
+      serverSidePastConsultingLivestreams
    )
    const companies = serverSideCompanies.map((company) =>
       deserializeGroupClient(company)
@@ -139,6 +145,10 @@ export default function ConsultingPage({
                   variant="consulting"
                />
                <WhatYouTakeAwaySection />
+               <PastLivestreamsCarousel
+                  livestreams={deserializedPastConsultingLivestreams}
+                  onCardClick={handleOpenLivestreamDialog}
+               />
                <RegisterNowSection
                   panelEvents={deserializedConsultingLivestreams}
                   handleOpenLivestreamDialog={handleOpenPanelDialog}
@@ -167,11 +177,13 @@ export const getServerSideProps: GetServerSideProps<
    ConsultingPageProps
 > = async () => {
    try {
-      // Fetch upcoming events and recent livestreams in parallel
-      const [allUpcomingEvents, recentLivestreams] = await Promise.all([
-         livestreamRepo.getUpcomingEvents(50), // Get more events to filter from
-         livestreamRepo.getUpcomingEvents(10),
-      ])
+      // Fetch upcoming events, recent livestreams, and past events in parallel
+      const [allUpcomingEvents, recentLivestreams, allPastEvents] =
+         await Promise.all([
+            livestreamRepo.getUpcomingEvents(50), // Get more events to filter from
+            livestreamRepo.getUpcomingEvents(10),
+            livestreamRepo.getPastEventsFrom({ limit: 50 }), // Get past events for recordings carousel
+         ])
 
       // Filter for consulting industry livestreams (max 4)
       const consultingLivestreams = (allUpcomingEvents || [])
@@ -179,6 +191,16 @@ export const getServerSideProps: GetServerSideProps<
             livestream.companyIndustries?.includes("ManagementConsulting")
          )
          .slice(0, 4) // Limit to 4 livestreams
+
+      // Filter for past consulting industry livestream recordings (max 8)
+      const pastConsultingLivestreams = (allPastEvents || [])
+         .filter(
+            (livestream) =>
+               livestream.companyIndustries?.includes("ManagementConsulting") &&
+               !livestream.denyRecordingAccess && // Only include recordings that are accessible
+               livestream.hasEnded // Only include ended streams
+         )
+         .slice(0, 8) // Limit to 8 recordings
 
       // Extract unique groupIds from consulting livestreams
       const allGroupIds = consultingLivestreams
@@ -212,6 +234,9 @@ export const getServerSideProps: GetServerSideProps<
       const serializedRecentLivestreams = (recentLivestreams || []).map(
          (stream) => LivestreamPresenter.serializeDocument(stream)
       )
+      const serializedPastConsultingLivestreams = pastConsultingLivestreams.map(
+         (livestream) => LivestreamPresenter.serializeDocument(livestream)
+      )
       const serializedCompanies = companies.map((company) =>
          serializeGroup(company)
       )
@@ -226,6 +251,8 @@ export const getServerSideProps: GetServerSideProps<
             serverSideConsultingLivestreams: livestreamsWithoutModerators,
             serverSideCompanies: serializedCompaniesWithoutCF,
             serverSideRecentLivestreams: serializedRecentLivestreams,
+            serverSidePastConsultingLivestreams:
+               serializedPastConsultingLivestreams,
          },
       }
    } catch (error) {
@@ -236,6 +263,7 @@ export const getServerSideProps: GetServerSideProps<
             serverSideConsultingLivestreams: [],
             serverSideCompanies: [],
             serverSideRecentLivestreams: [],
+            serverSidePastConsultingLivestreams: [],
          },
       }
    }
