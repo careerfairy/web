@@ -32,6 +32,8 @@ export const FUNCTION_NAMES = {
    upsertLivestreamSpeaker: "upsertLivestreamSpeaker_v4",
    deleteLivestream: "deleteLivestream",
    updateCreatorRoles: "updateCreatorRoles",
+   getLivestreamsICalendarEvents: "getLivestreamsICalendarEvents",
+
    // Reminders functions
    onLivestreamStartScheduleNoShowReminder:
       "onLivestreamStartScheduleNoShowReminder",

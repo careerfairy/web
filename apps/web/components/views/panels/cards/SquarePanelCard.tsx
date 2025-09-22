@@ -66,6 +66,7 @@ type SquarePanelCardProps = {
    event: LivestreamEvent
    fullHeight?: boolean
    fullRegistrationStatus?: boolean
+   hideRegistrationStatus?: boolean
    stackedBottomSection?: boolean
    onCardClick?: (livestreamId: string) => void
 }
@@ -74,6 +75,7 @@ export const SquarePanelCard = ({
    event,
    fullHeight,
    fullRegistrationStatus,
+   hideRegistrationStatus,
    stackedBottomSection,
    onCardClick,
 }: SquarePanelCardProps) => {
@@ -103,10 +105,12 @@ export const SquarePanelCard = ({
       >
          <Box>
             <Box sx={styles.topSection}>
-               <PanelRegistrationStatus
-                  isRegistered={isRegistered}
-                  variant={fullRegistrationStatus ? "default" : "small"}
-               />
+               {!hideRegistrationStatus && (
+                  <PanelRegistrationStatus
+                     isRegistered={isRegistered}
+                     variant={fullRegistrationStatus ? "default" : "small"}
+                  />
+               )}
                <Box sx={styles.dateBadgeOverride}>
                   <PanelDateBadge
                      startDate={event.start?.toDate()}
