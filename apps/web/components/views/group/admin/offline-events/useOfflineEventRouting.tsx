@@ -81,10 +81,6 @@ export const useOfflineEventRouting = (): Result => {
          registrationUrl: initialValues.registrationUrl,
          backgroundImageUrl: initialValues.backgroundImageUrl,
          hidden: initialValues.hidden,
-         company: {
-            name: group.universityName,
-            groupId: group.id,
-         },
          address: {
             countryISOCode: group.companyCountry,
             cityISOCode: initialValues.city,

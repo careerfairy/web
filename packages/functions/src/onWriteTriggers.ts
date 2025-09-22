@@ -1,10 +1,7 @@
 import functions = require("firebase-functions")
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
-import {
-   hasCustomJobsGroupMetaDataChanged,
-   hasPublicGroupMetaDataChanged,
-} from "@careerfairy/shared-lib/groups/metadata"
+import { hasCustomJobsGroupMetaDataChanged } from "@careerfairy/shared-lib/groups/metadata"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { hasMetadataChanged as hasGroupMetadataChanged } from "@careerfairy/shared-lib/livestreams/metadata"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
@@ -318,11 +315,9 @@ export const onWriteGroup = onDocumentWritten(
             )
          }
 
-         if (hasPublicGroupMetaDataChanged(previousValue, newValue)) {
-            sideEffectPromises.push(
-               offlineEventRepo.syncGroupDataToOfflineEvent(groupId, newValue)
-            )
-         }
+         sideEffectPromises.push(
+            offlineEventRepo.syncGroupDataToOfflineEvent(groupId, newValue)
+         )
       }
 
       return handleSideEffects(sideEffectPromises)
