@@ -29,7 +29,7 @@ export const FUNCTION_NAMES = {
    createNewUserAccount: "createNewUserAccount_v5",
 
    // Streaming functions
-   upsertLivestreamSpeaker: "upsertLivestreamSpeaker_v3",
+   upsertLivestreamSpeaker: "upsertLivestreamSpeaker_v4",
    deleteLivestream: "deleteLivestream",
    updateCreatorRoles: "updateCreatorRoles",
    // Reminders functions

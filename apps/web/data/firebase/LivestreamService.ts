@@ -270,6 +270,8 @@ export class LivestreamService {
                id: speakerId,
                groupId: speaker.groupId,
                background: speaker.background,
+               companyName: speaker.companyName,
+               companyLogoUrl: speaker.companyLogoUrl,
             }
          }
       }

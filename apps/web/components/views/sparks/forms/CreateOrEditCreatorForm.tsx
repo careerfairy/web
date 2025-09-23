@@ -163,6 +163,9 @@ export const getInitialValues = (
    id: creator?.id || "",
    email: creator && "email" in creator ? creator.email : "",
    roles: getInitialRolesValues(creator),
+   groupId: creator?.groupId,
+   companyName: creator?.companyName,
+   companyLogoUrl: creator?.companyLogoUrl,
 })
 
 export default CreateOrEditCreatorForm

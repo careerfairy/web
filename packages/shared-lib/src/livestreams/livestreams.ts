@@ -510,6 +510,7 @@ export interface Speaker extends Identifiable {
    roles: CreatorRole[]
    groupId?: string
    companyName?: string
+   companyLogoUrl?: string
 }
 
 export interface LiveSpeaker extends Identifiable {
@@ -974,6 +975,8 @@ export type ParticipantDetails = {
    id: string
    groupId?: string
    background?: string
+   companyName?: string
+   companyLogoUrl?: string
 }
 
 export interface LivestreamCTA extends Identifiable {
