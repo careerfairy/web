@@ -1,15 +1,15 @@
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
 import { IconButton, Stack, Typography } from "@mui/material"
-import { forwardRef, memo, useEffect, useState } from "react"
-import { sxStyles } from "types/commonTypes"
-import { getChatAuthor, getIsMe } from "./util"
-import DateUtil from "util/DateUtil"
 import LinkifyText from "components/util/LinkifyText"
-import { MoreVertical } from "react-feather"
-import { useStreamingContext } from "../../context"
 import { useAuth } from "HOCs/AuthProvider"
+import { forwardRef, memo, useEffect, useState } from "react"
+import { MoreVertical } from "react-feather"
+import { sxStyles } from "types/commonTypes"
+import DateUtil from "util/DateUtil"
+import { useStreamingContext } from "../../context"
 import { UserType } from "../../util"
 import { UserDetails } from "../UserDetails"
+import { getChatAuthor, getIsMe } from "./util"
 
 const styles = sxStyles({
    root: {
@@ -112,13 +112,15 @@ export const ChatEntry = memo(
 
 const useTimeSinceEntry = (entry: LivestreamChatEntry) => {
    const [timeSince, setTimeSince] = useState(() =>
-      DateUtil.getTimeAgo(entry.timestamp.toDate())
+      DateUtil.getTimeAgo(entry.timestamp?.toDate() ?? new Date())
    )
 
    useEffect(() => {
       // Function to periodically refresh the "time since" string
       const refreshTimeSince = () => {
-         setTimeSince(DateUtil.getTimeAgo(entry.timestamp.toDate()))
+         setTimeSince(
+            DateUtil.getTimeAgo(entry.timestamp?.toDate() ?? new Date())
+         )
       }
 
       // Refresh the "time since" every 30 seconds
