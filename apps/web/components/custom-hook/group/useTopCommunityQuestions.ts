@@ -12,7 +12,7 @@ export interface TopCommunityQuestion extends LivestreamQuestion {
 }
 
 /**
- * Custom hook to fetch the top 5 most liked community questions from past livestreams
+ * Custom hook to fetch the top 5 most liked community questions from past and upcoming livestreams
  * organized by a specific group within the last 1 year. Results are memoized to avoid re-fetching on page refresh.
  *
  * @param groupId - The ID of the group to fetch questions for
@@ -37,8 +37,12 @@ export const useTopCommunityQuestions = (groupId: string) => {
             Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS
          )
 
+         // Calculate date 1 year from now for upcoming streams
+         const oneYearFromNow = new Date()
+         oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1)
+
          // Fetch past livestreams from the last 1 year for this group
-         const livestreamsQuery = query(
+         const pastLivestreamsQuery = query(
             collection(firestore, "livestreams"),
             where("test", "==", false),
             where("groupIds", "array-contains", groupId),
@@ -47,16 +51,35 @@ export const useTopCommunityQuestions = (groupId: string) => {
             orderBy("start", "desc")
          ).withConverter(createGenericConverter<LivestreamEvent>())
 
-         const livestreamsSnapshot = await getDocs(livestreamsQuery)
-         const pastLivestreams = livestreamsSnapshot.docs.map((doc) => doc.data())
+         // Fetch upcoming livestreams for this group (within the next year)
+         const upcomingLivestreamsQuery = query(
+            collection(firestore, "livestreams"),
+            where("test", "==", false),
+            where("groupIds", "array-contains", groupId),
+            where("start", ">=", pastStreamCutoff), // Only upcoming streams
+            where("start", "<", oneYearFromNow), // Within the next year
+            orderBy("start", "asc")
+         ).withConverter(createGenericConverter<LivestreamEvent>())
+
+         // Execute both queries in parallel
+         const [pastLivestreamsSnapshot, upcomingLivestreamsSnapshot] = await Promise.all([
+            getDocs(pastLivestreamsQuery),
+            getDocs(upcomingLivestreamsQuery)
+         ])
+
+         const pastLivestreams = pastLivestreamsSnapshot.docs.map((doc) => doc.data())
+         const upcomingLivestreams = upcomingLivestreamsSnapshot.docs.map((doc) => doc.data())
+         
+         // Combine past and upcoming streams
+         const allLivestreams = [...pastLivestreams, ...upcomingLivestreams]
 
          // Return empty array if no livestreams found
-         if (!pastLivestreams?.length) {
+         if (!allLivestreams?.length) {
             return []
          }
 
-         // Collect all questions from all past livestreams with better error handling
-         const allQuestionsPromises = pastLivestreams.map(
+         // Collect all questions from all livestreams (past and upcoming) with better error handling
+         const allQuestionsPromises = allLivestreams.map(
             async (livestream) => {
                try {
                   // Ensure livestream has valid id
