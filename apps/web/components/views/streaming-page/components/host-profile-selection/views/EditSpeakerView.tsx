@@ -96,7 +96,7 @@ export const EditSpeakerView = () => {
 
 const SaveChangesButton = () => {
    const { livestreamId, streamerAuthToken } = useStreamingContext()
-   const { selectSpeaker } = useHostProfileSelection()
+   const { selectSpeaker, selectedSpeaker } = useHostProfileSelection()
 
    const { handleSubmit: handleSubmitSpeakerForm } = useSpeakerFormSubmit(
       livestreamId,
@@ -110,7 +110,20 @@ const SaveChangesButton = () => {
 
    const onSubmit = async (values: CreateCreatorSchemaType) => {
       await handleSubmitSpeakerForm(values)
-      selectSpeaker(mapCreatorToSpeaker(values))
+      selectSpeaker(
+         mapCreatorToSpeaker({
+            ...values,
+            ...(selectedSpeaker?.groupId && {
+               groupId: selectedSpeaker?.groupId,
+            }),
+            ...(selectedSpeaker?.companyName && {
+               companyName: selectedSpeaker?.companyName,
+            }),
+            ...(selectedSpeaker?.companyLogoUrl && {
+               companyLogoUrl: selectedSpeaker?.companyLogoUrl,
+            }),
+         })
+      )
    }
 
    return (

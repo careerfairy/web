@@ -11,9 +11,13 @@ import { errorLogAndNotify } from "util/CommonUtil"
  * @param creatorId - The ID of the creator to fetch data for
  * @returns SWR response containing creator data and loading state
  */
-export const useCreator = (groupId: string, creatorId: string) => {
+export const useCreator = (
+   groupId: string | null,
+   creatorId: string | null
+) => {
    const firestore = useFirestore()
-   const fetcherKey = creatorId ? `creator-${groupId}-${creatorId}` : null
+   const fetcherKey =
+      groupId && creatorId ? `creator-${groupId}-${creatorId}` : null
 
    const fetcher = async () => {
       try {
