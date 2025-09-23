@@ -54,7 +54,8 @@ const OfflineEventFormPreviewDesktop = ({
          <Box sx={styles.preview}>
             <OfflineEventFormPreviewContent
                ref={previewRef}
-               contentProps={{ detailsDirection: "column" }}
+               detailsDirection="column"
+               showHeaderIcons
             />
          </Box>
       </Box>

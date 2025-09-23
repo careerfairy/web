@@ -1,9 +1,56 @@
-import { Box, Stack, StackProps, Typography, alpha } from "@mui/material"
+import {
+   Box,
+   Skeleton,
+   Stack,
+   StackProps,
+   SxProps,
+   Theme,
+   Typography,
+   alpha,
+} from "@mui/material"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { DateTime } from "luxon"
 import Image from "next/image"
-import { Calendar, MapPin } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import {
+   Calendar,
+   ChevronLeft,
+   ChevronRight,
+   MapPin,
+   Share2,
+} from "react-feather"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { useOfflineEventPreviewContext } from "./OfflineEventPreviewContext"
+
+// Helper function to format date in the desired format: "Monday, 25 Aug 2025"
+const formatEventDate = (date: Date | null | undefined): string => {
+   if (!date) return ""
+
+   const luxonDate = DateTime.fromJSDate(date)
+   return luxonDate.toFormat("cccc, d MMM yyyy")
+}
+
+// Helper function to format time in the desired format: "13:00"
+const formatEventTime = (date: Date | null | undefined): string => {
+   if (!date) return ""
+
+   const luxonDate = DateTime.fromJSDate(date)
+   return luxonDate.toFormat("HH:mm")
+}
+
+const skeletonStyles = sxStyles({
+   skeleton: {
+      width: "100%",
+   },
+   default: {
+      height: "30px",
+      backgroundColor: "#CBCBCB",
+   },
+   secondary: {
+      height: "25px",
+      background: "rgba(203, 203, 203, 0.7)",
+      width: "80%",
+   },
+})
 
 const styles = sxStyles({
    root: {
@@ -40,6 +87,36 @@ const styles = sxStyles({
       borderTopLeftRadius: "12px",
       borderTopRightRadius: "12px",
    },
+   headerIcons: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      p: 1,
+      zIndex: 2,
+   },
+   headerIcon: {
+      width: 20,
+      height: 20,
+      borderRadius: "50%",
+      backgroundColor: (theme) => alpha(theme.palette.common.black, 0.3),
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      transition: "background-color 0.2s ease",
+      "&:hover": {
+         backgroundColor: (theme) => alpha(theme.palette.common.black, 0.5),
+      },
+      "& svg": {
+         width: 10,
+         height: 10,
+         color: (theme) => theme.palette.common.white,
+      },
+   },
    details: {
       backgroundColor: (theme) => theme.brand.white[100],
       minHeight: "300px",
@@ -55,7 +132,7 @@ const styles = sxStyles({
    },
    detailsItem: {
       p: 1,
-      // minWidth: "300px",
+      width: "100%",
    },
 })
 
@@ -63,37 +140,75 @@ export type DetailsProps = {
    detailsDirection?: StackProps["direction"]
 }
 
-export type OfflineEventPreviewContentProps = DetailsProps
+export type HeaderProps = {
+   showHeaderIcons?: boolean
+}
+
+export type OfflineEventPreviewContentProps = DetailsProps & HeaderProps
 
 export const OfflineEventPreviewContent = ({
    detailsDirection = "row",
+   showHeaderIcons = false,
 }: OfflineEventPreviewContentProps) => {
    return (
       <Stack sx={styles.root}>
-         <Header />
+         <Header showHeaderIcons={showHeaderIcons} />
          <Details detailsDirection={detailsDirection} />
       </Stack>
    )
 }
 
-const Header = () => {
+const Header = ({ showHeaderIcons = false }: HeaderProps) => {
    const { offlineEvent } = useOfflineEventPreviewContext()
 
    return (
-      <Box sx={styles.headerImage}>
-         <Image
-            src={offlineEvent.backgroundImageUrl}
-            alt={`${offlineEvent.title} banner`}
-            fill
-            style={{ objectFit: "cover" }}
-            priority
-         />
+      <Box
+         sx={[
+            styles.headerImage,
+            !offlineEvent.backgroundImageUrl && { backgroundColor: "#B4B4B4" },
+         ]}
+      >
+         {offlineEvent.backgroundImageUrl ? (
+            <Image
+               src={offlineEvent.backgroundImageUrl}
+               alt={`${offlineEvent.title} banner`}
+               fill
+               style={{ objectFit: "cover" }}
+               priority
+            />
+         ) : null}
+         <Box sx={styles.headerOverlayTop} />
+         <Box sx={styles.headerOverlayBottom} />
+         {showHeaderIcons ? (
+            <Box sx={styles.headerIcons}>
+               <Box sx={styles.headerIcon}>
+                  <ChevronLeft />
+               </Box>
+               <Box sx={styles.headerIcon}>
+                  <Share2 />
+               </Box>
+            </Box>
+         ) : null}
       </Box>
    )
 }
 
 const Details = ({ detailsDirection = "row" }: DetailsProps) => {
    const { offlineEvent } = useOfflineEventPreviewContext()
+
+   const startAtText = offlineEvent?.startAt
+      ? formatEventDate(offlineEvent?.startAt?.toDate())
+      : ""
+   const startAtTimeText = offlineEvent?.startAt
+      ? formatEventTime(offlineEvent?.startAt?.toDate())
+      : ""
+
+   const cityAndCountryText = offlineEvent?.street?.properties
+      ? `${offlineEvent?.street?.properties.address_level1}, ${offlineEvent?.street?.properties?.country}`
+      : ""
+   const streetText = offlineEvent?.street?.properties
+      ? offlineEvent?.street?.properties.address_line1
+      : ""
 
    return (
       <Stack sx={styles.details} spacing={1}>
@@ -103,19 +218,26 @@ const Details = ({ detailsDirection = "row" }: DetailsProps) => {
                fontWeight={600}
                color={"neutral.800"}
             >
-               {offlineEvent.title}
+               <SkeletonWrapper
+                  applySkeleton={!offlineEvent?.title?.length}
+                  sx={{ width: "70%" }}
+               >
+                  <Typography variant="medium" color={"neutral.800"}>
+                     {offlineEvent?.title}
+                  </Typography>
+               </SkeletonWrapper>
             </Typography>
          </Box>
          <Stack spacing={1} direction={detailsDirection} sx={styles.subSection}>
             <DetailsItem
                icon={<Box component={Calendar} size={18} />}
-               title={"Monday, 25 Aug 2025"}
-               subtitle={"13:00"}
+               title={startAtText}
+               subtitle={startAtTimeText}
             />
             <DetailsItem
                icon={<Box component={MapPin} size={18} />}
-               title={"Bern, Switzerland"}
-               subtitle={"Route de la glane"}
+               title={cityAndCountryText}
+               subtitle={streetText}
             />
          </Stack>
          <OrganizedBy />
@@ -139,13 +261,22 @@ const DetailsItem = ({ icon, title, subtitle }: DetailsItemProps) => {
          sx={styles.detailsItem}
       >
          <Box sx={{ pt: 0.5 }}>{icon}</Box>
-         <Stack direction="column" alignItems="start" spacing={0}>
-            <Typography variant="medium" color={"neutral.800"}>
-               {title}
-            </Typography>
-            <Typography variant="medium" color={"neutral.600"}>
-               {subtitle}
-            </Typography>
+         <Stack
+            direction="column"
+            alignItems="start"
+            spacing={0}
+            sx={{ width: "100%" }}
+         >
+            <SkeletonWrapper applySkeleton={!title?.length}>
+               <Typography variant="medium" color={"neutral.800"}>
+                  {title}
+               </Typography>
+            </SkeletonWrapper>
+            <SkeletonWrapper applySkeleton={!subtitle?.length} type="secondary">
+               <Typography variant="medium" color={"neutral.600"}>
+                  {subtitle}
+               </Typography>
+            </SkeletonWrapper>
          </Stack>
       </Stack>
    )
@@ -165,20 +296,27 @@ const OrganizedBy = () => {
             <Typography variant="medium" fontWeight={600} color={"neutral.800"}>
                Organized by
             </Typography>
-            <Stack spacing={1} direction="row" alignItems="start">
-               <CircularLogo
-                  src={offlineEvent.group.logoUrl}
-                  alt={offlineEvent.group.universityName}
-                  size={40}
-               />
-               <Stack>
-                  <Typography variant="medium" color={"neutral.800"}>
-                     {offlineEvent.group.universityName}
-                  </Typography>
-                  <Typography variant="small" color={"neutral.700"}>
-                     {groupIndustries}
-                  </Typography>
+            <Stack
+               direction="row"
+               justifyContent="space-between"
+               alignItems="center"
+            >
+               <Stack spacing={1} direction="row" alignItems="start">
+                  <CircularLogo
+                     src={offlineEvent.group.logoUrl}
+                     alt={offlineEvent.group.universityName}
+                     size={40}
+                  />
+                  <Stack>
+                     <Typography variant="medium" color={"neutral.800"}>
+                        {offlineEvent.group.universityName}
+                     </Typography>
+                     <Typography variant="small" color={"neutral.700"}>
+                        {groupIndustries}
+                     </Typography>
+                  </Stack>
                </Stack>
+               <Box component={ChevronRight} size={16} color="neutral.700" />
             </Stack>
          </Stack>
       </Box>
@@ -193,13 +331,61 @@ const About = () => {
          <Typography variant="medium" color={"neutral.800"} fontWeight={600}>
             About this event
          </Typography>
-         <Typography
-            sx={{ wordBreak: "break-word" }}
-            variant="medium"
-            color={"neutral.700"}
-         >
-            {offlineEvent.description}
-         </Typography>
+         {offlineEvent.description ? (
+            <Typography
+               sx={{ wordBreak: "break-word" }}
+               variant="medium"
+               color={"neutral.700"}
+            >
+               {offlineEvent.description}
+            </Typography>
+         ) : (
+            <Stack>
+               <Stack direction="row" spacing={1}>
+                  <Skeleton width="40%" height="30px" />
+                  <Skeleton width="100%" height="30px" />
+               </Stack>
+               <Stack direction="row" spacing={1}>
+                  <Skeleton width="25%" height="25px" />
+                  <Skeleton width="100%" height="25px" />
+                  <Skeleton width="100%" height="25px" />
+                  <Skeleton width="100%" height="25px" />
+               </Stack>
+               <Stack direction="row" spacing={1}>
+                  <Skeleton width="60%" height="25px" />
+                  <Skeleton width="100%" height="25px" />
+               </Stack>
+
+               <Stack direction="row" spacing={1}>
+                  <Skeleton width="100%" height="30px" />
+                  <Skeleton width="50%" height="30px" />
+                  <Skeleton width="100%" height="30px" />
+               </Stack>
+            </Stack>
+         )}
       </Stack>
+   )
+}
+
+type SkeletonWrapperProps = {
+   type?: "default" | "secondary"
+   children: React.ReactNode
+   applySkeleton?: boolean
+   sx?: SxProps<Theme>
+}
+
+const SkeletonWrapper = ({
+   type = "default",
+   children,
+   applySkeleton = false,
+   sx,
+}: SkeletonWrapperProps) => {
+   if (!applySkeleton) {
+      return children
+   }
+   return (
+      <Skeleton
+         sx={combineStyles(skeletonStyles.skeleton, skeletonStyles[type], sx)}
+      />
    )
 }

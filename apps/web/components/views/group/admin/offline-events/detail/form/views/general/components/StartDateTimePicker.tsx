@@ -30,7 +30,29 @@ const styles = sxStyles({
       ".MuiDigitalClock-item:hover": {
          backgroundColor: "rgb(137 42 186 / 4%) !important",
       },
+      // Prevent scrolling when picker is open
+      "& .MuiPickersLayout-root": {
+         "&:focus-within": {
+            "& *": {
+               "&:focus": {
+                  outline: "none",
+               },
+            },
+         },
+      },
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
    }),
+   desktopPaper: {
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
    datePickerMobile: (theme) => ({
       "&.MuiPickersLayout-root": {
          display: "block",
@@ -72,7 +94,36 @@ const styles = sxStyles({
             backgroundColor: `${theme.palette.secondary.main} !important`,
          },
       },
+      // Prevent scrolling when picker is open
+      "& .MuiPickersLayout-root": {
+         "&:focus-within": {
+            "& *": {
+               "&:focus": {
+                  outline: "none",
+               },
+            },
+         },
+      },
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
    }),
+   mobilePaper: {
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
+   actionBar: {
+      "& .MuiButton-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
    icon: {
       svg: {
          color: (theme) => theme.palette.secondary.main,
@@ -131,6 +182,7 @@ const StartDateTimePicker = ({
             disablePast
             ampm={false}
             openTo="day"
+            reduceAnimations={false}
             viewRenderers={{
                // @ts-ignore
                hours: renderMultiSectionDigitalClockTimeView,
@@ -153,6 +205,16 @@ const StartDateTimePicker = ({
                         },
                      },
                   ],
+                  disablePortal: false,
+               },
+               desktopPaper: {
+                  sx: styles.desktopPaper,
+               },
+               mobilePaper: {
+                  sx: styles.mobilePaper,
+               },
+               actionBar: {
+                  sx: styles.actionBar,
                },
             }}
             slots={{
