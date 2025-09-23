@@ -295,6 +295,11 @@ const moduleExports = {
    redirects: async () => {
       return [
          {
+            source: "/panels",
+            destination: "/portal",
+            permanent: false,
+         },
+         {
             source: "/landing",
             destination: "/",
             permanent: false,
