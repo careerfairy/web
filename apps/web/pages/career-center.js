@@ -20,7 +20,7 @@ import {
 } from "../constants/images"
 import ExperienceSection from "components/views/landing/ExperienceSection"
 
-const CareerCenterLandingPage = ({}) => {
+const CareerCenterLandingPage = () => {
    const {
       palette: { secondary, common, grey },
    } = useTheme()

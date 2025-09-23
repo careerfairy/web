@@ -1,4 +1,4 @@
-const { memo } = require("react")
+import { memo } from "react"
 
 import {
    Box,

@@ -279,13 +279,13 @@ export class CarouselContentService {
       return content
          .map((item) => {
             switch (item.contentType) {
-               case "LivestreamEvent":
-                  // eslint-disable-next-line no-case-declarations
+               case "LivestreamEvent": {
                   const stream = mapFromServerSide([item])[0]
                   return {
                      ...stream,
                      contentType: "LivestreamEvent" as const,
                   }
+               }
                case "CTASlide":
                   return item
                default:

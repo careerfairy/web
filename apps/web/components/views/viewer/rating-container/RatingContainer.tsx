@@ -101,7 +101,9 @@ const ActionComponent = ({
       setSubmitting(true)
       try {
          await firebase.optOutOfRating(livestreamId, email, rating.id)
-      } catch (e) {}
+      } catch (e) {
+         console.error("Error opting out of rating:", e)
+      }
       setSubmitting(false)
       closeSnackbar(rating.id)
    }
@@ -159,7 +161,7 @@ const ActionComponent = ({
          }}
          enableReinitialize
          validate={(values) => {
-            let errors: any = {}
+            const errors: any = {}
             if (!values[rating.id] && !values.message) {
                errors.message = "Please fill one"
                errors[rating.id] = "Please fill one"

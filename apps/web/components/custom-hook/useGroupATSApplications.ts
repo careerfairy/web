@@ -75,7 +75,7 @@ function filterJobApplications(
    integrationId: string
 ) {
    // job ids for the given integration id
-   let validJobIds = livestreams
+   const validJobIds = livestreams
       .map((stream) =>
          stream.jobs
             .filter((j) => j.integrationId === integrationId)
@@ -83,7 +83,7 @@ function filterJobApplications(
       )
       .flat()
 
-   for (let jobId in data.jobApplications) {
+   for (const jobId in data.jobApplications) {
       if (!validJobIds.includes(jobId)) {
          delete data.jobApplications[jobId]
       }

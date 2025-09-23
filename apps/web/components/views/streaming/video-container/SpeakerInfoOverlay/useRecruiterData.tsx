@@ -7,7 +7,7 @@ import { userRepo } from "../../../../../data/RepositoryInstances"
 
 const useRecruiterData = (speakerId) => {
    const [recruiterData, setRecruiterData] = useState<SavedRecruiter>(null)
-   const [recruiterSaved, setRecruiterSaved] = useState<Boolean>(false)
+   const [recruiterSaved, setRecruiterSaved] = useState<boolean>(false)
    const [isLoading, setIsLoading] = useState(true)
    const { userData } = useAuth()
    const { enqueueSnackbar } = useSnackbar()

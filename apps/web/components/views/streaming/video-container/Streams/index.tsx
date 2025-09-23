@@ -93,12 +93,12 @@ const Streams = ({
          setStreamData(allStreams)
          return
       }
-      let newLargeStream = handleGetLargeStream(allStreams, currentSpeakerId)
+      const newLargeStream = handleGetLargeStream(allStreams, currentSpeakerId)
       if (!newLargeStream) {
          setStreamData([])
          return
       }
-      let newSmallStreams = handleGetSmallStream(allStreams, newLargeStream)
+      const newSmallStreams = handleGetSmallStream(allStreams, newLargeStream)
       setStreamData([...newSmallStreams, newLargeStream])
    }, [
       externalMediaStreams,

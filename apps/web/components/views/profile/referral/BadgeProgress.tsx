@@ -17,7 +17,7 @@ const BadgeProgress = () => {
    }
 
    // we only have the networker badge for now, we need to change this in the future
-   let networkerBadge = userBadges.networkerBadge()
+   const networkerBadge = userBadges.networkerBadge()
    let nextBadge: Badge
 
    if (!networkerBadge) {

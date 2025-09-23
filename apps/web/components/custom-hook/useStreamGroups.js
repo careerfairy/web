@@ -10,7 +10,9 @@ const useStreamGroups = (groupIds) => {
          try {
             const newCareerCenters = await getGroupsWithIds(groupIds)
             setCareerCenters(newCareerCenters)
-         } catch (e) {}
+         } catch (e) {
+            console.error("Error fetching career centers:", e)
+         }
       }
 
       if (groupIds?.length) {

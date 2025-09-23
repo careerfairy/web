@@ -41,7 +41,7 @@ type Props = {
    alreadyApplied: boolean
 }
 const CvUploadSection = ({ alreadyApplied }: Props) => {
-   let { userData } = useAuth()
+   const { userData } = useAuth()
    const { isStreamer } = useCurrentStream()
 
    return (
@@ -55,7 +55,7 @@ const CvUploadSection = ({ alreadyApplied }: Props) => {
             </Box>
          </Box>
 
-         {Boolean(userData) ? (
+         {userData ? (
             <Box sx={styles.uploadCvButton}>
                <Box>
                   <UserResume
@@ -64,7 +64,7 @@ const CvUploadSection = ({ alreadyApplied }: Props) => {
                      disabled={isStreamer || alreadyApplied}
                   />
                </Box>
-               {Boolean(isStreamer) ? (
+               {isStreamer ? (
                   <Box sx={styles.studentsInfoWrapper}>
                      <InfoOutlinedIcon />
                      <Typography sx={styles.studentsMessage}>

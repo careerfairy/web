@@ -13,8 +13,8 @@ import LinkifyText from "../../../../../util/LinkifyText"
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
 import { sxStyles } from "../../../../../../types/commonTypes"
 
-const dayjs = require("dayjs")
-const relativeTime = require("dayjs/plugin/relativeTime")
+import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
 dayjs.extend(relativeTime)
 
 const styles = sxStyles({

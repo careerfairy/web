@@ -85,7 +85,7 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({ uplink, downlink }) => {
 
    useEffect(() => {
       return () => {
-         let connectionStati = [
+         const connectionStati = [
             "DisconnectedStatus",
             "ConnectingStatus",
             "ConnectedStatus",

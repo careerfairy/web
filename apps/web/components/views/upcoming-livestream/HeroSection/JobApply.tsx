@@ -82,7 +82,7 @@ const LoadingJobsSpinner = () => {
 }
 
 const JobList = ({ livestream }: Props) => {
-   let { jobs } = useLivestreamJobs(livestream.id, livestream.jobs)
+   const { jobs } = useLivestreamJobs(livestream.id, livestream.jobs)
    const [selectedJob, setSelectedJob] = useState(null)
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()

@@ -64,7 +64,7 @@ export default function useAgoraClientConfig(
           */
          rtcClient.on("user-joined", async (remoteUser) => {
             setRemoteStreams((prevRemoteStreams) => {
-               let cleanedRemoteStreams = removeStreamFromList(
+               const cleanedRemoteStreams = removeStreamFromList(
                   remoteUser.uid,
                   prevRemoteStreams
                )
