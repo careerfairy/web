@@ -15,6 +15,9 @@ export type CreatorFormValues = {
    email: string
    id?: string
    roles: CreatorRole[]
+   groupId?: string
+   companyName?: string
+   companyLogoUrl?: string
 }
 
 type UseCreatorFormSubmit = {
@@ -84,6 +87,7 @@ const useCreatorFormSubmit = (
                id: values.id,
                roles: values.roles,
                companyName: group?.universityName,
+               companyLogoUrl: group?.logoUrl,
             })
          } else {
             creator = await groupRepo.addCreatorToGroup(groupId, {
@@ -96,6 +100,7 @@ const useCreatorFormSubmit = (
                story: values.story,
                roles: values.roles,
                companyName: group?.universityName,
+               companyLogoUrl: group?.logoUrl,
             })
          }
 
@@ -103,7 +108,13 @@ const useCreatorFormSubmit = (
             onSubmited(creator)
          }
       },
-      [groupId, group?.universityName, handleUploadFile, onSubmited]
+      [
+         groupId,
+         group?.universityName,
+         group?.logoUrl,
+         handleUploadFile,
+         onSubmited,
+      ]
    )
 
    return useMemo<UseCreatorFormSubmit>(

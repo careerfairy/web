@@ -34,6 +34,7 @@ export interface Creator extends Identifiable {
    linkedInUrl?: string
    story?: string
    companyName?: string
+   companyLogoUrl?: string
    // user can have multiple roles
    // allows to filter creators if needed
    roles: CreatorRole[]
@@ -52,6 +53,7 @@ export type PublicCreator = Pick<
    | "linkedInUrl"
    | "documentType"
    | "companyName"
+   | "companyLogoUrl"
 >
 
 export type AddCreatorData = Pick<
@@ -65,6 +67,7 @@ export type AddCreatorData = Pick<
    | "story"
    | "roles"
    | "companyName"
+   | "companyLogoUrl"
 >
 
 export type UpdateCreatorData = Partial<AddCreatorData> & Identifiable
@@ -81,6 +84,8 @@ export const pickPublicDataFromCreator = (creator: Creator): PublicCreator => {
       id: creator.id ?? null,
       linkedInUrl: creator.linkedInUrl ?? null,
       documentType: creator.documentType ?? null,
+      companyName: creator.companyName ?? null,
+      companyLogoUrl: creator.companyLogoUrl ?? null,
    }
 }
 
@@ -97,6 +102,7 @@ export const mapSpeakerToPublicCreator = (speaker: Speaker): PublicCreator => {
       story: speaker.background || null,
       roles: speaker.roles || [CreatorRoles.Speaker],
       companyName: speaker.companyName || null,
+      companyLogoUrl: speaker.companyLogoUrl || null,
    }
 }
 
@@ -114,6 +120,7 @@ export const mapCreatorToSpeaker = (
       | "roles"
       | "groupId"
       | "companyName"
+      | "companyLogoUrl"
    >
 ): Speaker => {
    return {
@@ -127,6 +134,7 @@ export const mapCreatorToSpeaker = (
       roles: creator.roles,
       groupId: creator.groupId,
       companyName: creator.companyName,
+      companyLogoUrl: creator.companyLogoUrl,
    }
 }
 
