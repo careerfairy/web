@@ -75,7 +75,7 @@ export const getStaticProps: GetStaticProps = async ({
       }
    }
 
-   let parsedMoreCompanyCaseStudies = []
+   const parsedMoreCompanyCaseStudies = []
 
    for (const moreCaseStudy of moreCompanyCaseStudies) {
       const parsed = await parseCaseStudy(moreCaseStudy)

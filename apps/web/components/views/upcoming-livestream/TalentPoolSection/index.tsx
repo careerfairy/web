@@ -134,7 +134,9 @@ const TalentPoolSection = (props: Props) => {
             userData,
             props.stream
          )
-      } catch (e) {}
+      } catch (e) {
+         console.error("Error joining talent pool:", e)
+      }
       setJoiningTalentPool(false)
    }
 
@@ -164,7 +166,9 @@ const TalentPoolSection = (props: Props) => {
             props.stream.id,
             userData.authId
          )
-      } catch (e) {}
+      } catch (e) {
+         console.error("Error leaving talent pool:", e)
+      }
       setLeavingTalentPool(false)
    }
    return (

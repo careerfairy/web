@@ -9,7 +9,7 @@ const useStoreUTMQueryParams = () => {
 
    useEffect(() => {
       const utmParamsFound: UTMParams = {}
-      for (let utmParam of UTMKeys) {
+      for (const utmParam of UTMKeys) {
          if (router.query[utmParam]) {
             utmParamsFound[utmParam] = router.query[utmParam] + "" // convert to string
          }

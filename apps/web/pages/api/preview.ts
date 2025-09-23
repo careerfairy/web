@@ -60,7 +60,7 @@ const getPreviewData = async (
    const pageType: string | PageTypes = query.pageType as string
 
    switch (pageType) {
-      case "COMPANY_CASE_STUDY":
+      case "COMPANY_CASE_STUDY": {
          const { companyCaseStudy } =
             await caseStudyRepo.getCaseStudyAndMoreCaseStudies(
                query.slug as string,
@@ -70,8 +70,9 @@ const getPreviewData = async (
             hasData: Boolean(companyCaseStudy),
             location: `/companies/customers/${companyCaseStudy.slug}`,
          }
+      }
 
-      case "MARKETING_LANDING_PAGE":
+      case "MARKETING_LANDING_PAGE": {
          const marketingLandingPage = await marketingPageRepo.getMarketingPage({
             slug: query.slug as string,
             preview: true,
@@ -81,8 +82,9 @@ const getPreviewData = async (
             hasData: Boolean(marketingLandingPage),
             location: `/landing/${marketingLandingPage?.slug}`,
          }
+      }
 
-      case "LANDING_PAGE":
+      case "LANDING_PAGE": {
          const landingPage = await marketingPageRepo.getPage({
             slug: query.slug as string,
             preview: true,
@@ -92,6 +94,7 @@ const getPreviewData = async (
             hasData: Boolean(landingPage),
             location: `/landing`,
          }
+      }
 
       default:
          return {

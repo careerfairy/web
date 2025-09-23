@@ -17,21 +17,21 @@ export function useSoundMeter(
 
    const onMicrophoneGranted = useCallback(
       async (stream) => {
-         let audioContext = new AudioContext()
+         const audioContext = new AudioContext()
 
          audioContext.audioWorklet
             .addModule("/volume-meter-processor.js")
             .then(() => {
                const mediaStream = new MediaStream()
                mediaStream.addTrack(stream)
-               let microphone =
+               const microphone =
                   audioContext.createMediaStreamSource(mediaStream)
 
                const node = new AudioWorkletNode(audioContext, "vumeter")
 
                node.port.onmessage = (event) => {
                   let _volume = 0
-                  let _sensibility = 5 // Just to add any sensibility to our ecuation
+                  const _sensibility = 5 // Just to add any sensibility to our ecuation
                   if (event.data.volume) {
                      _volume = event.data.volume
                      if (isMounted()) {

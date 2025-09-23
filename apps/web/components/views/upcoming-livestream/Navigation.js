@@ -45,7 +45,7 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
    }, [aboutRef.current, questionsRef.current, speakersRef.current])
 
    useEffect(() => {
-      if (!"IntersectionObserver" in window) {
+      if (!("IntersectionObserver" in window)) {
          // this browser doesn't seem to support the IntersectionObserver API, do nothing
          return
       }
@@ -59,7 +59,7 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
             entries.forEach((entry) => {
                const entryId = entry.target.id
                if (entry.isIntersecting) {
-                  handleChange(_, entryId)
+                  handleChange(null, entryId)
                }
             })
          }, options)

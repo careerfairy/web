@@ -186,7 +186,7 @@ const PollCategory = ({ livestream, setSelectedState }) => {
    }, [currentPoll?.id, authEmail, setSelectedState])
 
    useEffect(() => {
-      if (!Boolean(currentPoll && authEmail)) {
+      if (!(currentPoll && authEmail)) {
          setValue(0)
       } else if (!hasVoted && !isRecordingWindow) {
          setValue(1)

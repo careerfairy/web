@@ -16,9 +16,9 @@ const useAnimatedNumber = (
       // Save the current value in a variable
       let currentValue = value
       // Save the target value (the initial value) in a variable
-      let targetValue = initialValue
+      const targetValue = initialValue
       // Calculate the increment that will be added to the current value on each interval
-      let increment = (targetValue - currentValue) / (timeout / interval)
+      const increment = (targetValue - currentValue) / (timeout / interval)
 
       // Set an interval that will run every 'interval' milliseconds
       const intervalId = setInterval(() => {

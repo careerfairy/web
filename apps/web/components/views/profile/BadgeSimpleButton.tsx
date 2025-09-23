@@ -55,7 +55,7 @@ const BadgeSimpleButton = ({ badge, isActive, onClick }: Props) => {
 type Props = {
    badge: Badge
    isActive: boolean
-   onClick?: () => {}
+   onClick?: () => void
 }
 
 export default BadgeSimpleButton

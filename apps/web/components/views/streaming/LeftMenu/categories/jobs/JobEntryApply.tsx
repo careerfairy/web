@@ -60,7 +60,7 @@ const JobEntryApply = ({
 
    const missingDataComponents = []
 
-   for (let requiredDataToApplyElement of requiredDataToApply) {
+   for (const requiredDataToApplyElement of requiredDataToApply) {
       if (!userData[requiredDataToApplyElement.field]) {
          missingDataComponents.push(requiredDataToApplyElement.component)
       }

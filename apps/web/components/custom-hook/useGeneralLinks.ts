@@ -105,7 +105,7 @@ export interface PageLinkProps {
    href: string
    title: string
    basePath?: string
-   icon?: React.ReactElement | OverridableComponent<SvgIconTypeMap<{}, "svg">>
+   icon?: React.ReactElement | OverridableComponent<SvgIconTypeMap<Record<string, never>, "svg">>
 }
 
 const landingLinks: PageLinkProps[] = [...initialSecondaryLinks]

@@ -23,14 +23,14 @@ function useFunctionsSWRFetcher<ResponseType>() {
             args = [args] as FunctionCallArgumentFetcher[]
          }
 
-         let promises = []
+         const promises = []
 
-         for (let arg of args) {
+         for (const arg of args) {
             // sometimes the the args have an extra wrapper array..
-            let functionName = Array.isArray(arg[0]) ? arg[0][0] : arg[0]
-            let dataArguments = Array.isArray(arg[0]) ? arg[0][1] : arg[1]
+            const functionName = Array.isArray(arg[0]) ? arg[0][0] : arg[0]
+            const dataArguments = Array.isArray(arg[0]) ? arg[0][1] : arg[1]
 
-            let callable = httpsCallable<unknown, ResponseType>(
+            const callable = httpsCallable<unknown, ResponseType>(
                functionsInstance,
                functionName
             )

@@ -198,7 +198,7 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
                   </Grid>
                </Grid>
                <List className={classes.activeHandRaiseContainer}>
-                  {!Boolean(filteredHandRaises.length) && (
+                  {!filteredHandRaises.length && (
                      <Box
                         display="flex"
                         flexDirection="column"

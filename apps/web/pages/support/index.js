@@ -7,7 +7,7 @@ import SupportCategoriesSection from "../../components/views/support/SupportCate
 const supportBanner =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/support-illustrations%2Fsupport-banner.svg?alt=media&token=23ca911c-9151-4831-9eb1-c13f1ed6fe20"
 
-const SupportPage = ({}) => {
+const SupportPage = () => {
    const {
       palette: {
          common: { white },

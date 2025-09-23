@@ -66,7 +66,7 @@ export function useSearch<T extends Identifiable>(
          searchConstraints.push(where(`triGrams.${name}`, "==", true))
       })
 
-      let constraints: QueryConstraint[] = [
+      const constraints: QueryConstraint[] = [
          ...searchConstraints,
          ...(options.additionalConstraints || []),
          limit(maxResults),

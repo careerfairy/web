@@ -2,7 +2,8 @@ import { window } from "global"
 
 function FilePickerContainer(props) {
    if (window) {
-      var { FilePicker } = require("react-file-picker")
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { FilePicker } = require("react-file-picker")
       return <FilePicker {...props} />
    } else {
       return (

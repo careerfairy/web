@@ -21,7 +21,7 @@ const useInfiniteScroll = <TData>(
 
    useEffect(() => {
       const unsubscribe = query.onSnapshot((querySnapshot) => {
-         let tempItems = []
+         const tempItems = []
          querySnapshot.forEach((doc) => {
             const data = doc.data()
             data.id = doc.id

@@ -58,7 +58,9 @@ const QuestionCard = ({
                   try {
                      setLoading(true)
                      await handleUpvote(question)
-                  } catch (e) {}
+                  } catch (e) {
+                     console.error("Error upvoting question:", e)
+                  }
                   setLoading(false)
                }}
                color={hasVoted(question) || isPastEvent ? "grey" : "primary"}
