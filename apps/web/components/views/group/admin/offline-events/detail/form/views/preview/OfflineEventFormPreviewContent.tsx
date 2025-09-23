@@ -35,16 +35,15 @@ const styles = sxStyles({
    },
 })
 
-type OfflineEventFormPreviewContentProps = {
+type OfflineEventFormPreviewContentProps = OfflineEventPreviewContentProps & {
    isInDialog?: boolean
    handleCloseDialog?: () => void
-   contentProps?: OfflineEventPreviewContentProps
 }
 
 const OfflineEventFormPreviewContent = forwardRef<
    HTMLDivElement,
    OfflineEventFormPreviewContentProps
->(({ isInDialog = false, handleCloseDialog, contentProps }, ref) => {
+>(({ isInDialog = false, handleCloseDialog, ...contentProps }, ref) => {
    return (
       <Box ref={ref} sx={styles.root}>
          {isInDialog ? (

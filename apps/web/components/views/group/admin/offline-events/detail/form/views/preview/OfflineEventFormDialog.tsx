@@ -1,36 +1,103 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Dialog, DialogContent } from "@mui/material"
+import {
+   Dialog,
+   DialogContent,
+   DialogProps,
+   SwipeableDrawerProps,
+   SxProps,
+} from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import BrandedSwipeableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
+import { ReactNode } from "react"
 import OfflineEventFormPreviewContent from "./OfflineEventFormPreviewContent"
 
 // const REAL_DIALOG_WIDTH = 915
 
 const styles = sxStyles({
    dialogContent: {
-      padding: 0, // TODO: Remove this
+      padding: 0,
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
       borderRadius: {
          md: 5,
       },
-      // maxWidth: `${REAL_DIALOG_WIDTH}px`,
       maxHeight: "700px",
-      // height: "100%",
    },
-   dialogPaperMobile: {
+   drawerPaper: {
       ...NICE_SCROLLBAR_STYLES,
-      position: "absolute",
-      bottom: 0,
-      borderRadius: 0, // No border radius for full screen mobile
-      maxHeight: "85vh",
-      height: "850vh",
+      maxHeight: "90vh",
       borderTopLeftRadius: "18px",
       borderTopRightRadius: "18px",
    },
 })
+
+type CustomResponsiveDialogProps = {
+   handleClose?: () => unknown
+   open: boolean
+   children: ReactNode
+   hideDragHandle?: boolean
+   dialogPaperStyles?: SxProps
+   drawerPaperStyles?: SxProps
+   TransitionComponent?: DialogProps["TransitionComponent"]
+   SlideProps?: SwipeableDrawerProps["SlideProps"]
+   TransitionProps?: DialogProps["TransitionProps"]
+   dataTestId?: string
+}
+
+const CustomResponsiveDialog = ({
+   children,
+   open,
+   handleClose,
+   hideDragHandle,
+   dialogPaperStyles,
+   drawerPaperStyles,
+   TransitionComponent,
+   SlideProps,
+   TransitionProps,
+   dataTestId,
+}: CustomResponsiveDialogProps) => {
+   const isMobile = useIsMobile()
+
+   if (isMobile) {
+      return (
+         <BrandedSwipeableDrawer
+            open={open}
+            anchor="bottom"
+            PaperProps={{
+               sx: drawerPaperStyles,
+               "data-testid": dataTestId,
+            }}
+            onOpen={() => {}}
+            onClose={handleClose}
+            disableEnforceFocus
+            hideDragHandle={hideDragHandle}
+            SlideProps={SlideProps}
+         >
+            {children}
+         </BrandedSwipeableDrawer>
+      )
+   }
+   return (
+      <Dialog
+         open={open}
+         maxWidth={"md"}
+         onClose={handleClose}
+         PaperProps={{
+            sx: dialogPaperStyles,
+            "data-testid": dataTestId,
+         }}
+         fullWidth
+         disableEnforceFocus
+         TransitionComponent={TransitionComponent}
+         TransitionProps={TransitionProps}
+      >
+         {children}
+      </Dialog>
+   )
+}
 
 type OfflineEventFormDialogProps = {
    isOpen: boolean
@@ -41,20 +108,14 @@ const OfflineEventFormDialog = ({
    isOpen,
    handleClose,
 }: OfflineEventFormDialogProps) => {
-   const isMobile = useIsMobile()
-
    return (
-      <Dialog
+      <CustomResponsiveDialog
          open={isOpen}
-         onClose={handleClose}
+         handleClose={handleClose}
          TransitionComponent={SlideUpTransition}
-         maxWidth="md"
-         fullWidth
-         fullScreen={isMobile}
-         closeAfterTransition={true}
-         PaperProps={{
-            sx: isMobile ? styles.dialogPaperMobile : styles.dialogPaper,
-         }}
+         dialogPaperStyles={styles.dialogPaper}
+         drawerPaperStyles={styles.drawerPaper}
+         dataTestId="offline-event-preview-dialog"
       >
          <DialogContent sx={styles.dialogContent}>
             <OfflineEventFormPreviewContent
@@ -62,7 +123,7 @@ const OfflineEventFormDialog = ({
                handleCloseDialog={handleClose}
             />
          </DialogContent>
-      </Dialog>
+      </CustomResponsiveDialog>
    )
 }
 

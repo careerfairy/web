@@ -3,7 +3,6 @@ import { AuthorInfo } from "@careerfairy/shared-lib/livestreams"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import FirebaseService from "data/firebase/FirebaseService"
 import { Formik } from "formik"
-import { DateTime } from "luxon"
 import { ReactNode } from "react"
 import { OfflineEventFormValues } from "./types"
 import { offlineEventFormValidationSchema } from "./validationSchemas"
@@ -18,7 +17,7 @@ const formGeneralTabInitialValues: OfflineEventFormValues["general"] = {
       fieldOfStudies: [],
    },
    registrationUrl: "",
-   startAt: DateTime.now().plus({ hour: 1 }).toJSDate(),
+   startAt: null,
    backgroundImageUrl: "",
    hidden: false,
 }
@@ -48,7 +47,9 @@ export const buildDraftOfflineEventObject = (
       status: "draft",
       industries: group.companyIndustries,
       author: author,
-      startAt: firebase.getFirebaseTimestamp(values.general.startAt),
+      startAt: values.general.startAt
+         ? firebase.getFirebaseTimestamp(values.general.startAt)
+         : null,
       createdAt: firebase.getFirebaseTimestamp(new Date()),
       updatedAt: firebase.getFirebaseTimestamp(new Date()),
       lastUpdatedBy: author,
