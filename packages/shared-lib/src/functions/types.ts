@@ -43,3 +43,8 @@ export type DeleteLivestreamRequest = {
    collection: "livestreams" | "draftLivestreams"
    groupId: string
 }
+
+export type GetNearbyOfflineEventsRequest = {
+   radiusInKm: number
+   limit: number
+}

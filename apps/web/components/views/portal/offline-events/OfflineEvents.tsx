@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material"
+import { useNearbyOfflineEvents } from "components/custom-hook/offline-event/useNearbyOfflineEvents"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
-import { offlineEventService } from "data/firebase/OfflineEventService"
-import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 import { OfflineEventCard } from "./OfflineEventCard"
 
@@ -20,13 +19,7 @@ const styles = sxStyles({
 })
 
 export const OfflineEvents = () => {
-   const { data: events } = useSWR(
-      "offline-events",
-      offlineEventService.getMany,
-      {
-         fallbackData: [],
-      }
-   )
+   const { data: events } = useNearbyOfflineEvents()
 
    return (
       <Box sx={styles.root}>
@@ -41,7 +34,7 @@ export const OfflineEvents = () => {
             headerRightSx={styles.headerRight}
             disableArrows={false}
          >
-            {events.map((event, index) => (
+            {events?.map((event, index) => (
                <OfflineEventCard event={event} key={event.id + index} />
             ))}
          </ContentCarousel>

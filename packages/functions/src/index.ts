@@ -89,6 +89,7 @@ import countries = require("./countries")
 import levels = require("./levels")
 import remindersNew = require("./reminders-new")
 import followups = require("./followups")
+import offlineEvents = require("./offlineEvents")
 
 // Auth
 exports[FUNCTION_NAMES.createNewUserAccount] = auth.createNewUserAccount
@@ -247,6 +248,10 @@ exports.updateUserJobApplications_eu = atsUser.updateUserJobApplications
 
 // BigQuery
 exports.getBigQueryUsers_v2 = bigQuery.getBigQueryUsers
+
+// Offline Events
+exports[FUNCTION_NAMES.getNearbyOfflineEvents] =
+   offlineEvents.getNearbyOfflineEvents
 
 // Group Analytics
 exports.getRegistrationSources_eu = groupAnalytics.getRegistrationSources
