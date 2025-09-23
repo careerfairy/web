@@ -2,12 +2,11 @@ import { FormBrandedTextField } from "components/views/common/inputs/BrandedText
 import FormSectionHeader from "components/views/group/admin/events/detail/form/FormSectionHeader"
 
 import { AddressAutofillOptions } from "@mapbox/search-js-core"
-import { Box } from "@mui/material"
 import FormLocationAutoFill from "components/views/common/inputs/FormLocationAutoFill"
-import BannerImageSelect from "components/views/group/admin/events/detail/form/views/general/components/BannerImageSelect"
 
 import { useOfflineEventCreationContext } from "../../../OfflineEventCreationContext"
 import MakeExclusiveSwitch from "./components/MakeExclusiveSwitch"
+import { OfflineEventBannerImageSelect } from "./components/OfflineEventBannerImageSelect"
 import StartDateTimePicker from "./components/StartDateTimePicker"
 
 const DESCRIPTION_PLACEHOLDER =
@@ -34,21 +33,7 @@ export const GeneralSettings = () => {
             placeholder="E.g., Discover the internship opportunities in our IT transformation team!"
             requiredText="(required)"
          />
-         <Box>
-            <BannerImageSelect
-               fieldName="general.backgroundImageUrl"
-               emptyBannerLabel="Upload your event banner image"
-               recommendedSizeLabel="Recommended size: 1920x1080"
-               withCropper={true}
-               cropperConfig={{
-                  title: "Upload event banner image",
-                  type: "rectangle",
-                  aspectRatio: 3 / 2,
-                  cropBoxResizable: true,
-                  key: "offline-event-banner-cropper",
-               }}
-            />
-         </Box>
+         <OfflineEventBannerImageSelect />
          <StartDateTimePicker
             fieldName="general.startAt"
             label="Event date"
@@ -57,7 +42,7 @@ export const GeneralSettings = () => {
          <FormLocationAutoFill
             name="general.street"
             label="Address"
-            placeholder="E.g., Max-Daetwyler-Platz 2"
+            placeholder="E.g., Max-Daetwyler-Platz 2, 8004 Zürich"
             requiredText="(required)"
             options={options}
          />

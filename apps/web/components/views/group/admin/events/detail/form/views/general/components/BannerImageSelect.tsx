@@ -4,6 +4,8 @@ import {
    Collapse,
    FormHelperText,
    Stack,
+   SxProps,
+   Theme,
    Typography,
 } from "@mui/material"
 import useFileUploader from "components/custom-hook/useFileUploader"
@@ -18,7 +20,7 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useField } from "formik"
 import { useCallback, useState } from "react"
 import { Upload } from "react-feather"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { UploadIcon } from "./UploadIcon"
 
 const PLACEHOLDER_BANNER_URL =
@@ -112,8 +114,11 @@ const styles = sxStyles({
    },
 })
 
-const getStyles = (hasError: boolean) =>
-   sxStyles({
+const getStyles = (
+   hasError: boolean,
+   customContainerStyles?: SxProps<Theme>
+) => {
+   const baseStyles = sxStyles({
       root: {
          position: "relative",
          height: {
@@ -130,6 +135,14 @@ const getStyles = (hasError: boolean) =>
       },
       ...styles,
    })
+
+   return {
+      ...baseStyles,
+      root: customContainerStyles
+         ? combineStyles([baseStyles.root, customContainerStyles])
+         : baseStyles.root,
+   }
+}
 
 const DEFAULT_FIELD_NAME = "general.backgroundImageUrl"
 const DEFAULT_EMPTY_BANNER_LABEL = "Upload your live stream banner image"
@@ -211,9 +224,10 @@ const EmptyBanner = ({
 
 type BannerWithImage = {
    imageUrl: string
+   customStyles?: SxProps<Theme>
 }
 
-const BannerWithImage = ({ imageUrl }: BannerWithImage) => {
+const BannerWithImage = ({ imageUrl, customStyles }: BannerWithImage) => {
    return (
       <>
          <Box sx={styles.changeBannerButtonWrapper}>
@@ -223,7 +237,11 @@ const BannerWithImage = ({ imageUrl }: BannerWithImage) => {
             component="img"
             src={imageUrl}
             alt="Banner"
-            sx={styles.bannerImage}
+            sx={
+               customStyles
+                  ? combineStyles([styles.bannerImage, customStyles])
+                  : styles.bannerImage
+            }
          />
       </>
    )
@@ -235,6 +253,8 @@ type BannerImageSelectProps = {
    recommendedSizeLabel?: string
    withCropper?: boolean
    cropperConfig?: CropperConfig
+   bannerImageStyles?: SxProps<Theme>
+   containerStyles?: SxProps<Theme>
 }
 
 const BannerImageSelect = ({
@@ -243,6 +263,8 @@ const BannerImageSelect = ({
    recommendedSizeLabel = DEFAULT_RECOMMENDED_SIZE,
    withCropper = false,
    cropperConfig,
+   bannerImageStyles,
+   containerStyles,
 }: BannerImageSelectProps) => {
    const firebase = useFirebaseService()
    const [field, meta, helpers] = useField(fieldName)
@@ -310,7 +332,10 @@ const BannerImageSelect = ({
       },
    })
 
-   const styles = getStyles(Boolean(meta.touched && meta.error))
+   const styles = getStyles(
+      Boolean(meta.touched && meta.error),
+      containerStyles
+   )
 
    return (
       <>
@@ -334,7 +359,10 @@ const BannerImageSelect = ({
             <FileUploader {...fileUploaderProps} sx={styles.fileUploader}>
                <>
                   {field.value ? (
-                     <BannerWithImage imageUrl={field.value} />
+                     <BannerWithImage
+                        imageUrl={field.value}
+                        customStyles={bannerImageStyles}
+                     />
                   ) : (
                      <EmptyBanner
                         emptyBannerLabel={emptyBannerLabel}
