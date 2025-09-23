@@ -414,6 +414,14 @@ const moduleExports = {
             destination: "/group/:groupId/admin/content/live-streams",
             permanent: false,
          },
+         /**
+          * Redirect /panels page to /portal
+          */
+         {
+            source: "/panels",
+            destination: "/portal",
+            permanent: false,
+         },
       ]
    },
 

@@ -245,7 +245,7 @@ const PanelsCTA = () => {
    return (
       <Button
          component={Link}
-         href="/panels"
+         href="/portal"
          sx={styles.ctaButton}
          endIcon={<ChevronRight size={18} />}
       >
@@ -260,7 +260,7 @@ const PanelsMobileCTA = () => {
          <Box sx={styles.mobileDivider} />
          <Stack
             component={Link}
-            href="/panels"
+            href="/portal"
             sx={styles.mobileCta}
             direction="row"
          >

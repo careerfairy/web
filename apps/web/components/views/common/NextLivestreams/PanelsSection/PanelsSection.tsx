@@ -89,7 +89,7 @@ export const PanelsSection = ({ panels }: Props) => {
             {!isMobile ? (
                <Button
                   component={Link}
-                  href="/panels"
+                  href="/portal"
                   shallow
                   scroll={false}
                   sx={styles.linkButton}
