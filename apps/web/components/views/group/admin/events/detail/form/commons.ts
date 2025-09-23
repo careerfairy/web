@@ -111,6 +111,7 @@ const mapCreatorToSpeaker = (creator: Creator): Speaker => {
       roles: creator.roles,
       groupId: creator.groupId,
       ...(creator.companyName && { companyName: creator.companyName }),
+      ...(creator.companyLogoUrl && { companyLogoUrl: creator.companyLogoUrl }),
    }
 }
 

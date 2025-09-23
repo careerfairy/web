@@ -15,6 +15,8 @@ import { useLivestreamData } from "components/custom-hook/streaming"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { getStreamerDisplayName } from "../util"
@@ -85,6 +87,22 @@ const styles = sxStyles({
    actionsWrapper: {
       gap: "8px",
       alignItems: "center",
+   },
+   companyLogoWrapper: {
+      position: "absolute",
+      bottom: { xs: -2, md: 0 },
+      right: { xs: -2, md: 0 },
+      width: 28,
+      height: 28,
+      borderRadius: "50%",
+      overflow: "hidden",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
+   },
+   companyLogo: {
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
    },
 })
 
@@ -208,19 +226,35 @@ const StreamerAvatar = ({ streamerDetails }: StreamerDetailsProps) => {
       streamerDetails.firstName,
       streamerDetails.lastName
    )
+
    return (
       <Stack sx={styles.avatarAndName}>
-         <Avatar
-            src={streamerDetails.avatarUrl}
-            alt={displayName}
-            sx={styles.avatar}
-         />
+         <Box sx={{ position: "relative" }}>
+            <Avatar
+               src={streamerDetails.avatarUrl}
+               alt={displayName}
+               sx={styles.avatar}
+            />
+            {streamerDetails.companyLogoUrl ? (
+               <Box sx={styles.companyLogoWrapper}>
+                  <CircularLogo
+                     src={getResizedUrl(streamerDetails.companyLogoUrl, "sm")}
+                     size={28}
+                     alt={`${streamerDetails.companyName || "Company"} logo`}
+                     objectFit="cover"
+                     sx={styles.companyLogo}
+                  />
+               </Box>
+            ) : null}
+         </Box>
          <Stack sx={styles.nameAndRole}>
             <Typography variant="brandedH5" sx={styles.fontWeight}>
                {displayName}
             </Typography>
             <Typography variant="small" sx={styles.role}>
                {streamerDetails.role}
+               {Boolean(streamerDetails.companyName) &&
+                  `  at ${streamerDetails.companyName}`}
             </Typography>
          </Stack>
       </Stack>
