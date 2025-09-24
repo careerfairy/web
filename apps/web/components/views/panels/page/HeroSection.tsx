@@ -25,7 +25,7 @@ const styles = sxStyles({
       position: "relative",
       height: { xs: "812px", md: "431px" },
       background:
-         "linear-gradient(0deg, #EDFAF8 0%, #EDFAF8 100%), linear-gradient(104deg, #F5FFF9 0%, #F5FFF9 100%), linear-gradient(169deg, rgba(31, 219, 192, 0.13) 1.77%, rgba(42, 186, 165, 0.00) 98.23%), linear-gradient(25deg, rgba(42, 186, 165, 0.00) -0.66%, rgba(31, 219, 192, 0.48) 141.07%), #376B65",
+         "linear-gradient(0deg, #EDF4FA 0%, #EDF4FA 100%), linear-gradient(104deg, #F5FFF9 0%, #F5FFF9 100%), linear-gradient(169deg, rgba(31, 219, 192, 0.13) 1.77%, rgba(42, 186, 165, 0.00) 98.23%), linear-gradient(25deg, rgba(42, 186, 165, 0.00) -0.66%, rgba(31, 219, 192, 0.48) 141.07%), #376B65",
    },
    logoContainer: {
       gap: 0.5,
