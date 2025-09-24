@@ -58,18 +58,14 @@ export const OfflineEventTopActions = () => {
             </Box>
          )}
 
-         {Boolean(
-            hasAutoSaved && !isAutoSaving && offlineEvent.status === "draft"
-         ) && (
+         {Boolean(hasAutoSaved && !isAutoSaving && !offlineEvent.published) && (
             <Box sx={styles.wrapper}>
                <Save size={ICON_SIZE} />
                {Boolean(!isMobile) && <Typography>Draft saved</Typography>}
             </Box>
          )}
 
-         {Boolean(
-            hasAutoSaved && !isAutoSaving && offlineEvent.status !== "draft"
-         ) && (
+         {Boolean(hasAutoSaved && !isAutoSaving && offlineEvent.published) && (
             <Box sx={styles.wrapper}>
                <Save size={ICON_SIZE} />
                {Boolean(!isMobile) && <Typography>Changes saved</Typography>}
