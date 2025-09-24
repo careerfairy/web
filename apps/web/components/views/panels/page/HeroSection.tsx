@@ -163,7 +163,7 @@ export default function HeroSection({
          <Box aria-hidden sx={styles.visualSupportContainer}>
             <Box aria-hidden sx={styles.visualSupportLeft}>
                <Image
-                  src="/panels/header-left-visual-support.svg"
+                  src="/panels/header-left-visual-support-consulting.svg"
                   alt=""
                   width={300}
                   height={300}
@@ -173,7 +173,7 @@ export default function HeroSection({
             {Boolean(isLargeScreen) && (
                <Box aria-hidden sx={styles.visualSupportRight}>
                   <Image
-                     src="/panels/header-right-visual-support.svg"
+                     src="/panels/header-right-visual-support-consulting.svg"
                      alt=""
                      width={300}
                      height={300}
