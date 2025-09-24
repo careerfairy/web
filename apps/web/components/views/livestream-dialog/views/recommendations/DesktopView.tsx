@@ -166,6 +166,7 @@ const Recommendations = ({
    events: LivestreamEvent[]
    loading: boolean
 }) => {
+   const { livestream } = useLiveStreamDialog()
    const singleColumn = useIsMobile(1250)
 
    return (
@@ -189,6 +190,7 @@ const Recommendations = ({
             singleColumn={singleColumn}
             events={events}
             loading={loading}
+            originLivestreamId={livestream.id}
          />
       </RecommendationsContainer>
    )

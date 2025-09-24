@@ -203,6 +203,7 @@ const Recommendations = ({
                   singleColumn={isSmall}
                   events={events}
                   loading={loadingEvents}
+                  originLivestreamId={livestream.id}
                />
             )}
          </AnimatePresence>
