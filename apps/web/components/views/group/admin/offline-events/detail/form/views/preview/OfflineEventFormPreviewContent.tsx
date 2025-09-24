@@ -12,7 +12,6 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.brand.black[500],
       borderRadius: 3,
       padding: 0,
-      // minHeight: 400,
       width: "100%",
       display: "flex",
       alignItems: "center",
