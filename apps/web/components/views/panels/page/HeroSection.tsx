@@ -70,7 +70,7 @@ const styles = sxStyles({
       zIndex: 1,
    },
    tagChip: {
-      backgroundColor: "rgba(55, 107, 101, 0.22)",
+      backgroundColor: "#D7DCE1",
       color: "neutral.700",
       px: 4,
       py: 1,
@@ -201,10 +201,13 @@ export default function HeroSection({
 
             <Stack sx={styles.tagChips}>
                <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Free online sessions</Typography>
+                  <Typography variant="medium">Talk to real consultants</Typography>
                </Box>
                <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Top companies</Typography>
+                  <Typography variant="medium">Cases, tips & more</Typography>
+               </Box>
+               <Box sx={styles.tagChip}>
+                  <Typography variant="medium">Live Interaction</Typography>
                </Box>
             </Stack>
          </Stack>
