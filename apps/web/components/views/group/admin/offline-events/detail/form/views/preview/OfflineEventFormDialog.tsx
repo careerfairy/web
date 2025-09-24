@@ -13,8 +13,6 @@ import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import { ReactNode } from "react"
 import OfflineEventFormPreviewContent from "./OfflineEventFormPreviewContent"
 
-// const REAL_DIALOG_WIDTH = 915
-
 const styles = sxStyles({
    dialogContent: {
       padding: 0,
