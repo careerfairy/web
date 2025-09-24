@@ -44,7 +44,8 @@ export const buildDraftOfflineEventObject = (
       backgroundImageUrl: values.general.backgroundImageUrl,
       hidden: values.general.hidden,
       address: values.general.address,
-      status: "draft",
+      published: false,
+      publishedAt: null,
       industries: group.companyIndustries,
       author: author,
       startAt: values.general.startAt

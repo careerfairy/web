@@ -54,7 +54,8 @@ export const usePublishOfflineEvent = () => {
             hidden: updatedOfflineEvent.hidden,
             address: updatedOfflineEvent.address,
             startAt: updatedOfflineEvent.startAt,
-            status: "upcoming", // Change status from draft to upcoming
+            published: true,
+            publishedAt: firebaseService.getFirebaseTimestamp(new Date()),
          }
 
          // Update the offline event in Firebase
@@ -66,12 +67,6 @@ export const usePublishOfflineEvent = () => {
                })
                router.push(`/group/${group.id}/admin/content/offline-events`)
             })
-
-         // enqueueSnackbar("Offline event published successfully!", {
-         //    variant: "success",
-         // })
-
-         // router.push(`/group/${group.id}/admin/content/offline-events`)
       } catch (error) {
          errorLogAndNotify(error, {
             message: "Failed to publish offline event",

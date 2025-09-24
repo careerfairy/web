@@ -72,7 +72,7 @@ export const useAutoSave = () => {
    }, [values, haveValuesChanged, offlineEvent?.id, updateOfflineEvent])
 
    useEffect(() => {
-      const isDraft = offlineEvent?.status === "draft"
+      const isDraft = !offlineEvent?.published
 
       const debounceTimeout = setTimeout(async () => {
          try {
@@ -100,7 +100,7 @@ export const useAutoSave = () => {
       values,
       haveValuesChanged,
       isAutoSaving,
-      offlineEvent?.status,
+      offlineEvent?.published,
       isValid,
       handleAutoSave,
       enqueueSnackbar,
