@@ -32,46 +32,18 @@ export const useTopCommunityQuestions = (groupId: string) => {
          const oneYearAgo = new Date()
          oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
 
-         // Calculate the cutoff date for past streams (not upcoming)
-         const pastStreamCutoff = new Date(
-            Date.now() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS
-         )
-
-         // Calculate date 1 year from now for upcoming streams
-         const oneYearFromNow = new Date()
-         oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1)
-
-         // Fetch past livestreams from the last 1 year for this group
-         const pastLivestreamsQuery = query(
+         // Fetch all livestreams from the last 12 months and upcoming ones for this group
+         // Using a single query that gets all streams from 1 year ago to future
+         const livestreamsQuery = query(
             collection(firestore, "livestreams"),
             where("test", "==", false),
             where("groupIds", "array-contains", groupId),
-            where("start", "<", pastStreamCutoff), // Only past streams
-            where("start", ">", oneYearAgo), // Only from last 1 year
+            where("start", ">", oneYearAgo), // From last 1 year to future
             orderBy("start", "desc")
          ).withConverter(createGenericConverter<LivestreamEvent>())
 
-         // Fetch upcoming livestreams for this group (within the next year)
-         const upcomingLivestreamsQuery = query(
-            collection(firestore, "livestreams"),
-            where("test", "==", false),
-            where("groupIds", "array-contains", groupId),
-            where("start", ">=", pastStreamCutoff), // Only upcoming streams
-            where("start", "<", oneYearFromNow), // Within the next year
-            orderBy("start", "asc")
-         ).withConverter(createGenericConverter<LivestreamEvent>())
-
-         // Execute both queries in parallel
-         const [pastLivestreamsSnapshot, upcomingLivestreamsSnapshot] = await Promise.all([
-            getDocs(pastLivestreamsQuery),
-            getDocs(upcomingLivestreamsQuery)
-         ])
-
-         const pastLivestreams = pastLivestreamsSnapshot.docs.map((doc) => doc.data())
-         const upcomingLivestreams = upcomingLivestreamsSnapshot.docs.map((doc) => doc.data())
-         
-         // Combine past and upcoming streams
-         const allLivestreams = [...pastLivestreams, ...upcomingLivestreams]
+         const livestreamsSnapshot = await getDocs(livestreamsQuery)
+         const allLivestreams = livestreamsSnapshot.docs.map((doc) => doc.data())
 
          // Return empty array if no livestreams found
          if (!allLivestreams?.length) {
