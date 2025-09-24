@@ -27,16 +27,28 @@ const styles = sxStyles({
       background:
          "linear-gradient(0deg, #EDF4FA 0%, #EDF4FA 100%), linear-gradient(104deg, #F5FFF9 0%, #F5FFF9 100%), linear-gradient(169deg, rgba(31, 219, 192, 0.13) 1.77%, rgba(42, 186, 165, 0.00) 98.23%), linear-gradient(25deg, rgba(42, 186, 165, 0.00) -0.66%, rgba(31, 219, 192, 0.48) 141.07%), #376B65",
    },
-   logoContainer: {
-      gap: 0.5,
-      alignItems: "center",
+   contentContainer: {
+      display: "flex",
+      flexDirection: { xs: "column", md: "row" },
+      gap: { xs: 2, md: 4 },
       zIndex: 1,
-      maxWidth: { xs: "100%", sm: "534px" },
-      alignSelf: "center",
+      alignItems: { xs: "center", md: "flex-start" },
+   },
+   titleContainer: {
+      flex: { xs: "none", md: "1" },
+      display: "flex",
+      alignItems: "center",
+   },
+   contentRightContainer: {
+      flex: { xs: "none", md: "1" },
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px",
+      alignItems: { xs: "center", md: "flex-start" },
    },
    brandTagline: {
       color: "neutral.700",
-      textAlign: "center",
+      textAlign: { xs: "center", md: "left" },
    },
    // Container to clip visual support elements
    visualSupportContainer: {
@@ -65,8 +77,8 @@ const styles = sxStyles({
    tagChips: {
       gap: { xs: 2, md: 2 },
       flexDirection: { xs: "column", md: "row" },
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: { xs: "center", md: "flex-start" },
+      justifyContent: { xs: "center", md: "flex-start" },
       zIndex: 1,
    },
    tagChip: {
@@ -182,33 +194,36 @@ export default function HeroSectionConsulting({
                </Box>
             )}
          </Box>
-         <Stack spacing={1.5}>
-            <Stack sx={styles.logoContainer}>
+         <Stack sx={styles.contentContainer}>
+            <Stack sx={styles.titleContainer}>
                <Typography
                   variant="h2"
                   sx={{
                      fontWeight: 600,
                      color: "#4A72C8",
-                     textAlign: "center",
+                     textAlign: { xs: "center", md: "left" },
                   }}
                >
                   Consulting collection
                </Typography>
+            </Stack>
+
+            <Stack sx={styles.contentRightContainer}>
                <Typography variant="medium" sx={{ ...styles.brandTagline, color: "neutral.800" }}>
                   Join live sessions with Europe's top consulting firms packed with career tips and real stories from young consultants
                </Typography>
-            </Stack>
 
-            <Stack sx={styles.tagChips}>
-               <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Talk to real consultants</Typography>
-               </Box>
-               <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Cases, tips & more</Typography>
-               </Box>
-               <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Live Interaction</Typography>
-               </Box>
+               <Stack sx={styles.tagChips}>
+                  <Box sx={styles.tagChip}>
+                     <Typography variant="medium">Talk to real consultants</Typography>
+                  </Box>
+                  <Box sx={styles.tagChip}>
+                     <Typography variant="medium">Cases, tips & more</Typography>
+                  </Box>
+                  <Box sx={styles.tagChip}>
+                     <Typography variant="medium">Live Interaction</Typography>
+                  </Box>
+               </Stack>
             </Stack>
          </Stack>
 
