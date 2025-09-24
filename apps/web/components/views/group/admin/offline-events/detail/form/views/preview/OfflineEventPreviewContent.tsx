@@ -1,5 +1,6 @@
 import {
    Box,
+   Button,
    Skeleton,
    Stack,
    StackProps,
@@ -247,6 +248,16 @@ const Details = ({ detailsDirection = "row" }: DetailsProps) => {
          </Stack>
          <OrganizedBy />
          <About />
+         <Stack width={"100%"} alignItems={"center"} px={1}>
+            <Button variant="contained" color="primary" sx={{ width: "100%" }}>
+               <Typography
+                  variant="medium"
+                  color={(theme) => theme.brand.white[100]}
+               >
+                  Register to event
+               </Typography>
+            </Button>
+         </Stack>
       </Stack>
    )
 }
