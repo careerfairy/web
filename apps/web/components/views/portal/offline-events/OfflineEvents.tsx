@@ -1,8 +1,9 @@
 import { Box, Typography } from "@mui/material"
-import { useNearbyOfflineEvents } from "components/custom-hook/offline-event/useNearbyOfflineEvents"
+import { useOfflineEvents } from "components/custom-hook/offline-event/useOfflineEvents"
 import { ContentCarousel } from "components/views/common/carousels/ContentCarousel"
 import { sxStyles } from "types/commonTypes"
 import { OfflineEventCard } from "./OfflineEventCard"
+import { OfflineEventCardSkeleton } from "./OfflineEventCardSkeleton"
 
 const styles = sxStyles({
    root: {
@@ -19,7 +20,7 @@ const styles = sxStyles({
 })
 
 export const OfflineEvents = () => {
-   const { data: events } = useNearbyOfflineEvents()
+   const { data: events, isLoading } = useOfflineEvents()
 
    return (
       <Box sx={styles.root}>
@@ -34,9 +35,13 @@ export const OfflineEvents = () => {
             headerRightSx={styles.headerRight}
             disableArrows={false}
          >
-            {events?.map((event, index) => (
-               <OfflineEventCard event={event} key={event.id + index} />
-            ))}
+            {isLoading
+               ? Array.from({ length: 3 }).map((_, index) => (
+                    <OfflineEventCardSkeleton key={index} />
+                 ))
+               : events?.map((event, index) => (
+                    <OfflineEventCard event={event} key={event.id + index} />
+                 ))}
          </ContentCarousel>
       </Box>
    )

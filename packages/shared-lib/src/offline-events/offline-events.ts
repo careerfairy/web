@@ -1,5 +1,4 @@
 import { AddressAutofillFeatureSuggestion } from "@mapbox/search-js-core"
-import { GeoPoint } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
@@ -19,8 +18,6 @@ export interface OfflineEvent extends Identifiable {
    title: string
    description: string
    street: AddressAutofillFeatureSuggestion
-   location: GeoPoint
-   geoHash: string
    industries: GroupOption[]
    targetAudience: OfflineEventTargetAudience
    status: OfflineEventStatus

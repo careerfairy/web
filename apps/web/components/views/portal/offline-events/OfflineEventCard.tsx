@@ -62,6 +62,7 @@ const styles = sxStyles({
    },
    detailText: {
       color: "neutral.700",
+      ...getMaxLineStyles(1),
    },
 })
 
@@ -71,7 +72,7 @@ type Props = {
 
 export const OfflineEventCard = ({ event }: Props) => {
    const { pathname } = useRouter()
-   const { backgroundImageUrl, company, title, address, startAt } = event
+   const { backgroundImageUrl, group, title, street, startAt } = event
 
    return (
       <Box
@@ -99,12 +100,12 @@ export const OfflineEventCard = ({ event }: Props) => {
          <Stack sx={styles.content}>
             <Box sx={styles.row} pt={1}>
                <CircularLogo
-                  src={company?.logoUrl || ""}
-                  alt={`${company.name} logo`}
+                  src={group?.logoUrl || ""}
+                  alt={`${group.universityName} logo`}
                   size={28}
                />
                <Typography variant="brandedBody" sx={styles.companyName}>
-                  {company.name}
+                  {group.universityName}
                </Typography>
             </Box>
 
@@ -120,7 +121,8 @@ export const OfflineEventCard = ({ event }: Props) => {
             <Box pt={1} sx={styles.detailRow}>
                <Box component={MapPin} sx={styles.icon} />
                <Typography variant="small" sx={styles.detailText}>
-                  {address.street} {address.cityISOCode.name}
+                  {street.properties.address_level2},{" "}
+                  {street.properties.address_level1}
                </Typography>
             </Box>
 

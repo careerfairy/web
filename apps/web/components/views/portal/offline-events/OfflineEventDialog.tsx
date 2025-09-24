@@ -21,7 +21,6 @@ import {
 } from "components/views/common/transitions"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import { offlineEventService } from "data/firebase/OfflineEventService"
-import { groupRepo } from "data/RepositoryInstances"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -239,13 +238,8 @@ const Content = ({
 }) => {
    const isMobile = useIsMobile()
 
-   const { data: group } = useSWR(
-      event?.company?.groupId ? ["group", event.company.groupId] : null,
-      () => groupRepo.getGroupById(event?.company?.groupId)
-   )
-
-   const companyUrl = group?.publicProfile
-      ? makeGroupCompanyPageUrl(group?.universityName, {
+   const companyUrl = event?.group?.publicProfile
+      ? makeGroupCompanyPageUrl(event?.group?.universityName, {
            interactionSource: InteractionSources.Offline_Event_Dialog,
         })
       : undefined
@@ -253,8 +247,6 @@ const Content = ({
    const {
       backgroundImageUrl,
       title,
-      company,
-      address,
       startAt,
       description,
       registrationUrl,
@@ -336,16 +328,16 @@ const Content = ({
                   Organised by
                </Typography>
                <Box sx={styles.organisedRow}>
-                  {company?.logoUrl ? (
+                  {event?.group?.logoUrl ? (
                      <CircularLogo
-                        src={company?.logoUrl || ""}
-                        alt={`${company?.name} logo`}
+                        src={event?.group?.logoUrl || ""}
+                        alt={`${event?.group?.universityName} logo`}
                         size={40}
                      />
                   ) : null}
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                      <Typography variant="medium" color="neutral.800">
-                        {company?.name}
+                        {event?.group?.universityName}
                      </Typography>
                      <br />
                      {industries?.[0]?.name ? (
