@@ -3,7 +3,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { Stack } from "@mui/material"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import {
-   HeroSection,
+   HeroSectionConsulting,
    NotForYouSection,
    ParticipatingCompaniesSection,
    RegisterNowSection,
@@ -127,7 +127,7 @@ export default function ConsultingPage({
       <>
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
-               <HeroSection
+               <HeroSectionConsulting
                   consultingLivestreams={deserializedConsultingLivestreams}
                   companies={companies}
                   handleOpenLivestreamDialog={handleOpenPanelDialog}
