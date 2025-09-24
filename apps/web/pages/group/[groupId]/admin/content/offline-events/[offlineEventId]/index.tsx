@@ -5,6 +5,7 @@ import { OfflineEventCreationContextProvider } from "components/views/group/admi
 import { OfflineEventTopActions } from "components/views/group/admin/offline-events/detail/OfflineEventTopActions"
 import OfflineEventForm from "components/views/group/admin/offline-events/detail/form/OfflineEventForm"
 import OfflineEventFormikProvider from "components/views/group/admin/offline-events/detail/form/OfflineEventFormikProvider"
+import OfflineEventAdminDetailBottomBarNavigation from "components/views/group/admin/offline-events/detail/navigation/OfflineEventAdminDetailBottomBarNavigation"
 import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
 import { NextPage } from "next"
 import { useRouter } from "next/router"
@@ -65,6 +66,7 @@ OfflineEventAdminDetailsPage.getLayout = function getLayout(
       wrapper: (layoutContent) => (
          <OfflineEventLayoutWrapper>{layoutContent}</OfflineEventLayoutWrapper>
       ),
+      bottomBarNavigation: <OfflineEventAdminDetailBottomBarNavigation />,
    })(page)
 }
 
