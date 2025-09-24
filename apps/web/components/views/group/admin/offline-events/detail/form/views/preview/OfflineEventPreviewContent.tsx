@@ -84,7 +84,6 @@ const styles = sxStyles({
       width: "100%",
       aspectRatio: "3/2",
       overflow: "hidden",
-      maxHeight: "40vh",
       borderTopLeftRadius: "12px",
       borderTopRightRadius: "12px",
    },
