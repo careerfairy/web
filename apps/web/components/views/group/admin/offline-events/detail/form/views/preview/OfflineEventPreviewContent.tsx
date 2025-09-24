@@ -134,6 +134,11 @@ const styles = sxStyles({
       p: 1,
       width: "100%",
    },
+   aboutDescription: {
+      wordBreak: "break-word",
+      whiteSpace: "pre-line",
+      color: (theme) => theme.palette.neutral[800],
+   },
 })
 
 export type DetailsProps = {
@@ -333,7 +338,7 @@ const About = () => {
          </Typography>
          {offlineEvent.description ? (
             <Typography
-               sx={{ wordBreak: "break-word" }}
+               sx={styles.aboutDescription}
                variant="medium"
                color={"neutral.700"}
             >
