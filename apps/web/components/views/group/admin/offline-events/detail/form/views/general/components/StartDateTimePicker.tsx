@@ -4,7 +4,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { useField } from "formik"
-import { useRef } from "react"
+import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const FIELD_NAME = "general.startDate"
@@ -167,14 +167,18 @@ const StartDateTimePicker = ({
 }: StartDateTimePickerProps) => {
    const isMobile = useIsMobile()
    const [field, , helpers] = useField(fieldName)
-   const anchorRef = useRef<HTMLDivElement>(null)
+   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null)
 
    const layoutStyles = isMobile
       ? styles.datePickerMobile
       : styles.datePickerDesktop
 
+   const handleAnchorRef = useCallback((node: HTMLDivElement | null) => {
+      setAnchorEl(node)
+   }, [])
+
    return (
-      <Box ref={anchorRef}>
+      <Box ref={handleAnchorRef}>
          <DateTimePicker
             name={fieldName}
             label={label}
@@ -195,7 +199,8 @@ const StartDateTimePicker = ({
                   sx: layoutStyles,
                },
                popper: {
-                  anchorEl: anchorRef.current,
+                  anchorEl: anchorEl,
+                  placement: "bottom-start",
                   modifiers: [
                      {
                         name: "preventOverflow",
@@ -218,11 +223,7 @@ const StartDateTimePicker = ({
                },
             }}
             slots={{
-               textField: (params) =>
-                  CustomInputField(
-                     { ...params, ref: anchorRef },
-                     { fieldName }
-                  ),
+               textField: (params) => CustomInputField(params, { fieldName }),
             }}
             value={field.value}
             onChange={async (newValue) => {
