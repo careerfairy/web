@@ -25,7 +25,7 @@ const styles = sxStyles({
       position: "relative",
       height: { xs: "812px", md: "431px" },
       background:
-         "linear-gradient(0deg, #EDFAF8 0%, #EDFAF8 100%), linear-gradient(104deg, #F5FFF9 0%, #F5FFF9 100%), linear-gradient(169deg, rgba(31, 219, 192, 0.13) 1.77%, rgba(42, 186, 165, 0.00) 98.23%), linear-gradient(25deg, rgba(42, 186, 165, 0.00) -0.66%, rgba(31, 219, 192, 0.48) 141.07%), #376B65",
+         "linear-gradient(0deg, #EDF4FA 0%, #EDF4FA 100%), linear-gradient(104deg, #F5FFF9 0%, #F5FFF9 100%), linear-gradient(169deg, rgba(31, 219, 192, 0.13) 1.77%, rgba(42, 186, 165, 0.00) 98.23%), linear-gradient(25deg, rgba(42, 186, 165, 0.00) -0.66%, rgba(31, 219, 192, 0.48) 141.07%), #376B65",
    },
    logoContainer: {
       gap: 0.5,
@@ -70,7 +70,7 @@ const styles = sxStyles({
       zIndex: 1,
    },
    tagChip: {
-      backgroundColor: "rgba(55, 107, 101, 0.22)",
+      backgroundColor: "#D7DCE1",
       color: "neutral.700",
       px: 4,
       py: 1,
@@ -85,19 +85,19 @@ const styles = sxStyles({
    },
 })
 
-interface HeroSectionProps {
+interface HeroSectionConsultingProps {
    panelEvents?: LivestreamEvent[]
    consultingLivestreams?: LivestreamEvent[]
    companies: Group[]
    handleOpenLivestreamDialog: (livestreamId: string) => void
 }
 
-export default function HeroSection({
+export default function HeroSectionConsulting({
    panelEvents,
    consultingLivestreams,
    companies,
    handleOpenLivestreamDialog,
-}: HeroSectionProps) {
+}: HeroSectionConsultingProps) {
    const theme = useTheme()
    const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"))
    // Refs used to measure the hero container and the overlapping panels area
@@ -163,7 +163,7 @@ export default function HeroSection({
          <Box aria-hidden sx={styles.visualSupportContainer}>
             <Box aria-hidden sx={styles.visualSupportLeft}>
                <Image
-                  src="/panels/header-left-visual-support.svg"
+                  src="/panels/header-left-visual-support-consulting.svg"
                   alt=""
                   width={300}
                   height={300}
@@ -173,7 +173,7 @@ export default function HeroSection({
             {Boolean(isLargeScreen) && (
                <Box aria-hidden sx={styles.visualSupportRight}>
                   <Image
-                     src="/panels/header-right-visual-support.svg"
+                     src="/panels/header-right-visual-support-consulting.svg"
                      alt=""
                      width={300}
                      height={300}
@@ -188,23 +188,26 @@ export default function HeroSection({
                   variant="h2"
                   sx={{
                      fontWeight: 600,
-                     color: "#244D49",
+                     color: "#4A72C8",
                      textAlign: "center",
                   }}
                >
-                  Panels
+                  Consulting collection
                </Typography>
-               <Typography variant="medium" sx={styles.brandTagline}>
-                  Live sessions from top companies to land your dream job.
+               <Typography variant="medium" sx={{ ...styles.brandTagline, color: "neutral.800" }}>
+                  Join live sessions with Europe's top consulting firms packed with career tips and real stories from young consultants
                </Typography>
             </Stack>
 
             <Stack sx={styles.tagChips}>
                <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Free online sessions</Typography>
+                  <Typography variant="medium">Talk to real consultants</Typography>
                </Box>
                <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Top companies</Typography>
+                  <Typography variant="medium">Cases, tips & more</Typography>
+               </Box>
+               <Box sx={styles.tagChip}>
+                  <Typography variant="medium">Live Interaction</Typography>
                </Box>
             </Stack>
          </Stack>

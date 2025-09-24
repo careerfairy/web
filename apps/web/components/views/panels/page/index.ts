@@ -1,4 +1,5 @@
 export { default as HeroSection } from "./HeroSection"
+export { default as HeroSectionConsulting } from "./HeroSectionConsulting"
 export { default as NotForYouSection } from "./NotForYouSection"
 export { default as ParticipatingCompaniesSection } from "./ParticipatingCompaniesSection"
 export { default as RegisterNowSection } from "./RegisterNowSection"
