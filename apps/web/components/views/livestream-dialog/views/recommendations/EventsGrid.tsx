@@ -37,9 +37,15 @@ type Props = {
    events: LivestreamEvent[]
    singleColumn?: boolean
    loading?: boolean
+   originLivestreamId?: string
 }
 
-export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
+export const EventsGrid = ({
+   events,
+   singleColumn,
+   loading,
+   originLivestreamId,
+}: Props) => {
    if (loading) {
       return (
          <AnimateSlideUp>
@@ -96,7 +102,7 @@ export const EventsGrid = ({ events, singleColumn, loading }: Props) => {
                         isRecommended
                         loading={!event}
                         event={event}
-                        location={`livestream-dialog-post-registration-recommendations-${event.id}`}
+                        location={`livestream-dialog-post-registration-recommendations-${originLivestreamId}`}
                      />
                   </motion.div>
                </Grid>
