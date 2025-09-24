@@ -104,19 +104,19 @@ const styles = sxStyles({
 export default function WhosThisForSection() {
    const targetAudience = [
       {
-         text: "Final-year students",
+         text: "You're a student or graduate exploring consulting",
          icon: CapIcon,
       },
       {
-         text: "First jobbers / recent grads",
+         text: "You're preparing for case interviews",
          icon: JobsIcon,
       },
       {
-         text: "Anyone feeling unsure about where to start",
+         text: "Curious about day-to-day consulting work",
          icon: BombIcon,
       },
       {
-         text: "Across all fields - business, STEM, humanities, social sciences",
+         text: "You are wondering if consulting is right for you",
          icon: PinIcon,
       },
    ]

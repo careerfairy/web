@@ -188,15 +188,14 @@ export default function HeroSection({
                   variant="h2"
                   sx={{
                      fontWeight: 600,
-                     color: "#244D49",
+                     color: "#4A72C8",
                      textAlign: "center",
                   }}
                >
-                  Consulting
+                  Consulting collection
                </Typography>
-               <Typography variant="medium" sx={styles.brandTagline}>
-                  Live sessions from top consulting companies to land your dream
-                  job.
+               <Typography variant="medium" sx={{ ...styles.brandTagline, color: "neutral.800" }}>
+                  Join live sessions with Europe's top consulting firms packed with career tips and real stories from young consultants
                </Typography>
             </Stack>
 
