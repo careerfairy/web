@@ -28,6 +28,10 @@ const AddressAutofill = dynamic(
 
 const DEFAULT_OPTIONS: Partial<AddressAutofillOptions> = {
    country: "ch",
+   // Using streets as true, would show us street results (not full addresses) and these when selected
+   // seem to not fire AddressAutofill.onRetrieve events, so for streets we cannot get any data of the
+   // selected street, only the input value is updated.
+   streets: false,
 }
 const iconToSvgString = (IconComponent: any, props: any = {}) => {
    const defaultProps = {
@@ -35,13 +39,7 @@ const iconToSvgString = (IconComponent: any, props: any = {}) => {
       ...props,
    }
 
-   try {
-      return renderToString(<IconComponent {...defaultProps} />)
-   } catch (error) {
-      console.error("Error rendering icon to string:", error)
-      // Fallback to a simple SVG string
-      return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle></svg>`
-   }
+   return renderToString(<IconComponent {...defaultProps} />)
 }
 
 const getDefaultMapBoxTheme = (muiTheme: Theme): MapBoxTheme => {
