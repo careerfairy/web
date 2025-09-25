@@ -52,7 +52,7 @@ export const usePublishOfflineEvent = () => {
             registrationUrl: updatedOfflineEvent.registrationUrl,
             backgroundImageUrl: updatedOfflineEvent.backgroundImageUrl,
             hidden: updatedOfflineEvent.hidden,
-            street: updatedOfflineEvent.street,
+            address: updatedOfflineEvent.address,
             startAt: updatedOfflineEvent.startAt,
             status: "upcoming", // Change status from draft to upcoming
          }

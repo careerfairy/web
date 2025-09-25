@@ -1,3 +1,4 @@
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import type {
    AddressAutofillFeatureSuggestion,
    AddressAutofillOptions,
@@ -7,7 +8,9 @@ import { AddressAutofillProps } from "@mapbox/search-js-react/dist/components/Ad
 import type { Theme as MapBoxTheme } from "@mapbox/search-js-web"
 import { Theme, useTheme } from "@mui/material/styles"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
+import { GeoPoint } from "firebase/firestore"
 import { useField } from "formik"
+import { geohashForLocation } from "geofire-common"
 import dynamic from "next/dynamic"
 import { FC, useCallback, useState } from "react"
 import { renderToString } from "react-dom/server"
@@ -25,10 +28,6 @@ const AddressAutofill = dynamic(
 
 const DEFAULT_OPTIONS: Partial<AddressAutofillOptions> = {
    country: "ch",
-   // Using streets as true, would show us street results (not full addresses) and these when selected
-   // seem to not fire AddressAutofill.onRetrieve events, so for streets we cannot get any data of the
-   // selected street, only the input value is updated.
-   streets: false,
 }
 const iconToSvgString = (IconComponent: any, props: any = {}) => {
    const defaultProps = {
@@ -36,7 +35,13 @@ const iconToSvgString = (IconComponent: any, props: any = {}) => {
       ...props,
    }
 
-   return renderToString(<IconComponent {...defaultProps} />)
+   try {
+      return renderToString(<IconComponent {...defaultProps} />)
+   } catch (error) {
+      console.error("Error rendering icon to string:", error)
+      // Fallback to a simple SVG string
+      return `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle></svg>`
+   }
 }
 
 const getDefaultMapBoxTheme = (muiTheme: Theme): MapBoxTheme => {
@@ -114,19 +119,19 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
    // Create Mapbox theme based on design system
    const mapboxTheme = mapBoxTheme || getDefaultMapBoxTheme(muiTheme)
 
-   const [field, meta, helpers] =
-      useField<AddressAutofillFeatureSuggestion | null>(name)
-   const [selectedSuggestion, setSelectedSuggestion] =
-      useState<AddressAutofillFeatureSuggestion | null>(field.value)
+   const [field, meta, helpers] = useField<OfflineEvent["address"] | null>(name)
+   const [selectedSuggestion, setSelectedSuggestion] = useState<
+      OfflineEvent["address"] | null
+   >(field.value)
 
    const [isFocused, setIsFocused] = useState(false)
 
    const handleSuggestionSelect = (
       suggestion: AddressAutofillFeatureSuggestion
    ) => {
-      setSelectedSuggestion(suggestion)
+      setSelectedSuggestion(extractLocationFromSuggestion(suggestion))
       setInputValue(suggestion.properties.place_name)
-      helpers.setValue(suggestion)
+      helpers.setValue(extractLocationFromSuggestion(suggestion))
       helpers.setTouched(true)
    }
 
@@ -140,12 +145,15 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
    // Handle input changes from AddressAutofill
    const handleInputChange = useCallback(
       (value: string) => {
-         setInputValue(value)
+         // Ensure value is a string
+         const stringValue =
+            typeof value === "string" ? value : String(value || "")
+         setInputValue(stringValue)
 
-         // Clear selected suggestion if user is typing something different
+         // Clear selected suggestion immediately if user is typing something different
          if (
             selectedSuggestion &&
-            value !== selectedSuggestion.properties.place_name
+            stringValue !== selectedSuggestion.placeName
          ) {
             setSelectedSuggestion(null)
             helpers.setValue(null)
@@ -170,7 +178,7 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
    // Determine what value to show in the input
    const displayValue = isFocused
       ? inputValue
-      : selectedSuggestion?.properties.place_name || inputValue
+      : selectedSuggestion?.placeName || inputValue || ""
 
    return (
       <AddressAutofill
@@ -200,6 +208,54 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
          />
       </AddressAutofill>
    )
+}
+/**
+ * Extracts location and geohash from Mapbox street suggestion
+ * @param suggestion - The Mapbox AddressAutofillFeatureSuggestion
+ * @returns Object with location (GeoPoint) and geoHash, or undefined if invalid
+ */
+function extractLocationFromSuggestion(
+   suggestion: AddressAutofillFeatureSuggestion
+): OfflineEvent["address"] {
+   // Properties may include context and text fields for address components
+   const { properties } = suggestion
+
+   const location: OfflineEvent["address"] = {
+      fullAddress: suggestion.properties.full_address,
+      country: properties.country,
+      countryCode: properties.country_code,
+      // @ts-ignore
+      state: properties.region,
+      // @ts-ignore
+      stateCode: properties.region_code,
+      // @ts-ignore
+      city: properties.place,
+      postcode: suggestion.properties.postcode,
+      // @ts-ignore
+      street: suggestion.properties.street,
+      // @ts-ignore
+      streetNumber: suggestion.properties.address_number,
+      placeName: suggestion.properties.place_name,
+      address_level1: suggestion.properties.address_level1,
+      address_level2: suggestion.properties.address_level2,
+      ...(suggestion.geometry.coordinates.length
+         ? {
+              geoPoint: new GeoPoint(
+                 suggestion.geometry.coordinates[1],
+                 suggestion.geometry.coordinates[0]
+              ),
+              geoHash: geohashForLocation([
+                 suggestion.geometry.coordinates[1],
+                 suggestion.geometry.coordinates[0],
+              ]),
+           }
+         : {
+              geoPoint: null,
+              geoHash: null,
+           }),
+   }
+
+   return location
 }
 
 export default FormLocationAutoFill

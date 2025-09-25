@@ -2,7 +2,11 @@ import { FormBrandedTextField } from "components/views/common/inputs/BrandedText
 import FormSectionHeader from "components/views/group/admin/events/detail/form/FormSectionHeader"
 
 import { AddressAutofillOptions } from "@mapbox/search-js-core"
-import FormLocationAutoFill from "components/views/common/inputs/FormLocationAutoFill"
+import dynamic from "next/dynamic"
+const FormLocationAutoFill = dynamic(
+   () => import("components/views/common/inputs/FormLocationAutoFill"),
+   { ssr: false }
+)
 
 import { useOfflineEventCreationContext } from "../../../OfflineEventCreationContext"
 import MakeExclusiveSwitch from "./components/MakeExclusiveSwitch"
@@ -17,7 +21,6 @@ export const GeneralSettings = () => {
 
    const options: Partial<AddressAutofillOptions> = {
       country: group.companyCountry?.id,
-      streets: false,
    }
 
    return (

@@ -72,7 +72,7 @@ type Props = {
 
 export const OfflineEventCard = ({ event }: Props) => {
    const { pathname } = useRouter()
-   const { backgroundImageUrl, group, title, street, startAt } = event
+   const { backgroundImageUrl, group, title, address: street, startAt } = event
 
    return (
       <Box
@@ -121,8 +121,7 @@ export const OfflineEventCard = ({ event }: Props) => {
             <Box pt={1} sx={styles.detailRow}>
                <Box component={MapPin} sx={styles.icon} />
                <Typography variant="small" sx={styles.detailText}>
-                  {street.properties.address_level2},{" "}
-                  {street.properties.address_level1}
+                  {street.city}, {street.state}
                </Typography>
             </Box>
 

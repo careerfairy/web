@@ -45,7 +45,7 @@ export const useAutoSave = () => {
             registrationUrl: newValues.general?.registrationUrl ?? "",
             hidden: newValues.general?.hidden ?? false,
             backgroundImageUrl: newValues.general?.backgroundImageUrl ?? "",
-            street: newValues.general?.street ?? null,
+            address: newValues.general?.address ?? null,
             startAt: firebaseService.getFirebaseTimestamp(
                newValues.general?.startAt ?? ""
             ),

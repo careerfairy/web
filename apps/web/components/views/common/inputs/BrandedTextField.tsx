@@ -164,15 +164,17 @@ export const FormBrandedTextField: FC<BrandedTextFieldProps> = ({
 
    return (
       <BrandedTextField
-         {...(autocomplete ? null : field)}
+         {...(autocomplete ? {} : field)}
          {...props}
          error={
             meta.touched || props.error
                ? Boolean(meta.error || props.error)
-               : null
+               : false
          }
          helperText={
-            meta.touched || props.error ? meta.error || props.helperText : null
+            meta.touched || props.error
+               ? meta.error || props.helperText
+               : undefined
          }
       />
    )
