@@ -2,6 +2,7 @@ import {
    isGroupAdminPath,
    isEmbedded,
    isStreamingPath,
+   isHostStreamingPath,
    isRecordingWindow,
    queryStringExists,
 } from "util/PathUtils"
@@ -46,7 +47,30 @@ test("Correct matching on streaming paths", () => {
    expect("/streaming/VRLKhWi8hdDdRi1FV0FE/viewer").toBeValidCall(
       isStreamingPath
    )
+   expect("/streaming/host/VRLKhWi8hdDdRi1FV0FE").toBeValidCall(
+      isStreamingPath
+   )
+   expect("/streaming/viewer/VRLKhWi8hdDdRi1FV0FE").toBeValidCall(
+      isStreamingPath
+   )
    expect(null).not.toBeValidCall(isStreamingPath)
+})
+
+test("Correct matching on host streaming paths", () => {
+   expect("/streaming/host/VRLKhWi8hdDdRi1FV0FE").toBeValidCall(
+      isHostStreamingPath
+   )
+   expect("/streaming/host/VRLKhWi8hdDdRi1FV0FE/main").toBeValidCall(
+      isHostStreamingPath
+   )
+   
+   expect("/streaming/viewer/VRLKhWi8hdDdRi1FV0FE").not.toBeValidCall(
+      isHostStreamingPath
+   )
+   expect("/streaming/VRLKhWi8hdDdRi1FV0FE/viewer").not.toBeValidCall(
+      isHostStreamingPath
+   )
+   expect(null).not.toBeValidCall(isHostStreamingPath)
 })
 
 test("Correct matching on isRecordingWindow query strings", () => {
