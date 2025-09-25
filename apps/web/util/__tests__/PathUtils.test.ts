@@ -1,9 +1,9 @@
 import {
-   isGroupAdminPath,
    isEmbedded,
-   isStreamingPath,
+   isGroupAdminPath,
    isHostStreamingPath,
    isRecordingWindow,
+   isStreamingPath,
    queryStringExists,
 } from "util/PathUtils"
 
