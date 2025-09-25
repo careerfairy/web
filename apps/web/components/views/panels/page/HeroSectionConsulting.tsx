@@ -254,16 +254,15 @@ export default function HeroSectionConsulting({
                </Grid>
             ) : (
                // Display panels (original behavior)
-               panelEvents?.map((panel: LivestreamEvent) => {
-                  return (
+               panelEvents?.map((panel: LivestreamEvent) => (
+                  <div key={panel.id}>
                      <ReasonsToJoinPanelCard
-                        key={panel.id}
                         panel={panel}
                         companies={companies}
                         handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                      />
-                  )
-               })
+                  </div>
+               ))
             )}
          </Stack>
       </Stack>
