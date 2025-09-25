@@ -13,20 +13,20 @@ export type UniversityOption = University & {
 export type OfflineEventStatus = "upcoming" | "draft" | "past"
 
 export type OfflineEventAddress = {
-   fullAddress: string
-   city: string
-   state: string
-   stateCode: string
-   country: string
-   countryCode: string
-   postcode: string
-   placeName: string
-   street: string
-   streetNumber: string
-   address_level1: string
-   address_level2: string
-   geoPoint: GeoPoint
-   geoHash: string
+   fullAddress: string | null
+   city: string | null
+   state: string | null
+   stateCode: string | null
+   country: string | null
+   countryCode: string | null
+   postcode: string | null
+   placeName: string | null
+   street: string | null
+   streetNumber: string | null
+   address_level1: string | null
+   address_level2: string | null
+   geoPoint: GeoPoint | null
+   geoHash: string | null
 }
 
 export interface OfflineEvent extends Identifiable {

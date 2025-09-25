@@ -4,11 +4,11 @@ import type {
    AddressAutofillOptions,
 } from "@mapbox/search-js-core"
 import { useAddressAutofillCore } from "@mapbox/search-js-react"
-import { Box, Typography } from "@mui/material"
+import { AutocompleteInputChangeReason, Box, Typography } from "@mui/material"
 import { GeoPoint } from "firebase/firestore"
 import { useField } from "formik"
 import { geohashForLocation } from "geofire-common"
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback, useEffect, useState } from "react"
 import { MapPin } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import BrandedAutocomplete from "./BrandedAutocomplete"
@@ -170,7 +170,9 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
    const [field, , helpers] = useField<OfflineEvent["address"] | null>(name)
    const [suggestions, setSuggestions] = useState<Option[]>([])
    const [loading, setLoading] = useState(false)
+
    const [inputValue, setInputValue] = useState("")
+   const [isSearching, setIsSearching] = useState(false)
 
    // Initialize Mapbox autofill core
    const autofill = useAddressAutofillCore({
@@ -178,16 +180,40 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
       ...options,
    })
 
+   // Sync inputValue with field value when field changes externally
+   useEffect(() => {
+      if (!isSearching) {
+         const displayValue = field.value?.placeName || ""
+         if (inputValue !== displayValue) {
+            setInputValue(displayValue)
+         }
+      }
+   }, [field.value, isSearching, inputValue])
+
    // Handle input changes and fetch suggestions
    const handleInputChange = useCallback(
-      async (value: string) => {
-         setInputValue(value)
-
-         if (!value.trim()) {
+      async (value: string, reason: AutocompleteInputChangeReason) => {
+         // Handle clear button specifically
+         if (reason === "clear") {
+            setInputValue("")
             setSuggestions([])
+            setIsSearching(false)
+            helpers.setValue(null)
             return
          }
 
+         setInputValue(value)
+         setIsSearching(true)
+
+         if (!value.trim()) {
+            setSuggestions([])
+            setIsSearching(false)
+            return
+         }
+
+         if (reason === "reset") {
+            return
+         }
          setLoading(true)
          try {
             const response = await autofill.suggest(value, {
@@ -211,14 +237,18 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
             setLoading(false)
          }
       },
-      [autofill]
+      [autofill, helpers]
    )
 
    // Handle selection of a suggestion
    const handleSuggestionSelect = useCallback(
       async (selectedOption: Option | null) => {
+         setIsSearching(false)
+
          if (!selectedOption?.suggestion) {
             helpers.setValue(null)
+            setInputValue("")
+            setSuggestions([])
             return
          }
 
@@ -236,6 +266,8 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
                   extractLocationFromSuggestion(selectedFeature)
                helpers.setValue(locationData)
                helpers.setTouched(true)
+               // inputValue will be updated by the useEffect
+               setSuggestions([])
             }
          } catch (error) {
             console.error("Error retrieving address details:", error)
@@ -244,13 +276,14 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
       [autofill, helpers]
    )
 
-   // Convert field value to display option
-   const selectedOption: Option | null = field.value
-      ? {
-           id: field.value.placeName || "",
-           name: field.value.placeName || "",
-        }
-      : null
+   // Convert field value to display option (only when not searching)
+   const selectedOption: Option | null =
+      !isSearching && field.value
+         ? {
+              id: field.value.placeName || "",
+              name: field.value.placeName || "",
+           }
+         : null
 
    return (
       <BrandedAutocomplete
@@ -262,9 +295,13 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
             if (typeof option === "string") return option
             return option.name || ""
          }}
-         onInputChange={(_, value) => handleInputChange(value)}
+         onInputChange={(_, value, reason) => {
+            handleInputChange(value, reason)
+         }}
          getOptionElement={getAddressOptionElement}
-         onChange={(_, value) => handleSuggestionSelect(value as Option | null)}
+         onChange={(_, value) => {
+            handleSuggestionSelect(value as Option | null)
+         }}
          inputValue={inputValue}
          value={selectedOption}
          noOptionsText={
@@ -273,13 +310,14 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
                : "Start typing to search addresses"
          }
          textFieldProps={{
-            name,
+            name: "address-line1",
             label,
             placeholder,
             requiredText: requiredText || "",
             disabled,
             autocomplete: true,
-            autoComplete: name,
+
+            autoComplete: "address-line1",
          }}
       />
    )
@@ -296,23 +334,23 @@ function extractLocationFromSuggestion(
    const { properties } = suggestion
 
    const location: OfflineEvent["address"] = {
-      fullAddress: suggestion.properties.full_address,
-      country: properties.country,
-      countryCode: properties.country_code,
+      fullAddress: suggestion.properties.full_address || null,
+      country: properties.country || null,
+      countryCode: properties.country_code || null,
       // @ts-ignore
-      state: properties.region,
+      state: properties.region || null,
       // @ts-ignore
-      stateCode: properties.region_code,
+      stateCode: properties.region_code || null,
       // @ts-ignore
-      city: properties.place,
-      postcode: suggestion.properties.postcode,
+      city: properties.place || null,
+      postcode: suggestion.properties.postcode || null,
       // @ts-ignore
-      street: suggestion.properties.street,
+      street: suggestion.properties.street || null,
       // @ts-ignore
-      streetNumber: suggestion.properties.address_number,
-      placeName: suggestion.properties.place_name,
-      address_level1: suggestion.properties.address_level1,
-      address_level2: suggestion.properties.address_level2,
+      streetNumber: suggestion.properties.address_number || null,
+      placeName: suggestion.properties.place_name || null,
+      address_level1: suggestion.properties.address_level1 || null,
+      address_level2: suggestion.properties.address_level2 || null,
       ...(suggestion.geometry.coordinates.length
          ? {
               geoPoint: new GeoPoint(

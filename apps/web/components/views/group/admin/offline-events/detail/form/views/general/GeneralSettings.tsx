@@ -43,7 +43,7 @@ export const GeneralSettings = () => {
             toolbarTitle="Select offline event start date"
          />
          <FormLocationAutoFill
-            name="general.street"
+            name="general.address"
             label="Address"
             placeholder="E.g., Max-Daetwyler-Platz 2, 8004 Zürich"
             requiredText="(required)"
