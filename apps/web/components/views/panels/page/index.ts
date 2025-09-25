@@ -6,3 +6,4 @@ export { default as RegisterNowSection } from "./RegisterNowSection"
 export { default as SpeakersSection } from "./SpeakersSection"
 export { default as WhatYouTakeAwaySection } from "./WhatYouTakeAwaySection"
 export { default as WhosThisForSection } from "./WhosThisForSection"
+
