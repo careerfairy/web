@@ -1,6 +1,6 @@
-import GroupSeed from "@careerfairy/seed-data/groups"
-import UserSeed from "@careerfairy/seed-data/users"
-import { companyNameSlugify } from "@careerfairy/shared-lib/dist/utils"
+import GroupSeed from "@careerfairy/seed-data/dist/groups"
+import UserSeed from "@careerfairy/seed-data/dist/users"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { expect } from "@playwright/test"
 import { groupAdminFixture as test } from "../../fixtures"
 

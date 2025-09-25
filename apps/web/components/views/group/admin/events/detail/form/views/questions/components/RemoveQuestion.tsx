@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { Trash2 as DeleteIcon } from "react-feather"

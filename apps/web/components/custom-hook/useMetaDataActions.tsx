@@ -1,6 +1,6 @@
-import { Group } from "@careerfairy/shared-lib/groups"
-import { PdfReportData } from "@careerfairy/shared-lib/groups/pdf-report"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { PdfReportData } from "@careerfairy/shared-lib/dist/groups/pdf-report"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import PDFIcon from "@mui/icons-material/PictureAsPdf"
 import {
    Button,

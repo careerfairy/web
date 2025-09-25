@@ -6,7 +6,7 @@ import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
 import LockClockIcon from "@mui/icons-material/LockClock"
 import { sxStyles } from "../../../types/commonTypes"
-import { HighLight } from "@careerfairy/shared-lib/highlights/Highlight"
+import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
 
 const itemSpacingSize = 14
 const mobileFactor = 1

@@ -14,7 +14,7 @@ import { atsServiceInstance } from "data/firebase/ATSService"
 import { useReducer, useCallback, useMemo } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import useMergeMetaEndpoint from "./useMergeMetaEndpoint"
-import { getIntegrationSpecifics } from "@careerfairy/shared-lib/ats/IntegrationSpecifics"
+import { getIntegrationSpecifics } from "@careerfairy/shared-lib/dist/ats/IntegrationSpecifics"
 
 export type State = {
    job: Job | null // selected job

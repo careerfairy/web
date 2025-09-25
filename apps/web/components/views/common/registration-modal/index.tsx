@@ -2,7 +2,7 @@ import React, { memo } from "react"
 import { Dialog, Grow } from "@mui/material"
 import { RegistrationContextProvider } from "context/registration/RegistrationContext"
 import RegistrationForm from "./RegistrationForm"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const RegistrationModal = memo(
    ({

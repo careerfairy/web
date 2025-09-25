@@ -14,7 +14,7 @@ import { percentageDonutConfig } from "../../../../util/chartUtils"
 import { Doughnut } from "react-chartjs-2"
 import CustomLegend from "../../../../../materialUI/Legends"
 import EmptyDisplay from "../displays/EmptyDisplay"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { sxStyles } from "../../../../../types/commonTypes"
 import useUserBreakdownStats from "../../../../custom-hook/useUserBreakdownStats"
 

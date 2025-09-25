@@ -2,7 +2,7 @@ import {
    BusinessFunctionsTagValues,
    ContentTopicsTagValues,
 } from "@careerfairy/shared-lib/constants/tags"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack } from "@mui/material"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import { useAuth } from "../../../../HOCs/AuthProvider"

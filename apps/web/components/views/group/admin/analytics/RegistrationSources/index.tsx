@@ -1,5 +1,5 @@
-import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { Grid, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"

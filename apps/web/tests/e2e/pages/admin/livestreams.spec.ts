@@ -1,6 +1,6 @@
 import JobsSeed from "@careerfairy/seed-data/jobs"
 import LivestreamSeed from "@careerfairy/seed-data/livestreams"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { setupLivestreamData } from "tests/e2e/setupData"
 import { groupAdminFixture as test } from "../../fixtures"
 

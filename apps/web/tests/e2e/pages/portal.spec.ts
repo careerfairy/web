@@ -1,4 +1,4 @@
-import UserSeed from "@careerfairy/seed-data/users"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import { expect } from "@playwright/test"
 import { signedInFixture as test } from "../fixtures"
 import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"

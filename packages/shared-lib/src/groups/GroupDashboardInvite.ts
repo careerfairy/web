@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { Identifiable } from "../commonTypes"
 import { GROUP_DASHBOARD_ROLE } from "./index"
 import Timestamp = firebase.firestore.Timestamp

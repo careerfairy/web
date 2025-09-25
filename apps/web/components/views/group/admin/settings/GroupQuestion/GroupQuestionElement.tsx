@@ -17,7 +17,7 @@ import {
    GroupQuestion,
    GroupQuestionOption,
    Group,
-} from "@careerfairy/shared-lib/groups"
+} from "@careerfairy/shared-lib/dist/groups"
 
 const styles = sxStyles({
    hiddenChip: {

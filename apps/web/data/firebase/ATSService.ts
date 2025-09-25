@@ -7,13 +7,13 @@ import { v4 as uuidv4 } from "uuid"
 import {
    MergeExtraRequiredData,
    MergeLinkTokenResponse,
-} from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
-import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { GroupATSAccountDocument } from "@careerfairy/shared-lib/groups"
+} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 import {
    ATSDataPaginationOptions,
    ATSPaginatedResults,
-} from "@careerfairy/shared-lib/ats/Functions"
+} from "@careerfairy/shared-lib/dist/ats/Functions"
 
 export class ATSService {
    constructor(

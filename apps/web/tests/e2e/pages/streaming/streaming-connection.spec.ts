@@ -3,8 +3,8 @@ import {
    clearFirestoreData,
 } from "@careerfairy/seed-data/emulators"
 import UserSeed from "@careerfairy/seed-data/users"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { test as base } from "@playwright/test"
 import { credentials, streaming } from "tests/constants"
 import { StreamerPage } from "tests/e2e/page-object-models/streaming/StreamerPage"

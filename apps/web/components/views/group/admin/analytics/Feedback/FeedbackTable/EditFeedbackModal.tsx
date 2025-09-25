@@ -28,7 +28,7 @@ import Collapse from "@mui/material/Collapse"
 import {
    EventRating,
    LivestreamEvent,
-} from "@careerfairy/shared-lib/livestreams"
+} from "@careerfairy/shared-lib/dist/livestreams"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import SentimentRating from "../../../../../viewer/rating-container/SentimentRating"
 import NormalRating from "../../../../../viewer/rating-container/NormalRating"

@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"

@@ -1,4 +1,4 @@
-import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { useMemo } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"

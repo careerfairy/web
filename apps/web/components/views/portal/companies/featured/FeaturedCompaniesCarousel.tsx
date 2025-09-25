@@ -3,7 +3,7 @@ import {
    GroupEventActions,
    InteractionSources,
 } from "@careerfairy/shared-lib/groups/telemetry"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroup from "components/custom-hook/group/useGroup"

@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { MergeExtraRequiredData } from "../ats/merge/MergeResponseTypes"
 import { Identifiable, ImageType, OptionGroup } from "../commonTypes"

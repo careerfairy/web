@@ -1,4 +1,4 @@
-import UserSeed from "@careerfairy/seed-data/users"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import { expect, test } from "@playwright/test"
 import { credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"

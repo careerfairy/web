@@ -2,9 +2,9 @@ import {
    LivestreamEvent,
    LivestreamEventPublicData,
    pickPublicDataFromLivestream,
-} from "@careerfairy/shared-lib/livestreams"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
 import { ConnectionDisconnectedReason, ConnectionState } from "agora-rtc-react"
 import { useCallback } from "react"
 import { livestreamRepo } from "../../data/RepositoryInstances"

@@ -1,4 +1,4 @@
-import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
+import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
 import { VALID_SOURCES } from "@careerfairy/shared-lib/livestreams/sources/sources"
 import {
    sourcesByLivestream,

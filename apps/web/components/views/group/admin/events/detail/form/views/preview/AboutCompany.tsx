@@ -1,7 +1,7 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import {
    Box,
    Button,

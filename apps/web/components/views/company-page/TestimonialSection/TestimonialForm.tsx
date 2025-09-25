@@ -9,7 +9,7 @@ import {
 } from "@mui/material"
 import ImageSelect from "../../draftStreamForm/ImageSelect/ImageSelect"
 import { UserPlus } from "react-feather"
-import { Testimonial } from "@careerfairy/shared-lib/groups"
+import { Testimonial } from "@careerfairy/shared-lib/dist/groups"
 import { FormikValues } from "formik"
 import CustomRichTextEditor from "components/util/CustomRichTextEditor"
 import { MutableRefObject, useRef } from "react"

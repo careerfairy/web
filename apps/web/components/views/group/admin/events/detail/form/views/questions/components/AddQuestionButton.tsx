@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Button } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { PlusCircle } from "react-feather"

@@ -1,6 +1,6 @@
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { LivestreamLanguage } from "@careerfairy/shared-lib/livestreams"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import Box from "@mui/material/Box"
 import WhiteTagChip from "components/views/common/chips/TagChip"
 import StaticSkeleton from "./StaticSkeleton"

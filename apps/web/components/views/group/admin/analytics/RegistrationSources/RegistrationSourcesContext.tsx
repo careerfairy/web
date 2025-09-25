@@ -1,13 +1,13 @@
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../../../../../custom-hook/utils/useFunctionsSWRFetcher"
-import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import useSWR from "swr"
 import { createContext, ReactElement, useContext, useMemo } from "react"
-import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
+import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { sortLivestreamsDesc } from "@careerfairy/shared-lib/dist/utils"
 import { fixLivestreamRegistrationDates } from "@careerfairy/shared-lib/livestreams/sources/transformations"
 
 type IRegistrationSourcesContext = {

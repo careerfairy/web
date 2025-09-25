@@ -1,7 +1,7 @@
 import {
    BigQueryUserQueryOptions,
    BigQueryUserResponse,
-} from "@careerfairy/shared-lib/bigQuery/types"
+} from "@careerfairy/shared-lib/dist/bigQuery/types"
 import { TablePagination } from "@mui/material"
 import React, { useCallback, useState } from "react"
 import { usePreviousDistinct } from "react-use"

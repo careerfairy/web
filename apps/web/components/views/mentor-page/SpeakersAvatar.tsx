@@ -1,5 +1,5 @@
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Stack, Typography } from "@mui/material"
 import CircularLogo from "../common/logos/CircularLogo"
 

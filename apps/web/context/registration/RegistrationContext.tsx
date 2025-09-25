@@ -1,9 +1,9 @@
-import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/groups"
+import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamQuestion,
-} from "@careerfairy/shared-lib/livestreams"
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo, userRepo } from "data/RepositoryInstances"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"

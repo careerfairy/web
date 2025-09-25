@@ -1,7 +1,7 @@
 import {
    LivestreamEvent,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/livestreams"
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import useSWR from "swr"
 import { useCallback } from "react"

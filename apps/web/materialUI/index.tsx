@@ -1,7 +1,7 @@
 import { styled } from "@mui/material/styles"
 import { Poppins } from "next/font/google"
 
-import { createBrandedTheme } from "@careerfairy/config-mui"
+import { createBrandedTheme } from "@careerfairy/shared-ui"
 
 export const poppins = Poppins({
    subsets: ["latin"],

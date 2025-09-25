@@ -10,7 +10,7 @@ import {
 import { Autocomplete, Box, Collapse, TextField } from "@mui/material"
 import MultiListSelect from "../../common/MultiListSelect"
 import { multiListSelectMapValueFn } from "../../signup/utils"
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 type Props = {
    handleChange: (event) => void

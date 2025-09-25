@@ -1,4 +1,4 @@
-import { RewardDoc } from "@careerfairy/shared-lib/rewards"
+import { RewardDoc } from "@careerfairy/shared-lib/dist/rewards"
 import { collection, query, orderBy } from "firebase/firestore"
 import { useFirestore, useFirestoreCollectionData } from "reactfire"
 
