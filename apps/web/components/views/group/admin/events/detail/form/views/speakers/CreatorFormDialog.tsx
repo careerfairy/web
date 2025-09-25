@@ -4,7 +4,7 @@ import {
    CreatorRoles,
 } from "@careerfairy/shared-lib/groups/creators"
 import { CreateCreatorSchema } from "@careerfairy/shared-lib/groups/schemas"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Grid } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"

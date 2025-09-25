@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"
 import { Chip, FormHelperText } from "@mui/material"
-import { Interest } from "@careerfairy/shared-lib/interests"
+import { Interest } from "@careerfairy/shared-lib/dist/interests"
 import Box from "@mui/material/Box"
 import { StylesProps } from "../../../types/commonTypes"
 

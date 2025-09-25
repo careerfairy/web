@@ -1,8 +1,8 @@
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import {
    ImpressionLocation,
    LivestreamEvent,
-} from "@careerfairy/shared-lib/livestreams"
+} from "@careerfairy/shared-lib/dist/livestreams"
 import {
    makeLivestreamEventDetailsUrl,
    makeLivestreamGroupEventDetailsUrl,

@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Tab, Tabs } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { Info } from "react-feather"

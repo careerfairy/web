@@ -10,7 +10,7 @@ import EmotesPopUp from "./EmotesPopUp"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import isEqual from "react-fast-compare"
 import LinkifyText from "../../../../../util/LinkifyText"
-import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
 import { sxStyles } from "../../../../../../types/commonTypes"
 
 const dayjs = require("dayjs")

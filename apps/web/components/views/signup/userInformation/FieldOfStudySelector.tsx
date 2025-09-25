@@ -1,4 +1,4 @@
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import { FormikHelpers } from "formik"
 import { useCallback, useMemo, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"

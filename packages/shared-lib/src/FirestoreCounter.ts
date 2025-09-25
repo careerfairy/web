@@ -15,7 +15,6 @@
  */
 import * as uuid from "uuid"
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 
 const SHARD_COLLECTION_ID = "_counter_shards_"
 const COOKIE_NAME = "FIRESTORE_COUNTER_SHARD_ID"

@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, IconButton } from "@mui/material"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import { useEffect, useMemo, useRef, useState } from "react"

@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { SwipeableDrawer } from "@mui/material"
 import { useCallback, useState } from "react"
 import { useLivestreamCreationContext } from "../../../../LivestreamCreationContext"

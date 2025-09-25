@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box } from "@mui/material"
 import SteppedDialog from "components/views/stepped-dialog/SteppedDialog"
 import { Formik } from "formik"

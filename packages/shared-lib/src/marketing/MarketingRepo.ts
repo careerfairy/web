@@ -1,6 +1,5 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import {
    FieldOfStudy,
    MarketingUserCreationFields,

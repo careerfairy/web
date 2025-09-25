@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 import { getResizedUrl } from "../components/helperFunctions/HelperFunctions"
 import { SeoProps } from "../components/util/SEO"

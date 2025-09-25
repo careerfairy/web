@@ -5,8 +5,8 @@ import RegistrationModal from "../common/registration-modal"
 import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
-} from "@careerfairy/shared-lib/livestreams"
-import { Group } from "@careerfairy/shared-lib/groups"
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 const useStyles = makeStyles((theme) => ({
    root: {

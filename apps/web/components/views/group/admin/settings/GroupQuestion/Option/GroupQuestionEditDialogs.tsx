@@ -16,7 +16,7 @@ import { UpdateMode } from "../GroupQuestionEdit"
 import {
    GroupQuestion,
    GroupQuestionOption,
-} from "@careerfairy/shared-lib/groups"
+} from "@careerfairy/shared-lib/dist/groups"
 
 const requiredTxt = "Please fill this field"
 const duplicateTxt = "Cannot be a duplicate"

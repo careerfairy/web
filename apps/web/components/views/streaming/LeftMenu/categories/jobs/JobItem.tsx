@@ -1,5 +1,5 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
 import {

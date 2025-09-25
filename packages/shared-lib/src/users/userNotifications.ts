@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { Identifiable } from "../commonTypes"
 
 export interface UserNotification extends Identifiable {

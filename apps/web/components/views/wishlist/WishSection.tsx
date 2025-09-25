@@ -1,6 +1,6 @@
 import React from "react"
 import { CircularProgress, Typography } from "@mui/material"
-import { Wish } from "@careerfairy/shared-lib/wishes"
+import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
 import WishCard from "./WishCard"

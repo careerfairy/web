@@ -1,8 +1,8 @@
 import {
    clearAuthData,
    clearFirestoreData,
-} from "@careerfairy/seed-data/emulators"
-import UserSeed from "@careerfairy/seed-data/users"
+} from "@careerfairy/seed-data/dist/emulators"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import { EngageBadgeLevel3 } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"

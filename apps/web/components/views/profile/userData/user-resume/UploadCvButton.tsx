@@ -13,7 +13,7 @@ import Add from "@mui/icons-material/Add"
 import DeleteForever from "@mui/icons-material/DeleteForever"
 import ArrowDropDown from "@mui/icons-material/ArrowDropDown"
 import FilePickerContainer from "../../../../ssr/FilePickerContainer"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { useCallback } from "react"
 
 const UploadCvButton = ({

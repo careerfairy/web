@@ -1,4 +1,4 @@
-import { SavedRecruiter } from "@careerfairy/shared-lib/users"
+import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
 import Card from "@mui/material/Card"
 import {
    CardActions,

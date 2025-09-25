@@ -3,7 +3,7 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
 import { useMemo } from "react"
-import { SyncStatus } from "@careerfairy/shared-lib/ats/SyncStatus"
+import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
 
 type Result = {
    data: SyncStatus[]

@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack, Tab, Tabs, useMediaQuery, useTheme } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { mapOptions } from "components/views/signup/utils"

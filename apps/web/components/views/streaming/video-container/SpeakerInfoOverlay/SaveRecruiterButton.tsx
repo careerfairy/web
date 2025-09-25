@@ -1,4 +1,4 @@
-import { SavedRecruiter } from "@careerfairy/shared-lib/users"
+import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import SaveIcon from "@mui/icons-material/Save"
 import LoadingButton from "@mui/lab/LoadingButton"

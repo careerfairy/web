@@ -4,7 +4,7 @@ import { alpha } from "@mui/material/styles"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 import ImageIcon from "@mui/icons-material/Image"
 import EditIcon from "@mui/icons-material/Edit"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { sxStyles } from "../../../../../../types/commonTypes"
 
 const styles = sxStyles({

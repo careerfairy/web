@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BrandedDialog, { BrandedDialogProps } from "./BrandedDialog"
 import RemoveQuestion from "./RemoveQuestion"

@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Grid, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"

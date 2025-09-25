@@ -1,6 +1,5 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { Interest } from "../interests"
 
 export interface Wish extends Identifiable {

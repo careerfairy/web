@@ -1,4 +1,4 @@
-import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { Grid } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
 import { useMemo } from "react"

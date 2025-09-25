@@ -7,7 +7,7 @@ import { Skeleton } from "@mui/material"
 import { QuestionsSkeleton } from "../livestream-details/main-content/Questions"
 import Paper from "@mui/material/Paper"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 
 const styles = sxStyles({
    contentOffset: {

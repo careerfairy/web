@@ -2,7 +2,7 @@ import {
    CompetitorCompanyData,
    CompetitorTopCompaniesBase,
 } from "@careerfairy/shared-lib/sparks/analytics"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import {
    Box,
    Collapse,

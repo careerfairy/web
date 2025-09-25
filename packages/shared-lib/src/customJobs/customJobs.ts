@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { Identifiable } from "../commonTypes"
 import { GroupOption, PublicGroup } from "../groups"
 import { UserData } from "../users"

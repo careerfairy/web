@@ -1,12 +1,12 @@
-import { TagValuesLookup } from "@careerfairy/shared-lib/dist/constants/tags"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
+import { Group } from "@careerfairy/shared-lib/groups"
 import {
    LivestreamEvent,
    LivestreamJobAssociation,
    Speaker,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { universityCountryMap } from "@careerfairy/shared-lib/dist/universities"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+} from "@careerfairy/shared-lib/livestreams"
+import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { Locator, Page, expect } from "@playwright/test"
 import DateUtil from "util/DateUtil"
 import { correctCompany, imageLogoPath } from "../../constants"

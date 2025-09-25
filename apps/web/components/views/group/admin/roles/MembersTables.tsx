@@ -15,7 +15,7 @@ import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import {
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
-} from "@careerfairy/shared-lib/groups"
+} from "@careerfairy/shared-lib/dist/groups"
 import useGroupAdmins from "../../../../custom-hook/useGroupAdmins"
 import MaterialTable, { Column, MaterialTableProps } from "@material-table/core"
 import { sxStyles } from "../../../../../types/commonTypes"

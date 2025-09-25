@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { Job, JobIdentifier } from "../ats/Job"
 import { Identifiable, OptionGroup, UTMParams } from "../commonTypes"
 import { PublicCustomJob } from "../customJobs/customJobs"

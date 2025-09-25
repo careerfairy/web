@@ -2,7 +2,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { PublicCreator } from "@careerfairy/shared-lib/groups/creators"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import {
    Button,
    Skeleton,

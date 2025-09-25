@@ -12,7 +12,7 @@ import UserList from "./UserList"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import EmptyDisplay from "../displays/EmptyDisplay"
 import LoadingDisplay from "../displays/LoadingDisplay"
-import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    searchGridWrapper: {

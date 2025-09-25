@@ -2,7 +2,7 @@ import useSWR from "swr"
 import {
    MergeMetaEntities,
    MergeMetaResponse,
-} from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
+} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import useFunctionsSWRFetcher, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"

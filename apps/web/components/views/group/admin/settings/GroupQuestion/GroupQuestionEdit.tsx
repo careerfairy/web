@@ -29,7 +29,7 @@ import {
    Group,
    GroupQuestion,
    GroupQuestionOption,
-} from "@careerfairy/shared-lib/groups"
+} from "@careerfairy/shared-lib/dist/groups"
 import { v4 as uuidv4 } from "uuid"
 import { groupRepo } from "../../../../../../data/RepositoryInstances"
 

@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { mapFirestoreDocuments } from "../BaseFirebaseRepository"
 import { HighLight } from "./Highlight"
 

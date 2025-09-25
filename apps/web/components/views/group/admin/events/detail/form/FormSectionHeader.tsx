@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Box, Stack, Typography } from "@mui/material"
 import { ReactNode } from "react"
 

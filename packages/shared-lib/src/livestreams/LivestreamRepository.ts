@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { OrderByDirection } from "firebase/firestore"
 import BaseFirebaseRepository, {
    createCompatGenericConverter,

@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { BrowserContext, expect } from "@playwright/test"
 import { groupAdminFixture as test } from "../../fixtures"
 import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"

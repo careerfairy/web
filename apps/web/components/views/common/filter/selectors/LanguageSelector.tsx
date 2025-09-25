@@ -5,7 +5,7 @@ import {
    multiListSelectMapValueFn,
 } from "../../../signup/utils"
 import React, { useCallback } from "react"
-import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import { useRouter } from "next/router"
 
 type Props = {

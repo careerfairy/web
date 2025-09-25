@@ -1,7 +1,7 @@
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
-} from "@careerfairy/shared-lib/groups"
+} from "@careerfairy/shared-lib/dist/groups"
 import {
    Button,
    CircularProgress,

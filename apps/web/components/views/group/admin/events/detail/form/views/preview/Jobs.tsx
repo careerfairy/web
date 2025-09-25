@@ -1,6 +1,6 @@
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"

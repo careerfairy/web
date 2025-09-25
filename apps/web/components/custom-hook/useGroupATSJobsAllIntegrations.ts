@@ -1,5 +1,5 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
-import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { useEffect, useState } from "react"
 import { atsServiceInstance } from "../../data/firebase/ATSService"
 

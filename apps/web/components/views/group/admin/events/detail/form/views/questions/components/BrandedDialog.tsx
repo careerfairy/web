@@ -1,4 +1,4 @@
-import { sxStyles } from "types/commonTypes"
+import { sxStyles } from "@careerfairy/shared-ui"
 import { Dialog, PaperProps } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"

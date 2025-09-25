@@ -12,7 +12,7 @@ import {
 import DisplayCategoryElement from "./DisplayCategoryElement"
 import { sxStyles } from "../../../../types/commonTypes"
 import { BaseGroupInfo } from "../../../../pages/group/create"
-import { GroupQuestion } from "@careerfairy/shared-lib/groups"
+import { GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 
 const styles = sxStyles({

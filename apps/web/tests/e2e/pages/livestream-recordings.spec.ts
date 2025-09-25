@@ -1,5 +1,5 @@
-import LivestreamSeed from "@careerfairy/seed-data/livestreams"
-import UserSeed from "@careerfairy/seed-data/users"
+import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import {
    clearAuthData,
    clearFirestoreData,
