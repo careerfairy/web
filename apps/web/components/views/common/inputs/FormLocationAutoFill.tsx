@@ -2,92 +2,151 @@ import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-eve
 import type {
    AddressAutofillFeatureSuggestion,
    AddressAutofillOptions,
-   AddressAutofillRetrieveResponse,
 } from "@mapbox/search-js-core"
-import { AddressAutofillProps } from "@mapbox/search-js-react/dist/components/AddressAutofill"
-import type { Theme as MapBoxTheme } from "@mapbox/search-js-web"
-import { Theme, useTheme } from "@mui/material/styles"
-import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
+import { useAddressAutofillCore } from "@mapbox/search-js-react"
+import { Box, Typography } from "@mui/material"
 import { GeoPoint } from "firebase/firestore"
 import { useField } from "formik"
 import { geohashForLocation } from "geofire-common"
-import dynamic from "next/dynamic"
 import { FC, useCallback, useState } from "react"
-import { renderToString } from "react-dom/server"
-import { MapPin, Search, X } from "react-feather"
-
-const AddressAutofill = dynamic(
-   () =>
-      import("@mapbox/search-js-react").then(
-         (mod) => mod.AddressAutofill as FC<AddressAutofillProps>
-      ),
-   {
-      ssr: false,
-   }
-)
+import { MapPin } from "react-feather"
+import { sxStyles } from "types/commonTypes"
+import BrandedAutocomplete from "./BrandedAutocomplete"
 
 const DEFAULT_OPTIONS: Partial<AddressAutofillOptions> = {
    country: "ch",
-   // Using streets as true, would show us street results (not full addresses) and these when selected
-   // seem to not fire AddressAutofill.onRetrieve events, so for streets we cannot get any data of the
-   // selected street, only the input value is updated.
-   streets: false,
-}
-const iconToSvgString = (IconComponent: any, props: any = {}) => {
-   const defaultProps = {
-      size: 18, // Icon size is fixed
-      ...props,
-   }
-
-   return renderToString(<IconComponent {...defaultProps} />)
 }
 
-const getDefaultMapBoxTheme = (muiTheme: Theme): MapBoxTheme => {
-   return {
-      variables: {
-         // Base font size and family
-         unit: "16px",
-         fontFamily: muiTheme.typography.fontFamily,
-
-         // Colors for the selection list
-         colorBackground: muiTheme.palette.background.paper, // List background color
-         colorText: muiTheme.palette.text.primary, // Main colors, texts and icons
-         colorPrimary: "red",
-         colorSecondary: muiTheme.palette.text.secondary, // Powered by Mapbox text
-
-         // Hover and active states
-         colorBackgroundHover: muiTheme.palette.action.hover,
-         colorBackgroundActive: muiTheme.palette.action.selected,
-
-         // Border and spacing
-         border: `1px solid ${muiTheme.palette.divider}`,
-         borderRadius: "8px",
-         boxShadow: muiTheme.shadows[2],
-         padding: "12px",
-         spacing: "8px",
-
-         // Typography weights
-         fontWeight: muiTheme.typography.fontWeightRegular?.toString() || "400",
-         fontWeightBold:
-            muiTheme.typography.fontWeightBold?.toString() || "700",
-         fontWeightSemibold: "600",
-         lineHeight: "1.5",
-
-         // Animation
-         duration: "150ms",
-         curve: "ease-out",
+// Styles for professional option rendering
+const styles = sxStyles({
+   optionContainer: {
+      display: "flex",
+      alignItems: "flex-start",
+      gap: 1.5,
+      py: 1.25,
+      px: 1.5,
+      mx: 0.75,
+      mb: 0.25,
+      borderRadius: "6px",
+      transition: "background-color 0.15s ease-in-out",
+      "&:last-child": {
+         mb: 0,
       },
-      icons: {
-         // Location pin icon for address results - using React Feather MapPin
-         addressMarker: iconToSvgString(MapPin),
-         // Street icon for street results - using React Feather MapPin
-         street: iconToSvgString(MapPin),
-         // Search icon - using React Feather Search
-         search: iconToSvgString(Search),
-         // Close icon - using React Feather X
-         close: iconToSvgString(X),
+   },
+   iconContainer: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      mt: 0.125,
+      width: 20,
+      height: 20,
+      borderRadius: "50%",
+      backgroundColor: (theme) => theme.brand.white[300],
+      "& svg": {
+         width: 14,
+         height: 14,
+         color: "secondary.main",
       },
+   },
+   textContainer: {
+      flex: 1,
+      minWidth: 0, // Allows text to truncate
+      display: "flex",
+      flexDirection: "column",
+      gap: 0.25,
+   },
+   primaryText: {
+      fontWeight: 600,
+      lineHeight: 1.2,
+      color: "text.primary",
+      fontSize: "0.9rem",
+   },
+   secondaryText: {
+      lineHeight: 1.1,
+      color: "text.secondary",
+      fontSize: "0.8rem",
+      opacity: 0.8,
+   },
+})
+
+/**
+ * Parses address components from Mapbox place_name for better display
+ */
+const parseAddressComponents = (placeName: string) => {
+   const parts = placeName.split(", ")
+   if (parts.length < 2) {
+      return { primary: placeName, secondary: "" }
    }
+
+   // For Swiss addresses, typically: "Street Number, Postal Code City, Country"
+   // Or: "Place Name, Postal Code City, Country"
+   const streetName = parts[0] // Street address or place name
+   const locationParts = parts.slice(1) // [postal code + city, country]
+
+   // Extract postal code and city from the second part
+   let primary = streetName
+   let secondary = ""
+
+   if (locationParts.length > 0) {
+      const postalAndCity = locationParts[0]
+      const country = locationParts[1] || ""
+
+      // Try to split postal code and city (e.g., "2072 Saint-Blaise")
+      const postalCityMatch = postalAndCity.match(/^(\d{4})\s+(.+)$/)
+      if (postalCityMatch) {
+         const [, postalCode, cityName] = postalCityMatch
+         primary = streetName
+         secondary = `${cityName} ${postalCode}${country ? `, ${country}` : ""}`
+      } else {
+         secondary = locationParts.join(", ")
+      }
+   }
+
+   return { primary, secondary }
+}
+
+/**
+ * Professional option element renderer for address suggestions
+ * Note: BrandedAutocomplete uses getOptionElement instead of renderOption
+ */
+const getAddressOptionElement = (option: Option) => (
+   <Box sx={styles.optionContainer}>
+      <Box sx={styles.iconContainer}>
+         <MapPin />
+      </Box>
+      <Box sx={styles.textContainer}>
+         {(() => {
+            const { primary, secondary } = parseAddressComponents(option.name)
+            return (
+               <>
+                  <Typography
+                     variant="medium"
+                     sx={styles.primaryText}
+                     component="div"
+                  >
+                     {primary}
+                  </Typography>
+                  {Boolean(secondary) && (
+                     <Typography
+                        variant="small"
+                        sx={styles.secondaryText}
+                        component="div"
+                     >
+                        {secondary}
+                     </Typography>
+                  )}
+               </>
+            )
+         })()}
+      </Box>
+   </Box>
+)
+
+// Option type for StyledLazyBrandedAutocomplete - must have id and name
+type Option = {
+   id: string
+   name: string
+   suggestion?: any // Mapbox suggestion object for retrieval
 }
 
 export interface LocationAutoFillProps {
@@ -98,8 +157,6 @@ export interface LocationAutoFillProps {
    requiredText?: string
    label?: string
    disabled?: boolean
-   /** Custom Mapbox theme configuration */
-   mapBoxTheme?: MapBoxTheme
 }
 
 export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
@@ -109,102 +166,122 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
    name,
    disabled,
    requiredText,
-   mapBoxTheme,
 }) => {
+   const [field, , helpers] = useField<OfflineEvent["address"] | null>(name)
+   const [suggestions, setSuggestions] = useState<Option[]>([])
+   const [loading, setLoading] = useState(false)
    const [inputValue, setInputValue] = useState("")
 
-   const muiTheme = useTheme()
-   // Create Mapbox theme based on design system
-   const mapboxTheme = mapBoxTheme || getDefaultMapBoxTheme(muiTheme)
+   // Initialize Mapbox autofill core
+   const autofill = useAddressAutofillCore({
+      accessToken: process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!,
+      ...options,
+   })
 
-   const [field, meta, helpers] = useField<OfflineEvent["address"] | null>(name)
-   const [selectedSuggestion, setSelectedSuggestion] = useState<
-      OfflineEvent["address"] | null
-   >(field.value)
-
-   const [isFocused, setIsFocused] = useState(false)
-
-   const handleSuggestionSelect = (
-      suggestion: AddressAutofillFeatureSuggestion
-   ) => {
-      setSelectedSuggestion(extractLocationFromSuggestion(suggestion))
-      setInputValue(suggestion.properties.place_name)
-      helpers.setValue(extractLocationFromSuggestion(suggestion))
-      helpers.setTouched(true)
-   }
-
-   const handleRetrieve = (response: AddressAutofillRetrieveResponse) => {
-      if (response?.features?.length) {
-         const selectedFeature = response.features[0]
-         handleSuggestionSelect(selectedFeature)
-      }
-   }
-
-   // Handle input changes from AddressAutofill
+   // Handle input changes and fetch suggestions
    const handleInputChange = useCallback(
-      (value: string) => {
-         // Ensure value is a string
-         const stringValue =
-            typeof value === "string" ? value : String(value || "")
-         setInputValue(stringValue)
+      async (value: string) => {
+         setInputValue(value)
 
-         // Clear selected suggestion immediately if user is typing something different
-         if (
-            selectedSuggestion &&
-            stringValue !== selectedSuggestion.placeName
-         ) {
-            setSelectedSuggestion(null)
-            helpers.setValue(null)
+         if (!value.trim()) {
+            setSuggestions([])
+            return
+         }
+
+         setLoading(true)
+         try {
+            const response = await autofill.suggest(value, {
+               sessionToken: `session-${Date.now()}`,
+            })
+
+            const mappedSuggestions: Option[] = response.suggestions.map(
+               (suggestion) => ({
+                  id: suggestion.mapbox_id,
+                  name: suggestion.place_name,
+                  // Store the full suggestion data for later retrieval
+                  suggestion,
+               })
+            )
+
+            setSuggestions(mappedSuggestions)
+         } catch (error) {
+            console.error("Error fetching suggestions:", error)
+            setSuggestions([])
+         } finally {
+            setLoading(false)
          }
       },
-      [selectedSuggestion, helpers]
+      [autofill]
    )
 
-   // Handle focus events
-   const handleFocus = useCallback(() => {
-      setIsFocused(true)
-   }, [])
+   // Handle selection of a suggestion
+   const handleSuggestionSelect = useCallback(
+      async (selectedOption: Option | null) => {
+         if (!selectedOption?.suggestion) {
+            helpers.setValue(null)
+            return
+         }
 
-   const handleBlur = useCallback(() => {
-      setIsFocused(false)
+         try {
+            const response = await autofill.retrieve(
+               selectedOption.suggestion,
+               {
+                  sessionToken: `session-${Date.now()}`,
+               }
+            )
 
-      // We only want to mark the field as touched if the user has interacted with the field and
-      // has unfocused the field otherwise the user would get an error as soon as the field is focused
-      helpers.setTouched(true)
-   }, [helpers])
+            if (response?.features?.length) {
+               const selectedFeature = response.features[0]
+               const locationData =
+                  extractLocationFromSuggestion(selectedFeature)
+               helpers.setValue(locationData)
+               helpers.setTouched(true)
+            }
+         } catch (error) {
+            console.error("Error retrieving address details:", error)
+         }
+      },
+      [autofill, helpers]
+   )
 
-   // Determine what value to show in the input
-   const displayValue = isFocused
-      ? inputValue
-      : selectedSuggestion?.placeName || inputValue || ""
+   // Convert field value to display option
+   const selectedOption: Option | null = field.value
+      ? {
+           id: field.value.placeName || "",
+           name: field.value.placeName || "",
+        }
+      : null
 
    return (
-      <AddressAutofill
-         accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-         onRetrieve={handleRetrieve}
-         onChange={handleInputChange}
-         options={options}
-         theme={mapboxTheme}
-      >
-         <FormBrandedTextField
-            // Due to the way Mapbox works, we need to use a fixed name for the input
-            // meaning formik cannot get meta errors for this field
-            // Workaround: updated BrandedTextField to also use passed error and helperText
-            name="address-line1"
-            autoComplete="address-line1"
-            requiredText={requiredText?.length ? requiredText : null}
-            label={label}
-            placeholder={placeholder}
-            fullWidth
-            disabled={disabled}
-            tooltipPlacement="top"
-            value={displayValue}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            error={meta.touched ? Boolean(meta.error) : null}
-            helperText={meta.touched ? meta.error : null}
-         />
-      </AddressAutofill>
+      <BrandedAutocomplete
+         options={suggestions}
+         loading={loading}
+         freeSolo={true}
+         filterOptions={(options) => options} // Don't filter, use Mapbox results
+         getOptionLabel={(option) => {
+            if (typeof option === "string") return option
+            return option.name || ""
+         }}
+         onInputChange={(_, value) => handleInputChange(value)}
+         getOptionElement={getAddressOptionElement}
+         onChange={(_, value) => handleSuggestionSelect(value as Option | null)}
+         inputValue={inputValue}
+         value={selectedOption}
+         noOptionsText={
+            inputValue.trim()
+               ? "No addresses found"
+               : "Start typing to search addresses"
+         }
+         textFieldProps={{
+            name,
+            label,
+            placeholder,
+            requiredText: requiredText || "",
+            disabled,
+            autocomplete: true,
+            autoComplete: name,
+         }}
+      />
    )
 }
 /**
