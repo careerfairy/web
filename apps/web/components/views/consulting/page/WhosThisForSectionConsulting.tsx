@@ -104,19 +104,19 @@ const styles = sxStyles({
 export default function WhosThisForSectionConsulting() {
    const targetAudience = [
       {
-         text: "Students interested in consulting careers",
+         text: "You're a student or graduate exploring consulting",
          icon: CapIcon,
       },
       {
-         text: "Recent graduates targeting MBB and tier-2 firms",
+         text: "You're preparing for case interviews",
          icon: JobsIcon,
       },
       {
-         text: "Professionals looking to pivot into consulting",
+         text: "Curious about day-to-day consulting work",
          icon: BombIcon,
       },
       {
-         text: "Anyone seeking insider knowledge of the consulting industry",
+         text: "You are wondering if consulting is right for you",
          icon: PinIcon,
       },
    ]
