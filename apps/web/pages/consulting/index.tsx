@@ -5,6 +5,7 @@ import {
    HeroSectionConsulting,
    NotForYouSectionConsulting,
    ParticipatingCompaniesSectionConsulting,
+   RecordingsSectionConsulting,
    RegisterNowSectionConsulting,
    SpeakersSectionConsulting,
    WhatYouTakeAwaySectionConsulting,
@@ -38,16 +39,21 @@ type ConsultingPageProps = {
    serverSidePanelEvents: any[]
    serverSideCompanies: SerializedGroup[]
    serverSideRecentLivestreams: any[]
+   serverSideConsultingRecordings: any[]
 }
 
 export default function ConsultingPage({
    serverSidePanelEvents,
    serverSideCompanies,
    serverSideRecentLivestreams,
+   serverSideConsultingRecordings,
 }: ConsultingPageProps) {
    const deserializedPanelEvents = mapFromServerSide(serverSidePanelEvents)
    const deserializedRecentLivestreams = mapFromServerSide(
       serverSideRecentLivestreams
+   )
+   const deserializedConsultingRecordings = mapFromServerSide(
+      serverSideConsultingRecordings
    )
    const companies = serverSideCompanies.map((company) =>
       deserializeGroupClient(company)
@@ -135,6 +141,10 @@ export default function ConsultingPage({
                   companies={companies}
                />
                <WhatYouTakeAwaySectionConsulting />
+               <RecordingsSectionConsulting
+                  consultingRecordings={deserializedConsultingRecordings}
+                  handleOpenLivestreamDialog={handleOpenLivestreamDialog}
+               />
                <RegisterNowSectionConsulting
                   panelEvents={deserializedPanelEvents}
                   handleOpenLivestreamDialog={handleOpenPanelDialog}
@@ -164,10 +174,15 @@ export const getServerSideProps: GetServerSideProps<
 > = async () => {
    try {
       // Fetch all data in parallel
-      const [recentLivestreams, allUpcomingEvents] = await Promise.all([
+      const [recentLivestreams, allUpcomingEvents, pastEvents] = await Promise.all([
          livestreamRepo.getUpcomingEvents(10),
          // Fetch upcoming events and filter by consulting industry
          livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
+         // Fetch past events for consulting recordings
+         livestreamRepo.getPastEventsFrom({
+            fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
+            limit: 50, // Get more to ensure we have enough after filtering
+         }),
       ])
 
       // Filter upcoming events by ManagementConsulting industry and limit to 6
@@ -175,6 +190,15 @@ export const getServerSideProps: GetServerSideProps<
          ?.filter((event) => 
             event.companyIndustries?.includes("ManagementConsulting")
          )
+         ?.slice(0, 6) || []
+
+      // Filter past events by ManagementConsulting industry and limit to 6 for recordings
+      const consultingRecordings = pastEvents
+         ?.filter((event) => 
+            event.companyIndustries?.includes("ManagementConsulting") && 
+            event.isRecording // Only include events that have recordings
+         )
+         ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
          ?.slice(0, 6) || []
 
       // Extract unique groupIds from consulting livestreams
@@ -208,6 +232,10 @@ export const getServerSideProps: GetServerSideProps<
          LivestreamPresenter.serializeDocument(stream)
       ) || []
 
+      const serializedConsultingRecordings = consultingRecordings.map((recording) =>
+         LivestreamPresenter.serializeDocument(recording)
+      )
+
       const serializedCompanies = companies.map((company) =>
          serializeGroup(company)
       )
@@ -222,6 +250,7 @@ export const getServerSideProps: GetServerSideProps<
             serverSidePanelEvents: eventsWithoutModerators,
             serverSideCompanies: serializedCompaniesWithoutCF,
             serverSideRecentLivestreams: serializedRecentLivestreams,
+            serverSideConsultingRecordings: serializedConsultingRecordings,
          },
       }
    } catch (error) {
@@ -232,6 +261,7 @@ export const getServerSideProps: GetServerSideProps<
             serverSidePanelEvents: [],
             serverSideCompanies: [],
             serverSideRecentLivestreams: [],
+            serverSideConsultingRecordings: [],
          },
       }
    }
