@@ -29,6 +29,18 @@ export const isStreamingPath = (pathname?: string): boolean => {
 }
 
 /**
+ * Check path is from a host streaming journey (group admin streaming)
+ *  if no pathname provided, uses the window object
+ */
+export const isHostStreamingPath = (pathname?: string): boolean => {
+   let path = pathname ?? getWindow()?.location?.pathname
+
+   const paths = [/^\/streaming\/host/]
+
+   return paths.some((r) => r.test(path))
+}
+
+/**
  * Check if current url is from a recording session
  *  if no queryString param is provided, it uses the window object
  */
