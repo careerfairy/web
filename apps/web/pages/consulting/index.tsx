@@ -125,6 +125,13 @@ export default function ConsultingPage({
                   handleOpenLivestreamDialog={handleOpenPanelDialog}
                />
                <WhosThisForSectionConsulting />
+               <ParticipatingCompaniesSectionConsulting companies={companies} />
+               <SpeakersSectionConsulting
+                  speakers={deserializedPanelEvents.flatMap(
+                     (panel) => panel.speakers || []
+                  )}
+                  companies={companies}
+               />
                <WhatYouTakeAwaySectionConsulting />
                <RegisterNowSectionConsulting
                   panelEvents={deserializedPanelEvents}
@@ -133,13 +140,6 @@ export default function ConsultingPage({
                <NotForYouSectionConsulting
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
-               />
-               <ParticipatingCompaniesSectionConsulting companies={companies} />
-               <SpeakersSectionConsulting
-                  speakers={deserializedPanelEvents.flatMap(
-                     (panel) => panel.speakers || []
-                  )}
-                  companies={companies}
                />
             </Stack>
          </GenericDashboardLayout>
