@@ -1,3 +1,4 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    Button,
@@ -12,15 +13,18 @@ import {
    getResizedUrl,
 } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
+import { SmallPanelCard } from "components/views/panels/cards/SmallPanelCard"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { ComponentProps, SyntheticEvent } from "react"
 import {
+   Calendar,
    Calendar as CalendarIcon,
    X as CloseIcon,
    Download as DownloadIcon,
 } from "react-feather"
 import { combineStyles, sxStyles } from "types/commonTypes"
+import DateUtil from "util/DateUtil"
 
 // Card container
 const StyledCard = styled(motion(Card))(({ theme }) => ({
@@ -84,14 +88,13 @@ const GradientOverlay = styled(Box)({
 })
 
 // Close button
-const CloseButton = styled(Box)(({ theme }) => ({
+const CloseButton = styled(Box)({
    position: "absolute",
    top: 12,
    right: 12,
    cursor: "pointer",
-   color: theme.palette.common.white,
    zIndex: 10,
-}))
+})
 
 // QR Code container
 const QRCodeContainer = styled(Box)({
@@ -129,22 +132,49 @@ const styles = sxStyles({
       maxWidth: { xs: "72px", md: "110px" },
       width: "100%",
    },
+   panelsContainer: {
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 1.5,
+      alignSelf: "stretch",
+      mt: "8px !important",
+   },
+   panelCardsContainer: {
+      width: "100%",
+      alignItems: "center",
+      gap: { xs: 0.5, md: 1.5 },
+   },
+   panelText: {
+      justifyContent: {
+         xs: "flex-start",
+         md: "center",
+      },
+      alignItems: "flex-start",
+      alignSelf: { xs: "flex-start", md: "center" },
+      minWidth: 0,
+      textAlign: "start",
+   },
+   panelDate: {
+      display: "flex",
+      alignItems: "center",
+   },
 })
 
 /** Props for the presentation component that handles UI */
 type Props = {
+   /** The registered livestreams, in the case of multi-registration flow (e.g. panels) */
+   registeredLivestreams?: LivestreamEvent[]
    /** Company name to display */
    companyName: string
    /** Company logo URL */
    companyLogoUrl: string
-   /** Panel logo URL. Only used if the livestream is a panel. */
-   panelLogoUrl?: string
    /** Job title or event title */
    title: string
    /** Banner image URL */
    bannerImageUrl: string
-   /** Formatted event date string */
-   eventDateString: string
+   /** Event date */
+   eventDate: any
    /** QR code image URL */
    qrCodeUrl: string
    /** If true, shows download app button. If false, shows only calendar button */
@@ -172,10 +202,9 @@ type Props = {
 export const GetNotifiedCardPresentation = ({
    companyName,
    companyLogoUrl,
-   panelLogoUrl,
    title,
    bannerImageUrl,
-   eventDateString,
+   eventDate,
    qrCodeUrl,
    shouldDownloadApp,
    isDesktop,
@@ -186,9 +215,13 @@ export const GetNotifiedCardPresentation = ({
    downloadAppHref,
    sx,
    animateLayout,
+   registeredLivestreams,
    ...cardProps
 }: Props) => {
    const buttonsSize = isDesktop ? "large" : "medium"
+   const isMultipleRegistrations = registeredLivestreams?.length > 1
+   const isPanel = registeredLivestreams?.length > 0 // Panels are always multiple registrations, and for now the only type that can follow this flow
+   const selectedPanel = registeredLivestreams?.[0] // When the user only picks only one panel from the multi registration flow
 
    const getCardMaxHeight = () => {
       if (isDesktop) {
@@ -214,48 +247,98 @@ export const GetNotifiedCardPresentation = ({
       >
          {/* Close button */}
          {Boolean(onClose) && !isDesktop && (
-            <CloseButton onClick={onClose}>
+            <CloseButton
+               onClick={onClose}
+               color={isPanel ? "neutral.800" : "common.white"}
+            >
                <CloseIcon />
             </CloseButton>
          )}
 
-         {/* Event details section */}
-         <EventBanner>
-            {/* Banner image with overlay */}
-            <BannerImageContainer sx={{ height: isDesktop ? 120 : 95 }}>
-               <Image
-                  src={bannerImageUrl}
-                  alt="Event banner"
-                  fill
-                  style={{ objectFit: "cover" }}
-                  sizes={isDesktop ? "402px" : "343px"}
-               />
-               <GradientOverlay />
-            </BannerImageContainer>
+         {!isMultipleRegistrations && (
+            <EventBanner>
+               {/* Banner image with overlay */}
+               <BannerImageContainer sx={{ height: isDesktop ? 120 : 95 }}>
+                  <Image
+                     src={selectedPanel?.backgroundImageUrl || bannerImageUrl}
+                     alt="Event banner"
+                     fill
+                     style={{ objectFit: "cover" }}
+                     sizes={isDesktop ? "402px" : "343px"}
+                  />
+                  <GradientOverlay />
+               </BannerImageContainer>
 
-            {/* Event content */}
-            <EventBannerLowerContentContainer
-               layout={animateLayout}
-               alignItems={isDesktop && isExpanded ? "center" : "flex-start"}
-            >
-               {/* Company info */}
-               {panelLogoUrl ? (
-                  <Box sx={styles.panelLogoContainer}>
-                     <Image
-                        src={getResizedUrl(panelLogoUrl, "lg")}
-                        alt="Panel Logo"
-                        width={297}
-                        height={120}
-                        style={{
+               {/* Event content */}
+               <EventBannerLowerContentContainer
+                  layout={animateLayout}
+                  alignItems={isDesktop && isExpanded ? "center" : "flex-start"}
+               >
+                  {/* Company info */}
+                  {selectedPanel ? (
+                     <Box sx={styles.panelLogoContainer}>
+                        <Image
+                           src={getResizedUrl(selectedPanel.panelLogoUrl, "lg")}
+                           alt="Panel Logo"
+                           width={297}
+                           height={120}
+                           style={{
+                              width: "100%",
+                              height: "auto",
+                           }}
+                           priority
+                           sizes="(max-width: 768px) 216px, 297px"
+                        />
+                     </Box>
+                  ) : (
+                     <Box
+                        sx={{
+                           display: "flex",
+                           alignItems: "center",
                            width: "100%",
-                           height: "auto",
+                           gap: 1,
+                           justifyContent:
+                              isDesktop && isExpanded ? "center" : "flex-start",
                         }}
-                        priority
-                        sizes="(max-width: 768px) 216px, 297px"
-                     />
-                  </Box>
-               ) : (
+                     >
+                        <AnimatedCircularLogo
+                           layout={animateLayout}
+                           src={companyLogoUrl}
+                           alt={`${companyName} logo`}
+                           size={28}
+                        />
+                        <Typography
+                           component={motion.div}
+                           layout={animateLayout}
+                           variant="small"
+                           color="text.secondary"
+                           fontWeight={600}
+                           sx={getMaxLineStyles(1)}
+                        >
+                           {companyName}
+                        </Typography>
+                     </Box>
+                  )}
+
+                  {/* Title */}
+                  {!isPanel && (
+                     <AnimatedTypography
+                        layout={animateLayout}
+                        variant="medium"
+                        color="text.primary"
+                        fontWeight={600}
+                        width="100%"
+                        align={isDesktop && isExpanded ? "center" : "left"}
+                        sx={getMaxLineStyles(1)}
+                     >
+                        {title}
+                     </AnimatedTypography>
+                  )}
+
+                  {/* Event date */}
                   <Box
+                     component={motion.div}
+                     layout={animateLayout}
                      sx={{
                         display: "flex",
                         alignItems: "center",
@@ -265,65 +348,21 @@ export const GetNotifiedCardPresentation = ({
                            isDesktop && isExpanded ? "center" : "flex-start",
                      }}
                   >
-                     <AnimatedCircularLogo
+                     <AnimatedCalendarIcon layout size={16} color="#5C5C6A" />
+                     <AnimatedTypography
                         layout={animateLayout}
-                        src={companyLogoUrl}
-                        alt={`${companyName} logo`}
-                        size={28}
-                     />
-                     <Typography
-                        component={motion.div}
-                        layout={animateLayout}
+                        sx={getMaxLineStyles(1)}
                         variant="small"
                         color="text.secondary"
-                        fontWeight={600}
-                        sx={getMaxLineStyles(1)}
                      >
-                        {companyName}
-                     </Typography>
+                        {formatLivestreamDate(
+                           selectedPanel ? selectedPanel.start : eventDate
+                        )}
+                     </AnimatedTypography>
                   </Box>
-               )}
-
-               {/* Title */}
-               {!panelLogoUrl && (
-                  <AnimatedTypography
-                     layout={animateLayout}
-                     variant="medium"
-                     color="text.primary"
-                     fontWeight={600}
-                     width="100%"
-                     align={isDesktop && isExpanded ? "center" : "left"}
-                     sx={getMaxLineStyles(1)}
-                  >
-                     {title}
-                  </AnimatedTypography>
-               )}
-
-               {/* Event date */}
-               <Box
-                  component={motion.div}
-                  layout={animateLayout}
-                  sx={{
-                     display: "flex",
-                     alignItems: "center",
-                     width: "100%",
-                     gap: 1,
-                     justifyContent:
-                        isDesktop && isExpanded ? "center" : "flex-start",
-                  }}
-               >
-                  <AnimatedCalendarIcon layout size={16} color="#5C5C6A" />
-                  <AnimatedTypography
-                     layout={animateLayout}
-                     sx={getMaxLineStyles(1)}
-                     variant="small"
-                     color="text.secondary"
-                  >
-                     {eventDateString}
-                  </AnimatedTypography>
-               </Box>
-            </EventBannerLowerContentContainer>
-         </EventBanner>
+               </EventBannerLowerContentContainer>
+            </EventBanner>
+         )}
 
          {/* Call to action section */}
          <CardContent
@@ -342,11 +381,17 @@ export const GetNotifiedCardPresentation = ({
                py={2}
                m="auto"
                display="flex"
-               maxWidth={!shouldDownloadApp ? 434 : undefined}
+               maxWidth={
+                  !shouldDownloadApp
+                     ? isMultipleRegistrations
+                        ? "100%"
+                        : 434
+                     : undefined
+               }
             >
                {/* Text content */}
                <Stack
-                  px={isDesktop ? 3 : 2}
+                  px={isDesktop ? 3 : 1.5}
                   textAlign={isDesktop && isExpanded ? "center" : "left"}
                   spacing={0.5}
                >
@@ -367,6 +412,62 @@ export const GetNotifiedCardPresentation = ({
                         ? "Stay updated on this live stream and future job opportunities by adding this event to your calendar."
                         : "Download our mobile app to get notified when this live stream starts and stay updated on future job opportunities!"}
                   </AnimatedTypography>
+                  {/* Multiple panels registrations section */}
+                  {Boolean(isMultipleRegistrations) && (
+                     <Stack sx={styles.panelsContainer}>
+                        {registeredLivestreams?.map((event) => (
+                           <Stack
+                              key={event.id}
+                              flexDirection={{ xs: "column", md: "row" }}
+                              sx={{
+                                 ...styles.panelCardsContainer,
+                                 ...{
+                                    "& > :first-of-type": {
+                                       minWidth: {
+                                          xs: "100%",
+                                          md: isExpanded ? "263px" : "178px",
+                                       },
+                                       height: "100px",
+                                       flexGrow: 1,
+                                       width: { xs: "100%", md: "unset" },
+                                    },
+                                 },
+                              }}
+                           >
+                              <SmallPanelCard
+                                 event={event}
+                                 hideDateBadge
+                                 hideRegistrationStatus
+                                 disableClick
+                              />
+                              <Stack sx={styles.panelText}>
+                                 <Typography
+                                    variant="brandedBody"
+                                    color="neutral.800"
+                                    sx={getMaxLineStyles(1)}
+                                 >
+                                    {event.title}
+                                 </Typography>
+                                 <Box
+                                    color="text.secondary"
+                                    sx={styles.panelDate}
+                                 >
+                                    <Box
+                                       component={Calendar}
+                                       size={16}
+                                       mr={0.5}
+                                    />
+                                    <Typography variant="small">
+                                       {DateUtil.formatDayMonthAtTime(
+                                          event.start?.toDate()
+                                       )}
+                                    </Typography>
+                                 </Box>
+                              </Stack>
+                           </Stack>
+                        ))}
+                     </Stack>
+                  )}
                </Stack>
 
                {/* Desktop QR Code and Buttons */}
@@ -426,7 +527,7 @@ export const GetNotifiedCardPresentation = ({
                   </Box>
                ) : (
                   /* Mobile Buttons or App Downloaded Buttons */
-                  <Box sx={{ px: 2 }}>
+                  <Box sx={{ px: 1.5 }}>
                      <Stack spacing={1.5} sx={{ width: "100%" }}>
                         {Boolean(shouldDownloadApp && !isDesktop) && (
                            <Button
@@ -455,9 +556,7 @@ export const GetNotifiedCardPresentation = ({
                            size={buttonsSize}
                            fullWidth
                         >
-                           {!shouldDownloadApp || isDesktop
-                              ? "Add to calendar"
-                              : "Add live stream to calendar"}
+                           Add to calendar
                         </Button>
                      </Stack>
                   </Box>
@@ -477,11 +576,25 @@ export const GetNotifiedCardPresentation = ({
                {Boolean(userEmail) && (
                   <Typography variant="xsmall" color="neutral.500">
                      You&apos;ll also receive reminders at {userEmail} before
-                     the start of the live stream
+                     the start of the {isPanel ? "Master Class" : "live stream"}
                   </Typography>
                )}
             </Box>
          </CardContent>
       </StyledCard>
    )
+}
+
+// Helper function to format date from firebase timestamp
+const formatLivestreamDate = (timestamp: any): string => {
+   if (!timestamp) return ""
+
+   try {
+      // Convert Firebase timestamp to JS Date
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
+      return DateUtil.formatDateTime(date)
+   } catch (error) {
+      console.error("Error formatting date:", error)
+      return ""
+   }
 }

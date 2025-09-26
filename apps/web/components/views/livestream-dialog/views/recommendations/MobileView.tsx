@@ -72,6 +72,7 @@ const fadeAnimation = {
 export const MobileView = () => {
    const {
       livestream,
+      registrationState,
       isRecommendationsListVisible,
       setIsRecommendationsListVisible,
    } = useLiveStreamDialog()
@@ -110,6 +111,9 @@ export const MobileView = () => {
                >
                   <BlurredBackground onClick={handleNext}>
                      <GetNotifiedCard
+                        registeredLivestreams={
+                           registrationState?.selectedLivestreams
+                        }
                         livestream={livestream}
                         onClose={handleNext}
                         onClick={(e) => e.stopPropagation()} // Prevent the card from closing when clicked
@@ -190,8 +194,14 @@ const Recommendations = ({
                         exit="exit"
                      >
                         <Subtitle key="recommendations-subtitle">
-                           Because you registered to <b>{livestream.company}</b>{" "}
-                           live stream:
+                           {livestream.isPanel ? (
+                              "because you registered to this Master Class:"
+                           ) : (
+                              <>
+                                 Because you registered to{" "}
+                                 <b>{livestream.company}</b> live stream:
+                              </>
+                           )}
                         </Subtitle>
                      </motion.div>
                   )}

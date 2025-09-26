@@ -58,12 +58,14 @@ const styles = sxStyles({
 type RectanglePanelCardProps = {
    event: LivestreamEvent
    contentSx?: SxProps<Theme>
+   hideRegistrationStatus?: boolean
    onCardClick?: (livestreamId: string) => void
 }
 
 export const RectanglePanelCard = ({
    event,
    contentSx,
+   hideRegistrationStatus,
    onCardClick,
 }: RectanglePanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
@@ -92,7 +94,9 @@ export const RectanglePanelCard = ({
       >
          <Box sx={combineStyles(styles.content, contentSx)}>
             <Box sx={styles.topSection}>
-               <PanelRegistrationStatus isRegistered={isRegistered} />
+               {!hideRegistrationStatus && (
+                  <PanelRegistrationStatus isRegistered={isRegistered} />
+               )}
                <Box sx={styles.dateBadgeOverride}>
                   <PanelDateBadge
                      startDate={event.start?.toDate()}

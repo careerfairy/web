@@ -23,6 +23,7 @@ type Options = {
    initialData?: LivestreamEvent[]
    suspense?: boolean
    limit?: number
+   disableCountryLimitation?: boolean
    userCountryCode?: string
    includeHidden?: boolean
 }
@@ -35,7 +36,9 @@ export const useUpcomingPanelEventsSWR = (options?: Options) => {
    const userCountryCode = userData?.countryIsoCode || options?.userCountryCode
 
    // Check if user's country is in the allowed list
-   const isCountryAllowed = userCountryCode
+   const isCountryAllowed = options?.disableCountryLimitation
+      ? true
+      : userCountryCode
       ? ALLOWED_COUNTRIES.includes(userCountryCode)
       : false
 

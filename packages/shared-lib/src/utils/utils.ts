@@ -350,6 +350,34 @@ const makeICSCalendarUrl = function (event: CalendarEvent): string {
    return encodeURI("data:text/calendar;charset=utf8," + components.join("\n"))
 }
 
+const makeMultipleEventsICSCalendarUrl = function (
+   events: CalendarEvent[]
+): string {
+   const components = ["BEGIN:VCALENDAR", "VERSION:2.0"]
+
+   // In case of SSR, document won't be defined
+   if (typeof document !== "undefined") {
+      // remove any hash from the url
+      const urlComponent = "URL:" + document.URL.split("#")[0]
+      components.push(urlComponent)
+   }
+
+   events.forEach((event) => {
+      components.push("BEGIN:VEVENT")
+      components.push(
+         `DTSTART:${makeTime(event.startsAt)}`,
+         `DTEND:${makeTime(event.endsAt)}`,
+         `SUMMARY:${event.name}`,
+         `DESCRIPTION:${event.details}`,
+         `LOCATION:${event.location}`,
+         "END:VEVENT"
+      )
+   })
+
+   components.push("END:VCALENDAR")
+   return encodeURI("data:text/calendar;charset=utf8," + components.join("\n"))
+}
+
 export const makeUrls = function (
    event: CalendarEvent,
    errorLog?: (error: Error) => void
@@ -364,6 +392,23 @@ export const makeUrls = function (
       outlook: makeOutlookCalendarUrl(event, errorLog),
       yahoo: makeYahooCalendarUrl(event, errorLog),
       ics: makeICSCalendarUrl(event),
+   }
+}
+
+export const makeMultipleEventsUrls = function (
+   events: CalendarEvent[],
+   errorLog?: (error: Error) => void
+): {
+   google: string[]
+   outlook: string[]
+   yahoo: string[]
+   ics: string
+} {
+   return {
+      google: events.map((event) => makeGoogleCalendarUrl(event, errorLog)),
+      outlook: events.map((event) => makeOutlookCalendarUrl(event, errorLog)),
+      yahoo: events.map((event) => makeYahooCalendarUrl(event, errorLog)),
+      ics: makeMultipleEventsICSCalendarUrl(events), // Combined ICS for all events
    }
 }
 
@@ -383,6 +428,21 @@ export const getLivestreamICSDownloadUrl = (
    return isLocal
       ? `http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v3?eventId=${streamId}${utmCampaignQueryParam}`
       : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v3?eventId=${streamId}${utmCampaignQueryParam}`
+}
+
+export const getLivestreamsICSDownloadUrl = (
+   streamIds: string[],
+   isLocal: boolean,
+   options: GetLivestreamICSDownloadUrlOptions = {}
+) => {
+   const utmCampaignQueryParam = options.utmCampaign
+      ? `&utm_campaign=${options.utmCampaign}`
+      : ""
+   const baseUrl = isLocal
+      ? "http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamsICalendarEvents"
+      : "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamsICalendarEvents"
+   const idQuery = `eventIds=${encodeURIComponent((streamIds || []).join(","))}`
+   return `${baseUrl}?${idQuery}${utmCampaignQueryParam}`
 }
 
 type OptionsCreateCalendarEvent = {

@@ -22,6 +22,7 @@ const styles = sxStyles({
       borderRadius: "12px",
       overflow: "hidden",
       cursor: "pointer",
+      WebkitTapHighlightColor: "transparent",
       transition: "transform 0.2s ease-in-out",
       "&:hover": {
          "& .panelBackground": {
@@ -104,6 +105,7 @@ type PanelCardBase = {
    contentSx?: SxProps<Theme>
    backgroundSx?: SxProps<Theme>
    onCardClick?: (panelId: string) => void
+   disableClick?: boolean
 }
 
 export const PanelCardBase = ({
@@ -113,6 +115,7 @@ export const PanelCardBase = ({
    contentSx,
    backgroundSx,
    onCardClick,
+   disableClick,
 }: PanelCardBase) => {
    const imageUrl = event.backgroundImageUrl
    const router = useRouter()
@@ -127,6 +130,9 @@ export const PanelCardBase = ({
    })
 
    const handleClick = () => {
+      if (disableClick) {
+         return
+      }
       if (onCardClick) {
          return onCardClick?.(event.id)
       }
@@ -136,7 +142,7 @@ export const PanelCardBase = ({
       })
    }
 
-   const isLink = !onCardClick
+   const isLink = !onCardClick && !disableClick
 
    return (
       <Box
