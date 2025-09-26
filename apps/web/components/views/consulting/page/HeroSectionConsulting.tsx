@@ -24,6 +24,11 @@ const styles = sxStyles({
       maxWidth: { xs: "100%", sm: "534px" },
       alignSelf: "center",
    },
+   sectionTitle: {
+      color: "text.primary",
+      textAlign: "center",
+      fontWeight: 700,
+   },
    brandTagline: {
       color: "neutral.700",
       textAlign: "center",
@@ -183,26 +188,23 @@ export default function HeroSectionConsulting({
          </Box>
          <Stack spacing={1.5}>
             <Stack sx={styles.logoContainer}>
-               <Box>
-                  <Image
-                     src="/panels/masterclass-logo.svg"
-                     alt="Consulting Masterclass Logo"
-                     width={isMobile ? 258 : 425}
-                     height={isMobile ? 54 : 88}
-                  />
-               </Box>
+               <Typography variant="brandedH1" sx={styles.sectionTitle}>
+                  Consulting collection
+               </Typography>
                <Typography variant="medium" sx={styles.brandTagline}>
-                  Live sessions focused on breaking into the consulting industry
-                  with confidence and insider knowledge.
+                  Join live sessions with Europe's top consulting firms packed with career tips and real stories from young consultants.
                </Typography>
             </Stack>
 
             <Stack sx={styles.tagChips}>
                <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Free consulting sessions</Typography>
+                  <Typography variant="medium">Talk to real consultants</Typography>
                </Box>
                <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Industry experts</Typography>
+                  <Typography variant="medium">Cases, tips & more</Typography>
+               </Box>
+               <Box sx={styles.tagChip}>
+                  <Typography variant="medium">Live interaction</Typography>
                </Box>
             </Stack>
          </Stack>
