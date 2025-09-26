@@ -1,134 +1,118 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
-import { RectanglePanelCard } from "../../panels/cards/RectanglePanelCard"
-import { SquarePanelCard } from "../../panels/cards/SquarePanelCard"
+import { Box, Button, Stack, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
-   ctaSection: (theme) => ({
-      backgroundColor: theme.brand.white[400],
-      paddingX: 4,
-      paddingY: 4,
-      textAlign: "center",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 3,
-      mx: "-16px",
-      px: "16px",
-      [theme.breakpoints.up("md")]: {
-         flexDirection: "row",
-         alignItems: "flex-start",
-         paddingX: 6,
-         paddingY: 6,
-         textAlign: "left",
-         mx: "-32px",
-         px: "32px",
-      },
-      [theme.breakpoints.up("sparksFullscreen")]: {
-         flexDirection: "column",
-         alignItems: "center",
-      },
-      [theme.breakpoints.up("lg")]: {
-         flexDirection: "row",
-         alignItems: "flex-start",
-      },
-   }),
-   ctaTitle: (theme) => ({
-      color: "text.primary",
-      fontWeight: 700,
-      fontSize: "20px",
-      lineHeight: "30px",
-      maxWidth: "100%",
-      alignItems: "flex-start",
-      textAlign: "center",
-      [theme.breakpoints.up("md")]: {
-         alignSelf: "center",
-         maxWidth: "428px",
-         textAlign: "left",
-         fontSize: "38px",
-         lineHeight: "50px",
-      },
-      [theme.breakpoints.up("sparksFullscreen")]: {
-         alignItems: "flex-start",
-         maxWidth: "100%",
-         textAlign: "center",
-      },
-      [theme.breakpoints.up("lg")]: {
-         alignSelf: "center",
-         maxWidth: "428px",
-         textAlign: "left",
-      },
-   }),
-   ctaHighlight: {
-      color: "secondary.600",
-   },
-   cardsContainer: (theme) => ({
+   fullWidthSection: {
+      padding: "12px",
       width: "100%",
+   },
+   ctaContainer: {
+      backgroundColor: "#0D212C",
+      borderRadius: "24px",
+      padding: { xs: "16px", md: "32px" },
+      width: "100%",
+      height: "344px",
+      display: "flex",
+      flexDirection: { xs: "column", md: "row" },
+      gap: { xs: "12px", md: "24px" },
       alignItems: "center",
-      maxWidth: "548px",
-      gap: 1.5,
-      flexGrow: 1,
-      minHeight: 0,
-      [theme.breakpoints.up("md")]: {
-         alignItems: "unset",
+   },
+   textContent: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: { xs: "center", md: "flex-start" },
+      textAlign: { xs: "center", md: "left" },
+      gap: 2,
+      flex: { md: "1 1 auto" },
+      order: { xs: 2, md: 1 },
+   },
+   heading: {
+      color: (theme) => theme.brand.white[50],
+      fontWeight: 700,
+      fontSize: { xs: "24px", md: "32px" },
+      lineHeight: { xs: "32px", md: "40px" },
+   },
+   paragraph: {
+      color: (theme) => theme.brand.white[50],
+      fontSize: { xs: "16px", md: "18px" },
+      lineHeight: { xs: "24px", md: "28px" },
+      fontWeight: 400,
+      maxWidth: { md: "400px" },
+   },
+   ctaButton: {
+      backgroundColor: "primary.main",
+      color: "white",
+      fontWeight: 600,
+      padding: "12px 24px",
+      borderRadius: "8px",
+      textTransform: "none",
+      fontSize: "16px",
+      "&:hover": {
+         backgroundColor: "primary.dark",
       },
-      "& > *": {
-         flex: 1,
-         minWidth: "280px",
-         width: "100%",
-         maxWidth: "343px",
-         minHeight: "170px",
-         [theme.breakpoints.up("md")]: {
-            minWidth: "272px",
-            maxWidth: "320px",
-            minHeight: "322px",
-         },
-      },
-   }),
+   },
+   imageContainer: {
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flex: { md: "0 0 auto" },
+      order: { xs: 1, md: 2 },
+      maxWidth: { xs: "100%", md: "50%" },
+   },
+   consultingImage: {
+      height: { xs: "200px", md: "100%" },
+      width: "auto",
+      maxWidth: "100%",
+      objectFit: "contain",
+   },
 })
 
-interface RegisterNowSectionConsultingProps {
-   panelEvents: LivestreamEvent[]
-   handleOpenLivestreamDialog: (livestreamId: string) => void
-}
+export default function RegisterNowSectionConsulting() {
+   const isMobile = useIsMobile()
 
-export default function RegisterNowSectionConsulting({
-   panelEvents,
-   handleOpenLivestreamDialog,
-}: RegisterNowSectionConsultingProps) {
-   const theme = useTheme()
-   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+   const scrollToHeader = () => {
+      const headerElement = document.querySelector("header") || document.body
+      headerElement.scrollIntoView({ behavior: "smooth" })
+   }
 
    return (
-      <Stack direction={{ xs: "column", md: "row" }} sx={styles.ctaSection}>
-         <Typography sx={styles.ctaTitle}>
-            Register now to break into{" "}
-            <Box component="span" sx={styles.ctaHighlight}>
-               consulting
-            </Box>{" "}
-            with confidence!
-         </Typography>
-
-         <Stack
-            direction={isMobile ? "column" : "row"}
-            sx={styles.cardsContainer}
-         >
-            {panelEvents.map((panel) =>
-               isMobile ? (
-                  <RectanglePanelCard
-                     key={panel.id}
-                     event={panel}
-                     onCardClick={handleOpenLivestreamDialog}
-                  />
-               ) : (
-                  <SquarePanelCard
-                     key={panel.id}
-                     event={panel}
-                     onCardClick={handleOpenLivestreamDialog}
-                  />
-               )
-            )}
-         </Stack>
-      </Stack>
+      <Box sx={styles.fullWidthSection}>
+         <Box id="CTA Container" sx={styles.ctaContainer}>
+            <Box id="Text content" sx={styles.textContent}>
+               <Typography variant="h3" sx={styles.heading}>
+                  Don't miss your chance!
+               </Typography>
+               <Typography sx={styles.paragraph}>
+                  Get one step closer to your dream job by exploring the live streams available.
+               </Typography>
+               <Button
+                  variant="contained"
+                  sx={styles.ctaButton}
+                  onClick={scrollToHeader}
+               >
+                  Explore live streams
+               </Button>
+            </Box>
+            
+            <Box sx={styles.imageContainer}>
+               <Image
+                  src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/consulting_page_explore_more_image.png?alt=media&token=453f0eb2-94ff-4029-b99e-835abe5b0a65"
+                  alt="Consulting career illustration"
+                  width={400}
+                  height={280}
+                  style={{
+                     height: isMobile ? "200px" : "100%",
+                     width: "auto",
+                     maxWidth: "100%",
+                     objectFit: "contain",
+                  }}
+                  priority
+               />
+            </Box>
+         </Box>
+      </Box>
    )
 }

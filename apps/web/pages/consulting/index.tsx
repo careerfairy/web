@@ -145,10 +145,7 @@ export default function ConsultingPage({
                   consultingRecordings={deserializedConsultingRecordings}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <RegisterNowSectionConsulting
-                  panelEvents={deserializedPanelEvents}
-                  handleOpenLivestreamDialog={handleOpenPanelDialog}
-               />
+               <RegisterNowSectionConsulting />
                <NotForYouSectionConsulting
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
