@@ -11,7 +11,7 @@ import Document, {
 } from "next/document"
 import * as React from "react"
 import { shouldUseEmulators } from "util/CommonUtil"
-import { isEmbedded, isGroupAdminPath, isStreamingPath } from "util/PathUtils"
+import { isEmbedded, isGroupAdminPath, isHostStreamingPath } from "util/PathUtils"
 
 interface DocumentProps extends DocumentInitialProps {
    emotionStyleTags: React.ReactNode[]
@@ -329,9 +329,10 @@ function shouldSuppressUCBanner(ctx: DocumentContext) {
 
 function shouldRunGTM(ctx: DocumentContext) {
    /**
-    * We don't want to run GTM for group admin journeys or livestreams
+    * We don't want to run GTM for group admin journeys or host streaming pages
+    * Allow GTM on viewer streaming pages to track student attendance events
     */
-   if (isGroupAdminPath(ctx.pathname) || isStreamingPath(ctx.pathname)) {
+   if (isGroupAdminPath(ctx.pathname) || isHostStreamingPath(ctx.pathname)) {
       return false
    }
 
