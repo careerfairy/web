@@ -127,9 +127,11 @@ export default function ConsultingPage({
                <WhosThisForSectionConsulting />
                <ParticipatingCompaniesSectionConsulting companies={companies} />
                <SpeakersSectionConsulting
-                  speakers={deserializedPanelEvents.flatMap(
-                     (panel) => panel.speakers || []
-                  )}
+                  speakers={deserializedPanelEvents
+                     .flatMap((panel) => panel.speakers || [])
+                     .sort(() => Math.random() - 0.5) // Randomize order
+                     .slice(0, 6) // Limit to 6 speakers
+                  }
                   companies={companies}
                />
                <WhatYouTakeAwaySectionConsulting />
