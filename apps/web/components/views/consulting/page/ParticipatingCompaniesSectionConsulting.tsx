@@ -22,10 +22,19 @@ const styles = sxStyles({
          flexDirection: "row",
       },
    }),
-   sectionTitleWrapper: {
+   sectionTitleWrapper: (theme) => ({
       flex: "1 0 0",
       alignSelf: "center",
-   },
+      [theme.breakpoints.up("md")]: {
+         order: 2,
+      },
+      [theme.breakpoints.up("sparksFullscreen")]: {
+         order: 1,
+      },
+      [theme.breakpoints.up("lg")]: {
+         order: 2,
+      },
+   }),
    sectionTitle: {
       color: "text.primary",
       fontWeight: 700,
@@ -43,12 +52,15 @@ const styles = sxStyles({
          maxWidth: "548px",
       },
       [theme.breakpoints.up("md")]: {
+         order: 1,
          flex: "1 1 auto",
       },
       [theme.breakpoints.up("sparksFullscreen")]: {
+         order: 2,
          flex: "0 0 auto",
       },
       [theme.breakpoints.up("lg")]: {
+         order: 1,
          flex: "1 1 auto",
       },
    }),
