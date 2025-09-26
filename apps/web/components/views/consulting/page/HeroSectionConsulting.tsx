@@ -1,6 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { ImpressionLocation, LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Grid, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { Box, Chip, Grid, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Image from "next/image"
@@ -17,21 +17,32 @@ const styles = sxStyles({
       background:
          "linear-gradient(0deg, #F0F4FF 0%, #F0F4FF 100%), linear-gradient(104deg, #F5F7FF 0%, #F5F7FF 100%), linear-gradient(169deg, rgba(98, 117, 255, 0.13) 1.77%, rgba(70, 90, 230, 0.00) 98.23%), linear-gradient(25deg, rgba(70, 90, 230, 0.00) -0.66%, rgba(98, 117, 255, 0.48) 141.07%), #4A5BAD",
    },
-   logoContainer: {
-      gap: 0.5,
-      alignItems: "center",
+   headerContainer: {
+      gap: { xs: 1.5, md: 4 },
+      alignItems: { xs: "center", md: "flex-start" },
       zIndex: 1,
-      maxWidth: { xs: "100%", sm: "534px" },
+      maxWidth: "100%",
       alignSelf: "center",
+      flexDirection: { xs: "column", md: "row" },
+   },
+   leftColumn: {
+      flex: { md: "1 1 50%" },
+      alignItems: { xs: "center", md: "flex-start" },
+      textAlign: { xs: "center", md: "left" },
+   },
+   rightColumn: {
+      flex: { md: "1 1 50%" },
+      gap: 1.5,
+      alignItems: { xs: "center", md: "flex-start" },
+      textAlign: { xs: "center", md: "left" },
    },
    sectionTitle: {
-      color: "text.primary",
-      textAlign: "center",
+      color: "#4A72C8",
       fontWeight: 700,
+      lineHeight: 1.2,
    },
    brandTagline: {
       color: "neutral.700",
-      textAlign: "center",
    },
    // Container to clip visual support elements
    visualSupportContainer: {
@@ -58,18 +69,12 @@ const styles = sxStyles({
       pointerEvents: "none",
    },
    tagChips: {
-      gap: { xs: 2, md: 2 },
-      flexDirection: { xs: "column", md: "row" },
-      alignItems: "center",
-      justifyContent: "center",
+      gap: 1,
+      flexDirection: "row",
+      alignItems: { xs: "center", md: "flex-start" },
+      justifyContent: { xs: "center", md: "flex-start" },
       zIndex: 1,
-   },
-   tagChip: {
-      backgroundColor: "rgba(74, 91, 173, 0.22)",
-      color: "neutral.700",
-      px: 4,
-      py: 1,
-      borderRadius: "42px",
+      flexWrap: "wrap",
    },
    livestreamsGrid: {
       gap: 2,
@@ -186,26 +191,49 @@ export default function HeroSectionConsulting({
                </Box>
             )}
          </Box>
-         <Stack spacing={1.5}>
-            <Stack sx={styles.logoContainer}>
+         <Stack sx={styles.headerContainer}>
+            {/* Left column - Title */}
+            <Stack sx={styles.leftColumn}>
                <Typography variant="brandedH1" sx={styles.sectionTitle}>
-                  Consulting collection
-               </Typography>
-               <Typography variant="medium" sx={styles.brandTagline}>
-                  Join live sessions with Europe's top consulting firms packed with career tips and real stories from young consultants.
+                  Consulting{isMobile ? " " : <br />}collection
                </Typography>
             </Stack>
 
-            <Stack sx={styles.tagChips}>
-               <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Talk to real consultants</Typography>
-               </Box>
-               <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Cases, tips & more</Typography>
-               </Box>
-               <Box sx={styles.tagChip}>
-                  <Typography variant="medium">Live interaction</Typography>
-               </Box>
+            {/* Right column - Subtitle and Tags */}
+            <Stack sx={styles.rightColumn}>
+               <Typography variant="medium" sx={styles.brandTagline}>
+                  Join live sessions with Europe's top consulting firms packed with career tips and real stories from young consultants.
+               </Typography>
+               
+               <Stack sx={styles.tagChips}>
+                  <Chip
+                     label="Talk to real consultants"
+                     size="small"
+                     sx={{
+                        backgroundColor: "rgba(74, 114, 200, 0.15)",
+                        color: "#4A72C8",
+                        fontWeight: 500,
+                     }}
+                  />
+                  <Chip
+                     label="Cases, tips & more"
+                     size="small"
+                     sx={{
+                        backgroundColor: "rgba(74, 114, 200, 0.15)",
+                        color: "#4A72C8",
+                        fontWeight: 500,
+                     }}
+                  />
+                  <Chip
+                     label="Live interaction"
+                     size="small"
+                     sx={{
+                        backgroundColor: "rgba(74, 114, 200, 0.15)",
+                        color: "#4A72C8",
+                        fontWeight: 500,
+                     }}
+                  />
+               </Stack>
             </Stack>
          </Stack>
 
