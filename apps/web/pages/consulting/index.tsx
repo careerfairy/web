@@ -162,15 +162,22 @@ export const getServerSideProps: GetServerSideProps<
 > = async () => {
    try {
       // Fetch all data in parallel
-      const [recentLivestreams, allPanels] = await Promise.all([
+      const [recentLivestreams, allUpcomingEvents] = await Promise.all([
          livestreamRepo.getUpcomingEvents(10),
-         // For now, we'll use the same panels data, but in the future this could be filtered by consulting tag
-         livestreamRepo.getAllPanels(),
+         // Fetch upcoming events and filter by consulting industry
+         livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
       ])
 
-      // Extract unique groupIds from all panels
-      const allGroupIds = allPanels
-         .flatMap((panel) => panel.groupIds || [])
+      // Filter upcoming events by ManagementConsulting industry and limit to 6
+      const consultingLivestreams = allUpcomingEvents
+         ?.filter((event) => 
+            event.companyIndustries?.includes("ManagementConsulting")
+         )
+         ?.slice(0, 6) || []
+
+      // Extract unique groupIds from consulting livestreams
+      const allGroupIds = consultingLivestreams
+         .flatMap((event) => event.groupIds || [])
          .filter((groupId, index, array) => array.indexOf(groupId) === index) // Remove duplicates
 
       // Fetch companies from the groupIds
@@ -180,35 +187,37 @@ export const getServerSideProps: GetServerSideProps<
             : []
 
       // Serialize events for server-side props
-      const serializedPanelEvents = allPanels.map((panel) =>
-         LivestreamPresenter.serializeDocument(panel)
+      const serializedConsultingEvents = consultingLivestreams.map((event) =>
+         LivestreamPresenter.serializeDocument(event)
       )
 
-      // TODO: Handle moderators on second iteration of the consulting page
-      const panelsWithoutModerators = serializedPanelEvents.map((panel) => {
-         panel.speakers = panel.speakers?.filter(
+      // Handle moderators - filter out moderators from speakers
+      const eventsWithoutModerators = serializedConsultingEvents.map((event) => {
+         event.speakers = event.speakers?.filter(
             (speaker) => speaker.position !== "Moderator"
          )
          return {
-            ...panel,
-            speakers: panel.speakers,
+            ...event,
+            speakers: event.speakers,
          }
       })
-      const serializedRecentLivestreams = recentLivestreams.map((stream) =>
+
+      const serializedRecentLivestreams = recentLivestreams?.map((stream) =>
          LivestreamPresenter.serializeDocument(stream)
-      )
+      ) || []
+
       const serializedCompanies = companies.map((company) =>
          serializeGroup(company)
       )
 
-      // TODO: Handle CF in second iteration of the consulting page
+      // Filter out CareerFairy group
       const serializedCompaniesWithoutCF = serializedCompanies.filter(
          (company) => company.id !== CF_GROUP_ID
       )
 
       return {
          props: {
-            serverSidePanelEvents: panelsWithoutModerators,
+            serverSidePanelEvents: eventsWithoutModerators,
             serverSideCompanies: serializedCompaniesWithoutCF,
             serverSideRecentLivestreams: serializedRecentLivestreams,
          },

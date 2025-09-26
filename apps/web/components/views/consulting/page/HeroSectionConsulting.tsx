@@ -1,11 +1,11 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { ImpressionLocation, LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Box, Grid, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Image from "next/image"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { ReasonsToJoinPanelCard } from "../../panels/cards/ReasonsToJoinPanelCard"
 
 const styles = sxStyles({
    heroSection: {
@@ -66,17 +66,23 @@ const styles = sxStyles({
       py: 1,
       borderRadius: "42px",
    },
-   panelsGrid: {
-      gap: 1.5,
+   livestreamsGrid: {
+      gap: 2,
       alignItems: "stretch",
       zIndex: 1,
       // Position to overlap/overflow the hero section
       position: "relative",
+      width: "100%",
+   },
+   gridItem: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "stretch",
    },
 })
 
 interface HeroSectionConsultingProps {
-   panelEvents: LivestreamEvent[]
+   panelEvents: LivestreamEvent[] // These are now consulting livestreams, not panels
    companies: Group[]
    handleOpenLivestreamDialog: (livestreamId: string) => void
 }
@@ -89,22 +95,26 @@ export default function HeroSectionConsulting({
    const theme = useTheme()
    const isMobile = useIsMobile()
    const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"))
-   // Refs used to measure the hero container and the overlapping panels area
+   // Refs used to measure the hero container and the overlapping livestreams area
    const heroRef = useRef<HTMLDivElement | null>(null)
-   const panelsRef = useRef<HTMLDivElement | null>(null)
-   // Dynamic bottom spacing equals panels' overflow below hero + a base 32px gap
+   const livestreamsRef = useRef<HTMLDivElement | null>(null)
+   // Dynamic bottom spacing equals livestreams' overflow below hero + a base 32px gap
    const [dynamicBottomSpacing, setDynamicBottomSpacing] = useState<number>(32)
    const BASE_GAP_PX = 32
 
-   // Compute how much the panels extend below the hero and update spacing
+   // Determine grid layout based on number of events
+   const shouldUse1x3Layout = panelEvents.length === 4
+   const displayedEvents = shouldUse1x3Layout ? panelEvents.slice(0, 3) : panelEvents
+
+   // Compute how much the livestreams extend below the hero and update spacing
    const computeOverlap = useMemo(
       () => () => {
-         if (!heroRef.current || !panelsRef.current) return
+         if (!heroRef.current || !livestreamsRef.current) return
          const heroRect = heroRef.current.getBoundingClientRect()
-         const panelsRect = panelsRef.current.getBoundingClientRect()
+         const livestreamsRect = livestreamsRef.current.getBoundingClientRect()
          const extensionBelowHero = Math.max(
             0,
-            panelsRect.bottom - heroRect.bottom
+            livestreamsRect.bottom - heroRect.bottom
          )
          setDynamicBottomSpacing(extensionBelowHero + BASE_GAP_PX)
       },
@@ -114,20 +124,20 @@ export default function HeroSectionConsulting({
    // Keep spacing accurate across resizes between hero and next section
    useEffect(() => {
       const heroEl = heroRef.current
-      const panelsEl = panelsRef.current
-      if (!heroEl || !panelsEl) return
+      const livestreamsEl = livestreamsRef.current
+      if (!heroEl || !livestreamsEl) return
 
       // Initial measurement
       computeOverlap()
 
-      // Observe size changes of hero and panels
+      // Observe size changes of hero and livestreams
       let heroObserver: ResizeObserver | null = null
-      let panelsObserver: ResizeObserver | null = null
+      let livestreamsObserver: ResizeObserver | null = null
       if (typeof window !== "undefined" && "ResizeObserver" in window) {
          heroObserver = new ResizeObserver(() => computeOverlap())
-         panelsObserver = new ResizeObserver(() => computeOverlap())
+         livestreamsObserver = new ResizeObserver(() => computeOverlap())
          heroObserver.observe(heroEl)
-         panelsObserver.observe(panelsEl)
+         livestreamsObserver.observe(livestreamsEl)
       }
 
       // Recompute on window resize and orientation changes
@@ -139,7 +149,7 @@ export default function HeroSectionConsulting({
          window.removeEventListener("resize", handleResize)
          window.removeEventListener("orientationchange", handleResize)
          if (heroObserver) heroObserver.disconnect()
-         if (panelsObserver) panelsObserver.disconnect()
+         if (livestreamsObserver) livestreamsObserver.disconnect()
       }
    }, [computeOverlap])
 
@@ -197,22 +207,38 @@ export default function HeroSectionConsulting({
             </Stack>
          </Stack>
 
-         <Stack
-            ref={panelsRef}
-            direction={{ xs: "column", md: "row" }}
-            sx={styles.panelsGrid}
-         >
-            {panelEvents.map((panel: LivestreamEvent) => {
-               return (
-                  <ReasonsToJoinPanelCard
-                     key={panel.id}
-                     panel={panel}
-                     companies={companies}
-                     handleOpenLivestreamDialog={handleOpenLivestreamDialog}
-                  />
-               )
-            })}
-         </Stack>
+         <Box ref={livestreamsRef} sx={styles.livestreamsGrid}>
+            <Grid 
+               container 
+               spacing={2}
+               sx={{ justifyContent: "center" }}
+            >
+               {displayedEvents.map((livestream: LivestreamEvent, index: number) => {
+                  // For 1x3 layout (when we have exactly 4 events), use 12/3 = 4 columns each
+                  // For 2x3 layout (all other cases), use 12/3 = 4 columns each on medium screens, 12 on mobile
+                  const gridSize = shouldUse1x3Layout 
+                     ? { xs: 12, sm: 6, md: 4 } 
+                     : { xs: 12, sm: 6, md: 4 }
+                  
+                  return (
+                     <Grid
+                        key={livestream.id}
+                        item
+                        {...gridSize}
+                        sx={styles.gridItem}
+                     >
+                        <EventPreviewCard
+                           event={livestream}
+                           location={ImpressionLocation.panelsOverviewPage}
+                           onCardClick={() => handleOpenLivestreamDialog(livestream.id)}
+                           index={index}
+                           totalElements={displayedEvents.length}
+                        />
+                     </Grid>
+                  )
+               })}
+            </Grid>
+         </Box>
       </Stack>
    )
 }
