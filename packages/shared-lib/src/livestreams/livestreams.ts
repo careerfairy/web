@@ -469,8 +469,6 @@ export interface IEmailSent {
 export interface IPromotionEmailSent {
    sevenDayPromotion?: boolean
    sevenDayPromotionSentAt?: FirebaseFirestore.Timestamp
-   fourteenDayPromotion?: boolean
-   fourteenDayPromotionSentAt?: FirebaseFirestore.Timestamp
 }
 
 /**
