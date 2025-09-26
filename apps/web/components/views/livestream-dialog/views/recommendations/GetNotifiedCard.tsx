@@ -3,7 +3,6 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { appQrCodeLSRegistration } from "constants/images"
 import { useAuth } from "HOCs/AuthProvider"
 import { useMemo } from "react"
-import DateUtil from "util/DateUtil"
 import { MobileUtils } from "util/mobile.utils"
 import { LivestreamEvent } from "../../../../../../../packages/shared-lib/src/livestreams/livestreams"
 import { AddToCalendar } from "../../../common/AddToCalendar"
@@ -16,6 +15,8 @@ import {
 type Props = {
    /** The livestream event data */
    livestream: LivestreamEvent
+   /** The registered livestreams, in the case of multi-registration flow (e.g. panels) */
+   registeredLivestreams?: LivestreamEvent[]
    /** Controls the responsive layout. "desktop" forces desktop layout, "mobile" forces mobile layout, "auto" uses media queries */
    responsiveMode?: "desktop" | "mobile" | "auto"
    /** If true and isDesktop is true, shows the expanded version with centered content */
@@ -32,6 +33,7 @@ type Props = {
  */
 export const GetNotifiedCard = ({
    livestream,
+   registeredLivestreams,
    responsiveMode = "auto",
    isExpanded = false,
    onClose,
@@ -55,22 +57,18 @@ export const GetNotifiedCard = ({
 
    return (
       <AddToCalendar
-         event={livestream}
+         events={registeredLivestreams}
          filename={`${livestream.company}-event`}
       >
          {(handleAddToCalendar) => (
             <GetNotifiedCardPresentation
                {...cardProps}
+               registeredLivestreams={registeredLivestreams}
                companyName={livestream.company}
                companyLogoUrl={livestream.companyLogoUrl}
                title={livestream.title}
                bannerImageUrl={livestream.backgroundImageUrl}
-               panelLogoUrl={
-                  livestream.isPanel ? livestream.panelLogoUrl : null
-               }
-               eventDateString={formatLivestreamDate(
-                  livestream?.start || new Date()
-               )}
+               eventDate={livestream?.start || new Date()}
                qrCodeUrl={appQrCodeLSRegistration}
                shouldDownloadApp={shouldDownloadApp}
                isDesktop={isDesktop}
@@ -86,18 +84,4 @@ export const GetNotifiedCard = ({
          )}
       </AddToCalendar>
    )
-}
-
-// Helper function to format date from firebase timestamp
-const formatLivestreamDate = (timestamp: any): string => {
-   if (!timestamp) return ""
-
-   try {
-      // Convert Firebase timestamp to JS Date
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp)
-      return DateUtil.formatDateTime(date)
-   } catch (error) {
-      console.error("Error formatting date:", error)
-      return ""
-   }
 }

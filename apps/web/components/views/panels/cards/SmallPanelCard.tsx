@@ -49,9 +49,17 @@ const styles = sxStyles({
 
 type SmallPanelCardProps = {
    event: LivestreamEvent
+   hideRegistrationStatus?: boolean
+   hideDateBadge?: boolean
+   disableClick?: boolean
 }
 
-export const SmallPanelCard = ({ event }: SmallPanelCardProps) => {
+export const SmallPanelCard = ({
+   event,
+   hideRegistrationStatus,
+   hideDateBadge,
+   disableClick,
+}: SmallPanelCardProps) => {
    const isRegistered = useUserIsRegistered(event.id)
 
    const { data: groups } = usePanelGroupsByIds(event.groupIds)
@@ -62,6 +70,7 @@ export const SmallPanelCard = ({ event }: SmallPanelCardProps) => {
    return (
       <PanelCardBase
          event={event}
+         disableClick={disableClick}
          backgroundSx={{
             "&::before": {
                background: `
@@ -78,18 +87,22 @@ export const SmallPanelCard = ({ event }: SmallPanelCardProps) => {
          <Box sx={styles.content}>
             {/* Top Left - Date Badge */}
             <Box sx={styles.topLeftSection}>
-               <PanelDateBadge
-                  startDate={event.start?.toDate()}
-                  variant="small"
-               />
+               {!hideDateBadge && (
+                  <PanelDateBadge
+                     startDate={event.start?.toDate()}
+                     variant="small"
+                  />
+               )}
             </Box>
 
             {/* Top Right - Registration Status */}
             <Box sx={styles.topRightSection}>
-               <PanelRegistrationStatus
-                  isRegistered={isRegistered}
-                  variant="small"
-               />
+               {!hideRegistrationStatus && (
+                  <PanelRegistrationStatus
+                     isRegistered={isRegistered}
+                     variant="small"
+                  />
+               )}
             </Box>
 
             {/* Bottom Left - Panel Image */}
