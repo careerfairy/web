@@ -210,27 +210,54 @@ export default function HeroSectionConsulting({
                      label="Talk to real consultants"
                      size="small"
                      sx={{
-                        backgroundColor: "rgba(74, 114, 200, 0.15)",
-                        color: "#4A72C8",
-                        fontWeight: 500,
+                        backgroundColor: "rgba(136, 136, 136, 0.22)",
+                        color: "neutral.700",
+                        fontWeight: 400,
+                        fontSize: "14px",
+                        lineHeight: "20px",
+                        px: "16px",
+                        py: "4px",
+                        height: "auto",
+                        "& .MuiChip-label": {
+                           px: 0,
+                           py: 0,
+                        },
                      }}
                   />
                   <Chip
                      label="Cases, tips & more"
                      size="small"
                      sx={{
-                        backgroundColor: "rgba(74, 114, 200, 0.15)",
-                        color: "#4A72C8",
-                        fontWeight: 500,
+                        backgroundColor: "rgba(136, 136, 136, 0.22)",
+                        color: "neutral.700",
+                        fontWeight: 400,
+                        fontSize: "14px",
+                        lineHeight: "20px",
+                        px: "16px",
+                        py: "4px",
+                        height: "auto",
+                        "& .MuiChip-label": {
+                           px: 0,
+                           py: 0,
+                        },
                      }}
                   />
                   <Chip
                      label="Live interaction"
                      size="small"
                      sx={{
-                        backgroundColor: "rgba(74, 114, 200, 0.15)",
-                        color: "#4A72C8",
-                        fontWeight: 500,
+                        backgroundColor: "rgba(136, 136, 136, 0.22)",
+                        color: "neutral.700",
+                        fontWeight: 400,
+                        fontSize: "14px",
+                        lineHeight: "20px",
+                        px: "16px",
+                        py: "4px",
+                        height: "auto",
+                        "& .MuiChip-label": {
+                           px: 0,
+                           py: 0,
+                        },
                      }}
                   />
                </Stack>

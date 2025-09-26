@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
@@ -42,16 +42,7 @@ const styles = sxStyles({
       maxWidth: { md: "400px" },
    },
    ctaButton: {
-      backgroundColor: "primary.main",
-      color: "white",
-      fontWeight: 600,
-      padding: "12px 24px",
-      borderRadius: "8px",
       textTransform: "none",
-      fontSize: "16px",
-      "&:hover": {
-         backgroundColor: "primary.dark",
-      },
    },
    imageContainer: {
       height: "100%",
@@ -90,6 +81,8 @@ export default function RegisterNowSectionConsulting() {
                </Typography>
                <Button
                   variant="contained"
+                  color="primary"
+                  size="medium"
                   sx={styles.ctaButton}
                   onClick={scrollToHeader}
                >
