@@ -89,6 +89,7 @@ import countries = require("./countries")
 import levels = require("./levels")
 import remindersNew = require("./reminders-new")
 import followups = require("./followups")
+import livestreamPromotion = require("./livestreamPromotion")
 
 // Auth
 exports[FUNCTION_NAMES.createNewUserAccount] = auth.createNewUserAccount
@@ -424,6 +425,10 @@ exports.sendFollowupToAttendees = followups.sendFollowupToAttendees
 exports.sendManualFollowup = followups.sendManualFollowup
 exports.sendReminderEmailAboutApplicationLink_v2 =
    followups.sendReminderEmailAboutApplicationLink
+
+// Livestream Promotion
+exports.schedule7DayPromotionEmails = livestreamPromotion.schedule7DayPromotionEmails
+exports.manualPromotionEmails = livestreamPromotion.manualPromotionEmails
 
 // Reminders Post
 exports[FUNCTION_NAMES.onLivestreamStartScheduleNoShowReminder] =
