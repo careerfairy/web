@@ -15,14 +15,14 @@ const promotionBufferMinutes = 20
 const promotionScheduleRange = 60 // 1 hour window
 
 /**
- * Configuration for the 7-day advance promotional email
+ * Configuration for the 14-day advance promotional email
  */
-const Promotion7Days = {
+const Promotion14Days = {
    templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_B2B_SOCIAL_SHARE_NUDGE,
-   scheduleEmailDaysBefore: 7,
-   promotionUtmCampaign: "7day-promotion",
-   // 7 days before the livestream starts
-   getStartDate: () => addMinutesDate(new Date(), promotionBufferMinutes + (7 * 24 * 60)),
+   scheduleEmailDaysBefore: 14,
+   promotionUtmCampaign: "14day-promotion",
+   // 14 days before the livestream starts
+   getStartDate: () => addMinutesDate(new Date(), promotionBufferMinutes + (14 * 24 * 60)),
 } as const
 
 const scheduleOptions = {
@@ -34,18 +34,18 @@ const scheduleOptions = {
 
 /**
  * Runs every hour and does the following:
- *  - Fetches livestreams that will start in 7 days (with buffer)
+ *  - Fetches livestreams that will start in 14 days (with buffer)
  *  - Sends promotional emails to all group admins for these streams
  */
-export const schedule7DayPromotionEmails = onSchedule(
+export const schedule14DayPromotionEmails = onSchedule(
    scheduleOptions,
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
-      const fromDate = Promotion7Days.getStartDate()
+      const fromDate = Promotion14Days.getStartDate()
       const toDate = addMinutesDate(fromDate, promotionScheduleRange)
 
-      // Streams that will start in 7 days
+      // Streams that will start in 14 days
       const streams = await getStreamsByDateForPromotion(fromDate, toDate)
 
       return handlePromotionEmails(streams)
@@ -62,7 +62,7 @@ export const manualPromotionEmails = onRequest(
       timeoutSeconds: scheduleOptions.timeoutSeconds,
    },
    async (req, res) => {
-      const daysFromNow = parseInt(req.query.daysFromNow as string) || 7
+      const daysFromNow = parseInt(req.query.daysFromNow as string) || 14
 
       const fromDate = addMinutesDate(new Date(), daysFromNow * 24 * 60)
       const toDate = addMinutesDate(fromDate, 24 * 60) // 1 day window
@@ -103,14 +103,14 @@ const getStreamsByDateForPromotion = async (
  */
 const handlePromotionEmails = async (streams: LivestreamEvent[]) => {
    if (streams.length === 0) {
-      log(`No streams found for 7-day promotion, skipping`)
+      log(`No streams found for 14-day promotion, skipping`)
       return
    }
 
    log(
       `Found ${streams.length} livestreams (${streams
          .map((s) => s.id)
-         .join(", ")}) for 7-day promotion emails`
+         .join(", ")}) for 14-day promotion emails`
    )
 
    try {
@@ -118,7 +118,7 @@ const handlePromotionEmails = async (streams: LivestreamEvent[]) => {
          await sendPromotionEmailsForStream(stream)
       }
    } catch (error) {
-      log(`Error handling 7-day promotion emails`, error)
+      log(`Error handling 14-day promotion emails`, error)
       throw new HttpsError("unknown", error)
    }
 }
@@ -132,7 +132,7 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
       const promotionEmailSent = await checkIfPromotionEmailSent(stream.id)
       
       if (promotionEmailSent) {
-         log(`7-day promotion email already sent for stream ${stream.id}`)
+         log(`14-day promotion email already sent for stream ${stream.id}`)
          return
       }
 
@@ -151,7 +151,7 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
       const groups = await groupRepo.getGroupsByIds(stream.groupIds)
       const group = groups.find((g) => !g.universityCode) || groups[0]
 
-      log(`Sending 7-day promotion emails to ${adminsInfo.length} admins for stream ${stream.id}`)
+      log(`Sending 14-day promotion emails to ${adminsInfo.length} admins for stream ${stream.id}`)
 
       // Send emails to all group admins
       await notificationService.sendEmailNotifications(
@@ -160,7 +160,7 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
             templateData: {
                dashboardUrl: addUtmTagsToLink({
                   link: admin.eventDashboardLink,
-                  campaign: Promotion7Days.promotionUtmCampaign,
+                  campaign: Promotion14Days.promotionUtmCampaign,
                }),
                livestream: {
                   company: stream.company,
@@ -169,7 +169,7 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
                   title: stream.title,
                   url: addUtmTagsToLink({
                      link: admin.nextLivestreamsLink,
-                     campaign: Promotion7Days.promotionUtmCampaign,
+                     campaign: Promotion14Days.promotionUtmCampaign,
                   }),
                },
             },
@@ -183,7 +183,7 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
       // Mark that the promotion email has been sent for this stream
       await markPromotionEmailSent(stream.id)
 
-      info(`Successfully sent 7-day promotion emails for stream ${stream.id}`)
+      info(`Successfully sent 14-day promotion emails for stream ${stream.id}`)
    } catch (error) {
       error(`Error sending promotion emails for stream ${stream.id}:`, error)
       throw error
@@ -191,7 +191,7 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
 }
 
 /**
- * Checks if a 7-day promotion email has already been sent for this stream
+ * Checks if a 14-day promotion email has already been sent for this stream
  */
 const checkIfPromotionEmailSent = async (streamId: string): Promise<boolean> => {
    try {
@@ -201,7 +201,7 @@ const checkIfPromotionEmailSent = async (streamId: string): Promise<boolean> => 
          .get()
 
       const data = doc.data()
-      return data?.promotionEmailsSent?.sevenDayPromotion === true
+      return data?.promotionEmailsSent?.fourteenDayPromotion === true
    } catch (error) {
       log(`Error checking promotion email status for stream ${streamId}:`, error)
       return false
@@ -209,7 +209,7 @@ const checkIfPromotionEmailSent = async (streamId: string): Promise<boolean> => 
 }
 
 /**
- * Marks that a 7-day promotion email has been sent for this stream
+ * Marks that a 14-day promotion email has been sent for this stream
  */
 const markPromotionEmailSent = async (streamId: string): Promise<void> => {
    try {
@@ -217,8 +217,8 @@ const markPromotionEmailSent = async (streamId: string): Promise<void> => {
          .collection("livestreams")
          .doc(streamId)
          .update({
-            "promotionEmailsSent.sevenDayPromotion": true,
-            "promotionEmailsSent.sevenDayPromotionSentAt": FieldValue.serverTimestamp(),
+            "promotionEmailsSent.fourteenDayPromotion": true,
+            "promotionEmailsSent.fourteenDayPromotionSentAt": FieldValue.serverTimestamp(),
          })
    } catch (error) {
       log(`Error marking promotion email as sent for stream ${streamId}:`, error)
