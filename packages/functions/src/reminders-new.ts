@@ -1,4 +1,7 @@
-import { generateCalendarData } from "@careerfairy/shared-lib/email/helpers"
+import {
+   generateCalendarData,
+   prepareEmailSpeakers,
+} from "@careerfairy/shared-lib/email/helpers"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import {
@@ -463,6 +466,13 @@ const handleSendEmails = async (
          isLocalEnvironment: isLocalEnvironment(),
       })
 
+      // Prepare speaker data
+      const speakersData = prepareEmailSpeakers(
+         stream,
+         getHost(),
+         reminder.reminderUtmCampaign
+      )
+
       // Create notification requests for all users
       const notificationRequests = registeredUsers.map<EmailRequest>(
          (userLivestreamData) => ({
@@ -494,6 +504,7 @@ const handleSendEmails = async (
                        })
                      : "",
                },
+               speakers: speakersData,
                calendar: calendarData,
             },
             identifiers: {

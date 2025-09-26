@@ -111,6 +111,7 @@ export type ReminderTemplateData = {
       url: string
       companyPageUrl: string
    }
+   speakers: SpeakerData[]
    calendar: {
       google: string
       outlook: string
