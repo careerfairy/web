@@ -9,7 +9,8 @@ import {
 import GroupsUtil from "../../../../../data/util/GroupsUtil"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { errorLogAndNotify } from "../../../../../util/CommonUtil"
-import useGroupsByIds from "../../../../custom-hook/useGroupsByIds"
+// import removed: useGroupsByIds - we'll fetch groups for all selected livestreams
+import { livestreamService } from "../../../../../data/firebase/LivestreamService"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../../common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
@@ -34,9 +35,11 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
    const { authenticatedUser, userData, userStats } = useAuth()
    const { checkIfUserAgreedToGroupPolicy } = useFirebaseService()
    const { errorNotification } = useSnackbarNotifications()
-   const { data: groups } = useGroupsByIds(livestream.groupIds)
-   const { completeRegistrationProcess, registrationStatus } =
-      useRegistrationHandler()
+   const {
+      completeRegistrationProcess,
+      registrationStatus,
+      selectedLivestreams,
+   } = useRegistrationHandler()
 
    const [isRegistering, setIsRegistering] = useState(false)
    const [hasRegistered, setHasRegistered] = useState(false)
@@ -51,103 +54,125 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
 
    // check if user has answered all questions / given consent
    useEffect(() => {
-      const promises = []
+      const fetchAndValidate = async () => {
+         // Determine which livestreams are part of the registration action
+         const targetLivestreamIds = selectedLivestreams?.length
+            ? selectedLivestreams.map((e) => e.id)
+            : [livestreamRef.current?.id]
 
-      // parallel load
-      promises.push(
-         GroupsUtil.getPolicyStatus(
-            groups,
-            authenticatedUser.email,
-            checkIfUserAgreedToGroupPolicy
-         ),
-         // pre-load the user's existing answers
-         groupRepo.mapUserAnswersToLivestreamGroupQuestions(
-            userData,
-            livestreamRef.current
+         // Fetch all target livestreams to build the union of participating groups
+         const targetLivestreams = await Promise.all(
+            targetLivestreamIds.map((id) => livestreamService.getById(id))
          )
-      )
 
-      Promise.all(promises)
-         .then(([{ hasAgreedToAll, groupsWithPolicies }, answers]) => {
-            registrationDispatch({
-               type: "set-user-existing-answers",
-               payload: answers,
-            })
+         const allGroupIds = Array.from(
+            targetLivestreams.flatMap((ls) => ls?.groupIds || [])
+         )
 
-            registrationDispatch({
-               type: "set-groups-with-policies",
-               payload: { groupsWithPolicies, hasAgreedToAll },
-            })
+         // Load all groups involved across the selected livestreams
+         const groups = await groupRepo.getGroupsByIds(allGroupIds)
 
-            const hasAnsweredAllQuestions =
-               checkIfUserHasAnsweredAllLivestreamGroupQuestions(answers)
+         const [{ hasAgreedToAll, groupsWithPolicies }, answers] =
+            await Promise.all([
+               GroupsUtil.getPolicyStatus(
+                  groups,
+                  authenticatedUser.email,
+                  checkIfUserAgreedToGroupPolicy
+               ),
+               // Pre-load the user's existing answers for the CURRENT livestream only
+               // (questions are per event; consent can be aggregated across events)
+               groupRepo.mapUserAnswersToLivestreamGroupQuestions(
+                  userData,
+                  livestreamRef.current
+               ),
+            ])
 
-            if (hasAgreedToAll && hasAnsweredAllQuestions) {
-               switch (registrationStatus()) {
-                  case "can_register":
-                     // we have enough information to complete the registration
-                     if (isRegisteringRef.current) {
-                        return
-                     }
-                     setIsRegistering(true)
-                     completeRegistrationProcess(
-                        userData,
-                        authenticatedUser,
-                        livestreamRef.current,
-                        groupsWithPolicies,
-                        answers
-                     )
-                        .then(() => {
-                           setHasRegistered(true)
-                           if (onRegisterSuccess) {
-                              onRegisterSuccess()
-                           }
-                           goToView("register-ask-questions")
-                        })
-                        .catch((e) => {
-                           errorNotification(e)
-                        })
-                        .finally(() => {
-                           setIsRegistering(false)
-                        })
+         registrationDispatch({
+            type: "set-user-existing-answers",
+            payload: answers,
+         })
 
-                     break
-                  case "registered":
-                     // user is already registered, so we can skip the registration process
+         registrationDispatch({
+            type: "set-groups-with-policies",
+            payload: { groupsWithPolicies, hasAgreedToAll },
+         })
 
-                     registrationDispatch({
-                        type: "set-loading-finished",
+         const hasAnsweredAllQuestions =
+            checkIfUserHasAnsweredAllLivestreamGroupQuestions(answers)
+
+         // Always render consent view for panels, even if no questions/policies
+         const shouldSkipConsentView =
+            hasAgreedToAll &&
+            hasAnsweredAllQuestions &&
+            !livestreamRef.current?.isPanel
+
+         if (shouldSkipConsentView) {
+            switch (registrationStatus()) {
+               case "can_register":
+                  // we have enough information to complete the registration
+                  if (isRegisteringRef.current) {
+                     return
+                  }
+                  setIsRegistering(true)
+                  completeRegistrationProcess(
+                     userData,
+                     authenticatedUser,
+                     livestreamRef.current,
+                     groupsWithPolicies,
+                     answers
+                  )
+                     .then(() => {
+                        setHasRegistered(true)
+                        if (onRegisterSuccess) {
+                           onRegisterSuccess()
+                        }
+                        goToView("register-ask-questions")
+                     })
+                     .catch((e) => {
+                        errorNotification(e)
+                     })
+                     .finally(() => {
+                        setIsRegistering(false)
                      })
 
-                     if (onRegisterSuccess) {
-                        onRegisterSuccess()
-                     }
-                     goToView("register-ask-questions")
-                     break
+                  break
+               case "registered":
+                  // user is already registered, so we can skip the registration process
 
-                  default:
-                     break
-               }
-            } else {
-               registrationDispatch({
-                  type: "set-loading-finished",
-               })
+                  registrationDispatch({
+                     type: "set-loading-finished",
+                  })
+
+                  if (onRegisterSuccess) {
+                     onRegisterSuccess()
+                  }
+                  goToView("register-ask-questions")
+                  break
+
+               default:
+                  break
             }
-         })
-         .catch((e) => {
-            errorNotification(e)
-         })
+         } else {
+            registrationDispatch({
+               type: "set-loading-finished",
+            })
+         }
+      }
+
+      fetchAndValidate().catch((e) => {
+         errorNotification(e)
+      })
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       authenticatedUser,
       authenticatedUser.email,
       checkIfUserAgreedToGroupPolicy,
       errorNotification,
-      groups,
       registrationDispatch,
       userData,
       registrationStatus,
       hasRegistered,
+      selectedLivestreams,
    ])
 
    // mark user as registered to any livestream
