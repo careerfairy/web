@@ -1,7 +1,6 @@
 import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { Stack } from "@mui/material"
-import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import {
    HeroSectionConsulting,
    NotForYouSectionConsulting,
@@ -11,6 +10,7 @@ import {
    WhatYouTakeAwaySectionConsulting,
    WhosThisForSectionConsulting,
 } from "components/views/consulting/page"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
@@ -125,13 +125,6 @@ export default function ConsultingPage({
                   handleOpenLivestreamDialog={handleOpenPanelDialog}
                />
                <WhosThisForSectionConsulting />
-               <SpeakersSectionConsulting
-                  speakers={deserializedPanelEvents.flatMap(
-                     (panel) => panel.speakers || []
-                  )}
-                  companies={companies}
-               />
-               <ParticipatingCompaniesSectionConsulting companies={companies} />
                <WhatYouTakeAwaySectionConsulting />
                <RegisterNowSectionConsulting
                   panelEvents={deserializedPanelEvents}
@@ -140,6 +133,13 @@ export default function ConsultingPage({
                <NotForYouSectionConsulting
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
+               />
+               <ParticipatingCompaniesSectionConsulting companies={companies} />
+               <SpeakersSectionConsulting
+                  speakers={deserializedPanelEvents.flatMap(
+                     (panel) => panel.speakers || []
+                  )}
+                  companies={companies}
                />
             </Stack>
          </GenericDashboardLayout>
