@@ -1,5 +1,8 @@
 import { GroupWithPolicy } from "@careerfairy/shared-lib/src/groups"
-import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/src/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+} from "@careerfairy/shared-lib/src/livestreams"
 
 export type RegistrationState = {
    groupsWithPolicies?: GroupWithPolicy[]
@@ -9,6 +12,11 @@ export type RegistrationState = {
    // fetch all the livestream groups, their policies and the user policy
    // status for each group
    isLoadingRequiredData: boolean
+
+   /**
+    * Selected livestreams to register to during multi-selection flows (e.g., panels)
+    */
+   selectedLivestreams?: LivestreamEvent[]
 }
 
 export type RegistrationAction =
@@ -21,9 +29,12 @@ export type RegistrationAction =
      }
    | { type: "set-user-existing-answers"; payload: LivestreamGroupQuestionsMap }
    | { type: "set-loading-finished" }
+   | { type: "set-selected-livestreams"; payload: LivestreamEvent[] }
+   | { type: "toggle-selected-livestream"; payload: LivestreamEvent }
 
 export const registrationInitialState: RegistrationState = {
    isLoadingRequiredData: true,
+   selectedLivestreams: [],
 }
 
 export function registrationReducer(
@@ -44,6 +55,20 @@ export function registrationReducer(
 
       case "set-loading-finished":
          newState.isLoadingRequiredData = false
+         break
+
+      case "set-selected-livestreams":
+         newState.selectedLivestreams = action.payload
+         break
+
+      case "toggle-selected-livestream":
+         newState.selectedLivestreams = (() => {
+            const current = newState.selectedLivestreams ?? []
+            const exists = current.some((ls) => ls.id === action.payload.id)
+            return exists
+               ? current.filter((ls) => ls.id !== action.payload.id)
+               : [...current, action.payload]
+         })()
          break
    }
 

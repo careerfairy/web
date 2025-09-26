@@ -24,6 +24,7 @@ import RegistrationPreConditions from "../../RegistrationPreConditions"
 import useRegistrationHandler from "../../useRegistrationHandler"
 import GroupConsentDataFetching from "./GroupConsentDataFetching"
 import LivestreamGroupQuestionsSelector from "./LivestreamGroupQuestionsSelector"
+import { PanelsConsentView } from "./PanelsConsentView"
 import RegisterDataConsentViewSkeleton from "./RegisterDataConsentViewSkeleton"
 
 const styles = sxStyles({
@@ -128,6 +129,15 @@ const GroupQuestionsForm = () => {
    }, [goToView])
 
    const policiesToAccept = groupsWithPolicies?.length > 0
+
+   if (livestream.isPanel) {
+      return (
+         <PanelsConsentView
+            goToPrevious={goToPrevious}
+            handleSubmit={handleSubmit}
+         />
+      )
+   }
 
    return (
       <Formik

@@ -3,7 +3,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat"
 import calendar from "dayjs/plugin/calendar"
 import duration from "dayjs/plugin/duration"
 import relativeTime from "dayjs/plugin/relativeTime"
-import timezone from "dayjs/plugin/timezone"; // dependent on utc plugin
+import timezone from "dayjs/plugin/timezone" // dependent on utc plugin
 import updateLocale from "dayjs/plugin/updateLocale"
 import utc from "dayjs/plugin/utc"
 
@@ -434,6 +434,17 @@ export default class DateUtil {
     */
    static formatEventDate(JSDate: Date | number): string {
       return dayjs(JSDate).format("DD MMM YY, HH:mm")
+   }
+
+   /**
+    * Formats a given date to a string in the format "D MMMM at HH:mm".
+    * Example output: "27 October at 15:00".
+    *
+    * @param {Date | number} JSDate - The JavaScript Date object or timestamp to be formatted.
+    * @return {string} - The formatted date string.
+    */
+   static formatDayMonthAtTime(JSDate: Date | number): string {
+      return dayjs(JSDate).format("D MMMM [at] HH:mm")
    }
 
    /**
