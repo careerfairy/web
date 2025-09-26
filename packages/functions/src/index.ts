@@ -427,7 +427,7 @@ exports.sendReminderEmailAboutApplicationLink_v2 =
    followups.sendReminderEmailAboutApplicationLink
 
 // Livestream Promotion
-exports.schedule7DayPromotionEmails = livestreamPromotion.schedule7DayPromotionEmails
+exports.schedule14DayPromotionEmails = livestreamPromotion.schedule14DayPromotionEmails
 exports.manualPromotionEmails = livestreamPromotion.manualPromotionEmails
 
 // Reminders Post
