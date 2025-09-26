@@ -31,14 +31,14 @@ const styles = sxStyles({
       alignSelf: "center",
       zIndex: 1,
       [theme.breakpoints.up("md")]: {
-         order: 2,
+         order: 1,
          flexShrink: 0,
       },
       [theme.breakpoints.up("sparksFullscreen")]: {
          order: 1,
       },
       [theme.breakpoints.up("lg")]: {
-         order: 2,
+         order: 1,
       },
    }),
    sectionTitle: {
@@ -60,7 +60,7 @@ const styles = sxStyles({
          maxWidth: "548px",
       },
       [theme.breakpoints.up("md")]: {
-         order: 1,
+         order: 2,
          flex: "1 1 auto",
       },
       [theme.breakpoints.up("sparksFullscreen")]: {
@@ -68,7 +68,7 @@ const styles = sxStyles({
          flex: "0 0 auto",
       },
       [theme.breakpoints.up("lg")]: {
-         order: 1,
+         order: 2,
          flex: "1 1 auto",
       },
    }),
