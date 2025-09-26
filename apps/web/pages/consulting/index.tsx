@@ -192,33 +192,16 @@ export const getServerSideProps: GetServerSideProps<
          )
          ?.slice(0, 6) || []
 
-      // Debug: Log past events data
-      console.log("Server-side debug - pastEvents total:", pastEvents?.length || 0)
-      console.log("Server-side debug - pastEvents sample:", pastEvents?.slice(0, 3).map(e => ({
-         id: e.id,
-         title: e.title,
-         companyIndustries: e.companyIndustries,
-         isRecording: e.isRecording
-      })))
 
       // Filter past events by ManagementConsulting industry and limit to 6 for recordings
-      // Temporarily remove isRecording filter for debugging
       const consultingRecordings = pastEvents
          ?.filter((event) => 
-            event.companyIndustries?.includes("ManagementConsulting")
-            // && event.isRecording // Temporarily commented out for debugging
+            event.companyIndustries?.includes("ManagementConsulting") &&
+            event.isRecording // Only include events that have recordings
          )
          ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
          ?.slice(0, 6) || []
 
-      // Debug: Log filtering results
-      console.log("Server-side debug - consultingRecordings count:", consultingRecordings.length)
-      console.log("Server-side debug - consultingRecordings:", consultingRecordings.map(e => ({
-         id: e.id,
-         title: e.title,
-         companyIndustries: e.companyIndustries,
-         isRecording: e.isRecording
-      })))
 
       // Extract unique groupIds from consulting livestreams
       const allGroupIds = consultingLivestreams
