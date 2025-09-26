@@ -8,7 +8,6 @@ import {
    RecordingsSectionConsulting,
    RegisterNowSectionConsulting,
    SpeakersSectionConsulting,
-   WhatYouTakeAwaySectionConsulting,
    WhosThisForSectionConsulting,
 } from "components/views/consulting/page"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
@@ -140,7 +139,6 @@ export default function ConsultingPage({
                   }
                   companies={companies}
                />
-               <WhatYouTakeAwaySectionConsulting />
                <RecordingsSectionConsulting
                   consultingRecordings={deserializedConsultingRecordings}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
