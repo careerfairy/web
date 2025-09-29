@@ -14,7 +14,7 @@ const styles = sxStyles({
       borderRadius: "24px",
       padding: { xs: "16px", md: "32px" },
       width: "100%",
-      height: "344px",
+      height: { xs: "auto", md: "344px" },
       display: "flex",
       flexDirection: { xs: "column", md: "row" },
       gap: { xs: "12px", md: "24px" },

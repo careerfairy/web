@@ -114,7 +114,11 @@ export default function HeroSectionConsulting({
 
    // Determine grid layout based on number of events
    const shouldUse1x3Layout = panelEvents.length === 4
-   const displayedEvents = shouldUse1x3Layout ? panelEvents.slice(0, 3) : panelEvents
+   const displayedEvents = shouldUse1x3Layout 
+      ? panelEvents.slice(0, 3) 
+      : isMobile 
+         ? panelEvents.slice(0, 3) // Always max 3 cards on mobile
+         : panelEvents
 
    // Compute how much the livestreams extend below the hero and update spacing
    const computeOverlap = useMemo(
