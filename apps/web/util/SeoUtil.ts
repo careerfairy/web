@@ -61,9 +61,10 @@ export const getOfflineEventMetaInfo = (event: OfflineEvent): SeoProps => {
 
    const keywords = [
       event?.title,
-      event?.company?.name,
-      event?.address?.cityISOCode?.name,
-      event?.address?.countryISOCode?.name,
+      event?.group?.universityName,
+      event?.address?.city,
+      event?.address?.state,
+      event?.address?.country,
       ...(event?.industries?.map((i) => i?.name).filter(Boolean) || []),
       "offline event",
       "CareerFairy",

@@ -251,6 +251,7 @@ const Content = ({
       description,
       registrationUrl,
       industries,
+      address,
    } = event || {}
 
    return (
@@ -307,13 +308,11 @@ const Content = ({
                   <Box component={MapPin} sx={styles.icon} />
                   <Box>
                      <Typography variant="medium" color="neutral.800">
-                        {address?.cityISOCode?.name},{" "}
-                        {address?.countryISOCode?.name}
+                        {address?.city}, {address?.country}
                      </Typography>
                      <br />
                      <Typography variant="small" color="neutral.600">
-                        {address?.street} {address?.cityISOCode?.name},{" "}
-                        {address?.countryISOCode?.name}
+                        {address?.street} {address?.city}, {address?.country}
                      </Typography>
                   </Box>
                </Box>

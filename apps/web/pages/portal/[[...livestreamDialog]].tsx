@@ -33,10 +33,10 @@ import { TagsCarouselSkeleton } from "components/views/tags/TagsCarouselSkeleton
 import { offlineEventService } from "data/firebase/OfflineEventService"
 import { sxStyles } from "types/commonTypes"
 import {
-   deserializeTimestamps,
-   SerializeTimestamps,
-   serializeTimestamps,
-} from "util/firebaseTimestamps"
+   deserializeDocument,
+   SerializedDocument,
+   serializeDocument,
+} from "util/firebaseSerializer"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
@@ -263,8 +263,8 @@ const PortalPage = ({
             </Fragment>
          </GenericDashboardLayout>
          <OfflineEventDialog
-            eventFromServer={deserializeTimestamps(
-               serializedOfflineEvent as SerializeTimestamps<OfflineEvent>
+            eventFromServer={deserializeDocument(
+               serializedOfflineEvent as SerializedDocument<OfflineEvent>
             )}
          />
       </Fragment>
@@ -353,7 +353,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          customJobDialogData,
          livestreamDialogData,
          userCountryCode,
-         serializedOfflineEvent: serializeTimestamps(offlineEventData),
+         serializedOfflineEvent: serializeDocument(offlineEventData),
       },
    }
 }

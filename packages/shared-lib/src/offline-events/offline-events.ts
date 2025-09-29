@@ -1,7 +1,6 @@
-import { GeoPoint } from "firebase/firestore"
 import { Identifiable } from "../commonTypes"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
-import { Timestamp } from "../firebaseTypes"
+import { GeoPoint, Timestamp } from "../firebaseTypes"
 import { GroupOption, PublicGroup } from "../groups"
 import { AuthorInfo } from "../livestreams"
 import { University } from "../universities"
