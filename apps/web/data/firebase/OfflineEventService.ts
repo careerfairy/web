@@ -42,7 +42,7 @@ export class OfflineEventService {
       author: AuthorInfo
    ) {
       const newDocRef = doc(
-         collection(FirestoreInstance, "offlineEvents")
+         collection(this.firestore, "offlineEvents")
       ).withConverter(createGenericConverter<OfflineEvent>())
 
       const now = Timestamp.now()
@@ -74,7 +74,7 @@ export class OfflineEventService {
       }
 
       const ref = doc(
-         FirestoreInstance,
+         this.firestore,
          "offlineEvents",
          offlineEvent.id
       ).withConverter(createGenericConverter<OfflineEvent>())
@@ -93,7 +93,7 @@ export class OfflineEventService {
     * @param offlineEventId - The ID of the offline event to delete
     */
    async deleteOfflineEvent(offlineEventId: string) {
-      const ref = doc(FirestoreInstance, "offlineEvents", offlineEventId)
+      const ref = doc(this.firestore, "offlineEvents", offlineEventId)
       await deleteDoc(ref)
    }
 
@@ -102,7 +102,7 @@ export class OfflineEventService {
     * @param groupId - The ID of the group
     */
    async decreaseGroupAvailableOfflineEvents(groupId: string) {
-      const ref = doc(FirestoreInstance, "careerCenterData", groupId)
+      const ref = doc(this.firestore, "careerCenterData", groupId)
 
       await updateDoc(ref, {
          availableOfflineEvents: increment(-1),
