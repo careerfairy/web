@@ -174,6 +174,11 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
    const [inputValue, setInputValue] = useState("")
    const [isSearching, setIsSearching] = useState(false)
 
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   const [sessionToken, setSessionToken] = useState(
+      () => `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+   )
+
    // Initialize Mapbox autofill core
    const autofill = useAddressAutofillCore({
       accessToken: process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!,
@@ -202,6 +207,10 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
             return
          }
 
+         if (reason === "reset") {
+            return
+         }
+
          setInputValue(value)
          setIsSearching(true)
 
@@ -211,13 +220,10 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
             return
          }
 
-         if (reason === "reset") {
-            return
-         }
          setLoading(true)
          try {
             const response = await autofill.suggest(value, {
-               sessionToken: `session-${Date.now()}`,
+               sessionToken,
             })
 
             const mappedSuggestions: Option[] = response.suggestions.map(
@@ -237,7 +243,7 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
             setLoading(false)
          }
       },
-      [autofill, helpers]
+      [autofill, helpers, sessionToken]
    )
 
    // Handle selection of a suggestion
@@ -256,7 +262,7 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
             const response = await autofill.retrieve(
                selectedOption.suggestion,
                {
-                  sessionToken: `session-${Date.now()}`,
+                  sessionToken,
                }
             )
 
@@ -273,7 +279,7 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
             console.error("Error retrieving address details:", error)
          }
       },
-      [autofill, helpers]
+      [autofill, helpers, sessionToken]
    )
 
    // Convert field value to display option (only when not searching)
@@ -316,7 +322,6 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
             requiredText: requiredText || "",
             disabled,
             autocomplete: true,
-
             autoComplete: "address-line1",
          }}
       />
