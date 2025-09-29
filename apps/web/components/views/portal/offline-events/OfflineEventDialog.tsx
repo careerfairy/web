@@ -165,17 +165,24 @@ type Props = {
    eventFromServer: OfflineEvent
 }
 
+export const OFFLINE_EVENT_DIALOG_KEY = "offline-event"
+
 export const OfflineEventDialog = ({ eventFromServer }: Props) => {
    const { push, query, pathname } = useRouter()
    const isMobile = useIsMobile()
    const isMounted = useIsMounted()
 
    const { data: event } = useSWR(
-      query.offlineEvent ? ["event", query.offlineEvent] : null,
-      () => offlineEventService.getById(query.offlineEvent as string),
+      query[OFFLINE_EVENT_DIALOG_KEY]
+         ? ["event", query[OFFLINE_EVENT_DIALOG_KEY]]
+         : null,
+      () =>
+         offlineEventService.getById(query[OFFLINE_EVENT_DIALOG_KEY] as string),
       {
          fallbackData:
-            eventFromServer?.id === query.offlineEvent ? eventFromServer : null,
+            eventFromServer?.id === query[OFFLINE_EVENT_DIALOG_KEY]
+               ? eventFromServer
+               : null,
       }
    )
 
@@ -184,7 +191,7 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
          ...query,
       }
 
-      delete newQuery.offlineEvent
+      delete newQuery[OFFLINE_EVENT_DIALOG_KEY]
 
       push(
          {

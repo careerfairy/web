@@ -24,7 +24,10 @@ import CategoryTagsContent from "components/views/common/tags/CategoryTagsConten
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { getCustomJobDialogData } from "components/views/jobs/components/custom-jobs/utils"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { OfflineEventDialog } from "components/views/portal/offline-events/OfflineEventDialog"
+import {
+   OFFLINE_EVENT_DIALOG_KEY,
+   OfflineEventDialog,
+} from "components/views/portal/offline-events/OfflineEventDialog"
 import { OfflineEvents } from "components/views/portal/offline-events/OfflineEvents"
 import { SparksLoadingFallback } from "components/views/portal/sparks/SparksLoadingFallback"
 import { SearchProvider } from "components/views/search/SearchContext"
@@ -312,7 +315,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const userCountryCode =
       (ctx.req.headers["x-vercel-ip-country"] as string) || null
 
-   const offlineEventId = ctx.query.offlineEvent as string
+   const offlineEventId = ctx.query[OFFLINE_EVENT_DIALOG_KEY] as string
 
    const promises = []
 

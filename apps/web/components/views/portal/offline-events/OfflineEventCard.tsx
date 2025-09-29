@@ -8,6 +8,7 @@ import { useRouter } from "next/router"
 import { Calendar, MapPin } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
+import { OFFLINE_EVENT_DIALOG_KEY } from "./OfflineEventDialog"
 
 const styles = sxStyles({
    card: {
@@ -80,7 +81,7 @@ export const OfflineEventCard = ({ event }: Props) => {
          href={{
             pathname,
             query: {
-               offlineEvent: event.id,
+               [OFFLINE_EVENT_DIALOG_KEY]: event.id,
             },
          }}
          shallow
