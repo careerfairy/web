@@ -74,6 +74,7 @@ export default function ConsultingPage({
                query: {
                   ...query,
                   selectedPanelId: panelId,
+                  originSource: "Consulting_Overview_Page",
                },
             },
             undefined,
