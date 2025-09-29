@@ -1,5 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
+import { InteractionSources, InteractionSourcesType } from "@careerfairy/shared-lib/groups/telemetry"
 import { Avatar, Box, Typography } from "@mui/material"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import FollowButton from "components/views/common/company/FollowButton"
@@ -122,11 +122,13 @@ const styles = sxStyles({
 interface CompanyCardProps {
    company: Group
    variant?: "large" | "small"
+   interactionSource?: InteractionSourcesType
 }
 
 export const CompanyCard = ({
    company,
    variant = "large",
+   interactionSource = InteractionSources.Panels_Overview_Page,
 }: CompanyCardProps) => {
    const isSmall = variant === "small"
 
@@ -139,7 +141,7 @@ export const CompanyCard = ({
          ]}
          component={Link}
          href={makeGroupCompanyPageUrl(company.universityName, {
-            interactionSource: InteractionSources.Panels_Overview_Page,
+            interactionSource,
          })}
       >
          <Box

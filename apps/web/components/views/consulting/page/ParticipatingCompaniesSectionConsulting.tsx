@@ -1,4 +1,5 @@
 import { Group } from "@careerfairy/shared-lib/groups"
+import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Grid, Stack, Typography } from "@mui/material"
 import { CompanyCard } from "components/views/common/company/CompanyCard"
 import Image from "next/image"
@@ -149,6 +150,7 @@ export default function ParticipatingCompaniesSectionConsulting({
                      <CompanyCard
                         company={company as unknown as Group}
                         variant="small"
+                        interactionSource={InteractionSources.Consulting_Overview_Page}
                      />
                   </Grid>
                ))}

@@ -92,6 +92,7 @@ export default function ConsultingPage({
                query: {
                   ...query,
                   selectedLivestreamId: livestreamId,
+                  originSource: "Consulting_Overview_Page",
                },
             },
             undefined,
@@ -106,6 +107,7 @@ export default function ConsultingPage({
       const {
          selectedPanelId: _p,
          selectedLivestreamId: _l,
+         originSource: _o,
          ...restOfQuery
       } = query
       /* eslint-enable @typescript-eslint/no-unused-vars */
