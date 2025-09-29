@@ -1,5 +1,8 @@
 import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { IconButton, Menu, MenuItem, Tooltip } from "@mui/material"
+import { IconButton, MenuItem } from "@mui/material"
+
+import BrandedMenu from "components/views/common/inputs/BrandedMenu"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { useState } from "react"
 import { MoreVertical } from "react-feather"
 import { OfflineEventStatus } from "./utils"
@@ -19,44 +22,49 @@ type Props = {
 export const OfflineEventActionsMenu = ({
    stat,
    // status,
-   onViewOfflineEvent,
-   onShareOfflineEvent,
-   onAnalytics,
+   // onViewOfflineEvent,
+   // onShareOfflineEvent,
+   // onAnalytics,
    onEdit,
-   onViewRegistration,
-   onViewDetails,
+   // onViewRegistration,
+   // onViewDetails,
    onDelete,
 }: Props) => {
    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
    const open = Boolean(anchorEl)
 
    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+      event.stopPropagation()
       setAnchorEl(event.currentTarget)
    }
 
-   const handleClose = () => {
+   const handleClose = (event?: React.MouseEvent | React.KeyboardEvent) => {
+      // Prevent event propagation when closing
+      if (event) {
+         event.stopPropagation()
+      }
       setAnchorEl(null)
    }
 
-   const handleAction = (action: () => void) => {
+   const handleAction = (action: () => void) => (event: React.MouseEvent) => {
+      event.stopPropagation()
       action()
       handleClose()
    }
 
-   const isPublished = stat.offlineEvent.published
-
    return (
       <>
-         <Tooltip title="More actions">
-            <IconButton size="small" onClick={handleClick} sx={{ p: 0.5 }}>
+         <BrandedTooltip title="More actions" placement="bottom">
+            <IconButton size="small" onClick={handleClick} sx={{ p: 1 }}>
                <MoreVertical size={16} />
             </IconButton>
-         </Tooltip>
+         </BrandedTooltip>
 
-         <Menu
+         <BrandedMenu
             anchorEl={anchorEl}
             open={open}
             onClose={handleClose}
+            disablePortal
             anchorOrigin={{
                vertical: "bottom",
                horizontal: "right",
@@ -65,50 +73,19 @@ export const OfflineEventActionsMenu = ({
                vertical: "top",
                horizontal: "right",
             }}
+            disableAutoFocusItem
+            disableEnforceFocus
+            disableRestoreFocus
          >
-            {isPublished ? (
-               <MenuItem
-                  onClick={() => handleAction(() => onViewOfflineEvent(stat))}
-               >
-                  View offline event
-               </MenuItem>
-            ) : null}
-
-            <MenuItem onClick={() => handleAction(() => onViewDetails(stat))}>
-               View details
-            </MenuItem>
-
-            <MenuItem onClick={() => handleAction(() => onEdit(stat))}>
-               Edit
-            </MenuItem>
-
-            {isPublished ? (
-               <MenuItem
-                  onClick={() => handleAction(() => onShareOfflineEvent(stat))}
-               >
-                  Share offline event
-               </MenuItem>
-            ) : null}
-
-            {isPublished ? (
-               <MenuItem
-                  onClick={() => handleAction(() => onViewRegistration(stat))}
-               >
-                  View registration
-               </MenuItem>
-            ) : null}
-
-            <MenuItem onClick={() => handleAction(() => onAnalytics(stat))}>
-               Analytics
-            </MenuItem>
+            <MenuItem onClick={handleAction(() => onEdit(stat))}>Edit</MenuItem>
 
             <MenuItem
-               onClick={() => handleAction(() => onDelete(stat))}
+               onClick={handleAction(() => onDelete(stat))}
                sx={{ color: "error.main" }}
             >
                Delete
             </MenuItem>
-         </Menu>
+         </BrandedMenu>
       </>
    )
 }

@@ -1,50 +1,36 @@
-import { Box, Chip } from "@mui/material"
+import { Box, Theme } from "@mui/material"
+import { CheckCircle, Clock, File } from "react-feather"
 import { OfflineEventStatus } from "./utils"
+
+const STATUS_ICONS = {
+   [OfflineEventStatus.UPCOMING]: {
+      icon: CheckCircle,
+      color: (theme: Theme) => theme.brand.success[700],
+   },
+   [OfflineEventStatus.DRAFT]: {
+      icon: File,
+      color: (theme: Theme) => theme.brand.warning[600],
+   },
+   [OfflineEventStatus.PAST]: {
+      icon: Clock,
+      color: (theme: Theme) => theme.brand.info[600],
+   },
+}
 
 type Props = {
    status: OfflineEventStatus
 }
 
 export const OfflineEventStatusBadge = ({ status }: Props) => {
-   const getStatusConfig = () => {
-      switch (status) {
-         case OfflineEventStatus.UPCOMING:
-            return {
-               label: "Upcoming",
-               color: "primary" as const,
-               variant: "filled" as const,
-            }
-         case OfflineEventStatus.DRAFT:
-            return {
-               label: "Draft",
-               color: "default" as const,
-               variant: "outlined" as const,
-            }
-         case OfflineEventStatus.PAST:
-            return {
-               label: "Past",
-               color: "secondary" as const,
-               variant: "filled" as const,
-            }
-         default:
-            return {
-               label: "Unknown",
-               color: "default" as const,
-               variant: "outlined" as const,
-            }
-      }
+   if (!STATUS_ICONS[status]) {
+      return null
    }
 
-   const config = getStatusConfig()
-
    return (
-      <Box>
-         <Chip
-            label={config.label}
-            color={config.color}
-            variant={config.variant}
-            size="small"
-         />
-      </Box>
+      <Box
+         component={STATUS_ICONS[status].icon}
+         size={16}
+         color={STATUS_ICONS[status].color}
+      />
    )
 }

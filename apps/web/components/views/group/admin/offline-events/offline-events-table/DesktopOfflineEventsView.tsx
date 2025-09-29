@@ -29,7 +29,7 @@ import { StatusFilterHeader } from "./StatusFilterHeader"
 import { SortableHeaderCell } from "./TableHeaderComponents"
 import { getOfflineEventStatsKey } from "./utils"
 
-const ITEMS_PER_PAGE = 3
+const ITEMS_PER_PAGE = 5
 
 type Props = {
    stats: OfflineEventsWithStats[]

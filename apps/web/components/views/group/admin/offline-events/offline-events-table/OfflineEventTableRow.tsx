@@ -1,12 +1,65 @@
 import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { TableCell, TableRow } from "@mui/material"
+import { Box, styled, TableCell, TableRow, Typography } from "@mui/material"
 import { useCallback } from "react"
+import { Calendar, Eye, MousePointer } from "react-feather"
 import { useSelector } from "react-redux"
-import { selectIsRowHovered } from "../../../../../../store/selectors/eventsTableSelectors"
+import { sxStyles } from "types/commonTypes"
+import { withStopPropagation } from "util/CommonUtil"
+import { selectIsRowHovered } from "../../../../../../store/selectors/offlineEventsTableSelectors"
+import { TableHighlighter } from "../../events/events-table-new/TableHighlighter"
+import { OfflineEventCardPreview } from "./OfflineEventCardPreview"
 import { OfflineEventStatusBadge } from "./OfflineEventStatusBadge"
 import { OfflineEventTableRowActions } from "./OfflineEventTableRowActions"
-import { OfflineEventTableRowContent } from "./OfflineEventTableRowContent"
-import { OfflineEventStatus } from "./utils"
+import { getOfflineEventStatus } from "./utils"
+
+const styles = sxStyles({
+   bodyRow: {
+      transition: "all 0.2s ease-in-out",
+      height: 80,
+      "& .MuiTableCell-root": {
+         cursor: "pointer",
+         borderBottom: "none",
+         py: 1,
+         border: "1px solid",
+         borderColor: (theme) => theme.brand.purple[50],
+         backgroundColor: (theme) => theme.brand.white[200],
+         boxSizing: "border-box",
+         transition: "all 0.2s ease-in-out",
+         height: 80,
+         verticalAlign: "top",
+         "&:first-of-type": {
+            borderTopLeftRadius: "8px",
+            borderBottomLeftRadius: "8px",
+            borderRight: "none",
+         },
+         "&:not(:first-of-type):not(:last-child)": {
+            borderLeft: "none",
+            borderRight: "none",
+         },
+         "&:last-child": {
+            borderTopRightRadius: "8px",
+            borderBottomRightRadius: "8px",
+            borderLeft: "none",
+         },
+      },
+   },
+   bodyRowHovered: {
+      "& .MuiTableCell-root": {
+         borderColor: "secondary.100",
+         backgroundColor: (theme) => theme.brand.white[400],
+      },
+   },
+   bodyCell: {
+      px: 1,
+   },
+})
+
+const CentredBox = styled(Box)({
+   display: "flex",
+   alignItems: "center",
+   width: "100%",
+   height: "100%",
+})
 
 type Props = {
    stat: OfflineEventsWithStats
@@ -49,57 +102,138 @@ export const OfflineEventTableRow = ({
       onMouseLeave()
    }, [onMouseLeave])
 
-   // Get the status for this offline event
-   const getStatus = (): OfflineEventStatus => {
-      if (!stat.offlineEvent.published) {
-         return OfflineEventStatus.DRAFT
-      }
+   const status = getOfflineEventStatus(stat.offlineEvent)
 
-      if (
-         stat.offlineEvent.startAt?.toDate &&
-         stat.offlineEvent.startAt.toDate() > new Date()
-      ) {
-         return OfflineEventStatus.UPCOMING
+   const formatDate = (timestamp: any) => {
+      if (!timestamp?.toDate) return "No date"
+      try {
+         return new Intl.DateTimeFormat("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+         }).format(timestamp.toDate())
+      } catch {
+         return "Invalid date"
       }
-
-      return OfflineEventStatus.PAST
    }
 
-   const status = getStatus()
+   const eventDate = formatDate(stat.offlineEvent.startAt)
 
    return (
       <TableRow
+         key={statKey}
+         sx={[styles.bodyRow, isHovered && styles.bodyRowHovered]}
          onMouseEnter={handleMouseEnter}
          onMouseLeave={handleMouseLeave}
-         sx={{
-            "&:hover": {
-               backgroundColor: "action.hover",
-            },
-         }}
+         onFocus={handleMouseEnter}
+         onBlur={handleMouseLeave}
+         onClick={withStopPropagation(() => onEdit(stat))}
       >
-         <TableCell>
-            <OfflineEventTableRowContent
-               stat={stat}
-               onClicksClick={onClicksClick}
-               onViewsClick={onViewsClick}
-            />
+         {/* Event Name Column */}
+         <TableCell variant="head" sx={styles.bodyCell}>
+            <CentredBox>
+               <OfflineEventCardPreview
+                  stat={stat}
+                  showHoverActions={isHovered}
+                  status={status}
+                  onShareOfflineEvent={() => onShareOfflineEvent(stat)}
+                  onAnalytics={() => onAnalytics(stat)}
+                  onEdit={() => onEdit(stat)}
+               />
+            </CentredBox>
          </TableCell>
-         <TableCell>
-            <OfflineEventStatusBadge status={status} />
+
+         {/* Date Column */}
+         <TableCell sx={styles.bodyCell}>
+            <CentredBox>
+               <TableHighlighter
+                  title="Offline event date"
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  color="neutral.600"
+                  cursor="default"
+               >
+                  <Box component={Calendar} size={16} />
+                  <Typography variant="small" whiteSpace="nowrap">
+                     {eventDate}
+                  </Typography>
+               </TableHighlighter>
+            </CentredBox>
          </TableCell>
+
+         {/* Clicks Column */}
          <TableCell>
-            <OfflineEventTableRowActions
-               stat={stat}
-               status={status}
-               isHovered={isHovered}
-               onViewOfflineEvent={onViewOfflineEvent}
-               onShareOfflineEvent={onShareOfflineEvent}
-               onAnalytics={onAnalytics}
-               onEdit={onEdit}
-               onViewRegistration={onViewRegistration}
-               onViewDetails={onViewDetails}
-               onDelete={onDelete}
-            />
+            <CentredBox>
+               <TableHighlighter
+                  onClick={withStopPropagation(() => onClicksClick(stat))}
+                  title="Clicks"
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  color="neutral.600"
+                  width={92}
+                  cursor="pointer"
+               >
+                  <Box component={MousePointer} size={16} />
+                  <Typography variant="small">
+                     {stat.stats?.totalClicks ?? 0}
+                  </Typography>
+               </TableHighlighter>
+            </CentredBox>
+         </TableCell>
+
+         {/* Views Column */}
+         <TableCell>
+            <CentredBox>
+               <TableHighlighter
+                  onClick={withStopPropagation(() => onViewsClick(stat))}
+                  title="Views"
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  color="neutral.600"
+                  width={92}
+                  cursor="pointer"
+               >
+                  <Box component={Eye} size={16} />
+                  <Typography variant="small">
+                     {stat.stats?.totalViews ?? 0}
+                  </Typography>
+               </TableHighlighter>
+            </CentredBox>
+         </TableCell>
+
+         {/* Status Column */}
+         <TableCell sx={styles.bodyCell}>
+            <CentredBox gap={0.5}>
+               <Box p={1}>
+                  <TableHighlighter
+                     title="Status"
+                     direction="row"
+                     alignItems="center"
+                     spacing={1}
+                     color="neutral.600"
+                     cursor="default"
+                  >
+                     <OfflineEventStatusBadge status={status} />
+                  </TableHighlighter>
+               </Box>
+               <OfflineEventTableRowActions
+                  stat={stat}
+                  status={status}
+                  isHovered={isHovered}
+                  onViewOfflineEvent={onViewOfflineEvent}
+                  onShareOfflineEvent={onShareOfflineEvent}
+                  onAnalytics={onAnalytics}
+                  onEdit={onEdit}
+                  onViewRegistration={onViewRegistration}
+                  onViewDetails={onViewDetails}
+                  onDelete={onDelete}
+               />
+            </CentredBox>
          </TableCell>
       </TableRow>
    )

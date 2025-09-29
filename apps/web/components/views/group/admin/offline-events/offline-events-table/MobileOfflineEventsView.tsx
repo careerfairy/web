@@ -1,14 +1,10 @@
 import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import useClientSidePagination from "components/custom-hook/utils/useClientSidePagination"
-import { useCallback, useEffect, useRef } from "react"
-import { useDispatch } from "react-redux"
-import {
-   clearHoveredRow,
-   setHoveredRow,
-} from "../../../../../../store/reducers/offlineEventsTableReducer"
+import { Fragment, useEffect, useRef, useState } from "react"
 import { StyledPagination } from "../../common/CardCustom"
 import { useOfflineEventsOverview } from "../context/OfflineEventsOverviewContext"
+import { OfflineEventMobileActionsMenu } from "./OfflineEventMobileActionsMenu"
 import { OfflineEventMobileCard } from "./OfflineEventMobileCard"
 import { getOfflineEventStatsKey } from "./utils"
 
@@ -28,6 +24,10 @@ export const MobileOfflineEventsView = ({
    onCreateOfflineEvent,
 }: Props) => {
    const { resetFilters, setOnPaginationReset } = useOfflineEventsOverview()
+
+   const [selectedStat, setSelectedStat] =
+      useState<OfflineEventsWithStats | null>(null)
+   const isMenuOpen = Boolean(selectedStat)
 
    // Reset filters when component unmounts
    useEffect(() => {
@@ -53,8 +53,16 @@ export const MobileOfflineEventsView = ({
       return () => setOnPaginationReset(undefined)
    }, [setOnPaginationReset])
 
+   const handleCardClick = (stat: OfflineEventsWithStats) => {
+      setSelectedStat(stat)
+   }
+
+   const handleMenuClose = () => {
+      setSelectedStat(null)
+   }
+
    return (
-      <Box>
+      <Fragment>
          {isEmptySearchFilter ? (
             <Box py={5} textAlign="center">
                <Typography variant="brandedBody" color="neutral.700">
@@ -89,7 +97,10 @@ export const MobileOfflineEventsView = ({
                </Button>
             </Stack>
          ) : (
-            <Cards currentPageData={currentPageData} />
+            <Cards
+               currentPageData={currentPageData}
+               onCardClick={handleCardClick}
+            />
          )}
 
          {totalPages > 1 && (
@@ -103,59 +114,31 @@ export const MobileOfflineEventsView = ({
                />
             </Stack>
          )}
-      </Box>
+
+         <OfflineEventMobileActionsMenu
+            stat={selectedStat}
+            open={isMenuOpen}
+            onClose={handleMenuClose}
+         />
+      </Fragment>
    )
 }
 
 type CardsProps = {
    currentPageData: OfflineEventsWithStats[]
+   onCardClick: (stat: OfflineEventsWithStats) => void
 }
 
-const Cards = ({ currentPageData }: CardsProps) => {
-   const {
-      handleViewOfflineEvent,
-      handleShareOfflineEvent,
-      handleAnalytics,
-      handleEdit,
-      handleViewRegistration,
-      handleViewDetails,
-      handleDelete,
-   } = useOfflineEventsOverview()
-
-   const dispatch = useDispatch()
-
-   const handleCardMouseEnter = useCallback(
-      (statKey: string) => {
-         dispatch(setHoveredRow(statKey))
-      },
-      [dispatch]
-   )
-
-   const handleCardMouseLeave = useCallback(() => {
-      dispatch(clearHoveredRow())
-   }, [dispatch])
-
+const Cards = ({ currentPageData, onCardClick }: CardsProps) => {
    return (
-      <Stack spacing={2}>
-         {currentPageData.map((stat) => {
-            const statKey = getOfflineEventStatsKey(stat)
-            return (
-               <OfflineEventMobileCard
-                  key={statKey}
-                  stat={stat}
-                  statKey={statKey}
-                  onMouseEnter={handleCardMouseEnter}
-                  onMouseLeave={handleCardMouseLeave}
-                  onViewOfflineEvent={handleViewOfflineEvent}
-                  onShareOfflineEvent={handleShareOfflineEvent}
-                  onAnalytics={handleAnalytics}
-                  onEdit={handleEdit}
-                  onViewRegistration={handleViewRegistration}
-                  onViewDetails={handleViewDetails}
-                  onDelete={handleDelete}
-               />
-            )
-         })}
+      <Stack spacing={0.5}>
+         {currentPageData.map((stat) => (
+            <OfflineEventMobileCard
+               key={getOfflineEventStatsKey(stat)}
+               stat={stat}
+               onCardClick={() => onCardClick(stat)}
+            />
+         ))}
       </Stack>
    )
 }

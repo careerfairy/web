@@ -1,135 +1,116 @@
 import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { Box, Card, CardContent, Stack, Typography } from "@mui/material"
-import { format } from "date-fns"
-import { OfflineEventMobileCardActions } from "./OfflineEventMobileCardActions"
+import { ButtonBase, Stack, Typography } from "@mui/material"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import { placeholderBanner } from "constants/images"
+import Image from "next/image"
+import { Calendar, Eye, MousePointer } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 import { OfflineEventStatusBadge } from "./OfflineEventStatusBadge"
-import { OfflineEventStatus } from "./utils"
+import { getOfflineEventStatus } from "./utils"
 
 type Props = {
    stat: OfflineEventsWithStats
-   statKey: string
-   onMouseEnter: (statKey: string) => void
-   onMouseLeave: () => void
-   onViewOfflineEvent: (stat: OfflineEventsWithStats) => void
-   onShareOfflineEvent: (stat: OfflineEventsWithStats) => void
-   onAnalytics: (stat: OfflineEventsWithStats) => void
-   onEdit: (stat: OfflineEventsWithStats) => void
-   onViewRegistration: (stat: OfflineEventsWithStats) => void
-   onViewDetails: (stat: OfflineEventsWithStats) => void
-   onDelete: (stat: OfflineEventsWithStats) => void
+   onCardClick: () => void
 }
 
-export const OfflineEventMobileCard = ({
-   stat,
-   statKey,
-   onMouseEnter,
-   onMouseLeave,
-   onViewOfflineEvent,
-   onShareOfflineEvent,
-   onAnalytics,
-   onEdit,
-   onViewRegistration,
-   onViewDetails,
-   onDelete,
-}: Props) => {
-   const title = stat.offlineEvent.title || "No title"
+const styles = sxStyles({
+   eventCard: {
+      height: 109,
+      p: 1,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      borderRadius: "8px",
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
+      backgroundColor: (theme) => theme.brand.white[100],
+      textAlign: "left",
+      verticalAlign: "top",
+      alignItems: "flex-start",
+   },
+   image: {
+      borderRadius: "8px",
+      objectFit: "cover",
+      flexShrink: 0,
+   },
+   statsRow: {
+      color: "neutral.600",
+      width: "100%",
+      "& svg": {
+         width: 14,
+         height: 14,
+      },
+   },
+})
+
+export const OfflineEventMobileCard = ({ stat, onCardClick }: Props) => {
+   const status = getOfflineEventStatus(stat.offlineEvent)
 
    const formatDate = (timestamp: any) => {
       if (!timestamp?.toDate) return "No date"
       try {
-         return format(timestamp.toDate(), "MMM dd, yyyy")
+         return new Intl.DateTimeFormat("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "2-digit",
+         }).format(timestamp.toDate())
       } catch {
          return "Invalid date"
       }
    }
 
-   const startDate = formatDate(stat.offlineEvent.startAt)
-
-   // Get the status for this offline event
-   const getStatus = (): OfflineEventStatus => {
-      if (!stat.offlineEvent.published) {
-         return OfflineEventStatus.DRAFT
-      }
-
-      if (
-         stat.offlineEvent.startAt?.toDate &&
-         stat.offlineEvent.startAt.toDate() > new Date()
-      ) {
-         return OfflineEventStatus.UPCOMING
-      }
-
-      return OfflineEventStatus.PAST
-   }
-
-   const status = getStatus()
+   const eventDate = formatDate(stat.offlineEvent.startAt)
 
    return (
-      <Card
-         onMouseEnter={() => onMouseEnter(statKey)}
-         onMouseLeave={onMouseLeave}
-         sx={{
-            "&:hover": {
-               boxShadow: 2,
-            },
-         }}
-      >
-         <CardContent>
-            <Stack spacing={2}>
+      <ButtonBase sx={styles.eventCard} onClick={onCardClick} disableRipple>
+         <Stack direction="row" spacing={1}>
+            <Image
+               src={stat.offlineEvent.backgroundImageUrl || placeholderBanner}
+               alt={stat.offlineEvent.title || "Offline event thumbnail"}
+               width={96}
+               height={53}
+               style={styles.image}
+            />
+            <Stack spacing={0.5}>
+               <Typography
+                  variant="medium"
+                  sx={getMaxLineStyles(2)}
+                  color="neutral.800"
+               >
+                  {stat.offlineEvent.title || "Untitled"}
+               </Typography>
                <Stack
                   direction="row"
-                  justifyContent="space-between"
-                  alignItems="flex-start"
+                  alignItems="center"
+                  spacing={1}
+                  color="neutral.600"
                >
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                     <Typography
-                        variant="brandedBody"
-                        fontWeight={600}
-                        color="text.primary"
-                        sx={{
-                           overflow: "hidden",
-                           textOverflow: "ellipsis",
-                           whiteSpace: "nowrap",
-                        }}
-                     >
-                        {title}
-                     </Typography>
-                     <Typography
-                        variant="small"
-                        color="text.secondary"
-                        mt={0.5}
-                     >
-                        {startDate}
-                     </Typography>
-                  </Box>
-                  <OfflineEventStatusBadge status={status} />
+                  <Calendar size={14} />
+                  <Typography variant="xsmall">{eventDate}</Typography>
                </Stack>
-
-               <Stack direction="row" spacing={3}>
-                  <Box>
-                     <Typography variant="small" color="text.secondary">
-                        {stat.stats?.totalClicks ?? 0} clicks
-                     </Typography>
-                  </Box>
-                  <Box>
-                     <Typography variant="small" color="text.secondary">
-                        {stat.stats?.totalViews ?? 0} views
-                     </Typography>
-                  </Box>
-               </Stack>
-
-               <OfflineEventMobileCardActions
-                  stat={stat}
-                  status={status}
-                  onViewOfflineEvent={onViewOfflineEvent}
-                  onShareOfflineEvent={onShareOfflineEvent}
-                  onAnalytics={onAnalytics}
-                  onEdit={onEdit}
-                  onViewRegistration={onViewRegistration}
-                  onViewDetails={onViewDetails}
-                  onDelete={onDelete}
-               />
             </Stack>
-         </CardContent>
-      </Card>
+         </Stack>
+
+         <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={1}
+            sx={styles.statsRow}
+         >
+            <Stack direction="row" alignItems="center" spacing={1}>
+               <Eye size={14} />
+               <Typography variant="xsmall">
+                  {stat.stats?.totalViews ?? 0}
+               </Typography>
+            </Stack>
+            <Stack direction="row" alignItems="center" spacing={1}>
+               <MousePointer size={14} />
+               <Typography variant="xsmall">
+                  {stat.stats?.totalClicks ?? 0}
+               </Typography>
+            </Stack>
+            <OfflineEventStatusBadge status={status} />
+         </Stack>
+      </ButtonBase>
    )
 }
