@@ -31,15 +31,6 @@ export class OfflineEventService {
       return docSnap.data()
    }
 
-   async getMany() {
-      const collectionRef = collection(
-         FirestoreInstance,
-         "offlineEvents"
-      ).withConverter(createGenericConverter<OfflineEvent>())
-      const docsSnap = await getDocs(collectionRef)
-      return docsSnap.docs.map((doc) => doc.data())
-   }
-
    /**
     * Creates a new offline event
     * @param offlineEvent - The offline event data to create
