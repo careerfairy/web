@@ -189,39 +189,6 @@ export const getServerSideProps: GetServerSideProps<
 
 
       // Filter past events by ManagementConsulting industry and limit to 6 for recordings
-      console.log("DEBUG: Total past events fetched:", pastEvents?.length || 0)
-      console.log("DEBUG: Sample of past events:", pastEvents?.slice(0, 3).map(event => ({
-         id: event.id,
-         title: event.title,
-         companyIndustries: event.companyIndustries,
-         isRecording: event.isRecording
-      })))
-      
-      console.log("DEBUG: Past events with ManagementConsulting industry:", 
-         pastEvents?.filter(event => event.companyIndustries?.includes("ManagementConsulting"))?.length || 0
-      )
-      console.log("DEBUG: Past events with recordings:", 
-         pastEvents?.filter(event => event.isRecording)?.length || 0
-      )
-      console.log("DEBUG: Past events with ManagementConsulting AND recordings:", 
-         pastEvents?.filter(event => 
-            event.companyIndustries?.includes("ManagementConsulting") && event.isRecording
-         )?.length || 0
-      )
-      
-      // Let's also try a more lenient filter to see if there are consulting events without the isRecording flag
-      const allConsultingPastEvents = pastEvents?.filter(event => 
-         event.companyIndustries?.includes("ManagementConsulting")
-      ) || []
-      
-      console.log("DEBUG: All consulting past events (ignoring isRecording):", allConsultingPastEvents.length)
-      console.log("DEBUG: Sample consulting events:", allConsultingPastEvents.slice(0, 3).map(event => ({
-         id: event.id,
-         title: event.title,
-         isRecording: event.isRecording,
-         hasEnded: event.hasEnded
-      })))
-      
       // First try to get events that are explicitly marked as recordings
       let consultingRecordings = pastEvents
          ?.filter((event) => 
@@ -232,9 +199,8 @@ export const getServerSideProps: GetServerSideProps<
          ?.slice(0, 6) || []
       
       // If we don't have enough recordings, fall back to all consulting past events
-      // This is a temporary fix until the isRecording flag is properly set
+      // This ensures the section renders even if the isRecording flag isn't properly set
       if (consultingRecordings.length === 0) {
-         console.log("DEBUG: No explicit recordings found, falling back to all consulting past events")
          consultingRecordings = pastEvents
             ?.filter((event) => 
                event.companyIndustries?.includes("ManagementConsulting") &&
@@ -243,8 +209,6 @@ export const getServerSideProps: GetServerSideProps<
             ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
             ?.slice(0, 6) || []
       }
-      
-      console.log("DEBUG: Final consulting recordings:", consultingRecordings.length)
 
 
       // Extract unique groupIds from consulting livestreams

@@ -32,13 +32,8 @@ export default function RecordingsSectionConsulting({
    consultingRecordings,
    handleOpenLivestreamDialog,
 }: RecordingsSectionConsultingProps) {
-   // Debug logging
-   console.log("DEBUG RecordingsSectionConsulting: Received recordings:", consultingRecordings?.length || 0)
-   console.log("DEBUG RecordingsSectionConsulting: Recordings data:", consultingRecordings)
-   
    // Don't render if no recordings available
    if (!consultingRecordings || consultingRecordings.length === 0) {
-      console.log("DEBUG RecordingsSectionConsulting: Not rendering - no recordings available")
       return null
    }
 
