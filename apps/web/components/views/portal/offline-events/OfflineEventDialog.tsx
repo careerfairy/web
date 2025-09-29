@@ -198,6 +198,10 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
       )
    }, [push, query, pathname])
 
+   const handleShare = useCallback(() => {
+      alert(`Share ${event?.title}`)
+   }, [event])
+
    return (
       <>
          {event ? <SEO {...getOfflineEventMetaInfo(event)} /> : null}
@@ -223,7 +227,11 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
                appear: isMounted,
             }}
          >
-            <Content event={event} onClose={handleClose} />
+            <Content
+               event={event}
+               onClose={handleClose}
+               onShare={handleShare}
+            />
          </Dialog>
       </>
    )
@@ -232,9 +240,11 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
 const Content = ({
    event,
    onClose,
+   onShare,
 }: {
    event: OfflineEvent
    onClose: () => void
+   onShare: () => void
 }) => {
    const isMobile = useIsMobile()
 
@@ -250,7 +260,6 @@ const Content = ({
       startAt,
       description,
       registrationUrl,
-      industries,
       address,
    } = event || {}
 
@@ -277,7 +286,7 @@ const Content = ({
                <IconButton onClick={onClose} sx={styles.closeIcon}>
                   <BasicShareIcon />
                </IconButton>
-               <IconButton onClick={onClose} sx={styles.closeIcon}>
+               <IconButton onClick={onShare} sx={styles.closeIcon}>
                   <Box component={isMobile ? ChevronLeft : X} />
                </IconButton>
             </Stack>
@@ -339,9 +348,11 @@ const Content = ({
                         {event?.group?.universityName}
                      </Typography>
                      <br />
-                     {industries?.[0]?.name ? (
+                     {event?.group?.companyIndustries?.length ? (
                         <Typography variant="small" sx={styles.text}>
-                           {industries?.[0]?.name}
+                           {event?.group?.companyIndustries
+                              ?.map((industry) => industry.name)
+                              .join(", ")}
                         </Typography>
                      ) : null}
                   </Box>
