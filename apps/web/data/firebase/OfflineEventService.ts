@@ -98,6 +98,27 @@ export class OfflineEventService {
    }
 
    /**
+    * Gets an offline event by ID
+    * @param offlineEventId - The ID of the offline event to fetch
+    * @returns Promise with the offline event data
+    */
+   async getById(offlineEventId: string): Promise<OfflineEvent> {
+      const ref = doc(
+         this.firestore,
+         "offlineEvents",
+         offlineEventId
+      ).withConverter(createGenericConverter<OfflineEvent>())
+
+      const docSnap = await getDoc(ref)
+
+      if (!docSnap.exists()) {
+         throw new Error(`Offline event with ID ${offlineEventId} not found`)
+      }
+
+      return docSnap.data()
+   }
+
+   /**
     * Decreases the available offline events count for a group
     * @param groupId - The ID of the group
     */
