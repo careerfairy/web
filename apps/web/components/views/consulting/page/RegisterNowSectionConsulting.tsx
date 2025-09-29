@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import Image from "next/image"
+import { useRouter } from "next/router"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -63,10 +64,10 @@ const styles = sxStyles({
 
 export default function RegisterNowSectionConsulting() {
    const isMobile = useIsMobile()
+   const router = useRouter()
 
-   const scrollToHeader = () => {
-      const headerElement = document.querySelector("header") || document.body
-      headerElement.scrollIntoView({ behavior: "smooth" })
+   const handleExploreStreams = () => {
+      router.push("/next-livestreams")
    }
 
    return (
@@ -84,7 +85,7 @@ export default function RegisterNowSectionConsulting() {
                   color="primary"
                   size="medium"
                   sx={styles.ctaButton}
-                  onClick={scrollToHeader}
+                  onClick={handleExploreStreams}
                >
                   Explore live streams
                </Button>
