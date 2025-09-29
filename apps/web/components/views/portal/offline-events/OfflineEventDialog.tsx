@@ -1,5 +1,6 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { makeOfflineEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import {
    Box,
    Button,
@@ -10,6 +11,7 @@ import {
    alpha,
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
 import SanitizedHTML from "components/util/SanitizedHTML"
 import SEO from "components/util/SEO"
@@ -26,8 +28,11 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { Calendar, ChevronLeft, ChevronRight, MapPin, X } from "react-feather"
+import { useCopyToClipboard } from "react-use"
 import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerEvent } from "util/analyticsUtils"
 import DateUtil from "util/DateUtil"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { getOfflineEventMetaInfo } from "util/SeoUtil"
@@ -171,6 +176,24 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
    const { push, query, pathname } = useRouter()
    const isMobile = useIsMobile()
    const isMounted = useIsMounted()
+   const { successNotification } = useSnackbarNotifications()
+   const [, copyEventLinkToClipboard] = useCopyToClipboard()
+
+   const handleShare = useCallback(() => {
+      const eventUrl = makeOfflineEventDetailsUrl(eventFromServer.id)
+
+      copyEventLinkToClipboard(eventUrl)
+
+      dataLayerEvent(AnalyticsEvents.OfflineEventShare, {
+         medium: "Copy Link",
+         eventId: eventFromServer.id,
+      })
+
+      successNotification(
+         "Event link has been copied to your clipboard",
+         "Copied"
+      )
+   }, [copyEventLinkToClipboard, eventFromServer, successNotification])
 
    const { data: event } = useSWR(
       query[OFFLINE_EVENT_DIALOG_KEY]
@@ -204,10 +227,6 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
          }
       )
    }, [push, query, pathname])
-
-   const handleShare = useCallback(() => {
-      alert(`Share ${event?.title}`)
-   }, [event])
 
    return (
       <>
@@ -290,10 +309,10 @@ const Content = ({
                sx={styles.iconsContainer}
                spacing={1}
             >
-               <IconButton onClick={onClose} sx={styles.closeIcon}>
+               <IconButton onClick={onShare} sx={styles.closeIcon}>
                   <BasicShareIcon />
                </IconButton>
-               <IconButton onClick={onShare} sx={styles.closeIcon}>
+               <IconButton onClick={onClose} sx={styles.closeIcon}>
                   <Box component={isMobile ? ChevronLeft : X} />
                </IconButton>
             </Stack>
