@@ -189,6 +189,19 @@ export const getServerSideProps: GetServerSideProps<
 
 
       // Filter past events by ManagementConsulting industry and limit to 6 for recordings
+      console.log("DEBUG: Total past events fetched:", pastEvents?.length || 0)
+      console.log("DEBUG: Past events with ManagementConsulting industry:", 
+         pastEvents?.filter(event => event.companyIndustries?.includes("ManagementConsulting"))?.length || 0
+      )
+      console.log("DEBUG: Past events with recordings:", 
+         pastEvents?.filter(event => event.isRecording)?.length || 0
+      )
+      console.log("DEBUG: Past events with ManagementConsulting AND recordings:", 
+         pastEvents?.filter(event => 
+            event.companyIndustries?.includes("ManagementConsulting") && event.isRecording
+         )?.length || 0
+      )
+      
       const consultingRecordings = pastEvents
          ?.filter((event) => 
             event.companyIndustries?.includes("ManagementConsulting") &&
@@ -196,6 +209,8 @@ export const getServerSideProps: GetServerSideProps<
          )
          ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
          ?.slice(0, 6) || []
+      
+      console.log("DEBUG: Final consulting recordings:", consultingRecordings.length)
 
 
       // Extract unique groupIds from consulting livestreams
