@@ -1,7 +1,5 @@
-import {
-   OfflineEvent,
-   OfflineEventsWithStats,
-} from "@careerfairy/shared-lib/offline-events/offline-events"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 
 export enum OfflineEventStatus {
    /** Event is scheduled for the future */

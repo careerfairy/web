@@ -1,10 +1,12 @@
-import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { ButtonBase, Stack, Typography } from "@mui/material"
+import { Box, ButtonBase, Stack, Typography } from "@mui/material"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import PointerClickIcon from "components/views/common/icons/PointerClickIcon"
 import { placeholderBanner } from "constants/images"
 import Image from "next/image"
-import { Calendar, Eye, MousePointer } from "react-feather"
+import { Calendar, Eye } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import DateUtil from "util/DateUtil"
 import { OfflineEventStatusBadge } from "./OfflineEventStatusBadge"
 import { getOfflineEventStatus } from "./utils"
 
@@ -45,20 +47,9 @@ const styles = sxStyles({
 export const OfflineEventMobileCard = ({ stat, onCardClick }: Props) => {
    const status = getOfflineEventStatus(stat.offlineEvent)
 
-   const formatDate = (timestamp: any) => {
-      if (!timestamp?.toDate) return "No date"
-      try {
-         return new Intl.DateTimeFormat("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "2-digit",
-         }).format(timestamp.toDate())
-      } catch {
-         return "Invalid date"
-      }
-   }
-
-   const eventDate = formatDate(stat.offlineEvent.startAt)
+   const eventDate = stat.offlineEvent.startAt
+      ? DateUtil.formatEventDate(stat.offlineEvent.startAt.toDate())
+      : "No date"
 
    return (
       <ButtonBase sx={styles.eventCard} onClick={onCardClick} disableRipple>
@@ -104,7 +95,7 @@ export const OfflineEventMobileCard = ({ stat, onCardClick }: Props) => {
                </Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
-               <MousePointer size={14} />
+               <Box component={PointerClickIcon} fill="none" color={"white"} />
                <Typography variant="xsmall">
                   {stat.stats?.totalClicks ?? 0}
                </Typography>

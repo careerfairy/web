@@ -1,5 +1,5 @@
-import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Box, Stack, Typography } from "@mui/material"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import { placeholderBanner } from "constants/images"
 import Image from "next/image"

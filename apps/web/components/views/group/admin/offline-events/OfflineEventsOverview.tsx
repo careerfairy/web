@@ -1,9 +1,11 @@
-import { Stack } from "@mui/material"
+import { Box, Stack, Typography } from "@mui/material"
 import { useGroupOfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { BrandedSearchField } from "components/views/common/inputs/BrandedSearchField"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
+import { Calendar } from "react-feather"
 import { AdminContainer } from "../common/Container"
 import {
    OfflineEventsViewProvider,
@@ -19,6 +21,7 @@ const OfflineEventsOverviewContent = () => {
    const isMobile = useIsMobile()
    const { sortBy, statusFilter, searchTerm, setSearchTerm } =
       useOfflineEventsOverview()
+   const { group } = useGroup()
    console.log(
       "🚀 ~ OfflineEventsOverviewContent ~ statusFilter:",
       statusFilter
@@ -41,12 +44,46 @@ const OfflineEventsOverviewContent = () => {
 
    return (
       <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
-         <BrandedSearchField
-            value={searchTerm}
-            onChange={setSearchTerm}
-            placeholder="Search by title or company"
-            fullWidth
-         />
+         <Stack
+            direction={isMobile ? "row" : "row"}
+            justifyContent="space-between"
+            alignItems="center"
+            spacing={1}
+         >
+            <BrandedSearchField
+               value={searchTerm}
+               onChange={setSearchTerm}
+               placeholder="Search"
+               fullWidth
+            />
+            <Box
+               sx={{
+                  borderRadius: 3,
+                  border: (theme) => `1px solid ${theme.palette.secondary[50]}`,
+                  p: 1.5,
+                  background: (theme) => theme.brand.white[100],
+                  height: "48px",
+                  alignItems: "center",
+                  display: "flex",
+                  // width: "100%"
+               }}
+            >
+               <Stack direction="row" alignItems="center" spacing={1}>
+                  <Box component={Calendar} size={16} color={"neutral.700"} />
+                  <Typography
+                     variant="small"
+                     color={"neutral.700"}
+                     sx={{
+                        whiteSpace: "nowrap",
+                     }}
+                  >
+                     {group?.availableOfflineEvents ?? 0}{" "}
+                     {group?.availableOfflineEvents === 1 ? "event" : "events"}{" "}
+                     available
+                  </Typography>
+               </Stack>
+            </Box>
+         </Stack>
 
          {Boolean(isLoading) && <p>Loading stats...</p>}
          {Boolean(error) && <p>Error loading stats: {error.message}</p>}

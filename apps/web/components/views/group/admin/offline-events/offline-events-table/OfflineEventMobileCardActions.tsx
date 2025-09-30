@@ -1,5 +1,5 @@
-import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Button, Stack } from "@mui/material"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import { OfflineEventActionsMenu } from "./OfflineEventActionsMenu"
 import { OfflineEventStatus } from "./utils"
 

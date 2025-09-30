@@ -1,14 +1,27 @@
-import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Box, Button, Stack, Typography } from "@mui/material"
-import useClientSidePagination from "components/custom-hook/utils/useClientSidePagination"
-import { Fragment, useEffect, useRef, useState } from "react"
-import { StyledPagination } from "../../common/CardCustom"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
+import useClientSideInfiniteScroll from "components/custom-hook/utils/useClientSideInfiniteScroll"
+import { Fragment, useEffect, useState } from "react"
+import { sxStyles } from "types/commonTypes"
 import { useOfflineEventsOverview } from "../context/OfflineEventsOverviewContext"
 import { OfflineEventMobileActionsMenu } from "./OfflineEventMobileActionsMenu"
 import { OfflineEventMobileCard } from "./OfflineEventMobileCard"
 import { getOfflineEventStatsKey } from "./utils"
 
-const ITEMS_PER_PAGE = 5
+const ITEMS_PER_PAGE = 10
+
+const styles = sxStyles({
+   loadMoreTrigger: {
+      height: 300,
+   },
+   emptyCard: {
+      px: 1,
+      backgroundColor: (theme) => theme.brand.white[200],
+      borderRadius: "8px",
+      textAlign: "center",
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
+   },
+})
 
 type Props = {
    stats: OfflineEventsWithStats[]
@@ -23,7 +36,11 @@ export const MobileOfflineEventsView = ({
    isEmptySearchFilter,
    onCreateOfflineEvent,
 }: Props) => {
-   const { resetFilters, setOnPaginationReset } = useOfflineEventsOverview()
+   const { resetFilters } = useOfflineEventsOverview()
+   const { visibleData, hasMore, ref } = useClientSideInfiniteScroll({
+      data: stats,
+      itemsPerPage: ITEMS_PER_PAGE,
+   })
 
    const [selectedStat, setSelectedStat] =
       useState<OfflineEventsWithStats | null>(null)
@@ -36,23 +53,6 @@ export const MobileOfflineEventsView = ({
       }
    }, [resetFilters])
 
-   const { currentPageData, currentPage, totalPages, goToPage } =
-      useClientSidePagination({
-         data: stats,
-         itemsPerPage: ITEMS_PER_PAGE,
-      })
-
-   // Use a ref to store the current goToPage function
-   const goToPageRef = useRef(goToPage)
-   goToPageRef.current = goToPage
-
-   // Register pagination reset callback
-   useEffect(() => {
-      const resetCallback = () => goToPageRef.current(1)
-      setOnPaginationReset(() => resetCallback)
-      return () => setOnPaginationReset(undefined)
-   }, [setOnPaginationReset])
-
    const handleCardClick = (stat: OfflineEventsWithStats) => {
       setSelectedStat(stat)
    }
@@ -64,27 +64,22 @@ export const MobileOfflineEventsView = ({
    return (
       <Fragment>
          {isEmptySearchFilter ? (
-            <Box py={5} textAlign="center">
+            <Box py={5} sx={styles.emptyCard} textAlign="center">
                <Typography variant="brandedBody" color="neutral.700">
                   No offline events found matching your search
                </Typography>
             </Box>
          ) : isEmptyNoEvents ? (
-            <Stack alignItems="center" py={4} spacing={1.5}>
-               <Typography
-                  variant="brandedBody"
-                  color="neutral.800"
-                  fontWeight={600}
-                  textAlign="center"
-               >
+            <Stack
+               sx={styles.emptyCard}
+               py={4}
+               color="neutral.700"
+               alignItems="center"
+            >
+               <Typography variant="brandedBody" mb={1} fontWeight={600}>
                   Plan your first offline event
                </Typography>
-               <Typography
-                  variant="brandedBody"
-                  color="neutral.700"
-                  textAlign="center"
-                  mb={1.5}
-               >
+               <Typography variant="brandedBody" textAlign="center" mb={1.5}>
                   This is where all your offline events will appear. Start by
                   creating one
                </Typography>
@@ -97,21 +92,18 @@ export const MobileOfflineEventsView = ({
                </Button>
             </Stack>
          ) : (
-            <Cards
-               currentPageData={currentPageData}
-               onCardClick={handleCardClick}
-            />
-         )}
+            <Stack spacing={0.5}>
+               {visibleData.map((stat) => (
+                  <OfflineEventMobileCard
+                     key={getOfflineEventStatsKey(stat)}
+                     stat={stat}
+                     onCardClick={() => handleCardClick(stat)}
+                  />
+               ))}
 
-         {totalPages > 1 && (
-            <Stack direction="row" justifyContent="center" sx={{ mt: 3 }}>
-               <StyledPagination
-                  color="secondary"
-                  size="small"
-                  count={totalPages}
-                  page={currentPage}
-                  onChange={(_, page) => goToPage(page)}
-               />
+               {Boolean(hasMore) && (
+                  <Box sx={styles.loadMoreTrigger} ref={ref} />
+               )}
             </Stack>
          )}
 
@@ -121,24 +113,5 @@ export const MobileOfflineEventsView = ({
             onClose={handleMenuClose}
          />
       </Fragment>
-   )
-}
-
-type CardsProps = {
-   currentPageData: OfflineEventsWithStats[]
-   onCardClick: (stat: OfflineEventsWithStats) => void
-}
-
-const Cards = ({ currentPageData, onCardClick }: CardsProps) => {
-   return (
-      <Stack spacing={0.5}>
-         {currentPageData.map((stat) => (
-            <OfflineEventMobileCard
-               key={getOfflineEventStatsKey(stat)}
-               stat={stat}
-               onCardClick={() => onCardClick(stat)}
-            />
-         ))}
-      </Stack>
    )
 }

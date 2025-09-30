@@ -1,7 +1,5 @@
-import {
-   OfflineEvent,
-   OfflineEventsWithStats,
-} from "@careerfairy/shared-lib/offline-events/offline-events"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import { offlineEventService } from "data/firebase/OfflineEventService"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
@@ -22,6 +20,7 @@ import { OfflineEventStatus } from "../offline-events-table/utils"
 // import { QuestionsDialog } from "../feedback-dialogs/QuestionsDialog"
 // import { PromoteLivestreamDialog } from "../PromoteLivestreamDialog"
 import { DeleteOfflineEventDialog } from "./DeleteOfflineEventDialog"
+import { ShareOfflineEventDialog } from "./ShareOfflineEventDialog"
 
 type OfflineEventsViewContextValue = {
    sortBy: OfflineEventStatsSortOption
@@ -118,6 +117,9 @@ export const OfflineEventsViewProvider = ({
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
    const [offlineEventToDelete, setOfflineEventToDelete] =
       useState<OfflineEvent | null>(null)
+   const [shareDialogOpen, setShareDialogOpen] = useState(false)
+   const [offlineEventToShare, setOfflineEventToShare] =
+      useState<OfflineEvent | null>(null)
    const [onPaginationReset, setOnPaginationReset] = useState<
       (() => void) | undefined
    >(undefined)
@@ -211,10 +213,9 @@ export const OfflineEventsViewProvider = ({
    const handleShareOfflineEvent = useCallback(
       (stat: OfflineEventsWithStats) => {
          if (!stat.offlineEvent.published) return
-         // Open new promote dialog
-         // setPromoteDialogOfflineEvent(stat.offlineEvent)
-         const title = stat.offlineEvent.title || "Untitled Event"
-         alert(`Share offline event: ${title}`)
+         // Open share dialog
+         setOfflineEventToShare(stat.offlineEvent)
+         setShareDialogOpen(true)
       },
       []
    )
@@ -289,6 +290,11 @@ export const OfflineEventsViewProvider = ({
    const handleDeleteDialogClose = useCallback(() => {
       setDeleteDialogOpen(false)
       setOfflineEventToDelete(null)
+   }, [])
+
+   const handleShareDialogClose = useCallback(() => {
+      setShareDialogOpen(false)
+      setOfflineEventToShare(null)
    }, [])
 
    // const handleClosePromoteDialog = useCallback(() => {
@@ -428,6 +434,13 @@ export const OfflineEventsViewProvider = ({
             open={deleteDialogOpen}
             offlineEvent={offlineEventToDelete}
             onClose={handleDeleteDialogClose}
+         />
+         <ShareOfflineEventDialog
+            open={shareDialogOpen}
+            offlineEvent={offlineEventToShare}
+            companyName={group?.universityName || ""}
+            companyCountryCode={group?.companyCountry?.id}
+            onClose={handleShareDialogClose}
          />
          {/* <PromoteOfflineEventDialog
             offlineEvent={promoteDialogOfflineEvent}

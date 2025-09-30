@@ -1,6 +1,7 @@
+import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import {
    OfflineEvent,
-   OfflineEventsWithStats,
+   OfflineEventStats
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { reducedRemoteCallsOptions } from "components/custom-hook/utils/useFunctionsSWRFetcher"
 import {
@@ -13,6 +14,14 @@ import { useFirestore } from "reactfire"
 import useSWR from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 
+export interface OfflineEventsWithStats {
+   offlineEvent: OfflineEvent
+   stats: {
+      totalClicks: number
+      totalViews: number
+   }
+   updatedAt: Timestamp
+}
 /**
  * Sort options for offline event stats
  */
@@ -108,11 +117,14 @@ export const useGroupOfflineEventsWithStats = (
             if (statsSnapshot.docs.length > 0) {
                // Stats exist, use the real stats
                const statsDoc = statsSnapshot.docs[0]
-               const statsData = statsDoc.data()
+               const statsData = statsDoc.data() as OfflineEventStats
 
                offlineEventsWithStats.push({
                   offlineEvent: offlineEventData,
-                  stats: statsData.stats,
+                  stats: {
+                     totalClicks: statsData.generalStats.totalNumberOfRegisterClicks,
+                     totalViews: statsData.generalStats.totalNumberOfTalentReached,
+                  },
                   updatedAt: statsData.updatedAt,
                })
             } else {
@@ -190,9 +202,9 @@ const compareByDate = (
    // If both are null/undefined, they are equal
    if (aTime === 0 && bTime === 0) return 0
 
-   // If one is null/undefined, put it at the end
-   if (aTime === 0) return ascending ? 1 : -1
-   if (bTime === 0) return ascending ? -1 : 1
+   // If one is null/undefined, always put it at the end (regardless of sort direction)
+   if (aTime === 0) return 1
+   if (bTime === 0) return -1
 
    return ascending ? aTime - bTime : bTime - aTime
 }

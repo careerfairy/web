@@ -1,6 +1,5 @@
-import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { IconButton, MenuItem } from "@mui/material"
-
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { useState } from "react"

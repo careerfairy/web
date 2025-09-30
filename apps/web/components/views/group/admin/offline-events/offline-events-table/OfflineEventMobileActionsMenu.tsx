@@ -1,4 +1,4 @@
-import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import { ShareArrowIconOutlined } from "components/views/common/icons/ShareArrowIconOutlined"
 import {
    MenuOption,

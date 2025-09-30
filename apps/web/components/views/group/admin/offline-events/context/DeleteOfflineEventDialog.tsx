@@ -1,9 +1,19 @@
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { offlineEventService } from "data/firebase/OfflineEventService"
+import { Box } from "@mui/material"
+import { getGroupOfflineEventsWithStatsKey } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import { SlideUpTransition } from "components/views/common/transitions"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useRouter } from "next/router"
-import { useCallback, useState } from "react"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { useCallback } from "react"
+import { Trash2 as DeleteIcon } from "react-feather"
+import { useSWRConfig } from "swr"
+import { capitalizeFirstLetter } from "util/CommonUtil"
+import ConfirmationDialog from "../../../../../../materialUI/GlobalModals/ConfirmationDialog"
+import { useDeleteOfflineEvent } from "../../../../../custom-hook/offline-event/useDeleteOfflineEvent"
+import {
+   getEventTypeName,
+   getOfflineEventStatus,
+} from "../offline-events-table/utils"
 
 type Props = {
    open: boolean
@@ -16,37 +26,79 @@ export const DeleteOfflineEventDialog = ({
    offlineEvent,
    onClose,
 }: Props) => {
-   console.log("🚀 ~ DeleteOfflineEventDialog ~ open:", open)
+   const { successNotification, errorNotification } = useSnackbarNotifications()
    const { group } = useGroup()
-   const { push } = useRouter()
-   const [isDeleting, setIsDeleting] = useState(false)
-   console.log("🚀 ~ DeleteOfflineEventDialog ~ isDeleting:", isDeleting)
+   const { mutate } = useSWRConfig()
 
-   const handleDelete = useCallback(async () => {
-      if (!offlineEvent || !group) return
+   const { trigger: deleteOfflineEvent, isMutating: isDeleting } =
+      useDeleteOfflineEvent({
+         offlineEventId: offlineEvent?.id,
+         groupId: group?.id,
+      })
+
+   const eventStatus = offlineEvent ? getOfflineEventStatus(offlineEvent) : null
+   const eventType = getEventTypeName(eventStatus)
+
+   const handleConfirm = useCallback(async () => {
+      if (!offlineEvent) return
 
       try {
-         setIsDeleting(true)
+         await deleteOfflineEvent()
+         // Force refetch of offline events with stats
+         mutate(getGroupOfflineEventsWithStatsKey(group?.id))
 
-         // Delete the offline event
-         await offlineEventService.deleteOfflineEvent(offlineEvent.id)
-
-         // Decrease the available offline events count
-         await offlineEventService.decreaseGroupAvailableOfflineEvents(group.id)
-
-         // Close dialog and navigate back to offline events list
          onClose()
-         push(`/group/${group.id}/admin/content/offline-events`)
+         successNotification(
+            `${capitalizeFirstLetter(eventType)} deleted successfully`
+         )
       } catch (error) {
-         errorLogAndNotify(error, {
-            message: "Failed to delete offline event",
-            offlineEventId: offlineEvent.id,
-         })
-      } finally {
-         setIsDeleting(false)
+         errorNotification(
+            error,
+            `Unable to delete ${capitalizeFirstLetter(
+               eventType
+            )}. Please try again.`,
+            {
+               collection: "offlineEvents",
+               eventId: offlineEvent?.id,
+            }
+         )
       }
-   }, [offlineEvent, group, onClose, push])
-   console.log("🚀 ~ DeleteOfflineEventDialog ~ handleDelete:", handleDelete)
+   }, [
+      offlineEvent,
+      deleteOfflineEvent,
+      mutate,
+      group?.id,
+      onClose,
+      successNotification,
+      eventType,
+      errorNotification,
+   ])
 
-   return <></>
+   return (
+      <ConfirmationDialog
+         open={open}
+         handleClose={onClose}
+         title={`Delete this ${eventType}?`}
+         description={`This action is permanent. You will no longer be able to recover this ${eventType}`}
+         icon={<Box component={DeleteIcon} color="error.main" />}
+         hideCloseIcon
+         mobileButtonsHorizontal
+         primaryAction={{
+            text: "Delete",
+            callback: handleConfirm,
+            color: "error",
+            variant: "contained",
+            loading: isDeleting,
+            fullWidth: true,
+         }}
+         secondaryAction={{
+            text: "Cancel",
+            callback: onClose,
+            variant: "outlined",
+            color: "grey",
+            fullWidth: true,
+         }}
+         TransitionComponent={SlideUpTransition}
+      />
+   )
 }

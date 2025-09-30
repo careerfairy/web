@@ -1,4 +1,3 @@
-import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
 import {
    Box,
    Button,
@@ -11,6 +10,7 @@ import {
    TableRow,
    Typography,
 } from "@mui/material"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import useClientSidePagination from "components/custom-hook/utils/useClientSidePagination"
 import { useCallback, useEffect, useRef } from "react"
 import { useDispatch } from "react-redux"
@@ -103,15 +103,6 @@ export const DesktopOfflineEventsView = ({
                         Date
                      </SortableHeaderCell>
                      <SortableHeaderCell
-                        active={isActiveSort("clicks")}
-                        direction={getSortDirection("clicks")}
-                        onSort={() => handleTableSort("clicks")}
-                        tooltip="The number of people who clicked on your offline event."
-                        width={COLUMN_WIDTHS.clicks}
-                     >
-                        Clicks
-                     </SortableHeaderCell>
-                     <SortableHeaderCell
                         active={isActiveSort("views")}
                         direction={getSortDirection("views")}
                         onSort={() => handleTableSort("views")}
@@ -120,6 +111,16 @@ export const DesktopOfflineEventsView = ({
                      >
                         Views
                      </SortableHeaderCell>
+                     <SortableHeaderCell
+                        active={isActiveSort("clicks")}
+                        direction={getSortDirection("clicks")}
+                        onSort={() => handleTableSort("clicks")}
+                        tooltip="The number of people who clicked on your offline event."
+                        width={COLUMN_WIDTHS.clicks}
+                     >
+                        Clicks
+                     </SortableHeaderCell>
+
                      <StatusFilterHeader
                         selectedStatuses={statusFilter}
                         onStatusFilterChange={setStatusFilter}

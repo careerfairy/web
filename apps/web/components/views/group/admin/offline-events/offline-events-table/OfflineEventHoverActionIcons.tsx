@@ -1,5 +1,7 @@
-import { Box, IconButton, Tooltip } from "@mui/material"
-import { BarChart, Edit, Share2 } from "react-feather"
+import { Box, IconButton } from "@mui/material"
+import { ShareArrowIconOutlined } from "components/views/common/icons/ShareArrowIconOutlined"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
+import { BarChart } from "react-feather"
 
 type Props = {
    isPublished: boolean
@@ -12,7 +14,6 @@ export const OfflineEventHoverActionIcons = ({
    isPublished,
    onShareOfflineEvent,
    onAnalytics,
-   onEdit,
 }: Props) => {
    return (
       <Box
@@ -26,7 +27,7 @@ export const OfflineEventHoverActionIcons = ({
       >
          {/* Share button - only show for published events */}
          {isPublished && onShareOfflineEvent ? (
-            <Tooltip title="Share offline event">
+            <BrandedTooltip title="Share offline event" placement="bottom">
                <IconButton
                   size="small"
                   onClick={(e) => {
@@ -35,14 +36,14 @@ export const OfflineEventHoverActionIcons = ({
                   }}
                   sx={{ p: 0.5 }}
                >
-                  <Share2 size={16} />
+                  <ShareArrowIconOutlined />
                </IconButton>
-            </Tooltip>
+            </BrandedTooltip>
          ) : null}
 
          {/* Analytics button - only show for published events */}
          {isPublished && onAnalytics ? (
-            <Tooltip title="Analytics">
+            <BrandedTooltip title="Analytics" placement="bottom">
                <IconButton
                   size="small"
                   onClick={(e) => {
@@ -53,23 +54,7 @@ export const OfflineEventHoverActionIcons = ({
                >
                   <BarChart size={16} />
                </IconButton>
-            </Tooltip>
-         ) : null}
-
-         {/* Edit button - always available */}
-         {onEdit ? (
-            <Tooltip title="Edit">
-               <IconButton
-                  size="small"
-                  onClick={(e) => {
-                     e.stopPropagation()
-                     onEdit()
-                  }}
-                  sx={{ p: 0.5 }}
-               >
-                  <Edit size={16} />
-               </IconButton>
-            </Tooltip>
+            </BrandedTooltip>
          ) : null}
       </Box>
    )

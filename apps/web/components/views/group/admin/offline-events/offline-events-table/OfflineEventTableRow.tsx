@@ -1,16 +1,18 @@
-import { OfflineEventsWithStats } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Box, styled, TableCell, TableRow, Typography } from "@mui/material"
-import { useCallback } from "react"
-import { Calendar, Eye, MousePointer } from "react-feather"
+import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
+import PointerClickIcon from "components/views/common/icons/PointerClickIcon"
+import { useCallback, useMemo } from "react"
+import { Calendar, Eye } from "react-feather"
 import { useSelector } from "react-redux"
 import { sxStyles } from "types/commonTypes"
 import { withStopPropagation } from "util/CommonUtil"
+import DateUtil from "util/DateUtil"
 import { selectIsRowHovered } from "../../../../../../store/selectors/offlineEventsTableSelectors"
 import { TableHighlighter } from "../../events/events-table-new/TableHighlighter"
 import { OfflineEventCardPreview } from "./OfflineEventCardPreview"
 import { OfflineEventStatusBadge } from "./OfflineEventStatusBadge"
 import { OfflineEventTableRowActions } from "./OfflineEventTableRowActions"
-import { getOfflineEventStatus } from "./utils"
+import { getOfflineEventStatus, OfflineEventStatus } from "./utils"
 
 const styles = sxStyles({
    bodyRow: {
@@ -104,22 +106,21 @@ export const OfflineEventTableRow = ({
 
    const status = getOfflineEventStatus(stat.offlineEvent)
 
-   const formatDate = (timestamp: any) => {
-      if (!timestamp?.toDate) return "No date"
-      try {
-         return new Intl.DateTimeFormat("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-         }).format(timestamp.toDate())
-      } catch {
-         return "Invalid date"
-      }
-   }
+   const eventDate = stat.offlineEvent.startAt
+      ? DateUtil.formatEventDate(stat.offlineEvent.startAt.toDate())
+      : "No date"
 
-   const eventDate = formatDate(stat.offlineEvent.startAt)
+   const statusTitle =
+      status === OfflineEventStatus.UPCOMING
+         ? "Upcoming"
+         : status === OfflineEventStatus.DRAFT
+         ? "Draft"
+         : "Past"
+
+   const showHoverActions = useMemo(
+      () => isHovered && stat.offlineEvent.published,
+      [isHovered, stat.offlineEvent.published]
+   )
 
    return (
       <TableRow
@@ -136,7 +137,7 @@ export const OfflineEventTableRow = ({
             <CentredBox>
                <OfflineEventCardPreview
                   stat={stat}
-                  showHoverActions={isHovered}
+                  showHoverActions={showHoverActions}
                   status={status}
                   onShareOfflineEvent={() => onShareOfflineEvent(stat)}
                   onAnalytics={() => onAnalytics(stat)}
@@ -164,27 +165,6 @@ export const OfflineEventTableRow = ({
             </CentredBox>
          </TableCell>
 
-         {/* Clicks Column */}
-         <TableCell>
-            <CentredBox>
-               <TableHighlighter
-                  onClick={withStopPropagation(() => onClicksClick(stat))}
-                  title="Clicks"
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  color="neutral.600"
-                  width={92}
-                  cursor="pointer"
-               >
-                  <Box component={MousePointer} size={16} />
-                  <Typography variant="small">
-                     {stat.stats?.totalClicks ?? 0}
-                  </Typography>
-               </TableHighlighter>
-            </CentredBox>
-         </TableCell>
-
          {/* Views Column */}
          <TableCell>
             <CentredBox>
@@ -206,12 +186,33 @@ export const OfflineEventTableRow = ({
             </CentredBox>
          </TableCell>
 
+         {/* Clicks Column */}
+         <TableCell>
+            <CentredBox>
+               <TableHighlighter
+                  onClick={withStopPropagation(() => onClicksClick(stat))}
+                  title="Clicks"
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  color="neutral.600"
+                  width={92}
+                  cursor="pointer"
+               >
+                  <Box component={PointerClickIcon} color={"white"} />
+                  <Typography variant="small">
+                     {stat.stats?.totalClicks ?? 0}
+                  </Typography>
+               </TableHighlighter>
+            </CentredBox>
+         </TableCell>
+
          {/* Status Column */}
          <TableCell sx={styles.bodyCell}>
             <CentredBox gap={0.5}>
                <Box p={1}>
                   <TableHighlighter
-                     title="Status"
+                     title={statusTitle}
                      direction="row"
                      alignItems="center"
                      spacing={1}
