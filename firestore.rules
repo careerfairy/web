@@ -502,6 +502,24 @@ service cloud.firestore {
         match /offlineEvents/{offlineEvent} {
             allow read: if true;
             allow write: if isAdminOfGroup(get(/databases/$(database)/documents/offlineEvents/$(offlineEvent)).data.group.id) || isCFAdmin();
+
+            // Sub-collection for user stats
+            match /offlineEventUserStats/{userAuthId} {
+                allow read: if isAdminOfGroup(get(/databases/$(database)/documents/offlineEvents/$(offlineEvent)).data.group.id) || isCFAdmin();
+                allow write: if request.auth.uid == userAuthId || isCFAdmin();
+
+                // Sub-collection for user actions
+                match /offlineEventActions/{actionId} {
+                    allow read: if isAdminOfGroup(get(/databases/$(database)/documents/offlineEvents/$(offlineEvent)).data.group.id) || isCFAdmin();
+                    allow write: if request.auth.uid == userAuthId || isCFAdmin();
+                }
+            }
+        }
+
+        // Root-level collection for offline event stats
+        match /offlineEventStats/{offlineEventId} {
+            allow read: if true;
+            allow write: if false; // Only backend functions should write stats
         }
 
         match /livestreams/{livestream} {

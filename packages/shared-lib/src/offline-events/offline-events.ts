@@ -1,4 +1,4 @@
-import { Identifiable } from "../commonTypes"
+import { Identifiable, UTMParams } from "../commonTypes"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 import { GeoPoint, Timestamp } from "../firebaseTypes"
 import { GroupOption, PublicGroup } from "../groups"
@@ -50,11 +50,6 @@ export interface OfflineEvent extends Identifiable {
    hidden?: boolean
 }
 
-type PublicOfflineEvent = Omit<
-   OfflineEvent,
-   "author" | "lastUpdatedBy" | "updatedAt" | "publishedAt" | "createdAt"
->
-
 export interface OfflineEventTargetAudience {
    universities: UniversityOption[]
    levelOfStudies: LevelOfStudy[]
@@ -76,10 +71,10 @@ export type OfflineEventStatsMap = {
    // TODO: Add other stats here
 }
 
-// collection path /offlineEvent/{offlineEventId}/stats/"offlineEventStats"/
+// collection path /offlineEventStats/{offlineEventId}
 export interface OfflineEventStats extends Identifiable {
    documentType: "offlineEventStats" // simplify groupCollection Queries
-   offlineEvent: PublicOfflineEvent
+   offlineEvent: OfflineEvent
    generalStats: StatsData
    universityStats: {
       [universityCode: string]: OfflineEventStatsMap
@@ -93,18 +88,30 @@ export interface OfflineEventStats extends Identifiable {
    updatedAt: Timestamp
 }
 
-// collection path /offlineEvent/{offlineEventId}/stats/"offlineEventStats"/{userAuthId}
+// collection path /offlineEvent/{offlineEventId}/offlineEventUserStats/{userAuthId}
 export interface OfflineEventUserStats extends Identifiable {
    documentType: "offlineEventUserStats" // simplify groupCollection Queries
    user: UserPublicData // Or more data if needed
-   offlineEvent: PublicOfflineEvent // Probably not needed as the base document contains all the data
+   offlineEvent: OfflineEvent // Probably not needed as the base document contains all the data
+   // Timestamp with UTM data for when the user last saw the event
+   lastSeenAt: {
+      date: Timestamp
+      utm: UTMParams | null
+   }
+   // Timestamp with UTM data for when the user clicked on the event listing
+   listClickedAt: {
+      date: Timestamp
+      utm: UTMParams | null
+   }
    createdAt: Timestamp
 }
 
-// collection path /offlineEvent/{offlineEventId}/stats/"offlineEventStats"/{userAuthId}/actions
-export interface OfflineEventUserStatActionsData extends Identifiable {
-   documentType: "offlineEventUserStatActionsData" // simplify groupCollection Queries
+// collection path /offlineEvent/{offlineEventId}/offlineEventUserStats/{userAuthId}/offlineEventActions/{actionId}
+export interface OfflineEventAction extends Identifiable {
+   documentType: "offlineEventAction" // simplify groupCollection Queries
+   userAuthId: string
+   offlineEventId: string
    type: OfflineEventStatsAction
-   offlineEvent: PublicOfflineEvent // Probably not needed as the base document contains all the data
+   utm: UTMParams | null
    createdAt: Timestamp
 }
