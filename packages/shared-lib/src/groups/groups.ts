@@ -81,6 +81,12 @@ export interface Group extends Identifiable {
    hasJobs?: boolean
    hasSparks?: boolean
    hasUpcomingEvents?: boolean
+
+   /**
+    * Offline events
+    */
+   hasPurchasedOfflineEvents?: boolean
+   availableOfflineEvents?: number // Number of offline events the group has available to use
    /**
     * Deprecated
     * */
