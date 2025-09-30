@@ -208,11 +208,11 @@ const Details = ({ detailsDirection = "row" }: DetailsProps) => {
       ? formatEventTime(offlineEvent?.startAt?.toDate())
       : ""
 
-   const cityAndCountryText = offlineEvent?.street?.properties
-      ? `${offlineEvent?.street?.properties.address_level1}, ${offlineEvent?.street?.properties?.country}`
+   const cityAndCountryText = offlineEvent?.address?.street
+      ? `${offlineEvent?.address?.city}, ${offlineEvent?.address?.country}`
       : ""
-   const streetText = offlineEvent?.street?.properties
-      ? offlineEvent?.street?.properties.address_line1
+   const streetText = offlineEvent?.address?.street
+      ? `${offlineEvent?.address?.street} ${offlineEvent?.address?.city}, ${offlineEvent?.address?.country}`
       : ""
 
    return (
