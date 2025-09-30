@@ -1,9 +1,13 @@
 import useAdminGroup from "components/custom-hook/useAdminGroup"
 import { BackToOfflineEventsHeader } from "components/views/group/admin/offline-events/detail/BackToOfflineEventsHeader"
+import { OfflineEventAutoSaveContextProvider } from "components/views/group/admin/offline-events/detail/OfflineEventAutoSaveContext"
+import { OfflineEventCreationContextProvider } from "components/views/group/admin/offline-events/detail/OfflineEventCreationContext"
+import OfflineEventFormikProvider from "components/views/group/admin/offline-events/detail/form/OfflineEventFormikProvider"
 import { withGroupDashboardLayout } from "layouts/GroupDashboardLayout/withGroupDashboardLayout"
 import { NextPage } from "next"
 import { useRouter } from "next/router"
 import { ReactElement } from "react"
+import OfflineEventFetchWrapper from "../../../../../../../components/views/group/admin/offline-events/detail/OfflineEventFetchWrapper"
 
 type NextPageWithLayout = NextPage & {
    getLayout?: (page: ReactElement) => ReactElement
@@ -16,13 +20,30 @@ const OfflineEventLayoutWrapper = ({
    children: ReactElement
 }) => {
    const router = useRouter()
-   const { groupId } = router.query
+   const { groupId, offlineEventId } = router.query
    const { group } = useAdminGroup(groupId as string)
 
    if (!groupId || !group) return children
 
-   // TODO: add all wrappers back
-   return children
+   return (
+      <OfflineEventFetchWrapper offlineEventId={offlineEventId as string}>
+         {(offlineEvent) => (
+            <OfflineEventFormikProvider
+               offlineEvent={offlineEvent}
+               group={group}
+            >
+               <OfflineEventCreationContextProvider
+                  offlineEvent={offlineEvent}
+                  group={group}
+               >
+                  <OfflineEventAutoSaveContextProvider>
+                     {children}
+                  </OfflineEventAutoSaveContextProvider>
+               </OfflineEventCreationContextProvider>
+            </OfflineEventFormikProvider>
+         )}
+      </OfflineEventFetchWrapper>
+   )
 }
 
 const OfflineEventAdminDetailsPage: NextPageWithLayout = () => {
