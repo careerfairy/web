@@ -28,11 +28,15 @@ const styles = sxStyles({
 interface NotForYouSectionProps {
    recentLivestreams: LivestreamEvent[]
    handleOpenLivestreamDialog: (livestreamId: string) => void
+   title?: string
+   subtitle?: string
 }
 
 export default function NotForYouSection({
    recentLivestreams,
    handleOpenLivestreamDialog,
+   title = "Not for you?",
+   subtitle = "Here are more live streams",
 }: NotForYouSectionProps) {
    const { authenticatedUser, userData } = useAuth()
    const hasInterests = Boolean(
@@ -61,10 +65,10 @@ export default function NotForYouSection({
             title={
                <Stack sx={{ gap: 0.5, mb: 1.5 }}>
                   <Typography variant="brandedH5" color="text.primary">
-                     Not for you?
+                     {title}
                   </Typography>
                   <Typography variant="medium" sx={styles.sectionDescription}>
-                     Here are more live streams
+                     {subtitle}
                   </Typography>
                </Stack>
             }

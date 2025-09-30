@@ -54,12 +54,6 @@ const styles = sxStyles({
       order: { xs: 1, md: 2 },
       maxWidth: { xs: "100%", md: "50%" },
    },
-   consultingImage: {
-      height: { xs: "200px", md: "100%" },
-      width: "auto",
-      maxWidth: "100%",
-      objectFit: "contain",
-   },
 })
 
 export default function RegisterNowSectionConsulting() {
@@ -75,10 +69,11 @@ export default function RegisterNowSectionConsulting() {
          <Box id="CTA Container" sx={styles.ctaContainer}>
             <Box id="Text content" sx={styles.textContent}>
                <Typography variant="h3" sx={styles.heading}>
-                  Don't miss your chance!
+                  Don&apos;t miss your chance!
                </Typography>
                <Typography sx={styles.paragraph}>
-                  Get one step closer to your dream job by exploring the live streams available.
+                  Get one step closer to your dream job by exploring the live
+                  streams available.
                </Typography>
                <Button
                   variant="contained"
@@ -90,7 +85,7 @@ export default function RegisterNowSectionConsulting() {
                   Explore live streams
                </Button>
             </Box>
-            
+
             <Box sx={styles.imageContainer}>
                <Image
                   src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/consulting_page_explore_more_image.png?alt=media&token=453f0eb2-94ff-4029-b99e-835abe5b0a65"

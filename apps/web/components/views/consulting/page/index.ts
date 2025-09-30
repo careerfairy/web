@@ -1,5 +1,4 @@
 export { default as HeroSectionConsulting } from "./HeroSectionConsulting"
-export { default as NotForYouSectionConsulting } from "./NotForYouSectionConsulting"
 export { default as ParticipatingCompaniesSectionConsulting } from "./ParticipatingCompaniesSectionConsulting"
 export { default as RecordingsSectionConsulting } from "./RecordingsSectionConsulting"
 export { default as RegisterNowSectionConsulting } from "./RegisterNowSectionConsulting"
