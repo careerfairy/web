@@ -76,7 +76,7 @@ export const OfflineEventTopActions = () => {
             </Box>
          )}
 
-         <PublishButton />
+         {Boolean(!isMobile) && <PublishButton />}
       </Stack>
    )
 }

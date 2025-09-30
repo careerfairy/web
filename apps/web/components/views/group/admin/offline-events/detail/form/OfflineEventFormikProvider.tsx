@@ -11,8 +11,7 @@ import { offlineEventFormValidationSchema } from "./validationSchemas"
 const formGeneralTabInitialValues: OfflineEventFormValues["general"] = {
    title: "",
    description: "",
-   city: null,
-   street: "",
+   address: null,
    targetAudience: {
       universities: [],
       levelOfStudies: [],
@@ -45,11 +44,7 @@ export const buildDraftOfflineEventObject = (
       registrationUrl: values.general.registrationUrl,
       backgroundImageUrl: values.general.backgroundImageUrl,
       hidden: values.general.hidden,
-      address: {
-         countryISOCode: group.companyCountry,
-         cityISOCode: values.general.city,
-         street: values.general.street,
-      },
+      address: values.general.address,
       status: "draft",
       industries: group.companyIndustries,
       author: author,
@@ -71,10 +66,7 @@ const convertOfflineEventObjectToForm = ({
       title: offlineEvent?.title || formGeneralTabInitialValues.title,
       description:
          offlineEvent?.description || formGeneralTabInitialValues.description,
-      city:
-         offlineEvent?.address?.cityISOCode || formGeneralTabInitialValues.city,
-      street:
-         offlineEvent?.address?.street || formGeneralTabInitialValues.street,
+      address: offlineEvent?.address || formGeneralTabInitialValues.address,
       targetAudience:
          offlineEvent?.targetAudience ||
          formGeneralTabInitialValues.targetAudience,

@@ -48,6 +48,13 @@ export const makeLivestreamEventDetailsUrl = (
 }
 
 /**
+ * Creates a deep link for a offline event details page / dialog
+ */
+export const makeOfflineEventDetailsUrl = (offlineEventId: string) => {
+   return `${getHost()}/portal?offline-event=${offlineEventId}`
+}
+
+/**
  * Creates a deep link for a live stream details inside a group
  */
 export const makeLivestreamGroupEventDetailsUrl = (
