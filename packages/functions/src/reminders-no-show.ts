@@ -25,7 +25,7 @@ import { logAndThrow } from "./lib/validations"
 import { formatLivestreamDate, getWebBaseUrl } from "./util"
 
 // Magic numbers for reminder timing
-const JOIN_REMINDER_DELAY_MINUTES = 7
+const JOIN_REMINDER_DELAY_MINUTES = 5
 
 /**
  * Schedules reminder emails for users who haven't joined a newly started livestream
@@ -87,7 +87,7 @@ export const onLivestreamStartScheduleNoShowReminder = onDocumentUpdated(
 )
 
 /**
- * HTTP function that waits for 7 minutes and then sends reminder emails
+ * HTTP function that waits for 5 minutes and then sends reminder emails
  * to users who registered for a livestream but haven't joined yet.
  */
 export const sendLivestreamNoShowReminder = onRequest(
