@@ -110,6 +110,7 @@ const styles = sxStyles({
       width: 18,
       height: 18,
       flexShrink: 0,
+      mt: 0.4,
    },
    text: {
       color: "neutral.700",
@@ -328,7 +329,7 @@ const Content = ({
                   <Box component={Calendar} sx={styles.icon} />
                   <Stack>
                      <Typography variant="medium" color="neutral.800">
-                        {DateUtil.getPrettyDateWithoutHourDayjs(
+                        {DateUtil.getPrettyDateWithWeekdayDayjs(
                            startAt?.toDate()
                         )}
                      </Typography>

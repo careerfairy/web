@@ -84,7 +84,7 @@ export const OfflineEventCard = ({ event }: Props) => {
                [OFFLINE_EVENT_DIALOG_KEY]: event.id,
             },
          }}
-         shallow
+         scroll={false}
          sx={styles.card}
          data-name="Offline event card"
       >
