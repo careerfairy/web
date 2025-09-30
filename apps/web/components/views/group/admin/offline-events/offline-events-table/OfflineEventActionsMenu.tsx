@@ -18,17 +18,7 @@ type Props = {
    onDelete: (stat: OfflineEventsWithStats) => void
 }
 
-export const OfflineEventActionsMenu = ({
-   stat,
-   // status,
-   // onViewOfflineEvent,
-   // onShareOfflineEvent,
-   // onAnalytics,
-   onEdit,
-   // onViewRegistration,
-   // onViewDetails,
-   onDelete,
-}: Props) => {
+export const OfflineEventActionsMenu = ({ stat, onEdit, onDelete }: Props) => {
    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
    const open = Boolean(anchorEl)
 

@@ -22,10 +22,6 @@ const OfflineEventsOverviewContent = () => {
    const { sortBy, statusFilter, searchTerm, setSearchTerm } =
       useOfflineEventsOverview()
    const { group } = useGroup()
-   console.log(
-      "🚀 ~ OfflineEventsOverviewContent ~ statusFilter:",
-      statusFilter
-   )
    const { createDraftOfflineEvent } = useOfflineEventRouting()
 
    const {
@@ -37,7 +33,6 @@ const OfflineEventsOverviewContent = () => {
       searchTerm,
       statusFilter,
    })
-   console.log("🚀 ~ OfflineEventsOverviewContent ~ stats:", stats)
 
    const hasFilters = Boolean(statusFilter.length > 0 || searchTerm.trim())
    const noResults = stats.length === 0
@@ -65,7 +60,6 @@ const OfflineEventsOverviewContent = () => {
                   height: "48px",
                   alignItems: "center",
                   display: "flex",
-                  // width: "100%"
                }}
             >
                <Stack direction="row" alignItems="center" spacing={1}>

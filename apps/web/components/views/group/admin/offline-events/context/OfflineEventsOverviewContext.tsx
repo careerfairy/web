@@ -1,6 +1,5 @@
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
-import { offlineEventService } from "data/firebase/OfflineEventService"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import {
@@ -8,17 +7,11 @@ import {
    createContext,
    useCallback,
    useContext,
-   useEffect,
    useMemo,
    useState,
 } from "react"
-import { errorLogAndNotify } from "util/CommonUtil"
 import { OfflineEventStatsSortOption } from "../../../../../custom-hook/offline-event/useGroupOfflineEventsWithStats"
-// import { FeedbackDialogProvider } from "../../analytics-new/feedback/feedback-dialog/FeedbackDialogProvider"
-// import { EnterStreamDialog } from "../EnterStreamDialog"
 import { OfflineEventStatus } from "../offline-events-table/utils"
-// import { QuestionsDialog } from "../feedback-dialogs/QuestionsDialog"
-// import { PromoteLivestreamDialog } from "../PromoteLivestreamDialog"
 import { DeleteOfflineEventDialog } from "./DeleteOfflineEventDialog"
 import { ShareOfflineEventDialog } from "./ShareOfflineEventDialog"
 
@@ -45,8 +38,6 @@ type OfflineEventsViewContextValue = {
    handleViewOfflineEvent: (stat: OfflineEventsWithStats) => void
    handleShareOfflineEvent: (stat: OfflineEventsWithStats) => void
    handleAnalytics: (stat: OfflineEventsWithStats) => void
-   // handleQuestions: (stat: OfflineEventsWithStats) => void
-   // handleFeedback: (stat: OfflineEventsWithStats) => void
    handleEdit: (stat: OfflineEventsWithStats) => void
    handleViewRegistration: (stat: OfflineEventsWithStats) => void
    handleViewDetails: (stat: OfflineEventsWithStats) => void
@@ -105,9 +96,6 @@ type OfflineEventsViewProviderProps = {
 export const OfflineEventsViewProvider = ({
    children,
 }: OfflineEventsViewProviderProps) => {
-   const { query, replace, pathname } = useRouter()
-   const { offlineEventIdToPromote } = query
-
    const { group } = useGroup()
    const [sortBy, setSortBy] = useState<OfflineEventStatsSortOption>(
       OfflineEventStatsSortOption.STATUS_WITH_DATE
@@ -123,18 +111,6 @@ export const OfflineEventsViewProvider = ({
    const [onPaginationReset, setOnPaginationReset] = useState<
       (() => void) | undefined
    >(undefined)
-   // const [promoteDialogOfflineEvent, setPromoteDialogOfflineEvent] =
-   //    useState<OfflineEvent | null>(null)
-   // const [feedbackDialogOfflineEventId, setFeedbackDialogOfflineEventId] = useState<
-   //    string | null
-   // >(null)
-   // const [feedbackDialogQuestionId, setFeedbackDialogQuestionId] = useState<
-   //    string | null
-   // >(null)
-   // const [questionsDialogOfflineEvent, setQuestionsDialogOfflineEvent] =
-   //    useState<OfflineEvent | null>(null)
-   // const [enterStreamDialogOfflineEventId, setEnterStreamDialogOfflineEventId] =
-   //    useState<string | null>(null)
    const { push } = useRouter()
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
@@ -234,19 +210,6 @@ export const OfflineEventsViewProvider = ({
       [group?.id, push]
    )
 
-   // const handleQuestions = useCallback((stat: OfflineEventStats) => {
-   //    if (!stat.offlineEvent.published) return
-   //    // Open questions dialog
-   //    setQuestionsDialogOfflineEvent(stat.offlineEvent)
-   // }, [])
-
-   // const handleFeedback = useCallback((stat: OfflineEventStats) => {
-   //    if (!stat.offlineEvent.published) return
-   //    // Open feedback dialog for past offline events
-   //    setFeedbackDialogOfflineEventId(stat.offlineEvent.id)
-   //    setFeedbackDialogQuestionId(null)
-   // }, [])
-
    const handleEdit = useCallback(
       (stat: OfflineEventsWithStats) => {
          // Navigate to edit page (with null-safe check)
@@ -297,31 +260,6 @@ export const OfflineEventsViewProvider = ({
       setOfflineEventToShare(null)
    }, [])
 
-   // const handleClosePromoteDialog = useCallback(() => {
-   //    setPromoteDialogOfflineEvent(null)
-   // }, [])
-
-   // const handleCloseFeedbackDialog = useCallback(() => {
-   //    setFeedbackDialogOfflineEventId(null)
-   //    setFeedbackDialogQuestionId(null)
-   // }, [])
-
-   // const handleFeedbackRatingQuestionClick = useCallback((ratingId: string) => {
-   //    setFeedbackDialogQuestionId(ratingId)
-   // }, [])
-
-   // const handleFeedbackBackToFeedback = useCallback(() => {
-   //    setFeedbackDialogQuestionId(null)
-   // }, [])
-
-   // const handleCloseQuestionsDialog = useCallback(() => {
-   //    setQuestionsDialogOfflineEvent(null)
-   // }, [])
-
-   // const handleCloseEnterStreamDialog = useCallback(() => {
-   //    setEnterStreamDialogOfflineEventId(null)
-   // }, [])
-
    const resetFilters = useCallback(() => {
       setSortBy(initialSort)
       setStatusFilter([])
@@ -348,36 +286,6 @@ export const OfflineEventsViewProvider = ({
       [onPaginationReset]
    )
 
-   useEffect(() => {
-      if (offlineEventIdToPromote) {
-         offlineEventService
-            .getById(offlineEventIdToPromote as string)
-            .then((offlineEvent) => {
-               // setPromoteDialogOfflineEvent(offlineEvent)
-               alert(`Promote offline event: ${offlineEvent.title}`)
-            })
-            .catch((err) => {
-               errorLogAndNotify(err, {
-                  message: "Failed to fetch offline event for promote dialog",
-                  offlineEventId: offlineEventIdToPromote,
-               })
-            })
-            .finally(() => {
-               const newQuery = {
-                  ...query,
-               }
-
-               delete newQuery.offlineEventIdToPromote
-
-               replace({
-                  pathname: pathname,
-                  query: newQuery,
-               })
-            })
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [offlineEventIdToPromote, replace])
-
    const value = useMemo<OfflineEventsViewContextValue>(
       () => ({
          sortBy,
@@ -395,8 +303,6 @@ export const OfflineEventsViewProvider = ({
          handleViewOfflineEvent,
          handleShareOfflineEvent,
          handleAnalytics,
-         // handleQuestions,
-         // handleFeedback,
          handleEdit,
          handleViewRegistration,
          handleViewDetails,
@@ -418,8 +324,6 @@ export const OfflineEventsViewProvider = ({
          handleViewOfflineEvent,
          handleShareOfflineEvent,
          handleAnalytics,
-         // handleQuestions,
-         // handleFeedback,
          handleEdit,
          handleViewRegistration,
          handleViewDetails,
@@ -442,30 +346,6 @@ export const OfflineEventsViewProvider = ({
             companyCountryCode={group?.companyCountry?.id}
             onClose={handleShareDialogClose}
          />
-         {/* <PromoteOfflineEventDialog
-            offlineEvent={promoteDialogOfflineEvent}
-            open={Boolean(promoteDialogOfflineEvent)}
-            companyName={group?.universityName}
-            companyCountryCode={group?.companyCountry?.id}
-            onClose={handleClosePromoteDialog}
-         />
-         <FeedbackDialogProvider
-            offlineEventId={feedbackDialogOfflineEventId}
-            feedbackQuestionId={feedbackDialogQuestionId}
-            onCloseFeedbackDialog={handleCloseFeedbackDialog}
-            onRatingQuestionClick={handleFeedbackRatingQuestionClick}
-            onBackToFeedback={handleFeedbackBackToFeedback}
-         />
-
-         <QuestionsDialog
-            offlineEvent={questionsDialogOfflineEvent}
-            onClose={handleCloseQuestionsDialog}
-         />
-         <EnterStreamDialog
-            offlineEventId={enterStreamDialogOfflineEventId}
-            open={Boolean(enterStreamDialogOfflineEventId)}
-            onClose={handleCloseEnterStreamDialog}
-         /> */}
       </OfflineEventsViewContext.Provider>
    )
 }

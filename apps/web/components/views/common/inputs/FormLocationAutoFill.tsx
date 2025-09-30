@@ -168,6 +168,7 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
    requiredText,
 }) => {
    const [field, , helpers] = useField<OfflineEvent["address"] | null>(name)
+   console.log("🚀 ~ FormLocationAutoFill ~ field:", field)
    const [suggestions, setSuggestions] = useState<Option[]>([])
    const [loading, setLoading] = useState(false)
 
