@@ -2,7 +2,7 @@ import { useFormikContext } from "formik"
 import { OfflineEventFormValues } from "./types"
 
 export const useOfflineEventFormValues = () => {
-   const { values, validateForm, errors, isValid } =
+   const { values, validateForm, errors, isValid, dirty } =
       useFormikContext<OfflineEventFormValues>()
 
    return {
@@ -10,5 +10,6 @@ export const useOfflineEventFormValues = () => {
       validateForm,
       errors,
       isValid,
+      dirty,
    }
 }

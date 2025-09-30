@@ -11,6 +11,7 @@ import { ElementType, useState } from "react"
 import { ChevronLeft, ChevronRight, IconProps, Info } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useOfflineEventCreationContext } from "../OfflineEventCreationContext"
+import { PublishButton } from "../PublishButton"
 
 const styles = sxStyles({
    root: {
@@ -142,6 +143,7 @@ const OfflineEventAdminDetailBottomBarNavigation = () => {
                <ButtonContent label={"Next"} Icon={ChevronRight} />
             </ButtonOrIconButton>
          </Box>
+         {Boolean(isMobile) && <PublishButton />}
          {Boolean(isMobile && shouldShowAlertIndicator) && (
             <InvalidAlertMobile />
          )}

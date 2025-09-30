@@ -154,6 +154,7 @@ const csp = {
       "https://cdn-eu.customer.io", // For sending events to Customer.io
       "https://*.customer.io", // For sending events to Customer.io
       "https://*.cloud.gist.build", // For sending events to Customer.io
+      "https://api.mapbox.com",
    ],
    "img-src": [
       "'self'",

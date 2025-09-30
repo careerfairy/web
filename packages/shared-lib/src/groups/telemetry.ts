@@ -44,6 +44,7 @@ export const InteractionSources = {
    Email_Panel_Reminder_24h: "Email_Panel_Reminder_24h",
    Job_Header: "Job_Header",
    Panels_Overview_Page: "Panels_Overview_Page",
+   Offline_Event_Dialog: "Offline_Event_Dialog",
 } as const
 
 export type InteractionSourcesType =

@@ -38,7 +38,7 @@ export const BackToOfflineEventsHeader = ({ groupId }: Props) => {
    return (
       <Box sx={styles.root} onClick={handleClick}>
          <Box component={ChevronLeft} />
-         {"Offline event details"}
+         {"Offline event creation"}
       </Box>
    )
 }

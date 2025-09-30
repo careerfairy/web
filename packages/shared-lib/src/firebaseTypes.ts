@@ -55,3 +55,4 @@ export type DocumentData = firebase.firestore.DocumentData
 export type DocumentSnapshot = firebase.firestore.DocumentSnapshot
 export type FieldValue = firebase.firestore.FieldValue
 export type DocumentReference = firebase.firestore.DocumentReference
+export type GeoPoint = firebase.firestore.GeoPoint
