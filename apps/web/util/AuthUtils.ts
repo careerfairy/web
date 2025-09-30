@@ -8,6 +8,8 @@ const securePaths = [
    "/group/[groupId]/admin/page/[[...livestreamDialog]]",
    "/group/[groupId]/admin/content/live-streams",
    "/group/[groupId]/admin/content/live-streams/[livestreamId]",
+   "/group/[groupId]/admin/content/offline-events",
+   "/group/[groupId]/admin/content/offline-events/[offlineEventId]",
    "/group/[groupId]/admin/content/sparks",
    "/group/[groupId]/admin/settings/general",
    "/group/[groupId]/admin/settings/team-members",
