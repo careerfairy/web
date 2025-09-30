@@ -30,6 +30,8 @@ export type SpeakerData = {
    url: string
    linkedInUrl: string
    company: string
+   firstName?: string
+   lastName?: string
 }
 
 export type SparkData = {
@@ -122,5 +124,7 @@ export const getSpeakerEmailData = (
          ...options.utmParams,
       }),
       linkedInUrl: speaker.linkedInUrl,
+      firstName: speaker.firstName ?? "",
+      lastName: speaker.lastName ?? "",
    }
 }
