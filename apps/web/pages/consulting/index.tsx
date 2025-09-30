@@ -3,7 +3,6 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { Stack } from "@mui/material"
 import {
    HeroSectionConsulting,
-   NotForYouSectionConsulting,
    ParticipatingCompaniesSectionConsulting,
    RecordingsSectionConsulting,
    RegisterNowSectionConsulting,
@@ -11,6 +10,7 @@ import {
    WhosThisForSectionConsulting,
 } from "components/views/consulting/page"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
+import { NotForYouSection } from "components/views/panels/page"
 import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
@@ -135,10 +135,11 @@ export default function ConsultingPage({
                <WhosThisForSectionConsulting />
                <ParticipatingCompaniesSectionConsulting companies={companies} />
                <SpeakersSectionConsulting
-                  speakers={deserializedPanelEvents
-                     .flatMap((panel) => panel.speakers || [])
-                     .sort(() => Math.random() - 0.5) // Randomize order
-                     .slice(0, 6) // Limit to 6 speakers
+                  speakers={
+                     deserializedPanelEvents
+                        .flatMap((panel) => panel.speakers || [])
+                        .sort(() => Math.random() - 0.5) // Randomize order
+                        .slice(0, 6) // Limit to 6 speakers
                   }
                   companies={companies}
                />
@@ -147,9 +148,11 @@ export default function ConsultingPage({
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
                <RegisterNowSectionConsulting />
-               <NotForYouSectionConsulting
+               <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
+                  title="Not interested in consulting?"
+                  subtitle="Explore other career-focused live streams"
                />
             </Stack>
          </GenericDashboardLayout>
@@ -172,47 +175,52 @@ export const getServerSideProps: GetServerSideProps<
 > = async () => {
    try {
       // Fetch all data in parallel
-      const [recentLivestreams, allUpcomingEvents, pastEvents] = await Promise.all([
-         livestreamRepo.getUpcomingEvents(10),
-         // Fetch upcoming events and filter by consulting industry
-         livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
-         // Fetch past events for consulting recordings
-         livestreamRepo.getPastEventsFrom({
-            fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
-            limit: 50, // Get more to ensure we have enough after filtering
-         }),
-      ])
+      const [recentLivestreams, allUpcomingEvents, pastEvents] =
+         await Promise.all([
+            livestreamRepo.getUpcomingEvents(10),
+            // Fetch upcoming events and filter by consulting industry
+            livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
+            // Fetch past events for consulting recordings
+            livestreamRepo.getPastEventsFrom({
+               fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
+               limit: 50, // Get more to ensure we have enough after filtering
+            }),
+         ])
 
       // Filter upcoming events by ManagementConsulting industry and limit to 6
-      const consultingLivestreams = allUpcomingEvents
-         ?.filter((event) => 
-            event.companyIndustries?.includes("ManagementConsulting")
-         )
-         ?.slice(0, 6) || []
-
+      const consultingLivestreams =
+         allUpcomingEvents
+            ?.filter((event) =>
+               event.companyIndustries?.includes("ManagementConsulting")
+            )
+            ?.slice(0, 6) || []
 
       // Filter past events by ManagementConsulting industry and limit to 6 for recordings
       // First try to get events that are explicitly marked as recordings
-      let consultingRecordings = pastEvents
-         ?.filter((event) => 
-            event.companyIndustries?.includes("ManagementConsulting") &&
-            event.isRecording // Only include events that have recordings
-         )
-         ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-         ?.slice(0, 6) || []
-      
-      // If we don't have enough recordings, fall back to all consulting past events
-      // This ensures the section renders even if the isRecording flag isn't properly set
-      if (consultingRecordings.length === 0) {
-         consultingRecordings = pastEvents
-            ?.filter((event) => 
-               event.companyIndustries?.includes("ManagementConsulting") &&
-               event.hasEnded // Only include events that have ended
+      let consultingRecordings =
+         pastEvents
+            ?.filter(
+               (event) =>
+                  event.companyIndustries?.includes("ManagementConsulting") &&
+                  event.isRecording // Only include events that have recordings
             )
             ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
             ?.slice(0, 6) || []
-      }
 
+      // If we don't have enough recordings, fall back to all consulting past events
+      // This ensures the section renders even if the isRecording flag isn't properly set
+      if (consultingRecordings.length === 0) {
+         consultingRecordings =
+            pastEvents
+               ?.filter(
+                  (event) =>
+                     event.companyIndustries?.includes(
+                        "ManagementConsulting"
+                     ) && event.hasEnded // Only include events that have ended
+               )
+               ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
+               ?.slice(0, 6) || []
+      }
 
       // Extract unique groupIds from consulting livestreams
       const allGroupIds = consultingLivestreams
@@ -231,22 +239,25 @@ export const getServerSideProps: GetServerSideProps<
       )
 
       // Handle moderators - filter out moderators from speakers
-      const eventsWithoutModerators = serializedConsultingEvents.map((event) => {
-         event.speakers = event.speakers?.filter(
-            (speaker) => speaker.position !== "Moderator"
-         )
-         return {
-            ...event,
-            speakers: event.speakers,
+      const eventsWithoutModerators = serializedConsultingEvents.map(
+         (event) => {
+            event.speakers = event.speakers?.filter(
+               (speaker) => speaker.position !== "Moderator"
+            )
+            return {
+               ...event,
+               speakers: event.speakers,
+            }
          }
-      })
+      )
 
-      const serializedRecentLivestreams = recentLivestreams?.map((stream) =>
-         LivestreamPresenter.serializeDocument(stream)
-      ) || []
+      const serializedRecentLivestreams =
+         recentLivestreams?.map((stream) =>
+            LivestreamPresenter.serializeDocument(stream)
+         ) || []
 
-      const serializedConsultingRecordings = consultingRecordings.map((recording) =>
-         LivestreamPresenter.serializeDocument(recording)
+      const serializedConsultingRecordings = consultingRecordings.map(
+         (recording) => LivestreamPresenter.serializeDocument(recording)
       )
 
       const serializedCompanies = companies.map((company) =>
