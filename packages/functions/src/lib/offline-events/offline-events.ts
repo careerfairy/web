@@ -8,12 +8,12 @@ import { Timestamp } from "firebase-admin/firestore"
 import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import { CallableRequest, onCall } from "firebase-functions/v2/https"
 import { mixed, object, string } from "yup"
-import { offlineEventRepo } from "./api/repositories"
-import { withMiddlewares } from "./middlewares-gen2/onCall/middleware"
+import { offlineEventRepo } from "../../api/repositories"
+import { withMiddlewares } from "../../middlewares-gen2/onCall/middleware"
 import {
    dataValidationMiddleware,
    userAuthExistsMiddleware,
-} from "./middlewares-gen2/onCall/validations"
+} from "../../middlewares-gen2/onCall/validations"
 import functions = require("firebase-functions")
 
 /**
