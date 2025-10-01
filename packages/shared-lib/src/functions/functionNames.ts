@@ -73,8 +73,7 @@ export const FUNCTION_NAMES = {
    getTotalUsersMatchingTargeting: "getTotalUsersMatchingTargeting",
 
    // Offline events functions
-   trackOfflineEventView: "trackOfflineEventView",
-   trackOfflineEventClick: "trackOfflineEventClick",
+   trackOfflineEventAction: "trackOfflineEventAction",
 
    // Slack Notifications
    notifySlackWhenSparksTrialStarts: "notifySlackWhenSparksTrialStarts",

@@ -22,25 +22,16 @@ export interface IOfflineEventFunctionsRepository {
    syncGroupDataToOfflineEvent(groupId: string, group: Group): Promise<void>
 
    /**
-    * Tracks when a user views an offline event (opens the dialog).
-    * Creates action record, updates user stats with lastSeenAt timestamp,
-    * and increments total/unique talent reached counters in segmented analytics.
+    * Shared implementation for tracking offline event actions (view or click).
+    * Creates action record, upserts user stats with appropriate timestamp,
+    * and updates general + segmented analytics (by university, country, field of study).
+    * Handles migration when users change their profile data.
     */
-   trackOfflineEventView(
+   trackOfflineEventAction(
       offlineEventId: string,
       user: UserPublicData,
-      utm: UTMParams | null
-   ): Promise<void>
-
-   /**
-    * Tracks when a user clicks the register button on an offline event.
-    * Creates action record, updates user stats with listClickedAt timestamp,
-    * and increments total/unique register click counters in segmented analytics.
-    */
-   trackOfflineEventClick(
-      offlineEventId: string,
-      user: UserPublicData,
-      utm: UTMParams | null
+      utm: UTMParams | null,
+      actionType: OfflineEventStatsAction
    ): Promise<void>
 }
 
@@ -78,58 +69,26 @@ export class OfflineEventFunctionsRepository
       await batch.commit()
    }
 
-   async trackOfflineEventView(
-      offlineEventId: string,
-      user: UserPublicData,
-      utm: UTMParams | null
-   ): Promise<void> {
-      return this.trackOfflineEventAction(
-         offlineEventId,
-         user,
-         utm,
-         OfflineEventStatsAction.View
-      )
-   }
-
-   async trackOfflineEventClick(
-      offlineEventId: string,
-      user: UserPublicData,
-      utm: UTMParams | null
-   ): Promise<void> {
-      return this.trackOfflineEventAction(
-         offlineEventId,
-         user,
-         utm,
-         OfflineEventStatsAction.Click
-      )
-   }
-
-   /**
-    * Shared implementation for tracking offline event actions (view or click).
-    * Creates action record, upserts user stats with appropriate timestamp,
-    * and updates general + segmented analytics (by university, country, field of study).
-    * Handles migration when users change their profile data.
-    */
-   private async trackOfflineEventAction(
+   async trackOfflineEventAction(
       offlineEventId: string,
       user: UserPublicData,
       utm: UTMParams | null,
-      actionType: OfflineEventStatsAction.View | OfflineEventStatsAction.Click
+      actionType: OfflineEventStatsAction
    ): Promise<void> {
       // Define configuration based on action type
       const config =
          actionType === OfflineEventStatsAction.View
             ? {
                  timestampField: "lastSeenAt" as const,
-                 totalStatsField: "totalNumberOfTalentReached",
-                 uniqueStatsField: "uniqueNumberOfTalentReached",
-                 segmentedStatsSuffix: "TalentReached",
+                 totalStatsField: "totalNumberOfTalentReached" as const,
+                 uniqueStatsField: "uniqueNumberOfTalentReached" as const,
+                 segmentedStatsSuffix: "TalentReached" as const,
               }
             : {
                  timestampField: "listClickedAt" as const,
-                 totalStatsField: "totalNumberOfRegisterClicks",
-                 uniqueStatsField: "totalNumberOfUniqueRegisterClicks",
-                 segmentedStatsSuffix: "RegisterClicks",
+                 totalStatsField: "totalNumberOfRegisterClicks" as const,
+                 uniqueStatsField: "uniqueNumberOfRegisterClicks" as const,
+                 segmentedStatsSuffix: "RegisterClicks" as const,
               }
 
       return this.firestore.runTransaction(async (transaction) => {
@@ -223,6 +182,7 @@ export class OfflineEventFunctionsRepository
                [`generalStats.${config.uniqueStatsField}`]:
                   FieldValue.increment(1),
             }),
+            updatedAt: Timestamp.now(),
          }
 
          // Handle university stats migration if user changed university

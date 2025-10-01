@@ -183,10 +183,8 @@ exports[FUNCTION_NAMES.notifySlackWhenSparksTrialStarts] =
    notificationOnboardings.notifySlackWhenSparksTrialStarts
 
 // Offline Events
-exports[FUNCTION_NAMES.trackOfflineEventView] =
-   offlineEvents.trackOfflineEventView
-exports[FUNCTION_NAMES.trackOfflineEventClick] =
-   offlineEvents.trackOfflineEventClick
+exports[FUNCTION_NAMES.trackOfflineEventAction] =
+   offlineEvents.trackOfflineEventAction
 
 // Offline Event Notifications
 exports[FUNCTION_NAMES.notifySlackWhenOfflineEventIsPublished] =

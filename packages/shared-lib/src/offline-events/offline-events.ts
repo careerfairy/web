@@ -56,10 +56,13 @@ export interface OfflineEventTargetAudience {
    fieldOfStudies: FieldOfStudy[]
 }
 
-export enum OfflineEventStatsAction {
-   Click = "click",
-   View = "view",
-}
+export const OfflineEventStatsAction = {
+   Click: "click",
+   View: "view",
+} as const
+
+export type OfflineEventStatsAction =
+   (typeof OfflineEventStatsAction)[keyof typeof OfflineEventStatsAction]
 
 type StatsData = {
    totalNumberOfRegisterClicks: number

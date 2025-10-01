@@ -1,135 +1,68 @@
-import {
-   TrackOfflineEventClickRequest,
-   TrackOfflineEventViewRequest,
-} from "@careerfairy/shared-lib/functions/types"
+import { TrackOfflineEventActionRequest } from "@careerfairy/shared-lib/functions/types"
 import {
    OfflineEvent,
    OfflineEventStats,
+   OfflineEventStatsAction,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import { Timestamp } from "firebase-admin/firestore"
 import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import { CallableRequest, onCall } from "firebase-functions/v2/https"
-import { offlineEventRepo, userRepo } from "./api/repositories"
+import { mixed, object, string } from "yup"
+import { offlineEventRepo } from "./api/repositories"
 import { withMiddlewares } from "./middlewares-gen2/onCall/middleware"
-import { userAuthExistsMiddleware } from "./middlewares-gen2/onCall/validations"
+import {
+   dataValidationMiddleware,
+   userAuthExistsMiddleware,
+} from "./middlewares-gen2/onCall/validations"
 import functions = require("firebase-functions")
 
 /**
- * Cloud function to track when a user views an offline event (opens the dialog)
- * - Upserts OfflineEventUserStats with lastSeenAt
- * - Creates an OfflineEventAction with type "view"
- * - Updates OfflineEventStats to increment totalNumberOfTalentReached and uniqueNumberOfTalentReached if first view
+ * Consolidated cloud function to track offline event actions (view or click)
+ * - For "view": Upserts OfflineEventUserStats with lastSeenAt, creates an OfflineEventAction,
+ *   and increments totalNumberOfTalentReached and uniqueNumberOfTalentReached
+ * - For "click": Upserts OfflineEventUserStats with listClickedAt, creates an OfflineEventAction,
+ *   and increments totalNumberOfRegisterClicks and uniqueNumberOfRegisterClicks
  */
-export const trackOfflineEventView = onCall(
+export const trackOfflineEventAction = onCall(
    withMiddlewares(
-      [userAuthExistsMiddleware()],
-      async (request: CallableRequest<TrackOfflineEventViewRequest>) => {
+      [
+         dataValidationMiddleware<TrackOfflineEventActionRequest>(
+            object({
+               offlineEventId: string().required(),
+               actionType: mixed<OfflineEventStatsAction>()
+                  .oneOf(Object.values(OfflineEventStatsAction))
+                  .required(),
+               utm: object().nullable(),
+               userData: object().required() as any,
+            })
+         ),
+         userAuthExistsMiddleware(),
+      ],
+      async (request: CallableRequest<TrackOfflineEventActionRequest>) => {
          try {
-            const { offlineEventId } = request.data
-
-            if (!offlineEventId) {
-               throw new functions.https.HttpsError(
-                  "invalid-argument",
-                  "offlineEventId is required"
-               )
-            }
-
-            // Get user data
-            const userData = await userRepo.getUserDataById(
-               request.auth.token.email
-            )
-
-            if (!userData) {
-               throw new functions.https.HttpsError(
-                  "not-found",
-                  "User data not found"
-               )
-            }
+            const { offlineEventId, actionType, utm, userData } = request.data
 
             // Convert to public user data
             const userPublicData = pickPublicDataFromUser(userData)
 
-            // Get UTM params from request data (passed from client)
-            const utm = request.data.utm || null
-
-            // Track the view
-            await offlineEventRepo.trackOfflineEventView(
+            // Track the action based on type
+            await offlineEventRepo.trackOfflineEventAction(
                offlineEventId,
                userPublicData,
-               utm
+               utm || null,
+               actionType
             )
 
             return { success: true }
          } catch (error) {
-            functions.logger.error("Error tracking offline event view:", error)
+            functions.logger.error(
+               `Error tracking offline event ${request.data.actionType}:`,
+               error
+            )
             throw new functions.https.HttpsError(
                "internal",
-               "Failed to track offline event view"
-            )
-         }
-      }
-   )
-)
-
-/**
- * Cloud function to track when a user clicks the register button on an offline event
- * - Upserts OfflineEventUserStats with listClickedAt
- * - Creates an OfflineEventAction with type "click"
- * - Updates OfflineEventStats to increment totalNumberOfRegisterClicks and totalNumberOfUniqueRegisterClicks if first click
- */
-export const trackOfflineEventClick = onCall(
-   withMiddlewares(
-      [userAuthExistsMiddleware()],
-      async (request: CallableRequest<TrackOfflineEventClickRequest>) => {
-         try {
-            if (!request.auth) {
-               throw new functions.https.HttpsError(
-                  "unauthenticated",
-                  "User must be authenticated"
-               )
-            }
-
-            const { offlineEventId } = request.data
-
-            if (!offlineEventId) {
-               throw new functions.https.HttpsError(
-                  "invalid-argument",
-                  "offlineEventId is required"
-               )
-            }
-
-            // Get user data
-            const userData = await userRepo.getUserDataById(
-               request.auth.token.email
-            )
-
-            if (!userData) {
-               throw new functions.https.HttpsError(
-                  "not-found",
-                  "User data not found"
-               )
-            }
-
-            // Convert to public user data
-            const userPublicData = pickPublicDataFromUser(userData)
-
-            // Get UTM params from request data (passed from client)
-            const utm = request.data.utm || null
-
-            // Track the click
-            await offlineEventRepo.trackOfflineEventClick(
-               offlineEventId,
-               userPublicData,
-               utm
-            )
-
-            return { success: true }
-         } catch (error) {
-            functions.logger.error("Error tracking offline event click:", error)
-            throw new functions.https.HttpsError(
-               "internal",
-               "Failed to track offline event click"
+               `Failed to track offline event ${request.data.actionType}`
             )
          }
       }
@@ -163,7 +96,7 @@ export const onCreateOfflineEvent = onDocumentCreated(
                totalNumberOfRegisterClicks: 0,
                totalNumberOfTalentReached: 0,
                uniqueNumberOfTalentReached: 0,
-               totalNumberOfUniqueRegisterClicks: 0,
+               uniqueNumberOfRegisterClicks: 0,
             },
             universityStats: {},
             countryStats: {},
@@ -182,8 +115,6 @@ export const onCreateOfflineEvent = onDocumentCreated(
          )
       } catch (error) {
          functions.logger.error("Error creating offline event stats:", error)
-         // Don't throw - we don't want to fail the offline event creation
-         // Stats can be manually created if needed
       }
    }
 )

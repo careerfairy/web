@@ -1,5 +1,8 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import {
+   OfflineEvent,
+   OfflineEventStatsAction,
+} from "@careerfairy/shared-lib/offline-events/offline-events"
 import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import { makeOfflineEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import {
@@ -35,6 +38,7 @@ import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerEvent } from "util/analyticsUtils"
+import { errorLogAndNotify } from "util/CommonUtil"
 import CookiesUtil from "util/CookiesUtil"
 import DateUtil from "util/DateUtil"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
@@ -182,8 +186,6 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
    const isMounted = useIsMounted()
    const { successNotification } = useSnackbarNotifications()
    const [, copyEventLinkToClipboard] = useCopyToClipboard()
-   const { userData } = useAuth()
-   const hasUserData = Boolean(userData)
 
    const handleShare = useCallback(() => {
       const eventUrl = makeOfflineEventDetailsUrl(eventFromServer.id)
@@ -214,30 +216,6 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
                : null,
       }
    )
-
-   // Track view when dialog opens (only once)
-   const hasTrackedView = useRef(false)
-
-   useEffect(() => {
-      if (event && hasUserData && !hasTrackedView.current) {
-         hasTrackedView.current = true
-         const userPublicData = pickPublicDataFromUser(userData)
-         const utm = CookiesUtil.getUTMParams()
-
-         offlineEventService
-            .trackOfflineEventView(event.id, userPublicData, utm)
-            .catch((error) => {
-               alert(
-                  `Failed to track offline event view ${JSON.stringify(
-                     error,
-                     null,
-                     2
-                  )}`
-               )
-               console.error("Failed to track offline event view:", error)
-            })
-      }
-   }, [event, event?.id, hasUserData, userData])
 
    const handleClose = useCallback(() => {
       const newQuery = {
@@ -278,6 +256,7 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
                ...NICE_SCROLLBAR_STYLES,
             }}
             TransitionProps={{
+               // ensure the content is unmounted when the dialog is closed
                unmountOnExit: true,
                // WHat this does is skips the slide up animation when loading the page for the first time, so it appears like the dialog is already open for ssr
                appear: isMounted,
@@ -320,22 +299,52 @@ const Content = ({
       address,
    } = event || {}
 
+   // Track view when dialog opens (only once)
+   const hasTrackedView = useRef(false)
+
+   useEffect(() => {
+      if (event && userData && !hasTrackedView.current) {
+         hasTrackedView.current = true
+         const userPublicData = pickPublicDataFromUser(userData)
+         const utm = CookiesUtil.getUTMParams()
+
+         offlineEventService
+            .trackOfflineEventAction(
+               event.id,
+               OfflineEventStatsAction.View,
+               userData,
+               utm
+            )
+            .catch((error) => {
+               errorLogAndNotify(error, {
+                  description: "Failed to track offline event view",
+                  offlineEventId: event.id,
+                  userPublicData,
+                  utm,
+               })
+            })
+      }
+   }, [event, event?.id, userData])
+
    const handleRegisterClick = useCallback(() => {
       if (userData && event) {
          const userPublicData = pickPublicDataFromUser(userData)
          const utm = CookiesUtil.getUTMParams()
 
          offlineEventService
-            .trackOfflineEventClick(event.id, userPublicData, utm)
+            .trackOfflineEventAction(
+               event.id,
+               OfflineEventStatsAction.Click,
+               userData,
+               utm
+            )
             .catch((error) => {
-               console.error("Failed to track offline event click:", error)
-               alert(
-                  `Failed to track offline event click ${JSON.stringify(
-                     error,
-                     null,
-                     2
-                  )}`
-               )
+               errorLogAndNotify(error, {
+                  description: "Failed to track offline event click",
+                  offlineEventId: event.id,
+                  userPublicData,
+                  utm,
+               })
             })
       }
    }, [userData, event])

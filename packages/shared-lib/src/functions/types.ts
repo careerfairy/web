@@ -1,4 +1,6 @@
 import { UTMParams } from "../commonTypes"
+import { OfflineEventStatsAction } from "../offline-events/offline-events"
+import { UserData } from "../users"
 
 export type SendNewlyPublishedEventEmailFnArgs = {
    livestreamId: string
@@ -46,12 +48,9 @@ export type DeleteLivestreamRequest = {
    groupId: string
 }
 
-export type TrackOfflineEventViewRequest = {
+export type TrackOfflineEventActionRequest = {
    offlineEventId: string
+   actionType: OfflineEventStatsAction
    utm: UTMParams | null
-}
-
-export type TrackOfflineEventClickRequest = {
-   offlineEventId: string
-   utm: UTMParams | null
+   userData: UserData
 }
