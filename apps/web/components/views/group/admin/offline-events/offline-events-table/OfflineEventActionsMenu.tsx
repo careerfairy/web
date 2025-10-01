@@ -1,9 +1,10 @@
-import { IconButton, MenuItem } from "@mui/material"
+import { IconButton } from "@mui/material"
 import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
-import BrandedMenu from "components/views/common/inputs/BrandedMenu"
+import { DesktopMenu } from "components/views/common/inputs/BrandedResponsiveMenu"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { useState } from "react"
-import { MoreVertical } from "react-feather"
+import { Edit2, MoreVertical, Trash2 } from "react-feather"
+import { withStopPropagation } from "util/CommonUtil"
 import { OfflineEventStatus } from "./utils"
 
 type Props = {
@@ -18,9 +19,29 @@ type Props = {
    onDelete: (stat: OfflineEventsWithStats) => void
 }
 
-export const OfflineEventActionsMenu = ({ stat, onEdit, onDelete }: Props) => {
+export const OfflineEventActionsMenu = ({
+   stat,
+   onEdit,
+   onDelete,
+   status,
+}: Props) => {
    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
    const open = Boolean(anchorEl)
+
+   const menuOptions = [
+      {
+         label: getEditLabel(status),
+         icon: <Edit2 size={16} />,
+         handleClick: withStopPropagation(() => onEdit(stat)),
+         color: "neutral.700",
+      },
+      {
+         label: getDeleteLabel(status),
+         icon: <Trash2 size={16} />,
+         handleClick: withStopPropagation(() => onDelete(stat)),
+         color: "error.main",
+      },
+   ]
 
    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
       event.stopPropagation()
@@ -35,12 +56,6 @@ export const OfflineEventActionsMenu = ({ stat, onEdit, onDelete }: Props) => {
       setAnchorEl(null)
    }
 
-   const handleAction = (action: () => void) => (event: React.MouseEvent) => {
-      event.stopPropagation()
-      action()
-      handleClose()
-   }
-
    return (
       <>
          <BrandedTooltip title="More actions" placement="bottom">
@@ -49,32 +64,35 @@ export const OfflineEventActionsMenu = ({ stat, onEdit, onDelete }: Props) => {
             </IconButton>
          </BrandedTooltip>
 
-         <BrandedMenu
-            anchorEl={anchorEl}
+         <DesktopMenu
+            options={menuOptions}
             open={open}
-            onClose={handleClose}
-            disablePortal
-            anchorOrigin={{
-               vertical: "bottom",
-               horizontal: "right",
-            }}
-            transformOrigin={{
-               vertical: "top",
-               horizontal: "right",
-            }}
-            disableAutoFocusItem
-            disableEnforceFocus
-            disableRestoreFocus
-         >
-            <MenuItem onClick={handleAction(() => onEdit(stat))}>Edit</MenuItem>
-
-            <MenuItem
-               onClick={handleAction(() => onDelete(stat))}
-               sx={{ color: "error.main" }}
-            >
-               Delete
-            </MenuItem>
-         </BrandedMenu>
+            anchorEl={anchorEl}
+            onClose={withStopPropagation(handleClose)}
+            placement="bottom"
+         />
       </>
    )
+}
+
+const getEditLabel = (eventStatus: OfflineEventStatus) => {
+   switch (eventStatus) {
+      case OfflineEventStatus.UPCOMING:
+         return "Edit upcoming event"
+      case OfflineEventStatus.PAST:
+         return "Edit past offline event"
+      default:
+         return "Edit draft"
+   }
+}
+
+const getDeleteLabel = (eventStatus: OfflineEventStatus) => {
+   switch (eventStatus) {
+      case OfflineEventStatus.UPCOMING:
+         return "Delete upcoming event"
+      case OfflineEventStatus.PAST:
+         return "Delete past offline event"
+      default:
+         return "Delete draft"
+   }
 }

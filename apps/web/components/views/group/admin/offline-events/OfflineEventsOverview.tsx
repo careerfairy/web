@@ -40,7 +40,7 @@ const OfflineEventsOverviewContent = () => {
    return (
       <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
          <Stack
-            direction={isMobile ? "row" : "row"}
+            direction={isMobile ? "column" : "row"}
             justifyContent="space-between"
             alignItems="center"
             spacing={1}
@@ -58,6 +58,7 @@ const OfflineEventsOverviewContent = () => {
                   p: 1.5,
                   background: (theme) => theme.brand.white[100],
                   height: "48px",
+                  width: isMobile ? "100%" : "auto",
                   alignItems: "center",
                   display: "flex",
                }}

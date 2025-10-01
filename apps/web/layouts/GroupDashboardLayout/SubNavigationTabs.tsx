@@ -154,6 +154,7 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
                indicatorColor="secondary"
                value={activeTab?.pathname || false}
                onChange={handleTabChange}
+               variant="scrollable"
             >
                {currentSection?.childLinks?.map((tab) => {
                   return (

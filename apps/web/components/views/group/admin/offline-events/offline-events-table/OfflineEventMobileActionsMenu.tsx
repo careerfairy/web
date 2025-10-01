@@ -9,6 +9,8 @@ import { BarChart2, Edit2, Trash2 } from "react-feather"
 import { useOfflineEventsOverview } from "../context/OfflineEventsOverviewContext"
 import { OfflineEventStatus, getOfflineEventStatus } from "./utils"
 
+const HIDE_ANALYTICS_ON_MOBILE = true
+
 type Props = {
    stat: OfflineEventsWithStats | null
    open: boolean
@@ -46,7 +48,7 @@ export const OfflineEventMobileActionsMenu = ({
       }
 
       // Analytics action - only for published events
-      if (isPublished) {
+      if (isPublished && !HIDE_ANALYTICS_ON_MOBILE) {
          options.push({
             label: "Analytics",
             icon: <BarChart2 />,
@@ -102,11 +104,11 @@ export const OfflineEventMobileActionsMenu = ({
 const getEditLabel = (eventStatus: OfflineEventStatus | null) => {
    switch (eventStatus) {
       case OfflineEventStatus.DRAFT:
-         return "Edit draft"
+         return "Edit draft event"
       case OfflineEventStatus.UPCOMING:
-         return "Edit offline event"
+         return "Edit upcoming event"
       case OfflineEventStatus.PAST:
-         return "Edit offline event"
+         return "Edit past event"
       default:
          return "Edit offline event"
    }
@@ -115,11 +117,11 @@ const getEditLabel = (eventStatus: OfflineEventStatus | null) => {
 const getDeleteLabel = (eventStatus: OfflineEventStatus | null) => {
    switch (eventStatus) {
       case OfflineEventStatus.DRAFT:
-         return "Delete draft"
+         return "Delete draft event"
       case OfflineEventStatus.UPCOMING:
-         return "Delete offline event"
+         return "Delete upcoming event"
       case OfflineEventStatus.PAST:
-         return "Delete offline event"
+         return "Delete past event"
       default:
          return "Delete offline event"
    }

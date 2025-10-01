@@ -78,8 +78,10 @@ export const DeleteOfflineEventDialog = ({
       <ConfirmationDialog
          open={open}
          handleClose={onClose}
-         title={`Delete this ${eventType}?`}
-         description={`This action is permanent. You will no longer be able to recover this ${eventType}`}
+         title={"Delete this event?"}
+         description={
+            "This action is permanent. You will no longer be able to recover this event"
+         }
          icon={<Box component={DeleteIcon} color="error.main" />}
          hideCloseIcon
          mobileButtonsHorizontal

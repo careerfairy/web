@@ -106,7 +106,7 @@ export const DesktopOfflineEventsView = ({
                         active={isActiveSort("views")}
                         direction={getSortDirection("views")}
                         onSort={() => handleTableSort("views")}
-                        tooltip="The number of people who viewed your offline event."
+                        tooltip="The number of views your offline event got."
                         width={COLUMN_WIDTHS.views}
                      >
                         Views
@@ -115,7 +115,7 @@ export const DesktopOfflineEventsView = ({
                         active={isActiveSort("clicks")}
                         direction={getSortDirection("clicks")}
                         onSort={() => handleTableSort("clicks")}
-                        tooltip="The number of people who clicked on your offline event."
+                        tooltip="The number of clicks your offline event got."
                         width={COLUMN_WIDTHS.clicks}
                      >
                         Clicks

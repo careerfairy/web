@@ -1,7 +1,7 @@
 import { Box, styled, TableCell, TableRow, Typography } from "@mui/material"
 import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import PointerClickIcon from "components/views/common/icons/PointerClickIcon"
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import { Calendar, Eye } from "react-feather"
 import { useSelector } from "react-redux"
 import { sxStyles } from "types/commonTypes"
@@ -117,11 +117,6 @@ export const OfflineEventTableRow = ({
          ? "Draft"
          : "Past"
 
-   const showHoverActions = useMemo(
-      () => isHovered && stat.offlineEvent.published,
-      [isHovered, stat.offlineEvent.published]
-   )
-
    return (
       <TableRow
          key={statKey}
@@ -137,7 +132,7 @@ export const OfflineEventTableRow = ({
             <CentredBox>
                <OfflineEventCardPreview
                   stat={stat}
-                  showHoverActions={showHoverActions}
+                  showHoverActions={isHovered}
                   status={status}
                   onShareOfflineEvent={() => onShareOfflineEvent(stat)}
                   onAnalytics={() => onAnalytics(stat)}
