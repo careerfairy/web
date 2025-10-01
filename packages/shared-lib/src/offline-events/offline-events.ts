@@ -62,13 +62,10 @@ export enum OfflineEventStatsAction {
 }
 
 type StatsData = {
-   totalClicks: number
-   totalViews: number
-}
-
-export type OfflineEventStatsMap = {
-   totalTalentReached: number
-   // TODO: Add other stats here
+   totalNumberOfRegisterClicks: number
+   totalNumberOfTalentReached: number
+   uniqueNumberOfTalentReached: number
+   totalNumberOfUniqueRegisterClicks: number
 }
 
 // collection path /offlineEventStats/{offlineEventId}
@@ -77,13 +74,13 @@ export interface OfflineEventStats extends Identifiable {
    offlineEvent: OfflineEvent
    generalStats: StatsData
    universityStats: {
-      [universityCode: string]: OfflineEventStatsMap
+      [universityCode: string]: StatsData
    }
    countryStats: {
-      [countryCode: string]: OfflineEventStatsMap
+      [countryCode: string]: StatsData
    }
    fieldOfStudyStats: {
-      [fieldOfStudyId: string]: OfflineEventStatsMap
+      [fieldOfStudyId: string]: StatsData
    }
    updatedAt: Timestamp
 }
