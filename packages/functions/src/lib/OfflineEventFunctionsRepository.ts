@@ -8,7 +8,7 @@ import {
    OfflineEventStatsAction,
    OfflineEventUserStats,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { UserPublicData } from "@careerfairy/shared-lib/users"
+import { UserData, UserPublicData } from "@careerfairy/shared-lib/users"
 import {
    FieldValue,
    Firestore,
@@ -71,7 +71,7 @@ export class OfflineEventFunctionsRepository
 
    async trackOfflineEventAction(
       offlineEventId: string,
-      user: UserPublicData,
+      user: UserData,
       utm: UTMParams | null,
       actionType: OfflineEventStatsAction
    ): Promise<void> {

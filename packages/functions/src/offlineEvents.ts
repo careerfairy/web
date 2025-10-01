@@ -4,7 +4,6 @@ import {
    OfflineEventStats,
    OfflineEventStatsAction,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import { Timestamp } from "firebase-admin/firestore"
 import { onDocumentCreated } from "firebase-functions/v2/firestore"
 import { CallableRequest, onCall } from "firebase-functions/v2/https"
@@ -43,13 +42,10 @@ export const trackOfflineEventAction = onCall(
          try {
             const { offlineEventId, actionType, utm, userData } = request.data
 
-            // Convert to public user data
-            const userPublicData = pickPublicDataFromUser(userData)
-
             // Track the action based on type
             await offlineEventRepo.trackOfflineEventAction(
                offlineEventId,
-               userPublicData,
+               userData,
                utm || null,
                actionType
             )

@@ -3,7 +3,6 @@ import {
    OfflineEvent,
    OfflineEventStatsAction,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import { makeOfflineEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import {
    Box,
@@ -305,7 +304,6 @@ const Content = ({
    useEffect(() => {
       if (event && userData && !hasTrackedView.current) {
          hasTrackedView.current = true
-         const userPublicData = pickPublicDataFromUser(userData)
          const utm = CookiesUtil.getUTMParams()
 
          offlineEventService
@@ -319,7 +317,7 @@ const Content = ({
                errorLogAndNotify(error, {
                   description: "Failed to track offline event view",
                   offlineEventId: event.id,
-                  userPublicData,
+                  userData,
                   utm,
                })
             })
@@ -328,7 +326,6 @@ const Content = ({
 
    const handleRegisterClick = useCallback(() => {
       if (userData && event) {
-         const userPublicData = pickPublicDataFromUser(userData)
          const utm = CookiesUtil.getUTMParams()
 
          offlineEventService
@@ -342,7 +339,7 @@ const Content = ({
                errorLogAndNotify(error, {
                   description: "Failed to track offline event click",
                   offlineEventId: event.id,
-                  userPublicData,
+                  userData,
                   utm,
                })
             })
