@@ -223,6 +223,79 @@ export const notifySparksTrialStarted = (
    })
 }
 
+/**
+ * Sends a Slack notification when an offline event is published.
+ *
+ * @returns Promise that resolves when the notification is sent
+ */
+export const notifyOfflineEventPublished = (
+   webhookUrl: string,
+   params: {
+      companyName: string
+      eventTitle: string
+      eventId: string
+      eventDate: Date
+      groupId: string
+      remainingCredits: number
+   }
+) => {
+   const eventLink = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events?eventId=${params.eventId}`
+   const adminLink = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
+
+   const body: Record<string, string> = {
+      "Company Name": params.companyName,
+      "Event Date": formatEventStartDate(params.eventDate),
+      "Remaining Credits": params.remainingCredits.toString(),
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `Offline Event Published:\n*<${eventLink}|${params.eventTitle}>*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+            accessory: {
+               type: "image",
+               image_url:
+                  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Fcalendar.png?alt=media&token=f86c0885-7def-435e-b1d3-5dce3f75c1f6",
+               alt_text: "Offline Event Published",
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Event Details",
+                  },
+                  url: eventLink,
+               },
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Admin Events Page",
+                  },
+                  url: adminLink,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
 function formatEventStartDate(date) {
    const luxonDate = DateTime.fromJSDate(date)
    return luxonDate.toLocaleString(DateTime.DATETIME_FULL)
