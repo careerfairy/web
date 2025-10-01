@@ -70,7 +70,7 @@ export const OfflineEventHoverActionIcons = ({
          animate="visible"
          sx={styles.motionContainer}
       >
-         {Boolean(onEdit) && (
+         {Boolean(onEdit) && !isPublished ? (
             <BrandedTooltip title="Edit" placement="top" disableInteractive>
                <IconButton
                   data-testid="hover-action-edit"
@@ -80,7 +80,7 @@ export const OfflineEventHoverActionIcons = ({
                   <Edit2 />
                </IconButton>
             </BrandedTooltip>
-         )}
+         ) : null}
          {/* Share button - only show for published events */}
          {isPublished && onShareOfflineEvent ? (
             <BrandedTooltip

@@ -1,7 +1,7 @@
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
 import {
    OfflineEvent,
-   OfflineEventStats
+   OfflineEventStats,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { reducedRemoteCallsOptions } from "components/custom-hook/utils/useFunctionsSWRFetcher"
 import {
@@ -122,8 +122,10 @@ export const useGroupOfflineEventsWithStats = (
                offlineEventsWithStats.push({
                   offlineEvent: offlineEventData,
                   stats: {
-                     totalClicks: statsData.generalStats.totalNumberOfRegisterClicks,
-                     totalViews: statsData.generalStats.totalNumberOfTalentReached,
+                     totalClicks:
+                        statsData.generalStats.totalNumberOfRegisterClicks,
+                     totalViews:
+                        statsData.generalStats.totalNumberOfTalentReached,
                   },
                   updatedAt: statsData.updatedAt,
                })
@@ -239,14 +241,11 @@ const filterStatsByStatus = (
    events: OfflineEventsWithStats[],
    statusFilter: OfflineEventStatus[]
 ): OfflineEventsWithStats[] => {
-   console.log("🚀 ~ filterStatsByStatus ~ statusFilter:", statusFilter)
    if (statusFilter.length === 0) return events
 
-   return events.filter((event) => {
-      const status = getOfflineEventStatus(event.offlineEvent)
-      console.log("🚀 ~ filterStatsByStatus ~ status:", status)
-      return statusFilter.includes(status)
-   })
+   return events.filter((event) =>
+      statusFilter.includes(getOfflineEventStatus(event.offlineEvent))
+   )
 }
 
 /**

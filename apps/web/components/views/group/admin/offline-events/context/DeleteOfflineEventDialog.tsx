@@ -7,13 +7,8 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback } from "react"
 import { Trash2 as DeleteIcon } from "react-feather"
 import { useSWRConfig } from "swr"
-import { capitalizeFirstLetter } from "util/CommonUtil"
 import ConfirmationDialog from "../../../../../../materialUI/GlobalModals/ConfirmationDialog"
 import { useDeleteOfflineEvent } from "../../../../../custom-hook/offline-event/useDeleteOfflineEvent"
-import {
-   getEventTypeName,
-   getOfflineEventStatus,
-} from "../offline-events-table/utils"
 
 type Props = {
    open: boolean
@@ -36,9 +31,6 @@ export const DeleteOfflineEventDialog = ({
          groupId: group?.id,
       })
 
-   const eventStatus = offlineEvent ? getOfflineEventStatus(offlineEvent) : null
-   const eventType = getEventTypeName(eventStatus)
-
    const handleConfirm = useCallback(async () => {
       if (!offlineEvent) return
 
@@ -48,20 +40,11 @@ export const DeleteOfflineEventDialog = ({
          mutate(getGroupOfflineEventsWithStatsKey(group?.id))
 
          onClose()
-         successNotification(
-            `${capitalizeFirstLetter(eventType)} deleted successfully`
-         )
+         successNotification("Event deleted successfully")
       } catch (error) {
-         errorNotification(
-            error,
-            `Unable to delete ${capitalizeFirstLetter(
-               eventType
-            )}. Please try again.`,
-            {
-               collection: "offlineEvents",
-               eventId: offlineEvent?.id,
-            }
-         )
+         errorNotification(error, "Unable to delete. Please try again.", {
+            offlineEventId: offlineEvent?.id,
+         })
       }
    }, [
       offlineEvent,
@@ -70,7 +53,6 @@ export const DeleteOfflineEventDialog = ({
       group?.id,
       onClose,
       successNotification,
-      eventType,
       errorNotification,
    ])
 

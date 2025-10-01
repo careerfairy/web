@@ -175,7 +175,7 @@ export const OfflineEventTableRow = ({
                >
                   <Box component={Eye} size={16} />
                   <Typography variant="small">
-                     {stat.stats?.totalViews ?? 0}
+                     {stat.stats?.totalViews > 0 ? stat.stats?.totalViews : "-"}
                   </Typography>
                </TableHighlighter>
             </CentredBox>
@@ -196,7 +196,9 @@ export const OfflineEventTableRow = ({
                >
                   <Box component={PointerClickIcon} color={"white"} />
                   <Typography variant="small">
-                     {stat.stats?.totalClicks ?? 0}
+                     {stat.stats?.totalClicks > 0
+                        ? stat.stats?.totalClicks
+                        : "-"}
                   </Typography>
                </TableHighlighter>
             </CentredBox>
