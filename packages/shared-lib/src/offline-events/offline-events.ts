@@ -4,7 +4,7 @@ import { GeoPoint, Timestamp } from "../firebaseTypes"
 import { GroupOption, PublicGroup } from "../groups"
 import { AuthorInfo } from "../livestreams"
 import { University } from "../universities"
-import { UserPublicData } from "../users"
+import { UserData } from "../users"
 
 export type UniversityOption = University & {
    country: string
@@ -88,7 +88,7 @@ export interface OfflineEventStats extends Identifiable {
 // collection path /offlineEvent/{offlineEventId}/offlineEventUserStats/{userAuthId}
 export interface OfflineEventUserStats extends Identifiable {
    documentType: "offlineEventUserStats" // simplify groupCollection Queries
-   user: UserPublicData // Or more data if needed
+   user: UserData // Or more data if needed
    offlineEvent: OfflineEvent // Probably not needed as the base document contains all the data
    // Timestamp with UTM data for when the user last saw the event
    lastSeenAt: {
@@ -106,7 +106,7 @@ export interface OfflineEventUserStats extends Identifiable {
 // collection path /offlineEvent/{offlineEventId}/offlineEventUserStats/{userAuthId}/offlineEventActions/{actionId}
 export interface OfflineEventAction extends Identifiable {
    documentType: "offlineEventAction" // simplify groupCollection Queries
-   user: UserPublicData
+   user: UserData
    offlineEventId: string
    type: OfflineEventStatsAction
    utm: UTMParams | null
