@@ -106,6 +106,8 @@ const OfflineEventFormDialog = ({
    isOpen,
    handleClose,
 }: OfflineEventFormDialogProps) => {
+   const isMobile = useIsMobile()
+
    return (
       <CustomResponsiveDialog
          open={isOpen}
@@ -119,6 +121,7 @@ const OfflineEventFormDialog = ({
             <OfflineEventFormPreviewContent
                isInDialog={true}
                handleCloseDialog={handleClose}
+               detailsDirection={isMobile ? "column" : "row"}
             />
          </DialogContent>
       </CustomResponsiveDialog>
