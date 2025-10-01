@@ -1,6 +1,7 @@
 import { Box, Button, Stack, Typography } from "@mui/material"
 import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import useClientSideInfiniteScroll from "components/custom-hook/utils/useClientSideInfiniteScroll"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { Fragment, useEffect, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { useOfflineEventsOverview } from "../context/OfflineEventsOverviewContext"
@@ -41,6 +42,8 @@ export const MobileOfflineEventsView = ({
       data: stats,
       itemsPerPage: ITEMS_PER_PAGE,
    })
+   const { groupPresenter } = useGroup()
+   const canCreateOfflineEvent = groupPresenter?.canCreateOfflineEvents()
 
    const [selectedStat, setSelectedStat] =
       useState<OfflineEventsWithStats | null>(null)
@@ -81,12 +84,14 @@ export const MobileOfflineEventsView = ({
                </Typography>
                <Typography variant="brandedBody" textAlign="center" mb={1.5}>
                   This is where all your offline events will appear. Start by
-                  creating one
+                  creating one or contact our sales department to upgrade your
+                  plan.
                </Typography>
                <Button
                   variant="contained"
                   color="secondary"
                   onClick={onCreateOfflineEvent}
+                  disabled={!canCreateOfflineEvent}
                >
                   Create offline event
                </Button>

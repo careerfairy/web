@@ -12,6 +12,7 @@ import {
 } from "@mui/material"
 import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import useClientSidePagination from "components/custom-hook/utils/useClientSidePagination"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useEffect, useRef } from "react"
 import { useDispatch } from "react-redux"
 import {
@@ -54,6 +55,8 @@ export const DesktopOfflineEventsView = ({
       setOnPaginationReset,
    } = useOfflineEventsOverview()
 
+   const { groupPresenter } = useGroup()
+   const canCreateOfflineEvent = groupPresenter?.canCreateOfflineEvents()
    // Reset filters when component unmounts
    useEffect(() => {
       return () => {
@@ -88,7 +91,6 @@ export const DesktopOfflineEventsView = ({
                         active={isActiveSort("title")}
                         direction={getSortDirection("title")}
                         onSort={() => handleTableSort("title")}
-                        // minWidth={COLUMN_WIDTHS.title}
                      >
                         Event name
                      </SortableHeaderCell>
@@ -97,7 +99,6 @@ export const DesktopOfflineEventsView = ({
                         direction={getSortDirection("date")}
                         onSort={() => handleTableSort("date")}
                         tooltip="The date when your offline event is scheduled to occur or has already taken place."
-                        // minWidth={COLUMN_WIDTHS.date}
                         width={COLUMN_WIDTHS.date}
                      >
                         Date
@@ -170,11 +171,13 @@ export const DesktopOfflineEventsView = ({
                                  mb={1.5}
                               >
                                  This is where all your offline events will
-                                 appear. Start by creating one
+                                 appear. Start by creating one or contact our
+                                 sales department to upgrade your plan.
                               </Typography>
                               <Button
                                  variant="contained"
                                  color="secondary"
+                                 disabled={!canCreateOfflineEvent}
                                  onClick={onCreateOfflineEvent}
                               >
                                  Create offline event
