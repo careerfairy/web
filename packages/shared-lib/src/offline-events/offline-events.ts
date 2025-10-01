@@ -109,7 +109,7 @@ export interface OfflineEventUserStats extends Identifiable {
 // collection path /offlineEvent/{offlineEventId}/offlineEventUserStats/{userAuthId}/offlineEventActions/{actionId}
 export interface OfflineEventAction extends Identifiable {
    documentType: "offlineEventAction" // simplify groupCollection Queries
-   userAuthId: string
+   user: UserPublicData
    offlineEventId: string
    type: OfflineEventStatsAction
    utm: UTMParams | null
