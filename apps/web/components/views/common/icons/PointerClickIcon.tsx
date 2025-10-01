@@ -8,7 +8,7 @@ const PointerClickIcon = (props: SvgIconProps) => {
          viewBox="0 0 16 16"
          sx={{
             "& path": {
-               strokeWidth: 1.2,
+               strokeWidth: 1,
             },
          }}
          {...props}
