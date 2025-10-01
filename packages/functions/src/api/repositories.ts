@@ -45,10 +45,6 @@ import {
    CustomJobFunctionsRepository,
    ICustomJobFunctionsRepository,
 } from "../lib/CustomJobFunctionsRepository"
-import {
-   IOfflineEventFunctionsRepository,
-   OfflineEventFunctionsRepository,
-} from "../lib/OfflineEventFunctionsRepository"
 import { groupEventsHandler } from "../lib/bigQuery/group/GroupBigQueryServices"
 import {
    sparkEventsHandler,
@@ -59,6 +55,10 @@ import {
    INotificationService,
    NotificationService,
 } from "../lib/notifications/NotificationService"
+import {
+   IOfflineEventFunctionsRepository,
+   OfflineEventFunctionsRepository,
+} from "../lib/offline-events/OfflineEventFunctionsRepository"
 import RecordingAnalyticsRepository from "../lib/recordings/analytics/RecordingAnalyticsRepository"
 import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
