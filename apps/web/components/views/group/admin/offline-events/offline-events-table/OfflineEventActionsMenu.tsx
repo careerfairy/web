@@ -3,8 +3,19 @@ import { OfflineEventsWithStats } from "components/custom-hook/offline-event/use
 import { DesktopMenu } from "components/views/common/inputs/BrandedResponsiveMenu"
 import { useState } from "react"
 import { Edit2, MoreVertical, Trash2 } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 import { withStopPropagation } from "util/CommonUtil"
 import { OfflineEventStatus } from "./utils"
+
+const styles = sxStyles({
+   iconButton: {
+      p: 0.75,
+      color: "neutral.700",
+      "&:hover": {
+         backgroundColor: "neutral.100",
+      },
+   },
+})
 
 type Props = {
    stat: OfflineEventsWithStats
@@ -57,7 +68,7 @@ export const OfflineEventActionsMenu = ({
 
    return (
       <>
-         <IconButton size="small" onClick={handleClick} sx={{ p: 1 }}>
+         <IconButton size="small" onClick={handleClick} sx={styles.iconButton}>
             <MoreVertical size={16} />
          </IconButton>
 

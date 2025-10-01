@@ -12,7 +12,7 @@ import { TableHighlighter } from "../../events/events-table-new/TableHighlighter
 import { OfflineEventCardPreview } from "./OfflineEventCardPreview"
 import { OfflineEventStatusBadge } from "./OfflineEventStatusBadge"
 import { OfflineEventTableRowActions } from "./OfflineEventTableRowActions"
-import { getOfflineEventStatus, OfflineEventStatus } from "./utils"
+import { getOfflineEventStatus } from "./utils"
 
 const styles = sxStyles({
    bodyRow: {
@@ -110,13 +110,6 @@ export const OfflineEventTableRow = ({
       ? DateUtil.formatEventDate(stat.offlineEvent.startAt.toDate())
       : "No date"
 
-   const statusTitle =
-      status === OfflineEventStatus.UPCOMING
-         ? "Upcoming"
-         : status === OfflineEventStatus.DRAFT
-         ? "Draft"
-         : "Past"
-
    return (
       <TableRow
          key={statKey}
@@ -207,17 +200,8 @@ export const OfflineEventTableRow = ({
          {/* Status Column */}
          <TableCell sx={styles.bodyCell}>
             <CentredBox gap={0.5}>
-               <Box>
-                  <TableHighlighter
-                     title={statusTitle}
-                     direction="row"
-                     alignItems="center"
-                     spacing={1}
-                     color="neutral.600"
-                     cursor="default"
-                  >
-                     <OfflineEventStatusBadge status={status} />
-                  </TableHighlighter>
+               <Box p={1}>
+                  <OfflineEventStatusBadge status={status} />
                </Box>
                <OfflineEventTableRowActions
                   stat={stat}

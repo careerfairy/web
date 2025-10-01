@@ -1,5 +1,6 @@
 import { Box, Theme } from "@mui/material"
 import TimeHistory from "components/views/common/icons/TimeHistory"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { CheckCircle, File } from "react-feather"
 import { OfflineEventStatus } from "./utils"
 
@@ -27,7 +28,20 @@ export const OfflineEventStatusBadge = ({ status }: Props) => {
       return null
    }
 
-   return (
+   const getTooltipTitle = () => {
+      switch (status) {
+         case OfflineEventStatus.UPCOMING:
+            return "Upcoming"
+         case OfflineEventStatus.DRAFT:
+            return "Draft"
+         case OfflineEventStatus.PAST:
+            return "Past"
+         default:
+            return "Unknown"
+      }
+   }
+
+   const icon = (
       <Box
          component={STATUS_ICONS[status].icon}
          size={20}
@@ -35,5 +49,16 @@ export const OfflineEventStatusBadge = ({ status }: Props) => {
          height={20}
          color={STATUS_ICONS[status].color}
       />
+   )
+
+   return (
+      <BrandedTooltip
+         title={getTooltipTitle()}
+         placement="top"
+         offset={[0, -5]}
+         disableInteractive
+      >
+         {icon}
+      </BrandedTooltip>
    )
 }
