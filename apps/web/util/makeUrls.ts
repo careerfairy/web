@@ -62,7 +62,9 @@ export const makeOfflineEventDetailsShareUrl = (
    offlineEventId: string,
    options?: OfflineEventShareURLOptions
 ) => {
-   const url = new URL(`${getBaseUrl()}/offline-events/${offlineEventId}`)
+   const url = new URL(
+      `${getBaseUrl()}/portal/offline-events/${offlineEventId}`
+   )
    if (options?.utm_source)
       url.searchParams.set("utm_source", options.utm_source)
    if (options?.utm_campaign)
