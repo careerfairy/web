@@ -13,7 +13,7 @@ const STATUS_ICONS = {
    },
    [OfflineEventStatus.PAST]: {
       icon: Clock,
-      color: (theme: Theme) => theme.brand.info[600],
+      color: (theme: Theme) => theme.palette.text.secondary,
    },
 }
 
