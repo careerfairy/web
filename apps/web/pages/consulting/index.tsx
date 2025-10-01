@@ -14,9 +14,9 @@ import { NotForYouSection } from "components/views/panels/page"
 import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
-import { GetServerSideProps } from "next"
+import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import { deserializeGroupClient, mapFromServerSide } from "util/serverUtil"
 
@@ -57,6 +57,15 @@ export default function ConsultingPage({
    const companies = serverSideCompanies.map((company) =>
       deserializeGroupClient(company)
    )
+
+   const shuffledSpeakers = useMemo(() => {
+      return (
+         deserializedPanelEvents
+            .flatMap((panel) => panel.speakers || [])
+            // .sort(() => Math.random() - 0.5) // Randomize order
+            .slice(0, 6)
+      ) // Limit to 6 speakers
+   }, [deserializedPanelEvents])
 
    const { authenticatedUser } = useAuth()
    const { push, query, pathname } = useRouter()
@@ -129,18 +138,12 @@ export default function ConsultingPage({
             <Stack sx={styles.pageContainer}>
                <HeroSectionConsulting
                   panelEvents={deserializedPanelEvents}
-                  companies={companies}
                   handleOpenLivestreamDialog={handleOpenPanelDialog}
                />
                <WhosThisForSectionConsulting />
                <ParticipatingCompaniesSectionConsulting companies={companies} />
                <SpeakersSectionConsulting
-                  speakers={
-                     deserializedPanelEvents
-                        .flatMap((panel) => panel.speakers || [])
-                        .sort(() => Math.random() - 0.5) // Randomize order
-                        .slice(0, 6) // Limit to 6 speakers
-                  }
+                  speakers={shuffledSpeakers}
                   companies={companies}
                />
                <RecordingsSectionConsulting
@@ -170,22 +173,21 @@ export default function ConsultingPage({
    )
 }
 
-export const getServerSideProps: GetServerSideProps<
-   ConsultingPageProps
-> = async () => {
+export const getStaticProps: GetStaticProps<ConsultingPageProps> = async () => {
    try {
       // Fetch all data in parallel
-      const [recentLivestreams, allUpcomingEvents, pastEvents] =
-         await Promise.all([
-            livestreamRepo.getUpcomingEvents(10),
-            // Fetch upcoming events and filter by consulting industry
-            livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
-            // Fetch past events for consulting recordings
-            livestreamRepo.getPastEventsFrom({
-               fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
-               limit: 50, // Get more to ensure we have enough after filtering
-            }),
-         ])
+      const [allUpcomingEvents, pastEvents] = await Promise.all([
+         // Fetch upcoming events (will be used for both consulting events and recent livestreams)
+         livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
+         // Fetch past events for consulting recordings
+         livestreamRepo.getPastEventsFrom({
+            fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
+            limit: 50, // Get more to ensure we have enough after filtering
+         }),
+      ])
+
+      // Use first 10 for recent livestreams (for "Not interested in consulting?" section)
+      const recentLivestreams = allUpcomingEvents?.slice(0, 10) || []
 
       // Filter upcoming events by ManagementConsulting industry and limit to 6
       const consultingLivestreams =
@@ -276,6 +278,7 @@ export const getServerSideProps: GetServerSideProps<
             serverSideRecentLivestreams: serializedRecentLivestreams,
             serverSideConsultingRecordings: serializedConsultingRecordings,
          },
+         revalidate: 300, // Revalidate every 5 minutes
       }
    } catch (error) {
       console.error("Error fetching consulting page data:", error)
@@ -287,6 +290,7 @@ export const getServerSideProps: GetServerSideProps<
             serverSideRecentLivestreams: [],
             serverSideConsultingRecordings: [],
          },
+         revalidate: 300, // Revalidate every 5 minutes
       }
    }
 }

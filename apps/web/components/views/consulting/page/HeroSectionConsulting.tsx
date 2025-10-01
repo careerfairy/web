@@ -1,6 +1,16 @@
-import { Group } from "@careerfairy/shared-lib/groups"
-import { ImpressionLocation, LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Box, Chip, Grid, Stack, Typography, useMediaQuery, useTheme } from "@mui/material"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
+import {
+   Box,
+   Chip,
+   Grid,
+   Stack,
+   Typography,
+   useMediaQuery,
+   useTheme,
+} from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Image from "next/image"
@@ -76,6 +86,20 @@ const styles = sxStyles({
       zIndex: 1,
       flexWrap: "wrap",
    },
+   tagChip: {
+      backgroundColor: "rgba(136, 136, 136, 0.22)",
+      color: "neutral.700",
+      fontWeight: 400,
+      fontSize: "14px",
+      lineHeight: "20px",
+      px: "16px",
+      py: "4px",
+      height: "auto",
+      "& .MuiChip-label": {
+         px: 0,
+         py: 0,
+      },
+   },
    livestreamsGrid: {
       gap: 2,
       alignItems: "stretch",
@@ -93,13 +117,11 @@ const styles = sxStyles({
 
 interface HeroSectionConsultingProps {
    panelEvents: LivestreamEvent[] // These are now consulting livestreams, not panels
-   companies: Group[]
    handleOpenLivestreamDialog: (livestreamId: string) => void
 }
 
 export default function HeroSectionConsulting({
    panelEvents,
-   companies,
    handleOpenLivestreamDialog,
 }: HeroSectionConsultingProps) {
    const theme = useTheme()
@@ -114,11 +136,11 @@ export default function HeroSectionConsulting({
 
    // Determine grid layout based on number of events
    const shouldUse1x3Layout = panelEvents.length === 4
-   const displayedEvents = shouldUse1x3Layout 
-      ? panelEvents.slice(0, 3) 
-      : isMobile 
-         ? panelEvents.slice(0, 3) // Always max 3 cards on mobile
-         : panelEvents
+   const displayedEvents = shouldUse1x3Layout
+      ? panelEvents.slice(0, 3)
+      : isMobile
+      ? panelEvents.slice(0, 3) // Always max 3 cards on mobile
+      : panelEvents
 
    // Compute how much the livestreams extend below the hero and update spacing
    const computeOverlap = useMemo(
@@ -206,98 +228,55 @@ export default function HeroSectionConsulting({
             {/* Right column - Subtitle and Tags */}
             <Stack sx={styles.rightColumn}>
                <Typography variant="medium" sx={styles.brandTagline}>
-                  Join live sessions with Europe's top consulting firms packed with career tips and real stories from young consultants.
+                  Join live sessions with Europe&apos;s top consulting firms
+                  packed with career tips and real stories from young
+                  consultants.
                </Typography>
-               
+
                <Stack sx={styles.tagChips}>
                   <Chip
                      label="Talk to real consultants"
                      size="small"
-                     sx={{
-                        backgroundColor: "rgba(136, 136, 136, 0.22)",
-                        color: "neutral.700",
-                        fontWeight: 400,
-                        fontSize: "14px",
-                        lineHeight: "20px",
-                        px: "16px",
-                        py: "4px",
-                        height: "auto",
-                        "& .MuiChip-label": {
-                           px: 0,
-                           py: 0,
-                        },
-                     }}
+                     sx={styles.tagChip}
                   />
                   <Chip
                      label="Cases, tips & more"
                      size="small"
-                     sx={{
-                        backgroundColor: "rgba(136, 136, 136, 0.22)",
-                        color: "neutral.700",
-                        fontWeight: 400,
-                        fontSize: "14px",
-                        lineHeight: "20px",
-                        px: "16px",
-                        py: "4px",
-                        height: "auto",
-                        "& .MuiChip-label": {
-                           px: 0,
-                           py: 0,
-                        },
-                     }}
+                     sx={styles.tagChip}
                   />
                   <Chip
                      label="Live interaction"
                      size="small"
-                     sx={{
-                        backgroundColor: "rgba(136, 136, 136, 0.22)",
-                        color: "neutral.700",
-                        fontWeight: 400,
-                        fontSize: "14px",
-                        lineHeight: "20px",
-                        px: "16px",
-                        py: "4px",
-                        height: "auto",
-                        "& .MuiChip-label": {
-                           px: 0,
-                           py: 0,
-                        },
-                     }}
+                     sx={styles.tagChip}
                   />
                </Stack>
             </Stack>
          </Stack>
 
          <Box ref={livestreamsRef} sx={styles.livestreamsGrid}>
-            <Grid 
-               container 
-               spacing={2}
-               sx={{ justifyContent: "center" }}
-            >
-               {displayedEvents.map((livestream: LivestreamEvent, index: number) => {
-                  // For 1x3 layout (when we have exactly 4 events), use 12/3 = 4 columns each
-                  // For 2x3 layout (all other cases), use 12/3 = 4 columns each on medium screens, 12 on mobile
-                  const gridSize = shouldUse1x3Layout 
-                     ? { xs: 12, sm: 6, md: 4 } 
-                     : { xs: 12, sm: 6, md: 4 }
-                  
-                  return (
+            <Grid container spacing={2} sx={{ justifyContent: "center" }}>
+               {displayedEvents.map(
+                  (livestream: LivestreamEvent, index: number) => (
                      <Grid
                         key={livestream.id}
                         item
-                        {...gridSize}
+                        xs={12}
+                        sm={6}
+                        md={4}
                         sx={styles.gridItem}
                      >
                         <EventPreviewCard
                            event={livestream}
                            location={ImpressionLocation.panelsOverviewPage}
-                           onCardClick={() => handleOpenLivestreamDialog(livestream.id)}
+                           onCardClick={() =>
+                              handleOpenLivestreamDialog(livestream.id)
+                           }
                            index={index}
                            totalElements={displayedEvents.length}
                         />
                      </Grid>
                   )
-               })}
+               )}
             </Grid>
          </Box>
       </Stack>
