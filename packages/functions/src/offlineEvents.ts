@@ -79,59 +79,61 @@ export const trackOfflineEventView = onCall(
  * - Updates OfflineEventStats to increment totalNumberOfRegisterClicks and totalNumberOfUniqueRegisterClicks if first click
  */
 export const trackOfflineEventClick = onCall(
-   withMiddlewares([userAuthExistsMiddleware()], async (request) => {
-      try {
-         if (!request.auth) {
+   withMiddlewares(
+      [userAuthExistsMiddleware()],
+      async (request: CallableRequest<TrackOfflineEventClickRequest>) => {
+         try {
+            if (!request.auth) {
+               throw new functions.https.HttpsError(
+                  "unauthenticated",
+                  "User must be authenticated"
+               )
+            }
+
+            const { offlineEventId } = request.data
+
+            if (!offlineEventId) {
+               throw new functions.https.HttpsError(
+                  "invalid-argument",
+                  "offlineEventId is required"
+               )
+            }
+
+            // Get user data
+            const userData = await userRepo.getUserDataById(
+               request.auth.token.email
+            )
+
+            if (!userData) {
+               throw new functions.https.HttpsError(
+                  "not-found",
+                  "User data not found"
+               )
+            }
+
+            // Convert to public user data
+            const userPublicData = pickPublicDataFromUser(userData)
+
+            // Get UTM params from request data (passed from client)
+            const utm = request.data.utm || null
+
+            // Track the click
+            await offlineEventRepo.trackOfflineEventClick(
+               offlineEventId,
+               userPublicData,
+               utm
+            )
+
+            return { success: true }
+         } catch (error) {
+            functions.logger.error("Error tracking offline event click:", error)
             throw new functions.https.HttpsError(
-               "unauthenticated",
-               "User must be authenticated"
+               "internal",
+               "Failed to track offline event click"
             )
          }
-
-         const { offlineEventId } =
-            request.data as TrackOfflineEventClickRequest
-
-         if (!offlineEventId) {
-            throw new functions.https.HttpsError(
-               "invalid-argument",
-               "offlineEventId is required"
-            )
-         }
-
-         // Get user data
-         const userData = await userRepo.getUserDataById(
-            request.auth.token.email
-         )
-
-         if (!userData) {
-            throw new functions.https.HttpsError(
-               "not-found",
-               "User data not found"
-            )
-         }
-
-         // Convert to public user data
-         const userPublicData = pickPublicDataFromUser(userData)
-
-         // Get UTM params from request data (passed from client)
-         const utm = request.data.utm || null
-
-         // Track the click
-         await offlineEventRepo.trackOfflineEventClick(
-            offlineEventId,
-            userPublicData,
-            utm
-         )
-
-         return { success: true }
-      } catch (error) {
-         functions.logger.error("Error tracking offline event click:", error)
-         throw new functions.https.HttpsError(
-            "internal",
-            "Failed to track offline event click"
-         )
       }
-   })
+   )
 )
 
 /**

@@ -363,6 +363,12 @@ export interface UserPublicData {
    firstName: string
    lastName: string
    badges?: string[]
+   university?: {
+      code: string
+      name: string
+   }
+   universityCountryCode?: string
+   fieldOfStudy?: FieldOfStudy
 }
 
 export type RegistrationStep = {
@@ -405,6 +411,14 @@ export const pickPublicDataFromUser = (userData: UserData): UserPublicData => {
       firstName: userData.firstName,
       lastName: userData.lastName,
       badges: userData.badges || [],
+      university: userData.university
+         ? {
+              code: userData.university.code,
+              name: userData.university.name,
+           }
+         : undefined,
+      universityCountryCode: userData.universityCountryCode,
+      fieldOfStudy: userData.fieldOfStudy,
    }
 }
 

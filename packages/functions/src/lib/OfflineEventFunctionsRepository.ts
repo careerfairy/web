@@ -3,21 +3,40 @@ import { UTMParams } from "@careerfairy/shared-lib/commonTypes"
 import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import {
    OfflineEvent,
+   OfflineEventAction,
+   OfflineEventStats,
    OfflineEventStatsAction,
    OfflineEventUserStats,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { UserPublicData } from "@careerfairy/shared-lib/users"
-import { FieldValue, Firestore, Timestamp } from "firebase-admin/firestore"
-import { FunctionsLogger } from "src/util"
+import {
+   FieldValue,
+   Firestore,
+   Timestamp,
+   UpdateData,
+} from "firebase-admin/firestore"
+import { FunctionsLogger } from "../util"
+import { createAdminConverter } from "../util/firestore-admin"
 
 export interface IOfflineEventFunctionsRepository {
    syncGroupDataToOfflineEvent(groupId: string, group: Group): Promise<void>
+
+   /**
+    * Tracks when a user views an offline event (opens the dialog).
+    * Creates action record, updates user stats with lastSeenAt timestamp,
+    * and increments total/unique talent reached counters in segmented analytics.
+    */
    trackOfflineEventView(
       offlineEventId: string,
       user: UserPublicData,
       utm: UTMParams | null
    ): Promise<void>
 
+   /**
+    * Tracks when a user clicks the register button on an offline event.
+    * Creates action record, updates user stats with listClickedAt timestamp,
+    * and increments total/unique register click counters in segmented analytics.
+    */
    trackOfflineEventClick(
       offlineEventId: string,
       user: UserPublicData,
@@ -59,30 +78,72 @@ export class OfflineEventFunctionsRepository
       await batch.commit()
    }
 
-   /**
-    * Tracks when a user views an offline event (opens the dialog)
-    * - Upserts OfflineEventUserStats with lastSeenAt
-    * - Creates an OfflineEventAction with type "view"
-    * - Updates OfflineEventStats to increment totalNumberOfTalentReached and uniqueNumberOfTalentReached if first view
-    * @param offlineEventId - The ID of the offline event
-    * @param user - The user's public data
-    * @param utm - UTM parameters from cookies
-    */
    async trackOfflineEventView(
       offlineEventId: string,
       user: UserPublicData,
       utm: UTMParams | null
    ): Promise<void> {
+      return this.trackOfflineEventAction(
+         offlineEventId,
+         user,
+         utm,
+         OfflineEventStatsAction.View
+      )
+   }
+
+   async trackOfflineEventClick(
+      offlineEventId: string,
+      user: UserPublicData,
+      utm: UTMParams | null
+   ): Promise<void> {
+      return this.trackOfflineEventAction(
+         offlineEventId,
+         user,
+         utm,
+         OfflineEventStatsAction.Click
+      )
+   }
+
+   /**
+    * Shared implementation for tracking offline event actions (view or click).
+    * Creates action record, upserts user stats with appropriate timestamp,
+    * and updates general + segmented analytics (by university, country, field of study).
+    * Handles migration when users change their profile data.
+    */
+   private async trackOfflineEventAction(
+      offlineEventId: string,
+      user: UserPublicData,
+      utm: UTMParams | null,
+      actionType: OfflineEventStatsAction.View | OfflineEventStatsAction.Click
+   ): Promise<void> {
+      // Define configuration based on action type
+      const config =
+         actionType === OfflineEventStatsAction.View
+            ? {
+                 timestampField: "lastSeenAt" as const,
+                 totalStatsField: "totalNumberOfTalentReached",
+                 uniqueStatsField: "uniqueNumberOfTalentReached",
+                 segmentedStatsSuffix: "TalentReached",
+              }
+            : {
+                 timestampField: "listClickedAt" as const,
+                 totalStatsField: "totalNumberOfRegisterClicks",
+                 uniqueStatsField: "totalNumberOfUniqueRegisterClicks",
+                 segmentedStatsSuffix: "RegisterClicks",
+              }
+
       return this.firestore.runTransaction(async (transaction) => {
          const userStatsRef = this.firestore
             .collection("offlineEvents")
             .doc(offlineEventId)
             .collection("offlineEventUserStats")
             .doc(user.authId)
+            .withConverter(createAdminConverter<OfflineEventUserStats>())
 
          const statsRef = this.firestore
             .collection("offlineEventStats")
             .doc(offlineEventId)
+            .withConverter(createAdminConverter<OfflineEventStats>())
 
          const actionRef = this.firestore
             .collection("offlineEvents")
@@ -90,34 +151,50 @@ export class OfflineEventFunctionsRepository
             .collection("offlineEventUserStats")
             .doc(user.authId)
             .collection("offlineEventActions")
+            .withConverter(createAdminConverter<OfflineEventAction>())
             .doc()
 
-         // Check if user has viewed before
+         // Check if user has performed this action before
          const userStatsSnap = await transaction.get(userStatsRef)
-         const isFirstView =
-            !userStatsSnap.exists || !userStatsSnap.data()?.lastSeenAt?.date
+         const isFirstAction =
+            !userStatsSnap.exists ||
+            !userStatsSnap.data()?.[config.timestampField]?.date
 
-         // Get the offline event to update stats with user segmentation
+         // Get the offline event to update stats
          const eventRef = this.firestore
             .collection("offlineEvents")
             .doc(offlineEventId)
+            .withConverter(createAdminConverter<OfflineEvent>())
          const eventSnap = await transaction.get(eventRef)
-         const offlineEvent = eventSnap.data() as OfflineEvent
+         const offlineEvent = eventSnap.data()
 
          if (!offlineEvent) {
             throw new Error(`Offline event ${offlineEventId} not found`)
          }
 
-         const userStatsData = userStatsSnap.data() as
-            | OfflineEventUserStats
-            | undefined
+         const userStatsData = userStatsSnap.data()
 
-         // Upsert user stats with lastSeenAt
+         // Check if user has changed their university, country, or field of study
+         const previousUser = userStatsData?.user
+         const hasChangedUniversity =
+            previousUser?.university?.code &&
+            user.university?.code &&
+            previousUser.university.code !== user.university.code
+         const hasChangedCountry =
+            previousUser?.universityCountryCode &&
+            user.universityCountryCode &&
+            previousUser.universityCountryCode !== user.universityCountryCode
+         const hasChangedFieldOfStudy =
+            previousUser?.fieldOfStudy?.id &&
+            user.fieldOfStudy?.id &&
+            previousUser.fieldOfStudy.id !== user.fieldOfStudy.id
+
+         // Upsert user stats with appropriate timestamp
          transaction.set(userStatsRef, {
             ...userStatsData,
             user,
             offlineEvent,
-            lastSeenAt: {
+            [config.timestampField]: {
                date: Timestamp.now(),
                utm,
             },
@@ -134,113 +211,90 @@ export class OfflineEventFunctionsRepository
             documentType: "offlineEventAction",
             user,
             offlineEventId,
-            type: OfflineEventStatsAction.View,
+            type: actionType,
             utm,
             createdAt: Timestamp.now(),
          })
 
-         transaction.update(statsRef, {
-            "generalStats.totalNumberOfTalentReached": FieldValue.increment(1),
-            ...(isFirstView && {
-               "generalStats.uniqueNumberOfTalentReached":
+         // Build update data for general and segmented stats
+         const updateData: UpdateData<OfflineEventStats> = {
+            [`generalStats.${config.totalStatsField}`]: FieldValue.increment(1),
+            ...(isFirstAction && {
+               [`generalStats.${config.uniqueStatsField}`]:
                   FieldValue.increment(1),
             }),
-         })
-      })
-   }
-
-   /**
-    * Tracks when a user clicks the register button on an offline event
-    * - Upserts OfflineEventUserStats with listClickedAt
-    * - Creates an OfflineEventAction with type "click"
-    * - Updates OfflineEventStats to increment totalNumberOfRegisterClicks and totalNumberOfUniqueRegisterClicks if first click
-    * @param offlineEventId - The ID of the offline event
-    * @param user - The user's public data
-    * @param utm - UTM parameters from cookies
-    */
-   async trackOfflineEventClick(
-      offlineEventId: string,
-      user: UserPublicData,
-      utm: UTMParams | null
-   ): Promise<void> {
-      return this.firestore.runTransaction(async (transaction) => {
-         const userStatsRef = this.firestore
-            .collection("offlineEvents")
-            .doc(offlineEventId)
-            .collection("offlineEventUserStats")
-            .doc(user.authId)
-
-         const statsRef = this.firestore
-            .collection("offlineEventStats")
-            .doc(offlineEventId)
-
-         const actionRef = this.firestore
-            .collection("offlineEvents")
-            .doc(offlineEventId)
-            .collection("offlineEventUserStats")
-            .doc(user.authId)
-            .collection("offlineEventActions")
-            .doc()
-
-         // Check if user has clicked before
-         const userStatsSnap = await transaction.get(userStatsRef)
-         const isFirstClick =
-            !userStatsSnap.exists || !userStatsSnap.data()?.listClickedAt?.date
-
-         // Get the offline event to update stats
-         const eventRef = this.firestore
-            .collection("offlineEvents")
-            .doc(offlineEventId)
-
-         const eventSnap = await transaction.get(eventRef)
-         const offlineEvent = eventSnap.data() as OfflineEvent
-
-         if (!offlineEvent) {
-            throw new Error(`Offline event ${offlineEventId} not found`)
          }
 
-         const userStatsData = userStatsSnap.data() as
-            | OfflineEventUserStats
-            | undefined
+         // Handle university stats migration if user changed university
+         if (hasChangedUniversity && previousUser?.university?.code) {
+            const oldUniversityCode = previousUser.university.code
+            // Decrement unique count from old university
+            updateData[
+               `universityStats.${oldUniversityCode}.uniqueNumberOf${config.segmentedStatsSuffix}`
+            ] = FieldValue.increment(-1)
+         }
 
-         // Upsert user stats with listClickedAt
-         transaction.set(
-            userStatsRef,
-            {
-               ...userStatsData,
-               user,
-               offlineEvent,
-               listClickedAt: {
-                  date: Timestamp.now(),
-                  utm,
-               },
-               createdAt: userStatsData?.createdAt
-                  ? userStatsData?.createdAt
-                  : Timestamp.now(),
-               documentType: "offlineEventUserStats",
-               id: userStatsRef.id,
-            },
-            { merge: true }
-         )
+         // Update university stats if available
+         if (user.university?.code) {
+            const universityCode = user.university.code
+            updateData[
+               `universityStats.${universityCode}.totalNumberOf${config.segmentedStatsSuffix}`
+            ] = FieldValue.increment(1)
+            // Increment unique if first action OR if migrating from another university
+            if (isFirstAction || hasChangedUniversity) {
+               updateData[
+                  `universityStats.${universityCode}.uniqueNumberOf${config.segmentedStatsSuffix}`
+               ] = FieldValue.increment(1)
+            }
+         }
 
-         // Create action record
-         transaction.set(actionRef, {
-            id: actionRef.id,
-            documentType: "offlineEventAction",
-            user,
-            offlineEventId,
-            type: OfflineEventStatsAction.Click,
-            utm,
-            createdAt: Timestamp.now(),
-         })
+         // Handle country stats migration if user changed country
+         if (hasChangedCountry && previousUser?.universityCountryCode) {
+            const oldCountryCode = previousUser.universityCountryCode
+            // Decrement unique count from old country
+            updateData[
+               `countryStats.${oldCountryCode}.uniqueNumberOf${config.segmentedStatsSuffix}`
+            ] = FieldValue.increment(-1)
+         }
 
-         transaction.update(statsRef, {
-            "generalStats.totalNumberOfRegisterClicks": FieldValue.increment(1),
-            ...(isFirstClick && {
-               "generalStats.totalNumberOfUniqueRegisterClicks":
-                  FieldValue.increment(1),
-            }),
-         })
+         // Update country stats if available
+         if (user.universityCountryCode) {
+            const countryCode = user.universityCountryCode
+            updateData[
+               `countryStats.${countryCode}.totalNumberOf${config.segmentedStatsSuffix}`
+            ] = FieldValue.increment(1)
+            // Increment unique if first action OR if migrating from another country
+            if (isFirstAction || hasChangedCountry) {
+               updateData[
+                  `countryStats.${countryCode}.uniqueNumberOf${config.segmentedStatsSuffix}`
+               ] = FieldValue.increment(1)
+            }
+         }
+
+         // Handle field of study stats migration if user changed field of study
+         if (hasChangedFieldOfStudy && previousUser?.fieldOfStudy?.id) {
+            const oldFieldOfStudyId = previousUser.fieldOfStudy.id
+            // Decrement unique count from old field of study
+            updateData[
+               `fieldOfStudyStats.${oldFieldOfStudyId}.uniqueNumberOf${config.segmentedStatsSuffix}`
+            ] = FieldValue.increment(-1)
+         }
+
+         // Update field of study stats if available
+         if (user.fieldOfStudy?.id) {
+            const fieldOfStudyId = user.fieldOfStudy.id
+            updateData[
+               `fieldOfStudyStats.${fieldOfStudyId}.totalNumberOf${config.segmentedStatsSuffix}`
+            ] = FieldValue.increment(1)
+            // Increment unique if first action OR if migrating from another field of study
+            if (isFirstAction || hasChangedFieldOfStudy) {
+               updateData[
+                  `fieldOfStudyStats.${fieldOfStudyId}.uniqueNumberOf${config.segmentedStatsSuffix}`
+               ] = FieldValue.increment(1)
+            }
+         }
+
+         transaction.update(statsRef, updateData)
       })
    }
 }

@@ -130,8 +130,8 @@ export class OfflineEventService {
       const snapshots = await getDocs(
          query(
             collection(FirestoreInstance, "offlineEvents"),
-            where("status", "==", "upcoming"),
-            where("hidden", "==", false)
+            where("hidden", "==", false),
+            where("published", "==", true)
          ).withConverter(createGenericConverter<OfflineEvent>())
       )
 
