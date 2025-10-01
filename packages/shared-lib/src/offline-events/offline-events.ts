@@ -65,7 +65,7 @@ type StatsData = {
    totalNumberOfRegisterClicks: number
    totalNumberOfTalentReached: number
    uniqueNumberOfTalentReached: number
-   totalNumberOfUniqueRegisterClicks: number
+   uniqueNumberOfRegisterClicks: number
 }
 
 // collection path /offlineEventStats/{offlineEventId}
