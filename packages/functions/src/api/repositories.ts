@@ -151,4 +151,4 @@ export const emailNotificationsRepo: IEmailNotificationRepository =
    new EmailNotificationFunctionsRepository(firestore as any)
 
 export const offlineEventRepo: IOfflineEventFunctionsRepository =
-   new OfflineEventFunctionsRepository(firestore as any, FieldValue)
+   new OfflineEventFunctionsRepository(firestore, logger)

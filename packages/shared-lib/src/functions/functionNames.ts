@@ -72,6 +72,10 @@ export const FUNCTION_NAMES = {
    getGroupTalentEngagement: "getGroupTalentEngagement",
    getTotalUsersMatchingTargeting: "getTotalUsersMatchingTargeting",
 
+   // Offline events functions
+   trackOfflineEventView: "trackOfflineEventView",
+   trackOfflineEventClick: "trackOfflineEventClick",
+
    // Slack Notifications
    notifySlackWhenSparksTrialStarts: "notifySlackWhenSparksTrialStarts",
    notifySlackWhenOfflineEventIsPublished:

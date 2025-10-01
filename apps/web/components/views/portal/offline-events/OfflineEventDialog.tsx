@@ -1,5 +1,6 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { pickPublicDataFromUser } from "@careerfairy/shared-lib/users"
 import { makeOfflineEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import {
    Box,
@@ -23,16 +24,18 @@ import {
 } from "components/views/common/transitions"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import { offlineEventService } from "data/firebase/OfflineEventService"
+import { useAuth } from "HOCs/AuthProvider"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useCallback } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { Calendar, ChevronLeft, ChevronRight, MapPin, X } from "react-feather"
 import { useCopyToClipboard } from "react-use"
 import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerEvent } from "util/analyticsUtils"
+import CookiesUtil from "util/CookiesUtil"
 import DateUtil from "util/DateUtil"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { getOfflineEventMetaInfo } from "util/SeoUtil"
@@ -179,6 +182,8 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
    const isMounted = useIsMounted()
    const { successNotification } = useSnackbarNotifications()
    const [, copyEventLinkToClipboard] = useCopyToClipboard()
+   const { userData } = useAuth()
+   const hasUserData = Boolean(userData)
 
    const handleShare = useCallback(() => {
       const eventUrl = makeOfflineEventDetailsUrl(eventFromServer.id)
@@ -209,6 +214,30 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
                : null,
       }
    )
+
+   // Track view when dialog opens (only once)
+   const hasTrackedView = useRef(false)
+
+   useEffect(() => {
+      if (event && hasUserData && !hasTrackedView.current) {
+         hasTrackedView.current = true
+         const userPublicData = pickPublicDataFromUser(userData)
+         const utm = CookiesUtil.getUTMParams()
+
+         offlineEventService
+            .trackOfflineEventView(event.id, userPublicData, utm)
+            .catch((error) => {
+               alert(
+                  `Failed to track offline event view ${JSON.stringify(
+                     error,
+                     null,
+                     2
+                  )}`
+               )
+               console.error("Failed to track offline event view:", error)
+            })
+      }
+   }, [event, event?.id, hasUserData, userData])
 
    const handleClose = useCallback(() => {
       const newQuery = {
@@ -274,6 +303,7 @@ const Content = ({
    onShare: () => void
 }) => {
    const isMobile = useIsMobile()
+   const { userData } = useAuth()
 
    const companyUrl = event?.group?.publicProfile
       ? makeGroupCompanyPageUrl(event?.group?.universityName, {
@@ -289,6 +319,26 @@ const Content = ({
       registrationUrl,
       address,
    } = event || {}
+
+   const handleRegisterClick = useCallback(() => {
+      if (userData && event) {
+         const userPublicData = pickPublicDataFromUser(userData)
+         const utm = CookiesUtil.getUTMParams()
+
+         offlineEventService
+            .trackOfflineEventClick(event.id, userPublicData, utm)
+            .catch((error) => {
+               console.error("Failed to track offline event click:", error)
+               alert(
+                  `Failed to track offline event click ${JSON.stringify(
+                     error,
+                     null,
+                     2
+                  )}`
+               )
+            })
+      }
+   }, [userData, event])
 
    return (
       <Box position="relative">
@@ -405,6 +455,7 @@ const Content = ({
                   href={registrationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={handleRegisterClick}
                >
                   Register to event
                </Button>

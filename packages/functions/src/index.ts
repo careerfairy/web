@@ -75,6 +75,7 @@ import userSparks = require("./userSparks")
 import sparksAnalytics = require("./sparksAnalytics")
 import customJobs = require("./customJobs")
 import notificationSparks = require("./notificationSparks")
+import offlineEvents = require("./offlineEvents")
 import groupPlans = require("./groupPlans")
 import search = require("./search")
 import companies = require("./companies")
@@ -180,6 +181,12 @@ exports[FUNCTION_NAMES.getLivestreamsICalendarEvents] =
 // Sparks Trial Notifications
 exports[FUNCTION_NAMES.notifySlackWhenSparksTrialStarts] =
    notificationOnboardings.notifySlackWhenSparksTrialStarts
+
+// Offline Events
+exports[FUNCTION_NAMES.trackOfflineEventView] =
+   offlineEvents.trackOfflineEventView
+exports[FUNCTION_NAMES.trackOfflineEventClick] =
+   offlineEvents.trackOfflineEventClick
 
 // Offline Event Notifications
 exports[FUNCTION_NAMES.notifySlackWhenOfflineEventIsPublished] =
@@ -297,6 +304,7 @@ exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
 exports.onCreateUserSparkFeed = onCreateTriggers.onCreateUserSparkFeed
 exports.onCreateSparkStats = onCreateTriggers.onCreateSparkStats
+exports.onCreateOfflineEvent = offlineEvents.onCreateOfflineEvent
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =

@@ -1,6 +1,13 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { UTMParams } from "@careerfairy/shared-lib/commonTypes"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
+import {
+   TrackOfflineEventClickRequest,
+   TrackOfflineEventViewRequest,
+} from "@careerfairy/shared-lib/functions/types"
 import { AuthorInfo } from "@careerfairy/shared-lib/livestreams"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { UserPublicData } from "@careerfairy/shared-lib/users"
 import {
    Timestamp,
    collection,
@@ -14,7 +21,8 @@ import {
    updateDoc,
    where,
 } from "firebase/firestore"
-import { FirestoreInstance } from "./FirebaseInstance"
+import { httpsCallable } from "firebase/functions"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 
 export class OfflineEventService {
    constructor(private readonly firestore: typeof FirestoreInstance) {}
@@ -128,6 +136,46 @@ export class OfflineEventService {
       )
 
       return snapshots.docs.map((doc) => doc.data())
+   }
+
+   /**
+    * Tracks when a user views an offline event (opens the dialog)
+    * - Calls cloud function to upsert OfflineEventUserStats with lastSeenAt
+    * - Creates an OfflineEventAction with type "view"
+    * - Updates OfflineEventStats to increment totalNumberOfTalentReached and uniqueNumberOfTalentReached if first view
+    * @param offlineEventId - The ID of the offline event
+    * @param user - The user's public data (not used, handled by cloud function)
+    * @param utm - UTM parameters from cookies
+    */
+   async trackOfflineEventView(
+      offlineEventId: string,
+      user: UserPublicData,
+      utm: UTMParams | null
+   ): Promise<void> {
+      await httpsCallable<TrackOfflineEventViewRequest>(
+         FunctionsInstance,
+         FUNCTION_NAMES.trackOfflineEventView
+      )({ offlineEventId, utm })
+   }
+
+   /**
+    * Tracks when a user clicks the register button on an offline event
+    * - Calls cloud function to upsert OfflineEventUserStats with listClickedAt
+    * - Creates an OfflineEventAction with type "click"
+    * - Updates OfflineEventStats to increment totalNumberOfRegisterClicks and totalNumberOfUniqueRegisterClicks if first click
+    * @param offlineEventId - The ID of the offline event
+    * @param user - The user's public data (not used, handled by cloud function)
+    * @param utm - UTM parameters from cookies
+    */
+   async trackOfflineEventClick(
+      offlineEventId: string,
+      user: UserPublicData,
+      utm: UTMParams | null
+   ): Promise<void> {
+      await httpsCallable<TrackOfflineEventClickRequest>(
+         FunctionsInstance,
+         FUNCTION_NAMES.trackOfflineEventClick
+      )({ offlineEventId, utm })
    }
 }
 
