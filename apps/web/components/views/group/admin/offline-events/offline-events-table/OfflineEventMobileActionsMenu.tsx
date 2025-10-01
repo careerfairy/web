@@ -41,7 +41,7 @@ export const OfflineEventMobileActionsMenu = ({
       // Share action - only for published events
       if (isPublished) {
          options.push({
-            label: "Share offline event",
+            label: "Share event",
             icon: <ShareArrowIconOutlined />,
             handleClick: () => handleShareOfflineEvent(stat),
          })
@@ -104,25 +104,25 @@ export const OfflineEventMobileActionsMenu = ({
 const getEditLabel = (eventStatus: OfflineEventStatus | null) => {
    switch (eventStatus) {
       case OfflineEventStatus.DRAFT:
-         return "Edit draft event"
+         return "Edit event"
       case OfflineEventStatus.UPCOMING:
-         return "Edit upcoming event"
+         return "Edit event"
       case OfflineEventStatus.PAST:
-         return "Edit past event"
+         return "Edit event"
       default:
-         return "Edit offline event"
+         return "Edit event"
    }
 }
 
 const getDeleteLabel = (eventStatus: OfflineEventStatus | null) => {
    switch (eventStatus) {
       case OfflineEventStatus.DRAFT:
-         return "Delete draft event"
+         return "Delete event"
       case OfflineEventStatus.UPCOMING:
-         return "Delete upcoming event"
+         return "Delete event"
       case OfflineEventStatus.PAST:
-         return "Delete past event"
+         return "Delete event"
       default:
-         return "Delete offline event"
+         return "Delete event"
    }
 }

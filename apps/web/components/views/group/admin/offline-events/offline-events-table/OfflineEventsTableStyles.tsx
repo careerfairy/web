@@ -5,7 +5,7 @@ export const COLUMN_WIDTHS = {
    date: "220px", // Date gets good space for readability
    clicks: "115px", // Clicks gets moderate space
    views: "115px", // Views gets moderate space
-   status: "110px", // Status gets minimal space
+   status: "85px", // Status gets minimal space
 } as const
 
 export const offlineEventsTableStyles = sxStyles({

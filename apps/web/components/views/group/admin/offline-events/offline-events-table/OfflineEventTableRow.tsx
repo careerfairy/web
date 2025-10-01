@@ -205,7 +205,7 @@ export const OfflineEventTableRow = ({
          {/* Status Column */}
          <TableCell sx={styles.bodyCell}>
             <CentredBox gap={0.5}>
-               <Box p={1}>
+               <Box>
                   <TableHighlighter
                      title={statusTitle}
                      direction="row"

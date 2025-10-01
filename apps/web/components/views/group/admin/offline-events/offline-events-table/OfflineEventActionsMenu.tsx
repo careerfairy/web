@@ -1,7 +1,6 @@
 import { IconButton } from "@mui/material"
 import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import { DesktopMenu } from "components/views/common/inputs/BrandedResponsiveMenu"
-import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { useState } from "react"
 import { Edit2, MoreVertical, Trash2 } from "react-feather"
 import { withStopPropagation } from "util/CommonUtil"
@@ -58,11 +57,9 @@ export const OfflineEventActionsMenu = ({
 
    return (
       <>
-         <BrandedTooltip title="More actions" placement="bottom">
-            <IconButton size="small" onClick={handleClick} sx={{ p: 1 }}>
-               <MoreVertical size={16} />
-            </IconButton>
-         </BrandedTooltip>
+         <IconButton size="small" onClick={handleClick} sx={{ p: 1 }}>
+            <MoreVertical size={16} />
+         </IconButton>
 
          <DesktopMenu
             options={menuOptions}
@@ -78,21 +75,21 @@ export const OfflineEventActionsMenu = ({
 const getEditLabel = (eventStatus: OfflineEventStatus) => {
    switch (eventStatus) {
       case OfflineEventStatus.UPCOMING:
-         return "Edit upcoming event"
+         return "Edit event"
       case OfflineEventStatus.PAST:
-         return "Edit past offline event"
+         return "Edit event"
       default:
-         return "Edit draft"
+         return "Edit event"
    }
 }
 
 const getDeleteLabel = (eventStatus: OfflineEventStatus) => {
    switch (eventStatus) {
       case OfflineEventStatus.UPCOMING:
-         return "Delete upcoming event"
+         return "Delete event"
       case OfflineEventStatus.PAST:
-         return "Delete past offline event"
+         return "Delete event"
       default:
-         return "Delete draft"
+         return "Delete event"
    }
 }

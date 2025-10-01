@@ -1,5 +1,6 @@
 import { Box, Theme } from "@mui/material"
-import { CheckCircle, Clock, File } from "react-feather"
+import TimeHistory from "components/views/common/icons/TimeHistory"
+import { CheckCircle, File } from "react-feather"
 import { OfflineEventStatus } from "./utils"
 
 const STATUS_ICONS = {
@@ -12,7 +13,7 @@ const STATUS_ICONS = {
       color: (theme: Theme) => theme.brand.warning[600],
    },
    [OfflineEventStatus.PAST]: {
-      icon: Clock,
+      icon: TimeHistory,
       color: (theme: Theme) => theme.palette.text.secondary,
    },
 }
@@ -29,7 +30,9 @@ export const OfflineEventStatusBadge = ({ status }: Props) => {
    return (
       <Box
          component={STATUS_ICONS[status].icon}
-         size={16}
+         size={20}
+         width={20}
+         height={20}
          color={STATUS_ICONS[status].color}
       />
    )
