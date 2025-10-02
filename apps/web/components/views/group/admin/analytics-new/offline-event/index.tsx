@@ -1,5 +1,4 @@
-import { Grid, Typography } from "@mui/material"
-import { Box } from "@mui/system"
+import { Box, Typography } from "@mui/material"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
@@ -7,10 +6,20 @@ import {
    OfflineEventAnalyticsPageProvider,
    useOfflineEventAnalyticsPageContext,
 } from "./OfflineEventAnalyticsPageProvider"
+import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
+import OfflineEventSearchNav from "./search/OfflineEventSearchNav"
 
 const styles = sxStyles({
-   gridItem: {
+   rootContainer: {
+      backgroundColor: "common.white",
+      borderRadius: "20px",
+      border: "1px solid",
+      borderColor: "neutral.50",
+      overflow: "hidden",
+   },
+   contentWrapper: {
       display: "flex",
+      flexDirection: "column",
    },
 })
 
@@ -29,33 +38,12 @@ const PageContent = () => {
 
    return (
       <LivestreamAnalyticsContainer>
-         <Grid container spacing={spacing}>
-            {noEvents ? (
-               <Grid xs={12} item style={styles.gridItem}>
-                  <SearchPageContent />
-               </Grid>
-            ) : (
-               <>
-                  <Grid xs={12} item style={styles.gridItem}>
-                     <Box width="100%" py={4}>
-                        <Typography align="center" variant="h6">
-                           Offline Event Analytics Coming Soon
-                        </Typography>
-                        <Typography
-                           align="center"
-                           variant="body2"
-                           sx={{ mt: 2 }}
-                        >
-                           Analytics for{" "}
-                           {currentEventStats?.offlineEvent?.title ||
-                              "this event"}{" "}
-                           will be displayed here.
-                        </Typography>
-                     </Box>
-                  </Grid>
-               </>
-            )}
-         </Grid>
+         <Box sx={styles.rootContainer}>
+            <Box sx={styles.contentWrapper}>
+               <OfflineEventSearchNav />
+               {noEvents ? <SearchPageContent /> : <AggregatedAnalytics />}
+            </Box>
+         </Box>
       </LivestreamAnalyticsContainer>
    )
 }
@@ -70,7 +58,6 @@ const SearchPageContent = () => {
    )
 }
 
-const spacing = 3
 const MemoizedPageContent = memo(PageContent)
 
 export default OfflineEventAnalyticsPageContent
