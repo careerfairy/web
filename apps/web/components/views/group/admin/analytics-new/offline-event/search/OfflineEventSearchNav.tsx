@@ -1,5 +1,8 @@
 import { Box, Card, InputBase } from "@mui/material"
+import { offlineEventService } from "data/firebase/OfflineEventService"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { Search as FindIcon } from "react-feather"
+import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -54,8 +57,17 @@ const styles = sxStyles({
 })
 
 const OfflineEventSearchNav = () => {
+   const { group } = useGroup()
    // Dummy data for now - will be replaced with actual search logic
    const searchValue = "Virtual Case Experience"
+
+   const { data: offlineEventStats } = useSWR(["offline-events"], async () => {
+      return offlineEventService.getFutureAndPublishedOfflineEventStats(
+         group.id
+      )
+   })
+
+   console.log(offlineEventStats)
 
    return (
       <Box sx={styles.wrapper}>

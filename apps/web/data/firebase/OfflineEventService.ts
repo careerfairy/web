@@ -206,6 +206,26 @@ export class OfflineEventService {
    }
 
    /**
+    * Fetches all future and published offline event stats for a specific group.
+    * @param groupId - The ID of the group to fetch the offline event stats for
+    * @returns Promise which resolves to an array of future offline event stats
+    */
+   async getFutureAndPublishedOfflineEventStats(
+      groupId: string
+   ): Promise<OfflineEventStats[]> {
+      const baseQuery = query(
+         collection(this.firestore, "offlineEventStats"),
+         where("offlineEvent.group.id", "==", groupId),
+         where("offlineEvent.startAt", ">", new Date()),
+         where("offlineEvent.published", "==", true),
+         orderBy("offlineEvent.startAt", "asc")
+      ).withConverter(createGenericConverter<OfflineEventStats>())
+
+      const snapshot = await getDocs(baseQuery)
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   /**
     * Helper method that consolidates tracking logic
     * Calls the consolidated cloud function with the appropriate action type
     */
