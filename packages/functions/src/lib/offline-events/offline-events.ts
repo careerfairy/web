@@ -70,7 +70,7 @@ export const trackOfflineEventAction = onCall(
  * Cloud function that triggers when an offline event is created or updated
  * - On CREATE: Creates an OfflineEventStats document with initial empty stats
  * - On UPDATE: Syncs the updated offline event to its embedding in the stats document
- * - On DELETE: No action needed (stats can remain for historical purposes)
+ * - On DELETE: Marks the stats document as deleted
  */
 export const onWriteOfflineEvent = onDocumentWritten(
    "offlineEvents/{offlineEventId}",

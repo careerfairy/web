@@ -134,7 +134,8 @@ export class OfflineEventService {
          query(
             collection(FirestoreInstance, "offlineEvents"),
             where("hidden", "==", false),
-            where("published", "==", true)
+            where("published", "==", true),
+            where("startAt", ">", new Date())
          ).withConverter(createGenericConverter<OfflineEvent>())
       )
 
@@ -218,6 +219,7 @@ export class OfflineEventService {
          where("offlineEvent.group.id", "==", groupId),
          where("offlineEvent.startAt", ">", new Date()),
          where("offlineEvent.published", "==", true),
+         where("deleted", "==", false),
          orderBy("offlineEvent.startAt", "asc")
       ).withConverter(createGenericConverter<OfflineEventStats>())
 
