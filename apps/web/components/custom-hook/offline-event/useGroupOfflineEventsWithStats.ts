@@ -134,8 +134,8 @@ export const useGroupOfflineEventsWithStats = (
                offlineEventsWithStats.push({
                   offlineEvent: offlineEventData,
                   stats: {
-                     totalClicks: Math.floor(Math.random() * 100), // TODO: Remove this
-                     totalViews: Math.floor(Math.random() * 100), // TODO: Remove this
+                     totalClicks: 0,
+                     totalViews: 0,
                   },
                   updatedAt: offlineEventData.updatedAt,
                })
