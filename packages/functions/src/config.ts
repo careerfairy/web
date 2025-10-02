@@ -15,7 +15,7 @@ const config = {
       sparksTrialStarted:
          "https://hooks.slack.com/services/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",
       offlineEventPublished:
-         "https://hooks.slack.com/services/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",
+         "https://hooks.slack.com/services/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",
    },
 
    // Firebase Hosting Domain
