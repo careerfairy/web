@@ -15,7 +15,7 @@ const config = {
       sparksTrialStarted:
          "https://hooks.slack.com/services/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",
       offlineEventPublished:
-         "https://hooks.slack.com/services/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",
+         "https://hooks.slack.com/services/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", // Replace with your actual webhook URL
    },
 
    // Firebase Hosting Domain

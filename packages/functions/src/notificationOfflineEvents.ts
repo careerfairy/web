@@ -32,6 +32,10 @@ export const notifySlackWhenOfflineEventIsPublished = onDocumentUpdated(
          const wasJustPublished = !beforePublished && afterPublished
 
          if (wasJustPublished) {
+            functions.logger.info(
+               `Offline event ${offlineEvent.id} was just published, sending notification to Slack`
+            )
+
             // Get the group's remaining credits
             const groupDoc = await firestore
                .collection("careerCenterData")
@@ -51,6 +55,7 @@ export const notifySlackWhenOfflineEventIsPublished = onDocumentUpdated(
                   eventDate: offlineEvent.startAt.toDate(),
                   groupId: offlineEvent.group.id,
                   remainingCredits,
+                  eventImageUrl: offlineEvent.backgroundImageUrl,
                }
             )
 

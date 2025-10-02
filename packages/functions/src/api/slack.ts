@@ -237,10 +237,11 @@ export const notifyOfflineEventPublished = (
       eventDate: Date
       groupId: string
       remainingCredits: number
+      eventImageUrl: string
    }
 ) => {
-   const eventLink = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events?eventId=${params.eventId}`
-   const adminLink = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
+   const eventLink = `https://www.careerfairy.io/portal?offline-event=${params.eventId}`
+   const groupAdminOfflineEvents = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
 
    const body: Record<string, string> = {
       "Company Name": params.companyName,
@@ -254,7 +255,7 @@ export const notifyOfflineEventPublished = (
             type: "section",
             text: {
                type: "mrkdwn",
-               text: `Offline Event Published:\n*<${eventLink}|${params.eventTitle}>*`,
+               text: `Offline Event Published: *<${eventLink}|${params.eventTitle}>*`,
             },
          },
          {
@@ -266,7 +267,7 @@ export const notifyOfflineEventPublished = (
             accessory: {
                type: "image",
                image_url:
-                  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Fcalendar.png?alt=media&token=f86c0885-7def-435e-b1d3-5dce3f75c1f6",
+                  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F5b79c024-f178-4004-9964-6088fdc63563_ge.png.png?alt=media",
                alt_text: "Offline Event Published",
             },
          },
@@ -277,17 +278,9 @@ export const notifyOfflineEventPublished = (
                   type: "button",
                   text: {
                      type: "plain_text",
-                     text: "Event Details",
-                  },
-                  url: eventLink,
-               },
-               {
-                  type: "button",
-                  text: {
-                     type: "plain_text",
                      text: "Admin Events Page",
                   },
-                  url: adminLink,
+                  url: groupAdminOfflineEvents,
                   style: "primary",
                },
             ],
