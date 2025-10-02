@@ -2,10 +2,10 @@ import { Box } from "@mui/material"
 import { HeroSectionFMCG } from "./HeroSectionFMCG"
 import { AboutSectionFMCG } from "./AboutSectionFMCG"
 import { CompaniesSectionFMCG } from "./CompaniesSectionFMCG"
-import { TestimonialsSection } from "../consulting/TestimonialsSection"
-import { StatsSection } from "../consulting/StatsSection"
+import { TestimonialsWrapper } from "../common/TestimonialsWrapper"
+import { StatsSection } from "../common/StatsSection"
 import { FAQSectionFMCG } from "./FAQSectionFMCG"
-import { CTASection } from "../consulting/CTASection"
+import { CTASection } from "../common/CTASection"
 
 export function FMCGLandingPage() {
    return (
@@ -13,7 +13,7 @@ export function FMCGLandingPage() {
          <HeroSectionFMCG />
          <AboutSectionFMCG />
          <CompaniesSectionFMCG />
-         <TestimonialsSection />
+         <TestimonialsWrapper />
          <StatsSection />
          <FAQSectionFMCG />
          <CTASection />

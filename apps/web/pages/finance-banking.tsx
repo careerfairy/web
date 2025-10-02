@@ -1,18 +1,22 @@
 import { NextPage } from "next"
 import { Box } from "@mui/material"
 import { FinanceBankingLandingPage } from "components/views/finance-banking/FinanceBankingLandingPage"
-import { MainLayout } from "components/layouts/MainLayout"
+import GeneralLayout from "../layouts/GeneralLayout"
+import SEO from "../components/util/SEO"
 
 const FinanceBankingPage: NextPage = () => {
    return (
-      <MainLayout
-         title="Finance & Banking Careers | CareerFairy"
-         description="Accelerate your finance and banking career with expert guidance from industry leaders at Goldman Sachs, JPMorgan, and top financial institutions."
-      >
-         <Box>
-            <FinanceBankingLandingPage />
-         </Box>
-      </MainLayout>
+      <>
+         <SEO
+            title="Finance & Banking Careers | CareerFairy"
+            description="Accelerate your finance and banking career with expert guidance from industry leaders at Goldman Sachs, JPMorgan, and top financial institutions."
+         />
+         <GeneralLayout>
+            <Box>
+               <FinanceBankingLandingPage />
+            </Box>
+         </GeneralLayout>
+      </>
    )
 }
 
