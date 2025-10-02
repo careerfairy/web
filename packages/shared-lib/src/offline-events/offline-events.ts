@@ -74,6 +74,7 @@ type StatsData = {
 // collection path /offlineEventStats/{offlineEventId}
 export interface OfflineEventStats extends Identifiable {
    documentType: "offlineEventStats" // simplify groupCollection Queries
+   deleted: boolean
    offlineEvent: OfflineEvent
    generalStats: StatsData
    universityStats: {

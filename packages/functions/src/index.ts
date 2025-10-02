@@ -302,7 +302,7 @@ exports.onCreateReward = onCreateTriggers.onCreateReward
 exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
 exports.onCreateUserSparkFeed = onCreateTriggers.onCreateUserSparkFeed
 exports.onCreateSparkStats = onCreateTriggers.onCreateSparkStats
-exports.onCreateOfflineEvent = offlineEvents.onCreateOfflineEvent
+exports.onWriteOfflineEvent = offlineEvents.onWriteOfflineEvent
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =

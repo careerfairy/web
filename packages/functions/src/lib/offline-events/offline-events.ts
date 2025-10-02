@@ -4,8 +4,8 @@ import {
    OfflineEventStats,
    OfflineEventStatsAction,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { Timestamp } from "firebase-admin/firestore"
-import { onDocumentCreated } from "firebase-functions/v2/firestore"
+import { Timestamp, UpdateData } from "firebase-admin/firestore"
+import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { CallableRequest, onCall } from "firebase-functions/v2/https"
 import { mixed, object, string } from "yup"
 import { offlineEventRepo } from "../../api/repositories"
@@ -14,6 +14,7 @@ import {
    dataValidationMiddleware,
    userAuthExistsMiddleware,
 } from "../../middlewares-gen2/onCall/validations"
+import { ChangeType, getChangeTypeEnum } from "../../util"
 import functions = require("firebase-functions")
 
 /**
@@ -66,51 +67,108 @@ export const trackOfflineEventAction = onCall(
 )
 
 /**
- * Cloud function that triggers when a new offline event is created
- * - Creates an OfflineEventStats document with initial empty stats
- * - This ensures stats exist before any tracking occurs
+ * Cloud function that triggers when an offline event is created or updated
+ * - On CREATE: Creates an OfflineEventStats document with initial empty stats
+ * - On UPDATE: Syncs the updated offline event to its embedding in the stats document
+ * - On DELETE: No action needed (stats can remain for historical purposes)
  */
-export const onCreateOfflineEvent = onDocumentCreated(
+export const onWriteOfflineEvent = onDocumentWritten(
    "offlineEvents/{offlineEventId}",
    async (event) => {
       try {
          const offlineEventId = event.params.offlineEventId
-         functions.logger.info(
-            `Creating stats for offline event: ${offlineEventId}`
-         )
-
-         const offlineEvent: OfflineEvent = {
-            ...(event.data.data() as OfflineEvent),
-            id: offlineEventId,
-         }
-
-         const offlineEventStats: OfflineEventStats = {
-            id: offlineEventId,
-            documentType: "offlineEventStats",
-            offlineEvent,
-            generalStats: {
-               totalNumberOfRegisterClicks: 0,
-               totalNumberOfTalentReached: 0,
-               uniqueNumberOfTalentReached: 0,
-               uniqueNumberOfRegisterClicks: 0,
-            },
-            universityStats: {},
-            countryStats: {},
-            fieldOfStudyStats: {},
-            updatedAt: Timestamp.now(),
-         }
-
-         // Create the stats document
-         await event.data.ref.firestore
-            .collection("offlineEventStats")
-            .doc(offlineEventId)
-            .set(offlineEventStats)
+         const changeType = getChangeTypeEnum(event)
 
          functions.logger.info(
-            `Successfully created stats for offline event: ${offlineEventId}`
+            `Processing ${changeType} for offline event: ${offlineEventId}`
          )
+
+         switch (changeType) {
+            case ChangeType.CREATE: {
+               const offlineEvent: OfflineEvent = {
+                  ...(event.data.after.data() as OfflineEvent),
+                  id: offlineEventId,
+               }
+
+               // Create new stats document with initial empty stats
+               const offlineEventStats: OfflineEventStats = {
+                  id: offlineEventId,
+                  documentType: "offlineEventStats",
+                  deleted: false,
+                  offlineEvent,
+                  generalStats: {
+                     totalNumberOfRegisterClicks: 0,
+                     totalNumberOfTalentReached: 0,
+                     uniqueNumberOfTalentReached: 0,
+                     uniqueNumberOfRegisterClicks: 0,
+                  },
+                  universityStats: {},
+                  countryStats: {},
+                  fieldOfStudyStats: {},
+                  updatedAt: Timestamp.now(),
+               }
+
+               await event.data.after.ref.firestore
+                  .collection("offlineEventStats")
+                  .doc(offlineEventId)
+                  .set(offlineEventStats)
+
+               functions.logger.info(
+                  `Successfully created stats for offline event: ${offlineEventId}`
+               )
+               break
+            }
+
+            case ChangeType.UPDATE: {
+               const offlineEvent: OfflineEvent = {
+                  ...(event.data.after.data() as OfflineEvent),
+                  id: offlineEventId,
+               }
+
+               const updateData: UpdateData<OfflineEventStats> = {
+                  offlineEvent,
+                  updatedAt: Timestamp.now(),
+               }
+
+               // Update the embedded offline event in the stats document
+               await event.data.after.ref.firestore
+                  .collection("offlineEventStats")
+                  .doc(offlineEventId)
+                  .update(updateData)
+
+               functions.logger.info(
+                  `Successfully synced offline event to stats: ${offlineEventId}`
+               )
+               break
+            }
+
+            case ChangeType.DELETE: {
+               functions.logger.info(
+                  `Offline event deleted: ${offlineEventId}, marking stats as deleted`
+               )
+
+               const updateData: UpdateData<OfflineEventStats> = {
+                  deleted: true,
+               }
+
+               await event.data.after.ref.firestore
+                  .collection("offlineEventStats")
+                  .doc(offlineEventId)
+                  .update(updateData)
+
+               functions.logger.info(
+                  `Successfully marked stats as deleted: ${offlineEventId}`
+               )
+               break
+            }
+
+            default:
+               functions.logger.warn(
+                  `Unknown change type for offline event: ${offlineEventId}`
+               )
+         }
       } catch (error) {
-         functions.logger.error("Error creating offline event stats:", error)
+         functions.logger.error("Error processing offline event change:", error)
       }
    }
 )
