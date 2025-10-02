@@ -37,10 +37,7 @@ const FMCGLandingPage: NextPage = () => {
          </Head>
          
          <Box sx={styles.pageContainer}>
-            <HeroSectionFMCG 
-               big={true}
-               backgroundColor="primary.50"
-            />
+            <HeroSectionFMCG />
             
             <CompaniesSectionFMCG 
                backgroundColor="background.paper"

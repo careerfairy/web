@@ -37,10 +37,7 @@ const FinanceBankingLandingPage: NextPage = () => {
          </Head>
          
          <Box sx={styles.pageContainer}>
-            <HeroSectionFinanceBanking 
-               big={true}
-               backgroundColor="tertiary.50"
-            />
+            <HeroSectionFinanceBanking />
             
             <CompaniesSectionFinanceBanking 
                backgroundColor="background.paper"

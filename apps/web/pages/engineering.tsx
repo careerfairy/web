@@ -37,10 +37,7 @@ const EngineeringLandingPage: NextPage = () => {
          </Head>
          
          <Box sx={styles.pageContainer}>
-            <HeroSectionEngineering 
-               big={true}
-               backgroundColor="secondary.50"
-            />
+            <HeroSectionEngineering />
             
             <CompaniesSectionEngineering 
                backgroundColor="background.paper"
