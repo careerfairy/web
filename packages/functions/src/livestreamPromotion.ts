@@ -184,9 +184,9 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
       await markPromotionEmailSent(stream.id)
 
       info(`Successfully sent 14-day promotion emails for stream ${stream.id}`)
-   } catch (error) {
-      error(`Error sending promotion emails for stream ${stream.id}:`, error)
-      throw error
+   } catch (e) {
+      log(`Error sending promotion emails for stream ${stream.id}:`, e)
+      throw e
    }
 }
 
