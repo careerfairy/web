@@ -280,8 +280,9 @@ const Content = ({
    onClose: () => void
    onShare: () => void
 }) => {
+   const { push, asPath } = useRouter()
    const isMobile = useIsMobile()
-   const { userData } = useAuth()
+   const { userData, isLoggedOut } = useAuth()
 
    const companyUrl = event?.group?.publicProfile
       ? makeGroupCompanyPageUrl(event?.group?.universityName, {
@@ -325,7 +326,17 @@ const Content = ({
    }, [event, event?.id, userData])
 
    const handleRegisterClick = useCallback(() => {
-      if (userData && event) {
+      if (event) {
+         if (isLoggedOut) {
+            return push({
+               pathname: "/login",
+               query: { absolutePath: asPath },
+            })
+         }
+
+         if (!userData) return
+
+         window.open(registrationUrl, "_blank", "noopener")
          const utm = CookiesUtil.getUTMParams()
 
          offlineEventService
@@ -344,7 +355,7 @@ const Content = ({
                })
             })
       }
-   }, [userData, event])
+   }, [userData, event, isLoggedOut, push, registrationUrl, asPath])
 
    return (
       <Box position="relative">
@@ -458,9 +469,6 @@ const Content = ({
                   variant="contained"
                   color="primary"
                   size="large"
-                  href={registrationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   onClick={handleRegisterClick}
                >
                   Register to event
