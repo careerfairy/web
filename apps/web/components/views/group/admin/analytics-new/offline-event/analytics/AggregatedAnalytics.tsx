@@ -213,6 +213,7 @@ const AggregatedAnalytics = () => {
                count,
             }
          })
+         .filter((field) => field.count > 0)
          .sort((a, b) => b.count - a.count)
          .slice(0, 5)
 
@@ -236,6 +237,7 @@ const AggregatedAnalytics = () => {
                count,
             }
          })
+         .filter((university) => university.count > 0)
          .sort((a, b) => b.count - a.count)
          .slice(0, 5)
 
