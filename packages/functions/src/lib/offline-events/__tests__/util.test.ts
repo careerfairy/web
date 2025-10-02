@@ -54,9 +54,9 @@ describe("buildOfflineEventStatsUpdateData", () => {
          )
 
          expect(result).toMatchObject({
-            "universityStats.TUM.totalNumberOfTalentReached":
+            "universityStats.DE_TUM.totalNumberOfTalentReached":
                FieldValue.increment(1),
-            "universityStats.TUM.uniqueNumberOfTalentReached":
+            "universityStats.DE_TUM.uniqueNumberOfTalentReached":
                FieldValue.increment(1),
          })
       })
@@ -129,12 +129,12 @@ describe("buildOfflineEventStatsUpdateData", () => {
          )
 
          expect(result).toMatchObject({
-            "universityStats.TUM.totalNumberOfTalentReached":
+            "universityStats.DE_TUM.totalNumberOfTalentReached":
                FieldValue.increment(1),
          })
          // Should NOT include unique increment
          expect(result).not.toHaveProperty(
-            "universityStats.TUM.uniqueNumberOfTalentReached"
+            "universityStats.DE_TUM.uniqueNumberOfTalentReached"
          )
       })
    })
@@ -164,9 +164,9 @@ describe("buildOfflineEventStatsUpdateData", () => {
          )
 
          expect(result).toMatchObject({
-            "universityStats.TUM.totalNumberOfRegisterClicks":
+            "universityStats.DE_TUM.totalNumberOfRegisterClicks":
                FieldValue.increment(1),
-            "universityStats.TUM.uniqueNumberOfRegisterClicks":
+            "universityStats.DE_TUM.uniqueNumberOfRegisterClicks":
                FieldValue.increment(1),
          })
       })
@@ -233,12 +233,12 @@ describe("buildOfflineEventStatsUpdateData", () => {
 
          expect(result).toMatchObject({
             // Decrement old university
-            "universityStats.LMU.uniqueNumberOfTalentReached":
+            "universityStats.DE_LMU.uniqueNumberOfTalentReached":
                FieldValue.increment(-1),
             // Increment new university (both total and unique)
-            "universityStats.TUM.totalNumberOfTalentReached":
+            "universityStats.DE_TUM.totalNumberOfTalentReached":
                FieldValue.increment(1),
-            "universityStats.TUM.uniqueNumberOfTalentReached":
+            "universityStats.DE_TUM.uniqueNumberOfTalentReached":
                FieldValue.increment(1),
             // General stats should only increment total, not unique
             "generalStats.totalNumberOfTalentReached": FieldValue.increment(1),
@@ -282,12 +282,12 @@ describe("buildOfflineEventStatsUpdateData", () => {
 
          expect(result).toMatchObject({
             // Decrement old university
-            "universityStats.LMU.uniqueNumberOfRegisterClicks":
+            "universityStats.DE_LMU.uniqueNumberOfRegisterClicks":
                FieldValue.increment(-1),
             // Increment new university
-            "universityStats.TUM.totalNumberOfRegisterClicks":
+            "universityStats.DE_TUM.totalNumberOfRegisterClicks":
                FieldValue.increment(1),
-            "universityStats.TUM.uniqueNumberOfRegisterClicks":
+            "universityStats.DE_TUM.uniqueNumberOfRegisterClicks":
                FieldValue.increment(1),
          })
       })
@@ -327,6 +327,13 @@ describe("buildOfflineEventStatsUpdateData", () => {
             "countryStats.DE.totalNumberOfTalentReached":
                FieldValue.increment(1),
             "countryStats.DE.uniqueNumberOfTalentReached":
+               FieldValue.increment(1),
+            // University stats also change because key includes country code
+            "universityStats.FR_TUM.uniqueNumberOfTalentReached":
+               FieldValue.increment(-1),
+            "universityStats.DE_TUM.totalNumberOfTalentReached":
+               FieldValue.increment(1),
+            "universityStats.DE_TUM.uniqueNumberOfTalentReached":
                FieldValue.increment(1),
          })
       })
@@ -420,17 +427,17 @@ describe("buildOfflineEventStatsUpdateData", () => {
          )
 
          expect(result).toMatchObject({
-            // Decrements from old values
-            "universityStats.LMU.uniqueNumberOfTalentReached":
+            // Decrements from old values (university key now includes country)
+            "universityStats.FR_LMU.uniqueNumberOfTalentReached":
                FieldValue.increment(-1),
             "countryStats.FR.uniqueNumberOfTalentReached":
                FieldValue.increment(-1),
             "fieldOfStudyStats.math.uniqueNumberOfTalentReached":
                FieldValue.increment(-1),
             // Increments to new values
-            "universityStats.TUM.totalNumberOfTalentReached":
+            "universityStats.DE_TUM.totalNumberOfTalentReached":
                FieldValue.increment(1),
-            "universityStats.TUM.uniqueNumberOfTalentReached":
+            "universityStats.DE_TUM.uniqueNumberOfTalentReached":
                FieldValue.increment(1),
             "countryStats.DE.totalNumberOfTalentReached":
                FieldValue.increment(1),
@@ -516,7 +523,7 @@ describe("buildOfflineEventStatsUpdateData", () => {
          })
 
          // Should NOT decrement old university (user just removed it, not migrated)
-         expect(Object.keys(result).some((key) => key.includes("TUM"))).toBe(
+         expect(Object.keys(result).some((key) => key.includes("DE_TUM"))).toBe(
             false
          )
       })
@@ -552,7 +559,7 @@ describe("buildOfflineEventStatsUpdateData", () => {
          // Should only increment total for university (not unique, as user already viewed)
          // The user was already counted as a unique viewer at the general level
          expect(result).toMatchObject({
-            "universityStats.TUM.totalNumberOfTalentReached":
+            "universityStats.DE_TUM.totalNumberOfTalentReached":
                FieldValue.increment(1),
             // General should only increment total
             "generalStats.totalNumberOfTalentReached": FieldValue.increment(1),
@@ -560,7 +567,7 @@ describe("buildOfflineEventStatsUpdateData", () => {
 
          // Should NOT increment unique university stat (user already viewed)
          expect(result).not.toHaveProperty(
-            "universityStats.TUM.uniqueNumberOfTalentReached"
+            "universityStats.DE_TUM.uniqueNumberOfTalentReached"
          )
       })
    })

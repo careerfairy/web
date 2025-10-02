@@ -78,25 +78,29 @@ export function buildOfflineEventStatsUpdateData(
       updatedAt: Timestamp.now(),
    }
 
-   // Handle university stats migration if user changed university
-   if (hasChangedUniversity && previousUser?.university?.code) {
-      const oldUniversityCode = previousUser.university.code
+   // Handle university stats migration if user changed university or country
+   if (
+      (hasChangedUniversity || hasChangedCountry) &&
+      previousUser?.university?.code &&
+      previousUser?.universityCountryCode
+   ) {
+      const oldUniversityKey = `${previousUser.universityCountryCode}_${previousUser.university.code}`
       // Decrement unique count from old university
       updateData[
-         `universityStats.${oldUniversityCode}.uniqueNumberOf${segmentedStatsSuffix}`
+         `universityStats.${oldUniversityKey}.uniqueNumberOf${segmentedStatsSuffix}`
       ] = FieldValue.increment(-1)
    }
 
-   // Update university stats if available
-   if (user.university?.code) {
-      const universityCode = user.university.code
+   // Update university stats if available (key format: "{countryCode}_{universityCode}")
+   if (user.university?.code && user.universityCountryCode) {
+      const universityKey = `${user.universityCountryCode}_${user.university.code}`
       updateData[
-         `universityStats.${universityCode}.totalNumberOf${segmentedStatsSuffix}`
+         `universityStats.${universityKey}.totalNumberOf${segmentedStatsSuffix}`
       ] = FieldValue.increment(1)
-      // Increment unique if first action OR if migrating from another university
-      if (isFirstAction || hasChangedUniversity) {
+      // Increment unique if first action OR if migrating from another university/country
+      if (isFirstAction || hasChangedUniversity || hasChangedCountry) {
          updateData[
-            `universityStats.${universityCode}.uniqueNumberOf${segmentedStatsSuffix}`
+            `universityStats.${universityKey}.uniqueNumberOf${segmentedStatsSuffix}`
          ] = FieldValue.increment(1)
       }
    }

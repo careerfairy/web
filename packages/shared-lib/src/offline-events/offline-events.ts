@@ -77,7 +77,9 @@ export interface OfflineEventStats extends Identifiable {
    offlineEvent: OfflineEvent
    generalStats: StatsData
    universityStats: {
-      [universityCode: string]: StatsData
+      // Key format: "{countryCode}_{universityCode}" (e.g., "US_1234")
+      // Both values are needed to fetch the university later
+      [countryCodeAndUniversityCode: string]: StatsData
    }
    countryStats: {
       [countryCode: string]: StatsData
