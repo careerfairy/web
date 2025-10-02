@@ -232,7 +232,7 @@ const AggregatedAnalytics = () => {
                   ? (count / totalUniversityReached) * 100
                   : 0
             return {
-               name: universityLookup[universityKey] || universityKey,
+               name: universityLookup[universityKey] || "...",
                percentage: parseFloat(percentage.toFixed(1)),
                count,
             }
