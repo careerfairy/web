@@ -1,5 +1,8 @@
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { OfflineEventStats } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { createLookup } from "@careerfairy/shared-lib/utils"
 import { useListenToDocument } from "components/custom-hook/useListenToDocument"
+import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { createContext, useContext, useMemo } from "react"
@@ -7,10 +10,12 @@ import useClosestOfflineEventStats from "./useClosestOfflineEventStats"
 
 type IOfflineEventAnalyticsPageContext = {
    currentEventStats: OfflineEventStats | undefined | null
+   fieldsOfStudyLookup: Record<string, string> | undefined | null
 }
 
 const initialValues: IOfflineEventAnalyticsPageContext = {
    currentEventStats: undefined,
+   fieldsOfStudyLookup: {},
 }
 
 const OfflineEventAnalyticsPageContext =
@@ -33,11 +38,20 @@ export const OfflineEventAnalyticsPageProvider = ({ children }) => {
       offlineEventId ? `offlineEventStats/${offlineEventId}` : null
    )
 
+   const { data: fieldsOfStudy } =
+      useFirestoreCollection<FieldOfStudy>("fieldsOfStudy")
+
+   const fieldsOfStudyLookup = useMemo(
+      () => createLookup(fieldsOfStudy, "name"),
+      [fieldsOfStudy]
+   )
+
    const value = useMemo<IOfflineEventAnalyticsPageContext>(() => {
       return {
          currentEventStats, // Only return the current event stats if we are on a /offlineEventId page
+         fieldsOfStudyLookup,
       }
-   }, [currentEventStats])
+   }, [currentEventStats, fieldsOfStudyLookup])
 
    return (
       <OfflineEventAnalyticsPageContext.Provider value={value}>

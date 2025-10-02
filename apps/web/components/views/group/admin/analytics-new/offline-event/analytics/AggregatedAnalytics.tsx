@@ -2,6 +2,7 @@ import { Box, Card, LinearProgress, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { ClickIcon } from "components/views/common/icons/ClickIcon"
 import { ConversionBadgeIcon } from "components/views/common/icons/ConversionBadgeIcon"
+import { useMemo } from "react"
 import { Eye } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useOfflineEventAnalyticsPageContext } from "../OfflineEventAnalyticsPageProvider"
@@ -129,29 +130,94 @@ const styles = sxStyles({
 })
 
 const AggregatedAnalytics = () => {
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-   const { currentEventStats } = useOfflineEventAnalyticsPageContext()
+   const { currentEventStats, fieldsOfStudyLookup } =
+      useOfflineEventAnalyticsPageContext()
 
-   // Dummy data for now
-   const totalTalentReached = 1320
-   const totalClicks = 689
-   const conversionRate = 52
+   // Calculate real stats from currentEventStats
+   const stats = useMemo(() => {
+      if (!currentEventStats) {
+         return {
+            totalTalentReached: 0,
+            totalClicks: 0,
+            conversionRate: 0,
+            fieldsOfStudy: [],
+            universities: [],
+         }
+      }
 
-   const fieldsOfStudy = [
-      { name: "Computer science", percentage: 16.8, width: 107 },
-      { name: "Mechanical engineering", percentage: 10.1, width: 73 },
-      { name: "Business engineering", percentage: 9.7, width: 62 },
-      { name: "Physics", percentage: 8.2, width: 49 },
-      { name: "Mathematics", percentage: 7.3, width: 40 },
-   ]
+      const { generalStats, fieldOfStudyStats, universityStats } =
+         currentEventStats
 
-   const universities = [
-      { name: "ETH Zurich", percentage: 23.6, width: 110.4 },
-      { name: "University of Zurich", percentage: 19.3, width: 75.44 },
-      { name: "EPF Lausanne", percentage: 11.8, width: 58 },
-      { name: "ZHAW", percentage: 9.2, width: 48 },
-      { name: "University of St. Gallen", percentage: 8.2, width: 38 },
-   ]
+      // Get general stats
+      const totalTalentReached = generalStats.uniqueNumberOfTalentReached || 0
+      const totalClicks = generalStats.uniqueNumberOfRegisterClicks || 0
+      const conversionRate =
+         totalTalentReached > 0
+            ? Math.round((totalClicks / totalTalentReached) * 100)
+            : 0
+
+      // Calculate fields of study percentages (relative to sum of all field stats)
+      const fieldOfStudyEntries = Object.entries(fieldOfStudyStats || {})
+      const totalFieldOfStudyReached = fieldOfStudyEntries.reduce(
+         (sum, [, stats]) => sum + (stats.uniqueNumberOfTalentReached || 0),
+         0
+      )
+
+      const fieldsOfStudy = fieldOfStudyEntries
+         .map(([fieldId, stats]) => {
+            const count = stats.uniqueNumberOfTalentReached || 0
+            const percentage =
+               totalFieldOfStudyReached > 0
+                  ? (count / totalFieldOfStudyReached) * 100
+                  : 0
+            return {
+               name: fieldsOfStudyLookup?.[fieldId] || fieldId,
+               percentage: parseFloat(percentage.toFixed(1)),
+               count,
+            }
+         })
+         .sort((a, b) => b.count - a.count)
+         .slice(0, 5)
+
+      // Calculate university percentages (relative to sum of all university stats)
+      const universityEntries = Object.entries(universityStats || {})
+      const totalUniversityReached = universityEntries.reduce(
+         (sum, [, stats]) => sum + (stats.uniqueNumberOfTalentReached || 0),
+         0
+      )
+
+      const universities = universityEntries
+         .map(([universityCode, stats]) => {
+            const count = stats.uniqueNumberOfTalentReached || 0
+            const percentage =
+               totalUniversityReached > 0
+                  ? (count / totalUniversityReached) * 100
+                  : 0
+            return {
+               name: universityCode,
+               percentage: parseFloat(percentage.toFixed(1)),
+               count,
+            }
+         })
+         .sort((a, b) => b.count - a.count)
+         .slice(0, 5)
+
+      return {
+         totalTalentReached,
+         totalClicks,
+         conversionRate,
+         fieldsOfStudy,
+         universities,
+      }
+   }, [currentEventStats, fieldsOfStudyLookup])
+
+   const {
+      totalTalentReached,
+      totalClicks,
+      conversionRate,
+      fieldsOfStudy,
+      universities,
+   } = stats
 
    return (
       <Box sx={styles.container}>
