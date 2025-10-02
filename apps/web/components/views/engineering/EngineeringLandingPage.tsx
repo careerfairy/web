@@ -2,10 +2,10 @@ import { Box } from "@mui/material"
 import { HeroSectionEngineering } from "./HeroSectionEngineering"
 import { AboutSectionEngineering } from "./AboutSectionEngineering"
 import { CompaniesSectionEngineering } from "./CompaniesSectionEngineering"
-import { TestimonialsSection } from "../consulting/TestimonialsSection"
-import { StatsSection } from "../consulting/StatsSection"
+import { TestimonialsWrapper } from "../common/TestimonialsWrapper"
+import { StatsSection } from "../common/StatsSection"
 import { FAQSectionEngineering } from "./FAQSectionEngineering"
-import { CTASection } from "../consulting/CTASection"
+import { CTASection } from "../common/CTASection"
 
 export function EngineeringLandingPage() {
    return (
@@ -13,7 +13,7 @@ export function EngineeringLandingPage() {
          <HeroSectionEngineering />
          <AboutSectionEngineering />
          <CompaniesSectionEngineering />
-         <TestimonialsSection />
+         <TestimonialsWrapper />
          <StatsSection />
          <FAQSectionEngineering />
          <CTASection />
