@@ -11,6 +11,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Search as FindIcon } from "react-feather"
 import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { useOfflineEventAnalyticsPageContext } from "../OfflineEventAnalyticsPageProvider"
 
 const styles = sxStyles({
@@ -81,6 +82,14 @@ const OfflineEventSearchNav = () => {
          return offlineEventService.getFutureAndPublishedOfflineEventStats(
             group.id
          )
+      },
+      {
+         onError: (error) => {
+            errorLogAndNotify(error, {
+               title: "Error fetching future and published offline events",
+               groupId: group.id,
+            })
+         },
       }
    )
 
