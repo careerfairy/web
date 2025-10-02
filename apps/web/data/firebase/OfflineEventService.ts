@@ -5,6 +5,7 @@ import { TrackOfflineEventActionRequest } from "@careerfairy/shared-lib/function
 import { AuthorInfo } from "@careerfairy/shared-lib/livestreams"
 import {
    OfflineEvent,
+   OfflineEventStats,
    OfflineEventStatsAction,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { UserData } from "@careerfairy/shared-lib/users"
@@ -16,6 +17,8 @@ import {
    getDoc,
    getDocs,
    increment,
+   limit,
+   orderBy,
    query,
    setDoc,
    updateDoc,
@@ -136,6 +139,70 @@ export class OfflineEventService {
       )
 
       return snapshots.docs.map((doc) => doc.data())
+   }
+
+   /**
+    * Get offline event stats by event ID
+    * @param offlineEventId - The ID of the offline event
+    * @returns Promise with the offline event stats or null if not found
+    */
+   async getOfflineEventStats(
+      offlineEventId: string
+   ): Promise<OfflineEventStats | null> {
+      const statsRef = doc(
+         this.firestore,
+         "offlineEventStats",
+         offlineEventId
+      ).withConverter(createGenericConverter<OfflineEventStats>())
+
+      const statsSnap = await getDoc(statsRef)
+      return statsSnap.exists() ? statsSnap.data() : null
+   }
+
+   /**
+    * Fetches the closest future offline event stats from a given date for a specific group.
+    * @param groupId - The ID of the group to fetch the offline event stats for
+    * @param fromDate - The date to start searching from (defaults to current date)
+    * @returns Promise which resolves to the closest future offline event stats or null if there are no upcoming events
+    */
+   async getClosestFutureOfflineEventStatsFromDate(
+      groupId: string,
+      fromDate: Date = new Date()
+   ): Promise<OfflineEventStats | null> {
+      const q = query(
+         collection(this.firestore, "offlineEventStats"),
+         where("offlineEvent.group.id", "==", groupId),
+         where("offlineEvent.startAt", ">", fromDate),
+         where("offlineEvent.published", "==", true),
+         orderBy("offlineEvent.startAt", "asc"),
+         limit(1)
+      ).withConverter(createGenericConverter<OfflineEventStats>())
+
+      const snapshot = await getDocs(q)
+      return snapshot.docs[0]?.data() || null
+   }
+
+   /**
+    * Fetches the closest past offline event stats from a given date for a specific group.
+    * @param groupId - The ID of the group to fetch the offline event stats for
+    * @param fromDate - The date to start searching from (defaults to current date)
+    * @returns Promise which resolves to the closest past offline event stats or null if there are no past events
+    */
+   async getClosestPastOfflineEventStatsFromDate(
+      groupId: string,
+      fromDate: Date = new Date()
+   ): Promise<OfflineEventStats | null> {
+      const q = query(
+         collection(this.firestore, "offlineEventStats"),
+         where("offlineEvent.group.id", "==", groupId),
+         where("offlineEvent.startAt", "<", fromDate),
+         where("offlineEvent.published", "==", true),
+         orderBy("offlineEvent.startAt", "desc"),
+         limit(1)
+      ).withConverter(createGenericConverter<OfflineEventStats>())
+
+      const snapshot = await getDocs(q)
+      return snapshot.docs[0]?.data() || null
    }
 
    /**
