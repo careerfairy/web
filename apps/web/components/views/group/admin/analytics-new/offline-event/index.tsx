@@ -11,6 +11,7 @@ import OfflineEventSearchNav from "./search/OfflineEventSearchNav"
 
 const styles = sxStyles({
    rootContainer: {
+      mt: 2,
       backgroundColor: "common.white",
       borderRadius: "20px",
       border: "1px solid",

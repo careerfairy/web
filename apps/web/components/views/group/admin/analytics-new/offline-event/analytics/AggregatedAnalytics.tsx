@@ -1,5 +1,6 @@
 import { Box, Card, LinearProgress, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
+import useUniversitiesByCountryCodes from "components/custom-hook/useUniversities"
 import { ClickIcon } from "components/views/common/icons/ClickIcon"
 import { ConversionBadgeIcon } from "components/views/common/icons/ConversionBadgeIcon"
 import { useMemo } from "react"
@@ -133,6 +134,42 @@ const AggregatedAnalytics = () => {
    const { currentEventStats, fieldsOfStudyLookup } =
       useOfflineEventAnalyticsPageContext()
 
+   // Extract unique country codes from universityStats
+   const countryCodes = useMemo(() => {
+      if (!currentEventStats?.universityStats) return []
+      const codes = Object.keys(currentEventStats.universityStats).map(
+         (key) => key.split("_")[0]
+      )
+      return [...new Set(codes)]
+   }, [currentEventStats])
+
+   // Fetch universities for all country codes
+   const fetchedUniversities = useUniversitiesByCountryCodes(countryCodes)
+
+   // Create lookup map: countryCode_universityId -> University Name
+   // The universityStats keys are in format: "{countryCode}_{universityId}"
+   const universityLookup = useMemo(() => {
+      const lookup: Record<string, string> = {}
+
+      // Need to map each fetched university to its country code
+      // Since we don't have direct country code on University, we need to track it during fetch
+      // For now, we'll build the lookup by matching the university IDs from the stats keys
+      if (!currentEventStats?.universityStats) return lookup
+
+      const statsKeys = Object.keys(currentEventStats.universityStats)
+      statsKeys.forEach((statsKey) => {
+         const [, universityId] = statsKey.split("_")
+         const university = fetchedUniversities.find(
+            (u) => u.id === universityId
+         )
+         if (university) {
+            lookup[statsKey] = university.name
+         }
+      })
+
+      return lookup
+   }, [fetchedUniversities, currentEventStats])
+
    // Calculate real stats from currentEventStats
    const stats = useMemo(() => {
       if (!currentEventStats) {
@@ -186,15 +223,15 @@ const AggregatedAnalytics = () => {
          0
       )
 
-      const universities = universityEntries
-         .map(([universityCode, stats]) => {
+      const universitiesData = universityEntries
+         .map(([universityKey, stats]) => {
             const count = stats.uniqueNumberOfTalentReached || 0
             const percentage =
                totalUniversityReached > 0
                   ? (count / totalUniversityReached) * 100
                   : 0
             return {
-               name: universityCode,
+               name: universityLookup[universityKey] || universityKey,
                percentage: parseFloat(percentage.toFixed(1)),
                count,
             }
@@ -207,9 +244,9 @@ const AggregatedAnalytics = () => {
          totalClicks,
          conversionRate,
          fieldsOfStudy,
-         universities,
+         universities: universitiesData,
       }
-   }, [currentEventStats, fieldsOfStudyLookup])
+   }, [currentEventStats, fieldsOfStudyLookup, universityLookup])
 
    const {
       totalTalentReached,
