@@ -266,8 +266,7 @@ export const notifyOfflineEventPublished = (
             },
             accessory: {
                type: "image",
-               image_url:
-                  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2F5b79c024-f178-4004-9964-6088fdc63563_ge.png.png?alt=media",
+               image_url: params.eventImageUrl,
                alt_text: "Offline Event Published",
             },
          },
