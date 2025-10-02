@@ -26,7 +26,7 @@ const Promotion14Days = {
 } as const
 
 const scheduleOptions = {
-   memory: "4GiB",
+   memory: "512MiB",
    timeoutSeconds: 540,
    schedule: "every 1 hours", // Run every hour to check for streams needing promotion
    timeZone: "Europe/Zurich",
