@@ -245,21 +245,17 @@ export class OfflineEventService {
    ): Promise<void> {
       const isUserData = typeof userDataOrFingerprint === "object"
 
-      const args: TrackOfflineEventActionRequest = {
+      await httpsCallable<TrackOfflineEventActionRequest>(
+         FunctionsInstance,
+         FUNCTION_NAMES.trackOfflineEventAction
+      )({
          offlineEventId,
          actionType,
          utm,
          ...(isUserData
             ? { userData: userDataOrFingerprint }
             : { fingerprint: userDataOrFingerprint }),
-      }
-
-      alert(JSON.stringify(args, null, 2))
-
-      await httpsCallable<TrackOfflineEventActionRequest>(
-         FunctionsInstance,
-         FUNCTION_NAMES.trackOfflineEventAction
-      )(args)
+      })
    }
 }
 
