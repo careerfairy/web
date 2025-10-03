@@ -69,12 +69,6 @@ const styles = sxStyles({
       width: { xs: 174, md: 240 },
       height: { xs: 346, md: "auto" },
       pointerEvents: "none",
-      "& img": {
-         filter: "hue-rotate(90deg) saturate(1.5) brightness(1.2)",
-      },
-      background: "linear-gradient(180deg, #0DFF00 0%, rgba(46, 125, 50, 0) 100%)",
-      mixBlendMode: "multiply",
-      opacity: 0.6,
    },
    visualSupportRight: {
       position: "absolute",
@@ -83,12 +77,6 @@ const styles = sxStyles({
       width: { xs: 273, md: 220 },
       height: { xs: 346, md: "auto" },
       pointerEvents: "none",
-      "& img": {
-         filter: "hue-rotate(90deg) saturate(1.3) brightness(1.1)",
-      },
-      background: "linear-gradient(180deg, rgba(173, 255, 181, 0.42) 0%, #2E7D32 100%)",
-      mixBlendMode: "multiply",
-      opacity: 0.6,
    },
    tagChips: {
       gap: 1,
@@ -210,7 +198,7 @@ export default function HeroSectionFinanceBanking({
          <Box aria-hidden sx={styles.visualSupportContainer}>
             <Box aria-hidden sx={styles.visualSupportLeft}>
                <Image
-                  src="/panels/header-left-visual-support.svg"
+                  src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/financebanking-hero-left-shape.svg?alt=media&token=44f614ca-8335-4151-868e-27900cd7731b"
                   alt=""
                   width={300}
                   height={300}
@@ -220,7 +208,7 @@ export default function HeroSectionFinanceBanking({
             {Boolean(isLargeScreen) && (
                <Box aria-hidden sx={styles.visualSupportRight}>
                   <Image
-                     src="/panels/header-right-visual-support.svg"
+                     src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/financebanking-hero-right-shape.svg?alt=media&token=4b4d81d0-bdef-466f-aafa-3c888e2a401d"
                      alt=""
                      width={300}
                      height={300}
