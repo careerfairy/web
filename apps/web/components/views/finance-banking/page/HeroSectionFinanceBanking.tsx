@@ -25,7 +25,7 @@ const styles = sxStyles({
       position: "relative",
       height: { xs: "812px", md: "431px" },
       background:
-         "linear-gradient(0deg, #F0F4FF 0%, #F0F4FF 100%), linear-gradient(104deg, #F5F7FF 0%, #F5F7FF 100%), linear-gradient(169deg, rgba(98, 117, 255, 0.13) 1.77%, rgba(70, 90, 230, 0.00) 98.23%), linear-gradient(25deg, rgba(70, 90, 230, 0.00) -0.66%, rgba(98, 117, 255, 0.48) 141.07%), #4A5BAD",
+         "linear-gradient(0deg, #E8F5E9 0%, #E8F5E9 100%), linear-gradient(104deg, #F1F8F4 0%, #F1F8F4 100%), linear-gradient(169deg, rgba(27, 154, 33, 0.13) 1.77%, rgba(46, 125, 50, 0.00) 98.23%), linear-gradient(25deg, rgba(46, 125, 50, 0.00) -0.66%, rgba(27, 154, 33, 0.48) 141.07%), #1B9A21",
    },
    headerContainer: {
       gap: { xs: 1.5, md: 4 },
@@ -47,7 +47,7 @@ const styles = sxStyles({
       textAlign: { xs: "center", md: "left" },
    },
    sectionTitle: {
-      color: "#4A72C8",
+      color: "#1B9A21",
       fontWeight: 700,
       lineHeight: 1.2,
    },
@@ -69,6 +69,12 @@ const styles = sxStyles({
       width: { xs: 174, md: 240 },
       height: { xs: 346, md: "auto" },
       pointerEvents: "none",
+      "& img": {
+         filter: "hue-rotate(90deg) saturate(1.5) brightness(1.2)",
+      },
+      background: "linear-gradient(180deg, #0DFF00 0%, rgba(46, 125, 50, 0) 100%)",
+      mixBlendMode: "multiply",
+      opacity: 0.6,
    },
    visualSupportRight: {
       position: "absolute",
@@ -77,6 +83,12 @@ const styles = sxStyles({
       width: { xs: 273, md: 220 },
       height: { xs: 346, md: "auto" },
       pointerEvents: "none",
+      "& img": {
+         filter: "hue-rotate(90deg) saturate(1.3) brightness(1.1)",
+      },
+      background: "linear-gradient(180deg, #2E7D32 0%, rgba(173, 255, 181, 0.42) 100%)",
+      mixBlendMode: "multiply",
+      opacity: 0.6,
    },
    tagChips: {
       gap: 1,
