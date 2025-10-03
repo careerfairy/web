@@ -1,5 +1,5 @@
 import { sxStyles } from "@careerfairy/shared-ui"
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { Form } from "formik"
@@ -12,6 +12,7 @@ import { useOfflineEventFormValues } from "./useOfflineEventFormValues"
 import { OfflineEventFormGeneralStep } from "./views/general"
 import OfflineEventFormPreview from "./views/preview/OfflineEventFormPreview"
 import { OfflineEventPreviewContextProvider } from "./views/preview/OfflineEventPreviewContext"
+import useOfflineEventPreviewScale from "./views/preview/useOfflineEventPreviewScale"
 
 const getRootStylesForDesktop = (columnWidth: string) =>
    sxStyles({
@@ -19,7 +20,7 @@ const getRootStylesForDesktop = (columnWidth: string) =>
       display: "grid",
       gridTemplateColumns: `auto ${columnWidth}`,
       columnGap: "0px",
-      height: "calc(100vh - 100px)", // Fixed height for the entire form container
+      overflowX: "hidden",
    })
 
 const styles = sxStyles({
@@ -28,8 +29,6 @@ const styles = sxStyles({
    },
    tabs: {
       padding: "24px",
-      height: "100%",
-      overflowY: "auto",
    },
 })
 
@@ -39,6 +38,7 @@ const OfflineEventForm = () => {
    const isMobile = useIsMobile()
    const { tabValue, group, author } = useOfflineEventCreationContext()
    const { values } = useOfflineEventFormValues()
+   const { scale, previewWidth } = useOfflineEventPreviewScale(formContainerRef)
    const offlineEventToPreview = useMemo(() => {
       return convertFormValuesToOfflineEventObject(
          values,
@@ -51,20 +51,26 @@ const OfflineEventForm = () => {
    useAutoSave()
 
    const rootStyles = useMemo(() => {
-      return isMobile ? styles.rootMobile : getRootStylesForDesktop("39%")
-   }, [isMobile])
+      return isMobile
+         ? styles.rootMobile
+         : getRootStylesForDesktop(previewWidth || "39%")
+   }, [isMobile, previewWidth])
 
    return (
-      <Form ref={formContainerRef} style={rootStyles}>
-         <Stack sx={styles.tabs} rowGap={2}>
-            {tabValue === TAB_VALUES.GENERAL && <OfflineEventFormGeneralStep />}
-         </Stack>
-         <OfflineEventPreviewContextProvider
-            offlineEvent={offlineEventToPreview}
-         >
-            <OfflineEventFormPreview />
-         </OfflineEventPreviewContextProvider>
-      </Form>
+      <Box sx={{ overflow: "auto", maxHeight: "calc(100vh - 76px)" }}>
+         <Form ref={formContainerRef} style={rootStyles}>
+            <Stack sx={styles.tabs} rowGap={2}>
+               {tabValue === TAB_VALUES.GENERAL && (
+                  <OfflineEventFormGeneralStep />
+               )}
+            </Stack>
+            <OfflineEventPreviewContextProvider
+               offlineEvent={offlineEventToPreview}
+            >
+               <OfflineEventFormPreview scale={scale} />
+            </OfflineEventPreviewContextProvider>
+         </Form>
+      </Box>
    )
 }
 
