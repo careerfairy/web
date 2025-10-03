@@ -49,11 +49,10 @@ export default function RecordingsSectionConsulting({
             title={
                <Stack sx={{ gap: 0.5, mb: 1.5 }}>
                   <Typography variant="brandedH5" color="text.primary">
-                     Can&apos;t wait for the insights?
+                     Can't wait for the insights?
                   </Typography>
                   <Typography variant="medium" sx={styles.sectionDescription}>
-                     Get ahead of everyone with the insights from consulting
-                     live streams that recently happened
+                     Get ahead of everyone with the insights from consulting live streams that recently happened
                   </Typography>
                </Stack>
             }
