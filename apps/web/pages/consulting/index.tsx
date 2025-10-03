@@ -74,25 +74,6 @@ export default function ConsultingPage({
          (query.selectedLivestreamId as string | null)
    )
 
-   const handleOpenPanelDialog = useCallback(
-      (panelId: string) => {
-         setSelectedId(panelId)
-         void push(
-            {
-               pathname: pathname,
-               query: {
-                  ...query,
-                  selectedPanelId: panelId,
-                  originSource: "Consulting_Overview_Page",
-               },
-            },
-            undefined,
-            { shallow: true }
-         )
-      },
-      [query, push, pathname]
-   )
-
    const handleOpenLivestreamDialog = useCallback(
       (livestreamId: string) => {
          setSelectedId(livestreamId)
@@ -138,7 +119,7 @@ export default function ConsultingPage({
             <Stack sx={styles.pageContainer}>
                <HeroSectionConsulting
                   panelEvents={deserializedPanelEvents}
-                  handleOpenLivestreamDialog={handleOpenPanelDialog}
+                  handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
                <WhosThisForSectionConsulting />
                <ParticipatingCompaniesSectionConsulting companies={companies} />
