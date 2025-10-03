@@ -3,9 +3,7 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { Stack, Typography } from "@mui/material"
-import useRecommendedEvents from "components/custom-hook/useRecommendedEvents"
 import EventsPreviewCarousel from "components/views/portal/events-preview/EventsPreviewCarousel"
-import { useAuth } from "HOCs/AuthProvider"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -25,39 +23,25 @@ const styles = sxStyles({
    },
 })
 
-interface NotForYouSectionProps {
-   recentLivestreams: LivestreamEvent[]
+interface RecordingsSectionConsultingProps {
+   consultingRecordings: LivestreamEvent[]
    handleOpenLivestreamDialog: (livestreamId: string) => void
-   title?: string
-   subtitle?: string
 }
 
-export default function NotForYouSection({
-   recentLivestreams,
+export default function RecordingsSectionConsulting({
+   consultingRecordings,
    handleOpenLivestreamDialog,
-   title = "Not for you?",
-   subtitle = "Here are more live streams",
-}: NotForYouSectionProps) {
-   const { authenticatedUser, userData } = useAuth()
-   const hasInterests = Boolean(
-      authenticatedUser?.email || userData?.interestsIds
-   )
-
-   const { events: recommendedEvents } = useRecommendedEvents({
-      limit: 10,
-   })
-
-   const showingRecommended = hasInterests && Boolean(recommendedEvents?.length)
-   const eventsToShow = showingRecommended
-      ? recommendedEvents
-      : recentLivestreams
+}: RecordingsSectionConsultingProps) {
+   // Don't render if no recordings available
+   if (!consultingRecordings || consultingRecordings.length === 0) {
+      return null
+   }
 
    return (
       <Stack sx={styles.carouselWrapper}>
          <EventsPreviewCarousel
-            events={eventsToShow}
+            events={consultingRecordings}
             location={ImpressionLocation.panelsOverviewPage}
-            isRecommended={showingRecommended}
             onCardClick={(event) => {
                handleOpenLivestreamDialog(event.id)
             }}
@@ -65,10 +49,11 @@ export default function NotForYouSection({
             title={
                <Stack sx={{ gap: 0.5, mb: 1.5 }}>
                   <Typography variant="brandedH5" color="text.primary">
-                     {title}
+                     Can&apos;t wait for the insights?
                   </Typography>
                   <Typography variant="medium" sx={styles.sectionDescription}>
-                     {subtitle}
+                     Get ahead of everyone with the insights from consulting
+                     live streams that recently happened
                   </Typography>
                </Stack>
             }
