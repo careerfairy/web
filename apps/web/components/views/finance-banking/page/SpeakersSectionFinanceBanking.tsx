@@ -126,7 +126,7 @@ export default function SpeakersSectionFinanceBanking({
                <Box aria-hidden sx={styles.visualSupportContainer}>
                   <Box aria-hidden sx={styles.visualSupportLeft}>
                      <Image
-                        src="/panels/speakers-purple-visual-support.svg"
+                        src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/financebanking-speakers-left-shape.svg?alt=media&token=8d94cd6b-fe9f-4f08-92c4-6dd7d86f69d1"
                         alt=""
                         width={237}
                         height={199}
@@ -135,7 +135,7 @@ export default function SpeakersSectionFinanceBanking({
                   </Box>
                   <Box aria-hidden sx={styles.visualSupportRight}>
                      <Image
-                        src="/panels/speakers-turquoise-visual-support.svg"
+                        src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/financebanking-speakers-right-shape.svg?alt=media&token=ea695cf6-f119-44f0-82e8-f6bcc4bcbba8"
                         alt=""
                         width={339}
                         height={199}
