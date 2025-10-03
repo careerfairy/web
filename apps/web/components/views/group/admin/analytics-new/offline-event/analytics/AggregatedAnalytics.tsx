@@ -88,8 +88,11 @@ const styles = sxStyles({
 
 const AggregatedAnalytics = () => {
    const isMobile = useIsMobile()
-   const { currentEventStats, fieldsOfStudyLookup } =
-      useOfflineEventAnalyticsPageContext()
+   const {
+      currentEventStats,
+      fieldsOfStudyLookup,
+      isLoadingCurrentEventStats,
+   } = useOfflineEventAnalyticsPageContext()
 
    // Extract unique country codes from universityStats
    const countryCodes = useMemo(() => {
@@ -143,8 +146,8 @@ const AggregatedAnalytics = () => {
          currentEventStats
 
       // Get general stats
-      const totalTalentReached = generalStats.uniqueNumberOfTalentReached || 0
-      const totalClicks = generalStats.uniqueNumberOfRegisterClicks || 0
+      const totalTalentReached = generalStats.totalNumberOfTalentReached || 0
+      const totalClicks = generalStats.totalNumberOfRegisterClicks || 0
       const conversionRate =
          totalTalentReached > 0
             ? Math.round((totalClicks / totalTalentReached) * 100)
@@ -153,13 +156,13 @@ const AggregatedAnalytics = () => {
       // Calculate fields of study percentages (relative to sum of all field stats)
       const fieldOfStudyEntries = Object.entries(fieldOfStudyStats || {})
       const totalFieldOfStudyReached = fieldOfStudyEntries.reduce(
-         (sum, [, stats]) => sum + (stats.uniqueNumberOfTalentReached || 0),
+         (sum, [, stats]) => sum + (stats.totalNumberOfTalentReached || 0),
          0
       )
 
       const fieldsOfStudy = fieldOfStudyEntries
          .map(([fieldId, stats]) => {
-            const count = stats.uniqueNumberOfTalentReached || 0
+            const count = stats.totalNumberOfTalentReached || 0
             const percentage =
                totalFieldOfStudyReached > 0
                   ? (count / totalFieldOfStudyReached) * 100
@@ -177,13 +180,13 @@ const AggregatedAnalytics = () => {
       // Calculate university percentages (relative to sum of all university stats)
       const universityEntries = Object.entries(universityStats || {})
       const totalUniversityReached = universityEntries.reduce(
-         (sum, [, stats]) => sum + (stats.uniqueNumberOfTalentReached || 0),
+         (sum, [, stats]) => sum + (stats.totalNumberOfTalentReached || 0),
          0
       )
 
       const universitiesData = universityEntries
          .map(([universityKey, stats]) => {
-            const count = stats.uniqueNumberOfTalentReached || 0
+            const count = stats.totalNumberOfTalentReached || 0
             const percentage =
                totalUniversityReached > 0
                   ? (count / totalUniversityReached) * 100
@@ -269,7 +272,7 @@ const AggregatedAnalytics = () => {
                   Top 5 fields of study
                </Typography>
 
-               {fieldsOfStudy.length === 0 ? (
+               {!fieldsOfStudy?.length && !isLoadingCurrentEventStats ? (
                   <Box sx={styles.emptyState}>
                      <Typography
                         variant="medium"
@@ -281,7 +284,7 @@ const AggregatedAnalytics = () => {
                   </Box>
                ) : (
                   <Box sx={styles.progressSection}>
-                     {fieldsOfStudy.map((field, index) => (
+                     {fieldsOfStudy?.map((field, index) => (
                         <ProgressBarItem
                            key={index}
                            name={field.name}
@@ -302,7 +305,7 @@ const AggregatedAnalytics = () => {
                   Top 5 universities
                </Typography>
 
-               {universities.length === 0 ? (
+               {!universities?.length && !isLoadingCurrentEventStats ? (
                   <Box sx={styles.emptyState}>
                      <Typography
                         variant="medium"
@@ -314,7 +317,7 @@ const AggregatedAnalytics = () => {
                   </Box>
                ) : (
                   <Box sx={styles.progressSection}>
-                     {universities.map((university, index) => (
+                     {universities?.map((university, index) => (
                         <ProgressBarItem
                            key={index}
                            name={university.name}

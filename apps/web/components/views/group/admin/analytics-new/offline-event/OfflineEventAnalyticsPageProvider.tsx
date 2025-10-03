@@ -10,11 +10,13 @@ import useClosestOfflineEventStats from "./useClosestOfflineEventStats"
 
 type IOfflineEventAnalyticsPageContext = {
    currentEventStats: OfflineEventStats | undefined | null
+   isLoadingCurrentEventStats: boolean
    fieldsOfStudyLookup: Record<string, string> | undefined | null
 }
 
 const initialValues: IOfflineEventAnalyticsPageContext = {
    currentEventStats: undefined,
+   isLoadingCurrentEventStats: false,
    fieldsOfStudyLookup: {},
 }
 
@@ -34,9 +36,10 @@ export const OfflineEventAnalyticsPageProvider = ({ children }) => {
       refreshInterval: 3000,
    })
 
-   const { data: currentEventStats } = useListenToDocument<OfflineEventStats>(
-      offlineEventId ? `offlineEventStats/${offlineEventId}` : null
-   )
+   const { data: currentEventStats, loading: isLoadingCurrentEventStats } =
+      useListenToDocument<OfflineEventStats>(
+         offlineEventId ? `offlineEventStats/${offlineEventId}` : null
+      )
 
    const { data: fieldsOfStudy } =
       useFirestoreCollection<FieldOfStudy>("fieldsOfStudy")
@@ -50,8 +53,9 @@ export const OfflineEventAnalyticsPageProvider = ({ children }) => {
       return {
          currentEventStats, // Only return the current event stats if we are on a /offlineEventId page
          fieldsOfStudyLookup,
+         isLoadingCurrentEventStats,
       }
-   }, [currentEventStats, fieldsOfStudyLookup])
+   }, [currentEventStats, fieldsOfStudyLookup, isLoadingCurrentEventStats])
 
    return (
       <OfflineEventAnalyticsPageContext.Provider value={value}>

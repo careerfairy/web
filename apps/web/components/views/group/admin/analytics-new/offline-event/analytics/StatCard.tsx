@@ -105,7 +105,11 @@ export const StatCard = ({
                         {label}
                      </Typography>
                   </Box>
-                  <Typography variant="desktopBrandedH3" fontWeight={700}>
+                  <Typography
+                     ml={"1.5px"}
+                     variant="desktopBrandedH3"
+                     fontWeight={700}
+                  >
                      {value.toLocaleString()}
                   </Typography>
                </Stack>
