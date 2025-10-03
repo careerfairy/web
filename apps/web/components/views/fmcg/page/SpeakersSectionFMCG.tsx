@@ -83,19 +83,35 @@ const styles = sxStyles({
       inset: 0,
       pointerEvents: "none",
    },
-   // Purple image - top left of speakers grid
+   // Top left of speakers grid
    visualSupportLeft: {
       position: "absolute",
       left: 0,
       top: 0,
       margin: "-10px -15px",
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         inset: 0,
+         background: "linear-gradient(135deg, #F4FFE1 0%, rgba(244, 255, 225, 0) 100%)",
+         mixBlendMode: "multiply",
+         pointerEvents: "none",
+      },
    },
-   // Turquoise image - bottom right of speakers grid
+   // Bottom right of speakers grid
    visualSupportRight: {
       position: "absolute",
       right: 0,
       bottom: 0,
       margin: "-5px",
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         inset: 0,
+         background: "linear-gradient(135deg, #FFF8E1 0%, rgba(255, 248, 225, 0) 100%)",
+         mixBlendMode: "multiply",
+         pointerEvents: "none",
+      },
    },
 })
 
