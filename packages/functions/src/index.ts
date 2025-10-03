@@ -84,6 +84,7 @@ import stripe = require("./stripe")
 import tags = require("./lib/tagging/tags")
 import notificationLivestreams = require("./notificationLivestreams")
 import notificationOnboardings = require("./notificationOnboarding")
+import notificationOfflineEvents = require("./notificationOfflineEvents")
 import user = require("./user")
 import countries = require("./countries")
 import levels = require("./levels")
@@ -179,6 +180,10 @@ exports[FUNCTION_NAMES.getLivestreamsICalendarEvents] =
 // Sparks Trial Notifications
 exports[FUNCTION_NAMES.notifySlackWhenSparksTrialStarts] =
    notificationOnboardings.notifySlackWhenSparksTrialStarts
+
+// Offline Event Notifications
+exports[FUNCTION_NAMES.notifySlackWhenOfflineEventIsPublished] =
+   notificationOfflineEvents.notifySlackWhenOfflineEventIsPublished
 
 // Tags
 exports.fetchTagsContentHits = tags.fetchContentHits

@@ -223,6 +223,71 @@ export const notifySparksTrialStarted = (
    })
 }
 
+/**
+ * Sends a Slack notification when an offline event is published.
+ *
+ * @returns Promise that resolves when the notification is sent
+ */
+export const notifyOfflineEventPublished = (
+   webhookUrl: string,
+   params: {
+      companyName: string
+      eventTitle: string
+      eventId: string
+      eventDate: Date
+      groupId: string
+      remainingCredits: number
+      eventImageUrl: string
+   }
+) => {
+   const eventLink = `https://www.careerfairy.io/portal?offline-event=${params.eventId}`
+   const groupAdminOfflineEvents = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
+
+   const body: Record<string, string> = {
+      "Company Name": params.companyName,
+      "Event Date": formatEventStartDate(params.eventDate),
+      "Remaining Credits": params.remainingCredits.toString(),
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `Offline Event Published: *<${eventLink}|${params.eventTitle}>*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+            accessory: {
+               type: "image",
+               image_url: params.eventImageUrl,
+               alt_text: "Offline Event Published",
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Admin Events Page",
+                  },
+                  url: groupAdminOfflineEvents,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
 function formatEventStartDate(date) {
    const luxonDate = DateTime.fromJSDate(date)
    return luxonDate.toLocaleString(DateTime.DATETIME_FULL)
