@@ -50,7 +50,7 @@ const styles = sxStyles({
       justifyContent: "center",
       flexShrink: 0,
       borderRadius: "50%",
-      backgroundColor: (theme) => theme.brand.purple[50],
+      backgroundColor: (theme) => theme.brand.white[400],
    },
    icon: {
       width: 16,
@@ -58,7 +58,7 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      color: (theme) => theme.brand.purple[800],
+      color: (theme) => theme.brand.tq[600],
       fontWeight: 600,
    },
    sectionTitle: {
