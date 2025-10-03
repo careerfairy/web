@@ -31,6 +31,7 @@ const getStyles = (responsiveHeight: string) =>
          borderRadius: "12px",
          overflowY: "scroll",
          maxHeight: "calc(100dvh - 96px)",
+         minHeight: "calc(100dvh - 96px)",
       },
    })
 
