@@ -56,10 +56,13 @@ export interface OfflineEventTargetAudience {
    fieldOfStudies: FieldOfStudy[]
 }
 
-export enum OfflineEventStatsAction {
-   Click = "click",
-   View = "view",
-}
+export const OfflineEventStatsAction = {
+   Click: "click",
+   View: "view",
+} as const
+
+export type OfflineEventStatsAction =
+   (typeof OfflineEventStatsAction)[keyof typeof OfflineEventStatsAction]
 
 type StatsData = {
    totalNumberOfRegisterClicks: number
@@ -71,10 +74,13 @@ type StatsData = {
 // collection path /offlineEventStats/{offlineEventId}
 export interface OfflineEventStats extends Identifiable {
    documentType: "offlineEventStats" // simplify groupCollection Queries
+   deleted: boolean
    offlineEvent: OfflineEvent
    generalStats: StatsData
    universityStats: {
-      [universityCode: string]: StatsData
+      // Key format: "{countryCode}_{universityCode}" (e.g., "US_1234")
+      // Both values are needed to fetch the university later
+      [countryCodeAndUniversityCode: string]: StatsData
    }
    countryStats: {
       [countryCode: string]: StatsData

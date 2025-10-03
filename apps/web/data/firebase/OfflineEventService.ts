@@ -1,6 +1,13 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { UTMParams } from "@careerfairy/shared-lib/commonTypes"
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
+import { TrackOfflineEventActionRequest } from "@careerfairy/shared-lib/functions/types"
 import { AuthorInfo } from "@careerfairy/shared-lib/livestreams"
-import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import {
+   OfflineEvent,
+   OfflineEventStatsAction,
+} from "@careerfairy/shared-lib/offline-events/offline-events"
+import { UserData } from "@careerfairy/shared-lib/users"
 import {
    Timestamp,
    collection,
@@ -14,7 +21,8 @@ import {
    updateDoc,
    where,
 } from "firebase/firestore"
-import { FirestoreInstance } from "./FirebaseInstance"
+import { httpsCallable } from "firebase/functions"
+import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 
 export class OfflineEventService {
    constructor(private readonly firestore: typeof FirestoreInstance) {}
@@ -122,12 +130,28 @@ export class OfflineEventService {
       const snapshots = await getDocs(
          query(
             collection(FirestoreInstance, "offlineEvents"),
-            where("status", "==", "upcoming"),
-            where("hidden", "==", false)
+            where("hidden", "==", false),
+            where("published", "==", true)
          ).withConverter(createGenericConverter<OfflineEvent>())
       )
 
       return snapshots.docs.map((doc) => doc.data())
+   }
+
+   /**
+    * Helper method that consolidates tracking logic
+    * Calls the consolidated cloud function with the appropriate action type
+    */
+   async trackOfflineEventAction(
+      offlineEventId: string,
+      actionType: OfflineEventStatsAction,
+      userData: UserData,
+      utm: UTMParams | null
+   ): Promise<void> {
+      await httpsCallable<TrackOfflineEventActionRequest>(
+         FunctionsInstance,
+         FUNCTION_NAMES.trackOfflineEventAction
+      )({ offlineEventId, actionType, utm, userData })
    }
 }
 

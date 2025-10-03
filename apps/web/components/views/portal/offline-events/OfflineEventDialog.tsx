@@ -1,5 +1,8 @@
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
-import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
+import {
+   OfflineEvent,
+   OfflineEventStatsAction,
+} from "@careerfairy/shared-lib/offline-events/offline-events"
 import { makeOfflineEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import {
    Box,
@@ -23,16 +26,19 @@ import {
 } from "components/views/common/transitions"
 import { NICE_SCROLLBAR_STYLES } from "constants/layout"
 import { offlineEventService } from "data/firebase/OfflineEventService"
+import { useAuth } from "HOCs/AuthProvider"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { useCallback } from "react"
+import { useCallback, useEffect, useRef } from "react"
 import { Calendar, ChevronLeft, ChevronRight, MapPin, X } from "react-feather"
 import { useCopyToClipboard } from "react-use"
 import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerEvent } from "util/analyticsUtils"
+import { errorLogAndNotify } from "util/CommonUtil"
+import CookiesUtil from "util/CookiesUtil"
 import DateUtil from "util/DateUtil"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { getOfflineEventMetaInfo } from "util/SeoUtil"
@@ -249,6 +255,7 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
                ...NICE_SCROLLBAR_STYLES,
             }}
             TransitionProps={{
+               // ensure the content is unmounted when the dialog is closed
                unmountOnExit: true,
                // WHat this does is skips the slide up animation when loading the page for the first time, so it appears like the dialog is already open for ssr
                appear: isMounted,
@@ -273,7 +280,9 @@ const Content = ({
    onClose: () => void
    onShare: () => void
 }) => {
+   const { push, asPath } = useRouter()
    const isMobile = useIsMobile()
+   const { userData, isLoggedOut } = useAuth()
 
    const companyUrl = event?.group?.publicProfile
       ? makeGroupCompanyPageUrl(event?.group?.universityName, {
@@ -289,6 +298,64 @@ const Content = ({
       registrationUrl,
       address,
    } = event || {}
+
+   // Track view when dialog opens (only once)
+   const hasTrackedView = useRef(false)
+
+   useEffect(() => {
+      if (event && userData && !hasTrackedView.current) {
+         hasTrackedView.current = true
+         const utm = CookiesUtil.getUTMParams()
+
+         offlineEventService
+            .trackOfflineEventAction(
+               event.id,
+               OfflineEventStatsAction.View,
+               userData,
+               utm
+            )
+            .catch((error) => {
+               errorLogAndNotify(error, {
+                  description: "Failed to track offline event view",
+                  offlineEventId: event.id,
+                  userData,
+                  utm,
+               })
+            })
+      }
+   }, [event, event?.id, userData])
+
+   const handleRegisterClick = useCallback(() => {
+      if (event) {
+         if (isLoggedOut) {
+            return push({
+               pathname: "/login",
+               query: { absolutePath: asPath },
+            })
+         }
+
+         if (!userData) return
+
+         window.open(registrationUrl, "_blank", "noopener")
+         const utm = CookiesUtil.getUTMParams()
+
+         offlineEventService
+            .trackOfflineEventAction(
+               event.id,
+               OfflineEventStatsAction.Click,
+               userData,
+               utm
+            )
+            .catch((error) => {
+               errorLogAndNotify(error, {
+                  description: "Failed to track offline event click",
+                  offlineEventId: event.id,
+                  userData,
+                  utm,
+               })
+            })
+      }
+   }, [userData, event, isLoggedOut, push, registrationUrl, asPath])
 
    return (
       <Box position="relative">
@@ -402,9 +469,7 @@ const Content = ({
                   variant="contained"
                   color="primary"
                   size="large"
-                  href={registrationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  onClick={handleRegisterClick}
                >
                   Register to event
                </Button>
