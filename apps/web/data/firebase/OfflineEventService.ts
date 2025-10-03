@@ -230,17 +230,36 @@ export class OfflineEventService {
    /**
     * Helper method that consolidates tracking logic
     * Calls the consolidated cloud function with the appropriate action type
+    * Supports both authenticated users (via userData) and anonymous users (via fingerprint)
+    *
+    * @param offlineEventId - The ID of the offline event
+    * @param actionType - The type of action (View or Click)
+    * @param userDataOrFingerprint - Either UserData object or fingerprint string
+    * @param utm - UTM parameters
     */
    async trackOfflineEventAction(
       offlineEventId: string,
       actionType: OfflineEventStatsAction,
-      userData: UserData,
+      userDataOrFingerprint: UserData | string,
       utm: UTMParams | null
    ): Promise<void> {
+      const isUserData = typeof userDataOrFingerprint === "object"
+
+      const args: TrackOfflineEventActionRequest = {
+         offlineEventId,
+         actionType,
+         utm,
+         ...(isUserData
+            ? { userData: userDataOrFingerprint }
+            : { fingerprint: userDataOrFingerprint }),
+      }
+
+      alert(JSON.stringify(args, null, 2))
+
       await httpsCallable<TrackOfflineEventActionRequest>(
          FunctionsInstance,
          FUNCTION_NAMES.trackOfflineEventAction
-      )({ offlineEventId, actionType, utm, userData })
+      )(args)
    }
 }
 

@@ -75,6 +75,7 @@ type StatsData = {
 export interface OfflineEventStats extends Identifiable {
    documentType: "offlineEventStats" // simplify groupCollection Queries
    deleted: boolean
+   deletedAt: Timestamp | null
    offlineEvent: OfflineEvent
    generalStats: StatsData
    universityStats: {
@@ -94,8 +95,9 @@ export interface OfflineEventStats extends Identifiable {
 // collection path /offlineEvent/{offlineEventId}/offlineEventUserStats/{userAuthId}
 export interface OfflineEventUserStats extends Identifiable {
    documentType: "offlineEventUserStats" // simplify groupCollection Queries
-   user: UserData // Or more data if needed
+   user: UserData | null // Null for anonymous users tracked by fingerprint
    offlineEvent: OfflineEvent // Probably not needed as the base document contains all the data
+   isAnonymous: boolean // True if tracked via fingerprint
    // Timestamp with UTM data for when the user last saw the event
    lastSeenAt: {
       date: Timestamp
@@ -112,7 +114,8 @@ export interface OfflineEventUserStats extends Identifiable {
 // collection path /offlineEvent/{offlineEventId}/offlineEventUserStats/{userAuthId}/offlineEventActions/{actionId}
 export interface OfflineEventAction extends Identifiable {
    documentType: "offlineEventAction" // simplify groupCollection Queries
-   user: UserData
+   user: UserData | null // Null for anonymous users tracked by fingerprint
+   isAnonymous: boolean // True if tracked via fingerprint
    offlineEventId: string
    type: OfflineEventStatsAction
    utm: UTMParams | null
