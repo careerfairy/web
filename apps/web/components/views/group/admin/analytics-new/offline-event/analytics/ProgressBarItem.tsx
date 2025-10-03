@@ -1,4 +1,5 @@
 import { Box, LinearProgress, Typography } from "@mui/material"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { sxStyles } from "types/commonTypes"
 
 const progressBarStyles = sxStyles({
@@ -85,13 +86,15 @@ export const ProgressBarItem = ({
       return (
          <Box sx={progressBarStyles.mobileRow}>
             <Box sx={progressBarStyles.mobileHeader}>
-               <Typography
-                  variant="medium"
-                  color="neutral.700"
-                  sx={progressBarStyles.mobileName}
-               >
-                  {name}
-               </Typography>
+               <BrandedTooltip title={name} arrow>
+                  <Typography
+                     variant="medium"
+                     color="neutral.700"
+                     sx={progressBarStyles.mobileName}
+                  >
+                     {name}
+                  </Typography>
+               </BrandedTooltip>
                <Typography
                   variant="xsmall"
                   color={(theme) => theme.brand.black[700]}
@@ -113,13 +116,15 @@ export const ProgressBarItem = ({
    return (
       <Box sx={progressBarStyles.desktopRow}>
          <Box sx={progressBarStyles.desktopBarContainer}>
-            <Typography
-               variant="medium"
-               color="neutral.700"
-               sx={progressBarStyles.desktopName}
-            >
-               {name}
-            </Typography>
+            <BrandedTooltip title={name} arrow>
+               <Typography
+                  variant="medium"
+                  color="neutral.700"
+                  sx={progressBarStyles.desktopName}
+               >
+                  {name}
+               </Typography>
+            </BrandedTooltip>
             <LinearProgress
                variant="determinate"
                value={percentage}
