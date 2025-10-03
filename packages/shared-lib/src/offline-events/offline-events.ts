@@ -36,11 +36,12 @@ export interface OfflineEvent extends Identifiable {
    address: OfflineEventAddress
    industries: GroupOption[]
    targetAudience: OfflineEventTargetAudience
-   status: OfflineEventStatus
+   published: boolean
    registrationUrl: string
    startAt: Timestamp
    createdAt: Timestamp
    updatedAt: Timestamp
+   publishedAt: Timestamp
    lastUpdatedBy: AuthorInfo
    backgroundImageUrl?: string
    hidden?: boolean

@@ -4,7 +4,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
 import { useField } from "formik"
-import { useRef } from "react"
+import { useCallback, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 
 const FIELD_NAME = "general.startDate"
@@ -30,7 +30,29 @@ const styles = sxStyles({
       ".MuiDigitalClock-item:hover": {
          backgroundColor: "rgb(137 42 186 / 4%) !important",
       },
+      // Prevent scrolling when picker is open
+      "& .MuiPickersLayout-root": {
+         "&:focus-within": {
+            "& *": {
+               "&:focus": {
+                  outline: "none",
+               },
+            },
+         },
+      },
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
    }),
+   desktopPaper: {
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
    datePickerMobile: (theme) => ({
       "&.MuiPickersLayout-root": {
          display: "block",
@@ -72,7 +94,36 @@ const styles = sxStyles({
             backgroundColor: `${theme.palette.secondary.main} !important`,
          },
       },
+      // Prevent scrolling when picker is open
+      "& .MuiPickersLayout-root": {
+         "&:focus-within": {
+            "& *": {
+               "&:focus": {
+                  outline: "none",
+               },
+            },
+         },
+      },
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
    }),
+   mobilePaper: {
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
+   actionBar: {
+      "& .MuiButton-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
    icon: {
       svg: {
          color: (theme) => theme.palette.secondary.main,
@@ -116,14 +167,18 @@ const StartDateTimePicker = ({
 }: StartDateTimePickerProps) => {
    const isMobile = useIsMobile()
    const [field, , helpers] = useField(fieldName)
-   const anchorRef = useRef<HTMLDivElement>(null)
+   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null)
 
    const layoutStyles = isMobile
       ? styles.datePickerMobile
       : styles.datePickerDesktop
 
+   const handleAnchorRef = useCallback((node: HTMLDivElement | null) => {
+      setAnchorEl(node)
+   }, [])
+
    return (
-      <Box ref={anchorRef}>
+      <Box ref={handleAnchorRef}>
          <DateTimePicker
             name={fieldName}
             label={label}
@@ -131,6 +186,7 @@ const StartDateTimePicker = ({
             disablePast
             ampm={false}
             openTo="day"
+            reduceAnimations={false}
             viewRenderers={{
                // @ts-ignore
                hours: renderMultiSectionDigitalClockTimeView,
@@ -143,7 +199,8 @@ const StartDateTimePicker = ({
                   sx: layoutStyles,
                },
                popper: {
-                  anchorEl: anchorRef.current,
+                  anchorEl: anchorEl,
+                  placement: "bottom-start",
                   modifiers: [
                      {
                         name: "preventOverflow",
@@ -153,14 +210,20 @@ const StartDateTimePicker = ({
                         },
                      },
                   ],
+                  disablePortal: false,
+               },
+               desktopPaper: {
+                  sx: styles.desktopPaper,
+               },
+               mobilePaper: {
+                  sx: styles.mobilePaper,
+               },
+               actionBar: {
+                  sx: styles.actionBar,
                },
             }}
             slots={{
-               textField: (params) =>
-                  CustomInputField(
-                     { ...params, ref: anchorRef },
-                     { fieldName }
-                  ),
+               textField: (params) => CustomInputField(params, { fieldName }),
             }}
             value={field.value}
             onChange={async (newValue) => {

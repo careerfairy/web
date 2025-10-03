@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import isEqual from "react-fast-compare"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { useOfflineEventCreationContext } from "../OfflineEventCreationContext"
+import { OfflineEventFormValues } from "./types"
 import { useOfflineEventFormValues } from "./useOfflineEventFormValues"
 
 const DEBOUNCE_TIME_MS = 3000
@@ -27,7 +28,7 @@ export const useAutoSave = () => {
    )
 
    const updateOfflineEvent = useCallback(
-      async (newValues: Partial<typeof values>) => {
+      async (newValues: Partial<OfflineEventFormValues>) => {
          if (!offlineEvent?.id || !userData) return
 
          const updateData: Partial<OfflineEvent> = {
@@ -46,9 +47,11 @@ export const useAutoSave = () => {
             hidden: newValues.general?.hidden ?? false,
             backgroundImageUrl: newValues.general?.backgroundImageUrl ?? "",
             address: newValues.general?.address ?? null,
-            startAt: firebaseService.getFirebaseTimestamp(
-               newValues.general?.startAt ?? ""
-            ),
+            startAt: newValues.general?.startAt
+               ? firebaseService.getFirebaseTimestamp(
+                    newValues.general?.startAt
+                 )
+               : null,
          }
 
          await offlineEventService.updateOfflineEvent(updateData, author)
@@ -69,7 +72,7 @@ export const useAutoSave = () => {
    }, [values, haveValuesChanged, offlineEvent?.id, updateOfflineEvent])
 
    useEffect(() => {
-      const isDraft = offlineEvent?.status === "draft"
+      const isDraft = !offlineEvent?.published
 
       const debounceTimeout = setTimeout(async () => {
          try {
@@ -97,7 +100,7 @@ export const useAutoSave = () => {
       values,
       haveValuesChanged,
       isAutoSaving,
-      offlineEvent?.status,
+      offlineEvent?.published,
       isValid,
       handleAutoSave,
       enqueueSnackbar,

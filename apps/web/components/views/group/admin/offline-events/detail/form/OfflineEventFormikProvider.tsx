@@ -3,7 +3,6 @@ import { AuthorInfo } from "@careerfairy/shared-lib/livestreams"
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import FirebaseService from "data/firebase/FirebaseService"
 import { Formik } from "formik"
-import { DateTime } from "luxon"
 import { ReactNode } from "react"
 import { OfflineEventFormValues } from "./types"
 import { offlineEventFormValidationSchema } from "./validationSchemas"
@@ -18,7 +17,7 @@ const formGeneralTabInitialValues: OfflineEventFormValues["general"] = {
       fieldOfStudies: [],
    },
    registrationUrl: "",
-   startAt: DateTime.now().plus({ hour: 1 }).toJSDate(),
+   startAt: null,
    backgroundImageUrl: "",
    hidden: false,
 }
@@ -45,10 +44,13 @@ export const buildDraftOfflineEventObject = (
       backgroundImageUrl: values.general.backgroundImageUrl,
       hidden: values.general.hidden,
       address: values.general.address,
-      status: "draft",
+      published: false,
+      publishedAt: null,
       industries: group.companyIndustries,
       author: author,
-      startAt: firebase.getFirebaseTimestamp(values.general.startAt),
+      startAt: values.general.startAt
+         ? firebase.getFirebaseTimestamp(values.general.startAt)
+         : null,
       createdAt: firebase.getFirebaseTimestamp(new Date()),
       updatedAt: firebase.getFirebaseTimestamp(new Date()),
       lastUpdatedBy: author,
@@ -84,6 +86,15 @@ const convertOfflineEventObjectToForm = ({
    return {
       general,
    }
+}
+
+export const convertFormValuesToOfflineEventObject = (
+   values: OfflineEventFormValues,
+   group: Group,
+   author: AuthorInfo,
+   firebase: FirebaseService
+): OfflineEvent => {
+   return buildDraftOfflineEventObject(values, group, author, firebase)
 }
 
 type Props = {
