@@ -129,7 +129,7 @@ export default function SpeakersSectionFMCG({
                <Box aria-hidden sx={styles.visualSupportContainer}>
                   <Box aria-hidden sx={styles.visualSupportLeft}>
                      <Image
-                        src="/panels/speakers-purple-visual-support.svg"
+                        src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/fmcg-speakers-left-shape.svg?alt=media&token=eb85b363-f77d-476f-b901-5d7eb3a8fb0c"
                         alt=""
                         width={237}
                         height={199}
@@ -138,7 +138,7 @@ export default function SpeakersSectionFMCG({
                   </Box>
                   <Box aria-hidden sx={styles.visualSupportRight}>
                      <Image
-                        src="/panels/speakers-turquoise-visual-support.svg"
+                        src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/fmcg-speakers-right-shape.svg?alt=media&token=4a52640f-4627-4843-8b87-1423e2063f27"
                         alt=""
                         width={339}
                         height={199}
