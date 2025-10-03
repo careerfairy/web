@@ -1,0 +1,237 @@
+import { Box } from "@mui/material"
+import { renderMultiSectionDigitalClockTimeView } from "@mui/x-date-pickers"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { FormBrandedTextField } from "components/views/common/inputs/BrandedTextField"
+import { useField } from "formik"
+import { useCallback, useState } from "react"
+import { sxStyles } from "types/commonTypes"
+
+const FIELD_NAME = "general.startDate"
+
+const styles = sxStyles({
+   datePickerDesktop: (theme) => ({
+      ".MuiButton-text": {
+         color: `${theme.palette.secondary.main} !important`,
+      },
+      ".MuiButton-text:hover, .MuiPickersDay-root:hover, .MuiPickersDay-root:focus":
+         {
+            backgroundColor: "rgb(137 42 186 / 4%) !important",
+         },
+      ".Mui-selected": {
+         backgroundColor: `${theme.palette.secondary.main} !important`,
+      },
+      ".Mui-selected:hover": {
+         backgroundColor: `${theme.palette.secondary.dark} !important`,
+      },
+      ".Mui-selected:focus": {
+         backgroundColor: `${theme.palette.secondary.main} !important`,
+      },
+      ".MuiDigitalClock-item:hover": {
+         backgroundColor: "rgb(137 42 186 / 4%) !important",
+      },
+      // Prevent scrolling when picker is open
+      "& .MuiPickersLayout-root": {
+         "&:focus-within": {
+            "& *": {
+               "&:focus": {
+                  outline: "none",
+               },
+            },
+         },
+      },
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   }),
+   desktopPaper: {
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
+   datePickerMobile: (theme) => ({
+      "&.MuiPickersLayout-root": {
+         display: "block",
+      },
+      ".MuiTab-root.Mui-selected": {
+         color: `${theme.palette.secondary.main}`,
+      },
+      ".MuiTabs-indicator": {
+         backgroundColor: `${theme.palette.secondary.main} !important`,
+      },
+      ".MuiPickersDay-root:hover, .MuiPickersDay-root:focus": {
+         backgroundColor: "rgb(137 42 186 / 4%) !important",
+      },
+      ".MuiPickersDay-root.Mui-selected, .MuiPickersYear-yearButton.Mui-selected":
+         {
+            backgroundColor: `${theme.palette.secondary.main} !important`,
+         },
+      ".MuiDialogActions-root": {
+         ".MuiButton-text": {
+            color: `${theme.palette.secondary.main}`,
+         },
+      },
+      ".MuiMultiSectionDigitalClock-root": {
+         justifyContent: "center",
+         ".Mui-selected": {
+            backgroundColor: `${theme.palette.secondary.main} !important`,
+         },
+         ".MuiMenuItem-root": {
+            fontSize: "1.1rem",
+            fontWeight: 600,
+         },
+         ".Mui-disabled": {
+            color: `${theme.palette.secondary.light}`,
+         },
+      },
+      ".MuiClock-root": {
+         ".MuiClock-pin, .MuiClockPointer-root, .MuiClockPointer-thumb": {
+            borderColor: `${theme.palette.secondary.main} !important`,
+            backgroundColor: `${theme.palette.secondary.main} !important`,
+         },
+      },
+      // Prevent scrolling when picker is open
+      "& .MuiPickersLayout-root": {
+         "&:focus-within": {
+            "& *": {
+               "&:focus": {
+                  outline: "none",
+               },
+            },
+         },
+      },
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   }),
+   mobilePaper: {
+      "& .MuiPickersDay-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
+   actionBar: {
+      "& .MuiButton-root": {
+         "&:focus": {
+            outline: "none",
+         },
+      },
+   },
+   icon: {
+      svg: {
+         color: (theme) => theme.palette.secondary.main,
+      },
+   },
+})
+
+type CustomInputFieldProps = {
+   fieldName: string
+}
+
+const CustomInputField = (params, { fieldName }: CustomInputFieldProps) => {
+   const [{ onBlur }, ,] = useField(fieldName)
+
+   return (
+      <FormBrandedTextField
+         {...params}
+         name={fieldName}
+         type="text"
+         fullWidth
+         sx={styles.icon}
+         placeholder="Insert date"
+         requiredText="(required)"
+         onBlur={async () => {
+            await onBlur({ target: { name: fieldName } })
+         }}
+      />
+   )
+}
+
+type StartDateTimePickerProps = {
+   fieldName?: string
+   label?: string
+   toolbarTitle?: string
+}
+
+const StartDateTimePicker = ({
+   fieldName = FIELD_NAME,
+   label = "Start date",
+   toolbarTitle = "Select live stream start date",
+}: StartDateTimePickerProps) => {
+   const isMobile = useIsMobile()
+   const [field, , helpers] = useField(fieldName)
+   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null)
+
+   const layoutStyles = isMobile
+      ? styles.datePickerMobile
+      : styles.datePickerDesktop
+
+   const handleAnchorRef = useCallback((node: HTMLDivElement | null) => {
+      setAnchorEl(node)
+   }, [])
+
+   return (
+      <Box ref={handleAnchorRef}>
+         <DateTimePicker
+            name={fieldName}
+            label={label}
+            localeText={isMobile ? { toolbarTitle } : null}
+            disablePast
+            ampm={false}
+            openTo="day"
+            reduceAnimations={false}
+            viewRenderers={{
+               // @ts-ignore
+               hours: renderMultiSectionDigitalClockTimeView,
+               // @ts-ignore
+               minutes: renderMultiSectionDigitalClockTimeView,
+            }}
+            format={"dd/MM/yyyy HH:mm"}
+            slotProps={{
+               layout: {
+                  sx: layoutStyles,
+               },
+               popper: {
+                  anchorEl: anchorEl,
+                  placement: "bottom-start",
+                  modifiers: [
+                     {
+                        name: "preventOverflow",
+                        enabled: true,
+                        options: {
+                           boundary: "viewport",
+                        },
+                     },
+                  ],
+                  disablePortal: false,
+               },
+               desktopPaper: {
+                  sx: styles.desktopPaper,
+               },
+               mobilePaper: {
+                  sx: styles.mobilePaper,
+               },
+               actionBar: {
+                  sx: styles.actionBar,
+               },
+            }}
+            slots={{
+               textField: (params) => CustomInputField(params, { fieldName }),
+            }}
+            value={field.value}
+            onChange={async (newValue) => {
+               await helpers.setValue(newValue)
+            }}
+         />
+      </Box>
+   )
+}
+
+export default StartDateTimePicker

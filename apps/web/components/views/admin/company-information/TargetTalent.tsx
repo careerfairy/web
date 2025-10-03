@@ -1,10 +1,12 @@
 import { Stack } from "@mui/material"
 import { FC, useCallback, useMemo } from "react"
 
+import { CompanyCountryValues } from "@careerfairy/shared-lib/constants/forms"
 import {
    GroupOption,
    GroupTargetUniversity,
 } from "@careerfairy/shared-lib/groups"
+import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
 import {
    University,
    UniversityCountry,
@@ -18,16 +20,14 @@ import {
 } from "components/custom-hook/useCollection"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { getTextFieldProps } from "components/helperFunctions/streamFormFunctions"
-import { CompanyCountryValues } from "@careerfairy/shared-lib/constants/forms"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 import { groupRepo } from "data/RepositoryInstances"
 import { Form, Formik } from "formik"
 import { useGroup } from "layouts/GroupDashboardLayout"
+import * as Yup from "yup"
 import BrandedAutocomplete from "../../common/inputs/BrandedAutocomplete"
 import BaseStyles from "./BaseStyles"
 import SectionComponent from "./SectionComponent"
-import * as Yup from "yup"
-import { GROUP_CONSTANTS } from "@careerfairy/shared-lib/groups/constants"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
 
 const [title, description, targetUniversityLabel] = [
    "Target talent",

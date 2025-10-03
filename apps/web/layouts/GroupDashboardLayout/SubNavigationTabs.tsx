@@ -37,7 +37,7 @@ type Props = {
 
 export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
    const { pathname, push } = useRouter()
-   const { group } = useGroup()
+   const { group, groupPresenter } = useGroup()
 
    // Create navigation links based on showSubNavigationFor
    const currentSection = useMemo(() => {
@@ -82,6 +82,16 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
                   pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/sparks`,
                   title: "Sparks",
                },
+               ...(groupPresenter?.canCreateOfflineEvents(true)
+                  ? [
+                       {
+                          id: "offline-event-analytics",
+                          href: `/${BASE_HREF_PATH}/${group.id}/admin/analytics/offline-events`,
+                          pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/analytics/offline-events/[[...offlineEventId]]`,
+                          title: "Offline events",
+                       },
+                    ]
+                  : []),
             ],
          },
          settings: {
@@ -105,8 +115,17 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
          },
       }
 
+      if (groupPresenter?.canCreateOfflineEvents(true)) {
+         navigationLookup.content.childLinks.push({
+            id: "offline-events",
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/content/offline-events`,
+            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/content/offline-events`,
+            title: "Offline events",
+         })
+      }
+
       return navigationLookup[showSubNavigationFor]
-   }, [group.id, showSubNavigationFor])
+   }, [group.id, showSubNavigationFor, groupPresenter])
 
    // Determine which tab should be active based on current pathname
    const activeTab = useMemo(() => {
@@ -148,6 +167,7 @@ export const SubNavigationTabs = ({ showSubNavigationFor }: Props) => {
                indicatorColor="secondary"
                value={activeTab?.pathname || false}
                onChange={handleTabChange}
+               variant="scrollable"
             >
                {currentSection?.childLinks?.map((tab) => {
                   return (

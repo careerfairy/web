@@ -82,7 +82,9 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
          expiresAt: Date | null
          startedAt: Date | null
       } | null,
-      public readonly featured: FeaturedGroup
+      public readonly featured: FeaturedGroup,
+      public readonly availableOfflineEvents: number,
+      public readonly hasPurchasedOfflineEvents: boolean
    ) {}
 
    setFeatureFlags(featureFlags: FeatureFlagsState): void {
@@ -119,7 +121,9 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
          group.banner || null,
          getPlanConstants(group.plan?.type),
          createPlanObject(group.plan),
-         group.featured
+         group.featured,
+         group.availableOfflineEvents || 0,
+         group.hasPurchasedOfflineEvents || false
       )
    }
 
@@ -419,6 +423,13 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
          this.plan?.type == GroupPlanTypes.Tier1 ||
          this.plan?.type == GroupPlanTypes.Tier2 ||
          this.plan?.type == GroupPlanTypes.Tier3
+      )
+   }
+
+   canCreateOfflineEvents(includePurchasedOfflineEvents = false) {
+      return (
+         this.availableOfflineEvents > 0 ||
+         (includePurchasedOfflineEvents && this.hasPurchasedOfflineEvents)
       )
    }
 

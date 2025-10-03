@@ -72,8 +72,13 @@ export const FUNCTION_NAMES = {
    getGroupTalentEngagement: "getGroupTalentEngagement",
    getTotalUsersMatchingTargeting: "getTotalUsersMatchingTargeting",
 
+   // Offline events functions
+   trackOfflineEventAction: "trackOfflineEventAction",
+
    // Slack Notifications
    notifySlackWhenSparksTrialStarts: "notifySlackWhenSparksTrialStarts",
+   notifySlackWhenOfflineEventIsPublished:
+      "notifySlackWhenOfflineEventIsPublished",
 
    // -- Trigger functions -- //
    /**

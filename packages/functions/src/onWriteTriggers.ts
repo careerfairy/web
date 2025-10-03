@@ -11,6 +11,7 @@ import {
    customJobRepo,
    groupRepo,
    livestreamsRepo,
+   offlineEventRepo,
    sparkRepo,
    universityRepo,
    userRepo,
@@ -313,6 +314,10 @@ export const onWriteGroup = onDocumentWritten(
                customJobRepo.syncCustomJobDataGroupMetaData(groupId, newValue)
             )
          }
+
+         sideEffectPromises.push(
+            offlineEventRepo.syncGroupDataToOfflineEvent(groupId, newValue)
+         )
       }
 
       return handleSideEffects(sideEffectPromises)
