@@ -21,6 +21,7 @@ import { sxStyles } from "types/commonTypes"
 import { deserializeGroupClient, mapFromServerSide } from "util/serverUtil"
 
 const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
+const WORLD_BANK_GROUP_ID = "qGGtl7ZfdoBbvZLFGbM2"
 
 const styles = sxStyles({
    pageContainer: {
@@ -170,21 +171,23 @@ export const getStaticProps: GetStaticProps<FinanceBankingPageProps> = async () 
       // Use first 10 for recent livestreams (for "Not interested in finance & banking?" section)
       const recentLivestreams = allUpcomingEvents?.slice(0, 10) || []
 
-      // Filter upcoming events by Finance&Banking industry and limit to 6
+      // Filter upcoming events by Finance&Banking industry (excluding World Bank Group) and limit to 6
       const financeBankingLivestreams =
          allUpcomingEvents
             ?.filter((event) =>
-               event.companyIndustries?.includes("Finance&Banking")
+               event.companyIndustries?.includes("Finance&Banking") &&
+               !event.groupIds?.includes(WORLD_BANK_GROUP_ID)
             )
             ?.slice(0, 6) || []
 
-      // Filter past events by Finance&Banking industry and limit to 6 for recordings
+      // Filter past events by Finance&Banking industry (excluding World Bank Group) and limit to 6 for recordings
       // First try to get events that are explicitly marked as recordings
       let financeBankingRecordings =
          pastEvents
             ?.filter(
                (event) =>
                   event.companyIndustries?.includes("Finance&Banking") &&
+                  !event.groupIds?.includes(WORLD_BANK_GROUP_ID) &&
                   event.isRecording // Only include events that have recordings
             )
             ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
@@ -199,7 +202,9 @@ export const getStaticProps: GetStaticProps<FinanceBankingPageProps> = async () 
                   (event) =>
                      event.companyIndustries?.includes(
                         "Finance&Banking"
-                     ) && event.hasEnded // Only include events that have ended
+                     ) &&
+                     !event.groupIds?.includes(WORLD_BANK_GROUP_ID) &&
+                     event.hasEnded // Only include events that have ended
                )
                ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
                ?.slice(0, 6) || []
