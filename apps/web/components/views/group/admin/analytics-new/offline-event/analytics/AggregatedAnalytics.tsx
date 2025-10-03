@@ -102,6 +102,15 @@ const styles = sxStyles({
       flexDirection: "column",
       gap: 1,
    },
+   emptyState: {
+      backgroundColor: (theme) => theme.brand.white[300],
+      borderRadius: "6px",
+      p: 1.5,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      minHeight: 174,
+   },
    progressRow: {
       display: "flex",
       alignItems: "center",
@@ -325,43 +334,55 @@ const AggregatedAnalytics = () => {
                   Top 5 fields of study
                </Typography>
 
-               <Box sx={styles.progressSection}>
-                  {fieldsOfStudy.map((field, index) => (
-                     <Box key={index} sx={styles.progressRow}>
-                        <Box sx={styles.progressBarContainer}>
+               {fieldsOfStudy.length === 0 ? (
+                  <Box sx={styles.emptyState}>
+                     <Typography
+                        variant="medium"
+                        color="neutral.700"
+                        textAlign="center"
+                     >
+                        Not enough data to display fields of study breakdown
+                     </Typography>
+                  </Box>
+               ) : (
+                  <Box sx={styles.progressSection}>
+                     {fieldsOfStudy.map((field, index) => (
+                        <Box key={index} sx={styles.progressRow}>
+                           <Box sx={styles.progressBarContainer}>
+                              <Typography
+                                 variant="medium"
+                                 color="neutral.700"
+                                 sx={{
+                                    width: 200,
+                                    lineHeight: "24px",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                 }}
+                              >
+                                 {field.name}
+                              </Typography>
+                              <LinearProgress
+                                 variant="determinate"
+                                 value={field.percentage}
+                                 sx={styles.progressBar}
+                              />
+                           </Box>
                            <Typography
-                              variant="medium"
-                              color="neutral.700"
+                              variant="xsmall"
+                              color={(theme) => theme.brand.black[700]}
                               sx={{
-                                 width: 200,
-                                 lineHeight: "24px",
-                                 whiteSpace: "nowrap",
-                                 overflow: "hidden",
-                                 textOverflow: "ellipsis",
+                                 width: 52,
+                                 textAlign: "right",
+                                 lineHeight: "16px",
                               }}
                            >
-                              {field.name}
+                              {field.percentage}%
                            </Typography>
-                           <LinearProgress
-                              variant="determinate"
-                              value={field.percentage}
-                              sx={styles.progressBar}
-                           />
                         </Box>
-                        <Typography
-                           variant="xsmall"
-                           color={(theme) => theme.brand.black[700]}
-                           sx={{
-                              width: 52,
-                              textAlign: "right",
-                              lineHeight: "16px",
-                           }}
-                        >
-                           {field.percentage}%
-                        </Typography>
-                     </Box>
-                  ))}
-               </Box>
+                     ))}
+                  </Box>
+               )}
             </Box>
 
             {/* Universities */}
@@ -373,43 +394,55 @@ const AggregatedAnalytics = () => {
                   Top 5 universities
                </Typography>
 
-               <Box sx={styles.progressSection}>
-                  {universities.map((university, index) => (
-                     <Box key={index} sx={styles.progressRow}>
-                        <Box sx={styles.progressBarContainer}>
+               {universities.length === 0 ? (
+                  <Box sx={styles.emptyState}>
+                     <Typography
+                        variant="medium"
+                        color="neutral.700"
+                        textAlign="center"
+                     >
+                        Not enough data to display universities breakdown
+                     </Typography>
+                  </Box>
+               ) : (
+                  <Box sx={styles.progressSection}>
+                     {universities.map((university, index) => (
+                        <Box key={index} sx={styles.progressRow}>
+                           <Box sx={styles.progressBarContainer}>
+                              <Typography
+                                 variant="medium"
+                                 color="neutral.700"
+                                 sx={{
+                                    width: 200,
+                                    lineHeight: "24px",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                 }}
+                              >
+                                 {university.name}
+                              </Typography>
+                              <LinearProgress
+                                 variant="determinate"
+                                 value={university.percentage}
+                                 sx={styles.progressBar}
+                              />
+                           </Box>
                            <Typography
-                              variant="medium"
-                              color="neutral.700"
+                              variant="xsmall"
+                              color={(theme) => theme.brand.black[700]}
                               sx={{
-                                 width: 200,
-                                 lineHeight: "24px",
-                                 whiteSpace: "nowrap",
-                                 overflow: "hidden",
-                                 textOverflow: "ellipsis",
+                                 width: 52,
+                                 textAlign: "right",
+                                 lineHeight: "16px",
                               }}
                            >
-                              {university.name}
+                              {university.percentage}%
                            </Typography>
-                           <LinearProgress
-                              variant="determinate"
-                              value={university.percentage}
-                              sx={styles.progressBar}
-                           />
                         </Box>
-                        <Typography
-                           variant="xsmall"
-                           color={(theme) => theme.brand.black[700]}
-                           sx={{
-                              width: 52,
-                              textAlign: "right",
-                              lineHeight: "16px",
-                           }}
-                        >
-                           {university.percentage}%
-                        </Typography>
-                     </Box>
-                  ))}
-               </Box>
+                     ))}
+                  </Box>
+               )}
             </Box>
          </Stack>
       </Box>
