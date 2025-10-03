@@ -52,6 +52,27 @@ export const makeLivestreamEventDetailsShareUrl = (
    return url
 }
 
+type OfflineEventShareURLOptions = {
+   utm_source?: string
+   utm_campaign?: string
+   utm_content?: string
+}
+
+export const makeOfflineEventDetailsShareUrl = (
+   offlineEventId: string,
+   options?: OfflineEventShareURLOptions
+) => {
+   const url = new URL(`${getBaseUrl()}/portal?offline-event=${offlineEventId}`)
+   if (options?.utm_source)
+      url.searchParams.set("utm_source", options.utm_source)
+   if (options?.utm_campaign)
+      url.searchParams.set("utm_campaign", options.utm_campaign)
+   if (options?.utm_content)
+      url.searchParams.set("utm_content", options.utm_content)
+
+   return url
+}
+
 export const makeReferralUrl = (userReferralCode) => {
    return `${getBaseUrl()}/?${queryReferralCode}=${userReferralCode}`
 }

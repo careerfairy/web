@@ -115,6 +115,10 @@ const OfflineEventAdminDetailBottomBarNavigation = () => {
    const isBackButtonDisabled = true
    const isNextButtonDisabled = true
 
+   if (isDesktop) {
+      return null
+   }
+
    return (
       <Box sx={styles.root}>
          <Box sx={styles.buttonsWrapper}>

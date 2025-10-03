@@ -3,6 +3,7 @@ import FormSectionHeader from "components/views/group/admin/events/detail/form/F
 
 import { AddressAutofillOptions } from "@mapbox/search-js-core"
 import dynamic from "next/dynamic"
+
 const FormLocationAutoFill = dynamic(
    () => import("components/views/common/inputs/FormLocationAutoFill"),
    { ssr: false }
