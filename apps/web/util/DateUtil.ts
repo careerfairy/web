@@ -468,4 +468,26 @@ export default class DateUtil {
    static formatDayOfMonth(JSDate: Date | number): string {
       return dayjs(JSDate).format("D MMMM")
    }
+
+   /**
+    * Formats a date to show the day, month, and year using dayjs.
+    * Example: "15 January 2024"
+    *
+    * @param {Date | number} JSDate - The JavaScript Date object or timestamp to be formatted.
+    * @return {string} - The formatted date string.
+    */
+   static getPrettyDateWithoutHourDayjs(JSDate: Date | number): string {
+      return dayjs(JSDate).format("DD MMMM YYYY")
+   }
+
+   /**
+    * Formats a date to show the weekday, day, month, and year using dayjs.
+    * Example: "Monday, 15 January 2024"
+    *
+    * @param {Date | number} JSDate - The JavaScript Date object or timestamp to be formatted.
+    * @return {string} - The formatted date string.
+    */
+   static getPrettyDateWithWeekdayDayjs(JSDate: Date | number): string {
+      return dayjs(JSDate).format("dddd, DD MMMM YYYY")
+   }
 }

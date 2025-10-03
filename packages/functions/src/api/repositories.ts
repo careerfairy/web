@@ -55,6 +55,10 @@ import {
    INotificationService,
    NotificationService,
 } from "../lib/notifications/NotificationService"
+import {
+   IOfflineEventFunctionsRepository,
+   OfflineEventFunctionsRepository,
+} from "../lib/offline-events/OfflineEventFunctionsRepository"
 import RecordingAnalyticsRepository from "../lib/recordings/analytics/RecordingAnalyticsRepository"
 import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksAnalyticsRepository"
 import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
@@ -145,3 +149,6 @@ export const customJobRepo: ICustomJobFunctionsRepository =
 
 export const emailNotificationsRepo: IEmailNotificationRepository =
    new EmailNotificationFunctionsRepository(firestore as any)
+
+export const offlineEventRepo: IOfflineEventFunctionsRepository =
+   new OfflineEventFunctionsRepository(firestore, logger)

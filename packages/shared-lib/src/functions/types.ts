@@ -1,3 +1,7 @@
+import { UTMParams } from "../commonTypes"
+import { OfflineEventStatsAction } from "../offline-events/offline-events"
+import { UserData } from "../users"
+
 export type SendNewlyPublishedEventEmailFnArgs = {
    livestreamId: string
    groupId: string
@@ -42,4 +46,12 @@ export type DeleteLivestreamRequest = {
    livestreamId: string
    collection: "livestreams" | "draftLivestreams"
    groupId: string
+}
+
+export type TrackOfflineEventActionRequest = {
+   offlineEventId: string
+   actionType: OfflineEventStatsAction
+   utm: UTMParams | null
+   userData?: UserData // Optional for anonymous users
+   fingerprint?: string // For anonymous user tracking
 }

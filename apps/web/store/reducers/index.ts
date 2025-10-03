@@ -11,6 +11,7 @@ import groupAnalyticsReducer from "./groupAnalyticsReducer"
 import groupDashboardLayoutReducer from "./groupDashboardLayoutReducer"
 import groupPlanReducer from "./groupPlanReducer"
 import nextLivestreamsReducer from "./nextLivestreamsReducer"
+import offlineEventsTableReducer from "./offlineEventsTableReducer"
 import profileSettingsReducer from "./profileSettingsReducer"
 import snackbarReducer from "./snackbarReducer"
 import sparksFeedReducer from "./sparksFeedReducer"
@@ -46,6 +47,7 @@ const reducers = {
    profileSettings: profileSettingsReducer,
    userSignUp: userSignUpReducer,
    eventsTable: eventsTableReducer,
+   offlineEventsTable: offlineEventsTableReducer,
 } as const // only way to get type inference on firebaseReducer
 
 export default combineReducers<typeof reducers>(reducers)

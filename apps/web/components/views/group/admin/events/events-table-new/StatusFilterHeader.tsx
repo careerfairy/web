@@ -14,23 +14,25 @@ import { BrandedCheckbox } from "../../../../common/inputs/BrandedCheckbox"
 import { NonSortableHeaderCell } from "./TableHeaderComponents"
 import { LivestreamEventStatus } from "./utils"
 
-type StatusFilterOption = {
-   value: LivestreamEventStatus
+type StatusFilterOption<T = LivestreamEventStatus> = {
+   value: T
    name: string
 }
 
-const statusOptions: StatusFilterOption[] = [
-   {
-      value: LivestreamEventStatus.UPCOMING,
-      name: "Published",
-   },
-   { value: LivestreamEventStatus.DRAFT, name: "Draft" },
-   { value: LivestreamEventStatus.RECORDING, name: "Recorded" },
-   {
-      value: LivestreamEventStatus.NOT_RECORDED,
-      name: "Recording not available",
-   },
-]
+// Default status options for livestream events
+const defaultLivestreamStatusOptions: StatusFilterOption<LivestreamEventStatus>[] =
+   [
+      {
+         value: LivestreamEventStatus.UPCOMING,
+         name: "Published",
+      },
+      { value: LivestreamEventStatus.DRAFT, name: "Draft" },
+      { value: LivestreamEventStatus.RECORDING, name: "Recorded" },
+      {
+         value: LivestreamEventStatus.NOT_RECORDED,
+         name: "Recording not available",
+      },
+   ]
 
 const styles = sxStyles({
    menuPaper: {
@@ -98,21 +100,25 @@ const menuListProps: MenuProps["MenuListProps"] = {
    },
 }
 
-type Props = {
-   selectedStatuses: LivestreamEventStatus[]
-   onStatusFilterChange: (statuses: LivestreamEventStatus[]) => void
+type Props<T = LivestreamEventStatus> = {
+   selectedStatuses: T[]
+   onStatusFilterChange: (statuses: T[]) => void
+   statusOptions?: StatusFilterOption<T>[]
+   tooltip?: string
    width?: number | string
 }
 
-export const StatusFilterHeader = ({
+export const StatusFilterHeader = <T = LivestreamEventStatus,>({
    selectedStatuses,
    onStatusFilterChange,
+   statusOptions = defaultLivestreamStatusOptions as StatusFilterOption<T>[],
+   tooltip = "Shows if your live stream is published, still a draft, or available as a recording.",
    width,
-}: Props) => {
+}: Props<T>) => {
    const { open, handleClick, handleClose, anchorEl } = useMenuState()
 
    const [tempSelectedStatuses, setTempSelectedStatuses] =
-      useState<LivestreamEventStatus[]>(selectedStatuses)
+      useState<T[]>(selectedStatuses)
 
    // Keep dropdown selections fresh and reset un-applied changes when menu is closed and re-opened
    useEffect(() => {
@@ -121,7 +127,7 @@ export const StatusFilterHeader = ({
       }
    }, [selectedStatuses, open])
 
-   const handleStatusToggle = (statusValue: LivestreamEventStatus) => {
+   const handleStatusToggle = (statusValue: T) => {
       setTempSelectedStatuses((prev) =>
          prev.includes(statusValue)
             ? prev.filter((status) => status !== statusValue)
@@ -139,7 +145,7 @@ export const StatusFilterHeader = ({
    return (
       <Fragment>
          <NonSortableHeaderCell
-            tooltip="Shows if your live stream is published, still a draft, or available as a recording."
+            tooltip={tooltip}
             onClick={handleClick}
             active={open || hasActiveFilter}
             width={width}
@@ -169,11 +175,11 @@ export const StatusFilterHeader = ({
                </Typography>
             </Box>
 
-            {statusOptions.map((option) => {
+            {statusOptions.map((option, index) => {
                const isChecked = tempSelectedStatuses.includes(option.value)
                return (
                   <MenuItem
-                     key={option.value}
+                     key={index}
                      sx={isChecked ? styles.menuItemActive : styles.menuItem}
                      onClick={() => handleStatusToggle(option.value)}
                      disableRipple

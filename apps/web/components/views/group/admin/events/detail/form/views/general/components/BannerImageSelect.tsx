@@ -4,6 +4,8 @@ import {
    Collapse,
    FormHelperText,
    Stack,
+   SxProps,
+   Theme,
    Typography,
 } from "@mui/material"
 import useFileUploader from "components/custom-hook/useFileUploader"
@@ -11,10 +13,14 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import { uploadLogo } from "components/helperFunctions/HelperFunctions"
 import { getDownloadUrl } from "components/helperFunctions/streamFormFunctions"
 import FileUploader from "components/views/common/FileUploader"
+import ImageCropperDialog, {
+   CropType,
+} from "components/views/common/ImageCropperDialog"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useField } from "formik"
-import { useCallback } from "react"
-import { sxStyles } from "types/commonTypes"
+import { useCallback, useState } from "react"
+import { Upload } from "react-feather"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import { UploadIcon } from "./UploadIcon"
 
 const PLACEHOLDER_BANNER_URL =
@@ -108,8 +114,11 @@ const styles = sxStyles({
    },
 })
 
-const getStyles = (hasError: boolean) =>
-   sxStyles({
+const getStyles = (
+   hasError: boolean,
+   customContainerStyles?: SxProps<Theme>
+) => {
+   const baseStyles = sxStyles({
       root: {
          position: "relative",
          height: {
@@ -127,7 +136,25 @@ const getStyles = (hasError: boolean) =>
       ...styles,
    })
 
-const FIELD_NAME = "general.backgroundImageUrl"
+   return {
+      ...baseStyles,
+      root: customContainerStyles
+         ? combineStyles([baseStyles.root, customContainerStyles])
+         : baseStyles.root,
+   }
+}
+
+const DEFAULT_FIELD_NAME = "general.backgroundImageUrl"
+const DEFAULT_EMPTY_BANNER_LABEL = "Upload your live stream banner image"
+const DEFAULT_RECOMMENDED_SIZE = "Recommended size: 1920x1080"
+
+type CropperConfig = {
+   title: string
+   type: CropType
+   aspectRatio: number
+   cropBoxResizable?: boolean
+   key?: string
+}
 
 const DragAndDropView = () => {
    return (
@@ -166,7 +193,15 @@ const FileUploaderButton = ({
    )
 }
 
-const EmptyBanner = () => {
+type EmptyBannerProps = {
+   emptyBannerLabel?: string
+   recommendedSizeLabel?: string
+}
+
+const EmptyBanner = ({
+   emptyBannerLabel = DEFAULT_EMPTY_BANNER_LABEL,
+   recommendedSizeLabel = DEFAULT_RECOMMENDED_SIZE,
+}: EmptyBannerProps) => {
    return (
       <Box sx={styles.emptyBannerWrapper}>
          <Box sx={styles.placeholderLogoContainer}>
@@ -177,11 +212,9 @@ const EmptyBanner = () => {
             />
          </Box>
          <Box>
-            <Typography sx={styles.label}>
-               Upload your live stream banner image
-            </Typography>
+            <Typography sx={styles.label}>{emptyBannerLabel}</Typography>
             <Typography sx={styles.recommendedSize}>
-               Recommended size: 1920x1080
+               {recommendedSizeLabel}
             </Typography>
          </Box>
          <FileUploaderButton buttonLabel="Upload banner" />
@@ -191,9 +224,10 @@ const EmptyBanner = () => {
 
 type BannerWithImage = {
    imageUrl: string
+   customStyles?: SxProps<Theme>
 }
 
-const BannerWithImage = ({ imageUrl }: BannerWithImage) => {
+const BannerWithImage = ({ imageUrl, customStyles }: BannerWithImage) => {
    return (
       <>
          <Box sx={styles.changeBannerButtonWrapper}>
@@ -203,30 +237,53 @@ const BannerWithImage = ({ imageUrl }: BannerWithImage) => {
             component="img"
             src={imageUrl}
             alt="Banner"
-            sx={styles.bannerImage}
+            sx={
+               customStyles
+                  ? combineStyles([styles.bannerImage, customStyles])
+                  : styles.bannerImage
+            }
          />
       </>
    )
 }
 
-const BannerImageSelect = () => {
+type BannerImageSelectProps = {
+   fieldName?: string
+   emptyBannerLabel?: string
+   recommendedSizeLabel?: string
+   withCropper?: boolean
+   cropperConfig?: CropperConfig
+   bannerImageStyles?: SxProps<Theme>
+   containerStyles?: SxProps<Theme>
+}
+
+const BannerImageSelect = ({
+   fieldName = DEFAULT_FIELD_NAME,
+   emptyBannerLabel = DEFAULT_EMPTY_BANNER_LABEL,
+   recommendedSizeLabel = DEFAULT_RECOMMENDED_SIZE,
+   withCropper = false,
+   cropperConfig,
+   bannerImageStyles,
+   containerStyles,
+}: BannerImageSelectProps) => {
    const firebase = useFirebaseService()
-   const [field, meta, helpers] = useField(FIELD_NAME)
+   const [field, meta, helpers] = useField(fieldName)
+   const [objectUrl, setObjectUrl] = useState<string | null>(null)
 
    const handleTouched = useCallback(() => {
       helpers.setTouched(true, false)
    }, [helpers])
 
-   const { fileUploaderProps, dragActive } = useFileUploader({
-      name: "general.backgroundImageUrl",
-      acceptedFileTypes: ["png", "jpeg", "jpg", "PNG", "JPEG", "JPG"],
-      maxFileSize: 10, // MB
-      multiple: false,
-      onValidated: async (file) => {
-         const newFile = Array.isArray(file) ? file[0] : file
+   const setImage = (file, imageSetter) => {
+      const newFile = Array.isArray(file) ? file[0] : file
+      imageSetter(URL.createObjectURL(newFile))
+   }
+
+   const handleCropperImageSubmit = useCallback(
+      async (image: File) => {
          await uploadLogo(
             "illustration-images",
-            newFile,
+            image,
             firebase,
             async (newUrl, fullPath) => {
                await helpers.setValue(getDownloadUrl(fullPath), true)
@@ -235,6 +292,37 @@ const BannerImageSelect = () => {
             },
             () => {}
          )
+         setObjectUrl(null)
+      },
+      [firebase, helpers, handleTouched]
+   )
+
+   const handleCloseCropImageDialog = useCallback(() => {
+      setObjectUrl(null)
+   }, [])
+
+   const { fileUploaderProps, dragActive } = useFileUploader({
+      name: fieldName,
+      acceptedFileTypes: ["png", "jpeg", "jpg", "PNG", "JPEG", "JPG"],
+      maxFileSize: 10, // MB
+      multiple: false,
+      onValidated: async (file) => {
+         if (withCropper) {
+            setImage(file, setObjectUrl)
+         } else {
+            const newFile = Array.isArray(file) ? file[0] : file
+            await uploadLogo(
+               "illustration-images",
+               newFile,
+               firebase,
+               async (newUrl, fullPath) => {
+                  await helpers.setValue(getDownloadUrl(fullPath), true)
+                  handleTouched()
+                  await helpers.setError(undefined)
+               },
+               () => {}
+            )
+         }
       },
       onCancel: async () => {
          handleTouched()
@@ -244,17 +332,42 @@ const BannerImageSelect = () => {
       },
    })
 
-   const styles = getStyles(Boolean(meta.touched && meta.error))
+   const styles = getStyles(
+      Boolean(meta.touched && meta.error),
+      containerStyles
+   )
 
    return (
       <>
+         {withCropper && objectUrl && cropperConfig ? (
+            <ImageCropperDialog
+               title={cropperConfig.title}
+               fileName={undefined}
+               imageSrc={objectUrl}
+               open={Boolean(objectUrl)}
+               handleClose={handleCloseCropImageDialog}
+               onSubmit={handleCropperImageSubmit}
+               key={cropperConfig.key}
+               cropType={cropperConfig.type}
+               cropBoxResizable={cropperConfig.cropBoxResizable}
+               aspectRatio={cropperConfig.aspectRatio}
+               titleIcon={<Upload />}
+               backButtonText="Cancel"
+            />
+         ) : null}
          <Stack spacing="10px" direction="column" sx={styles.root}>
             <FileUploader {...fileUploaderProps} sx={styles.fileUploader}>
                <>
                   {field.value ? (
-                     <BannerWithImage imageUrl={field.value} />
+                     <BannerWithImage
+                        imageUrl={field.value}
+                        customStyles={bannerImageStyles}
+                     />
                   ) : (
-                     <EmptyBanner />
+                     <EmptyBanner
+                        emptyBannerLabel={emptyBannerLabel}
+                        recommendedSizeLabel={recommendedSizeLabel}
+                     />
                   )}
                   {dragActive ? <DragAndDropView /> : null}
                </>
