@@ -205,7 +205,6 @@ export const OfflineEventTableRow = ({
                </Box>
                <OfflineEventTableRowActions
                   stat={stat}
-                  status={status}
                   isHovered={isHovered}
                   onViewOfflineEvent={onViewOfflineEvent}
                   onShareOfflineEvent={onShareOfflineEvent}

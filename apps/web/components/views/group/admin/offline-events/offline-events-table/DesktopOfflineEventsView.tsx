@@ -20,15 +20,24 @@ import {
    setHoveredRow,
 } from "../../../../../../store/reducers/offlineEventsTableReducer"
 import { StyledPagination } from "../../common/CardCustom"
+import { StatusFilterHeader } from "../../events/events-table-new/StatusFilterHeader"
+import { SortableHeaderCell } from "../../events/events-table-new/TableHeaderComponents"
 import { useOfflineEventsOverview } from "../context/OfflineEventsOverviewContext"
 import { OfflineEventTableRow } from "./OfflineEventTableRow"
 import {
    COLUMN_WIDTHS,
    offlineEventsTableStyles,
 } from "./OfflineEventsTableStyles"
-import { StatusFilterHeader } from "./StatusFilterHeader"
-import { SortableHeaderCell } from "./TableHeaderComponents"
-import { getOfflineEventStatsKey } from "./utils"
+import { OfflineEventStatus, getOfflineEventStatsKey } from "./utils"
+
+const offlineEventStatusOptions = [
+   {
+      value: OfflineEventStatus.UPCOMING,
+      name: "Upcoming",
+   },
+   { value: OfflineEventStatus.DRAFT, name: "Draft" },
+   { value: OfflineEventStatus.PAST, name: "Past" },
+]
 
 const ITEMS_PER_PAGE = 6
 
@@ -122,9 +131,11 @@ export const DesktopOfflineEventsView = ({
                         Clicks
                      </SortableHeaderCell>
 
-                     <StatusFilterHeader
+                     <StatusFilterHeader<OfflineEventStatus>
                         selectedStatuses={statusFilter}
                         onStatusFilterChange={setStatusFilter}
+                        statusOptions={offlineEventStatusOptions}
+                        tooltip="Shows if your offline event is published, still a draft, or has already taken place."
                         width={COLUMN_WIDTHS.status}
                      />
                   </TableRow>

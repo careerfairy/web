@@ -1,11 +1,9 @@
 import { Box } from "@mui/material"
 import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import { OfflineEventActionsMenu } from "./OfflineEventActionsMenu"
-import { OfflineEventStatus } from "./utils"
 
 type Props = {
    stat: OfflineEventsWithStats
-   status: OfflineEventStatus
    isHovered: boolean
    onViewOfflineEvent: (stat: OfflineEventsWithStats) => void
    onShareOfflineEvent: (stat: OfflineEventsWithStats) => void
@@ -18,7 +16,6 @@ type Props = {
 
 export const OfflineEventTableRowActions = ({
    stat,
-   status,
    onViewOfflineEvent,
    onShareOfflineEvent,
    onAnalytics,
@@ -32,7 +29,6 @@ export const OfflineEventTableRowActions = ({
          {/* More actions menu */}
          <OfflineEventActionsMenu
             stat={stat}
-            status={status}
             onViewOfflineEvent={onViewOfflineEvent}
             onShareOfflineEvent={onShareOfflineEvent}
             onAnalytics={onAnalytics}

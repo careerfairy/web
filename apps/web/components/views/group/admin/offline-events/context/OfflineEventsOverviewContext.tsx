@@ -7,6 +7,7 @@ import {
    createContext,
    useCallback,
    useContext,
+   useEffect,
    useMemo,
    useState,
 } from "react"
@@ -96,7 +97,7 @@ type OfflineEventsViewProviderProps = {
 export const OfflineEventsViewProvider = ({
    children,
 }: OfflineEventsViewProviderProps) => {
-   const { group } = useGroup()
+   const { group, groupPresenter } = useGroup()
    const [sortBy, setSortBy] = useState<OfflineEventStatsSortOption>(
       OfflineEventStatsSortOption.STATUS_WITH_DATE
    )
@@ -330,6 +331,12 @@ export const OfflineEventsViewProvider = ({
          handleDelete,
       ]
    )
+
+   useEffect(() => {
+      if (group?.id && !groupPresenter?.canCreateOfflineEvents(true)) {
+         push(`/group/${group?.id}/admin/content/live-streams`)
+      }
+   }, [groupPresenter, group?.id, push])
 
    return (
       <OfflineEventsViewContext.Provider value={value}>

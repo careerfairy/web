@@ -99,10 +99,6 @@ export class OfflineEventService {
 
       const docSnap = await getDoc(ref)
 
-      if (!docSnap.exists()) {
-         throw new Error(`Offline event with ID ${offlineEventId} not found`)
-      }
-
       return docSnap.data()
    }
 

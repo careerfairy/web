@@ -1,18 +1,61 @@
 import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon"
-import ReactComponent from "public/pointer-click.svg"
+import { sxStyles } from "types/commonTypes"
+
+const styles = sxStyles({
+   root: {
+      "& path": {
+         strokeWidth: 1,
+      },
+   },
+})
 
 const PointerClickIcon = (props: SvgIconProps) => {
    return (
-      <SvgIcon
-         component={ReactComponent}
-         viewBox="0 0 16 16"
-         sx={{
-            "& path": {
-               strokeWidth: 1,
-            },
-         }}
-         {...props}
-      />
+      <SvgIcon viewBox="0 0 16 16" sx={styles.root} {...props}>
+         <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+         >
+            <path
+               d="M9.33333 2.73334L8 4"
+               stroke="#6B6B7F"
+               stroke-width="1.5"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+            />
+            <path
+               d="M3.40001 5.33332L1.46667 4.79999"
+               stroke="#6B6B7F"
+               stroke-width="1.5"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+            />
+            <path
+               d="M3.99994 8L2.73328 9.33333"
+               stroke="#6B6B7F"
+               stroke-width="1.5"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+            />
+            <path
+               d="M4.80005 1.46667L5.33338 3.40001"
+               stroke="#6B6B7F"
+               stroke-width="1.5"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+            />
+            <path
+               d="M6.02469 6.46002C5.99883 6.39912 5.99177 6.33189 6.00439 6.26695C6.01701 6.202 6.04875 6.14231 6.09553 6.09553C6.14231 6.04875 6.202 6.01701 6.26695 6.00439C6.33189 5.99177 6.39912 5.99883 6.46002 6.02469L13.7934 9.02469C13.8586 9.05146 13.9137 9.09825 13.9507 9.15833C13.9877 9.2184 14.0046 9.28866 13.9992 9.35899C13.9937 9.42932 13.966 9.4961 13.9202 9.54972C13.8743 9.60333 13.8126 9.64102 13.744 9.65735L10.8447 10.3514C10.725 10.3799 10.6156 10.4411 10.5285 10.5281C10.4414 10.615 10.3801 10.7244 10.3514 10.844L9.65802 13.744C9.64186 13.8129 9.60422 13.8748 9.55053 13.9209C9.49685 13.9669 9.4299 13.9947 9.35939 14.0002C9.28887 14.0057 9.21843 13.9886 9.15826 13.9514C9.09809 13.9142 9.05131 13.8589 9.02469 13.7934L6.02469 6.46002Z"
+               stroke="#6B6B7F"
+               stroke-width="1.5"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+            />
+         </svg>
+      </SvgIcon>
    )
 }
 

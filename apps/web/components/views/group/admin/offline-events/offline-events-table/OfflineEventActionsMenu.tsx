@@ -5,7 +5,6 @@ import { useState } from "react"
 import { Edit2, MoreVertical, Trash2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { withStopPropagation } from "util/CommonUtil"
-import { OfflineEventStatus } from "./utils"
 
 const styles = sxStyles({
    iconButton: {
@@ -19,7 +18,6 @@ const styles = sxStyles({
 
 type Props = {
    stat: OfflineEventsWithStats
-   status: OfflineEventStatus
    onViewOfflineEvent: (stat: OfflineEventsWithStats) => void
    onShareOfflineEvent: (stat: OfflineEventsWithStats) => void
    onAnalytics: (stat: OfflineEventsWithStats) => void
@@ -29,24 +27,19 @@ type Props = {
    onDelete: (stat: OfflineEventsWithStats) => void
 }
 
-export const OfflineEventActionsMenu = ({
-   stat,
-   onEdit,
-   onDelete,
-   status,
-}: Props) => {
+export const OfflineEventActionsMenu = ({ stat, onEdit, onDelete }: Props) => {
    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
    const open = Boolean(anchorEl)
 
    const menuOptions = [
       {
-         label: getEditLabel(status),
+         label: "Edit event",
          icon: <Edit2 size={16} />,
          handleClick: withStopPropagation(() => onEdit(stat)),
          color: "neutral.700",
       },
       {
-         label: getDeleteLabel(status),
+         label: "Delete event",
          icon: <Trash2 size={16} />,
          handleClick: withStopPropagation(() => onDelete(stat)),
          color: "error.main",
@@ -81,26 +74,4 @@ export const OfflineEventActionsMenu = ({
          />
       </>
    )
-}
-
-const getEditLabel = (eventStatus: OfflineEventStatus) => {
-   switch (eventStatus) {
-      case OfflineEventStatus.UPCOMING:
-         return "Edit event"
-      case OfflineEventStatus.PAST:
-         return "Edit event"
-      default:
-         return "Edit event"
-   }
-}
-
-const getDeleteLabel = (eventStatus: OfflineEventStatus) => {
-   switch (eventStatus) {
-      case OfflineEventStatus.UPCOMING:
-         return "Delete event"
-      case OfflineEventStatus.PAST:
-         return "Delete event"
-      default:
-         return "Delete event"
-   }
 }
