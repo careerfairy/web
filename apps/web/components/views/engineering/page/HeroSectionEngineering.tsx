@@ -24,8 +24,7 @@ const styles = sxStyles({
       gap: 5,
       position: "relative",
       height: { xs: "812px", md: "431px" },
-      background:
-         "linear-gradient(0deg, #E8E8E8 0%, #E8E8E8 100%), linear-gradient(104deg, #EDEDED 0%, #EDEDED 100%), linear-gradient(169deg, rgba(154, 154, 154, 0.13) 1.77%, rgba(154, 154, 154, 0.00) 98.23%), linear-gradient(25deg, rgba(154, 154, 154, 0.00) -0.66%, rgba(154, 154, 154, 0.48) 141.07%), #9A9A9A",
+      backgroundColor: "#9A9A9A",
    },
    headerContainer: {
       gap: { xs: 1.5, md: 4 },
