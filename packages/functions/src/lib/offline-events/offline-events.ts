@@ -165,7 +165,7 @@ export const onWriteOfflineEvent = onDocumentWritten(
                   deletedAt: Timestamp.now(),
                }
 
-               await event.data.after.ref.firestore
+               await event.data.before.ref.firestore
                   .collection("offlineEventStats")
                   .doc(offlineEventId)
                   .update(updateData)
