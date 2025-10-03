@@ -150,9 +150,7 @@ export default function ParticipatingCompaniesSectionConsulting({
                      <CompanyCard
                         company={company as unknown as Group}
                         variant="small"
-                        interactionSource={
-                           InteractionSources.Consulting_Overview_Page
-                        }
+                        interactionSource={InteractionSources.Consulting_Overview_Page}
                      />
                   </Grid>
                ))}
