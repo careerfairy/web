@@ -53,6 +53,9 @@ const styles = sxStyles({
       borderRadius: "12px",
       border: (theme) => `1px solid ${theme.palette.secondary[50]}`,
    },
+   searchIcon: {
+      color: "neutral.500",
+   },
 })
 
 type OfflineEventOption = {
@@ -147,7 +150,12 @@ const OfflineEventSearchNav = () => {
             isOptionEqualToValue={isOptionEqualToValue}
             getOptionLabel={getOptionLabel}
             inputStartIcon={
-               <FindIcon color="#7A7A8E" strokeWidth={2} size={20} />
+               <Box
+                  component={FindIcon}
+                  sx={styles.searchIcon}
+                  strokeWidth={2}
+                  size={20}
+               />
             }
             setInputValue={setInputValue}
             placeholderText="Search offline events"
