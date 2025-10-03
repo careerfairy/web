@@ -11,6 +11,7 @@ const getStyles = (responsiveHeight: string) =>
       root: {
          height: responsiveHeight,
          maxHeight: "calc(100dvh - 96px)",
+         minHeight: "calc(100dvh - 96px)",
       },
       maximizeButton: {
          position: "absolute",
