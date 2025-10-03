@@ -76,14 +76,6 @@ const styles = sxStyles({
       left: 0,
       top: 0,
       margin: "-15px -10px",
-      "&::before": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "linear-gradient(135deg, #FFF8E1 0%, rgba(255, 248, 225, 0) 100%)",
-         mixBlendMode: "multiply",
-         pointerEvents: "none",
-      },
    },
    // Bottom right of companies grid
    visualSupportRight: {
@@ -91,14 +83,6 @@ const styles = sxStyles({
       right: 0,
       bottom: 0,
       margin: "-10px",
-      "&::before": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "linear-gradient(135deg, #F4FFE1 0%, rgba(244, 255, 225, 0) 100%)",
-         mixBlendMode: "multiply",
-         pointerEvents: "none",
-      },
    },
 })
 
