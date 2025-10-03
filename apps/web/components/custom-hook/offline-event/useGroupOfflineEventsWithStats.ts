@@ -8,7 +8,14 @@ import {
    OfflineEventStatus,
    getOfflineEventStatus,
 } from "components/views/group/admin/offline-events/offline-events-table/utils"
-import { collection, getDocs, query, where } from "firebase/firestore"
+import {
+   collection,
+   doc,
+   getDoc,
+   getDocs,
+   query,
+   where,
+} from "firebase/firestore"
 import { useMemo } from "react"
 import { useFirestore } from "reactfire"
 import useSWR from "swr"
@@ -107,17 +114,13 @@ export const useGroupOfflineEventsWithStats = (
             const offlineEventData = eventDoc.data() as OfflineEvent
 
             // Try to fetch stats for this offline event
-            const statsQuery = query(
-               collection(firestore, "offlineEvents", eventDoc.id, "stats"),
-               where("documentType", "==", "offlineEventStats")
-            )
+            const statsDoc = doc(firestore, "offlineEventStats", eventDoc.id)
 
-            const statsSnapshot = await getDocs(statsQuery)
+            const statsSnapshot = await getDoc(statsDoc)
 
-            if (statsSnapshot.docs.length > 0) {
+            if (statsSnapshot.exists) {
                // Stats exist, use the real stats
-               const statsDoc = statsSnapshot.docs[0]
-               const statsData = statsDoc.data() as OfflineEventStats
+               const statsData = statsSnapshot.data() as OfflineEventStats
 
                offlineEventsWithStats.push({
                   offlineEvent: offlineEventData,
