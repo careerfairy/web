@@ -58,6 +58,7 @@ const offlineEventFormGeneralTabSchema = yup.object().shape({
       .required(REQUIRED_FIELD_MESSAGE),
    startAt: yup
       .date()
+      .nullable()
       .min(
          DateTime.now().plus({ hour: 1 }).toJSDate(),
          "Please select a date in the future (+1 hour)"
