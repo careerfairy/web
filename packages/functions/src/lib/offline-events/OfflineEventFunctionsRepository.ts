@@ -129,23 +129,30 @@ export class OfflineEventFunctionsRepository
             throw new Error(`Offline event ${offlineEventId} not found`)
          }
 
-         const userStatsData = userStatsSnap.data()
+         // Get existing data or create new object with both properties initialized to null
+         const userStatsData: OfflineEventUserStats = userStatsSnap.exists
+            ? userStatsSnap.data()
+            : {
+                 id: userStatsRef.id,
+                 documentType: "offlineEventUserStats",
+                 user: userData,
+                 isAnonymous,
+                 offlineEvent,
+                 lastSeenAt: null,
+                 listClickedAt: null,
+                 createdAt: Timestamp.now(),
+              }
 
-         // Upsert user stats with appropriate timestamp
          transaction.set(userStatsRef, {
             ...userStatsData,
             user: userData,
             isAnonymous,
             offlineEvent,
+            // Update the current action's timestamp, preserve the other
             [config.timestampField]: {
                date: Timestamp.now(),
                utm,
             },
-            createdAt: userStatsData?.createdAt
-               ? userStatsData?.createdAt
-               : Timestamp.now(),
-            documentType: "offlineEventUserStats",
-            id: userStatsRef.id,
          })
 
          // Create action record

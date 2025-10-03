@@ -281,9 +281,8 @@ const Content = ({
    onClose: () => void
    onShare: () => void
 }) => {
-   const { push, asPath } = useRouter()
    const isMobile = useIsMobile()
-   const { userData, isLoggedOut, isLoadingUserData } = useAuth()
+   const { userData, isLoadingUserData } = useAuth()
    const { data: fingerprint, isLoading: isLoadingFingerprint } =
       useFingerPrint()
 
@@ -366,25 +365,13 @@ const Content = ({
                })
          }
 
-         // Redirect to login if logged out, otherwise open registration
-         if (isLoggedOut) {
-            return push({
-               pathname: "/login",
-               query: { absolutePath: asPath },
-            })
-         }
+         const url = new URL(registrationUrl)
 
-         window.open(registrationUrl, "_blank", "noopener")
+         url.searchParams.set("utm_source", "careerfairy")
+
+         window.open(url.toString(), "_blank", "noopener")
       }
-   }, [
-      userData,
-      fingerprint,
-      event,
-      isLoggedOut,
-      push,
-      registrationUrl,
-      asPath,
-   ])
+   }, [userData, fingerprint, event, registrationUrl])
 
    return (
       <Box position="relative">

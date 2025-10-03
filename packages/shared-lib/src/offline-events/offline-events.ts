@@ -102,12 +102,12 @@ export interface OfflineEventUserStats extends Identifiable {
    lastSeenAt: {
       date: Timestamp
       utm: UTMParams | null
-   }
+   } | null
    // Timestamp with UTM data for when the user clicked on the event listing
    listClickedAt: {
       date: Timestamp
       utm: UTMParams | null
-   }
+   } | null
    createdAt: Timestamp
 }
 
