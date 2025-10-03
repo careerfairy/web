@@ -13,6 +13,17 @@ const progressBarStyles = sxStyles({
       alignItems: "center",
       gap: 1.5,
    },
+   mobileName: {
+      flex: 1,
+      lineHeight: "24px",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+   },
+   mobilePercentage: {
+      textAlign: "right",
+      lineHeight: "16px",
+   },
    mobileProgressBar: {
       width: "100%",
       height: 17,
@@ -34,6 +45,18 @@ const progressBarStyles = sxStyles({
       display: "flex",
       alignItems: "center",
       gap: 2,
+   },
+   desktopName: {
+      width: 200,
+      lineHeight: "24px",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+   },
+   desktopPercentage: {
+      width: 52,
+      textAlign: "right",
+      lineHeight: "16px",
    },
    desktopProgressBar: {
       flex: 1,
@@ -65,23 +88,14 @@ export const ProgressBarItem = ({
                <Typography
                   variant="medium"
                   color="neutral.700"
-                  sx={{
-                     flex: 1,
-                     lineHeight: "24px",
-                     whiteSpace: "nowrap",
-                     overflow: "hidden",
-                     textOverflow: "ellipsis",
-                  }}
+                  sx={progressBarStyles.mobileName}
                >
                   {name}
                </Typography>
                <Typography
                   variant="xsmall"
                   color={(theme) => theme.brand.black[700]}
-                  sx={{
-                     textAlign: "right",
-                     lineHeight: "16px",
-                  }}
+                  sx={progressBarStyles.mobilePercentage}
                >
                   {percentage}%
                </Typography>
@@ -102,13 +116,7 @@ export const ProgressBarItem = ({
             <Typography
                variant="medium"
                color="neutral.700"
-               sx={{
-                  width: 200,
-                  lineHeight: "24px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-               }}
+               sx={progressBarStyles.desktopName}
             >
                {name}
             </Typography>
@@ -121,11 +129,7 @@ export const ProgressBarItem = ({
          <Typography
             variant="xsmall"
             color={(theme) => theme.brand.black[700]}
-            sx={{
-               width: 52,
-               textAlign: "right",
-               lineHeight: "16px",
-            }}
+            sx={progressBarStyles.desktopPercentage}
          >
             {percentage}%
          </Typography>

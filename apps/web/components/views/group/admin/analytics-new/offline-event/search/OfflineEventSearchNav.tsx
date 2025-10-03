@@ -18,9 +18,9 @@ const styles = sxStyles({
    wrapper: {
       width: "100%",
       backgroundColor: (theme) => theme.brand.white[400],
-      p: { xs: 2, md: 2 },
-      px: { xs: 2, md: 2 },
-      py: { xs: 1.5, md: 1.5 },
+      p: { xs: 0, md: 2 },
+      px: { xs: 0, md: 2 },
+      py: { xs: 0, md: 1.5 },
       gap: { xs: 1.5, md: 1.25 },
       display: "flex",
       flexDirection: "column",
@@ -76,22 +76,23 @@ const OfflineEventSearchNav = () => {
    const [inputValue, setInputValue] = useState("")
    const [open, setOpen] = useState(false)
 
-   const { data: offlineEventStats } = useSWR(
-      [`group-${group.id}-published-offline-events`],
-      async () => {
-         return offlineEventService.getFutureAndPublishedOfflineEventStats(
-            group.id
-         )
-      },
-      {
-         onError: (error) => {
-            errorLogAndNotify(error, {
-               title: "Error fetching future and published offline events",
-               groupId: group.id,
-            })
+   const { data: offlineEventStats, isLoading: isLoadingOfflineEventStats } =
+      useSWR(
+         [`group-${group.id}-published-offline-events`],
+         async () => {
+            return offlineEventService.getFutureAndPublishedOfflineEventStats(
+               group.id
+            )
          },
-      }
-   )
+         {
+            onError: (error) => {
+               errorLogAndNotify(error, {
+                  title: "Error fetching future and published offline events",
+                  groupId: group.id,
+               })
+            },
+         }
+      )
 
    const options: OfflineEventOption[] = useMemo(
       () =>
@@ -104,8 +105,8 @@ const OfflineEventSearchNav = () => {
    )
 
    // Find current value from options, or create it from currentEventStats if not in the list
-   const currentValue: OfflineEventOption | undefined = useMemo(() => {
-      if (!currentEventStats) return undefined
+   const currentValue: OfflineEventOption | null = useMemo(() => {
+      if (!currentEventStats) return null
 
       // First try to find it in the options
       const foundOption = options.find((opt) => opt.id === currentEventStats.id)
@@ -153,6 +154,8 @@ const OfflineEventSearchNav = () => {
             open={open}
             setOpen={setOpen}
             textFieldStyles={styles.textField}
+            loading={isLoadingOfflineEventStats}
+            noOptionsText="No offline events found"
          />
       </Box>
    )

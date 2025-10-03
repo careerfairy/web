@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
@@ -12,15 +13,21 @@ import OfflineEventSearchNav from "./search/OfflineEventSearchNav"
 const styles = sxStyles({
    rootContainer: {
       mt: 2,
+      overflow: "hidden",
+   },
+   rootDesktopContainer: {
       backgroundColor: "common.white",
       borderRadius: "20px",
       border: "1px solid",
       borderColor: "neutral.50",
-      overflow: "hidden",
    },
    contentWrapper: {
       display: "flex",
       flexDirection: "column",
+      gap: {
+         xs: 1.5,
+         md: 0,
+      },
    },
 })
 
@@ -33,13 +40,19 @@ const OfflineEventAnalyticsPageContent = () => {
 }
 
 const PageContent = () => {
+   const isMobile = useIsMobile()
    const { currentEventStats } = useOfflineEventAnalyticsPageContext()
 
    const noEvents = currentEventStats === null
 
    return (
       <LivestreamAnalyticsContainer>
-         <Box sx={styles.rootContainer}>
+         <Box
+            sx={[
+               styles.rootContainer,
+               !isMobile && styles.rootDesktopContainer,
+            ]}
+         >
             <Box sx={styles.contentWrapper}>
                <OfflineEventSearchNav />
                {noEvents ? <SearchPageContent /> : <AggregatedAnalytics />}

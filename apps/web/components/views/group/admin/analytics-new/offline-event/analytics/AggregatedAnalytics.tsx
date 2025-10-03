@@ -1,5 +1,6 @@
-import { Box, Card, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import useUniversitiesByCountryCodes from "components/custom-hook/useUniversities"
 import { ClickIcon } from "components/views/common/icons/ClickIcon"
 import { ConversionBadgeIcon } from "components/views/common/icons/ConversionBadgeIcon"
@@ -8,15 +9,16 @@ import { Eye } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useOfflineEventAnalyticsPageContext } from "../OfflineEventAnalyticsPageProvider"
 import { ProgressBarItem } from "./ProgressBarItem"
+import { StatCard } from "./StatCard"
 
 const styles = sxStyles({
    container: {
       width: "100%",
       display: "flex",
       flexDirection: "column",
-      gap: { xs: 1, md: 2.5 },
-      px: { xs: 2, md: 2 },
-      pb: { xs: 1, md: 1.5 },
+      gap: { xs: 1.5, md: 2.5 },
+      px: { xs: 0, md: 2 },
+      pb: { xs: 0, md: 1.5 },
       pt: { xs: 0, md: 2.5 },
    },
    statsRow: {
@@ -24,41 +26,6 @@ const styles = sxStyles({
       alignItems: "center",
       width: "100%",
       position: "relative",
-   },
-   statCard: {
-      flex: 1,
-      backgroundColor: (theme) => theme.brand.white[200],
-      border: "1px solid",
-      borderColor: "neutral.50",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "flex-start",
-      gap: { xs: 0.5, md: 0 },
-      p: { xs: 1.5, md: 1.5 },
-   },
-   statCardDesktop: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 2,
-   },
-   statCardLeft: {
-      borderTopLeftRadius: "16px",
-      borderBottomLeftRadius: "16px",
-   },
-   statCardRight: {
-      borderTopRightRadius: "16px",
-      borderBottomRightRadius: "16px",
-      pl: { xs: 1.5, md: 4.5 },
-   },
-   iconContainer: {
-      backgroundColor: "secondary.50",
-      borderRadius: "44px",
-      p: { xs: "4px", md: 1 },
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: { xs: 24, md: 48 },
-      height: { xs: 24, md: 48 },
    },
    conversionBadge: {
       position: "absolute",
@@ -81,15 +48,13 @@ const styles = sxStyles({
       left: 0,
       width: "100%",
       height: "100%",
-      scale: 1.02,
+      scale: {
+         xs: 1,
+         md: 1.02,
+      },
    },
    conversionText: {
       position: "absolute",
-   },
-   topSection: {
-      display: "flex",
-      flexDirection: "column",
-      gap: { xs: 1.5, md: 1.25 },
    },
    sectionCard: {
       flex: 1,
@@ -119,16 +84,10 @@ const styles = sxStyles({
       justifyContent: "center",
       minHeight: 174,
    },
-   icon: {
-      width: { xs: 16, md: 32 },
-      height: { xs: 16, md: 32 },
-      color: "secondary.600",
-   },
 })
 
 const AggregatedAnalytics = () => {
-   const theme = useTheme()
-   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+   const isMobile = useIsMobile()
    const { currentEventStats, fieldsOfStudyLookup } =
       useOfflineEventAnalyticsPageContext()
 
@@ -260,35 +219,13 @@ const AggregatedAnalytics = () => {
       <Box sx={styles.container}>
          {/* Top Stats Row */}
          <Box sx={styles.statsRow}>
-            <Card
-               sx={[
-                  styles.statCard,
-                  styles.statCardLeft,
-                  !isMobile && styles.statCardDesktop,
-               ]}
-               elevation={0}
-            >
-               <Box
-                  sx={{
-                     display: "flex",
-                     alignItems: "center",
-                     gap: 1,
-                  }}
-               >
-                  <Box sx={styles.iconContainer}>
-                     <Box component={Eye} sx={styles.icon} />
-                  </Box>
-                  <Typography variant="medium" color="neutral.600">
-                     {isMobile ? "Reach" : "Total talent reached"}
-                  </Typography>
-               </Box>
-               <Typography
-                  variant={isMobile ? "brandedH3" : "desktopBrandedH3"}
-                  fontWeight={700}
-               >
-                  {totalTalentReached.toLocaleString()}
-               </Typography>
-            </Card>
+            <StatCard
+               icon={Eye}
+               label={isMobile ? "Reach" : "Total talent reached"}
+               value={totalTalentReached}
+               isMobile={isMobile}
+               position="left"
+            />
 
             {/* Conversion Badge */}
             <Box sx={styles.conversionBadge}>
@@ -306,36 +243,13 @@ const AggregatedAnalytics = () => {
                </Box>
             </Box>
 
-            <Card
-               sx={[
-                  styles.statCard,
-                  styles.statCardRight,
-                  !isMobile && styles.statCardDesktop,
-               ]}
-               elevation={0}
-            >
-               {!isMobile && <Box width={20} />}
-               <Box
-                  sx={{
-                     display: "flex",
-                     alignItems: "center",
-                     gap: 1,
-                  }}
-               >
-                  <Box sx={styles.iconContainer}>
-                     <ClickIcon sx={styles.icon} />
-                  </Box>
-                  <Typography variant="medium" color="neutral.600">
-                     {isMobile ? "Clicks" : "Total clicks"}
-                  </Typography>
-               </Box>
-               <Typography
-                  variant={isMobile ? "brandedH3" : "desktopBrandedH3"}
-                  fontWeight={700}
-               >
-                  {totalClicks.toLocaleString()}
-               </Typography>
-            </Card>
+            <StatCard
+               icon={ClickIcon}
+               label={isMobile ? "Clicks" : "Total clicks"}
+               value={totalClicks}
+               isMobile={isMobile}
+               position="right"
+            />
          </Box>
 
          {/* Bottom Section with Progress Bars */}
@@ -344,7 +258,7 @@ const AggregatedAnalytics = () => {
                xs: "column",
                md: "row",
             }}
-            spacing={2.5}
+            spacing={{ xs: 1.5, md: 2.5 }}
          >
             {/* Fields of Study */}
             <Box sx={styles.sectionCard}>
