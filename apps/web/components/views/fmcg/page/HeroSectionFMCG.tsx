@@ -69,14 +69,6 @@ const styles = sxStyles({
       width: { xs: 174, md: 240 },
       height: { xs: 346, md: "auto" },
       pointerEvents: "none",
-      "&::before": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "linear-gradient(135deg, rgba(255, 217, 0, 0) 0%, #F9A825 100%)",
-         mixBlendMode: "multiply",
-         pointerEvents: "none",
-      },
    },
    visualSupportRight: {
       position: "absolute",
@@ -85,14 +77,6 @@ const styles = sxStyles({
       width: { xs: 273, md: 220 },
       height: { xs: 346, md: "auto" },
       pointerEvents: "none",
-      "&::before": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "linear-gradient(135deg, #F9A825 0%, rgba(230, 57, 70, 0.42) 100%)",
-         mixBlendMode: "multiply",
-         pointerEvents: "none",
-      },
    },
    tagChips: {
       gap: 1,
@@ -214,7 +198,7 @@ export default function HeroSectionFMCG({
          <Box aria-hidden sx={styles.visualSupportContainer}>
             <Box aria-hidden sx={styles.visualSupportLeft}>
                <Image
-                  src="/panels/header-left-visual-support.svg"
+                  src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/fmcg-hero-left-shape.svg?alt=media&token=827a82dd-4f36-431a-bc25-7a3ba7f2504f"
                   alt=""
                   width={300}
                   height={300}
@@ -224,7 +208,7 @@ export default function HeroSectionFMCG({
             {Boolean(isLargeScreen) && (
                <Box aria-hidden sx={styles.visualSupportRight}>
                   <Image
-                     src="/panels/header-right-visual-support.svg"
+                     src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/fmcg-hero-right-shape.svg?alt=media&token=0aa41101-de0f-441a-b602-4a44b7444d75"
                      alt=""
                      width={300}
                      height={300}
