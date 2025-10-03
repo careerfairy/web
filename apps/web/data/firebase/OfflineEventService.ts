@@ -19,18 +19,6 @@ import { FirestoreInstance } from "./FirebaseInstance"
 export class OfflineEventService {
    constructor(private readonly firestore: typeof FirestoreInstance) {}
 
-   async getById(eventId: string) {
-      if (!eventId) return null
-
-      const docRef = doc(
-         FirestoreInstance,
-         "offlineEvents",
-         eventId
-      ).withConverter(createGenericConverter<OfflineEvent>())
-      const docSnap = await getDoc(docRef)
-      return docSnap.data()
-   }
-
    /**
     * Creates a new offline event
     * @param offlineEvent - The offline event data to create
@@ -95,6 +83,23 @@ export class OfflineEventService {
    async deleteOfflineEvent(offlineEventId: string) {
       const ref = doc(this.firestore, "offlineEvents", offlineEventId)
       await deleteDoc(ref)
+   }
+
+   /**
+    * Gets an offline event by ID
+    * @param offlineEventId - The ID of the offline event to fetch
+    * @returns Promise with the offline event data
+    */
+   async getById(offlineEventId: string): Promise<OfflineEvent> {
+      const ref = doc(
+         this.firestore,
+         "offlineEvents",
+         offlineEventId
+      ).withConverter(createGenericConverter<OfflineEvent>())
+
+      const docSnap = await getDoc(ref)
+
+      return docSnap.data()
    }
 
    /**

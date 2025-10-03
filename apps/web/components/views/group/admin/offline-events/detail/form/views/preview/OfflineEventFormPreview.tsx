@@ -10,13 +10,16 @@ const styles = sxStyles({
    previewContainer: {
       position: "relative",
       marginTop: "10px !important",
-      maxHeight: "90vh",
       display: "flex",
       flexDirection: "column",
    },
 })
 
-const OfflineEventFormPreview = () => {
+type OfflineEventFormPreviewProps = {
+   scale: number
+}
+
+const OfflineEventFormPreview = ({ scale }: OfflineEventFormPreviewProps) => {
    const isMobile = useIsMobile()
    const [
       isPreviewDialogOpen,
@@ -34,6 +37,7 @@ const OfflineEventFormPreview = () => {
             <Box sx={styles.previewContainer}>
                <OfflineEventFormPreviewDesktop
                   handleDialogOpen={handlePreviewDialogOpen}
+                  scale={scale}
                />
             </Box>
          )}
