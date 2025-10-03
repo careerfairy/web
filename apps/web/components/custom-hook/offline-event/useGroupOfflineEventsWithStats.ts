@@ -172,10 +172,6 @@ export const useGroupOfflineEventsWithStats = (
       // First filter by search term, then by status, then sort
       let filteredData = filterStatsBySearchTerm(data, searchTerm)
       filteredData = filterStatsByStatus(filteredData, statusFilter)
-      console.log(
-         "🚀 ~ useGroupOfflineEventsWithStats ~ filteredData:",
-         filteredData
-      )
       return sortStatsArray(filteredData, sortBy)
    }, [data, searchTerm, statusFilter, sortBy])
 

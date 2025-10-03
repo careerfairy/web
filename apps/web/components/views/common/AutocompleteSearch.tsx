@@ -1,5 +1,5 @@
 import { COPY_CONSTANTS } from "@careerfairy/shared-lib/constants"
-import { InputAdornment, Paper, styled } from "@mui/material"
+import { InputAdornment, Paper, styled, SxProps } from "@mui/material"
 import Autocomplete, {
    AutocompleteInputChangeReason,
    AutocompleteRenderOptionState,
@@ -51,6 +51,7 @@ type AutocompleteSearchProps<TOption = unknown> = {
    open?: boolean
    setOpen?: React.Dispatch<React.SetStateAction<boolean>>
    freeSolo?: boolean
+   textFieldStyles?: SxProps
 }
 
 const StyledPaper = styled(Paper)({
@@ -84,6 +85,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    open,
    setOpen,
    freeSolo,
+   textFieldStyles,
 }) => {
    const inputTooSmall = minCharacters && inputValue.length < minCharacters
 
@@ -109,10 +111,13 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
       ) => {
          if (reason === "clear") {
             if (!freeSolo) {
-               setInputValue("") // reset input value when user clicks on clear button/esacpe/outside
+               setInputValue("") // reset input value when user clicks on clear button/escape/outside
             }
             return
          } else if (reason === "input") {
+            setInputValue(value)
+         } else if (reason === "reset") {
+            // Handle when value changes programmatically
             setInputValue(value)
          }
       },
@@ -139,6 +144,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
          ListboxComponent={StyledListbox}
          ListboxProps={listBoxProps}
          value={value}
+         inputValue={inputValue}
          isOptionEqualToValue={isOptionEqualToValue}
          noOptionsText={
             inputTooSmall
@@ -166,7 +172,7 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
                         </InputAdornment>
                      ),
                   }),
-                  sx: styles.input,
+                  sx: [styles.input, textFieldStyles],
                }}
                placeholder={placeholderText}
                fullWidth

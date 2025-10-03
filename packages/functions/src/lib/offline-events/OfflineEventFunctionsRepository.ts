@@ -8,7 +8,7 @@ import {
    OfflineEventStatsAction,
    OfflineEventUserStats,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { UserData, UserPublicData } from "@careerfairy/shared-lib/users"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { Firestore, Timestamp } from "firebase-admin/firestore"
 import { FunctionsLogger } from "../../util"
 import { createAdminConverter } from "../../util/firestore-admin"
@@ -22,10 +22,18 @@ export interface IOfflineEventFunctionsRepository {
     * Creates action record, upserts user stats with appropriate timestamp,
     * and updates general + segmented analytics (by university, country, field of study).
     * Handles migration when users change their profile data.
+    * Supports both authenticated users and anonymous users (via fingerprint).
+    *
+    * @param offlineEventId - The ID of the offline event
+    * @param userIdentifier - Either authId (for authenticated users) or fingerprint (for anonymous users)
+    * @param userData - User data (null for anonymous users)
+    * @param utm - UTM parameters
+    * @param actionType - The type of action (View or Click)
     */
    trackOfflineEventAction(
       offlineEventId: string,
-      user: UserPublicData,
+      userIdentifier: string,
+      userData: UserData | null,
       utm: UTMParams | null,
       actionType: OfflineEventStatsAction
    ): Promise<void>
@@ -67,7 +75,8 @@ export class OfflineEventFunctionsRepository
 
    async trackOfflineEventAction(
       offlineEventId: string,
-      user: UserData,
+      userIdentifier: string,
+      userData: UserData | null,
       utm: UTMParams | null,
       actionType: OfflineEventStatsAction
    ): Promise<void> {
@@ -83,12 +92,14 @@ export class OfflineEventFunctionsRepository
                  segmentedStatsSuffix: "RegisterClicks" as const,
               }
 
+      const isAnonymous = !userData
+
       return this.firestore.runTransaction(async (transaction) => {
          const userStatsRef = this.firestore
             .collection("offlineEvents")
             .doc(offlineEventId)
             .collection("offlineEventUserStats")
-            .doc(user.authId)
+            .doc(userIdentifier)
             .withConverter(createAdminConverter<OfflineEventUserStats>())
 
          const statsRef = this.firestore
@@ -100,7 +111,7 @@ export class OfflineEventFunctionsRepository
             .collection("offlineEvents")
             .doc(offlineEventId)
             .collection("offlineEventUserStats")
-            .doc(user.authId)
+            .doc(userIdentifier)
             .collection("offlineEventActions")
             .withConverter(createAdminConverter<OfflineEventAction>())
             .doc()
@@ -118,29 +129,38 @@ export class OfflineEventFunctionsRepository
             throw new Error(`Offline event ${offlineEventId} not found`)
          }
 
-         const userStatsData = userStatsSnap.data()
+         // Get existing data or create new object with both properties initialized to null
+         const userStatsData: OfflineEventUserStats = userStatsSnap.exists
+            ? userStatsSnap.data()
+            : {
+                 id: userStatsRef.id,
+                 documentType: "offlineEventUserStats",
+                 user: userData,
+                 isAnonymous,
+                 offlineEvent,
+                 lastSeenAt: null,
+                 listClickedAt: null,
+                 createdAt: Timestamp.now(),
+              }
 
-         // Upsert user stats with appropriate timestamp
          transaction.set(userStatsRef, {
             ...userStatsData,
-            user,
+            user: userData,
+            isAnonymous,
             offlineEvent,
+            // Update the current action's timestamp, preserve the other
             [config.timestampField]: {
                date: Timestamp.now(),
                utm,
             },
-            createdAt: userStatsData?.createdAt
-               ? userStatsData?.createdAt
-               : Timestamp.now(),
-            documentType: "offlineEventUserStats",
-            id: userStatsRef.id,
          })
 
          // Create action record
          transaction.set(actionRef, {
             id: actionRef.id,
             documentType: "offlineEventAction",
-            user,
+            user: userData,
+            isAnonymous,
             offlineEventId,
             type: actionType,
             utm,
@@ -148,10 +168,11 @@ export class OfflineEventFunctionsRepository
          })
 
          // Build update data using the extracted testable function
+         // For anonymous users, pass null userData so segmented stats are not updated
          const updateData = buildOfflineEventStatsUpdateData(
             actionType,
             userStatsData || null,
-            user,
+            userData,
             config.segmentedStatsSuffix
          )
 

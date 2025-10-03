@@ -13,6 +13,7 @@ import {
    Typography,
    alpha,
 } from "@mui/material"
+import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import { useIsMounted } from "components/custom-hook/utils/useIsMounted"
@@ -280,9 +281,10 @@ const Content = ({
    onClose: () => void
    onShare: () => void
 }) => {
-   const { push, asPath } = useRouter()
    const isMobile = useIsMobile()
-   const { userData, isLoggedOut } = useAuth()
+   const { userData, isLoadingUserData } = useAuth()
+   const { data: fingerprint, isLoading: isLoadingFingerprint } =
+      useFingerPrint()
 
    const companyUrl = event?.group?.publicProfile
       ? makeGroupCompanyPageUrl(event?.group?.universityName, {
@@ -303,7 +305,13 @@ const Content = ({
    const hasTrackedView = useRef(false)
 
    useEffect(() => {
-      if (event && userData && !hasTrackedView.current) {
+      // Wait for both auth and fingerprint to finish loading
+      if (isLoadingUserData || isLoadingFingerprint) return
+
+      // Track view for both authenticated and anonymous users
+      // Prioritize userData (logged in) over fingerprint (anonymous)
+      const identifier = userData || fingerprint
+      if (event && !hasTrackedView.current && identifier) {
          hasTrackedView.current = true
          const utm = CookiesUtil.getUTMParams()
 
@@ -311,51 +319,59 @@ const Content = ({
             .trackOfflineEventAction(
                event.id,
                OfflineEventStatsAction.View,
-               userData,
+               identifier,
                utm
             )
             .catch((error) => {
                errorLogAndNotify(error, {
                   description: "Failed to track offline event view",
                   offlineEventId: event.id,
-                  userData,
+                  identifier,
                   utm,
                })
             })
       }
-   }, [event, event?.id, userData])
+   }, [
+      event,
+      event?.id,
+      userData,
+      fingerprint,
+      isLoadingUserData,
+      isLoadingFingerprint,
+   ])
 
    const handleRegisterClick = useCallback(() => {
       if (event) {
-         if (isLoggedOut) {
-            return push({
-               pathname: "/login",
-               query: { absolutePath: asPath },
-            })
-         }
-
-         if (!userData) return
-
-         window.open(registrationUrl, "_blank", "noopener")
          const utm = CookiesUtil.getUTMParams()
 
-         offlineEventService
-            .trackOfflineEventAction(
-               event.id,
-               OfflineEventStatsAction.Click,
-               userData,
-               utm
-            )
-            .catch((error) => {
-               errorLogAndNotify(error, {
-                  description: "Failed to track offline event click",
-                  offlineEventId: event.id,
-                  userData,
-                  utm,
+         // Track click for both authenticated and anonymous users
+         if (userData || fingerprint) {
+            const userDataOrFingerprint = userData || fingerprint
+
+            offlineEventService
+               .trackOfflineEventAction(
+                  event.id,
+                  OfflineEventStatsAction.Click,
+                  userDataOrFingerprint,
+                  utm
+               )
+               .catch((error) => {
+                  errorLogAndNotify(error, {
+                     description: "Failed to track offline event click",
+                     offlineEventId: event.id,
+                     userDataOrFingerprint,
+                     utm,
+                  })
                })
-            })
+         }
+
+         const url = new URL(registrationUrl)
+
+         url.searchParams.set("utm_source", "careerfairy")
+
+         window.open(url.toString(), "_blank", "noopener")
       }
-   }, [userData, event, isLoggedOut, push, registrationUrl, asPath])
+   }, [userData, fingerprint, event, registrationUrl])
 
    return (
       <Box position="relative">
