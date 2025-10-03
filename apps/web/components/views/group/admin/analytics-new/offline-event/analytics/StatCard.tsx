@@ -87,7 +87,7 @@ export const StatCard = ({
             elevation={0}
          >
             <Box sx={{ display: "flex" }}>
-               {position === "right" && <Box id="right-stat-card" width={30} />}
+               {position === "right" && <Box id="right-stat-card" width={25} />}
                <Stack>
                   <Box
                      sx={{

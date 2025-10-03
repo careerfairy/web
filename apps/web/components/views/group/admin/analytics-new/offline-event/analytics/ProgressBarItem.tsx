@@ -12,6 +12,7 @@ const progressBarStyles = sxStyles({
    mobileHeader: {
       display: "flex",
       alignItems: "center",
+      justifyContent: "space-between",
       gap: 1.5,
    },
    mobileName: {
