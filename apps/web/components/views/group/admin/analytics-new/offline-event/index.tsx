@@ -1,6 +1,8 @@
 import { Box, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { memo } from "react"
+import { useGroup } from "layouts/GroupDashboardLayout"
+import { useRouter } from "next/router"
+import { memo, useEffect } from "react"
 import { sxStyles } from "types/commonTypes"
 import { LivestreamAnalyticsContainer } from "../LivestreamAnalyticsContainer"
 import {
@@ -41,9 +43,17 @@ const OfflineEventAnalyticsPageContent = () => {
 
 const PageContent = () => {
    const isMobile = useIsMobile()
+   const { groupPresenter } = useGroup()
    const { currentEventStats } = useOfflineEventAnalyticsPageContext()
+   const { replace } = useRouter()
 
    const noEvents = currentEventStats === null
+
+   useEffect(() => {
+      if (groupPresenter && !groupPresenter.canCreateOfflineEvents(true)) {
+         replace(`/group/${groupPresenter.id}/admin`)
+      }
+   }, [groupPresenter, replace])
 
    return (
       <LivestreamAnalyticsContainer>
