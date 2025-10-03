@@ -74,6 +74,8 @@ export const FUNCTION_NAMES = {
 
    // Slack Notifications
    notifySlackWhenSparksTrialStarts: "notifySlackWhenSparksTrialStarts",
+   notifySlackWhenOfflineEventIsPublished:
+      "notifySlackWhenOfflineEventIsPublished",
 
    // -- Trigger functions -- //
    /**
