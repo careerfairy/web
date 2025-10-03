@@ -70,19 +70,35 @@ const styles = sxStyles({
       inset: 0,
       pointerEvents: "none",
    },
-   // Turquoise image - top left of companies grid
+   // Top left of companies grid
    visualSupportLeft: {
       position: "absolute",
       left: 0,
       top: 0,
       margin: "-15px -10px",
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         inset: 0,
+         background: "linear-gradient(135deg, #FFF8E1 0%, rgba(255, 248, 225, 0) 100%)",
+         mixBlendMode: "multiply",
+         pointerEvents: "none",
+      },
    },
-   // Purple image - bottom right of companies grid
+   // Bottom right of companies grid
    visualSupportRight: {
       position: "absolute",
       right: 0,
       bottom: 0,
       margin: "-10px",
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         inset: 0,
+         background: "linear-gradient(135deg, #F4FFE1 0%, rgba(244, 255, 225, 0) 100%)",
+         mixBlendMode: "multiply",
+         pointerEvents: "none",
+      },
    },
 })
 
