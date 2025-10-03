@@ -109,7 +109,7 @@ export default function ParticipatingCompaniesSectionFinanceBanking({
             <Box aria-hidden sx={styles.visualSupportContainer}>
                <Box aria-hidden sx={styles.visualSupportLeft}>
                   <Image
-                     src="/panels/companies-turquoise-visual-support.svg"
+                     src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/financebanking-companies-left-shape.svg?alt=media&token=50bfe377-8ee3-4a28-9d06-5aee3387b076"
                      alt=""
                      width={339}
                      height={199}
@@ -118,7 +118,7 @@ export default function ParticipatingCompaniesSectionFinanceBanking({
                </Box>
                <Box aria-hidden sx={styles.visualSupportRight}>
                   <Image
-                     src="/panels/companies-purple-visual-support.svg"
+                     src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/financebanking-companies-right-shape.svg?alt=media&token=b7e908d2-c00a-49aa-9469-dc4a63af62ef"
                      alt=""
                      width={187}
                      height={338}
