@@ -117,10 +117,10 @@ export const useGroupOfflineEventsWithStats = (
             const statsDoc = doc(firestore, "offlineEventStats", eventDoc.id)
 
             const statsSnapshot = await getDoc(statsDoc)
+            const statsData = statsSnapshot.data() as OfflineEventStats
 
-            if (statsSnapshot.exists) {
+            if (statsData) {
                // Stats exist, use the real stats
-               const statsData = statsSnapshot.data() as OfflineEventStats
 
                offlineEventsWithStats.push({
                   offlineEvent: offlineEventData,
