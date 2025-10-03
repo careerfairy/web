@@ -47,6 +47,7 @@ export const InteractionSources = {
    Offline_Event_Dialog: "Offline_Event_Dialog",
    Consulting_Overview_Page: "Consulting_Overview_Page",
    Engineering_Overview_Page: "Engineering_Overview_Page",
+   FMCG_Overview_Page: "FMCG_Overview_Page",
 } as const
 
 export type InteractionSourcesType =
