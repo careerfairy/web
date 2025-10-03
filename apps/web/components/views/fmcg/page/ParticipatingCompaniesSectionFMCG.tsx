@@ -111,7 +111,7 @@ export default function ParticipatingCompaniesSectionFMCG({
             <Box aria-hidden sx={styles.visualSupportContainer}>
                <Box aria-hidden sx={styles.visualSupportLeft}>
                   <Image
-                     src="/panels/companies-turquoise-visual-support.svg"
+                     src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/fmcg-companies-left-shape.svg?alt=media&token=80d9c8c9-f598-4aba-9bab-c68bd51952fe"
                      alt=""
                      width={339}
                      height={199}
@@ -120,7 +120,7 @@ export default function ParticipatingCompaniesSectionFMCG({
                </Box>
                <Box aria-hidden sx={styles.visualSupportRight}>
                   <Image
-                     src="/panels/companies-purple-visual-support.svg"
+                     src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/fmcg-companies-right-shape.svg?alt=media&token=99802fa4-d750-4863-aab1-4fce98eef344"
                      alt=""
                      width={187}
                      height={338}
