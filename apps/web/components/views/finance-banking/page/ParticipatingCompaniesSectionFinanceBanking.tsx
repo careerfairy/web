@@ -2,6 +2,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Grid, Stack, Typography } from "@mui/material"
 import { CompanyCard } from "components/views/common/company/CompanyCard"
+import Image from "next/image"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -75,9 +76,6 @@ const styles = sxStyles({
       left: 0,
       top: 0,
       margin: "-15px -10px",
-      background: "linear-gradient(180deg, #EDF9FA 0%, rgba(237, 249, 250, 0) 100%)",
-      width: "339px",
-      height: "199px",
    },
    // Purple image - bottom right of companies grid
    visualSupportRight: {
@@ -85,9 +83,6 @@ const styles = sxStyles({
       right: 0,
       bottom: 0,
       margin: "-10px",
-      background: "linear-gradient(180deg, #EDF6ED 0%, rgba(237, 246, 237, 0) 100%)",
-      width: "187px",
-      height: "338px",
    },
 })
 
@@ -110,10 +105,26 @@ export default function ParticipatingCompaniesSectionFinanceBanking({
          </Stack>
 
          <Box sx={styles.companiesWrapper}>
-            {/* Visual support gradients - positioned absolutely behind companies grid */}
+            {/* Visual support images - positioned absolutely behind companies grid */}
             <Box aria-hidden sx={styles.visualSupportContainer}>
-               <Box aria-hidden sx={styles.visualSupportLeft} />
-               <Box aria-hidden sx={styles.visualSupportRight} />
+               <Box aria-hidden sx={styles.visualSupportLeft}>
+                  <Image
+                     src="/panels/companies-turquoise-visual-support.svg"
+                     alt=""
+                     width={339}
+                     height={199}
+                     priority
+                  />
+               </Box>
+               <Box aria-hidden sx={styles.visualSupportRight}>
+                  <Image
+                     src="/panels/companies-purple-visual-support.svg"
+                     alt=""
+                     width={187}
+                     height={338}
+                     priority
+                  />
+               </Box>
             </Box>
 
             <Grid

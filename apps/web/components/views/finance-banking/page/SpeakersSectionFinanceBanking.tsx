@@ -89,13 +89,6 @@ const styles = sxStyles({
       left: 0,
       top: 0,
       margin: "-10px -15px",
-      "&::after": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "linear-gradient(180deg, #EDF6ED 0%, rgba(237, 246, 237, 0) 100%)",
-         pointerEvents: "none",
-      },
    },
    // Turquoise image - bottom right of speakers grid
    visualSupportRight: {
@@ -103,13 +96,6 @@ const styles = sxStyles({
       right: 0,
       bottom: 0,
       margin: "-5px",
-      "&::after": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "linear-gradient(180deg, #EDF9FA 0%, rgba(237, 249, 250, 0) 100%)",
-         pointerEvents: "none",
-      },
    },
 })
 
