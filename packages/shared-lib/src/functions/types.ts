@@ -52,5 +52,6 @@ export type TrackOfflineEventActionRequest = {
    offlineEventId: string
    actionType: OfflineEventStatsAction
    utm: UTMParams | null
-   userData: UserData
+   userData?: UserData // Optional for anonymous users
+   fingerprint?: string // For anonymous user tracking
 }

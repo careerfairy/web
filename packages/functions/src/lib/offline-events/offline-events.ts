@@ -10,10 +10,7 @@ import { CallableRequest, onCall } from "firebase-functions/v2/https"
 import { mixed, object, string } from "yup"
 import { offlineEventRepo } from "../../api/repositories"
 import { withMiddlewares } from "../../middlewares-gen2/onCall/middleware"
-import {
-   dataValidationMiddleware,
-   userAuthExistsMiddleware,
-} from "../../middlewares-gen2/onCall/validations"
+import { dataValidationMiddleware } from "../../middlewares-gen2/onCall/validations"
 import { ChangeType, getChangeTypeEnum } from "../../util"
 import functions = require("firebase-functions")
 
@@ -23,6 +20,7 @@ import functions = require("firebase-functions")
  *   and increments totalNumberOfTalentReached and uniqueNumberOfTalentReached
  * - For "click": Upserts OfflineEventUserStats with listClickedAt, creates an OfflineEventAction,
  *   and increments totalNumberOfRegisterClicks and uniqueNumberOfRegisterClicks
+ * - Supports both authenticated users (via userData) and anonymous users (via fingerprint)
  */
 export const trackOfflineEventAction = onCall(
    withMiddlewares(
@@ -34,19 +32,33 @@ export const trackOfflineEventAction = onCall(
                   .oneOf(Object.values(OfflineEventStatsAction))
                   .required(),
                utm: object().nullable(),
-               userData: object().required() as any,
+               userData: object().optional() as any,
+               fingerprint: string().when("userData", {
+                  is: (userData: any) => !userData || !userData.authId,
+                  then: (schema) =>
+                     schema.required(
+                        "Either userData.authId or fingerprint must be provided"
+                     ),
+                  otherwise: (schema) => schema.optional(),
+               }),
             })
          ),
-         userAuthExistsMiddleware(),
+         // Removed userAuthExistsMiddleware to allow anonymous users
       ],
       async (request: CallableRequest<TrackOfflineEventActionRequest>) => {
          try {
-            const { offlineEventId, actionType, utm, userData } = request.data
+            const { offlineEventId, actionType, utm, userData, fingerprint } =
+               request.data
+
+            // Determine user identifier (authId or fingerprint)
+            // Validation middleware ensures one of these is present
+            const userIdentifier = userData?.authId || fingerprint
 
             // Track the action based on type
             await offlineEventRepo.trackOfflineEventAction(
                offlineEventId,
-               userData,
+               userIdentifier,
+               userData || null,
                utm || null,
                actionType
             )
@@ -70,7 +82,7 @@ export const trackOfflineEventAction = onCall(
  * Cloud function that triggers when an offline event is created or updated
  * - On CREATE: Creates an OfflineEventStats document with initial empty stats
  * - On UPDATE: Syncs the updated offline event to its embedding in the stats document
- * - On DELETE: No action needed (stats can remain for historical purposes)
+ * - On DELETE: Marks the stats document as deleted
  */
 export const onWriteOfflineEvent = onDocumentWritten(
    "offlineEvents/{offlineEventId}",
@@ -95,6 +107,7 @@ export const onWriteOfflineEvent = onDocumentWritten(
                   id: offlineEventId,
                   documentType: "offlineEventStats",
                   deleted: false,
+                  deletedAt: null,
                   offlineEvent,
                   generalStats: {
                      totalNumberOfRegisterClicks: 0,
@@ -149,9 +162,10 @@ export const onWriteOfflineEvent = onDocumentWritten(
 
                const updateData: UpdateData<OfflineEventStats> = {
                   deleted: true,
+                  deletedAt: Timestamp.now(),
                }
 
-               await event.data.after.ref.firestore
+               await event.data.before.ref.firestore
                   .collection("offlineEventStats")
                   .doc(offlineEventId)
                   .update(updateData)

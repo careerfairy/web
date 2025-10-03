@@ -9,8 +9,6 @@ import { BarChart2, Edit2, Trash2 } from "react-feather"
 import { useOfflineEventsOverview } from "../context/OfflineEventsOverviewContext"
 import { OfflineEventStatus, getOfflineEventStatus } from "./utils"
 
-const HIDE_ANALYTICS_ON_MOBILE = true
-
 type Props = {
    stat: OfflineEventsWithStats | null
    open: boolean
@@ -48,7 +46,7 @@ export const OfflineEventMobileActionsMenu = ({
       }
 
       // Analytics action - only for published events
-      if (isPublished && !HIDE_ANALYTICS_ON_MOBILE) {
+      if (isPublished) {
          options.push({
             label: "Analytics",
             icon: <BarChart2 />,

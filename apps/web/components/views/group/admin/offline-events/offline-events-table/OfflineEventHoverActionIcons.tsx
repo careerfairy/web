@@ -6,8 +6,6 @@ import { BarChart2, Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { withStopPropagation } from "util/CommonUtil"
 
-const HIDE_ANALYTICS = true
-
 const styles = sxStyles({
    iconButton: {
       p: 0.75,
@@ -99,7 +97,7 @@ export const OfflineEventHoverActionIcons = ({
          ) : null}
 
          {/* Analytics button - only show for published events */}
-         {isPublished && onAnalytics && !HIDE_ANALYTICS ? (
+         {isPublished && onAnalytics ? (
             <BrandedTooltip
                title="Analytics"
                placement="top"

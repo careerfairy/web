@@ -24,14 +24,14 @@ type ActionConfig = {
  *
  * @param actionType - The type of action (View or Click)
  * @param existingUserStats - The existing user stats (null if first action)
- * @param user - The current user data
+ * @param user - The current user data (null for anonymous users)
  * @param segmentedStatsSuffix - The suffix for segmented stats
  * @returns UpdateData object with FieldValue.increment() operations
  */
 export function buildOfflineEventStatsUpdateData(
    actionType: OfflineEventStatsAction,
    existingUserStats: Partial<OfflineEventUserStats> | null,
-   user: UserData,
+   user: UserData | null,
    segmentedStatsSuffix: "TalentReached" | "RegisterClicks"
 ): UpdateData<OfflineEventStats> {
    // Define configuration based on action type
@@ -54,6 +54,20 @@ export function buildOfflineEventStatsUpdateData(
    const isFirstAction =
       !existingUserStats || !existingUserStats?.[config.timestampField]?.date
 
+   // Build update data for general stats (always update these)
+   const updateData: UpdateData<OfflineEventStats> = {
+      [`generalStats.${config.totalStatsField}`]: FieldValue.increment(1),
+      ...(isFirstAction && {
+         [`generalStats.${config.uniqueStatsField}`]: FieldValue.increment(1),
+      }),
+      updatedAt: Timestamp.now(),
+   }
+
+   // For anonymous users, we only track general stats, not segmented stats
+   if (!user) {
+      return updateData
+   }
+
    // Check if user has changed their university, country, or field of study
    const previousUser = existingUserStats?.user
    const hasChangedUniversity =
@@ -68,15 +82,6 @@ export function buildOfflineEventStatsUpdateData(
       previousUser?.fieldOfStudy?.id &&
       user.fieldOfStudy?.id &&
       previousUser.fieldOfStudy.id !== user.fieldOfStudy.id
-
-   // Build update data for general and segmented stats
-   const updateData: UpdateData<OfflineEventStats> = {
-      [`generalStats.${config.totalStatsField}`]: FieldValue.increment(1),
-      ...(isFirstAction && {
-         [`generalStats.${config.uniqueStatsField}`]: FieldValue.increment(1),
-      }),
-      updatedAt: Timestamp.now(),
-   }
 
    // Handle university stats migration if user changed university or country
    if (
