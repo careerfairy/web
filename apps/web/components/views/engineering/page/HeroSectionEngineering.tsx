@@ -88,7 +88,7 @@ const styles = sxStyles({
          content: '""',
          position: "absolute",
          inset: 0,
-         background: "linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.42) 100%)",
+         background: "linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 1) 100%)",
          mixBlendMode: "normal",
          zIndex: 1,
       },
