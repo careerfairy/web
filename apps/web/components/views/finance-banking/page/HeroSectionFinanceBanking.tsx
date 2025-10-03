@@ -86,7 +86,7 @@ const styles = sxStyles({
       "& img": {
          filter: "hue-rotate(90deg) saturate(1.3) brightness(1.1)",
       },
-      background: "linear-gradient(180deg, #2E7D32 0%, rgba(173, 255, 181, 0.42) 100%)",
+      background: "linear-gradient(180deg, rgba(173, 255, 181, 0.42) 0%, #2E7D32 100%)",
       mixBlendMode: "multiply",
       opacity: 0.6,
    },
