@@ -68,14 +68,6 @@ const styles = sxStyles({
       width: { xs: 174, md: 240 },
       height: { xs: 346, md: "auto" },
       pointerEvents: "none",
-      "&::before": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%)",
-         mixBlendMode: "normal",
-         zIndex: 1,
-      },
    },
    visualSupportRight: {
       position: "absolute",
@@ -84,14 +76,6 @@ const styles = sxStyles({
       width: { xs: 273, md: 220 },
       height: { xs: 346, md: "auto" },
       pointerEvents: "none",
-      "&::before": {
-         content: '""',
-         position: "absolute",
-         inset: 0,
-         background: "linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 1) 100%)",
-         mixBlendMode: "normal",
-         zIndex: 1,
-      },
    },
    tagChips: {
       gap: 1,
@@ -213,7 +197,7 @@ export default function HeroSectionEngineering({
          <Box aria-hidden sx={styles.visualSupportContainer}>
             <Box aria-hidden sx={styles.visualSupportLeft}>
                <Image
-                  src="/panels/header-left-visual-support.svg"
+                  src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/engineering-hero-left-shape.svg?alt=media&token=516a5e84-949f-4ce7-80fd-bcf01464972a"
                   alt=""
                   width={300}
                   height={300}
@@ -223,7 +207,7 @@ export default function HeroSectionEngineering({
             {Boolean(isLargeScreen) && (
                <Box aria-hidden sx={styles.visualSupportRight}>
                   <Image
-                     src="/panels/header-right-visual-support.svg"
+                     src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/engineering-hero-right-shape.svg?alt=media&token=90e37ba9-3b28-406d-bb54-85e7578ac0cd"
                      alt=""
                      width={300}
                      height={300}
