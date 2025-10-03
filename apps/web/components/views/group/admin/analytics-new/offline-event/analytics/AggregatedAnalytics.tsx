@@ -1,4 +1,4 @@
-import { Box, Card, LinearProgress, Typography } from "@mui/material"
+import { Box, Card, Typography, useMediaQuery, useTheme } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import useUniversitiesByCountryCodes from "components/custom-hook/useUniversities"
 import { ClickIcon } from "components/views/common/icons/ClickIcon"
@@ -7,16 +7,17 @@ import { useMemo } from "react"
 import { Eye } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { useOfflineEventAnalyticsPageContext } from "../OfflineEventAnalyticsPageProvider"
+import { ProgressBarItem } from "./ProgressBarItem"
 
 const styles = sxStyles({
    container: {
       width: "100%",
       display: "flex",
       flexDirection: "column",
-      gap: 2.5,
-      px: 2,
-      pb: 1.5,
-      pt: 2.5,
+      gap: { xs: 1, md: 2.5 },
+      px: { xs: 2, md: 2 },
+      pb: { xs: 1, md: 1.5 },
+      pt: { xs: 0, md: 2.5 },
    },
    statsRow: {
       display: "flex",
@@ -30,9 +31,15 @@ const styles = sxStyles({
       border: "1px solid",
       borderColor: "neutral.50",
       display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: { xs: 0.5, md: 0 },
+      p: { xs: 1.5, md: 1.5 },
+   },
+   statCardDesktop: {
+      flexDirection: "row",
       alignItems: "center",
       gap: 2,
-      p: 1.5,
    },
    statCardLeft: {
       borderTopLeftRadius: "16px",
@@ -41,16 +48,17 @@ const styles = sxStyles({
    statCardRight: {
       borderTopRightRadius: "16px",
       borderBottomRightRadius: "16px",
+      pl: { xs: 1.5, md: 4.5 },
    },
    iconContainer: {
       backgroundColor: "secondary.50",
       borderRadius: "44px",
-      p: 1,
+      p: { xs: "4px", md: 1 },
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      width: 48,
-      height: 48,
+      width: { xs: 24, md: 48 },
+      height: { xs: 24, md: 48 },
    },
    conversionBadge: {
       position: "absolute",
@@ -61,7 +69,7 @@ const styles = sxStyles({
    },
    conversionBox: {
       position: "relative",
-      width: 70,
+      width: { xs: 70, md: 70 },
       height: "100%",
       display: "flex",
       alignItems: "center",
@@ -81,7 +89,7 @@ const styles = sxStyles({
    topSection: {
       display: "flex",
       flexDirection: "column",
-      gap: 1.25,
+      gap: { xs: 1.5, md: 1.25 },
    },
    sectionCard: {
       flex: 1,
@@ -89,18 +97,18 @@ const styles = sxStyles({
       border: "1px solid",
       borderColor: "neutral.50",
       borderRadius: "16px",
-      p: 1.5,
+      p: { xs: 1.5, md: 1.5 },
       display: "flex",
       flexDirection: "column",
-      gap: 2,
+      gap: { xs: 2, md: 2 },
    },
    progressSection: {
       backgroundColor: (theme) => theme.brand.white[300],
       borderRadius: "6px",
-      p: 1.5,
+      p: { xs: 1.5, md: 1.5 },
       display: "flex",
       flexDirection: "column",
-      gap: 1,
+      gap: { xs: 1, md: 1 },
    },
    emptyState: {
       backgroundColor: (theme) => theme.brand.white[300],
@@ -111,35 +119,16 @@ const styles = sxStyles({
       justifyContent: "center",
       minHeight: 174,
    },
-   progressRow: {
-      display: "flex",
-      alignItems: "center",
-      gap: 1.5,
-   },
-   progressBarContainer: {
-      flex: 1,
-      display: "flex",
-      alignItems: "center",
-      gap: 2,
-   },
-   progressBar: {
-      flex: 1,
-      height: 17,
-      borderRadius: "27px",
-      backgroundColor: "neutral.50",
-      "& .MuiLinearProgress-bar": {
-         borderRadius: "27px",
-         backgroundColor: "secondary.600",
-      },
-   },
    icon: {
-      width: 32,
-      height: 32,
+      width: { xs: 16, md: 32 },
+      height: { xs: 16, md: 32 },
       color: "secondary.600",
    },
 })
 
 const AggregatedAnalytics = () => {
+   const theme = useTheme()
+   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
    const { currentEventStats, fieldsOfStudyLookup } =
       useOfflineEventAnalyticsPageContext()
 
@@ -271,18 +260,34 @@ const AggregatedAnalytics = () => {
       <Box sx={styles.container}>
          {/* Top Stats Row */}
          <Box sx={styles.statsRow}>
-            <Card sx={[styles.statCard, styles.statCardLeft]} elevation={0}>
-               <Box sx={styles.iconContainer}>
-                  <Box component={Eye} sx={styles.icon} />
-               </Box>
-               <Stack flex={1}>
+            <Card
+               sx={[
+                  styles.statCard,
+                  styles.statCardLeft,
+                  !isMobile && styles.statCardDesktop,
+               ]}
+               elevation={0}
+            >
+               <Box
+                  sx={{
+                     display: "flex",
+                     alignItems: "center",
+                     gap: 1,
+                  }}
+               >
+                  <Box sx={styles.iconContainer}>
+                     <Box component={Eye} sx={styles.icon} />
+                  </Box>
                   <Typography variant="medium" color="neutral.600">
-                     Total talent reached
+                     {isMobile ? "Reach" : "Total talent reached"}
                   </Typography>
-                  <Typography variant="desktopBrandedH3" fontWeight={700}>
-                     {totalTalentReached.toLocaleString()}
-                  </Typography>
-               </Stack>
+               </Box>
+               <Typography
+                  variant={isMobile ? "brandedH3" : "desktopBrandedH3"}
+                  fontWeight={700}
+               >
+                  {totalTalentReached.toLocaleString()}
+               </Typography>
             </Card>
 
             {/* Conversion Badge */}
@@ -301,19 +306,35 @@ const AggregatedAnalytics = () => {
                </Box>
             </Box>
 
-            <Card sx={[styles.statCard, styles.statCardRight]} elevation={0}>
-               <Box width={20} />
-               <Box sx={styles.iconContainer}>
-                  <ClickIcon sx={styles.icon} />
-               </Box>
-               <Stack flex={1}>
+            <Card
+               sx={[
+                  styles.statCard,
+                  styles.statCardRight,
+                  !isMobile && styles.statCardDesktop,
+               ]}
+               elevation={0}
+            >
+               {!isMobile && <Box width={20} />}
+               <Box
+                  sx={{
+                     display: "flex",
+                     alignItems: "center",
+                     gap: 1,
+                  }}
+               >
+                  <Box sx={styles.iconContainer}>
+                     <ClickIcon sx={styles.icon} />
+                  </Box>
                   <Typography variant="medium" color="neutral.600">
-                     Total clicks
+                     {isMobile ? "Clicks" : "Total clicks"}
                   </Typography>
-                  <Typography variant="desktopBrandedH3" fontWeight={700}>
-                     {totalClicks.toLocaleString()}
-                  </Typography>
-               </Stack>
+               </Box>
+               <Typography
+                  variant={isMobile ? "brandedH3" : "desktopBrandedH3"}
+                  fontWeight={700}
+               >
+                  {totalClicks.toLocaleString()}
+               </Typography>
             </Card>
          </Box>
 
@@ -347,39 +368,12 @@ const AggregatedAnalytics = () => {
                ) : (
                   <Box sx={styles.progressSection}>
                      {fieldsOfStudy.map((field, index) => (
-                        <Box key={index} sx={styles.progressRow}>
-                           <Box sx={styles.progressBarContainer}>
-                              <Typography
-                                 variant="medium"
-                                 color="neutral.700"
-                                 sx={{
-                                    width: 200,
-                                    lineHeight: "24px",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                 }}
-                              >
-                                 {field.name}
-                              </Typography>
-                              <LinearProgress
-                                 variant="determinate"
-                                 value={field.percentage}
-                                 sx={styles.progressBar}
-                              />
-                           </Box>
-                           <Typography
-                              variant="xsmall"
-                              color={(theme) => theme.brand.black[700]}
-                              sx={{
-                                 width: 52,
-                                 textAlign: "right",
-                                 lineHeight: "16px",
-                              }}
-                           >
-                              {field.percentage}%
-                           </Typography>
-                        </Box>
+                        <ProgressBarItem
+                           key={index}
+                           name={field.name}
+                           percentage={field.percentage}
+                           isMobile={isMobile}
+                        />
                      ))}
                   </Box>
                )}
@@ -407,39 +401,12 @@ const AggregatedAnalytics = () => {
                ) : (
                   <Box sx={styles.progressSection}>
                      {universities.map((university, index) => (
-                        <Box key={index} sx={styles.progressRow}>
-                           <Box sx={styles.progressBarContainer}>
-                              <Typography
-                                 variant="medium"
-                                 color="neutral.700"
-                                 sx={{
-                                    width: 200,
-                                    lineHeight: "24px",
-                                    whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                 }}
-                              >
-                                 {university.name}
-                              </Typography>
-                              <LinearProgress
-                                 variant="determinate"
-                                 value={university.percentage}
-                                 sx={styles.progressBar}
-                              />
-                           </Box>
-                           <Typography
-                              variant="xsmall"
-                              color={(theme) => theme.brand.black[700]}
-                              sx={{
-                                 width: 52,
-                                 textAlign: "right",
-                                 lineHeight: "16px",
-                              }}
-                           >
-                              {university.percentage}%
-                           </Typography>
-                        </Box>
+                        <ProgressBarItem
+                           key={index}
+                           name={university.name}
+                           percentage={university.percentage}
+                           isMobile={isMobile}
+                        />
                      ))}
                   </Box>
                )}
