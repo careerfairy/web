@@ -252,9 +252,9 @@ export const getStaticProps: GetStaticProps<FinanceBankingPageProps> = async () 
          serializeGroup(company)
       )
 
-      // Filter out CareerFairy group
+      // Filter out CareerFairy group and universities
       const serializedCompaniesWithoutCF = serializedCompanies.filter(
-         (company) => company.id !== CF_GROUP_ID
+         (company) => company.id !== CF_GROUP_ID && !company.universityCode
       )
 
       return {
