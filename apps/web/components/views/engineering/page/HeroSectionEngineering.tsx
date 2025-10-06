@@ -51,7 +51,7 @@ const styles = sxStyles({
       lineHeight: 1.2,
    },
    brandTagline: {
-      color: "neutral.700",
+      color: "#FFFFFF",
    },
    // Container to clip visual support elements
    visualSupportContainer: {
