@@ -241,7 +241,6 @@ const StreamerAvatar = ({ streamerDetails }: StreamerDetailsProps) => {
                      src={getResizedUrl(streamerDetails.companyLogoUrl, "sm")}
                      size={28}
                      alt={`${streamerDetails.companyName || "Company"} logo`}
-                     objectFit="cover"
                      sx={styles.companyLogo}
                   />
                </Box>
