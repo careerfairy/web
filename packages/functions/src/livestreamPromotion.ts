@@ -12,7 +12,7 @@ import { addMinutesDate } from "./util"
 const promotionBufferMinutes = 20
 
 // Range of time to look for streams (in minutes)
-const promotionScheduleRange = 60 // 1 hour window
+const promotionScheduleRange = 1440 // 24 hour window
 
 /**
  * Configuration for the 14-day advance promotional email
@@ -28,12 +28,12 @@ const Promotion14Days = {
 const scheduleOptions = {
    memory: "512MiB",
    timeoutSeconds: 540,
-   schedule: "every 1 hours", // Run every hour to check for streams needing promotion
+   schedule: "0 10 * * *", // Run daily at 10:00 AM CET to check for streams needing promotion
    timeZone: "Europe/Zurich",
 } as const satisfies ScheduleOptions
 
 /**
- * Runs every hour and does the following:
+ * Runs daily at 10:00 AM CET and does the following:
  *  - Fetches livestreams that will start in 14 days (with buffer)
  *  - Sends promotional emails to all group admins for these streams
  */
