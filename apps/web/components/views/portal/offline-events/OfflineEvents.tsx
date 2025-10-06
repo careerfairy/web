@@ -22,6 +22,10 @@ const styles = sxStyles({
 export const OfflineEvents = () => {
    const { data: events, isLoading } = useOfflineEvents()
 
+   if (!isLoading && !events?.length) {
+      return null
+   }
+
    return (
       <Box sx={styles.root}>
          <ContentCarousel
