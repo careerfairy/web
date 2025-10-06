@@ -176,6 +176,7 @@ export class OfflineEventService {
          where("offlineEvent.startAt", ">", fromDate),
          where("offlineEvent.published", "==", true),
          orderBy("offlineEvent.startAt", "asc"),
+         where("deleted", "==", false),
          limit(1)
       ).withConverter(createGenericConverter<OfflineEventStats>())
 
@@ -199,6 +200,7 @@ export class OfflineEventService {
          where("offlineEvent.startAt", "<", fromDate),
          where("offlineEvent.published", "==", true),
          orderBy("offlineEvent.startAt", "desc"),
+         where("deleted", "==", false),
          limit(1)
       ).withConverter(createGenericConverter<OfflineEventStats>())
 
