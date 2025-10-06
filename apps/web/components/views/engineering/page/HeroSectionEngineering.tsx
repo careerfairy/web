@@ -94,6 +94,7 @@ const styles = sxStyles({
       px: "16px",
       py: "4px",
       height: "auto",
+      backdropFilter: "blur(32px)",
       "& .MuiChip-label": {
          px: 0,
          py: 0,
