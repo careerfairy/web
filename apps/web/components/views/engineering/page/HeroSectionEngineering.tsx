@@ -87,7 +87,7 @@ const styles = sxStyles({
    },
    tagChip: {
       backgroundColor: "rgba(136, 136, 136, 0.22)",
-      color: "neutral.700",
+      color: (theme) => theme.brand.white[50],
       fontWeight: 400,
       fontSize: "14px",
       lineHeight: "20px",
