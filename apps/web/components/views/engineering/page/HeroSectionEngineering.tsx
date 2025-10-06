@@ -86,7 +86,7 @@ const styles = sxStyles({
       flexWrap: "wrap",
    },
    tagChip: {
-      backgroundColor: "rgba(136, 136, 136, 0.22)",
+      backgroundColor: "rgba(221, 221, 221, 0.22)",
       color: (theme) => theme.brand.white[50],
       fontWeight: 400,
       fontSize: "14px",
