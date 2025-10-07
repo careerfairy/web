@@ -22,7 +22,7 @@ import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
 import {
    deserializeGroupClient,
@@ -47,6 +47,7 @@ type FMCGPageProps = {
    serverSideCompanies: SerializedGroup[]
    serverSideRecentLivestreams: any[]
    serverSideFMCGRecordings: any[]
+   serverSideShuffledSpeakers: any[]
 }
 
 export default function FMCGPage({
@@ -54,6 +55,7 @@ export default function FMCGPage({
    serverSideCompanies,
    serverSideRecentLivestreams,
    serverSideFMCGRecordings,
+   serverSideShuffledSpeakers,
 }: FMCGPageProps) {
    const deserializedPanelEvents = mapFromServerSide(serverSidePanelEvents)
    const deserializedRecentLivestreams = mapFromServerSide(
@@ -66,14 +68,8 @@ export default function FMCGPage({
       deserializeGroupClient(company)
    )
 
-   const shuffledSpeakers = useMemo(() => {
-      return (
-         deserializedPanelEvents
-            .flatMap((panel) => panel.speakers || [])
-            // .sort(() => Math.random() - 0.5) // Randomize order
-            .slice(0, 6)
-      ) // Limit to 6 speakers
-   }, [deserializedPanelEvents])
+   // Speakers are shuffled on the server to avoid hydration errors
+   const shuffledSpeakers = serverSideShuffledSpeakers
 
    const { authenticatedUser } = useAuth()
    const { push, query, pathname } = useRouter()
@@ -177,6 +173,7 @@ export const getStaticProps: GetStaticProps<FMCGPageProps> = async () => {
          serverSideCompanies: data.serverSideCompanies,
          serverSideRecentLivestreams: data.serverSideRecentLivestreams,
          serverSideFMCGRecordings: data.serverSideRecordings || [],
+         serverSideShuffledSpeakers: data.serverSideShuffledSpeakers,
       },
       revalidate: 300, // Revalidate every 5 minutes
    }
