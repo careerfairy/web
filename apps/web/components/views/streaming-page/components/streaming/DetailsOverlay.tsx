@@ -1,9 +1,17 @@
 import { Box, Grow, Stack, Typography } from "@mui/material"
-import { useLivestreamData } from "components/custom-hook/streaming"
+import {
+   useLivestreamData,
+   useStreamIsMobile,
+} from "components/custom-hook/streaming"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+} from "components/helperFunctions/HelperFunctions"
+import CircularLogo from "components/views/common/logos/CircularLogo"
 import { Info, MicOff } from "react-feather"
+import { useIsPanel } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
@@ -20,6 +28,11 @@ const styles = sxStyles({
       },
       display: "flex",
    },
+   leftContainer: {
+      flex: 1,
+      minWidth: 0,
+      overflow: "hidden",
+   },
    micOff: {
       color: "error.600",
    },
@@ -32,6 +45,12 @@ const styles = sxStyles({
    },
    detailsButton: {
       cursor: "pointer",
+   },
+   companyLogo: {
+      border: (theme) => `1px solid ${theme.brand.white[400]}`,
+   },
+   iconsContainer: {
+      flex: "0 0 auto",
    },
 })
 
@@ -46,6 +65,8 @@ export const DetailsOverlay = ({
    streamerDetails,
    showIcons,
 }: Props) => {
+   const isPanel = useIsPanel()
+   const isStreamerMobile = useStreamIsMobile()
    const [isStreamerInfoDialogOpen, handleDialogOpen, handleDialogClose] =
       useDialogStateHandler(false)
 
@@ -53,6 +74,11 @@ export const DetailsOverlay = ({
       streamerDetails.firstName,
       streamerDetails.lastName
    )
+
+   const showCompanyName =
+      isPanel &&
+      streamerDetails.companyName &&
+      streamerDetails.role !== "Moderator"
 
    return (
       <>
@@ -65,20 +91,43 @@ export const DetailsOverlay = ({
                alignItems="center"
                spacing={0.3}
             >
-               <Stack spacing={-0.5} minWidth={0}>
-                  {Boolean(displayName) && (
-                     <Typography variant="brandedBody" sx={styles.displayName}>
-                        {displayName}
-                     </Typography>
-                  )}
-                  {Boolean(streamerDetails.role) && (
-                     <Typography sx={styles.role} variant="xsmall">
-                        {streamerDetails.role}
-                     </Typography>
-                  )}
+               <Stack direction="row" spacing={1.25} sx={styles.leftContainer}>
+                  {isPanel && !isStreamerMobile ? (
+                     <CircularLogo
+                        src={getResizedUrl(
+                           streamerDetails.companyLogoUrl,
+                           "sm"
+                        )}
+                        size={36}
+                        alt={`${streamerDetails.companyName || "Company"} logo`}
+                        objectFit="cover"
+                        sx={styles.companyLogo}
+                     />
+                  ) : null}
+                  <Stack spacing={-0.5} minWidth={0}>
+                     {Boolean(displayName) && (
+                        <Typography
+                           variant="brandedBody"
+                           sx={styles.displayName}
+                        >
+                           {displayName}
+                        </Typography>
+                     )}
+                     {Boolean(streamerDetails.role) && (
+                        <Typography sx={styles.role} variant="xsmall">
+                           {streamerDetails.role}
+                           {Boolean(showCompanyName) &&
+                              ` at ${streamerDetails.companyName}`}
+                        </Typography>
+                     )}
+                  </Stack>
                </Stack>
                {Boolean(showIcons) && (
-                  <Stack direction="row" spacing={1.5}>
+                  <Stack
+                     direction="row"
+                     spacing={1.5}
+                     sx={styles.iconsContainer}
+                  >
                      <Grow in={!micActive} unmountOnExit>
                         <Box sx={styles.micOff} component={MicOff} size={20} />
                      </Grow>

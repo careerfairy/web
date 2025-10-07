@@ -40,13 +40,14 @@ export default function useRegistrationHandler() {
       currentSparkId,
       mode,
       originSource,
+      registrationState,
+      registrationDispatch,
    } = useLiveStreamDialog()
    const { push, asPath, pathname } = useRouter()
    const { forceShowReminder } = useUserReminders()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
    const isInTalentGuidePage = useIsInTalentGuide()
-   const { registrationState, registrationDispatch } = useLiveStreamDialog()
    const dispatch = useAppDispatch()
    const firebase = useFirebaseService()
    const {

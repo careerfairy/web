@@ -122,6 +122,11 @@ type Props = {
    handleDiscoverCompanySparks?: () => void
    setting?: DialogSetting
    appear?: boolean
+   /**
+    * Whether to bypass the recommended streams for multi-registration.
+    *
+    */
+   shouldBypassMultiSelection?: boolean
 } & (
    | {
         /**
@@ -350,6 +355,7 @@ const Content: FC<ContentProps> = ({
    isRecommendationsListVisible,
    setIsRecommendationsListVisible,
    providedOriginSource,
+   shouldBypassMultiSelection,
 }) => {
    const router = useRouter()
    /**
@@ -588,6 +594,20 @@ const Content: FC<ContentProps> = ({
          livestream ? LivestreamPresenter.createFromDocument(livestream) : null,
       [livestream]
    )
+
+   useEffect(() => {
+      registrationDispatch({
+         type: "set-should-bypass-multi-selection",
+         // at the moment, only panels have multi-registration
+         payload: livestreamPresenter?.isPanel
+            ? shouldBypassMultiSelection
+            : true,
+      })
+   }, [
+      shouldBypassMultiSelection,
+      registrationDispatch,
+      livestreamPresenter?.isPanel,
+   ])
 
    const isRedirecting = useRedirectToEventRoom(
       livestreamPresenter,

@@ -95,6 +95,8 @@ export interface StreamingAppState {
       test: boolean
       isRecordingWindow: boolean
       isRecordingBotInRoom: boolean
+      isPanel: boolean
+      groupIds: string[]
    } | null
    rtmSignalingState: {
       failedToConnect: boolean
@@ -155,6 +157,8 @@ const initialState: StreamingAppState = {
       test: false,
       isRecordingWindow: false,
       isRecordingBotInRoom: false,
+      isPanel: false,
+      groupIds: [],
    },
    rtmSignalingState: {
       failedToConnect: false,
@@ -282,6 +286,12 @@ const streamingAppSlice = createSlice({
       },
       setTitle(state, action: PayloadAction<string>) {
          state.livestreamState.title = action.payload
+      },
+      setIsPanel(state, action: PayloadAction<boolean>) {
+         state.livestreamState.isPanel = action.payload
+      },
+      setLivestreamGroupIds(state, action: PayloadAction<string[]>) {
+         state.livestreamState.groupIds = action.payload
       },
       setHandRaiseEnabled(state, action: PayloadAction<boolean>) {
          if (state.livestreamState.handRaiseEnabled !== action.payload) {
@@ -470,6 +480,8 @@ export const {
       setSpeakerId,
       setUserUid,
       setAutoplayState,
+      setIsPanel,
+      setLivestreamGroupIds,
    },
    reducer: streamingAppReducer,
 } = streamingAppSlice

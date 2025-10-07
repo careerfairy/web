@@ -14,6 +14,7 @@ import {
 } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
+import { usePanelGroupsByIds } from "components/custom-hook/panels/usePanelGroupsByIds"
 import {
    useStreamIsLandscape,
    useStreamIsMobile,
@@ -25,6 +26,10 @@ import CircularLogo from "components/views/common/logos/CircularLogo"
 import Link from "next/link"
 import { ComponentType, useState } from "react"
 import { ExternalLink, MapPin, Tag, Users } from "react-feather"
+import {
+   useIsPanel,
+   useLivestreamGroupIds,
+} from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { makeGroupCompanyPageUrl } from "util/makeUrls"
 import { useStreamingContext } from "../../context"
@@ -131,18 +136,46 @@ const styles = sxStyles({
 })
 
 export const CompanyButton = () => {
+   const isPanel = useIsPanel()
    return (
       <SuspenseWithBoundary fallback={<></>}>
-         <CompanyButtonLayout />
+         {isPanel ? (
+            <CompanyButtonPanelLayout />
+         ) : (
+            <CompanyButtonLivestreamLayout />
+         )}
       </SuspenseWithBoundary>
    )
 }
 
-const CompanyButtonLayout = () => {
-   const isMobile = useStreamIsMobile()
-   const [isInfoOpen, setIsInfoOpen] = useState(false)
+const CompanyButtonLivestreamLayout = () => {
    const { livestreamId } = useStreamingContext()
    const { data: hostCompany } = useLivestreamCompanyHostSWR(livestreamId)
+
+   if (!hostCompany) return null
+
+   return <CompanyButtonIcon company={hostCompany} />
+}
+
+const CompanyButtonPanelLayout = () => {
+   const { isHost } = useStreamingContext()
+   const groupIds = useLivestreamGroupIds()
+   const { data: companies } = usePanelGroupsByIds(groupIds)
+
+   if (isHost) return null
+
+   return (
+      <Stack direction="row" gap={0.5}>
+         {companies?.map((company) => (
+            <CompanyButtonIcon company={company} key={company.universityName} />
+         ))}
+      </Stack>
+   )
+}
+
+const CompanyButtonIcon = ({ company }: { company: Group }) => {
+   const isMobile = useStreamIsMobile()
+   const [isInfoOpen, setIsInfoOpen] = useState(false)
 
    const toggleInfoOpen = () => {
       setIsInfoOpen((tooltipOpen) => !tooltipOpen)
@@ -151,16 +184,13 @@ const CompanyButtonLayout = () => {
    const closeTooltip = () => {
       setIsInfoOpen(false)
    }
-
-   if (!hostCompany) return null
-
    return (
       <>
          {isMobile ? (
             <>
                <CompanyLogo
-                  src={hostCompany.logoUrl}
-                  alt={hostCompany.universityName}
+                  src={company.logoUrl}
+                  alt={company.universityName}
                   onClick={toggleInfoOpen}
                   size={32}
                />
@@ -178,7 +208,7 @@ const CompanyButtonLayout = () => {
                      icon={<CompanyIcon />}
                      handlePanelToggle={toggleInfoOpen}
                   >
-                     <Content company={hostCompany} />
+                     <Content company={company} />
                   </SidePanelView>
                </SwipeableDrawer>
             </>
@@ -188,12 +218,12 @@ const CompanyButtonLayout = () => {
                   <StyledTooltip
                      disableHoverListener
                      open={isInfoOpen}
-                     title={<Content company={hostCompany} />}
+                     title={<Content company={company} />}
                   >
                      <Box>
                         <CompanyLogo
-                           src={hostCompany.logoUrl}
-                           alt={hostCompany.universityName}
+                           src={company.logoUrl}
+                           alt={company.universityName}
                            onClick={toggleInfoOpen}
                            size={40}
                         />

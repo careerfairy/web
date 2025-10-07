@@ -17,6 +17,11 @@ export type RegistrationState = {
     * Selected livestreams to register to during multi-selection flows (e.g., panels)
     */
    selectedLivestreams?: LivestreamEvent[]
+
+   /**
+    * Whether to bypass the recommended streams for multi-registration.
+    */
+   shouldBypassMultiSelection?: boolean
 }
 
 export type RegistrationAction =
@@ -31,10 +36,12 @@ export type RegistrationAction =
    | { type: "set-loading-finished" }
    | { type: "set-selected-livestreams"; payload: LivestreamEvent[] }
    | { type: "toggle-selected-livestream"; payload: LivestreamEvent }
+   | { type: "set-should-bypass-multi-selection"; payload: boolean }
 
 export const registrationInitialState: RegistrationState = {
    isLoadingRequiredData: true,
    selectedLivestreams: [],
+   shouldBypassMultiSelection: false,
 }
 
 export function registrationReducer(
@@ -69,6 +76,10 @@ export function registrationReducer(
                ? current.filter((ls) => ls.id !== action.payload.id)
                : [...current, action.payload]
          })()
+         break
+
+      case "set-should-bypass-multi-selection":
+         newState.shouldBypassMultiSelection = action.payload
          break
    }
 
