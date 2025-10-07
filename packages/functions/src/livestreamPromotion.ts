@@ -137,10 +137,7 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
       }
 
       // Get all group admin info for this stream
-      const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(
-         stream.id,
-         "https://careerfairy.io" // Use production URL for promotional emails
-      )
+      const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(stream.id)
 
       if (adminsInfo.length === 0) {
          log(`No group admins found for stream ${stream.id}`)
