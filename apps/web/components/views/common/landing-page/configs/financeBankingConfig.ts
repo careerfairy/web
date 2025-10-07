@@ -59,10 +59,6 @@ export const financeBankingSpeakersConfig: SpeakersSectionConfig = {
    title: "Meet our finance experts!",
    description:
       "Connect with experienced professionals from leading financial institutions who have built successful careers in finance and banking. Learn from their experiences, get insider tips on interviews, and discover what it really takes to break into the finance industry.",
-   visualSupport: {
-      left: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/financebanking-speakers-left-shape.svg?alt=media&token=8d94cd6b-fe9f-4f08-92c4-6dd7d86f69d1",
-      right: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/financebanking-speakers-right-shape.svg?alt=media&token=ea695cf6-f119-44f0-82e8-f6bcc4bcbba8",
-   },
 }
 
 export const financeBankingRecordingsConfig: RecordingsSectionConfig = {
