@@ -1,7 +1,0 @@
-export { default as HeroSectionFMCG } from "./HeroSectionFMCG"
-export { default as ParticipatingCompaniesSectionFMCG } from "./ParticipatingCompaniesSectionFMCG"
-export { default as RecordingsSectionFMCG } from "./RecordingsSectionFMCG"
-export { default as RegisterNowSectionFMCG } from "./RegisterNowSectionFMCG"
-export { default as SpeakersSectionFMCG } from "./SpeakersSectionFMCG"
-export { default as WhatYouTakeAwaySectionFMCG } from "./WhatYouTakeAwaySectionFMCG"
-export { default as WhosThisForSectionFMCG } from "./WhosThisForSectionFMCG"

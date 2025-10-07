@@ -1,26 +1,34 @@
-import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { SerializedGroup } from "@careerfairy/shared-lib/groups"
 import { Stack } from "@mui/material"
 import {
-   HeroSectionFMCG,
-   ParticipatingCompaniesSectionFMCG,
-   RecordingsSectionFMCG,
-   RegisterNowSectionFMCG,
-   SpeakersSectionFMCG,
-   WhosThisForSectionFMCG,
-} from "components/views/fmcg/page"
+   HeroSection,
+   ParticipatingCompaniesSection,
+   RecordingsSection,
+   RegisterNowSection,
+   SpeakersSection,
+   WhosThisForSection,
+} from "components/views/common/landing-page"
+import {
+   fmcgCompaniesConfig,
+   fmcgHeroConfig,
+   fmcgRecordingsConfig,
+   fmcgRegisterNowConfig,
+   fmcgSpeakersConfig,
+   fmcgWhosThisForConfig,
+} from "components/views/common/landing-page/configs"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { NotForYouSection } from "components/views/panels/page"
-import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { deserializeGroupClient, mapFromServerSide } from "util/serverUtil"
-
-const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
+import {
+   deserializeGroupClient,
+   getLandingPageData,
+   mapFromServerSide,
+} from "util/serverUtil"
 
 const styles = sxStyles({
    pageContainer: {
@@ -117,21 +125,27 @@ export default function FMCGPage({
       <>
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
-               <HeroSectionFMCG
-                  panelEvents={deserializedPanelEvents}
+               <HeroSection
+                  config={fmcgHeroConfig}
+                  events={deserializedPanelEvents}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <WhosThisForSectionFMCG />
-               <ParticipatingCompaniesSectionFMCG companies={companies} />
-               <SpeakersSectionFMCG
+               <WhosThisForSection config={fmcgWhosThisForConfig} />
+               <ParticipatingCompaniesSection
+                  config={fmcgCompaniesConfig}
+                  companies={companies}
+               />
+               <SpeakersSection
+                  config={fmcgSpeakersConfig}
                   speakers={shuffledSpeakers}
                   companies={companies}
                />
-               <RecordingsSectionFMCG
-                  fmcgRecordings={deserializedFMCGRecordings}
+               <RecordingsSection
+                  config={fmcgRecordingsConfig}
+                  recordings={deserializedFMCGRecordings}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <RegisterNowSectionFMCG />
+               <RegisterNowSection config={fmcgRegisterNowConfig} />
                <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
@@ -155,122 +169,21 @@ export default function FMCGPage({
 }
 
 export const getStaticProps: GetStaticProps<FMCGPageProps> = async () => {
-   try {
-      // Fetch all data in parallel
-      const [allUpcomingEvents, pastEvents] = await Promise.all([
-         // Fetch upcoming events (will be used for both FMCG events and recent livestreams)
-         livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
-         // Fetch past events for FMCG recordings
-         livestreamRepo.getPastEventsFrom({
-            fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
-            limit: 50, // Get more to ensure we have enough after filtering
-         }),
-      ])
+   const data = await getLandingPageData({
+      type: "industry",
+      industries: ["FMCG"],
+      recordingsFromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
+      upcomingLimit: 6,
+      recordingsLimit: 6,
+   })
 
-      // Use first 10 for recent livestreams (for "Not interested in FMCG?" section)
-      const recentLivestreams = allUpcomingEvents?.slice(0, 10) || []
-
-      // Filter upcoming events by FMCG industry and limit to 6
-      const fmcgLivestreams =
-         allUpcomingEvents
-            ?.filter((event) =>
-               event.companyIndustries?.includes("FMCG")
-            )
-            ?.slice(0, 6) || []
-
-      // Filter past events by FMCG industry and limit to 6 for recordings
-      // First try to get events that are explicitly marked as recordings
-      let fmcgRecordings =
-         pastEvents
-            ?.filter(
-               (event) =>
-                  event.companyIndustries?.includes("FMCG") &&
-                  event.isRecording // Only include events that have recordings
-            )
-            ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-            ?.slice(0, 6) || []
-
-      // If we don't have enough recordings, fall back to all FMCG past events
-      // This ensures the section renders even if the isRecording flag isn't properly set
-      if (fmcgRecordings.length === 0) {
-         fmcgRecordings =
-            pastEvents
-               ?.filter(
-                  (event) =>
-                     event.companyIndustries?.includes("FMCG") &&
-                     event.hasEnded // Only include events that have ended
-               )
-               ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-               ?.slice(0, 6) || []
-      }
-
-      // Extract unique groupIds from FMCG livestreams
-      const allGroupIds = fmcgLivestreams
-         .flatMap((event) => event.groupIds || [])
-         .filter((groupId, index, array) => array.indexOf(groupId) === index) // Remove duplicates
-
-      // Fetch companies from the groupIds
-      const companies =
-         allGroupIds.length > 0
-            ? await groupRepo.getGroupsByIds(allGroupIds)
-            : []
-
-      // Serialize events for server-side props
-      const serializedFMCGEvents = fmcgLivestreams.map((event) =>
-         LivestreamPresenter.serializeDocument(event)
-      )
-
-      // Handle moderators - filter out moderators from speakers
-      const eventsWithoutModerators = serializedFMCGEvents.map(
-         (event) => {
-            event.speakers = event.speakers?.filter(
-               (speaker) => speaker.position !== "Moderator"
-            )
-            return {
-               ...event,
-               speakers: event.speakers,
-            }
-         }
-      )
-
-      const serializedRecentLivestreams =
-         recentLivestreams?.map((stream) =>
-            LivestreamPresenter.serializeDocument(stream)
-         ) || []
-
-      const serializedFMCGRecordings = fmcgRecordings.map(
-         (recording) => LivestreamPresenter.serializeDocument(recording)
-      )
-
-      const serializedCompanies = companies.map((company) =>
-         serializeGroup(company)
-      )
-
-      // Filter out CareerFairy group and universities
-      const serializedCompaniesWithoutCF = serializedCompanies.filter(
-         (company) => company.id !== CF_GROUP_ID && !company.universityCode
-      )
-
-      return {
-         props: {
-            serverSidePanelEvents: eventsWithoutModerators,
-            serverSideCompanies: serializedCompaniesWithoutCF,
-            serverSideRecentLivestreams: serializedRecentLivestreams,
-            serverSideFMCGRecordings: serializedFMCGRecordings,
-         },
-         revalidate: 300, // Revalidate every 5 minutes
-      }
-   } catch (error) {
-      console.error("Error fetching FMCG page data:", error)
-
-      return {
-         props: {
-            serverSidePanelEvents: [],
-            serverSideCompanies: [],
-            serverSideRecentLivestreams: [],
-            serverSideFMCGRecordings: [],
-         },
-         revalidate: 300, // Revalidate every 5 minutes
-      }
+   return {
+      props: {
+         serverSidePanelEvents: data.serverSidePanelEvents,
+         serverSideCompanies: data.serverSideCompanies,
+         serverSideRecentLivestreams: data.serverSideRecentLivestreams,
+         serverSideFMCGRecordings: data.serverSideRecordings || [],
+      },
+      revalidate: 300, // Revalidate every 5 minutes
    }
 }
