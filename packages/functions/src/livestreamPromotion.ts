@@ -128,7 +128,7 @@ const handlePromotionEmails = async (streams: LivestreamEvent[]) => {
       }
    } catch (error) {
       log(`Error handling 14-day promotion emails`, error)
-      throw new HttpsError("unknown", error)
+      throw new HttpsError("unknown", `Error handling 14-day promotion emails: ${error}`)
    }
 }
 
