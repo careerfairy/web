@@ -23,7 +23,7 @@ import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { DateTime } from "luxon"
 import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import {
    deserializeGroupClient,
@@ -78,14 +78,10 @@ export default function EngineeringPage({
 
    const { authenticatedUser } = useAuth()
    const { push, query, pathname } = useRouter()
-   const [selectedId, setSelectedId] = useState<string | null>(
-      (query.selectedPanelId as string | null) ||
-         (query.selectedLivestreamId as string | null)
-   )
+   const selectedId = query.selectedLivestreamId as string | undefined
 
    const handleOpenLivestreamDialog = useCallback(
       (livestreamId: string) => {
-         setSelectedId(livestreamId)
          void push(
             {
                pathname: pathname,
@@ -105,13 +101,11 @@ export default function EngineeringPage({
    const handleCloseLivestreamDialog = useCallback(() => {
       /* eslint-disable @typescript-eslint/no-unused-vars */
       const {
-         selectedPanelId: _p,
          selectedLivestreamId: _l,
          originSource: _o,
          ...restOfQuery
       } = query
       /* eslint-enable @typescript-eslint/no-unused-vars */
-      setSelectedId(null)
       void push(
          {
             pathname: pathname,
