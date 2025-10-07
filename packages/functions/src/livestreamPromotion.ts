@@ -6,13 +6,6 @@ import { onSchedule, ScheduleOptions } from "firebase-functions/v2/scheduler"
 import { FieldValue, firestore } from "./api/firestoreAdmin"
 import { groupRepo, livestreamsRepo, notificationService } from "./api/repositories"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
-import { addMinutesDate } from "./util"
-
-// Buffer time to ensure we catch all streams that need promotion emails
-const promotionBufferMinutes = 20
-
-// Range of time to look for streams (in minutes)
-const promotionScheduleRange = 1440 // 24 hour window
 
 /**
  * Configuration for the 14-day advance promotional email
@@ -21,8 +14,6 @@ const Promotion14Days = {
    templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_B2B_SOCIAL_SHARE_NUDGE,
    scheduleEmailDaysBefore: 14,
    promotionUtmCampaign: "14day-promotion",
-   // 14 days before the livestream starts
-   getStartDate: () => addMinutesDate(new Date(), promotionBufferMinutes + (14 * 24 * 60)),
 } as const
 
 const scheduleOptions = {
@@ -34,7 +25,7 @@ const scheduleOptions = {
 
 /**
  * Runs daily at 10:00 AM CET and does the following:
- *  - Fetches livestreams that will start in 14 days (with buffer)
+ *  - Fetches livestreams that will start in 14 days
  *  - Sends promotional emails to all group admins for these streams
  */
 export const schedule14DayPromotionEmails = onSchedule(
@@ -42,10 +33,19 @@ export const schedule14DayPromotionEmails = onSchedule(
    async () => {
       log(`Current time: ${new Date().toLocaleString()}`)
 
-      const fromDate = Promotion14Days.getStartDate()
-      const toDate = addMinutesDate(fromDate, promotionScheduleRange)
+      // Calculate 14 days from now
+      const targetDate = new Date()
+      targetDate.setDate(targetDate.getDate() + Promotion14Days.scheduleEmailDaysBefore)
+      
+      // Start of the target day (00:00:00)
+      const fromDate = new Date(targetDate)
+      fromDate.setHours(0, 0, 0, 0)
+      
+      // End of the target day (23:59:59.999)
+      const toDate = new Date(targetDate)
+      toDate.setHours(23, 59, 59, 999)
 
-      // Streams that will start in 14 days
+      // Streams that will start on the target day (14 days from now)
       const streams = await getStreamsByDateForPromotion(fromDate, toDate)
 
       return handlePromotionEmails(streams)
@@ -64,8 +64,17 @@ export const manualPromotionEmails = onRequest(
    async (req, res) => {
       const daysFromNow = parseInt(req.query.daysFromNow as string) || 14
 
-      const fromDate = addMinutesDate(new Date(), daysFromNow * 24 * 60)
-      const toDate = addMinutesDate(fromDate, 24 * 60) // 1 day window
+      // Calculate the target date
+      const targetDate = new Date()
+      targetDate.setDate(targetDate.getDate() + daysFromNow)
+      
+      // Start of the target day (00:00:00)
+      const fromDate = new Date(targetDate)
+      fromDate.setHours(0, 0, 0, 0)
+      
+      // End of the target day (23:59:59.999)
+      const toDate = new Date(targetDate)
+      toDate.setHours(23, 59, 59, 999)
 
       const streams = await getStreamsByDateForPromotion(fromDate, toDate)
 
