@@ -54,8 +54,8 @@ const styles = sxStyles({
       maxWidth: "375px",
       alignSelf: "center",
       justifyContent: "center",
-      position: "relative", // Enable absolute positioning for visual support
-      zIndex: 1, // Ensure speakers are above visual support
+      position: "relative",
+      zIndex: 1,
       [theme.breakpoints.up("sm")]: {
          maxWidth: "548px",
       },
@@ -77,20 +77,17 @@ const styles = sxStyles({
       justifyContent: "center",
       alignItems: "stretch",
    },
-   // Visual support container - positioned absolutely behind speakers grid
    visualSupportContainer: {
       position: "absolute",
       inset: 0,
       pointerEvents: "none",
    },
-   // Purple image - top left of speakers grid (swapped colors for consulting theme)
    visualSupportLeft: {
       position: "absolute",
       left: 0,
       top: 0,
       margin: "-10px -15px",
    },
-   // Turquoise image - bottom right of speakers grid (swapped colors for consulting theme)
    visualSupportRight: {
       position: "absolute",
       right: 0,
@@ -99,33 +96,36 @@ const styles = sxStyles({
    },
 })
 
-interface SpeakersSectionConsultingProps {
+export interface SpeakersSectionConfig {
+   title: string
+   description: string
+}
+
+interface SpeakersSectionProps {
+   config: SpeakersSectionConfig
    speakers: Speaker[]
    companies: Group[]
 }
 
-export default function SpeakersSectionConsulting({
+export default function SpeakersSection({
+   config,
    speakers,
    companies,
-}: SpeakersSectionConsultingProps) {
+}: SpeakersSectionProps) {
    return (
       <Stack sx={styles.section}>
          <Stack sx={styles.sectionTitleWrapper} spacing={1.5}>
             <Typography variant="desktopBrandedH4" sx={styles.sectionTitle}>
-               Meet our consulting experts!
+               {config.title}
             </Typography>
 
             <Typography variant="brandedBody" sx={styles.sectionDescription}>
-               Connect with seasoned consultants from top-tier firms who have
-               navigated the competitive consulting landscape. Learn from their
-               experiences, get insider tips on case interviews, and discover
-               what it really takes to break into consulting.
+               {config.description}
             </Typography>
          </Stack>
 
          {speakers?.length > 0 && (
             <Box sx={styles.speakersWrapper}>
-               {/* Visual support images - positioned absolutely behind speakers grid */}
                <Box aria-hidden sx={styles.visualSupportContainer}>
                   <Box aria-hidden sx={styles.visualSupportLeft}>
                      <Image

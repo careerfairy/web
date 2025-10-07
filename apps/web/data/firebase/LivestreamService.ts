@@ -1556,6 +1556,126 @@ export class LivestreamService {
       }
       return snap.data().value
    }
+
+   /**
+    * Fetches upcoming livestream events filtered by company industries.
+    * Uses Firestore's array-contains-any to efficiently filter at the query level.
+    *
+    * @param industries - Array of industry strings to filter by (max 30)
+    * @param limitCount - Maximum number of events to return (default: 50)
+    * @param showHidden - Whether to include hidden events (default: false)
+    * @returns Promise containing array of LivestreamEvent objects, or empty array if no industries provided
+    */
+   async getUpcomingEventsByIndustries(
+      industries: string[],
+      limitCount: number = 50,
+      showHidden = false
+   ): Promise<LivestreamEvent[]> {
+      // Return empty array for invalid input
+      if (!industries || industries.length === 0) {
+         return []
+      }
+
+      try {
+         const now = new Date()
+         // Buffer time for events that are about to start
+         const earliestEventTime = new Date(
+            now.getTime() - UPCOMING_STREAM_THRESHOLD_MILLISECONDS
+         )
+
+         let q = query(
+            collection(FirestoreInstance, "livestreams"),
+            where("start", ">", earliestEventTime),
+            where("test", "==", false),
+            where("companyIndustries", "array-contains-any", industries),
+            orderBy("start", "asc")
+         ).withConverter(createGenericConverter<LivestreamEvent>())
+
+         if (!showHidden) {
+            q = query(q, where("hidden", "==", false))
+         }
+
+         if (limitCount && limitCount > 0) {
+            q = query(q, limit(limitCount))
+         }
+
+         const snapshot = await getDocs(q)
+
+         // Filter out events that have already ended (client-side safety check)
+         return snapshot.docs
+            .map((doc) => doc.data())
+            .filter((event) => !event.hasEnded)
+      } catch (error) {
+         console.error("Error fetching upcoming events by industries:", error)
+         return []
+      }
+   }
+
+   /**
+    * Fetches past livestream events filtered by company industries.
+    * Includes both events marked as recordings and events that have ended.
+    *
+    * @param industries - Array of industry strings to filter by (max 30)
+    * @param fromDate - Start date to fetch events from
+    * @param limitCount - Maximum number of events to return (default: 50)
+    * @returns Promise containing array of LivestreamEvent objects sorted by most recent first, or empty array on error
+    *
+    * @example
+    * // Get consulting recordings from the last year
+    * const consultingRecordings = await livestreamService.getPastEventsByIndustries(
+    *    ["ManagementConsulting"],
+    *    new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+    *    6
+    * )
+    */
+   async getPastEventsByIndustries(
+      industries: string[],
+      fromDate: Date,
+      limitCount: number = 50
+   ): Promise<LivestreamEvent[]> {
+      // Return empty array for invalid input
+      if (!industries || industries.length === 0) {
+         return []
+      }
+
+      if (!fromDate) {
+         return []
+      }
+
+      try {
+         const now = new Date()
+
+         let q = query(
+            collection(FirestoreInstance, "livestreams"),
+            where("start", ">", fromDate),
+            where("start", "<", now),
+            where("test", "==", false),
+            where("companyIndustries", "array-contains-any", industries),
+            orderBy("start", "desc")
+         ).withConverter(createGenericConverter<LivestreamEvent>())
+
+         if (limitCount && limitCount > 0) {
+            q = query(q, limit(limitCount))
+         }
+
+         const snapshot = await getDocs(q)
+         const events = snapshot.docs.map((doc) => doc.data())
+
+         // First try to get events marked as recordings
+         const recordings = events.filter((event) => event.isRecording)
+
+         // If we have recordings, return them
+         if (recordings.length > 0) {
+            return recordings
+         }
+
+         // Fall back to events that have ended
+         return events.filter((event) => event.hasEnded)
+      } catch (error) {
+         console.error("Error fetching past events by industries:", error)
+         return []
+      }
+   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

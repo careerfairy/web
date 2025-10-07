@@ -1,26 +1,35 @@
-import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { SerializedGroup } from "@careerfairy/shared-lib/groups"
 import { Stack } from "@mui/material"
 import {
-   HeroSectionEngineering,
-   ParticipatingCompaniesSectionEngineering,
-   RecordingsSectionEngineering,
-   RegisterNowSectionEngineering,
-   SpeakersSectionEngineering,
-   WhosThisForSectionEngineering,
-} from "components/views/engineering/page"
+   HeroSection,
+   ParticipatingCompaniesSection,
+   RecordingsSection,
+   RegisterNowSection,
+   SpeakersSection,
+   WhosThisForSection,
+} from "components/views/common/landing-page"
+import {
+   engineeringCompaniesConfig,
+   engineeringHeroConfig,
+   engineeringRecordingsConfig,
+   engineeringRegisterNowConfig,
+   engineeringSpeakersConfig,
+   engineeringWhosThisForConfig,
+} from "components/views/common/landing-page/configs"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { NotForYouSection } from "components/views/panels/page"
-import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
+import { DateTime } from "luxon"
 import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { deserializeGroupClient, mapFromServerSide } from "util/serverUtil"
-
-const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
+import {
+   deserializeGroupClient,
+   getLandingPageData,
+   mapFromServerSide,
+} from "util/serverUtil"
 
 const styles = sxStyles({
    pageContainer: {
@@ -117,21 +126,27 @@ export default function EngineeringPage({
       <>
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
-               <HeroSectionEngineering
-                  panelEvents={deserializedPanelEvents}
+               <HeroSection
+                  config={engineeringHeroConfig}
+                  events={deserializedPanelEvents}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <WhosThisForSectionEngineering />
-               <ParticipatingCompaniesSectionEngineering companies={companies} />
-               <SpeakersSectionEngineering
+               <WhosThisForSection config={engineeringWhosThisForConfig} />
+               <ParticipatingCompaniesSection
+                  config={engineeringCompaniesConfig}
+                  companies={companies}
+               />
+               <SpeakersSection
+                  config={engineeringSpeakersConfig}
                   speakers={shuffledSpeakers}
                   companies={companies}
                />
-               <RecordingsSectionEngineering
-                  engineeringRecordings={deserializedEngineeringRecordings}
+               <RecordingsSection
+                  config={engineeringRecordingsConfig}
+                  recordings={deserializedEngineeringRecordings}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <RegisterNowSectionEngineering />
+               <RegisterNowSection config={engineeringRegisterNowConfig} />
                <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
@@ -154,127 +169,24 @@ export default function EngineeringPage({
    )
 }
 
-export const getStaticProps: GetStaticProps<EngineeringPageProps> = async () => {
-   try {
-      // Fetch all data in parallel
-      const [allUpcomingEvents, pastEvents] = await Promise.all([
-         // Fetch upcoming events (will be used for both engineering events and recent livestreams)
-         livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
-         // Fetch past events for engineering recordings
-         livestreamRepo.getPastEventsFrom({
-            fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
-            limit: 50, // Get more to ensure we have enough after filtering
-         }),
-      ])
+export const getStaticProps: GetStaticProps<
+   EngineeringPageProps
+> = async () => {
+   const data = await getLandingPageData({
+      type: "industry",
+      industries: ["Engineering", "Manufacturing"],
+      recordingsFromDate: DateTime.now().minus({ years: 1 }).toJSDate(),
+      upcomingLimit: 6,
+      recordingsLimit: 6,
+   })
 
-      // Use first 10 for recent livestreams (for "Not interested in engineering?" section)
-      const recentLivestreams = allUpcomingEvents?.slice(0, 10) || []
-
-      // Filter upcoming events by Engineering or Manufacturing industry and limit to 6
-      const engineeringLivestreams =
-         allUpcomingEvents
-            ?.filter((event) =>
-               event.companyIndustries?.some((industry) =>
-                  ["Engineering", "Manufacturing"].includes(industry)
-               )
-            )
-            ?.slice(0, 6) || []
-
-      // Filter past events by Engineering or Manufacturing industry and limit to 6 for recordings
-      // First try to get events that are explicitly marked as recordings
-      let engineeringRecordings =
-         pastEvents
-            ?.filter(
-               (event) =>
-                  event.companyIndustries?.some((industry) =>
-                     ["Engineering", "Manufacturing"].includes(industry)
-                  ) && event.isRecording // Only include events that have recordings
-            )
-            ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-            ?.slice(0, 6) || []
-
-      // If we don't have enough recordings, fall back to all engineering past events
-      // This ensures the section renders even if the isRecording flag isn't properly set
-      if (engineeringRecordings.length === 0) {
-         engineeringRecordings =
-            pastEvents
-               ?.filter(
-                  (event) =>
-                     event.companyIndustries?.some((industry) =>
-                        ["Engineering", "Manufacturing"].includes(industry)
-                     ) && event.hasEnded // Only include events that have ended
-               )
-               ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-               ?.slice(0, 6) || []
-      }
-
-      // Extract unique groupIds from engineering livestreams
-      const allGroupIds = engineeringLivestreams
-         .flatMap((event) => event.groupIds || [])
-         .filter((groupId, index, array) => array.indexOf(groupId) === index) // Remove duplicates
-
-      // Fetch companies from the groupIds
-      const companies =
-         allGroupIds.length > 0
-            ? await groupRepo.getGroupsByIds(allGroupIds)
-            : []
-
-      // Serialize events for server-side props
-      const serializedEngineeringEvents = engineeringLivestreams.map((event) =>
-         LivestreamPresenter.serializeDocument(event)
-      )
-
-      // Handle moderators - filter out moderators from speakers
-      const eventsWithoutModerators = serializedEngineeringEvents.map(
-         (event) => {
-            event.speakers = event.speakers?.filter(
-               (speaker) => speaker.position !== "Moderator"
-            )
-            return {
-               ...event,
-               speakers: event.speakers,
-            }
-         }
-      )
-
-      const serializedRecentLivestreams =
-         recentLivestreams?.map((stream) =>
-            LivestreamPresenter.serializeDocument(stream)
-         ) || []
-
-      const serializedEngineeringRecordings = engineeringRecordings.map(
-         (recording) => LivestreamPresenter.serializeDocument(recording)
-      )
-
-      const serializedCompanies = companies.map((company) =>
-         serializeGroup(company)
-      )
-
-      // Filter out CareerFairy group and universities
-      const serializedCompaniesWithoutCF = serializedCompanies.filter(
-         (company) => company.id !== CF_GROUP_ID && !company.universityCode
-      )
-
-      return {
-         props: {
-            serverSidePanelEvents: eventsWithoutModerators,
-            serverSideCompanies: serializedCompaniesWithoutCF,
-            serverSideRecentLivestreams: serializedRecentLivestreams,
-            serverSideEngineeringRecordings: serializedEngineeringRecordings,
-         },
-         revalidate: 300, // Revalidate every 5 minutes
-      }
-   } catch (error) {
-      console.error("Error fetching engineering page data:", error)
-
-      return {
-         props: {
-            serverSidePanelEvents: [],
-            serverSideCompanies: [],
-            serverSideRecentLivestreams: [],
-            serverSideEngineeringRecordings: [],
-         },
-         revalidate: 300, // Revalidate every 5 minutes
-      }
+   return {
+      props: {
+         serverSidePanelEvents: data.serverSidePanelEvents,
+         serverSideCompanies: data.serverSideCompanies,
+         serverSideRecentLivestreams: data.serverSideRecentLivestreams,
+         serverSideEngineeringRecordings: data.serverSideRecordings || [],
+      },
+      revalidate: 300, // Revalidate every 5 minutes
    }
 }

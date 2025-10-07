@@ -4,6 +4,7 @@ import {
    Group,
    SerializedGroup,
    deserializeGroup,
+   serializeGroup,
 } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
@@ -16,6 +17,7 @@ import {
 import { getLivestreamDialogData } from "components/views/livestream-dialog"
 import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { fromDate } from "data/firebase/FirebaseInstance"
+import { livestreamService } from "data/firebase/LivestreamService"
 import { GetServerSidePropsContext, GetStaticPathsContext } from "next"
 import nookies from "nookies"
 import { ParsedUrlQuery } from "querystring"
@@ -293,5 +295,202 @@ export const getLivestreamsAndDialogData = async (
       serverSidePastLivestreams,
       serverSideGroupAvailableCustomJobs,
       livestreamDialogData,
+   }
+}
+
+const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
+
+export type LandingPageEventType = "panels" | "industry"
+
+export type IndustryLandingPageOptions = {
+   type: "industry"
+   industries: string[]
+   recordingsFromDate?: Date
+   upcomingLimit?: number
+   recordingsLimit?: number
+}
+
+export type PanelsLandingPageOptions = {
+   type: "panels"
+}
+
+export type LandingPageOptions =
+   | IndustryLandingPageOptions
+   | PanelsLandingPageOptions
+
+export type LandingPageData = {
+   serverSidePanelEvents: any[]
+   serverSideCompanies: SerializedGroup[]
+   serverSideRecentLivestreams: any[]
+   serverSideRecordings?: any[]
+}
+
+/**
+ * Fetches and processes data for industry/topic landing pages (panels, consulting, engineering, etc.)
+ * This function encapsulates the common logic for fetching events, companies, and recent livestreams.
+ *
+ * @param {LandingPageOptions} options - Configuration options for the landing page type
+ * @returns {Promise<LandingPageData>} Serialized data ready for Next.js props
+ *
+ * @example
+ * // For panels page
+ * const data = await getLandingPageData({ type: "panels" })
+ *
+ * @example
+ * // For consulting page
+ * const data = await getLandingPageData({
+ *    type: "industry",
+ *    industries: ["ManagementConsulting"],
+ *    recordingsFromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+ *    upcomingLimit: 6,
+ *    recordingsLimit: 6
+ * })
+ */
+export const getLandingPageData = async (
+   options: LandingPageOptions
+): Promise<LandingPageData> => {
+   try {
+      let mainEvents: LivestreamEvent[] = []
+      let recordings: LivestreamEvent[] = []
+
+      // Fetch data based on page type
+      if (options.type === "panels") {
+         // Fetch panels and recent livestreams in parallel
+         const [recentLivestreams, allPanels] = await Promise.all([
+            livestreamRepo.getUpcomingEvents(10),
+            livestreamRepo.getAllPanels(),
+         ])
+
+         mainEvents = allPanels
+         recordings = [] // Panels page doesn't have recordings section
+
+         // Extract unique groupIds from all panels
+         const allGroupIds = mainEvents
+            .flatMap((panel) => panel.groupIds || [])
+            .filter((groupId, index, array) => array.indexOf(groupId) === index)
+
+         // Fetch companies from the groupIds
+         const companies =
+            allGroupIds.length > 0
+               ? await groupRepo.getGroupsByIds(allGroupIds)
+               : []
+
+         // Process and serialize data
+         return processLandingPageData(
+            mainEvents,
+            recordings,
+            companies,
+            recentLivestreams
+         )
+      } else if (options.type === "industry") {
+         // Fetch industry-specific data in parallel
+         const [recentLivestreams, upcomingEvents, pastEvents] =
+            await Promise.all([
+               livestreamRepo.getUpcomingEvents(10),
+               livestreamService.getUpcomingEventsByIndustries(
+                  options.industries,
+                  options.upcomingLimit || 6
+               ),
+               livestreamService.getPastEventsByIndustries(
+                  options.industries,
+                  options.recordingsFromDate ||
+                     new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
+                  options.recordingsLimit || 6
+               ),
+            ])
+
+         mainEvents = upcomingEvents
+         recordings = pastEvents
+
+         // Extract unique groupIds from industry livestreams
+         const allGroupIds = mainEvents
+            .flatMap((event) => event.groupIds || [])
+            .filter((groupId, index, array) => array.indexOf(groupId) === index)
+
+         // Fetch companies from the groupIds
+         const companies =
+            allGroupIds.length > 0
+               ? await groupRepo.getGroupsByIds(allGroupIds)
+               : []
+
+         // Process and serialize data
+         return processLandingPageData(
+            mainEvents,
+            recordings,
+            companies,
+            recentLivestreams
+         )
+      }
+
+      // Fallback empty data
+      return {
+         serverSidePanelEvents: [],
+         serverSideCompanies: [],
+         serverSideRecentLivestreams: [],
+         serverSideRecordings: [],
+      }
+   } catch (error) {
+      console.error("Error fetching landing page data:", error)
+      return {
+         serverSidePanelEvents: [],
+         serverSideCompanies: [],
+         serverSideRecentLivestreams: [],
+         serverSideRecordings: [],
+      }
+   }
+}
+
+/**
+ * Processes and serializes landing page data
+ * Handles filtering moderators and CF group, and serialization
+ */
+function processLandingPageData(
+   mainEvents: LivestreamEvent[],
+   recordings: LivestreamEvent[],
+   companies: Group[],
+   recentLivestreams: LivestreamEvent[]
+): LandingPageData {
+   // Serialize events for server-side props
+   const serializedMainEvents = mainEvents.map((event) =>
+      LivestreamPresenter.serializeDocument(event)
+   )
+
+   // Filter out moderators from speakers
+   const eventsWithoutModerators = serializedMainEvents.map((event) => {
+      event.speakers = event.speakers?.filter(
+         (speaker) => speaker.position !== "Moderator"
+      )
+      return {
+         ...event,
+         speakers: event.speakers,
+      }
+   })
+
+   // Serialize recent livestreams
+   const serializedRecentLivestreams =
+      recentLivestreams?.map((stream) =>
+         LivestreamPresenter.serializeDocument(stream)
+      ) || []
+
+   // Serialize recordings if they exist
+   const serializedRecordings = recordings.map((recording) =>
+      LivestreamPresenter.serializeDocument(recording)
+   )
+
+   // Serialize companies
+   const serializedCompanies = companies.map((company) =>
+      serializeGroup(company)
+   )
+
+   // Filter out CareerFairy group and universities
+   const serializedCompaniesWithoutCF = serializedCompanies.filter(
+      (company) => company.id !== CF_GROUP_ID && !company.universityCode
+   )
+
+   return {
+      serverSidePanelEvents: eventsWithoutModerators,
+      serverSideCompanies: serializedCompaniesWithoutCF,
+      serverSideRecentLivestreams: serializedRecentLivestreams,
+      serverSideRecordings: serializedRecordings,
    }
 }

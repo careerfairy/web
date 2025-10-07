@@ -56,7 +56,21 @@ const styles = sxStyles({
    },
 })
 
-export default function RegisterNowSectionConsulting() {
+export interface RegisterNowSectionConfig {
+   heading: string
+   description: string
+   buttonText: string
+   imageUrl: string
+   imageAlt: string
+}
+
+interface RegisterNowSectionProps {
+   config: RegisterNowSectionConfig
+}
+
+export default function RegisterNowSection({
+   config,
+}: RegisterNowSectionProps) {
    const isMobile = useIsMobile()
    const router = useRouter()
 
@@ -69,11 +83,10 @@ export default function RegisterNowSectionConsulting() {
          <Box id="CTA Container" sx={styles.ctaContainer}>
             <Box id="Text content" sx={styles.textContent}>
                <Typography variant="h3" sx={styles.heading}>
-                  Don&apos;t miss your chance!
+                  {config.heading}
                </Typography>
                <Typography sx={styles.paragraph}>
-                  Get one step closer to your dream job by exploring the live
-                  streams available.
+                  {config.description}
                </Typography>
                <Button
                   variant="contained"
@@ -82,14 +95,14 @@ export default function RegisterNowSectionConsulting() {
                   sx={styles.ctaButton}
                   onClick={handleExploreStreams}
                >
-                  Explore live streams
+                  {config.buttonText}
                </Button>
             </Box>
 
             <Box sx={styles.imageContainer}>
                <Image
-                  src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/consulting_page_explore_more_image.png?alt=media&token=453f0eb2-94ff-4029-b99e-835abe5b0a65"
-                  alt="Consulting career illustration"
+                  src={config.imageUrl}
+                  alt={config.imageAlt}
                   width={400}
                   height={280}
                   style={{
