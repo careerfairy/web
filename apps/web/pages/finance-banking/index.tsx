@@ -1,27 +1,35 @@
-import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { SerializedGroup } from "@careerfairy/shared-lib/groups"
 import { Stack } from "@mui/material"
 import {
-   HeroSectionFinanceBanking,
-   ParticipatingCompaniesSectionFinanceBanking,
-   RecordingsSectionFinanceBanking,
-   RegisterNowSectionFinanceBanking,
-   SpeakersSectionFinanceBanking,
-   WhosThisForSectionFinanceBanking,
-} from "components/views/finance-banking/page"
+   HeroSection,
+   ParticipatingCompaniesSection,
+   RecordingsSection,
+   RegisterNowSection,
+   SpeakersSection,
+   WhosThisForSection,
+} from "components/views/common/landing-page"
+import {
+   financeBankingCompaniesConfig,
+   financeBankingHeroConfig,
+   financeBankingRecordingsConfig,
+   financeBankingRegisterNowConfig,
+   financeBankingSpeakersConfig,
+   financeBankingWhosThisForConfig,
+} from "components/views/common/landing-page/configs"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { NotForYouSection } from "components/views/panels/page"
-import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
+import { DateTime } from "luxon"
 import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { deserializeGroupClient, mapFromServerSide } from "util/serverUtil"
-
-const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
-const WORLD_BANK_GROUP_ID = "qGGtl7ZfdoBbvZLFGbM2"
+import {
+   deserializeGroupClient,
+   getLandingPageData,
+   mapFromServerSide,
+} from "util/serverUtil"
 
 const styles = sxStyles({
    pageContainer: {
@@ -70,14 +78,10 @@ export default function FinanceBankingPage({
 
    const { authenticatedUser } = useAuth()
    const { push, query, pathname } = useRouter()
-   const [selectedId, setSelectedId] = useState<string | null>(
-      (query.selectedPanelId as string | null) ||
-         (query.selectedLivestreamId as string | null)
-   )
+   const selectedId = query.selectedLivestreamId as string | undefined
 
    const handleOpenLivestreamDialog = useCallback(
       (livestreamId: string) => {
-         setSelectedId(livestreamId)
          void push(
             {
                pathname: pathname,
@@ -97,13 +101,11 @@ export default function FinanceBankingPage({
    const handleCloseLivestreamDialog = useCallback(() => {
       /* eslint-disable @typescript-eslint/no-unused-vars */
       const {
-         selectedPanelId: _p,
          selectedLivestreamId: _l,
          originSource: _o,
          ...restOfQuery
       } = query
       /* eslint-enable @typescript-eslint/no-unused-vars */
-      setSelectedId(null)
       void push(
          {
             pathname: pathname,
@@ -118,21 +120,27 @@ export default function FinanceBankingPage({
       <>
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
-               <HeroSectionFinanceBanking
-                  panelEvents={deserializedPanelEvents}
+               <HeroSection
+                  config={financeBankingHeroConfig}
+                  events={deserializedPanelEvents}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <WhosThisForSectionFinanceBanking />
-               <ParticipatingCompaniesSectionFinanceBanking companies={companies} />
-               <SpeakersSectionFinanceBanking
+               <WhosThisForSection config={financeBankingWhosThisForConfig} />
+               <ParticipatingCompaniesSection
+                  config={financeBankingCompaniesConfig}
+                  companies={companies}
+               />
+               <SpeakersSection
+                  config={financeBankingSpeakersConfig}
                   speakers={shuffledSpeakers}
                   companies={companies}
                />
-               <RecordingsSectionFinanceBanking
-                  financeBankingRecordings={deserializedFinanceBankingRecordings}
+               <RecordingsSection
+                  config={financeBankingRecordingsConfig}
+                  recordings={deserializedFinanceBankingRecordings}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <RegisterNowSectionFinanceBanking />
+               <RegisterNowSection config={financeBankingRegisterNowConfig} />
                <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
@@ -155,128 +163,24 @@ export default function FinanceBankingPage({
    )
 }
 
-export const getStaticProps: GetStaticProps<FinanceBankingPageProps> = async () => {
-   try {
-      // Fetch all data in parallel
-      const [allUpcomingEvents, pastEvents] = await Promise.all([
-         // Fetch upcoming events (will be used for both finance & banking events and recent livestreams)
-         livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
-         // Fetch past events for finance & banking recordings
-         livestreamRepo.getPastEventsFrom({
-            fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
-            limit: 50, // Get more to ensure we have enough after filtering
-         }),
-      ])
+export const getStaticProps: GetStaticProps<
+   FinanceBankingPageProps
+> = async () => {
+   const data = await getLandingPageData({
+      type: "industry",
+      industries: ["Finance&Banking"],
+      recordingsFromDate: DateTime.now().minus({ years: 1 }).toJSDate(),
+      upcomingLimit: 6,
+      recordingsLimit: 6,
+   })
 
-      // Use first 10 for recent livestreams (for "Not interested in finance & banking?" section)
-      const recentLivestreams = allUpcomingEvents?.slice(0, 10) || []
-
-      // Filter upcoming events by Finance&Banking industry (excluding World Bank Group) and limit to 6
-      const financeBankingLivestreams =
-         allUpcomingEvents
-            ?.filter((event) =>
-               event.companyIndustries?.includes("Finance&Banking") &&
-               !event.groupIds?.includes(WORLD_BANK_GROUP_ID)
-            )
-            ?.slice(0, 6) || []
-
-      // Filter past events by Finance&Banking industry (excluding World Bank Group) and limit to 6 for recordings
-      // First try to get events that are explicitly marked as recordings
-      let financeBankingRecordings =
-         pastEvents
-            ?.filter(
-               (event) =>
-                  event.companyIndustries?.includes("Finance&Banking") &&
-                  !event.groupIds?.includes(WORLD_BANK_GROUP_ID) &&
-                  event.isRecording // Only include events that have recordings
-            )
-            ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-            ?.slice(0, 6) || []
-
-      // If we don't have enough recordings, fall back to all finance & banking past events
-      // This ensures the section renders even if the isRecording flag isn't properly set
-      if (financeBankingRecordings.length === 0) {
-         financeBankingRecordings =
-            pastEvents
-               ?.filter(
-                  (event) =>
-                     event.companyIndustries?.includes(
-                        "Finance&Banking"
-                     ) &&
-                     !event.groupIds?.includes(WORLD_BANK_GROUP_ID) &&
-                     event.hasEnded // Only include events that have ended
-               )
-               ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-               ?.slice(0, 6) || []
-      }
-
-      // Extract unique groupIds from finance & banking livestreams
-      const allGroupIds = financeBankingLivestreams
-         .flatMap((event) => event.groupIds || [])
-         .filter((groupId, index, array) => array.indexOf(groupId) === index) // Remove duplicates
-
-      // Fetch companies from the groupIds
-      const companies =
-         allGroupIds.length > 0
-            ? await groupRepo.getGroupsByIds(allGroupIds)
-            : []
-
-      // Serialize events for server-side props
-      const serializedFinanceBankingEvents = financeBankingLivestreams.map((event) =>
-         LivestreamPresenter.serializeDocument(event)
-      )
-
-      // Handle moderators - filter out moderators from speakers
-      const eventsWithoutModerators = serializedFinanceBankingEvents.map(
-         (event) => {
-            event.speakers = event.speakers?.filter(
-               (speaker) => speaker.position !== "Moderator"
-            )
-            return {
-               ...event,
-               speakers: event.speakers,
-            }
-         }
-      )
-
-      const serializedRecentLivestreams =
-         recentLivestreams?.map((stream) =>
-            LivestreamPresenter.serializeDocument(stream)
-         ) || []
-
-      const serializedFinanceBankingRecordings = financeBankingRecordings.map(
-         (recording) => LivestreamPresenter.serializeDocument(recording)
-      )
-
-      const serializedCompanies = companies.map((company) =>
-         serializeGroup(company)
-      )
-
-      // Filter out CareerFairy group and universities
-      const serializedCompaniesWithoutCF = serializedCompanies.filter(
-         (company) => company.id !== CF_GROUP_ID && !company.universityCode
-      )
-
-      return {
-         props: {
-            serverSidePanelEvents: eventsWithoutModerators,
-            serverSideCompanies: serializedCompaniesWithoutCF,
-            serverSideRecentLivestreams: serializedRecentLivestreams,
-            serverSideFinanceBankingRecordings: serializedFinanceBankingRecordings,
-         },
-         revalidate: 300, // Revalidate every 5 minutes
-      }
-   } catch (error) {
-      console.error("Error fetching finance & banking page data:", error)
-
-      return {
-         props: {
-            serverSidePanelEvents: [],
-            serverSideCompanies: [],
-            serverSideRecentLivestreams: [],
-            serverSideFinanceBankingRecordings: [],
-         },
-         revalidate: 300, // Revalidate every 5 minutes
-      }
+   return {
+      props: {
+         serverSidePanelEvents: data.serverSidePanelEvents,
+         serverSideCompanies: data.serverSideCompanies,
+         serverSideRecentLivestreams: data.serverSideRecentLivestreams,
+         serverSideFinanceBankingRecordings: data.serverSideRecordings || [],
+      },
+      revalidate: 300, // Revalidate every 5 minutes
    }
 }
