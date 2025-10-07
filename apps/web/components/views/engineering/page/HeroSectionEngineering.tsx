@@ -46,7 +46,7 @@ const styles = sxStyles({
       textAlign: { xs: "center", md: "left" },
    },
    sectionTitle: {
-      color: "#FFFFFF",
+      color: theme => theme.brand.white[50],
       fontWeight: 700,
       lineHeight: 1.2,
    },
