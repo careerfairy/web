@@ -21,7 +21,7 @@ import { NotForYouSection } from "components/views/panels/page"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { DateTime } from "luxon"
-import { GetStaticProps } from "next"
+import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -159,7 +159,9 @@ export default function ConsultingPage({
    )
 }
 
-export const getStaticProps: GetStaticProps<ConsultingPageProps> = async () => {
+export const getServerSideProps: GetServerSideProps<
+   ConsultingPageProps
+> = async () => {
    const data = await getLandingPageData({
       type: "industry",
       industries: ["ManagementConsulting"],
@@ -176,6 +178,5 @@ export const getStaticProps: GetStaticProps<ConsultingPageProps> = async () => {
          serverSideConsultingRecordings: data.serverSideRecordings || [],
          serverSideShuffledSpeakers: data.serverSideShuffledSpeakers,
       },
-      revalidate: 300, // Revalidate every 5 minutes
    }
 }

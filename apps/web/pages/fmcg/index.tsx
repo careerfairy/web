@@ -20,7 +20,7 @@ import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialo
 import { NotForYouSection } from "components/views/panels/page"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
-import { GetStaticProps } from "next"
+import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -158,7 +158,9 @@ export default function FMCGPage({
    )
 }
 
-export const getStaticProps: GetStaticProps<FMCGPageProps> = async () => {
+export const getServerSideProps: GetServerSideProps<
+   FMCGPageProps
+> = async () => {
    const data = await getLandingPageData({
       type: "industry",
       industries: ["FMCG"],
@@ -175,6 +177,5 @@ export const getStaticProps: GetStaticProps<FMCGPageProps> = async () => {
          serverSideFMCGRecordings: data.serverSideRecordings || [],
          serverSideShuffledSpeakers: data.serverSideShuffledSpeakers,
       },
-      revalidate: 300, // Revalidate every 5 minutes
    }
 }
