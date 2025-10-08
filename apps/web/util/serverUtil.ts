@@ -10,6 +10,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GetEventsOfGroupOptions } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { shuffle } from "@careerfairy/shared-lib/utils"
 import {
    MAX_PAST_STREAMS,
    MAX_UPCOMING_STREAMS,
@@ -323,6 +324,7 @@ export type LandingPageData = {
    serverSideCompanies: SerializedGroup[]
    serverSideRecentLivestreams: any[]
    serverSideRecordings?: any[]
+   serverSideShuffledSpeakers: any[]
 }
 
 /**
@@ -428,6 +430,7 @@ export const getLandingPageData = async (
          serverSideCompanies: [],
          serverSideRecentLivestreams: [],
          serverSideRecordings: [],
+         serverSideShuffledSpeakers: [],
       }
    } catch (error) {
       console.error("Error fetching landing page data:", error)
@@ -436,8 +439,19 @@ export const getLandingPageData = async (
          serverSideCompanies: [],
          serverSideRecentLivestreams: [],
          serverSideRecordings: [],
+         serverSideShuffledSpeakers: [],
       }
    }
+}
+
+/**
+ * Shuffles an array (non-mutating version)
+ * Used for randomizing speakers on the server side to avoid hydration errors
+ */
+export function shuffleArray<T>(array: T[]): T[] {
+   const shuffled = [...array]
+   shuffle(shuffled)
+   return shuffled
 }
 
 /**
@@ -466,6 +480,12 @@ function processLandingPageData(
       }
    })
 
+   // Shuffle speakers on the server to avoid hydration errors
+   const allSpeakers = eventsWithoutModerators.flatMap(
+      (panel) => panel.speakers || []
+   )
+   const shuffledSpeakers = shuffleArray(allSpeakers).slice(0, 6)
+
    // Serialize recent livestreams
    const serializedRecentLivestreams =
       recentLivestreams?.map((stream) =>
@@ -492,5 +512,6 @@ function processLandingPageData(
       serverSideCompanies: serializedCompaniesWithoutCF,
       serverSideRecentLivestreams: serializedRecentLivestreams,
       serverSideRecordings: serializedRecordings,
+      serverSideShuffledSpeakers: shuffledSpeakers,
    }
 }

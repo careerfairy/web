@@ -9,17 +9,18 @@ import {
    WhosThisForSection,
 } from "components/views/common/landing-page"
 import {
-   fmcgCompaniesConfig,
-   fmcgHeroConfig,
-   fmcgRecordingsConfig,
-   fmcgRegisterNowConfig,
-   fmcgSpeakersConfig,
-   fmcgWhosThisForConfig,
+   financeBankingCompaniesConfig,
+   financeBankingHeroConfig,
+   financeBankingRecordingsConfig,
+   financeBankingRegisterNowConfig,
+   financeBankingSpeakersConfig,
+   financeBankingWhosThisForConfig,
 } from "components/views/common/landing-page/configs"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { NotForYouSection } from "components/views/panels/page"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
+import { DateTime } from "luxon"
 import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
@@ -42,27 +43,27 @@ const styles = sxStyles({
    },
 })
 
-type FMCGPageProps = {
+type FinanceBankingPageProps = {
    serverSidePanelEvents: any[]
    serverSideCompanies: SerializedGroup[]
    serverSideRecentLivestreams: any[]
-   serverSideFMCGRecordings: any[]
+   serverSideFinanceBankingRecordings: any[]
    serverSideShuffledSpeakers: any[]
 }
 
-export default function FMCGPage({
+export default function FinanceBankingPage({
    serverSidePanelEvents,
    serverSideCompanies,
    serverSideRecentLivestreams,
-   serverSideFMCGRecordings,
+   serverSideFinanceBankingRecordings,
    serverSideShuffledSpeakers,
-}: FMCGPageProps) {
+}: FinanceBankingPageProps) {
    const deserializedPanelEvents = mapFromServerSide(serverSidePanelEvents)
    const deserializedRecentLivestreams = mapFromServerSide(
       serverSideRecentLivestreams
    )
-   const deserializedFMCGRecordings = mapFromServerSide(
-      serverSideFMCGRecordings
+   const deserializedFinanceBankingRecordings = mapFromServerSide(
+      serverSideFinanceBankingRecordings
    )
    const companies = serverSideCompanies.map((company) =>
       deserializeGroupClient(company)
@@ -83,7 +84,7 @@ export default function FMCGPage({
                query: {
                   ...query,
                   selectedLivestreamId: livestreamId,
-                  originSource: "FMCG_Overview_Page",
+                  originSource: "Finance_Banking_Overview_Page",
                },
             },
             undefined,
@@ -116,30 +117,30 @@ export default function FMCGPage({
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
                <HeroSection
-                  config={fmcgHeroConfig}
+                  config={financeBankingHeroConfig}
                   events={deserializedPanelEvents}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <WhosThisForSection config={fmcgWhosThisForConfig} />
+               <WhosThisForSection config={financeBankingWhosThisForConfig} />
                <ParticipatingCompaniesSection
-                  config={fmcgCompaniesConfig}
+                  config={financeBankingCompaniesConfig}
                   companies={companies}
                />
                <SpeakersSection
-                  config={fmcgSpeakersConfig}
+                  config={financeBankingSpeakersConfig}
                   speakers={shuffledSpeakers}
                   companies={companies}
                />
                <RecordingsSection
-                  config={fmcgRecordingsConfig}
-                  recordings={deserializedFMCGRecordings}
+                  config={financeBankingRecordingsConfig}
+                  recordings={deserializedFinanceBankingRecordings}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <RegisterNowSection config={fmcgRegisterNowConfig} />
+               <RegisterNowSection config={financeBankingRegisterNowConfig} />
                <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
-                  title="Not interested in FMCG?"
+                  title="Not interested in finance & banking?"
                   subtitle="Explore other career-focused live streams"
                />
             </Stack>
@@ -152,17 +153,19 @@ export default function FMCGPage({
             mode="stand-alone"
             initialPage={"details"}
             serverUserEmail={authenticatedUser?.email || ""}
-            providedOriginSource={`fmcg-overview-page-${selectedId}`}
+            providedOriginSource={`finance-banking-overview-page-${selectedId}`}
          />
       </>
    )
 }
 
-export const getStaticProps: GetStaticProps<FMCGPageProps> = async () => {
+export const getStaticProps: GetStaticProps<
+   FinanceBankingPageProps
+> = async () => {
    const data = await getLandingPageData({
       type: "industry",
-      industries: ["FMCG"],
-      recordingsFromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
+      industries: ["Finance&Banking"],
+      recordingsFromDate: DateTime.now().minus({ years: 1 }).toJSDate(),
       upcomingLimit: 6,
       recordingsLimit: 6,
    })
@@ -172,7 +175,7 @@ export const getStaticProps: GetStaticProps<FMCGPageProps> = async () => {
          serverSidePanelEvents: data.serverSidePanelEvents,
          serverSideCompanies: data.serverSideCompanies,
          serverSideRecentLivestreams: data.serverSideRecentLivestreams,
-         serverSideFMCGRecordings: data.serverSideRecordings || [],
+         serverSideFinanceBankingRecordings: data.serverSideRecordings || [],
          serverSideShuffledSpeakers: data.serverSideShuffledSpeakers,
       },
       revalidate: 300, // Revalidate every 5 minutes
