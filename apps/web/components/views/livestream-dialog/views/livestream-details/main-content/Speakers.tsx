@@ -29,7 +29,6 @@ const styles = sxStyles({
       ":hover": {
          borderColor: theme.palette.secondary[100],
          background: theme.brand.white[400],
-         cursor: "pointer",
       },
    }),
    avatarWrapper: (theme) => ({
@@ -115,6 +114,15 @@ const SpeakerCard: FC<SpeakerCardProps> = ({
    const { goToSpeakerDetails } = useLiveStreamDialog()
    const displayName = `${speaker.firstName ?? ""} ${speaker.lastName ?? ""}`
 
+   const isModerator = speaker.position === "Moderator"
+
+   const getSubtitle = () => {
+      if (subtitleType === "position") {
+         return speaker.position
+      }
+      return isModerator ? "Moderator" : speaker.companyName
+   }
+
    return (
       <BrandedTooltip
          title={`See more about ${speaker.firstName ?? ""} ${
@@ -125,10 +133,14 @@ const SpeakerCard: FC<SpeakerCardProps> = ({
          <Stack
             spacing={1}
             direction="row"
-            sx={styles.speakerWrapper}
+            sx={[
+               styles.speakerWrapper,
+               { cursor: isModerator ? "default" : "pointer" },
+            ]}
             onClick={() => {
                onClick && onClick()
-               goToSpeakerDetails(speaker.id)
+
+               !isModerator && goToSpeakerDetails(speaker.id)
             }}
          >
             <Box sx={styles.avatarWrapper}>
@@ -156,9 +168,7 @@ const SpeakerCard: FC<SpeakerCardProps> = ({
                   whiteSpace="nowrap"
                   variant="small"
                >
-                  {subtitleType === "position"
-                     ? speaker.position
-                     : speaker.companyName}
+                  {getSubtitle()}
                </Typography>
             </Stack>
          </Stack>
