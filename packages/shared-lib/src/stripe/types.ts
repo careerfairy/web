@@ -17,6 +17,16 @@ export interface BaseStripeSessionMetadata {
    type: StripeProductType
 }
 
+export interface CreateCheckoutSessionParams<
+   T extends BaseStripeSessionMetadata
+> {
+   customerId: string
+   returnUrl: string
+   priceId: string
+   adjustableQuantity?: boolean
+   metadata: T
+}
+
 /**
  * Product types supported by the Stripe integration
  */

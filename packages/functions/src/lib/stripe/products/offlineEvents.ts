@@ -4,9 +4,7 @@ import {
    StripeProductType,
 } from "@careerfairy/shared-lib/stripe/types"
 import { Stripe } from "stripe"
-import stripeInstance from ".."
-import { createCheckoutSession } from "../checkout"
-import { getTotalQuantityFromCheckoutSession } from "../utils"
+import { stripeRepo } from "../../../api/repositories"
 import functions = require("firebase-functions")
 
 /**
@@ -25,7 +23,7 @@ export async function handleOfflineEventSession(
       type: StripeProductType.OFFLINE_EVENT,
    }
 
-   return createCheckoutSession({
+   return stripeRepo.createCheckoutSession({
       customerId,
       returnUrl,
       priceId: data.priceId,
@@ -44,7 +42,7 @@ export async function handleOfflineEventWebhook(
       const sessionId = event.data.object.id
 
       // Retrieve the full checkout session with expanded line_items to get quantity information
-      const session = await stripeInstance.checkout.sessions.retrieve(
+      const session = await stripeRepo.stripe.checkout.sessions.retrieve(
          sessionId,
          {
             expand: ["line_items"],
@@ -52,7 +50,8 @@ export async function handleOfflineEventWebhook(
       )
 
       // Extract quantity information from line items
-      const totalQuantity = getTotalQuantityFromCheckoutSession(session)
+      const totalQuantity =
+         stripeRepo.getTotalQuantityFromCheckoutSession(session)
 
       functions.logger.info(
          `📦 Total items purchased: ${totalQuantity}`,

@@ -5,8 +5,7 @@ import {
    StripeProductType,
 } from "@careerfairy/shared-lib/stripe/types"
 import { Stripe } from "stripe"
-import { groupRepo } from "../../../api/repositories"
-import { createCheckoutSession } from "../checkout"
+import { groupRepo, stripeRepo } from "../../../api/repositories"
 import functions = require("firebase-functions")
 
 /**
@@ -26,7 +25,7 @@ export async function handleGroupPlanSession(
       plan: data.plan,
    }
 
-   return createCheckoutSession({
+   return stripeRepo.createCheckoutSession({
       customerId,
       returnUrl,
       priceId: data.priceId,
