@@ -16,32 +16,38 @@ const styles = sxStyles({
    },
    viewport: {
       overflow: "hidden",
-      // hack to ensure overflow visibility with parent padding
       paddingX: "48px",
       marginX: "-48px",
       width: "calc(100% + 48px)",
    },
 })
 
-interface RecordingsSectionConsultingProps {
-   consultingRecordings: LivestreamEvent[]
+export interface RecordingsSectionConfig {
+   title: string
+   description: string
+   impressionLocation: ImpressionLocation
+}
+
+interface RecordingsSectionProps {
+   config: RecordingsSectionConfig
+   recordings: LivestreamEvent[]
    handleOpenLivestreamDialog: (livestreamId: string) => void
 }
 
-export default function RecordingsSectionConsulting({
-   consultingRecordings,
+export default function RecordingsSection({
+   config,
+   recordings,
    handleOpenLivestreamDialog,
-}: RecordingsSectionConsultingProps) {
-   // Don't render if no recordings available
-   if (!consultingRecordings || consultingRecordings.length === 0) {
+}: RecordingsSectionProps) {
+   if (!recordings || recordings.length === 0) {
       return null
    }
 
    return (
       <Stack sx={styles.carouselWrapper}>
          <EventsPreviewCarousel
-            events={consultingRecordings}
-            location={ImpressionLocation.panelsOverviewPage}
+            events={recordings}
+            location={config.impressionLocation}
             onCardClick={(event) => {
                handleOpenLivestreamDialog(event.id)
             }}
@@ -49,10 +55,10 @@ export default function RecordingsSectionConsulting({
             title={
                <Stack sx={{ gap: 0.5, mb: 1.5 }}>
                   <Typography variant="brandedH5" color="text.primary">
-                     Can't wait for the insights?
+                     {config.title}
                   </Typography>
                   <Typography variant="medium" sx={styles.sectionDescription}>
-                     Get ahead of everyone with the insights from consulting live streams that recently happened
+                     {config.description}
                   </Typography>
                </Stack>
             }

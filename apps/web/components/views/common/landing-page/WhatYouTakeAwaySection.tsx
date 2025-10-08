@@ -96,14 +96,18 @@ const styles = sxStyles({
    }),
 })
 
-const takeaways = [
-   "A replay link straight to your inbox",
-   "Exclusive consulting case study frameworks and templates",
-   "Priority access to future consulting-focused sessions",
-   "Networking opportunities with consulting professionals",
-]
+export interface WhatYouTakeAwaySectionConfig {
+   title: string
+   takeaways: string[]
+}
 
-export default function WhatYouTakeAwaySectionConsulting() {
+interface WhatYouTakeAwaySectionProps {
+   config: WhatYouTakeAwaySectionConfig
+}
+
+export default function WhatYouTakeAwaySection({
+   config,
+}: WhatYouTakeAwaySectionProps) {
    const isMobile = useIsMobile()
 
    return (
@@ -111,7 +115,7 @@ export default function WhatYouTakeAwaySectionConsulting() {
          <Box sx={styles.imageWrapper}>
             <Image
                src={`/panels/take-away-${isMobile ? "mobile" : "desktop"}.png`}
-               alt="What you take away - Consulting"
+               alt={`What you take away - ${config.title}`}
                width={500}
                height={500}
                style={{ width: "100%", height: "auto" }}
@@ -120,11 +124,11 @@ export default function WhatYouTakeAwaySectionConsulting() {
 
          <Stack sx={styles.textWrapper} spacing={1.5}>
             <Typography variant="desktopBrandedH4" sx={styles.sectionTitle}>
-               What do you take away?
+               {config.title}
             </Typography>
 
             <Stack sx={styles.takeawaysList}>
-               {takeaways.map((takeaway, index) => (
+               {config.takeaways.map((takeaway, index) => (
                   <Stack key={index} sx={styles.takeawayItem} direction="row">
                      <Box sx={styles.iconWrapper}>
                         <Box sx={styles.icon} component={CheckIcon}></Box>

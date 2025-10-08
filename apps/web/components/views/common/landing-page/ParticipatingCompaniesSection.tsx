@@ -1,5 +1,4 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import { Box, Grid, Stack, Typography } from "@mui/material"
 import { CompanyCard } from "components/views/common/company/CompanyCard"
 import Image from "next/image"
@@ -47,8 +46,8 @@ const styles = sxStyles({
       maxWidth: "375px",
       alignSelf: "center",
       justifyContent: "center",
-      position: "relative", // Enable absolute positioning for visual support
-      zIndex: 2, // Ensure companies are above visual support
+      position: "relative",
+      zIndex: 2,
       [theme.breakpoints.up("sm")]: {
          maxWidth: "548px",
       },
@@ -70,14 +69,12 @@ const styles = sxStyles({
       inset: 0,
       pointerEvents: "none",
    },
-   // Turquoise image - top left of companies grid (swapped for consulting theme)
    visualSupportLeft: {
       position: "absolute",
       left: 0,
       top: 0,
       margin: "-15px -10px",
    },
-   // Purple image - bottom right of companies grid (swapped for consulting theme)
    visualSupportRight: {
       position: "absolute",
       right: 0,
@@ -86,29 +83,33 @@ const styles = sxStyles({
    },
 })
 
-interface ParticipatingCompaniesSectionConsultingProps {
+export interface ParticipatingCompaniesSectionConfig {
+   title: string
+   description: string
+   interactionSource: string
+}
+
+interface ParticipatingCompaniesSectionProps {
+   config: ParticipatingCompaniesSectionConfig
    companies: Group[]
 }
 
-export default function ParticipatingCompaniesSectionConsulting({
+export default function ParticipatingCompaniesSection({
+   config,
    companies,
-}: ParticipatingCompaniesSectionConsultingProps) {
+}: ParticipatingCompaniesSectionProps) {
    return (
       <Stack sx={styles.section}>
          <Stack sx={styles.sectionTitleWrapper} spacing={1.5}>
             <Typography variant="desktopBrandedH4" sx={styles.sectionTitle}>
-               Featured consulting firms
+               {config.title}
             </Typography>
             <Typography variant="brandedBody" sx={styles.sectionDescription}>
-               Get exclusive insights from leading consulting firms including
-               MBB (McKinsey, BCG, Bain) and top-tier boutique consultancies.
-               Learn about their unique cultures, hiring processes, and what
-               they look for in candidates.
+               {config.description}
             </Typography>
          </Stack>
 
          <Box sx={styles.companiesWrapper}>
-            {/* Visual support images - positioned absolutely behind companies grid */}
             <Box aria-hidden sx={styles.visualSupportContainer}>
                <Box aria-hidden sx={styles.visualSupportLeft}>
                   <Image
@@ -150,7 +151,7 @@ export default function ParticipatingCompaniesSectionConsulting({
                      <CompanyCard
                         company={company as unknown as Group}
                         variant="small"
-                        interactionSource={InteractionSources.Consulting_Overview_Page}
+                        interactionSource={config.interactionSource as any}
                      />
                   </Grid>
                ))}
