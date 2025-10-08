@@ -87,6 +87,10 @@ export interface ParticipatingCompaniesSectionConfig {
    title: string
    description: string
    interactionSource: string
+   visualSupport?: {
+      left?: string
+      right?: string
+   }
 }
 
 interface ParticipatingCompaniesSectionProps {
