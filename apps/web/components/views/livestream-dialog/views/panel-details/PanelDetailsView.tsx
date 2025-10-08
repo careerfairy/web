@@ -67,11 +67,6 @@ const PanelDetailsView = () => {
       (company) => company.id !== CF_GROUP_ID
    )
 
-   // TODO: Handle moderators on second iteration of the panels
-   const speakersWithoutModerator = livestream?.speakers?.filter(
-      (speaker) => speaker.position !== "Moderator"
-   )
-
    return (
       <Box
          sx={{
@@ -100,7 +95,7 @@ const PanelDetailsView = () => {
                      Meet the experts
                   </Typography>
                   <Speakers
-                     speakers={speakersWithoutModerator}
+                     speakers={livestream?.speakers}
                      title=""
                      subtitleType="company"
                   />
