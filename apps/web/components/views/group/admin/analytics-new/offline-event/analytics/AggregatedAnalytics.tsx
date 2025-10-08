@@ -184,22 +184,48 @@ const AggregatedAnalytics = () => {
          0
       )
 
-      const universitiesData = universityEntries
+      // Separate valid universities from "other" entries
+      let otherCount = 0
+      const validUniversities = universityEntries
          .map(([universityKey, stats]) => {
             const count = stats.totalNumberOfTalentReached || 0
+            const universityName = universityLookup[universityKey]
+
+            // If no university name found (includes country_other), aggregate into "other"
+            if (!universityName) {
+               otherCount += count
+               return null
+            }
+
             const percentage =
                totalUniversityReached > 0
                   ? (count / totalUniversityReached) * 100
                   : 0
             return {
-               name: universityLookup[universityKey] || "...",
+               name: universityName,
                percentage: parseFloat(percentage.toFixed(1)),
                count,
             }
          })
-         .filter((university) => university.count > 0)
-         .sort((a, b) => b.count - a.count)
-         .slice(0, 5)
+         .filter((university) => university !== null && university.count > 0)
+
+      // Add aggregated "Other" entry if there are any
+      const universitiesData = [...validUniversities]
+      if (otherCount > 0) {
+         const otherPercentage =
+            totalUniversityReached > 0
+               ? (otherCount / totalUniversityReached) * 100
+               : 0
+         universitiesData.push({
+            name: "Other",
+            percentage: parseFloat(otherPercentage.toFixed(1)),
+            count: otherCount,
+         })
+      }
+
+      // Sort and limit to top 5
+      universitiesData.sort((a, b) => b.count - a.count)
+      universitiesData.splice(5)
 
       return {
          totalTalentReached,
