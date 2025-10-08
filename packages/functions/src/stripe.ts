@@ -9,8 +9,7 @@ import { GlobalOptions } from "firebase-functions"
 import { onCall, onRequest } from "firebase-functions/v2/https"
 import { Stripe } from "stripe"
 import { SchemaOf, object, string } from "yup"
-import stripeInstance from "./lib/stripe"
-import { createOrUpdateStripeCustomer } from "./lib/stripe/customer"
+import { stripeRepo } from "./api/repositories"
 import { EventHandlers } from "./lib/stripe/events"
 import { sessionHandlers } from "./lib/stripe/sessions"
 import { logAndThrow } from "./lib/validations"
@@ -83,13 +82,15 @@ export const fetchStripeCustomerSession = onCall(
       userShouldBeGroupAdmin(),
       async (request) => {
          const data = request.data
-         functions.logger.info("Retrieve customer session: ", data)
+         functions.logger.info("AAARetrieve customer session: ", data)
 
          const returnUrl = request.rawRequest.headers.origin + data.successUrl
 
          try {
             // Create or update customer (shared logic)
-            const groupCustomer = await createOrUpdateStripeCustomer(data)
+            const groupCustomer = await stripeRepo.createOrUpdateStripeCustomer(
+               data
+            )
 
             // Create session based on product type using handler map
             const handler = sessionHandlers[data.type]
@@ -97,7 +98,7 @@ export const fetchStripeCustomerSession = onCall(
             if (!handler) {
                logAndThrow("Unsupported product type", {
                   data,
-                  request,
+                  error: new Error("Unsupported product type"),
                })
             }
 
@@ -115,7 +116,6 @@ export const fetchStripeCustomerSession = onCall(
             logAndThrow("Error while creating Stripe Customer Session", {
                data,
                error,
-               request,
             })
          }
       }
@@ -137,7 +137,7 @@ export const fetchStripePrice = onCall(
          )
 
          try {
-            return stripeInstance.prices.retrieve(request.data.priceId)
+            return stripeRepo.stripe.prices.retrieve(request.data.priceId)
          } catch (error) {
             logAndThrow("Error while retrieving Stripe price by ID", {
                error,
@@ -162,11 +162,12 @@ export const fetchStripeSessionStatus = onCall(
             request.data.sessionId
          )
 
+         // TODO: This should be done using the stripeRepo
          try {
-            const session = await stripeInstance.checkout.sessions.retrieve(
+            const session = await stripeRepo.stripe.checkout.sessions.retrieve(
                request.data.sessionId
             )
-            const customer = await stripeInstance.customers.retrieve(
+            const customer = await stripeRepo.stripe.customers.retrieve(
                session.customer as string
             )
 
