@@ -228,9 +228,10 @@ const PortalPage = ({
                            <RecommendedCustomJobs
                               userCountryCode={userCountryCode}
                            />
-                           {userCountryCode?.toUpperCase() === "DE" && (
+                           {userCountryCode?.toUpperCase() === "DE" ||
+                           userCountryCode?.toUpperCase() === "CH" ? (
                               <OfflineEvents />
-                           )}
+                           ) : null}
                            <FeaturedCompanies />
 
                            <UserSparksCarousel
