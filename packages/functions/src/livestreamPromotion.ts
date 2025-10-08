@@ -4,7 +4,11 @@ import { info, log } from "firebase-functions/logger"
 import { HttpsError, onRequest } from "firebase-functions/v2/https"
 import { onSchedule, ScheduleOptions } from "firebase-functions/v2/scheduler"
 import { FieldValue, firestore } from "./api/firestoreAdmin"
-import { groupRepo, livestreamsRepo, notificationService } from "./api/repositories"
+import {
+   groupRepo,
+   livestreamsRepo,
+   notificationService,
+} from "./api/repositories"
 import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 
 /**
@@ -35,12 +39,14 @@ export const schedule14DayPromotionEmails = onSchedule(
 
       // Calculate 14 days from now
       const targetDate = new Date()
-      targetDate.setDate(targetDate.getDate() + Promotion14Days.scheduleEmailDaysBefore)
-      
+      targetDate.setDate(
+         targetDate.getDate() + Promotion14Days.scheduleEmailDaysBefore
+      )
+
       // Start of the target day (00:00:00)
       const fromDate = new Date(targetDate)
       fromDate.setHours(0, 0, 0, 0)
-      
+
       // End of the target day (23:59:59.999)
       const toDate = new Date(targetDate)
       toDate.setHours(23, 59, 59, 999)
@@ -67,11 +73,11 @@ export const manualPromotionEmails = onRequest(
       // Calculate the target date
       const targetDate = new Date()
       targetDate.setDate(targetDate.getDate() + daysFromNow)
-      
+
       // Start of the target day (00:00:00)
       const fromDate = new Date(targetDate)
       fromDate.setHours(0, 0, 0, 0)
-      
+
       // End of the target day (23:59:59.999)
       const toDate = new Date(targetDate)
       toDate.setHours(23, 59, 59, 999)
@@ -112,7 +118,7 @@ const getStreamsByDateForPromotion = async (
  */
 const handlePromotionEmails = async (streams: LivestreamEvent[]) => {
    if (streams.length === 0) {
-      log(`No streams found for 14-day promotion, skipping`)
+      log("No streams found for 14-day promotion, skipping")
       return
    }
 
@@ -127,8 +133,11 @@ const handlePromotionEmails = async (streams: LivestreamEvent[]) => {
          await sendPromotionEmailsForStream(stream)
       }
    } catch (error) {
-      log(`Error handling 14-day promotion emails`, error)
-      throw new HttpsError("unknown", `Error handling 14-day promotion emails: ${error}`)
+      log("Error handling 14-day promotion emails", error)
+      throw new HttpsError(
+         "unknown",
+         `Error handling 14-day promotion emails: ${error}`
+      )
    }
 }
 
@@ -139,14 +148,17 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
    try {
       // Check if promotion email has already been sent for this stream
       const promotionEmailSent = await checkIfPromotionEmailSent(stream.id)
-      
+
       if (promotionEmailSent) {
          log(`14-day promotion email already sent for stream ${stream.id}`)
          return
       }
 
       // Get all group admin info for this stream
-      const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(stream.id, Promotion14Days.promotionUtmCampaign)
+      const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(
+         stream.id,
+         Promotion14Days.promotionUtmCampaign
+      )
 
       if (adminsInfo.length === 0) {
          log(`No group admins found for stream ${stream.id}`)
@@ -157,12 +169,15 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
       const groups = await groupRepo.getGroupsByIds(stream.groupIds)
       const group = groups.find((g) => !g.universityCode) || groups[0]
 
-      log(`Sending 14-day promotion emails to ${adminsInfo.length} admins for stream ${stream.id}`)
+      log(
+         `Sending 14-day promotion emails to ${adminsInfo.length} admins for stream ${stream.id}`
+      )
 
       // Send emails to all group admins
       await notificationService.sendEmailNotifications(
          adminsInfo.map((admin) => ({
-            templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_B2B_SOCIAL_SHARE_NUDGE,
+            templateId:
+               CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_B2B_SOCIAL_SHARE_NUDGE,
             templateData: {
                dashboardUrl: addUtmTagsToLink({
                   link: admin.eventDashboardLink,
@@ -171,7 +186,8 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
                livestream: {
                   company: stream.company,
                   companyLogoUrl: stream.companyLogoUrl,
-                  companyBannerImageUrl: group?.bannerImageUrl || stream.backgroundImageUrl,
+                  companyBannerImageUrl:
+                     group?.bannerImageUrl || stream.backgroundImageUrl,
                   title: stream.title,
                   url: addUtmTagsToLink({
                      link: admin.nextLivestreamsLink,
@@ -199,17 +215,19 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
 /**
  * Checks if a 14-day promotion email has already been sent for this stream
  */
-const checkIfPromotionEmailSent = async (streamId: string): Promise<boolean> => {
+const checkIfPromotionEmailSent = async (
+   streamId: string
+): Promise<boolean> => {
    try {
-      const doc = await firestore
-         .collection("livestreams")
-         .doc(streamId)
-         .get()
+      const doc = await firestore.collection("livestreams").doc(streamId).get()
 
       const data = doc.data()
       return data?.promotionEmailsSent?.fourteenDayPromotion === true
    } catch (error) {
-      log(`Error checking promotion email status for stream ${streamId}:`, error)
+      log(
+         `Error checking promotion email status for stream ${streamId}:`,
+         error
+      )
       return false
    }
 }
@@ -219,15 +237,16 @@ const checkIfPromotionEmailSent = async (streamId: string): Promise<boolean> => 
  */
 const markPromotionEmailSent = async (streamId: string): Promise<void> => {
    try {
-      await firestore
-         .collection("livestreams")
-         .doc(streamId)
-         .update({
-            "promotionEmailsSent.fourteenDayPromotion": true,
-            "promotionEmailsSent.fourteenDayPromotionSentAt": FieldValue.serverTimestamp(),
-         })
+      await firestore.collection("livestreams").doc(streamId).update({
+         "promotionEmailsSent.fourteenDayPromotion": true,
+         "promotionEmailsSent.fourteenDayPromotionSentAt":
+            FieldValue.serverTimestamp(),
+      })
    } catch (error) {
-      log(`Error marking promotion email as sent for stream ${streamId}:`, error)
+      log(
+         `Error marking promotion email as sent for stream ${streamId}:`,
+         error
+      )
       throw error
    }
 }
