@@ -8,9 +8,6 @@ import { Stripe } from "stripe"
 import { groupRepo, stripeRepo } from "../../../api/repositories"
 import functions = require("firebase-functions")
 
-/**
- * Handles group plan session creation with full logic
- */
 export async function handleGroupPlanSession(
    customerId: string,
    returnUrl: string,
@@ -33,9 +30,6 @@ export async function handleGroupPlanSession(
    })
 }
 
-/**
- * Handles group plan webhook events
- */
 export async function handleGroupPlanCheckoutSessionCompleted(
    event: Stripe.CheckoutSessionCompletedEvent
 ): Promise<void> {
@@ -46,14 +40,11 @@ export async function handleGroupPlanCheckoutSessionCompleted(
       await groupRepo.startPlan(metadata.groupId, plan)
 
       functions.logger.info(
-         "✅ Successfully processed group-plan event - Stripe Customer: " +
-            JSON.stringify(metadata) +
-            ", Group ID: ",
-         metadata.groupId
+         `✅ Successfully processed group-plan event for Customer: ${metadata.groupId}, Plan: ${metadata.plan}`
       )
    } else {
       functions.logger.error(
-         "Could not process group-plan webhook - missing plan in metadata: ",
+         "Could not process group-plan checkout 'checkout.session.completed' event - missing plan in metadata",
          metadata
       )
    }

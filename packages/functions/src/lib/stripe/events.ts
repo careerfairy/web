@@ -26,20 +26,22 @@ export async function handleCheckoutSessionCompleted(
 ): Promise<void> {
    const metadata = event?.data?.object?.metadata
 
-   // if (metadata && metadata.groupId && metadata.type) {
-   const handler = handleOfflineEventCheckoutSessionCompleted // checkoutSessionCompletedHandlers[metadata.type as StripeProductType]
-   if (handler) {
-      await handler(event)
+   if (metadata && metadata.groupId && metadata.type) {
+      const handler =
+         checkoutSessionCompletedHandlers[metadata.type as StripeProductType]
+
+      if (handler) {
+         await handler(event)
+      } else {
+         functions.logger.error(
+            "Could not process Stripe event checkout.session.completed - unknown type: ",
+            metadata
+         )
+      }
    } else {
       functions.logger.error(
-         "Could not process Stripe event checkout.session.completed - unknown type: ",
+         "Could not process Stripe event checkout.session.completed based on metadata: ",
          metadata
       )
    }
-   // } else {
-   //    functions.logger.error(
-   //       "Could not process Stripe event checkout.session.completed based on metadata: ",
-   //       metadata
-   //    )
-   // }
 }

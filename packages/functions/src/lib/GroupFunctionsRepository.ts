@@ -30,7 +30,7 @@ import { UserRecord } from "firebase-admin/auth"
 import { Change } from "firebase-functions"
 import { cloneDeep, isEmpty, union } from "lodash"
 import { DateTime } from "luxon"
-import { Timestamp, auth } from "../api/firestoreAdmin"
+import { FieldValue, Timestamp, auth } from "../api/firestoreAdmin"
 import type { FunctionsLogger } from "../util"
 import { getWebBaseUrl } from "../util"
 import BigQueryCreateInsertService from "./bigQuery/BigQueryCreateInsertService"
@@ -213,6 +213,11 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    ): Promise<void>
 
    trackGroupEvents(events: GroupEventServer[]): Promise<void>
+
+   increaseAvailableOfflineEvents(
+      groupId: string,
+      quantity: number
+   ): Promise<void>
 }
 
 export class GroupFunctionsRepository
@@ -663,6 +668,19 @@ export class GroupFunctionsRepository
          .doc(groupId)
 
       return groupRef.update({ "plan.expiresAt": Timestamp.now() })
+   }
+
+   async increaseAvailableOfflineEvents(
+      groupId: string,
+      quantity: number
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .doc(groupId)
+
+      return groupRef.update({
+         availableOfflineEvents: FieldValue.increment(quantity),
+      })
    }
 
    async sendTrialWelcomeEmail(

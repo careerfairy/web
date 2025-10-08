@@ -14,7 +14,7 @@ export interface IStripeFunctionsRepository {
 
    /**
     * Creates or updates a Stripe customer, with the customer id being set in the metadata.groupId, allowing for the
-    * default Stripe id to be untouched.
+    * default Stripe id to be untouched. Its recommended to not influence the customerId of the customer object.
     *
     * Retrieving the same customer, can be done by querying the customer with the metadata.groupId. If needed,
     * the created customerId can be synched into the Group document.
@@ -40,9 +40,6 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
       return this._stripe
    }
 
-   /**
-    * Creates a Stripe checkout session
-    */
    async createCheckoutSession<T extends BaseStripeSessionMetadata>(
       options: CreateCheckoutSessionParams<T>
    ): Promise<Stripe.Checkout.Session> {
@@ -73,13 +70,6 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
       })
    }
 
-   /**
-    * Creates or updates a Stripe customer for the given group
-    * Returns the customer object.
-    *
-    * Its advised to not influence the customerId of the customer object. So the metadata.groupId is used to identify the customer.
-    *  - If needed the created customerId can be synched into the Group document.
-    */
    async createOrUpdateStripeCustomer(
       payload: BaseSessionPayload
    ): Promise<Stripe.Customer> {
@@ -129,9 +119,6 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
 
    // Utility functions
 
-   /**
-    * Calculates the total quantity from a checkout session's line items
-    */
    getTotalQuantityFromCheckoutSession(
       session: Stripe.Checkout.Session
    ): number {

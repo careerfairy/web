@@ -4,12 +4,9 @@ import {
    StripeProductType,
 } from "@careerfairy/shared-lib/stripe/types"
 import { Stripe } from "stripe"
-import { stripeRepo } from "../../../api/repositories"
+import { groupRepo, stripeRepo } from "../../../api/repositories"
 import functions = require("firebase-functions")
 
-/**
- * Handles offline event session creation with full logic
- */
 export async function handleOfflineEventSession(
    customerId: string,
    returnUrl: string,
@@ -31,25 +28,30 @@ export async function handleOfflineEventSession(
    })
 }
 
-/**
- * Handles offline event webhook events
- * Retrieves the purchased quantity from the checkout session
- */
 export async function handleOfflineEventCheckoutSessionCompleted(
    event: Stripe.CheckoutSessionCompletedEvent
 ): Promise<void> {
    try {
       const sessionId = event.data.object.id
 
-      const totalQuantity =
+      // For a session completed event, there must always be a quantity, at least 1.
+      const totalQuantityBought =
          await stripeRepo.getTotalQuantityFromCheckoutSessionById(sessionId)
 
-      functions.logger.info(`📦 Total items purchased: ${totalQuantity}`)
+      const metadata = event.data.object
+         .metadata as unknown as OfflineEventSessionMetadata
 
-      // TODO: Implement specific logic for offline events based on quantity
+      await groupRepo.increaseAvailableOfflineEvents(
+         metadata.groupId,
+         totalQuantityBought
+      )
+
+      functions.logger.info(
+         `📦 Added ${totalQuantityBought} (bought) offline events to group ${metadata.groupId}`
+      )
    } catch (error) {
       functions.logger.error(
-         "❌ Error handling Stripe Offline Event webhook:",
+         "❌ Error handling Stripe Offline Event checkout 'checkout.session.completed' event:",
          error
       )
       throw error
