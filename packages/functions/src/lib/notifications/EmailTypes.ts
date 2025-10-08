@@ -30,6 +30,7 @@ export const CUSTOMERIO_EMAIL_TEMPLATES = {
    PASSWORD_RESET: "password_reset",
    GROUP_INVITATION: "group_invitation",
    LIVE_STREAM_PUBLISH: "live_stream_publish",
+   LIVE_STREAM_B2B_SOCIAL_SHARE_NUDGE: "ls_b2b_social_share_nudge",
    SPARKS_START_SUBSCRIPTION: "sparks_start_subscription",
    SPARKS_END_SUBSCRIPTION: "sparks_end_subscription",
    SPARKS_END_CONTENT_CREATION_PERIOD: "sparks_end_content_creation_period",
@@ -223,6 +224,7 @@ export type CustomerIoEmailMessageData = {
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_NO_SHOW]: NoShowReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_NO_SHOW]: PanelNoShowReminderTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_PUBLISH]: LivestreamPublishedTemplateData
+   [CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_B2B_SOCIAL_SHARE_NUDGE]: LivestreamPublishedTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_START_SUBSCRIPTION]: SparksPlanTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_SUBSCRIPTION]: SparksPlanTemplateData
    [CUSTOMERIO_EMAIL_TEMPLATES.SPARKS_END_CONTENT_CREATION_PERIOD]: SparksPlanTemplateData
