@@ -1,5 +1,6 @@
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { OfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import {
@@ -7,7 +8,6 @@ import {
    createContext,
    useCallback,
    useContext,
-   useEffect,
    useMemo,
    useState,
 } from "react"
@@ -17,6 +17,10 @@ import { DeleteOfflineEventDialog } from "./DeleteOfflineEventDialog"
 import { ShareOfflineEventDialog } from "./ShareOfflineEventDialog"
 
 type OfflineEventsViewContextValue = {
+   showBuyCTA: boolean
+   checkoutDialogOpen: boolean
+   handleCheckoutDialogOpen: () => void
+   handleCheckoutDialogClose: () => void
    sortBy: OfflineEventStatsSortOption
    setSortBy: (sortBy: OfflineEventStatsSortOption) => void
    handleTableSort: (field: "title" | "date" | "views" | "clicks") => void
@@ -101,6 +105,13 @@ export const OfflineEventsViewProvider = ({
    const [sortBy, setSortBy] = useState<OfflineEventStatsSortOption>(
       OfflineEventStatsSortOption.STATUS_WITH_DATE
    )
+   const showBuyCTA = !groupPresenter?.canCreateOfflineEvents(true)
+
+   const [
+      checkoutDialogOpen,
+      handleCheckoutDialogOpen,
+      handleCheckoutDialogClose,
+   ] = useDialogStateHandler()
    const [statusFilter, setStatusFilter] = useState<OfflineEventStatus[]>([])
    const [searchTerm, setSearchTerm] = useState("")
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -289,6 +300,10 @@ export const OfflineEventsViewProvider = ({
 
    const value = useMemo<OfflineEventsViewContextValue>(
       () => ({
+         showBuyCTA,
+         checkoutDialogOpen,
+         handleCheckoutDialogOpen,
+         handleCheckoutDialogClose,
          sortBy,
          setSortBy,
          handleTableSort,
@@ -329,14 +344,12 @@ export const OfflineEventsViewProvider = ({
          handleViewRegistration,
          handleViewDetails,
          handleDelete,
+         showBuyCTA,
+         checkoutDialogOpen,
+         handleCheckoutDialogOpen,
+         handleCheckoutDialogClose,
       ]
    )
-
-   useEffect(() => {
-      if (group?.id && !groupPresenter?.canCreateOfflineEvents(true)) {
-         push(`/group/${group?.id}/admin/content/live-streams`)
-      }
-   }, [groupPresenter, group?.id, push])
 
    return (
       <OfflineEventsViewContext.Provider value={value}>

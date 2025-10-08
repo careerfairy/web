@@ -1,11 +1,9 @@
-import * as React from "react"
-import ConditionalWrapper from "components/util/ConditionalWrapper"
-import getStripe from "data/stripe/stripe"
 import {
    EmbeddedCheckout,
    EmbeddedCheckoutProvider,
 } from "@stripe/react-stripe-js"
-import { Box } from "@mui/material"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import getStripe from "data/stripe/stripe"
 
 const stripePromise = getStripe()
 
@@ -20,11 +18,9 @@ const StripeCheckoutComponent = ({ clientSecret }: Props) => {
    }
    return (
       <ConditionalWrapper condition={Boolean(clientSecret)}>
-         <Box width={"800px"} height={"500px"}>
-            <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
-               <EmbeddedCheckout />
-            </EmbeddedCheckoutProvider>
-         </Box>
+         <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
+            <EmbeddedCheckout />
+         </EmbeddedCheckoutProvider>
       </ConditionalWrapper>
    )
 }
