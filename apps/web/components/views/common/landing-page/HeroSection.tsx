@@ -7,6 +7,8 @@ import {
    Chip,
    Grid,
    Stack,
+   SxProps,
+   Theme,
    Typography,
    useMediaQuery,
    useTheme,
@@ -15,7 +17,7 @@ import useIsMobile from "components/custom-hook/useIsMobile"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
 import Image from "next/image"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    heroSection: {
@@ -24,8 +26,6 @@ const styles = sxStyles({
       gap: 5,
       position: "relative",
       height: { xs: "812px", md: "431px" },
-      background:
-         "linear-gradient(0deg, #F0F4FF 0%, #F0F4FF 100%), linear-gradient(104deg, #F5F7FF 0%, #F5F7FF 100%), linear-gradient(169deg, rgba(98, 117, 255, 0.13) 1.77%, rgba(70, 90, 230, 0.00) 98.23%), linear-gradient(25deg, rgba(70, 90, 230, 0.00) -0.66%, rgba(98, 117, 255, 0.48) 141.07%), #4A5BAD",
    },
    headerContainer: {
       gap: { xs: 1.5, md: 4 },
@@ -47,14 +47,9 @@ const styles = sxStyles({
       textAlign: { xs: "center", md: "left" },
    },
    sectionTitle: {
-      color: "#4A72C8",
       fontWeight: 700,
       lineHeight: 1.2,
    },
-   brandTagline: {
-      color: "neutral.700",
-   },
-   // Container to clip visual support elements
    visualSupportContainer: {
       position: "absolute",
       inset: 0,
@@ -87,8 +82,6 @@ const styles = sxStyles({
       flexWrap: "wrap",
    },
    tagChip: {
-      backgroundColor: "rgba(136, 136, 136, 0.22)",
-      color: "neutral.700",
       fontWeight: 400,
       fontSize: "14px",
       lineHeight: "20px",
@@ -104,7 +97,6 @@ const styles = sxStyles({
       gap: 2,
       alignItems: "stretch",
       zIndex: 1,
-      // Position to overlap/overflow the hero section
       position: "relative",
       width: "100%",
    },
@@ -115,34 +107,47 @@ const styles = sxStyles({
    },
 })
 
-interface HeroSectionConsultingProps {
-   panelEvents: LivestreamEvent[] // These are now consulting livestreams, not panels
+export interface HeroSectionConfig {
+   title: string
+   subtitle: string
+   tags: string[]
+   backgroundSx: SxProps<Theme>
+   titleColorSx: SxProps<Theme>
+   subtitleColorSx: SxProps<Theme>
+   tagChipSx: SxProps<Theme>
+   visualSupport?: {
+      left?: string
+      right?: string
+   }
+   impressionLocation: ImpressionLocation
+}
+
+interface HeroSectionProps {
+   config: HeroSectionConfig
+   events: LivestreamEvent[]
    handleOpenLivestreamDialog: (livestreamId: string) => void
 }
 
-export default function HeroSectionConsulting({
-   panelEvents,
+export default function HeroSection({
+   config,
+   events,
    handleOpenLivestreamDialog,
-}: HeroSectionConsultingProps) {
+}: HeroSectionProps) {
    const theme = useTheme()
    const isMobile = useIsMobile()
    const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"))
-   // Refs used to measure the hero container and the overlapping livestreams area
    const heroRef = useRef<HTMLDivElement | null>(null)
    const livestreamsRef = useRef<HTMLDivElement | null>(null)
-   // Dynamic bottom spacing equals livestreams' overflow below hero + a base 32px gap
    const [dynamicBottomSpacing, setDynamicBottomSpacing] = useState<number>(32)
    const BASE_GAP_PX = 32
 
-   // Determine grid layout based on number of events
-   const shouldUse1x3Layout = panelEvents.length === 4
+   const shouldUse1x3Layout = events.length === 4
    const displayedEvents = shouldUse1x3Layout
-      ? panelEvents.slice(0, 3)
+      ? events.slice(0, 3)
       : isMobile
-      ? panelEvents.slice(0, 3) // Always max 3 cards on mobile
-      : panelEvents
+      ? events.slice(0, 3)
+      : events
 
-   // Compute how much the livestreams extend below the hero and update spacing
    const computeOverlap = useMemo(
       () => () => {
          if (!heroRef.current || !livestreamsRef.current) return
@@ -157,16 +162,13 @@ export default function HeroSectionConsulting({
       []
    )
 
-   // Keep spacing accurate across resizes between hero and next section
    useEffect(() => {
       const heroEl = heroRef.current
       const livestreamsEl = livestreamsRef.current
       if (!heroEl || !livestreamsEl) return
 
-      // Initial measurement
       computeOverlap()
 
-      // Observe size changes of hero and livestreams
       let heroObserver: ResizeObserver | null = null
       let livestreamsObserver: ResizeObserver | null = null
       if (typeof window !== "undefined" && "ResizeObserver" in window) {
@@ -176,7 +178,6 @@ export default function HeroSectionConsulting({
          livestreamsObserver.observe(livestreamsEl)
       }
 
-      // Recompute on window resize and orientation changes
       const handleResize = () => computeOverlap()
       window.addEventListener("resize", handleResize)
       window.addEventListener("orientationchange", handleResize)
@@ -192,23 +193,26 @@ export default function HeroSectionConsulting({
    return (
       <Stack
          ref={heroRef}
-         sx={[styles.heroSection, { mb: `${dynamicBottomSpacing}px` }]}
+         sx={combineStyles(styles.heroSection, config.backgroundSx, {
+            mb: `${dynamicBottomSpacing}px`,
+         })}
       >
-         {/* Decorative header visuals */}
          <Box aria-hidden sx={styles.visualSupportContainer}>
-            <Box aria-hidden sx={styles.visualSupportLeft}>
-               <Image
-                  src="/panels/header-left-visual-support.svg"
-                  alt=""
-                  width={300}
-                  height={300}
-                  priority
-               />
-            </Box>
-            {Boolean(isLargeScreen) && (
+            {Boolean(config.visualSupport?.left) && (
+               <Box aria-hidden sx={styles.visualSupportLeft}>
+                  <Image
+                     src={config.visualSupport.left}
+                     alt=""
+                     width={300}
+                     height={300}
+                     priority
+                  />
+               </Box>
+            )}
+            {Boolean(isLargeScreen && config.visualSupport?.right) && (
                <Box aria-hidden sx={styles.visualSupportRight}>
                   <Image
-                     src="/panels/header-right-visual-support.svg"
+                     src={config.visualSupport.right}
                      alt=""
                      width={300}
                      height={300}
@@ -218,37 +222,31 @@ export default function HeroSectionConsulting({
             )}
          </Box>
          <Stack sx={styles.headerContainer}>
-            {/* Left column - Title */}
             <Stack sx={styles.leftColumn}>
-               <Typography variant="brandedH1" sx={styles.sectionTitle}>
-                  Consulting{isMobile ? " " : <br />}collection
+               <Typography
+                  variant="brandedH1"
+                  sx={combineStyles(styles.sectionTitle, config.titleColorSx)}
+               >
+                  {config.title.split(" ")[0]}
+                  {isMobile ? " " : <br />}
+                  {config.title.split(" ").slice(1).join(" ")}
                </Typography>
             </Stack>
 
-            {/* Right column - Subtitle and Tags */}
             <Stack sx={styles.rightColumn}>
-               <Typography variant="medium" sx={styles.brandTagline}>
-                  Join live sessions with Europe&apos;s top consulting firms
-                  packed with career tips and real stories from young
-                  consultants.
+               <Typography variant="medium" sx={config.subtitleColorSx}>
+                  {config.subtitle}
                </Typography>
 
                <Stack sx={styles.tagChips}>
-                  <Chip
-                     label="Talk to real consultants"
-                     size="small"
-                     sx={styles.tagChip}
-                  />
-                  <Chip
-                     label="Cases, tips & more"
-                     size="small"
-                     sx={styles.tagChip}
-                  />
-                  <Chip
-                     label="Live interaction"
-                     size="small"
-                     sx={styles.tagChip}
-                  />
+                  {config.tags.map((tag, index) => (
+                     <Chip
+                        key={index}
+                        label={tag}
+                        size="small"
+                        sx={combineStyles(styles.tagChip, config.tagChipSx)}
+                     />
+                  ))}
                </Stack>
             </Stack>
          </Stack>
@@ -267,7 +265,7 @@ export default function HeroSectionConsulting({
                      >
                         <EventPreviewCard
                            event={livestream}
-                           location={ImpressionLocation.panelsOverviewPage}
+                           location={config.impressionLocation}
                            onCardClick={() =>
                               handleOpenLivestreamDialog(livestream.id)
                            }

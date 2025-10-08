@@ -1,10 +1,7 @@
-import { Box, Stack, Typography } from "@mui/material"
-import { JobsIcon } from "components/views/common/icons/JobsIcon"
+import { Box, Stack, SxProps, Theme, Typography } from "@mui/material"
 import Image from "next/image"
-import { sxStyles } from "types/commonTypes"
-import { BombIcon } from "../../panels/page/components/BombIcon"
-import { CapIcon } from "../../panels/page/components/CapIcon"
-import { PinIcon } from "../../panels/page/components/PinIcon"
+import { ComponentType } from "react"
+import { combineStyles, sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    section: (theme) => ({
@@ -19,7 +16,7 @@ const styles = sxStyles({
       flexDirection: "column",
       [theme.breakpoints.up("md")]: {
          flexDirection: "row",
-         padding: 3,
+         padding: theme.spacing(3),
          gap: 6,
       },
       [theme.breakpoints.up("sparksFullscreen")]: {
@@ -50,7 +47,6 @@ const styles = sxStyles({
       justifyContent: "center",
       flexShrink: 0,
       borderRadius: "50%",
-      backgroundColor: (theme) => theme.brand.purple[50],
    },
    icon: {
       width: 16,
@@ -58,7 +54,6 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      color: (theme) => theme.brand.purple[800],
       fontWeight: 600,
    },
    sectionTitle: {
@@ -101,43 +96,49 @@ const styles = sxStyles({
    }),
 })
 
-export default function WhosThisForSectionConsulting() {
-   const targetAudience = [
-      {
-         text: "You're a student or graduate exploring consulting",
-         icon: CapIcon,
-      },
-      {
-         text: "You're preparing for case interviews",
-         icon: JobsIcon,
-      },
-      {
-         text: "Curious about day-to-day consulting work",
-         icon: BombIcon,
-      },
-      {
-         text: "You are wondering if consulting is right for you",
-         icon: PinIcon,
-      },
-   ]
+export interface TargetAudienceItem {
+   text: string
+   icon: ComponentType<any>
+}
 
+export interface WhosThisForSectionConfig {
+   title: string
+   targetAudience: TargetAudienceItem[]
+   imageUrl: string
+   imageAlt: string
+   iconWrapperSx: SxProps<Theme>
+   iconSx: SxProps<Theme>
+}
+
+interface WhosThisForSectionProps {
+   config: WhosThisForSectionConfig
+}
+
+export default function WhosThisForSection({
+   config,
+}: WhosThisForSectionProps) {
    return (
       <Stack sx={styles.section}>
          <Stack sx={styles.textWrapper} spacing={1.5}>
             <Typography variant="desktopBrandedH4" sx={styles.sectionTitle}>
-               Who&apos;s this for?
+               {config.title}
             </Typography>
 
             <Stack sx={styles.targetAudienceList}>
-               {targetAudience.map((audience, index) => (
+               {config.targetAudience.map((audience, index) => (
                   <Stack
                      key={index}
                      direction="row"
                      sx={styles.targetAudienceItem}
                   >
-                     <Box sx={styles.iconWrapper}>
+                     <Box
+                        sx={combineStyles(
+                           styles.iconWrapper,
+                           config.iconWrapperSx
+                        )}
+                     >
                         <Box
-                           sx={styles.icon}
+                           sx={combineStyles(styles.icon, config.iconSx)}
                            component={audience.icon}
                            strokeWidth="2.25"
                         ></Box>
@@ -155,8 +156,8 @@ export default function WhosThisForSectionConsulting() {
 
          <Box sx={styles.imageContainer}>
             <Image
-               src="/panels/whos-this-for.png"
-               alt="Whos this for section - Consulting"
+               src={config.imageUrl}
+               alt={config.imageAlt}
                width={500}
                height={300}
                style={{
