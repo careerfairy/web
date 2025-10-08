@@ -33,6 +33,7 @@ import { getCountryCode } from "./util"
  * */
 export const getRecommendedEvents = onCall(
    {
+      memory: "512MiB",
       concurrency: 10,
    },
    middlewares<GetRecommendedEventsFnArgs>(
