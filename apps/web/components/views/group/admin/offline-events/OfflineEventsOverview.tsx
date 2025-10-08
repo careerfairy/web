@@ -104,8 +104,8 @@ const getCheckoutData = (
       customerName: group.universityName,
       customerEmail: userEmail,
       groupId: group.groupId,
-      priceId: "price_1SFGClKcrPDGIq6mIh1P8EH4",
-      successUrl: "/offline-event-success",
+      priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID,
+      successUrl: "/offline-event-success", // TODO: Update to the correct URL
    }
 }
 
