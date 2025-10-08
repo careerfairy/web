@@ -48,6 +48,7 @@ export const InteractionSources = {
    Consulting_Overview_Page: "Consulting_Overview_Page",
    Engineering_Overview_Page: "Engineering_Overview_Page",
    FMCG_Overview_Page: "FMCG_Overview_Page",
+   Finance_Banking_Overview_Page: "Finance_Banking_Overview_Page",
 } as const
 
 export type InteractionSourcesType =
