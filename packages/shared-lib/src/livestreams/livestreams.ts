@@ -191,6 +191,7 @@ export interface LivestreamEvent extends Identifiable {
    isFaceToFace?: boolean
    reminderEmailsSent?: IEmailSent
    reminderEmailsStatus?: Record<string, ReminderEmailStatus>
+   promotionEmailsSent?: IPromotionEmailSent
 
    /*
     * Breakout rooms
@@ -463,6 +464,11 @@ export interface IEmailSent {
    reminder5Minutes: boolean
    reminder1Hour: boolean
    reminder24Hours: boolean
+}
+
+export interface IPromotionEmailSent {
+   fourteenDayPromotion?: boolean
+   fourteenDayPromotionSentAt?: FirebaseFirestore.Timestamp
 }
 
 /**
