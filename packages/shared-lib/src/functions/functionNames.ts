@@ -94,5 +94,8 @@ export const FUNCTION_NAMES = {
    checkExpiredPlans: "checkExpiredPlans_v2",
 
    // Stripe functions
-   fetchStripeCustomerSession: "fetchStripeCustomerSession",
+   stripeWebHook: "stripeWebHook_v2",
+   fetchStripeCustomerSession: "fetchStripeCustomerSession_v2",
+   fetchStripePrice: "fetchStripePrice_v2",
+   fetchStripeSessionStatus: "fetchStripeSessionStatus_v2",
 } as const
