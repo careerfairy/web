@@ -11,9 +11,24 @@ export interface IStripeFunctionsRepository {
    createCheckoutSession<T extends BaseStripeSessionMetadata>(
       options: CreateCheckoutSessionParams<T>
    ): Promise<Stripe.Checkout.Session>
+
+   /**
+    * Creates or updates a Stripe customer, with the customer id being set in the metadata.groupId, allowing for the
+    * default Stripe id to be untouched.
+    *
+    * Retrieving the same customer, can be done by querying the customer with the metadata.groupId. If needed,
+    * the created customerId can be synched into the Group document.
+    */
    createOrUpdateStripeCustomer(
       payload: BaseSessionPayload
    ): Promise<Stripe.Customer>
+
+   /**
+    * Retrieves the total quantity from a checkout session by its id, using the expand parameter to get the line items and
+    * perform the calculation.
+    */
+   getTotalQuantityFromCheckoutSessionById(sessionId: string): Promise<number>
+
    getTotalQuantityFromCheckoutSession(session: Stripe.Checkout.Session): number
    stripe: Stripe
 }
@@ -100,6 +115,16 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
       }
 
       return groupCustomer
+   }
+
+   async getTotalQuantityFromCheckoutSessionById(
+      sessionId: string
+   ): Promise<number> {
+      const session = await this._stripe.checkout.sessions.retrieve(sessionId, {
+         expand: ["line_items"],
+      })
+
+      return this.getTotalQuantityFromCheckoutSession(session)
    }
 
    // Utility functions
