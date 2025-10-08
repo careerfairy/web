@@ -1,26 +1,35 @@
-import { SerializedGroup, serializeGroup } from "@careerfairy/shared-lib/groups"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { SerializedGroup } from "@careerfairy/shared-lib/groups"
 import { Stack } from "@mui/material"
 import {
-   HeroSectionConsulting,
-   ParticipatingCompaniesSectionConsulting,
-   RecordingsSectionConsulting,
-   RegisterNowSectionConsulting,
-   SpeakersSectionConsulting,
-   WhosThisForSectionConsulting,
-} from "components/views/consulting/page"
+   HeroSection,
+   ParticipatingCompaniesSection,
+   RecordingsSection,
+   RegisterNowSection,
+   SpeakersSection,
+   WhosThisForSection,
+} from "components/views/common/landing-page"
+import {
+   consultingCompaniesConfig,
+   consultingHeroConfig,
+   consultingRecordingsConfig,
+   consultingRegisterNowConfig,
+   consultingSpeakersConfig,
+   consultingWhosThisForConfig,
+} from "components/views/common/landing-page/configs"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { NotForYouSection } from "components/views/panels/page"
-import { groupRepo, livestreamRepo } from "data/RepositoryInstances"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
+import { DateTime } from "luxon"
 import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
-import { deserializeGroupClient, mapFromServerSide } from "util/serverUtil"
-
-const CF_GROUP_ID = "i8NjOiRu85ohJWDuFPwo"
+import {
+   deserializeGroupClient,
+   getLandingPageData,
+   mapFromServerSide,
+} from "util/serverUtil"
 
 const styles = sxStyles({
    pageContainer: {
@@ -117,21 +126,27 @@ export default function ConsultingPage({
       <>
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
-               <HeroSectionConsulting
-                  panelEvents={deserializedPanelEvents}
+               <HeroSection
+                  config={consultingHeroConfig}
+                  events={deserializedPanelEvents}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <WhosThisForSectionConsulting />
-               <ParticipatingCompaniesSectionConsulting companies={companies} />
-               <SpeakersSectionConsulting
+               <WhosThisForSection config={consultingWhosThisForConfig} />
+               <ParticipatingCompaniesSection
+                  config={consultingCompaniesConfig}
+                  companies={companies}
+               />
+               <SpeakersSection
+                  config={consultingSpeakersConfig}
                   speakers={shuffledSpeakers}
                   companies={companies}
                />
-               <RecordingsSectionConsulting
-                  consultingRecordings={deserializedConsultingRecordings}
+               <RecordingsSection
+                  config={consultingRecordingsConfig}
+                  recordings={deserializedConsultingRecordings}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <RegisterNowSectionConsulting />
+               <RegisterNowSection config={consultingRegisterNowConfig} />
                <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
@@ -155,123 +170,21 @@ export default function ConsultingPage({
 }
 
 export const getStaticProps: GetStaticProps<ConsultingPageProps> = async () => {
-   try {
-      // Fetch all data in parallel
-      const [allUpcomingEvents, pastEvents] = await Promise.all([
-         // Fetch upcoming events (will be used for both consulting events and recent livestreams)
-         livestreamRepo.getUpcomingEvents(50), // Get more to ensure we have enough after filtering
-         // Fetch past events for consulting recordings
-         livestreamRepo.getPastEventsFrom({
-            fromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
-            limit: 50, // Get more to ensure we have enough after filtering
-         }),
-      ])
+   const data = await getLandingPageData({
+      type: "industry",
+      industries: ["ManagementConsulting"],
+      recordingsFromDate: DateTime.now().minus({ years: 1 }).toJSDate(),
+      upcomingLimit: 6,
+      recordingsLimit: 6,
+   })
 
-      // Use first 10 for recent livestreams (for "Not interested in consulting?" section)
-      const recentLivestreams = allUpcomingEvents?.slice(0, 10) || []
-
-      // Filter upcoming events by ManagementConsulting industry and limit to 6
-      const consultingLivestreams =
-         allUpcomingEvents
-            ?.filter((event) =>
-               event.companyIndustries?.includes("ManagementConsulting")
-            )
-            ?.slice(0, 6) || []
-
-      // Filter past events by ManagementConsulting industry and limit to 6 for recordings
-      // First try to get events that are explicitly marked as recordings
-      let consultingRecordings =
-         pastEvents
-            ?.filter(
-               (event) =>
-                  event.companyIndustries?.includes("ManagementConsulting") &&
-                  event.isRecording // Only include events that have recordings
-            )
-            ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-            ?.slice(0, 6) || []
-
-      // If we don't have enough recordings, fall back to all consulting past events
-      // This ensures the section renders even if the isRecording flag isn't properly set
-      if (consultingRecordings.length === 0) {
-         consultingRecordings =
-            pastEvents
-               ?.filter(
-                  (event) =>
-                     event.companyIndustries?.includes(
-                        "ManagementConsulting"
-                     ) && event.hasEnded // Only include events that have ended
-               )
-               ?.sort((a, b) => b.start.toMillis() - a.start.toMillis()) // Sort by most recent first
-               ?.slice(0, 6) || []
-      }
-
-      // Extract unique groupIds from consulting livestreams
-      const allGroupIds = consultingLivestreams
-         .flatMap((event) => event.groupIds || [])
-         .filter((groupId, index, array) => array.indexOf(groupId) === index) // Remove duplicates
-
-      // Fetch companies from the groupIds
-      const companies =
-         allGroupIds.length > 0
-            ? await groupRepo.getGroupsByIds(allGroupIds)
-            : []
-
-      // Serialize events for server-side props
-      const serializedConsultingEvents = consultingLivestreams.map((event) =>
-         LivestreamPresenter.serializeDocument(event)
-      )
-
-      // Handle moderators - filter out moderators from speakers
-      const eventsWithoutModerators = serializedConsultingEvents.map(
-         (event) => {
-            event.speakers = event.speakers?.filter(
-               (speaker) => speaker.position !== "Moderator"
-            )
-            return {
-               ...event,
-               speakers: event.speakers,
-            }
-         }
-      )
-
-      const serializedRecentLivestreams =
-         recentLivestreams?.map((stream) =>
-            LivestreamPresenter.serializeDocument(stream)
-         ) || []
-
-      const serializedConsultingRecordings = consultingRecordings.map(
-         (recording) => LivestreamPresenter.serializeDocument(recording)
-      )
-
-      const serializedCompanies = companies.map((company) =>
-         serializeGroup(company)
-      )
-
-      // Filter out CareerFairy group
-      const serializedCompaniesWithoutCF = serializedCompanies.filter(
-         (company) => company.id !== CF_GROUP_ID
-      )
-
-      return {
-         props: {
-            serverSidePanelEvents: eventsWithoutModerators,
-            serverSideCompanies: serializedCompaniesWithoutCF,
-            serverSideRecentLivestreams: serializedRecentLivestreams,
-            serverSideConsultingRecordings: serializedConsultingRecordings,
-         },
-         revalidate: 300, // Revalidate every 5 minutes
-      }
-   } catch (error) {
-      console.error("Error fetching consulting page data:", error)
-
-      return {
-         props: {
-            serverSidePanelEvents: [],
-            serverSideCompanies: [],
-            serverSideRecentLivestreams: [],
-            serverSideConsultingRecordings: [],
-         },
-         revalidate: 300, // Revalidate every 5 minutes
-      }
+   return {
+      props: {
+         serverSidePanelEvents: data.serverSidePanelEvents,
+         serverSideCompanies: data.serverSideCompanies,
+         serverSideRecentLivestreams: data.serverSideRecentLivestreams,
+         serverSideConsultingRecordings: data.serverSideRecordings || [],
+      },
+      revalidate: 300, // Revalidate every 5 minutes
    }
 }

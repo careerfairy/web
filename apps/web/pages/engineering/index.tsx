@@ -1,20 +1,29 @@
 import { SerializedGroup } from "@careerfairy/shared-lib/groups"
 import { Stack } from "@mui/material"
-import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import {
    HeroSection,
-   NotForYouSection,
    ParticipatingCompaniesSection,
+   RecordingsSection,
    RegisterNowSection,
    SpeakersSection,
-   WhatYouTakeAwaySection,
    WhosThisForSection,
-} from "components/views/panels/page"
+} from "components/views/common/landing-page"
+import {
+   engineeringCompaniesConfig,
+   engineeringHeroConfig,
+   engineeringRecordingsConfig,
+   engineeringRegisterNowConfig,
+   engineeringSpeakersConfig,
+   engineeringWhosThisForConfig,
+} from "components/views/common/landing-page/configs"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
+import { NotForYouSection } from "components/views/panels/page"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
-import { GetServerSideProps } from "next"
+import { DateTime } from "luxon"
+import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "types/commonTypes"
 import {
    deserializeGroupClient,
@@ -34,48 +43,44 @@ const styles = sxStyles({
    },
 })
 
-type PanelsPageProps = {
+type EngineeringPageProps = {
    serverSidePanelEvents: any[]
    serverSideCompanies: SerializedGroup[]
    serverSideRecentLivestreams: any[]
+   serverSideEngineeringRecordings: any[]
 }
 
-export default function PanelsPage({
+export default function EngineeringPage({
    serverSidePanelEvents,
    serverSideCompanies,
    serverSideRecentLivestreams,
-}: PanelsPageProps) {
+   serverSideEngineeringRecordings,
+}: EngineeringPageProps) {
    const deserializedPanelEvents = mapFromServerSide(serverSidePanelEvents)
    const deserializedRecentLivestreams = mapFromServerSide(
       serverSideRecentLivestreams
    )
+   const deserializedEngineeringRecordings = mapFromServerSide(
+      serverSideEngineeringRecordings
+   )
    const companies = serverSideCompanies.map((company) =>
       deserializeGroupClient(company)
    )
+
+   const shuffledSpeakers = useMemo(() => {
+      return (
+         deserializedPanelEvents
+            .flatMap((panel) => panel.speakers || [])
+            // .sort(() => Math.random() - 0.5) // Randomize order
+            .slice(0, 6)
+      ) // Limit to 6 speakers
+   }, [deserializedPanelEvents])
 
    const { authenticatedUser } = useAuth()
    const { push, query, pathname } = useRouter()
    const [selectedId, setSelectedId] = useState<string | null>(
       (query.selectedPanelId as string | null) ||
          (query.selectedLivestreamId as string | null)
-   )
-
-   const handleOpenPanelDialog = useCallback(
-      (panelId: string) => {
-         setSelectedId(panelId)
-         void push(
-            {
-               pathname: pathname,
-               query: {
-                  ...query,
-                  selectedPanelId: panelId,
-               },
-            },
-            undefined,
-            { shallow: true }
-         )
-      },
-      [query, push, pathname]
    )
 
    const handleOpenLivestreamDialog = useCallback(
@@ -87,6 +92,7 @@ export default function PanelsPage({
                query: {
                   ...query,
                   selectedLivestreamId: livestreamId,
+                  originSource: "Engineering_Overview_Page",
                },
             },
             undefined,
@@ -101,6 +107,7 @@ export default function PanelsPage({
       const {
          selectedPanelId: _p,
          selectedLivestreamId: _l,
+         originSource: _o,
          ...restOfQuery
       } = query
       /* eslint-enable @typescript-eslint/no-unused-vars */
@@ -120,26 +127,31 @@ export default function PanelsPage({
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
                <HeroSection
-                  panelEvents={deserializedPanelEvents}
-                  companies={companies}
-                  handleOpenLivestreamDialog={handleOpenPanelDialog}
+                  config={engineeringHeroConfig}
+                  events={deserializedPanelEvents}
+                  handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <WhosThisForSection />
+               <WhosThisForSection config={engineeringWhosThisForConfig} />
+               <ParticipatingCompaniesSection
+                  config={engineeringCompaniesConfig}
+                  companies={companies}
+               />
                <SpeakersSection
-                  speakers={deserializedPanelEvents.flatMap(
-                     (panel) => panel.speakers || []
-                  )}
+                  config={engineeringSpeakersConfig}
+                  speakers={shuffledSpeakers}
                   companies={companies}
                />
-               <ParticipatingCompaniesSection companies={companies} />
-               <WhatYouTakeAwaySection />
-               <RegisterNowSection
-                  panelEvents={deserializedPanelEvents}
-                  handleOpenLivestreamDialog={handleOpenPanelDialog}
+               <RecordingsSection
+                  config={engineeringRecordingsConfig}
+                  recordings={deserializedEngineeringRecordings}
+                  handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
+               <RegisterNowSection config={engineeringRegisterNowConfig} />
                <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
+                  title="Not interested in engineering?"
+                  subtitle="Explore other career-focused live streams"
                />
             </Stack>
          </GenericDashboardLayout>
@@ -151,20 +163,30 @@ export default function PanelsPage({
             mode="stand-alone"
             initialPage={"details"}
             serverUserEmail={authenticatedUser?.email || ""}
-            providedOriginSource={`panels-overview-page-${selectedId}`}
+            providedOriginSource={`engineering-overview-page-${selectedId}`}
          />
       </>
    )
 }
 
-export const getServerSideProps: GetServerSideProps<
-   PanelsPageProps
+export const getStaticProps: GetStaticProps<
+   EngineeringPageProps
 > = async () => {
-   const props = await getLandingPageData({
-      type: "panels",
+   const data = await getLandingPageData({
+      type: "industry",
+      industries: ["Engineering", "Manufacturing"],
+      recordingsFromDate: DateTime.now().minus({ years: 1 }).toJSDate(),
+      upcomingLimit: 6,
+      recordingsLimit: 6,
    })
 
    return {
-      props,
+      props: {
+         serverSidePanelEvents: data.serverSidePanelEvents,
+         serverSideCompanies: data.serverSideCompanies,
+         serverSideRecentLivestreams: data.serverSideRecentLivestreams,
+         serverSideEngineeringRecordings: data.serverSideRecordings || [],
+      },
+      revalidate: 300, // Revalidate every 5 minutes
    }
 }
