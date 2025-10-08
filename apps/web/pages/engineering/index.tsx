@@ -21,7 +21,7 @@ import { NotForYouSection } from "components/views/panels/page"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
 import { DateTime } from "luxon"
-import { GetStaticProps } from "next"
+import { GetServerSideProps } from "next"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -159,7 +159,7 @@ export default function EngineeringPage({
    )
 }
 
-export const getStaticProps: GetStaticProps<
+export const getServerSideProps: GetServerSideProps<
    EngineeringPageProps
 > = async () => {
    const data = await getLandingPageData({
@@ -178,6 +178,5 @@ export const getStaticProps: GetStaticProps<
          serverSideEngineeringRecordings: data.serverSideRecordings || [],
          serverSideShuffledSpeakers: data.serverSideShuffledSpeakers,
       },
-      revalidate: 300, // Revalidate every 5 minutes
    }
 }
