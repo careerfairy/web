@@ -1,6 +1,11 @@
+import {
+   BusinessFunctionsTagValues,
+   ContentTopicsTagValues,
+} from "../constants/tags"
 import { Timestamp } from "../firebaseTypes"
+import { LivestreamEvent } from "../livestreams/livestreams"
 import { UserData } from "../users"
-import { CustomerIOUserData } from "./types"
+import { CustomerIOLivestreamData, CustomerIOUserData } from "./types"
 
 /**
  * Converts a Firebase timestamp to Unix timestamp (seconds since epoch).
@@ -10,6 +15,32 @@ import { CustomerIOUserData } from "./types"
 export function toUnixTimestamp(timestamp: Timestamp): number | undefined {
    if (!timestamp) return undefined
    return Math.floor(timestamp.toDate().getTime() / 1000)
+}
+
+/**
+ * Maps business function tag IDs to their display names
+ */
+function mapBusinessFunctionTagIdsToNames(tagIds?: string[]): string[] {
+   if (!tagIds || tagIds.length === 0) return []
+   const tagMap: Map<string, string> = new Map(
+      BusinessFunctionsTagValues.map((t) => [t.id, t.name])
+   )
+   return tagIds
+      .map((id) => tagMap.get(id))
+      .filter((name) => name !== undefined) as string[]
+}
+
+/**
+ * Maps content topic tag IDs to their display names
+ */
+function mapContentTopicTagIdsToNames(tagIds?: string[]): string[] {
+   if (!tagIds || tagIds.length === 0) return []
+   const tagMap: Map<string, string> = new Map(
+      ContentTopicsTagValues.map((t) => [t.id, t.name])
+   )
+   return tagIds
+      .map((id) => tagMap.get(id))
+      .filter((name) => name !== undefined) as string[]
 }
 
 /**
@@ -65,5 +96,103 @@ export function transformUserDataForCustomerIO(
 
       // Engagement Metrics
       credits: userData.credits,
+   }
+}
+
+/**
+ * Helper function to transform LivestreamEvent to CustomerIO format
+ * Flattens livestream attributes for use in Customer.io segmentation and personalization
+ */
+export function transformLivestreamDataForCustomerIO(
+   livestream: LivestreamEvent
+): CustomerIOLivestreamData {
+   // Extract speaker information
+   const speakers = livestream.speakers || []
+   const speakerNames = speakers
+      .map((s) => `${s.firstName || ""} ${s.lastName || ""}`.trim())
+      .filter(Boolean)
+   const speakerPositions = speakers
+      .map((s) => s.position)
+      .filter((p): p is string => !!p)
+
+   return {
+      // Basic Info
+      livestream_id: livestream.id,
+      title: livestream.title || "",
+      summary: livestream.summary,
+      start_time: toUnixTimestamp(livestream.start),
+      created_at: toUnixTimestamp(livestream.created),
+      last_updated: toUnixTimestamp(livestream.lastUpdated),
+
+      // Company/Host Info
+      company_name: livestream.company,
+      company_id: livestream.companyId,
+      company_logo_url: livestream.companyLogoUrl,
+
+      // Event Status & Type
+      is_test: !!livestream.test,
+      is_hidden: !!livestream.hidden,
+      is_draft: !!livestream.isDraft,
+      has_started: !!livestream.hasStarted,
+      has_ended: !!livestream.hasEnded,
+      started_at: toUnixTimestamp(livestream.startedAt),
+      ended_at: toUnixTimestamp(livestream.endedAt),
+
+      // Event Details
+      duration: livestream.duration,
+      language_code: livestream.language?.code,
+      language_name: livestream.language?.name,
+      timezone: livestream.timezone,
+      is_hybrid: livestream.isHybrid,
+      is_face_to_face: livestream.isFaceToFace,
+      external_event_link: livestream.externalEventLink,
+
+      // Content Tags & Targeting
+      business_functions_tag_ids: livestream.businessFunctionsTagIds || [],
+      business_functions_tag_names: mapBusinessFunctionTagIdsToNames(
+         livestream.businessFunctionsTagIds
+      ),
+      content_topics_tag_ids: livestream.contentTopicsTagIds || [],
+      content_topics_tag_names: mapContentTopicTagIdsToNames(
+         livestream.contentTopicsTagIds
+      ),
+      target_country_ids: livestream.targetCountries?.map((c) => c.id) || [],
+      target_country_names:
+         livestream.targetCountries?.map((c) => c.name) || [],
+      target_universities: livestream.targetUniversities || [],
+      target_field_of_study_ids:
+         livestream.targetFieldsOfStudy?.map((f) => f.id) || [],
+      target_field_of_study_names:
+         livestream.targetFieldsOfStudy?.map((f) => f.name) || [],
+      target_level_of_study_ids:
+         livestream.targetLevelsOfStudy?.map((l) => l.id) || [],
+      target_level_of_study_names:
+         livestream.targetLevelsOfStudy?.map((l) => l.name) || [],
+
+      // Speakers
+      speaker_names: speakerNames.length > 0 ? speakerNames : undefined,
+      speaker_positions:
+         speakerPositions.length > 0 ? speakerPositions : undefined,
+      speaker_count: speakers.length > 0 ? speakers.length : undefined,
+
+      // Call to Actions
+      has_active_ctas:
+         livestream.activeCallToActionIds &&
+         livestream.activeCallToActionIds.length > 0,
+
+      // Jobs
+      has_jobs: livestream.hasJobs,
+      linked_custom_jobs_tag_ids: livestream.linkedCustomJobsTagIds,
+
+      // Engagement Metrics
+      impressions: livestream.impressions,
+      max_registrants: livestream.maxRegistrants,
+
+      // Mode & Features
+      is_panel: livestream.isPanel,
+      panel_logo_url: livestream.panelLogoUrl,
+      open_stream: livestream.openStream,
+      with_resume: livestream.withResume,
+      deny_recording_access: livestream.denyRecordingAccess,
    }
 }

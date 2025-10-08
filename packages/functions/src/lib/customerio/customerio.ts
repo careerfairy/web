@@ -1,8 +1,10 @@
 import {
    CustomerIOUserData,
    CUTOFF_DATE,
+   transformLivestreamDataForCustomerIO,
    transformUserDataForCustomerIO,
 } from "@careerfairy/shared-lib/customerio"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/firestore"
@@ -13,8 +15,13 @@ import {
    customerIOWebhookSignatureMiddleware,
    withMiddlewares,
 } from "../../middlewares-gen2/onRequest"
-import { isLocalEnvironment } from "../../util"
+import { ChangeType, getChangeTypeEnum, isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
+import {
+   createOrUpdateObject,
+   deleteObject as deleteCustomerIOObject,
+   OBJECT_TYPES,
+} from "./objectsClient"
 import { CustomerIOWebhookEvent } from "./types"
 
 /**
@@ -137,6 +144,133 @@ const hasCustomerIODataChanged = (
 ): boolean => {
    if (!oldData) return true
    return JSON.stringify(oldData) !== JSON.stringify(newData)
+}
+
+/**
+ * Syncs livestream metadata to Customer.io as objects
+ * Firestore trigger on livestreams/{livestreamId}
+ */
+export const syncLivestreamToCustomerIO = onDocumentWritten(
+   {
+      document: "livestreams/{livestreamId}",
+      maxInstances: 70, // CustomerIO has a fair-use rate limit of 100 requests/second
+      concurrency: 1, // Process updates sequentially to avoid rate limit issues
+   },
+   async (event) => {
+      if (isLocalEnvironment()) {
+         logger.info(
+            "Skipping CustomerIO livestream sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
+         )
+         return
+      }
+
+      try {
+         const changeType = getChangeTypeEnum(event)
+         const livestreamId = event.params.livestreamId
+
+         logger.info(
+            `Processing ${changeType} for livestream ${livestreamId} in CustomerIO`
+         )
+
+         switch (changeType) {
+            case ChangeType.CREATE: {
+               const livestream = event.data.after.data() as LivestreamEvent
+
+               if (shouldSyncLivestream(livestream)) {
+                  const livestreamData =
+                     transformLivestreamDataForCustomerIO(livestream)
+
+                  await createOrUpdateObject(
+                     OBJECT_TYPES.LIVESTREAMS,
+                     livestreamId,
+                     livestreamData
+                  )
+
+                  logger.info(
+                     `Successfully created livestream ${livestreamId} in CustomerIO`
+                  )
+               } else {
+                  logger.info(
+                     `Skipping CustomerIO sync for livestream ${livestreamId} - Reason: ${getLivestreamExclusionReason(
+                        livestream
+                     )}`
+                  )
+               }
+               break
+            }
+
+            case ChangeType.UPDATE: {
+               const livestream = event.data.after.data() as LivestreamEvent
+
+               if (shouldSyncLivestream(livestream)) {
+                  const livestreamData =
+                     transformLivestreamDataForCustomerIO(livestream)
+
+                  await createOrUpdateObject(
+                     OBJECT_TYPES.LIVESTREAMS,
+                     livestreamId,
+                     livestreamData
+                  )
+
+                  logger.info(
+                     `Successfully updated livestream ${livestreamId} in CustomerIO`
+                  )
+               } else {
+                  // Livestream no longer qualifies (became test/hidden/draft)
+                  await deleteCustomerIOObject(
+                     OBJECT_TYPES.LIVESTREAMS,
+                     livestreamId
+                  )
+
+                  logger.info(
+                     `Removed livestream ${livestreamId} from CustomerIO - Reason: ${getLivestreamExclusionReason(
+                        livestream
+                     )}`
+                  )
+               }
+               break
+            }
+
+            case ChangeType.DELETE: {
+               await deleteCustomerIOObject(
+                  OBJECT_TYPES.LIVESTREAMS,
+                  livestreamId
+               )
+
+               logger.info(
+                  `Successfully deleted livestream ${livestreamId} from CustomerIO`
+               )
+               break
+            }
+
+            default:
+               logger.warn(
+                  `Unknown change type ${changeType} for livestream ${livestreamId} in CustomerIO sync`
+               )
+         }
+      } catch (error) {
+         logger.error("Error syncing livestream to CustomerIO:", error)
+      }
+   }
+)
+
+/**
+ * Determines if a livestream should be synced to Customer.io
+ * Excludes test, hidden, and draft livestreams per marketing requirements
+ */
+const shouldSyncLivestream = (livestream: LivestreamEvent): boolean => {
+   return !livestream.test
+}
+
+/**
+ * Returns a human-readable reason why a livestream is excluded from Customer.io sync
+ */
+const getLivestreamExclusionReason = (livestream: LivestreamEvent): string => {
+   const reasons: string[] = []
+
+   if (livestream.test) reasons.push("test event")
+
+   return reasons.length > 0 ? reasons.join(", ") : "unknown"
 }
 
 /**

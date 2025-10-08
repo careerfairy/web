@@ -408,6 +408,7 @@ exports.getFollowedCreators = levels.getFollowedCreators
 
 // CustomerIO
 exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
+exports.syncLivestreamToCustomerIO = customerio.syncLivestreamToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
 exports[FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook] =
    customerio.customerIORecommendedLivestreamsWebhook
@@ -440,7 +441,8 @@ exports.sendReminderEmailAboutApplicationLink_v2 =
    followups.sendReminderEmailAboutApplicationLink
 
 // Livestream Promotion
-exports.schedule14DayPromotionEmails = livestreamPromotion.schedule14DayPromotionEmails
+exports.schedule14DayPromotionEmails =
+   livestreamPromotion.schedule14DayPromotionEmails
 exports.manualPromotionEmails = livestreamPromotion.manualPromotionEmails
 
 // Reminders Post
