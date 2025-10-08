@@ -160,7 +160,8 @@ exports.updateUserLiveStreamDataOnUserChange =
 
 // Stripe
 exports.stripeWebHook = stripe.stripeWebHook
-exports.fetchStripeCustomerSession = stripe.fetchStripeCustomerSession
+exports[FUNCTION_NAMES.fetchStripeCustomerSession] =
+   stripe.fetchStripeCustomerSession
 exports.fetchStripePrice = stripe.fetchStripePrice
 exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
 
