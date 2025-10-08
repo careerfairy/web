@@ -137,7 +137,7 @@ export const fetchStripePrice = onCall(
          )
 
          try {
-            return stripeRepo.stripe.prices.retrieve(request.data.priceId)
+            return await stripeRepo.stripe.prices.retrieve(request.data.priceId)
          } catch (error) {
             logAndThrow("Error while retrieving Stripe price by ID", {
                error,

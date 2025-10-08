@@ -1,15 +1,16 @@
 import { StripeProductType } from "@careerfairy/shared-lib/stripe/types"
 import { Stripe } from "stripe"
-import { handleGroupPlanWebhook } from "./products/groupPlans"
-import { handleOfflineEventWebhook } from "./products/offlineEvents"
+import { handleGroupPlanCheckoutSessionCompleted } from "./products/groupPlans"
+import { handleOfflineEventCheckoutSessionCompleted } from "./products/offlineEvents"
 import functions = require("firebase-functions")
 
 /**
  * Map of product types to their checkout.session.completed handlers.
  */
 export const checkoutSessionCompletedHandlers = {
-   [StripeProductType.GROUP_PLAN]: handleGroupPlanWebhook,
-   [StripeProductType.OFFLINE_EVENT]: handleOfflineEventWebhook,
+   [StripeProductType.GROUP_PLAN]: handleGroupPlanCheckoutSessionCompleted,
+   [StripeProductType.OFFLINE_EVENT]:
+      handleOfflineEventCheckoutSessionCompleted,
 }
 
 export const EventHandlers: Partial<
@@ -26,7 +27,7 @@ export async function handleCheckoutSessionCompleted(
    const metadata = event?.data?.object?.metadata
 
    // if (metadata && metadata.groupId && metadata.type) {
-   const handler = handleOfflineEventWebhook // checkoutSessionCompletedHandlers[metadata.type as StripeProductType]
+   const handler = handleOfflineEventCheckoutSessionCompleted // checkoutSessionCompletedHandlers[metadata.type as StripeProductType]
    if (handler) {
       await handler(event)
    } else {

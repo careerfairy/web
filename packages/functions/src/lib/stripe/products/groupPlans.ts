@@ -36,7 +36,7 @@ export async function handleGroupPlanSession(
 /**
  * Handles group plan webhook events
  */
-export async function handleGroupPlanWebhook(
+export async function handleGroupPlanCheckoutSessionCompleted(
    event: Stripe.CheckoutSessionCompletedEvent
 ): Promise<void> {
    const metadata = event?.data?.object?.metadata
