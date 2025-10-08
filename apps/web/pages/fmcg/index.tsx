@@ -9,18 +9,17 @@ import {
    WhosThisForSection,
 } from "components/views/common/landing-page"
 import {
-   engineeringCompaniesConfig,
-   engineeringHeroConfig,
-   engineeringRecordingsConfig,
-   engineeringRegisterNowConfig,
-   engineeringSpeakersConfig,
-   engineeringWhosThisForConfig,
+   fmcgCompaniesConfig,
+   fmcgHeroConfig,
+   fmcgRecordingsConfig,
+   fmcgRegisterNowConfig,
+   fmcgSpeakersConfig,
+   fmcgWhosThisForConfig,
 } from "components/views/common/landing-page/configs"
 import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
 import { NotForYouSection } from "components/views/panels/page"
 import { useAuth } from "HOCs/AuthProvider"
 import GenericDashboardLayout from "layouts/GenericDashboardLayout"
-import { DateTime } from "luxon"
 import { GetStaticProps } from "next"
 import { useRouter } from "next/router"
 import { useCallback, useMemo } from "react"
@@ -43,25 +42,25 @@ const styles = sxStyles({
    },
 })
 
-type EngineeringPageProps = {
+type FMCGPageProps = {
    serverSidePanelEvents: any[]
    serverSideCompanies: SerializedGroup[]
    serverSideRecentLivestreams: any[]
-   serverSideEngineeringRecordings: any[]
+   serverSideFMCGRecordings: any[]
 }
 
-export default function EngineeringPage({
+export default function FMCGPage({
    serverSidePanelEvents,
    serverSideCompanies,
    serverSideRecentLivestreams,
-   serverSideEngineeringRecordings,
-}: EngineeringPageProps) {
+   serverSideFMCGRecordings,
+}: FMCGPageProps) {
    const deserializedPanelEvents = mapFromServerSide(serverSidePanelEvents)
    const deserializedRecentLivestreams = mapFromServerSide(
       serverSideRecentLivestreams
    )
-   const deserializedEngineeringRecordings = mapFromServerSide(
-      serverSideEngineeringRecordings
+   const deserializedFMCGRecordings = mapFromServerSide(
+      serverSideFMCGRecordings
    )
    const companies = serverSideCompanies.map((company) =>
       deserializeGroupClient(company)
@@ -88,7 +87,7 @@ export default function EngineeringPage({
                query: {
                   ...query,
                   selectedLivestreamId: livestreamId,
-                  originSource: "Engineering_Overview_Page",
+                  originSource: "FMCG_Overview_Page",
                },
             },
             undefined,
@@ -121,30 +120,30 @@ export default function EngineeringPage({
          <GenericDashboardLayout>
             <Stack sx={styles.pageContainer}>
                <HeroSection
-                  config={engineeringHeroConfig}
+                  config={fmcgHeroConfig}
                   events={deserializedPanelEvents}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <WhosThisForSection config={engineeringWhosThisForConfig} />
+               <WhosThisForSection config={fmcgWhosThisForConfig} />
                <ParticipatingCompaniesSection
-                  config={engineeringCompaniesConfig}
+                  config={fmcgCompaniesConfig}
                   companies={companies}
                />
                <SpeakersSection
-                  config={engineeringSpeakersConfig}
+                  config={fmcgSpeakersConfig}
                   speakers={shuffledSpeakers}
                   companies={companies}
                />
                <RecordingsSection
-                  config={engineeringRecordingsConfig}
-                  recordings={deserializedEngineeringRecordings}
+                  config={fmcgRecordingsConfig}
+                  recordings={deserializedFMCGRecordings}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
                />
-               <RegisterNowSection config={engineeringRegisterNowConfig} />
+               <RegisterNowSection config={fmcgRegisterNowConfig} />
                <NotForYouSection
                   recentLivestreams={deserializedRecentLivestreams}
                   handleOpenLivestreamDialog={handleOpenLivestreamDialog}
-                  title="Not interested in engineering?"
+                  title="Not interested in FMCG?"
                   subtitle="Explore other career-focused live streams"
                />
             </Stack>
@@ -157,19 +156,17 @@ export default function EngineeringPage({
             mode="stand-alone"
             initialPage={"details"}
             serverUserEmail={authenticatedUser?.email || ""}
-            providedOriginSource={`engineering-overview-page-${selectedId}`}
+            providedOriginSource={`fmcg-overview-page-${selectedId}`}
          />
       </>
    )
 }
 
-export const getStaticProps: GetStaticProps<
-   EngineeringPageProps
-> = async () => {
+export const getStaticProps: GetStaticProps<FMCGPageProps> = async () => {
    const data = await getLandingPageData({
       type: "industry",
-      industries: ["Engineering", "Manufacturing"],
-      recordingsFromDate: DateTime.now().minus({ years: 1 }).toJSDate(),
+      industries: ["FMCG"],
+      recordingsFromDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
       upcomingLimit: 6,
       recordingsLimit: 6,
    })
@@ -179,7 +176,7 @@ export const getStaticProps: GetStaticProps<
          serverSidePanelEvents: data.serverSidePanelEvents,
          serverSideCompanies: data.serverSideCompanies,
          serverSideRecentLivestreams: data.serverSideRecentLivestreams,
-         serverSideEngineeringRecordings: data.serverSideRecordings || [],
+         serverSideFMCGRecordings: data.serverSideRecordings || [],
       },
       revalidate: 300, // Revalidate every 5 minutes
    }
