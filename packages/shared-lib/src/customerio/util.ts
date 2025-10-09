@@ -52,6 +52,35 @@ export function toUnixTimestamp(timestamp: Timestamp): number | undefined {
 }
 
 /**
+ * Formats a date for use in Customer.io object names
+ * @param date The date to format
+ * @returns Formatted date string like "May 15, 2024"
+ */
+function formatDateForCustomerIO(date: Date): string {
+   if (!date) return "No Date"
+   return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+   })
+}
+
+/**
+ * Generates a descriptive name for Customer.io livestream objects
+ * Format: "[Company] Title (Date)"
+ * Example: "[OnLogic] Discover Our Internship Program (May 15, 2024)"
+ * @param livestream The livestream event
+ * @returns Formatted name string
+ */
+function generateLivestreamObjectName(livestream: LivestreamEvent): string {
+   const company = livestream.company || "Unknown Company"
+   const title = livestream.title || "Untitled Event"
+   const date = formatDateForCustomerIO(livestream.start?.toDate?.())
+
+   return `[${company}] ${title} (${date})`
+}
+
+/**
  * Maps business function tag IDs to their display names
  */
 function mapBusinessFunctionTagIdsToNames(tagIds?: string[]): string[] {
@@ -136,6 +165,9 @@ export function transformUserDataForCustomerIO(
 /**
  * Helper function to transform LivestreamEvent to CustomerIO format
  * Flattens livestream attributes for use in Customer.io segmentation and personalization
+ *
+ * The `name` field is formatted as: "[Company] Title (Date)"
+ * Example: "[OnLogic] Discover Our Internship Program (May 15, 2024)"
  */
 export function transformLivestreamDataForCustomerIO(
    livestream: LivestreamEvent
@@ -153,7 +185,12 @@ export function transformLivestreamDataForCustomerIO(
       // Basic Info
       livestream_id: livestream.id,
       title: livestream.title || "",
-      name: livestream.title || "",
+      /**
+       * Reserved field in Customer.io used to identify the object.
+       * Format: "[Company] Title (Date)"
+       * Example: "[OnLogic] Discover Our Internship Program (May 15, 2024)"
+       */
+      name: generateLivestreamObjectName(livestream),
       summary: truncateString(livestream.summary, CUSTOMERIO_BYTE_LIMIT),
       start_time: toUnixTimestamp(livestream.start),
       created_at: toUnixTimestamp(livestream.created),

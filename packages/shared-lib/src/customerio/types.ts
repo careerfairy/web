@@ -75,6 +75,11 @@ export interface CustomerIOLivestreamData {
    // Basic Info
    livestream_id: string
    title: string
+   /**
+    * Reserved field in Customer.io used to identify the object.
+    * Format: "[Company] Title (Date)"
+    * Example: "[OnLogic] Discover Our Internship Program (May 15, 2024)"
+    */
    name: string
    summary?: string
    /**
