@@ -15,9 +15,11 @@ import {
    useTrackEvent,
 } from "agora-rtc-react"
 import { useAgoraRtcToken } from "components/custom-hook/streaming"
+import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
 import { useSetLivestreamMode } from "components/custom-hook/streaming/useSetLivestreamMode"
 import { STREAM_IDENTIFIERS } from "constants/streaming"
 import { agoraCredentials } from "data/agora/AgoraInstance"
+import { useRouter } from "next/router"
 import {
    ReactNode,
    createContext,
@@ -28,11 +30,9 @@ import {
    useRef,
    useState,
 } from "react"
-import { useStreamingContext } from "."
-import { useRouter } from "next/router"
-import { useClientConfig } from "components/custom-hook/streaming/useClientConfig"
-import { LocalUserScreen } from "../types"
 import { useCurrentScreenSharer } from "store/selectors/streamingAppSelectors"
+import { useStreamingContext } from "."
+import { LocalUserScreen } from "../types"
 
 interface ScreenShareProviderProps {
    children: ReactNode
@@ -82,7 +82,9 @@ export const ScreenShareProvider = ({ children }: ScreenShareProviderProps) => {
    const currentScreenSharer = useCurrentScreenSharer()
    const localScreenTrack = useLocalScreenTrack(
       shouldStream ? screenShareOn : false,
-      {},
+      {
+         systemAudio: "exclude",
+      },
       "auto"
    )
 
