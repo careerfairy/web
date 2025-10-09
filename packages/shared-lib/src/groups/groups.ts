@@ -385,9 +385,13 @@ export type GroupAdminNewEventEmailInfo = {
     */
    eventDashboardLink: string
    /**
-    * Link to the public live stream event page in the platform
+    * Link to the public live stream event page in the next livestreams page filtered by the group
     */
    nextLivestreamsLink: string
+   /**
+    * Link to the public live stream event page in the general portal page
+    */
+   portalLink: string
 }
 
 export type FilterCompanyOptions = {

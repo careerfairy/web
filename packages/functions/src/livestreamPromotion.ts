@@ -1,5 +1,4 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { info, log } from "firebase-functions/logger"
 import { HttpsError, onRequest } from "firebase-functions/v2/https"
 import { onSchedule, ScheduleOptions } from "firebase-functions/v2/scheduler"
@@ -17,7 +16,6 @@ import { CUSTOMERIO_EMAIL_TEMPLATES } from "./lib/notifications/EmailTypes"
 const Promotion14Days = {
    templateId: CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_B2B_SOCIAL_SHARE_NUDGE,
    scheduleEmailDaysBefore: 14,
-   promotionUtmCampaign: "14day-promotion",
 } as const
 
 const scheduleOptions = {
@@ -156,8 +154,7 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
 
       // Get all group admin info for this stream
       const adminsInfo = await livestreamsRepo.getAllGroupAdminInfoByStream(
-         stream.id,
-         Promotion14Days.promotionUtmCampaign
+         stream.id
       )
 
       if (adminsInfo.length === 0) {
@@ -179,20 +176,14 @@ const sendPromotionEmailsForStream = async (stream: LivestreamEvent) => {
             templateId:
                CUSTOMERIO_EMAIL_TEMPLATES.LIVE_STREAM_B2B_SOCIAL_SHARE_NUDGE,
             templateData: {
-               dashboardUrl: addUtmTagsToLink({
-                  link: admin.eventDashboardLink,
-                  campaign: Promotion14Days.promotionUtmCampaign,
-               }),
+               dashboardUrl: admin.eventDashboardLink,
                livestream: {
                   company: stream.company,
                   companyLogoUrl: stream.companyLogoUrl,
                   companyBannerImageUrl:
                      group?.bannerImageUrl || stream.backgroundImageUrl,
                   title: stream.title,
-                  url: addUtmTagsToLink({
-                     link: admin.nextLivestreamsLink,
-                     campaign: Promotion14Days.promotionUtmCampaign,
-                  }),
+                  url: admin.portalLink,
                },
             },
             identifiers: {

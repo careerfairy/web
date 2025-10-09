@@ -209,7 +209,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
    getAllGroupAdminInfoByStream(
       streamId: string,
-      origin: string
+      origin?: string
    ): Promise<GroupAdminNewEventEmailInfo[]>
 
    /**
@@ -851,6 +851,7 @@ export class LivestreamFunctionsRepository
                email: adminData.email,
                eventDashboardLink: `${origin}/group/${groupId}/admin/events?eventId=${streamId}`,
                nextLivestreamsLink: `${origin}/next-livestreams/livestream/${streamId}?companyId=${groupId}`,
+               portalLink: `${origin}/portal/livestream/${streamId}`,
             })
          })
       }
