@@ -57,6 +57,7 @@ export const GetNotifiedCard = ({
 
    return (
       <AddToCalendar
+         event={livestream}
          events={registeredLivestreams}
          filename={`${livestream.company}-event`}
       >
