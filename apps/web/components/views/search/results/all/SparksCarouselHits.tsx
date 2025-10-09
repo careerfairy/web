@@ -12,7 +12,7 @@ import { SectionTitle } from "./SectionTitle"
 
 const styles = sxStyles({
    carouselSection: {
-      mb: 2,
+      mb: 4,
    },
 })
 
