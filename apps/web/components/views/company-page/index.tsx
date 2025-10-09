@@ -36,6 +36,7 @@ import { groupRepo } from "../../../data/RepositoryInstances"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { errorLogAndNotify, isTestEnvironment } from "../../../util/CommonUtil"
 import useListenToStreams from "../../custom-hook/useListenToStreams"
+import { CoffeeChatsSection } from "./CoffeeChatsSection"
 import Header from "./Header"
 import MediaSection from "./MediaSection"
 import NewsletterSection from "./NewsletterSection"
@@ -551,7 +552,10 @@ const CompanyPageOverview = ({
                   </Box>
                   {tabValue === TabValue.overview ? (
                      <Box mt={0} width={"100%"}>
-                        <MediaSection />
+                        <Stack spacing={2}>
+                           <CoffeeChatsSection />
+                           <MediaSection />
+                        </Stack>
                      </Box>
                   ) : null}
                </Stack>
