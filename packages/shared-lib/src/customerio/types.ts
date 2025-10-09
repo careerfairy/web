@@ -149,4 +149,7 @@ export interface CustomerIOLivestreamData {
    open_stream: boolean
    with_resume: boolean
    deny_recording_access: boolean
+
+   // Marketing & Automation
+   livestream_url: string
 }

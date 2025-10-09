@@ -5,6 +5,12 @@ import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { userRepo } from "../../api/repositories"
 import { ChangeType, getChangeTypeEnum } from "../../util"
+import {
+   createParticipationRelationship,
+   createRegistrationRelationship,
+   deleteParticipationRelationship,
+   deleteRegistrationRelationship,
+} from "../customerio/relationships"
 
 export const onUserRegistration = onDocumentWritten(
    {
@@ -23,21 +29,25 @@ export const onUserRegistration = onDocumentWritten(
       const oldUserLivestreamData =
          event.data.before.data() as UserLivestreamData
 
-      // on backfill, we don't need to check for registration changes, we need to update all documents
+      // Check for both registration and participation changes
       const registrationChanged = hasRegistrationChanged(
          oldUserLivestreamData,
          newUserLivestreamData
       )
+      const participationChanged = hasParticipationChanged(
+         oldUserLivestreamData,
+         newUserLivestreamData
+      )
 
-      if (!registrationChanged) {
+      if (!registrationChanged && !participationChanged) {
          logger.info(
-            `No registration change detected for live stream ${livestreamId} and user ${userEmail}`
+            `No registration or participation change detected for live stream ${livestreamId} and user ${userEmail}`
          )
          return
       }
 
       logger.info(
-         `Registration change detected for live stream ${livestreamId} and user ${userEmail}`
+         `Registration or participation change detected for live stream ${livestreamId} and user ${userEmail}`
       )
 
       try {
@@ -49,6 +59,14 @@ export const onUserRegistration = onDocumentWritten(
             )
             return
          }
+
+         // Track Customer.io relationship changes for registration and participation
+         await trackCustomerIORelationships(
+            livestreamId,
+            oldUserLivestreamData,
+            newUserLivestreamData,
+            userData
+         )
 
          const registeredLivestreamsRef = firestore()
             .collection("registeredLivestreams")
@@ -147,6 +165,16 @@ function hasRegistrationChanged(
    )
 }
 
+function hasParticipationChanged(
+   oldData: UserLivestreamData,
+   newData: UserLivestreamData
+): boolean {
+   return (
+      Boolean(oldData?.participated?.date) !==
+      Boolean(newData?.participated?.date)
+   )
+}
+
 function getOrCreateRegisteredLivestreams(
    doc: FirebaseFirestore.DocumentSnapshot,
    userData: UserData | undefined
@@ -198,4 +226,63 @@ function updateRegisteredLivestreams(
    )
 
    return updateData
+}
+
+/**
+ * Tracks Customer.io relationship changes for both registration and participation
+ * Creates or deletes relationships based on registration and participation states
+ */
+async function trackCustomerIORelationships(
+   livestreamId: string,
+   oldUserLivestreamData: UserLivestreamData | null,
+   newUserLivestreamData: UserLivestreamData,
+   userData: UserData
+): Promise<void> {
+   const userAuthId = userData.authId
+
+   try {
+      // Track registration relationship changes
+      const wasRegistered = Boolean(oldUserLivestreamData?.registered?.date)
+      const isRegistered = Boolean(newUserLivestreamData?.registered?.date)
+
+      if (!wasRegistered && isRegistered) {
+         // User just registered - create relationship
+         await createRegistrationRelationship(userAuthId, livestreamId)
+         logger.info(
+            `Created Customer.io registration relationship: user ${userAuthId} -> livestream ${livestreamId}`
+         )
+      } else if (wasRegistered && !isRegistered) {
+         // User unregistered - delete relationship
+         await deleteRegistrationRelationship(userAuthId, livestreamId)
+         logger.info(
+            `Deleted Customer.io registration relationship: user ${userAuthId} -> livestream ${livestreamId}`
+         )
+      }
+
+      // Track participation relationship changes
+      const wasParticipating = Boolean(
+         oldUserLivestreamData?.participated?.date
+      )
+      const isParticipating = Boolean(newUserLivestreamData?.participated?.date)
+
+      if (!wasParticipating && isParticipating) {
+         // User just participated - create relationship
+         await createParticipationRelationship(userAuthId, livestreamId)
+         logger.info(
+            `Created Customer.io participation relationship: user ${userAuthId} -> livestream ${livestreamId}`
+         )
+      } else if (wasParticipating && !isParticipating) {
+         // User stopped participating - delete relationship
+         await deleteParticipationRelationship(userAuthId, livestreamId)
+         logger.info(
+            `Deleted Customer.io participation relationship: user ${userAuthId} -> livestream ${livestreamId}`
+         )
+      }
+   } catch (error) {
+      // Log error but don't fail the entire registration process
+      logger.error(
+         `Failed to update Customer.io relationships for user ${userAuthId} and livestream ${livestreamId}:`,
+         error
+      )
+   }
 }

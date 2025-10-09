@@ -22,6 +22,7 @@ import {
    deleteObject as deleteCustomerIOObject,
    OBJECT_TYPES,
 } from "./objectsClient"
+import { deleteAllLivestreamRelationships } from "./relationships"
 import { CustomerIOWebhookEvent } from "./types"
 
 /**
@@ -232,13 +233,16 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
             }
 
             case ChangeType.DELETE: {
+               // Clean up all relationships before deleting the object
+               await deleteAllLivestreamRelationships(livestreamId)
+
                await deleteCustomerIOObject(
                   OBJECT_TYPES.LIVESTREAMS,
                   livestreamId
                )
 
                logger.info(
-                  `Successfully deleted livestream ${livestreamId} from CustomerIO`
+                  `Successfully deleted livestream ${livestreamId} and cleaned up relationships from CustomerIO`
                )
                break
             }

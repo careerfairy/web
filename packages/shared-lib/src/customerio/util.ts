@@ -5,6 +5,8 @@ import {
 import { Timestamp } from "../firebaseTypes"
 import { LivestreamEvent } from "../livestreams/livestreams"
 import { UserData } from "../users"
+import { addUtmTagsToLink } from "../utils"
+import { makeLivestreamEventDetailsUrl } from "../utils/urls"
 import { CustomerIOLivestreamData, CustomerIOUserData } from "./types"
 
 /**
@@ -184,15 +186,30 @@ export function transformLivestreamDataForCustomerIO(
       has_jobs: livestream.hasJobs,
       linked_custom_jobs_tag_ids: livestream.linkedCustomJobsTagIds,
 
-      // Engagement Metrics
-      impressions: livestream.impressions,
-      max_registrants: livestream.maxRegistrants,
-
       // Mode & Features
       is_panel: livestream.isPanel,
       panel_logo_url: livestream.panelLogoUrl,
       open_stream: livestream.openStream,
       with_resume: livestream.withResume,
       deny_recording_access: livestream.denyRecordingAccess,
+
+      // Marketing & Automation
+      livestream_url: generateLivestreamUrlWithUTM(livestream.id),
    }
+}
+
+/**
+ * Generates a full livestream URL with predefined UTM parameters for talent mail campaigns
+ * @param livestreamId The livestream identifier
+ * @returns Full URL with UTM parameters for Customer.io talent mail campaigns
+ */
+function generateLivestreamUrlWithUTM(livestreamId: string): string {
+   const baseUrl = makeLivestreamEventDetailsUrl(livestreamId)
+
+   return addUtmTagsToLink({
+      link: baseUrl,
+      source: "customerio",
+      medium: "email",
+      campaign: "talent_mail",
+   })
 }
