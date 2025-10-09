@@ -29,10 +29,6 @@ const styles = sxStyles({
 export const CoffeeChatsSection = () => {
    const { group } = useCompanyPage()
 
-   if (!group?.hasCoffeeChats) {
-      return null
-   }
-
    return (
       <Box sx={styles.banner}>
          <Stack spacing={2}>
