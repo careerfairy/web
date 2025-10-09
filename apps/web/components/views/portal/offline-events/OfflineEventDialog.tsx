@@ -242,6 +242,7 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
          <Dialog
             open={Boolean(event)}
             onClose={handleClose}
+            closeAfterTransition
             disablePortal
             TransitionComponent={
                isMobile ? SlideLeftTransition : SlideUpTransition
