@@ -474,30 +474,27 @@ export class LivestreamService {
          !userLivestreamDataSnapshot.data()?.participated?.date
 
       // Set the user Participating data in the userLivestreamData collection
-      batch.set(
-         userLivestreamDataRef,
-         {
-            user: userData,
-            userId: userData?.authId,
-            participated: {
+      const updateData: Partial<UserLivestreamData> = {
+         user: userData,
+         userId: userData?.authId,
+      }
+
+      // Only set participated data on first participation to preserve the original date
+      if (isFirstTimeParticipating) {
+         updateData.participated = {
+            date: Timestamp.now(),
+            initialSnapshot: {
+               userData: userData || null,
+               userStats: userStats || null,
                date: Timestamp.now(),
-               // If this is the first time the user is participating, we store the user stats
-               ...(isFirstTimeParticipating
-                  ? {
-                       initialSnapshot: {
-                          userData: userData || null,
-                          userStats: userStats || null,
-                          date: Timestamp.now(),
-                       },
-                       utm: CookiesUtil.getUTMParams(),
-                    }
-                  : {}),
             },
-         },
-         {
-            merge: true,
+            utm: CookiesUtil.getUTMParams(),
          }
-      )
+      }
+
+      batch.set(userLivestreamDataRef, updateData, {
+         merge: true,
+      })
 
       return batch.commit()
    }
