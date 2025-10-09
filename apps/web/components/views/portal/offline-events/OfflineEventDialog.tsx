@@ -161,6 +161,8 @@ const styles = sxStyles({
          )} 0%, ${alpha(theme.palette.common.white, 0.98)} 78%)`,
       display: "flex",
       justifyContent: "center",
+      width: "100%",
+      maxWidth: 570,
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
