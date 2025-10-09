@@ -10,6 +10,38 @@ import { makeLivestreamEventDetailsUrl } from "../utils/urls"
 import { CustomerIOLivestreamData, CustomerIOUserData } from "./types"
 
 /**
+ * Customer.io has a 1000 byte limit per property value
+ * We use a slightly lower limit to account for JSON encoding overhead
+ */
+const CUSTOMERIO_BYTE_LIMIT = 950
+
+/**
+ * Truncates a string to fit within the byte limit
+ */
+function truncateString(
+   str: string | undefined,
+   byteLimit: number
+): string | undefined {
+   if (!str) return str
+
+   const encoder = new TextEncoder()
+
+   // Check if already under limit
+   if (encoder.encode(str).length <= byteLimit) return str
+
+   // Simple iterative approach: remove characters until it fits
+   let truncated = str
+   while (
+      encoder.encode(truncated + "...").length > byteLimit &&
+      truncated.length > 0
+   ) {
+      truncated = truncated.slice(0, -1)
+   }
+
+   return truncated.length > 0 ? truncated + "..." : ""
+}
+
+/**
  * Converts a Firebase timestamp to Unix timestamp (seconds since epoch).
  * Uses Math.floor() as CustomerIO requires integer timestamps and does not accept decimal values.
  * @param timestamp Firebase timestamp
@@ -121,7 +153,8 @@ export function transformLivestreamDataForCustomerIO(
       // Basic Info
       livestream_id: livestream.id,
       title: livestream.title || "",
-      summary: livestream.summary,
+      name: livestream.title || "",
+      summary: truncateString(livestream.summary, CUSTOMERIO_BYTE_LIMIT),
       start_time: toUnixTimestamp(livestream.start),
       created_at: toUnixTimestamp(livestream.created),
       last_updated: toUnixTimestamp(livestream.lastUpdated),
@@ -161,7 +194,7 @@ export function transformLivestreamDataForCustomerIO(
       target_country_ids: livestream.targetCountries?.map((c) => c.id) || [],
       target_country_names:
          livestream.targetCountries?.map((c) => c.name) || [],
-      target_universities: livestream.targetUniversities || [],
+      target_university_ids: livestream.companyTargetedUniversities || [],
       target_field_of_study_ids:
          livestream.targetFieldsOfStudy?.map((f) => f.id) || [],
       target_field_of_study_names:

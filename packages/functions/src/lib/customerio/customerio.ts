@@ -158,12 +158,13 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
       concurrency: 1, // Process updates sequentially to avoid rate limit issues
    },
    async (event) => {
-      if (isLocalEnvironment()) {
-         logger.info(
-            "Skipping CustomerIO livestream sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
-         )
-         return
-      }
+      console.log("🚀 ~ 3")
+      // if (isLocalEnvironment()) {
+      //    logger.info(
+      //       "Skipping CustomerIO livestream sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
+      //    )
+      //    return
+      // }
 
       try {
          const changeType = getChangeTypeEnum(event)
