@@ -15,7 +15,7 @@ const styles = sxStyles({
       height: "auto",
       position: "relative",
       overflow: "hidden",
-      mx: { xs: 2, md: 0 },
+      mx: 0,
       display: "flex",
       flexDirection: "column",
       alignItems: { xs: "center", md: "flex-start" },
