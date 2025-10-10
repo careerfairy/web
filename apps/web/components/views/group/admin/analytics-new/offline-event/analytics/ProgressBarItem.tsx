@@ -25,6 +25,8 @@ const progressBarStyles = sxStyles({
    mobilePercentage: {
       textAlign: "right",
       lineHeight: "16px",
+      flexShrink: 0,
+      minWidth: "fit-content",
    },
    mobileProgressBar: {
       width: "100%",
