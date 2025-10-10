@@ -47,7 +47,7 @@ function truncateString(
  * @param timestamp Firebase timestamp
  */
 export function toUnixTimestamp(timestamp: Timestamp): number | undefined {
-   if (!timestamp) return undefined
+   if (!timestamp || typeof timestamp.toDate !== "function") return undefined
    return Math.floor(timestamp.toDate().getTime() / 1000)
 }
 
@@ -67,8 +67,8 @@ function formatDateForCustomerIO(date: Date): string {
 
 /**
  * Generates a descriptive name for Customer.io livestream objects
- * Format: "[Company] Title (Date)"
- * Example: "[OnLogic] Discover Our Internship Program (May 15, 2024)"
+ * Format: "Title [Company] (Date)"
+ * Example: "Discover Our Internship Program [OnLogic] (May 15, 2024)"
  * @param livestream The livestream event
  * @returns Formatted name string
  */
@@ -77,7 +77,7 @@ function generateLivestreamObjectName(livestream: LivestreamEvent): string {
    const title = livestream.title || "Untitled Event"
    const date = formatDateForCustomerIO(livestream.start?.toDate?.())
 
-   return `[${company}] ${title} (${date})`
+   return `${title} [${company}] (${date})`
 }
 
 /**
@@ -229,17 +229,11 @@ export function transformLivestreamDataForCustomerIO(
          livestream.contentTopicsTagIds
       ),
       target_country_ids: livestream.targetCountries?.map((c) => c.id) || [],
-      target_country_names:
-         livestream.targetCountries?.map((c) => c.name) || [],
       target_university_ids: livestream.companyTargetedUniversities || [],
       target_field_of_study_ids:
          livestream.targetFieldsOfStudy?.map((f) => f.id) || [],
-      target_field_of_study_names:
-         livestream.targetFieldsOfStudy?.map((f) => f.name) || [],
       target_level_of_study_ids:
          livestream.targetLevelsOfStudy?.map((l) => l.id) || [],
-      target_level_of_study_names:
-         livestream.targetLevelsOfStudy?.map((l) => l.name) || [],
 
       // Speakers
       speaker_names: speakerNames.length > 0 ? speakerNames : undefined,

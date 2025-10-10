@@ -130,12 +130,9 @@ export interface CustomerIOLivestreamData {
    content_topics_tag_ids: string[]
    content_topics_tag_names: string[]
    target_country_ids: string[]
-   target_country_names: string[]
    target_university_ids: string[]
    target_field_of_study_ids: string[]
-   target_field_of_study_names: string[]
    target_level_of_study_ids: string[]
-   target_level_of_study_names: string[]
 
    // Speakers
    speaker_names?: string[]
