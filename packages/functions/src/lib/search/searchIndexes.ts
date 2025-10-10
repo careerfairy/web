@@ -143,6 +143,7 @@ const customJobsIndex = {
    fields: removeDuplicates(CUSTOM_JOB_FIELDS_TO_INDEX),
    transformData: (data) => ({
       ...data,
+      groupCompanyName: data.group?.universityName ?? null,
       locationNameTags:
          data.jobLocation?.map((location) => location.name) ?? [],
       locationIdTags: data.jobLocation?.map((location) => location.id) ?? [],
