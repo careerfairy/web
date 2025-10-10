@@ -161,6 +161,7 @@ const styles = sxStyles({
          )} 0%, ${alpha(theme.palette.common.white, 0.98)} 78%)`,
       display: "flex",
       justifyContent: "center",
+      width: "100%",
    },
    dialogPaper: {
       ...NICE_SCROLLBAR_STYLES,
@@ -487,6 +488,7 @@ const Content = ({
                   color="primary"
                   size="large"
                   onClick={handleRegisterClick}
+                  sx={{ width: "100%", maxWidth: 570 }}
                >
                   Register to event
                </Button>
