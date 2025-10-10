@@ -145,7 +145,7 @@ type Props = {
  * UI for the user to answer the group questions and give consent
  */
 export const PanelsConsentView = ({ goToPrevious, handleSubmit }: Props) => {
-   const { registrationState, onRegisterSuccess } = useLiveStreamDialog()
+   const { registrationState } = useLiveStreamDialog()
    const { data: panels = [] } = useUpcomingPanelEventsSWR({
       // If users are already in the dialog, then they are allowed to see all panels
       disableCountryLimitation: true,
@@ -159,41 +159,49 @@ export const PanelsConsentView = ({ goToPrevious, handleSubmit }: Props) => {
 
    const { groupsWithPolicies } = registrationState
 
+   const shouldSkipMultiSelection = registrationState.shouldBypassMultiSelection
+
    const policiesToAccept = groupsWithPolicies?.length > 0
 
    const handleBack = useCallback(() => {
-      onRegisterSuccess ? undefined : goToPrevious()
-   }, [goToPrevious, onRegisterSuccess])
+      goToPrevious()
+   }, [goToPrevious])
 
    return (
       <>
          <Stack sx={styles.root}>
             <Box sx={styles.topLeftBar}>
-               <IconButton onClick={handleBack} sx={styles.backButton}>
-                  <ChevronLeft size={24} />
-               </IconButton>
+               {shouldSkipMultiSelection ? null : (
+                  <IconButton onClick={handleBack} sx={styles.backButton}>
+                     <ChevronLeft size={24} />
+                  </IconButton>
+               )}
             </Box>
 
             <Box sx={styles.centerContent}>
-               <Box sx={styles.header}>
-                  <Stack spacing={1} alignItems="center" width="100%">
-                     <Typography variant="brandedH2" sx={styles.title}>
-                        Ready to stand out this fall?
-                     </Typography>
-                     <Typography variant="medium" sx={styles.subtitle}>
-                        Two sessions to get you fully ready for this hiring
-                        season. Check your status below.
-                     </Typography>
-                  </Stack>
-               </Box>
+               {shouldSkipMultiSelection ? null : (
+                  <>
+                     <Box sx={styles.header}>
+                        <Stack spacing={1} alignItems="center" width="100%">
+                           <Typography variant="brandedH2" sx={styles.title}>
+                              Ready to stand out this fall?
+                           </Typography>
+                           <Typography variant="medium" sx={styles.subtitle}>
+                              Two sessions to get you fully ready for this
+                              hiring season. Check your status below.
+                           </Typography>
+                        </Stack>
+                     </Box>
 
-               <PanelSelectionGrid
-                  panels={panels}
-                  selectedLivestreams={selectedLivestreams}
-                  isLivestreamSelected={isLivestreamSelected}
-                  toggleLivestreamSelection={toggleLivestreamSelection}
-                  setLivestreamSelections={setLivestreamSelections}
-               />
+                     <PanelSelectionGrid
+                        panels={panels}
+                        selectedLivestreams={selectedLivestreams}
+                        isLivestreamSelected={isLivestreamSelected}
+                        toggleLivestreamSelection={toggleLivestreamSelection}
+                        setLivestreamSelections={setLivestreamSelections}
+                     />
+                  </>
+               )}
                {policiesToAccept ? (
                   <ConsentText groupsWithPolicies={groupsWithPolicies} />
                ) : null}
@@ -202,7 +210,10 @@ export const PanelsConsentView = ({ goToPrevious, handleSubmit }: Props) => {
             <Box sx={styles.ctaContainer}>
                <Button
                   fullWidth
-                  disabled={selectedLivestreams.length === 0}
+                  disabled={
+                     !shouldSkipMultiSelection &&
+                     selectedLivestreams.length === 0
+                  }
                   onClick={() => handleSubmit({})}
                   variant="contained"
                   size="medium"
