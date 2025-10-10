@@ -1,5 +1,5 @@
-import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/dist/groups/planConstants"
 import { Group, GroupPlanType } from "@careerfairy/shared-lib/groups/groups"
+import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 import {
    GroupPlanFetchStripeCustomerSession,
    StripeProductType,
