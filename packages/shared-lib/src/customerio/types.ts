@@ -45,6 +45,11 @@ export interface CustomerIOUserData {
    position: string
    spoken_languages: string[]
 
+   // Location Info
+   country_iso_code: string
+   state_iso_code: string
+   state_name: string
+
    // Interests & Preferences
    business_functions?: string[]
    content_topics: string[]

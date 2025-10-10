@@ -44,6 +44,11 @@ export function transformUserDataForCustomerIO(
       position: userData.position,
       spoken_languages: userData.spokenLanguages,
 
+      // Location Info
+      country_iso_code: userData.countryIsoCode,
+      state_iso_code: userData.stateIsoCode,
+      state_name: userData.stateName,
+
       // Interests & Preferences
       business_functions: userData.businessFunctionsTagIds,
       content_topics: userData.contentTopicsTagIds,
