@@ -23,9 +23,11 @@ export const Overview = ({ editMode }: Props) => {
    return (
       <Stack spacing={{ xs: 2, md: 3 }}>
          <AboutSection />
-         <Box display={{ xs: "block", md: "none" }}>
-            <CoffeeChatsSection />
-         </Box>
+         {Boolean(group.hasCoffeeChats) && (
+            <Box display={{ xs: "block", md: "none" }}>
+               <CoffeeChatsSection />
+            </Box>
+         )}
          {customJobs?.length ? <JobsSection /> : null}
          {group.publicSparks && group.hasSparks ? (
             <SparksSection key={group.id} groupId={group.id} />

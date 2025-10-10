@@ -1,4 +1,6 @@
 import { Box, Button, Stack, Typography } from "@mui/material"
+import { AnalyticsEvents } from "util/analyticsConstants"
+import { dataLayerEvent } from "util/analyticsUtils"
 import { useCompanyPage } from ".."
 import { sxStyles } from "../../../../types/commonTypes"
 
@@ -111,6 +113,14 @@ const styles = sxStyles({
 export const CoffeeChatsSection = () => {
    const { group } = useCompanyPage()
 
+   const handleClick = () => {
+      dataLayerEvent(AnalyticsEvents.CompanyPageCoffeeChatsClick, {
+         companyName: group.universityName,
+         companyId: group.id,
+      })
+      window.open("https://tally.so/r/mKqrbD", "_blank")
+   }
+
    return (
       <Box sx={styles.banner}>
          <Box sx={styles.textContent}>
@@ -122,7 +132,11 @@ export const CoffeeChatsSection = () => {
                   Join their upcoming coffee chat and get to know the team.
                </Typography>
                <Box>
-                  <Button variant="outlined" sx={styles.button}>
+                  <Button
+                     variant="outlined"
+                     sx={styles.button}
+                     onClick={handleClick}
+                  >
                      Book a chat
                   </Button>
                </Box>

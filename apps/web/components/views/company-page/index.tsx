@@ -553,9 +553,11 @@ const CompanyPageOverview = ({
                   {tabValue === TabValue.overview ? (
                      <Box mt={0} width={"100%"}>
                         <Stack spacing={2}>
-                           <Box display={{ xs: "none", md: "block" }}>
-                              <CoffeeChatsSection />
-                           </Box>
+                           {Boolean(group.hasCoffeeChats) && (
+                              <Box display={{ xs: "none", md: "block" }}>
+                                 <CoffeeChatsSection />
+                              </Box>
+                           )}
                            <MediaSection />
                         </Stack>
                      </Box>
