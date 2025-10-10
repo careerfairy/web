@@ -13,7 +13,7 @@ const styles = sxStyles({
       overflow: "hidden",
    },
    textContent: {
-      width: "40%",
+      width: "60%",
    },
    title: {
       color: (theme) => theme.brand.white[50],
@@ -22,12 +22,11 @@ const styles = sxStyles({
       color: (theme) => theme.brand.white[50],
    },
    button: {
-      backgroundColor: (theme) => theme.brand.tq[600],
       borderColor: (theme) => theme.brand.tq[600],
-      color: (theme) => theme.brand.white[50],
+      color: (theme) => theme.brand.tq[600],
       "&:hover": {
-         backgroundColor: (theme) => theme.brand.tq[700],
          borderColor: (theme) => theme.brand.tq[700],
+         backgroundColor: "rgba(42, 186, 165, 0.1)",
       },
    },
    backgroundImage: {
