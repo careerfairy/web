@@ -22,17 +22,25 @@ const styles = sxStyles({
       color: (theme) => theme.brand.white[50],
    },
    button: {
-      borderColor: (theme) => theme.brand.white[50],
+      backgroundColor: (theme) => theme.brand.tq[600],
+      borderColor: (theme) => theme.brand.tq[600],
       color: (theme) => theme.brand.white[50],
       "&:hover": {
-         borderColor: (theme) => theme.brand.white[50],
-         backgroundColor: "rgba(255, 255, 255, 0.1)",
+         backgroundColor: (theme) => theme.brand.tq[700],
+         borderColor: (theme) => theme.brand.tq[700],
       },
    },
    backgroundImage: {
       position: "absolute",
       right: "-166px",
       top: 0,
+      bottom: 0,
+      pointerEvents: "none",
+   },
+   modelImage: {
+      position: "absolute",
+      height: "100%",
+      right: "-20px",
       bottom: 0,
       pointerEvents: "none",
    },
@@ -63,6 +71,12 @@ export const CoffeeChatsSection = () => {
             src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/CoffeeChats%2FCoffee-chat-star-background.svg?alt=media&token=d7387610-9b53-485c-956a-7deddd3b296e"
             alt=""
             sx={styles.backgroundImage}
+         />
+         <Box
+            component="img"
+            src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/CoffeeChats%2Fcoffee-chats-girl-model.webp?alt=media&token=34428295-c744-48fc-a7e9-cc57c9c5c593"
+            alt=""
+            sx={styles.modelImage}
          />
       </Box>
    )
