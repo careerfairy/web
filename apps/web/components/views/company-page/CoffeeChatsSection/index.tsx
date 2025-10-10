@@ -11,9 +11,10 @@ const styles = sxStyles({
       height: "auto",
       position: "relative",
       overflow: "hidden",
+      mx: { xs: 2, md: 0 },
    },
    textContent: {
-      width: "60%",
+      width: { xs: "100%", md: "60%" },
    },
    title: {
       color: (theme) => theme.brand.white[50],
@@ -33,17 +34,17 @@ const styles = sxStyles({
    },
    backgroundImage: {
       position: "absolute",
-      right: "-166px",
+      right: "-120px",
       top: 0,
       bottom: 0,
       pointerEvents: "none",
    },
    modelImage: {
-      position: { xs: "relative", md: "absolute" },
+      position: { xs: "fixed", md: "absolute" },
       height: { xs: "auto", md: "100%" },
       right: { xs: "auto", md: "-20px" },
       bottom: { xs: "auto", md: 0 },
-      display: { xs: "none", md: "block" },
+      display: "block",
       pointerEvents: "none",
    },
 })
