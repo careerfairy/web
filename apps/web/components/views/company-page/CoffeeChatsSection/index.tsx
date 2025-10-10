@@ -17,6 +17,7 @@ const styles = sxStyles({
    },
    title: {
       color: (theme) => theme.brand.white[50],
+      fontWeight: 600,
    },
    description: {
       color: (theme) => theme.brand.white[50],
@@ -25,8 +26,9 @@ const styles = sxStyles({
       borderColor: (theme) => theme.brand.tq[600],
       color: (theme) => theme.brand.tq[600],
       "&:hover": {
-         borderColor: (theme) => theme.brand.tq[700],
-         backgroundColor: "rgba(42, 186, 165, 0.1)",
+         backgroundColor: (theme) => theme.brand.tq[50],
+         borderColor: (theme) => theme.brand.tq[600],
+         color: (theme) => theme.brand.tq[600],
       },
    },
    backgroundImage: {
@@ -37,10 +39,11 @@ const styles = sxStyles({
       pointerEvents: "none",
    },
    modelImage: {
-      position: "absolute",
-      height: "100%",
-      right: "-20px",
-      bottom: 0,
+      position: { xs: "relative", md: "absolute" },
+      height: { xs: "auto", md: "100%" },
+      right: { xs: "auto", md: "-20px" },
+      bottom: { xs: "auto", md: 0 },
+      display: { xs: "none", md: "block" },
       pointerEvents: "none",
    },
 })
@@ -52,7 +55,7 @@ export const CoffeeChatsSection = () => {
       <Box sx={styles.banner}>
          <Box sx={styles.textContent}>
             <Stack spacing={2}>
-               <Typography variant="desktopBrandedH5" sx={styles.title}>
+               <Typography variant="brandedH5" sx={styles.title}>
                   Want to meet {group.universityName}?
                </Typography>
                <Typography variant="brandedBody" sx={styles.description}>
