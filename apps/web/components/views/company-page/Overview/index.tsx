@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCompanyPage } from ".."
 import AboutSection from "../AboutSection"
