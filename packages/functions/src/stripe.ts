@@ -137,7 +137,7 @@ export const fetchStripePrice = onCall(
          )
 
          try {
-            return await stripeRepo.stripe.prices.retrieve(request.data.priceId)
+            return await stripeRepo.retrievePrice(request.data.priceId)
          } catch (error) {
             logAndThrow("Error while retrieving Stripe price by ID", {
                error,
@@ -162,22 +162,11 @@ export const fetchStripeSessionStatus = onCall(
             request.data.sessionId
          )
 
-         // TODO: This should be done using the stripeRepo
          try {
-            const session = await stripeRepo.stripe.checkout.sessions.retrieve(
+            const session = await stripeRepo.retrieveCheckoutSession(
                request.data.sessionId
             )
-            const customer = await stripeRepo.stripe.customers.retrieve(
-               session.customer as string
-            )
-
-            if (customer.deleted) {
-               logAndThrow("Customer is deleted", {
-                  customer,
-                  session,
-                  request,
-               })
-            }
+            await stripeRepo.retrieveCustomer(session.customer as string)
 
             return {
                status: session.status,
@@ -213,9 +202,9 @@ export const stripeWebHook = onRequest(
          let event: Stripe.Event = null
 
          try {
-            event = Stripe.webhooks.constructEvent(
+            event = stripeRepo.constructWebhookEvent(
                buffer,
-               signature,
+               signature as string,
                webhookSecret
             )
 
