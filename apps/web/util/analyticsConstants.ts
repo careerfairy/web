@@ -165,6 +165,9 @@ export const AnalyticsEvents = {
 
    // Value Scoring
    Purchase: "Purchase",
+
+   // Coffee Chats
+   CompanyPageCoffeeChatsClick: "company_page_coffee_chats_click",
 } as const
 
 export type AnalyticsEvent =
