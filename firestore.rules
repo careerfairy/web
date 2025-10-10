@@ -500,8 +500,15 @@ service cloud.firestore {
         }
 
         match /offlineEvents/{offlineEvent} {
+            function isOfflineEventGroupAdmin() {
+                // For create operations, use request.resource.data
+                // For update/delete operations, use get() to fetch the document
+                return (resource == null && isAdminOfGroup(request.resource.data.group.id)) ||
+                       (resource != null && isAdminOfGroup(get(/databases/$(database)/documents/offlineEvents/$(offlineEvent)).data.group.id));
+            }
+
             allow read: if true;
-            allow write: if isAdminOfGroup(get(/databases/$(database)/documents/offlineEvents/$(offlineEvent)).data.group.id) || isCFAdmin();
+            allow write: if isOfflineEventGroupAdmin() || isCFAdmin();
 
             // Sub-collection for user stats
             match /offlineEventUserStats/{userAuthId} {
