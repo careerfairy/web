@@ -30,15 +30,22 @@ export interface IStripeFunctionsRepository {
    getTotalQuantityFromCheckoutSessionById(sessionId: string): Promise<number>
 
    getTotalQuantityFromCheckoutSession(session: Stripe.Checkout.Session): number
-   stripe: Stripe
+
+   retrievePrice(priceId: string): Promise<Stripe.Price>
+
+   retrieveCheckoutSession(sessionId: string): Promise<Stripe.Checkout.Session>
+
+   retrieveCustomer(customerId: string): Promise<Stripe.Customer>
+
+   constructWebhookEvent(
+      payload: string | Buffer,
+      signature: string,
+      secret: string
+   ): Stripe.Event
 }
 
 export class StripeFunctionsRepository implements IStripeFunctionsRepository {
    constructor(private _stripe: Stripe) {}
-
-   get stripe(): Stripe {
-      return this._stripe
-   }
 
    async createCheckoutSession<T extends BaseStripeSessionMetadata>(
       options: CreateCheckoutSessionParams<T>
@@ -125,5 +132,31 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
       const lineItems = session.line_items?.data || []
 
       return lineItems.reduce((acc, item) => acc + (item.quantity || 0), 0)
+   }
+
+   async retrievePrice(priceId: string): Promise<Stripe.Price> {
+      return this._stripe.prices.retrieve(priceId)
+   }
+
+   async retrieveCheckoutSession(
+      sessionId: string
+   ): Promise<Stripe.Checkout.Session> {
+      return this._stripe.checkout.sessions.retrieve(sessionId)
+   }
+
+   async retrieveCustomer(customerId: string): Promise<Stripe.Customer> {
+      const customer = await this._stripe.customers.retrieve(customerId)
+      if (customer.deleted) {
+         throw new Error(`Customer ${customerId} has been deleted`)
+      }
+      return customer as Stripe.Customer
+   }
+
+   constructWebhookEvent(
+      payload: string | Buffer,
+      signature: string,
+      secret: string
+   ): Stripe.Event {
+      return Stripe.webhooks.constructEvent(payload, signature, secret)
    }
 }
