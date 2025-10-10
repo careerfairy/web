@@ -1,5 +1,6 @@
 import useSWR, { SWRConfiguration } from "swr"
 
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import { Group, GroupPlanType } from "@careerfairy/shared-lib/groups"
 import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
 import { useMemo } from "react"
@@ -62,7 +63,7 @@ const useStripeCustomerSession = (
       userEmail,
    ])
    const { data, isLoading, error } = useSWR(
-      ["fetchStripeCustomerSession", options],
+      [FUNCTION_NAMES.fetchStripeCustomerSession, options],
       fetcher,
       swrOptions
    )
