@@ -1,15 +1,17 @@
+import { toUnixTimestamp } from "@careerfairy/shared-lib/customerio"
 import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { RegisteredLivestreams, UserData } from "@careerfairy/shared-lib/users"
-import { firestore } from "firebase-admin"
+import * as admin from "firebase-admin"
+import { FieldValue } from "firebase-admin/firestore"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { userRepo } from "../../api/repositories"
 import { ChangeType, getChangeTypeEnum } from "../../util"
 import {
-   createParticipationRelationship,
-   createRegistrationRelationship,
-   deleteParticipationRelationship,
-   deleteRegistrationRelationship,
+   clearParticipationData,
+   clearRegistrationData,
+   updateParticipationData,
+   updateRegistrationData,
 } from "../customerio/relationships"
 
 export const onUserRegistration = onDocumentWritten(
@@ -68,7 +70,8 @@ export const onUserRegistration = onDocumentWritten(
             userData
          )
 
-         const registeredLivestreamsRef = firestore()
+         const registeredLivestreamsRef = admin
+            .firestore()
             .collection("registeredLivestreams")
             .doc(userData.authId)
 
@@ -130,7 +133,8 @@ export const syncUserInRegisteredLivestreams = onDocumentWritten(
                return null
             }
 
-            const registeredLivestreamsRef = firestore()
+            const registeredLivestreamsRef = admin
+               .firestore()
                .collection("registeredLivestreams")
                .doc(newUserData.authId)
 
@@ -214,8 +218,7 @@ function updateRegisteredLivestreams(
          `User ${newUserLivestreamData.userId} registered for live stream ${livestreamId}`
       )
    } else {
-      updateData[`registeredLivestreams.${livestreamId}`] =
-         firestore.FieldValue.delete()
+      updateData[`registeredLivestreams.${livestreamId}`] = FieldValue.delete()
       logger.info(
          `User ${newUserLivestreamData.userId} unregistered from live stream ${livestreamId}`
       )
@@ -230,7 +233,7 @@ function updateRegisteredLivestreams(
 
 /**
  * Tracks Customer.io relationship changes for both registration and participation
- * Creates or deletes relationships based on registration and participation states
+ * Updates or clears specific attribute sets while preserving the relationship for future attributes
  */
 async function trackCustomerIORelationships(
    livestreamId: string,
@@ -241,41 +244,52 @@ async function trackCustomerIORelationships(
    const userAuthId = userData.authId
 
    try {
-      // Track registration relationship changes
+      // Track registration and participation changes
       const wasRegistered = Boolean(oldUserLivestreamData?.registered?.date)
       const isRegistered = Boolean(newUserLivestreamData?.registered?.date)
-
-      if (!wasRegistered && isRegistered) {
-         // User just registered - create relationship
-         await createRegistrationRelationship(userAuthId, livestreamId)
-         logger.info(
-            `Created Customer.io registration relationship: user ${userAuthId} -> livestream ${livestreamId}`
-         )
-      } else if (wasRegistered && !isRegistered) {
-         // User unregistered - delete relationship
-         await deleteRegistrationRelationship(userAuthId, livestreamId)
-         logger.info(
-            `Deleted Customer.io registration relationship: user ${userAuthId} -> livestream ${livestreamId}`
-         )
-      }
-
-      // Track participation relationship changes
       const wasParticipating = Boolean(
          oldUserLivestreamData?.participated?.date
       )
       const isParticipating = Boolean(newUserLivestreamData?.participated?.date)
 
-      if (!wasParticipating && isParticipating) {
-         // User just participated - create relationship
-         await createParticipationRelationship(userAuthId, livestreamId)
+      // Handle registration changes
+      if (!wasRegistered && isRegistered) {
+         // User just registered - add registration data
+         await updateRegistrationData(userAuthId, livestreamId, {
+            registeredAt: toUnixTimestamp(
+               newUserLivestreamData.registered?.date
+            ),
+            utm: newUserLivestreamData.registered?.utm,
+            originSource: newUserLivestreamData.registered?.originSource,
+         })
          logger.info(
-            `Created Customer.io participation relationship: user ${userAuthId} -> livestream ${livestreamId}`
+            `Updated Customer.io registration data: user ${userAuthId} -> livestream ${livestreamId}`
+         )
+      } else if (wasRegistered && !isRegistered) {
+         // User deregistered - clear registration attributes
+         await clearRegistrationData(userAuthId, livestreamId)
+         logger.info(
+            `Cleared Customer.io registration data: user ${userAuthId} -> livestream ${livestreamId}`
+         )
+      }
+
+      // Handle participation changes
+      if (!wasParticipating && isParticipating) {
+         // User just participated - add participation data
+         await updateParticipationData(userAuthId, livestreamId, {
+            participatedAt: toUnixTimestamp(
+               newUserLivestreamData.participated?.date
+            ),
+            utm: newUserLivestreamData.participated?.utm,
+         })
+         logger.info(
+            `Updated Customer.io participation data: user ${userAuthId} -> livestream ${livestreamId}`
          )
       } else if (wasParticipating && !isParticipating) {
-         // User stopped participating - delete relationship
-         await deleteParticipationRelationship(userAuthId, livestreamId)
+         // User stopped participating - clear participation attributes
+         await clearParticipationData(userAuthId, livestreamId)
          logger.info(
-            `Deleted Customer.io participation relationship: user ${userAuthId} -> livestream ${livestreamId}`
+            `Cleared Customer.io participation data: user ${userAuthId} -> livestream ${livestreamId}`
          )
       }
    } catch (error) {

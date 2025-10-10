@@ -183,6 +183,7 @@ export function transformLivestreamDataForCustomerIO(
 
    return {
       // Basic Info
+      id: livestream.id,
       livestream_id: livestream.id,
       title: livestream.title || "",
       /**

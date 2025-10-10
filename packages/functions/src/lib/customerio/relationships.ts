@@ -1,19 +1,41 @@
+import { UTMParams } from "@careerfairy/shared-lib/commonTypes"
+import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
 import axios from "axios"
 import { logger } from "firebase-functions"
 import { isLocalEnvironment, isTestEnvironment } from "../../util"
 import { OBJECT_TYPES } from "./objectsClient"
 
 /**
- * Relationship types between users and livestream objects in Customer.io
- * These IDs are used to categorize different types of user-livestream interactions
+ * Customer.io Livestream Relationships
+ *
+ * IMPORTANT: Customer.io maintains ONE relationship between a user and a livestream,
+ * identified by userAuthId + livestreamId. There are no separate relationship types.
+ *
+ * All data is preserved through prefixed attributes:
+ * - registered_at, registration_utm, registration_origin_source
+ * - participated_at, participation_utm
+ *
+ * The presence of these attributes indicates the user's interaction history.
  */
-export const RELATIONSHIP_TYPES = {
-   REGISTERED_TO_LIVESTREAM: 2,
-   PARTICIPATED_IN_LIVESTREAM: 3,
-} as const
 
-type RelationshipTypeId =
-   (typeof RELATIONSHIP_TYPES)[keyof typeof RELATIONSHIP_TYPES]
+/**
+ * Additional context data for registration relationships
+ * Note: registeredAt should be a Unix timestamp (seconds since epoch)
+ */
+export interface RegistrationRelationshipData {
+   registeredAt?: number
+   utm?: UTMParams
+   originSource?: ImpressionLocation
+}
+
+/**
+ * Additional context data for participation relationships
+ * Note: participatedAt should be a Unix timestamp (seconds since epoch)
+ */
+export interface ParticipationRelationshipData {
+   participatedAt?: number
+   utm?: UTMParams
+}
 
 const getApiCredentials = () => {
    let siteId = process.env.CUSTOMERIO_SITE_ID
@@ -30,21 +52,22 @@ const getApiCredentials = () => {
 const CUSTOMERIO_TRACK_API_URL = "https://track-eu.customer.io"
 
 /**
- * Creates a relationship between a user and a livestream object in Customer.io
+ * Creates or updates a relationship between a user and a livestream object in Customer.io
  * This enables segmentation based on user interactions with specific livestreams
  *
  * @param userAuthId The user's authentication ID (used as Customer.io user identifier)
  * @param livestreamId The livestream identifier
- * @param relationshipType The type of relationship (registered, participated, etc.)
+ * @param attributes Attributes to attach to the relationship (registered_at, participated_at, utm data, etc.)
  */
 export async function createUserLivestreamRelationship(
    userAuthId: string,
    livestreamId: string,
-   relationshipType: RelationshipTypeId
+   attributes?: Record<string, any>
 ): Promise<void> {
    if (isTestEnvironment()) {
       logger.info(
-         `[TEST] Would create Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId} (type: ${relationshipType})`
+         `[TEST] Would create Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`,
+         attributes
       )
       return
    }
@@ -59,23 +82,28 @@ export async function createUserLivestreamRelationship(
    const auth = Buffer.from(`${siteId}:${apiKey}`).toString("base64")
 
    logger.info(
-      `Creating Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId} (type: ${relationshipType})`
+      `🔥 Creating Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`,
+      attributes
    )
 
    try {
       await axios.post(
          url,
          {
-            type: "object_relationship",
-            action: "create",
+            type: "person",
+            action: "add_relationships",
             identifiers: {
-               user_id: userAuthId,
-               object_type_id: OBJECT_TYPES.LIVESTREAMS,
-               object_id: livestreamId,
+               id: userAuthId,
             },
-            attributes: {
-               type_id: relationshipType,
-            },
+            cio_relationships: [
+               {
+                  identifiers: {
+                     object_type_id: OBJECT_TYPES.LIVESTREAMS,
+                     object_id: livestreamId,
+                  },
+                  relationship_attributes: attributes || {},
+               },
+            ],
          },
          {
             headers: {
@@ -84,20 +112,19 @@ export async function createUserLivestreamRelationship(
             },
          }
       )
-
       logger.info(
-         `Successfully created Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId} (type: ${relationshipType})`
+         `Successfully created Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`
       )
    } catch (error) {
       logger.error(
-         `Failed to create Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId} (type: ${relationshipType})`,
+         `Failed to create Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`,
          {
             error: error?.message,
             response: error?.response?.data,
             status: error?.response?.status,
             userAuthId,
             livestreamId,
-            relationshipType,
+            attributes,
          }
       )
       throw error
@@ -105,20 +132,18 @@ export async function createUserLivestreamRelationship(
 }
 
 /**
- * Deletes a specific relationship between a user and a livestream object in Customer.io
+ * Deletes the relationship between a user and a livestream object in Customer.io
  *
  * @param userAuthId The user's authentication ID
  * @param livestreamId The livestream identifier
- * @param relationshipType The type of relationship to delete
  */
 export async function deleteUserLivestreamRelationship(
    userAuthId: string,
-   livestreamId: string,
-   relationshipType: RelationshipTypeId
+   livestreamId: string
 ): Promise<void> {
    if (isTestEnvironment()) {
       logger.info(
-         `[TEST] Would delete Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId} (type: ${relationshipType})`
+         `[TEST] Would delete Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`
       )
       return
    }
@@ -133,46 +158,51 @@ export async function deleteUserLivestreamRelationship(
    const auth = Buffer.from(`${siteId}:${apiKey}`).toString("base64")
 
    try {
-      await axios.delete(url, {
-         headers: {
-            Authorization: `Basic ${auth}`,
-            "Content-Type": "application/json",
-         },
-         data: {
-            type: "object_relationship",
-            action: "delete",
+      await axios.post(
+         url,
+         {
+            type: "person",
+            action: "delete_relationships",
             identifiers: {
-               user_id: userAuthId,
-               object_type_id: OBJECT_TYPES.LIVESTREAMS,
-               object_id: livestreamId,
+               id: userAuthId,
             },
-            attributes: {
-               type_id: relationshipType,
-            },
+            cio_relationships: [
+               {
+                  identifiers: {
+                     object_type_id: OBJECT_TYPES.LIVESTREAMS,
+                     object_id: livestreamId,
+                  },
+               },
+            ],
          },
-      })
+         {
+            headers: {
+               Authorization: `Basic ${auth}`,
+               "Content-Type": "application/json",
+            },
+         }
+      )
 
       logger.info(
-         `Successfully deleted Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId} (type: ${relationshipType})`
+         `Successfully deleted Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`
       )
    } catch (error) {
       // 404 errors are ok - relationship doesn't exist
       if (error?.response?.status === 404) {
          logger.info(
-            `Customer.io relationship doesn't exist: user ${userAuthId} -> livestream ${livestreamId} (type: ${relationshipType}), skipping deletion`
+            `Customer.io relationship doesn't exist: user ${userAuthId} -> livestream ${livestreamId}, skipping deletion`
          )
          return
       }
 
       logger.error(
-         `Failed to delete Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId} (type: ${relationshipType})`,
+         `Failed to delete Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`,
          {
             error: error?.message,
             response: error?.response?.data,
             status: error?.response?.status,
             userAuthId,
             livestreamId,
-            relationshipType,
          }
       )
       throw error
@@ -210,57 +240,80 @@ export async function deleteAllLivestreamRelationships(
 }
 
 /**
- * Helper function to create a registration relationship
+ * Helper function to update registration data on a livestream relationship
+ * Uses prefixed attribute names to preserve any existing participation data
+ * @param userAuthId The user's authentication ID
+ * @param livestreamId The livestream identifier
+ * @param data Optional registration data (timestamp, UTM, origin)
  */
-export async function createRegistrationRelationship(
+export async function updateRegistrationData(
    userAuthId: string,
-   livestreamId: string
+   livestreamId: string,
+   data?: RegistrationRelationshipData
 ): Promise<void> {
-   return createUserLivestreamRelationship(
-      userAuthId,
-      livestreamId,
-      RELATIONSHIP_TYPES.REGISTERED_TO_LIVESTREAM
-   )
+   const attributes: Record<string, any> = {}
+
+   if (data?.registeredAt) attributes.registered_at = data.registeredAt
+   if (data?.utm) attributes.registration_utm = data.utm
+   if (data?.originSource)
+      attributes.registration_origin_source = data.originSource
+
+   return createUserLivestreamRelationship(userAuthId, livestreamId, attributes)
 }
 
 /**
- * Helper function to create a participation relationship
+ * Helper function to update participation data on a livestream relationship
+ * Uses prefixed attribute names to preserve any existing registration data
+ * @param userAuthId The user's authentication ID
+ * @param livestreamId The livestream identifier
+ * @param data Optional participation data (timestamp, UTM)
  */
-export async function createParticipationRelationship(
+export async function updateParticipationData(
    userAuthId: string,
-   livestreamId: string
+   livestreamId: string,
+   data?: ParticipationRelationshipData
 ): Promise<void> {
-   return createUserLivestreamRelationship(
-      userAuthId,
-      livestreamId,
-      RELATIONSHIP_TYPES.PARTICIPATED_IN_LIVESTREAM
-   )
+   const attributes: Record<string, any> = {}
+
+   if (data?.participatedAt) attributes.participated_at = data.participatedAt
+   if (data?.utm) attributes.participation_utm = data.utm
+
+   return createUserLivestreamRelationship(userAuthId, livestreamId, attributes)
 }
 
 /**
- * Helper function to delete a registration relationship
+ * Helper function to clear registration data from a livestream relationship
+ * Sets registration attributes to null while preserving participation data
+ * @param userAuthId The user's authentication ID
+ * @param livestreamId The livestream identifier
  */
-export async function deleteRegistrationRelationship(
+export async function clearRegistrationData(
    userAuthId: string,
    livestreamId: string
 ): Promise<void> {
-   return deleteUserLivestreamRelationship(
-      userAuthId,
-      livestreamId,
-      RELATIONSHIP_TYPES.REGISTERED_TO_LIVESTREAM
-   )
+   const attributes: Record<string, any> = {
+      registered_at: null,
+      registration_utm: null,
+      registration_origin_source: null,
+   }
+
+   return createUserLivestreamRelationship(userAuthId, livestreamId, attributes)
 }
 
 /**
- * Helper function to delete a participation relationship
+ * Helper function to clear participation data from a livestream relationship
+ * Sets participation attributes to null while preserving registration data
+ * @param userAuthId The user's authentication ID
+ * @param livestreamId The livestream identifier
  */
-export async function deleteParticipationRelationship(
+export async function clearParticipationData(
    userAuthId: string,
    livestreamId: string
 ): Promise<void> {
-   return deleteUserLivestreamRelationship(
-      userAuthId,
-      livestreamId,
-      RELATIONSHIP_TYPES.PARTICIPATED_IN_LIVESTREAM
-   )
+   const attributes: Record<string, any> = {
+      participated_at: null,
+      participation_utm: null,
+   }
+
+   return createUserLivestreamRelationship(userAuthId, livestreamId, attributes)
 }

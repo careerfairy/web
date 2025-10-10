@@ -68,11 +68,30 @@ export interface CustomerIOUserData {
 }
 
 /**
+ * Type definition for User-Livestream Relationship attributes in Customer.io
+ * These attributes are attached to the relationship between a user and a livestream object
+ *
+ * Note: Customer.io maintains ONE relationship per user-livestream pair. When a user
+ * both registers and participates, the attributes are merged (not duplicated).
+ */
+export interface CustomerIOLivestreamRelationshipAttributes {
+   // Registration data
+   registered_at?: number // Unix timestamp
+   registration_origin_source?: string // Where the registration came from (e.g., "portal-past-livestreams-carousel")
+   registration_utm?: UTMParams // UTM parameters at time of registration
+
+   // Participation data
+   participated_at?: number // Unix timestamp
+   participation_utm?: UTMParams // UTM parameters at time of participation
+}
+
+/**
  * Type definition for Livestream data sent to Customer.io
  * Represents livestream objects that can be used for segmentation and personalization
  */
 export interface CustomerIOLivestreamData {
    // Basic Info
+   id: string
    livestream_id: string
    title: string
    /**
