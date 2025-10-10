@@ -99,12 +99,19 @@ const getCheckoutData = (
    group: Group,
    userEmail: string
 ): OfflineEventFetchStripeCustomerSession => {
+   console.log(
+      "🚀 ~ getCheckoutData ~  process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID:",
+      process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID
+   )
+
    return {
       type: StripeProductType.OFFLINE_EVENT,
       customerName: group.universityName,
       customerEmail: userEmail,
       groupId: group.groupId,
-      priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID,
+      priceId:
+         process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID ||
+         "price_1SFGClKcrPDGIq6mIh1P8EH4", // TODO: Remove test price id
       successUrl: "/offline-event-success", // TODO: Update to the correct URL
    }
 }
