@@ -164,3 +164,9 @@ export const useAutoplayState = () =>
 
 export const useRtcConnectionState = () =>
    useAppSelector((state) => state.streamingApp.rtcState.connectionState)
+
+export const useIsPanel = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.isPanel)
+
+export const useLivestreamGroupIds = () =>
+   useAppSelector((state) => state.streamingApp.livestreamState.groupIds)

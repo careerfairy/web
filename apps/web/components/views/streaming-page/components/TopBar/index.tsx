@@ -3,7 +3,7 @@ import { Box, Stack, StackProps } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ReactNode } from "react"
-import { useIsSpyMode } from "store/selectors/streamingAppSelectors"
+import { useIsPanel, useIsSpyMode } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context/Streaming"
 import { CallsToActionButton } from "./CallsToActionButton"
@@ -96,6 +96,7 @@ const HostView = () => {
 
 const ViewerView = () => {
    const { shouldStream } = useStreamingContext()
+   const isPanel = useIsPanel()
 
    return (
       <StackComponent justifyContent="flex-end">
@@ -105,7 +106,7 @@ const ViewerView = () => {
          <CallsToActionButton />
          {shouldStream ? <ConnectionStatus /> : null}
          <CompanyButton />
-         <CheckJobsButton />
+         {isPanel ? null : <CheckJobsButton />}
       </StackComponent>
    )
 }
@@ -133,5 +134,5 @@ type MarginBoxProps = {
 const MarginBox = ({ children }: MarginBoxProps) => {
    const isNarrow = useIsMobile(TOOLBAR_WRAP_BREAKPOINT)
 
-   return <Box mr={isNarrow ? 0 : "auto !important"}>{children}</Box>
+   return <Box mr={isNarrow ? "auto !important" : 0}>{children}</Box>
 }

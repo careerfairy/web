@@ -82,6 +82,8 @@ const LivestreamValidationsComponent = ({
       isLoggedOut &&
       !(livestream.test || livestream.openStream || isRecordingWindow)
 
+   const shouldBypassMultiSelection = Boolean(livestream?.isPanel)
+
    useConditionalRedirect(isInvalidToken, "/streaming/error")
 
    if (needsToBeLoggedIn) {
@@ -112,6 +114,7 @@ const LivestreamValidationsComponent = ({
             mode="stand-alone"
             onRegisterSuccess={afterRegistrationMutations}
             providedOriginSource={`event-room-${livestream.id}`}
+            shouldBypassMultiSelection={shouldBypassMultiSelection}
          />
       )
    }
