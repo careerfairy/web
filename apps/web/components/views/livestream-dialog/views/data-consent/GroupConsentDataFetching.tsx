@@ -100,11 +100,10 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
          const hasAnsweredAllQuestions =
             checkIfUserHasAnsweredAllLivestreamGroupQuestions(answers)
 
-         // Always render consent view for panels, even if no questions/policies
          const shouldSkipConsentView =
             hasAgreedToAll &&
             hasAnsweredAllQuestions &&
-            !livestreamRef.current?.isPanel
+            registrationState.shouldBypassMultiSelection
 
          if (shouldSkipConsentView) {
             switch (registrationStatus()) {
@@ -173,6 +172,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
       registrationStatus,
       hasRegistered,
       selectedLivestreams,
+      onRegisterSuccess,
    ])
 
    // mark user as registered to any livestream

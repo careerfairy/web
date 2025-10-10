@@ -11,8 +11,10 @@ import {
    setHandRaiseEnabled,
    setHasEnded,
    setHasJobs,
+   setIsPanel,
    setIsRecordingWindow,
    setIsSpyMode,
+   setLivestreamGroupIds,
    setLivestreamMode,
    setNumberOfParticipants,
    setOpenStream,
@@ -128,6 +130,11 @@ export const LivestreamStateTrackers = (): null => {
          dispatch(setIsSpyMode(Boolean(query.spy)))
       }
    }, [dispatch, query.spy, userData?.isAdmin])
+
+   useEffect(() => {
+      dispatch(setIsPanel(Boolean(livestream.isPanel)))
+      dispatch(setLivestreamGroupIds(livestream.groupIds ?? []))
+   }, [dispatch, livestream.isPanel, livestream.groupIds])
 
    // Clean up the state on unmount
    useEffect(() => {
