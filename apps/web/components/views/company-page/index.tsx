@@ -551,9 +551,11 @@ const CompanyPageOverview = ({
                      </Box>
                   </Box>
                   {tabValue === TabValue.overview ? (
-                     <Box mt={0} width={"100%"} display={{ xs: "none", md: "block" }}>
+                     <Box mt={0} width={"100%"}>
                         <Stack spacing={2}>
-                           <CoffeeChatsSection />
+                           <Box display={{ xs: "none", md: "block" }}>
+                              <CoffeeChatsSection />
+                           </Box>
                            <MediaSection />
                         </Stack>
                      </Box>

@@ -13,6 +13,9 @@ const styles = sxStyles({
       position: "relative",
       overflow: "hidden",
       mx: { xs: 2, md: 0 },
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
    },
    textContent: {
       width: { xs: "100%", md: "60%" },
@@ -37,7 +40,7 @@ const styles = sxStyles({
       position: "absolute",
       right: { xs: 0, md: "-120px" },
       top: { xs: "auto", md: 0 },
-      bottom: { xs: "-110px", md: 0 },
+      bottom: { xs: "-130px", md: 0 },
       pointerEvents: "none",
    },
    modelImage: {
