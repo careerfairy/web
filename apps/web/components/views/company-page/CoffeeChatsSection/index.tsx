@@ -4,7 +4,10 @@ import { sxStyles } from "../../../../types/commonTypes"
 
 const styles = sxStyles({
    banner: {
-      background: "linear-gradient(98deg, #2ABAA5 0%, #F5B07E 100%)",
+      background: {
+         xs: "linear-gradient(148deg, #2ABAA5 19.92%, #F5B07E 107.66%)",
+         md: "linear-gradient(98deg, #2ABAA5 0%, #F5B07E 100%)",
+      },
       borderRadius: "12px",
       p: 3,
       pb: { xs: 0, md: 3 },
@@ -15,7 +18,7 @@ const styles = sxStyles({
       mx: { xs: 2, md: 0 },
       display: "flex",
       flexDirection: "column",
-      alignItems: "center",
+      alignItems: { xs: "center", md: "flex-start" },
    },
    textContent: {
       width: { xs: "100%", md: "60%" },
