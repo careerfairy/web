@@ -10,13 +10,11 @@ import functions = require("firebase-functions")
 export async function handleOfflineEventSession(
    customerId: string,
    returnUrl: string,
-   data: OfflineEventFetchStripeCustomerSession,
-   sessionMetadataVersion: string
+   data: OfflineEventFetchStripeCustomerSession
 ): Promise<Stripe.Checkout.Session> {
    const metadata: OfflineEventSessionMetadata = {
       groupId: data.groupId,
       userEmail: data.customerEmail,
-      version: sessionMetadataVersion,
       type: StripeProductType.OFFLINE_EVENT,
    }
 

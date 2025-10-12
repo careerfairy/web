@@ -11,13 +11,11 @@ import functions = require("firebase-functions")
 export async function handleGroupPlanSession(
    customerId: string,
    returnUrl: string,
-   data: GroupPlanFetchStripeCustomerSession,
-   sessionMetadataVersion: string
+   data: GroupPlanFetchStripeCustomerSession
 ): Promise<Stripe.Checkout.Session> {
    const metadata: GroupPlanSessionMetadata = {
       groupId: data.groupId,
       userEmail: data.customerEmail,
-      version: sessionMetadataVersion,
       type: StripeProductType.GROUP_PLAN,
       plan: data.plan,
    }
