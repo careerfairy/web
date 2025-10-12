@@ -1,7 +1,6 @@
 import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import {
    BaseSessionPayload,
-   STRIPE_CUSTOMER_SESSION_METADATA_VERSION,
    StripeCustomerSessionData,
    StripeProductType,
 } from "@careerfairy/shared-lib/stripe/types"
@@ -105,8 +104,7 @@ export const fetchStripeCustomerSession = onCall(
             const customerSession = await handler(
                groupCustomer.id,
                returnUrl,
-               data as any, // Type assertion should be safe here due to the handler map
-               STRIPE_CUSTOMER_SESSION_METADATA_VERSION
+               data as any // Type assertion should be safe here due to the handler map
             )
 
             return {

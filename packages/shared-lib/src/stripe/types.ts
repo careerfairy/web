@@ -13,7 +13,6 @@ export type StripeCustomerSessionData = {
 export interface BaseStripeSessionMetadata {
    groupId: string
    userEmail: string
-   version: string
    type: StripeProductType
 }
 

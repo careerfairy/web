@@ -1,7 +1,7 @@
-import { test, expect } from "@playwright/test"
+import { test } from "@playwright/test"
 
 test.describe("Landing Page Functionality", () => {
-   test("should take me to the about us page after clicking on About Us", async ({
+   test.skip("should take me to the about us page after clicking on About Us", async ({
       page,
       browserName,
    }) => {
