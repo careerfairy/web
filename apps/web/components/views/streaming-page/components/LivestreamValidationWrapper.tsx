@@ -82,7 +82,7 @@ const LivestreamValidationsComponent = ({
       isLoggedOut &&
       !(livestream.test || livestream.openStream || isRecordingWindow)
 
-   const shouldBypassMultiSelection = Boolean(livestream?.isPanel)
+   const shouldBypassMultiSelection = livestream?.livestreamType === "panel"
 
    useConditionalRedirect(isInvalidToken, "/streaming/error")
 

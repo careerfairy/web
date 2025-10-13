@@ -258,7 +258,14 @@ export interface LivestreamEvent extends Identifiable {
    /**
     * If true, the livestream is a panel and has multiple hosts
     */
+   /** @deprecated Use `livestreamType === "panel"` */
    isPanel?: boolean
+
+   /**
+    * The type of livestream
+    * Defaults to "livestream" when missing
+    */
+   livestreamType?: LivestreamType
 
    /**
     * The logo of the panel
@@ -270,6 +277,14 @@ export interface LivestreamEvent extends Identifiable {
     */
    panelTrailerUrl?: string
 }
+
+const LivestreamTypes = {
+   PANEL: "panel",
+   LIVESTREAM: "livestream",
+} as const
+
+export type LivestreamType =
+   (typeof LivestreamTypes)[keyof typeof LivestreamTypes]
 
 export const LivestreamModes = {
    /**

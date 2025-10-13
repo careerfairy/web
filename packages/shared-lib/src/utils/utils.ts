@@ -439,8 +439,8 @@ export const getLivestreamsICSDownloadUrl = (
       ? `&utm_campaign=${options.utmCampaign}`
       : ""
    const baseUrl = isLocal
-      ? "http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamsICalendarEvents"
-      : "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamsICalendarEvents"
+      ? "http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1/getLivestreamsICalendarEvents_v2"
+      : "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamsICalendarEvents_v2"
    const idQuery = `eventIds=${encodeURIComponent((streamIds || []).join(","))}`
    return `${baseUrl}?${idQuery}${utmCampaignQueryParam}`
 }

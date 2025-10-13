@@ -396,6 +396,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          lastUpdated: admin.firestore.Timestamp.fromDate(faker.date.recent()),
          created: admin.firestore.Timestamp.fromDate(faker.date.recent()),
          test: false,
+         livestreamType: "livestream",
          title,
          type: "upcoming",
          universities: [],
