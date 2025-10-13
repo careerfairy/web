@@ -1,4 +1,4 @@
-import { UserData } from "@careerfairy/shared-lib/src/users/users"
+import { UserData } from "@careerfairy/shared-lib/src/users"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import counterConstants from "../../lib/Counter/constants"
@@ -31,7 +31,7 @@ interface DefaultUpdateData {
  * query. Defaults to undefined.
  */
 interface UpdateDocumentsConfig<T = unknown> {
-   query: Query<T>
+   query: Query
    updateData:
       | Partial<{ [K in keyof T]: T[K] }>
       | ((data: T) => Partial<{ [K in keyof T]: T[K] }>)
@@ -54,10 +54,10 @@ const config: UpdateDocumentsConfig<UserData> = {
    },
    batchSize: 200,
    waitTimeBetweenBatches: 3_000,
-   dryRun: false, // Set to true first to test
+   dryRun: true, // Set to true first to test
 }
 
-const getTotalDocumentCount = async (query: Query<UserData>) => {
+const getTotalDocumentCount = async (query: Query) => {
    const totalDocumentsSnapshot = await query.count().get()
    return totalDocumentsSnapshot.data().count
 }
@@ -115,7 +115,7 @@ export async function run() {
          for (const doc of docs) {
             if (
                config.customDataFilter &&
-               !config.customDataFilter(doc.data())
+               !config.customDataFilter(doc.data() as UserData)
             ) {
                skips++
                continue
@@ -127,7 +127,7 @@ export async function run() {
             if (!config.dryRun) {
                const updateData =
                   typeof config.updateData === "function"
-                     ? config.updateData(doc.data())
+                     ? config.updateData(doc.data() as UserData)
                      : {
                           ...doc.data(),
                           ...config.updateData,
