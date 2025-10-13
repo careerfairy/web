@@ -45,6 +45,7 @@ import {
 
 import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
 import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
+import Stripe from "stripe"
 import {
    CustomJobFunctionsRepository,
    ICustomJobFunctionsRepository,
@@ -68,8 +69,6 @@ import GroupSparksAnalyticsRepository from "../lib/sparks/analytics/GroupSparksA
 import { SparksFeedReplenisher } from "../lib/sparks/sparksFeedReplenisher"
 import bigQueryClient from "./bigQueryClient"
 import { FieldValue, Timestamp, firestore, storage } from "./firestoreAdmin"
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const stripeInstance = require("stripe")(process.env.STRIPE_SECRET_KEY)
 import logger = require("firebase-functions/logger")
 
 export const groupRepo: IGroupFunctionsRepository =
@@ -159,4 +158,4 @@ export const offlineEventRepo: IOfflineEventFunctionsRepository =
    new OfflineEventFunctionsRepository(firestore, logger)
 
 export const stripeRepo: IStripeFunctionsRepository =
-   new StripeFunctionsRepository(stripeInstance)
+   new StripeFunctionsRepository(new Stripe(process.env.STRIPE_SECRET_KEY))
