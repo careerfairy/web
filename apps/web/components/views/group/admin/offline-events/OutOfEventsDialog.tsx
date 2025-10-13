@@ -1,21 +1,29 @@
 import { Box, Button, Dialog, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import PlusCircleIcon from "components/views/common/icons/PlusCircleIcon"
 import BrandedSwipeableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
+import Image from "next/image"
 import Link from "next/link"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
+   desktopPaper: {
+      borderRadius: {
+         xs: "12px 12px 0 0",
+         sm: "12px 12px 0 0",
+         md: "24px",
+      },
+      height: "461px",
+   },
+   mobilePaper: {
+      borderTopLeftRadius: "24px",
+      borderTopRightRadius: "24px",
+      height: "485px",
+   },
    contentRoot: {
       p: "12px 12px 24px 12px ",
       height: "100%",
       width: "100%",
-      // borderRadius: "24px",
-      // p: { xs: 3, sm: 3 },
-      // pb: { xs: 3, sm: 3 },
-      // pt: { xs: 1.5, sm: 1.5 },
-      // maxWidth: "517px",
-      // width: "100%",
-      // position: "relative",
    },
    illustrationContainer: {
       height: "100%",
@@ -23,6 +31,14 @@ const styles = sxStyles({
       borderRadius: "14px",
       background:
          "conic-gradient(from 180deg at 50% 50%, #E7E1FF 0deg, #C9BFF9 160.9615409374237deg, #CDB4FF 271.7307758331299deg, #D0C8F5 360deg)",
+      display: "flex",
+      alignItems: "flex-start",
+      justifyContent: "center",
+   },
+   plusCircleIcon: {
+      position: "absolute",
+      ml: 23,
+      mt: 4,
    },
 })
 
@@ -43,8 +59,24 @@ export const OutOfEventsDialog = ({
 
    const dialogContent = (
       <Stack spacing={"24px"} sx={styles.contentRoot}>
-         <Box sx={styles.illustrationContainer}></Box>
-
+         <Stack minWidth="100%" alignItems="center">
+            <Box sx={styles.illustrationContainer} minWidth="100%">
+               <Image
+                  src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fcalendar.png?alt=media&token=9ec49476-8a85-4316-b7c9-748a79dd2145"
+                  alt="Calendar"
+                  style={{ objectFit: "contain", marginLeft: "36px" }}
+                  priority
+                  height={225}
+                  width={221}
+               />
+            </Box>
+            <Box
+               sx={styles.plusCircleIcon}
+               component={PlusCircleIcon}
+               width={144}
+               height={186}
+            />
+         </Stack>
          <Stack spacing={2} px={isMobile ? "12px" : "24px"}>
             <Stack spacing={0} alignItems="center">
                <Typography
@@ -97,11 +129,7 @@ export const OutOfEventsDialog = ({
             onOpen={() => {}}
             anchor="bottom"
             PaperProps={{
-               sx: {
-                  borderTopLeftRadius: "24px",
-                  borderTopRightRadius: "24px",
-                  height: "485px",
-               },
+               sx: styles.mobilePaper,
             }}
          >
             {dialogContent}
@@ -116,14 +144,7 @@ export const OutOfEventsDialog = ({
          maxWidth="sm"
          fullWidth
          PaperProps={{
-            sx: {
-               borderRadius: {
-                  xs: "12px 12px 0 0",
-                  sm: "12px 12px 0 0",
-                  md: "24px",
-               },
-               height: "461px",
-            },
+            sx: styles.desktopPaper,
          }}
       >
          {dialogContent}
