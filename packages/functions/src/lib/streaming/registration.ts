@@ -5,14 +5,8 @@ import * as admin from "firebase-admin"
 import { FieldValue } from "firebase-admin/firestore"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
-import { userRepo } from "../../api/repositories"
+import { relationshipsClient, userRepo } from "../../api/repositories"
 import { ChangeType, getChangeTypeEnum } from "../../util"
-import {
-   clearRegistrationData,
-   updateParticipationData,
-   updateRegistrationData,
-   updateSeenData,
-} from "../customerio/relationships"
 
 export const onUserRegistration = onDocumentWritten(
    {
@@ -284,19 +278,26 @@ async function trackCustomerIORelationships(
       // Handle registration changes
       if (!wasRegistered && isRegistered) {
          // User just registered - add registration data
-         await updateRegistrationData(userAuthId, livestreamId, {
-            registeredAt: toUnixTimestamp(
-               newUserLivestreamData.registered?.date
-            ),
-            utm: newUserLivestreamData.registered?.utm,
-            originSource: newUserLivestreamData.registered?.originSource,
-         })
+         await relationshipsClient.updateRegistrationData(
+            userAuthId,
+            livestreamId,
+            {
+               registeredAt: toUnixTimestamp(
+                  newUserLivestreamData.registered?.date
+               ),
+               utm: newUserLivestreamData.registered?.utm,
+               originSource: newUserLivestreamData.registered?.originSource,
+            }
+         )
          logger.info(
             `Updated Customer.io registration data: user ${userAuthId} -> livestream ${livestreamId}`
          )
       } else if (wasRegistered && !isRegistered) {
          // User deregistered - clear registration attributes
-         await clearRegistrationData(userAuthId, livestreamId)
+         await relationshipsClient.clearRegistrationData(
+            userAuthId,
+            livestreamId
+         )
          logger.info(
             `Cleared Customer.io registration data: user ${userAuthId} -> livestream ${livestreamId}`
          )
@@ -305,12 +306,16 @@ async function trackCustomerIORelationships(
       // Handle participation changes
       if (!wasParticipating && isParticipating) {
          // User just participated - add participation data
-         await updateParticipationData(userAuthId, livestreamId, {
-            participatedAt: toUnixTimestamp(
-               newUserLivestreamData.participated?.date
-            ),
-            utm: newUserLivestreamData.participated?.utm,
-         })
+         await relationshipsClient.updateParticipationData(
+            userAuthId,
+            livestreamId,
+            {
+               participatedAt: toUnixTimestamp(
+                  newUserLivestreamData.participated?.date
+               ),
+               utm: newUserLivestreamData.participated?.utm,
+            }
+         )
          logger.info(
             `Updated Customer.io participation data: user ${userAuthId} -> livestream ${livestreamId}`
          )
@@ -322,7 +327,7 @@ async function trackCustomerIORelationships(
          hasSeen
       ) {
          // User has viewed the livestream - update seen data
-         await updateSeenData(userAuthId, livestreamId, {
+         await relationshipsClient.updateSeenData(userAuthId, livestreamId, {
             firstSeenAt: toUnixTimestamp(
                newUserLivestreamData.seen?.firstSeenAt
             ),
