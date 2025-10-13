@@ -13,7 +13,6 @@ import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 export interface CustomerIOSpeaker {
    id: string
    avatar?: string
-   background?: string
    firstName?: string
    lastName?: string
    position?: string
@@ -159,7 +158,6 @@ export interface CustomerIOLivestreamData {
    timezone: string
    is_hybrid: boolean
    is_face_to_face: boolean
-   external_event_link: string
 
    // Content Tags & Targeting
    business_functions_tag_ids: string[]

@@ -224,7 +224,6 @@ export function transformLivestreamDataForCustomerIO(
       ? {
            id: speakers[0].id,
            avatar: speakers[0].avatar,
-           background: speakers[0].background,
            firstName: speakers[0].firstName,
            lastName: speakers[0].lastName,
            position: speakers[0].position,
@@ -237,7 +236,6 @@ export function transformLivestreamDataForCustomerIO(
       ? {
            id: speakers[1].id,
            avatar: speakers[1].avatar,
-           background: speakers[1].background,
            firstName: speakers[1].firstName,
            lastName: speakers[1].lastName,
            position: speakers[1].position,
@@ -250,7 +248,6 @@ export function transformLivestreamDataForCustomerIO(
       ? {
            id: speakers[2].id,
            avatar: speakers[2].avatar,
-           background: speakers[2].background,
            firstName: speakers[2].firstName,
            lastName: speakers[2].lastName,
            position: speakers[2].position,
@@ -302,7 +299,6 @@ export function transformLivestreamDataForCustomerIO(
       timezone: livestream.timezone,
       is_hybrid: livestream.isHybrid,
       is_face_to_face: livestream.isFaceToFace,
-      external_event_link: livestream.externalEventLink,
 
       // Content Tags & Targeting
       business_functions_tag_ids: livestream.businessFunctionsTagIds || [],
