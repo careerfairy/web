@@ -22,6 +22,7 @@ export async function handleOfflineEventSession(
       customerId,
       returnUrl,
       priceId: data.priceId,
+      adjustableQuantity: true,
       metadata,
    })
 }

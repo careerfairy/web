@@ -81,7 +81,7 @@ export const fetchStripeCustomerSession = onCall(
       userShouldBeGroupAdmin(),
       async (request) => {
          const data = request.data
-         functions.logger.info("AAARetrieve customer session: ", data)
+         functions.logger.info("Retrieve customer session: ", data)
 
          const returnUrl = request.rawRequest.headers.origin + data.successUrl
 
