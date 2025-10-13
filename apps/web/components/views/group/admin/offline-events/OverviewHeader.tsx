@@ -18,19 +18,15 @@ const styles = sxStyles({
    getMoreEventsMobile: {
       borderTopRightRadius: "12px",
       borderBottomRightRadius: "12px",
-      color: (theme) => theme.brand.purple[600],
       p: "12px",
-      backgroundColor: (theme) => theme.brand.white[300],
       width: "100%",
       borderLeft: (theme) => `1px solid ${theme.palette.neutral[50]}`,
    },
    getMoreEventsDesktop: {
       borderTopRightRadius: "12px",
       borderBottomRightRadius: "12px",
-      color: (theme) => theme.brand.white[100],
       p: "14px 12px",
       width: "100%",
-      backgroundColor: (theme) => theme.brand.purple[500],
       borderLeft: (theme) => `1px solid ${theme.palette.neutral[50]}`,
    },
    eventsCounterRoot: {
@@ -41,11 +37,19 @@ const styles = sxStyles({
       minWidth: "100%",
       height: "40px",
    },
+   moreEventsNoneAvailable: {
+      backgroundColor: (theme) => theme.brand.purple[500],
+      color: (theme) => theme.brand.white[100],
+   },
+   moreEvents: {
+      backgroundColor: (theme) => theme.brand.white[300],
+      color: (theme) => theme.brand.purple[600],
+   },
 })
 
 export const OverviewHeader = () => {
    const isMobile = useIsMobile(700)
-   const { group } = useGroup()
+   const { group, groupPresenter } = useGroup()
    const { searchTerm, setSearchTerm, handleCheckoutDialogOpen } =
       useOfflineEventsOverview()
 
@@ -94,6 +98,9 @@ export const OverviewHeader = () => {
                   isMobile
                      ? styles.getMoreEventsMobile
                      : styles.getMoreEventsDesktop,
+                  groupPresenter?.availableOfflineEvents === 0
+                     ? styles.moreEventsNoneAvailable
+                     : styles.moreEvents,
                ]}
                onClick={handleCheckoutDialogOpen}
             >
