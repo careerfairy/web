@@ -21,6 +21,10 @@ type OfflineEventsViewContextValue = {
    checkoutDialogOpen: boolean
    handleCheckoutDialogOpen: () => void
    handleCheckoutDialogClose: () => void
+   // Out of events dialog
+   outOfEventsDialogOpen: boolean
+   handleOutOfEventsDialogOpen: () => void
+   handleOutOfEventsDialogClose: () => void
    // Plan confirmation dialog
    stripeSessionId: string | null
    sortBy: OfflineEventStatsSortOption
@@ -114,6 +118,11 @@ export const OfflineEventsViewProvider = ({
       checkoutDialogOpen,
       handleCheckoutDialogOpen,
       handleCheckoutDialogClose,
+   ] = useDialogStateHandler()
+   const [
+      outOfEventsDialogOpen,
+      handleOutOfEventsDialogOpen,
+      handleOutOfEventsDialogClose,
    ] = useDialogStateHandler()
    const [statusFilter, setStatusFilter] = useState<OfflineEventStatus[]>([])
    const [searchTerm, setSearchTerm] = useState("")
@@ -309,6 +318,9 @@ export const OfflineEventsViewProvider = ({
          checkoutDialogOpen,
          handleCheckoutDialogOpen,
          handleCheckoutDialogClose,
+         outOfEventsDialogOpen,
+         handleOutOfEventsDialogOpen,
+         handleOutOfEventsDialogClose,
          stripeSessionId,
          sortBy,
          setSortBy,
@@ -354,6 +366,9 @@ export const OfflineEventsViewProvider = ({
          checkoutDialogOpen,
          handleCheckoutDialogOpen,
          handleCheckoutDialogClose,
+         outOfEventsDialogOpen,
+         handleOutOfEventsDialogOpen,
+         handleOutOfEventsDialogClose,
          stripeSessionId,
       ]
    )
