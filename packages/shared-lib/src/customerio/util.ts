@@ -3,11 +3,15 @@ import {
    ContentTopicsTagValues,
 } from "../constants/tags"
 import { Timestamp } from "../firebaseTypes"
-import { LivestreamEvent } from "../livestreams/livestreams"
+import { LivestreamEvent, Speaker } from "../livestreams"
 import { UserData } from "../users"
 import { addUtmTagsToLink } from "../utils"
 import { makeLivestreamEventDetailsUrl } from "../utils/urls"
-import { CustomerIOLivestreamData, CustomerIOUserData } from "./types"
+import {
+   CustomerIOLivestreamData,
+   CustomerIOSpeaker,
+   CustomerIOUserData,
+} from "./types"
 
 /**
  * Customer.io has a 1000 byte limit per property value
@@ -149,6 +153,24 @@ function mapContentTopicTagIdsToNames(tagIds?: string[]): string[] {
 }
 
 /**
+ * Extracts speaker data without company fields to reduce payload size
+ * @param speaker The speaker object from livestream
+ * @returns CustomerIOSpeaker object without company fields
+ */
+function extractSpeakerData(speaker: Speaker): CustomerIOSpeaker {
+   return {
+      id: speaker.id,
+      avatar: speaker.avatar,
+      firstName: speaker.firstName,
+      lastName: speaker.lastName,
+      position: speaker.position,
+      rank: speaker.rank,
+      linkedInUrl: speaker.linkedInUrl,
+      groupId: speaker.groupId,
+   }
+}
+
+/**
  * Helper function to transform UserData to CustomerIO format
  */
 export function transformUserDataForCustomerIO(
@@ -211,51 +233,24 @@ export function transformUserDataForCustomerIO(
  * The `name` field is formatted as: "Title (Date)"
  * Example: "Discover Our Internship Program (May 15, 2024)"
  *
- * Speaker data is flattened into speaker1, speaker2, speaker3 fields (excludes companyName/companyLogoUrl to reduce payload size).
+ * Speaker data is dynamically flattened into speaker1, speaker2, speaker3, etc. fields (excludes companyName/companyLogoUrl to reduce payload size).
  * speaker_count reflects the total number of speakers.
  */
 export function transformLivestreamDataForCustomerIO(
    livestream: LivestreamEvent
 ): CustomerIOLivestreamData {
-   // Extract speaker information (up to 3 speakers as individual fields)
+   // Extract speaker information dynamically for all speakers
    // Remove companyName and companyLogoUrl to reduce payload size
    const speakers = livestream.speakers || []
-   const speaker1 = speakers[0]
-      ? {
-           id: speakers[0].id,
-           avatar: speakers[0].avatar,
-           firstName: speakers[0].firstName,
-           lastName: speakers[0].lastName,
-           position: speakers[0].position,
-           rank: speakers[0].rank,
-           linkedInUrl: speakers[0].linkedInUrl,
-           groupId: speakers[0].groupId,
-        }
-      : undefined
-   const speaker2 = speakers[1]
-      ? {
-           id: speakers[1].id,
-           avatar: speakers[1].avatar,
-           firstName: speakers[1].firstName,
-           lastName: speakers[1].lastName,
-           position: speakers[1].position,
-           rank: speakers[1].rank,
-           linkedInUrl: speakers[1].linkedInUrl,
-           groupId: speakers[1].groupId,
-        }
-      : undefined
-   const speaker3 = speakers[2]
-      ? {
-           id: speakers[2].id,
-           avatar: speakers[2].avatar,
-           firstName: speakers[2].firstName,
-           lastName: speakers[2].lastName,
-           position: speakers[2].position,
-           rank: speakers[2].rank,
-           linkedInUrl: speakers[2].linkedInUrl,
-           groupId: speakers[2].groupId,
-        }
-      : undefined
+
+   // Create dynamic speaker fields (speaker1, speaker2, speaker3, etc.)
+   const dynamicSpeakerFields: Record<string, CustomerIOSpeaker> = {}
+   speakers.forEach((speaker, index) => {
+      if (speaker) {
+         dynamicSpeakerFields[`speaker${index + 1}`] =
+            extractSpeakerData(speaker)
+      }
+   })
 
    // Split university IDs into max 2 arrays to stay within 1000 byte limit
    const universityIds = livestream.companyTargetedUniversities || []
@@ -281,7 +276,6 @@ export function transformLivestreamDataForCustomerIO(
       company_name: livestream.company,
       company_logo_url: livestream.companyLogoUrl,
       group_ids: livestream.groupIds || [],
-      creator_ids: livestream.creatorsIds || [],
 
       // Event Status & Type
       is_test: !!livestream.test,
@@ -322,11 +316,10 @@ export function transformLivestreamDataForCustomerIO(
       target_level_of_study_ids:
          livestream.targetLevelsOfStudy?.map((l) => l.id) || [],
 
-      // Speakers (up to 3 as individual fields without company fields)
-      speaker1,
-      speaker2,
-      speaker3,
+      // Dynamic speaker fields (speaker1, speaker2, speaker3, etc. without company fields)
+      ...dynamicSpeakerFields,
       speaker_count: speakers.length > 0 ? speakers.length : undefined,
+      creator_ids: livestream.creatorsIds || [],
 
       // Call to Actions
       has_active_ctas:

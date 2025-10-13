@@ -174,11 +174,10 @@ export interface CustomerIOLivestreamData {
    target_field_of_study_ids: string[]
    target_level_of_study_ids: string[]
 
-   // Speakers (up to 3 speakers as individual fields)
-   speaker1?: CustomerIOSpeaker
-   speaker2?: CustomerIOSpeaker
-   speaker3?: CustomerIOSpeaker
+   // Speakers (dynamic speaker fields for any number of speakers)
    speaker_count?: number
+   // Dynamic speaker fields will be added as speaker1, speaker2, speaker3, etc.
+   [key: `speaker${number}`]: CustomerIOSpeaker | undefined
 
    // Call to Actions
    has_active_ctas?: boolean
