@@ -166,34 +166,34 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
 
-         # - name: Install Playwright's dependencies
-         #   run: npx playwright install --with-deps
-         # - name: Install uuid-runtime
-         #   run: sudo apt-get install uuid-runtime
-         # - name: Generate UUID
-         #   run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
-         # - name: Run Playwright End to End tests
-         #   env:
-         #      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-         #      NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
-         #      NODE_ENV: test
-         #   run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
+         - name: Install Playwright's dependencies
+           run: npx playwright install --with-deps
+         - name: Install uuid-runtime
+           run: sudo apt-get install uuid-runtime
+         - name: Generate UUID
+           run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
+         - name: Run Playwright End to End tests
+           env:
+              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
+              NODE_ENV: test
+           run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
-         # - name: Upload test results
-         #   if: ${{ failure() }}
-         #   uses: actions/upload-artifact@v4
-         #   with:
-         #      name: ${{ matrix.shard }}-playwright-report
-         #      path: apps/web/playwright-report
-         #      retention-days: 30
+         - name: Upload test results
+           if: ${{ failure() }}
+           uses: actions/upload-artifact@v4
+           with:
+              name: ${{ matrix.shard }}-playwright-report
+              path: apps/web/playwright-report
+              retention-days: 30
 
-         # - name: Upload debug logs
-         #   if: ${{ failure() }}
-         #   uses: actions/upload-artifact@v4
-         #   with:
-         #      name: ${{ matrix.shard }}-debug-logs
-         #      path: firebase-debug.log
-         #      retention-days: 30
+         - name: Upload debug logs
+           if: ${{ failure() }}
+           uses: actions/upload-artifact@v4
+           with:
+              name: ${{ matrix.shard }}-debug-logs
+              path: firebase-debug.log
+              retention-days: 30
 
    # Deploy
    deploy:
