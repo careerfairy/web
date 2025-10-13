@@ -1,7 +1,7 @@
 import { test } from "@playwright/test"
 
 test.describe("Landing Page Functionality", () => {
-   test.skip("should take me to the about us page after clicking on About Us", async ({
+   test("should take me to the about us page after clicking on About Us", async ({
       page,
       browserName,
    }) => {
