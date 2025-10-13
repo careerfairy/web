@@ -22,7 +22,6 @@ import {
    deleteObject as deleteCustomerIOObject,
    OBJECT_TYPES,
 } from "./objectsClient"
-import { deleteAllLivestreamRelationships } from "./relationships"
 import { CustomerIOWebhookEvent } from "./types"
 
 /**
@@ -158,13 +157,12 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
       concurrency: 1, // Process updates sequentially to avoid rate limit issues
    },
    async (event) => {
-      console.log("🚀 ~ 3")
-      // if (isLocalEnvironment()) {
-      //    logger.info(
-      //       "Skipping CustomerIO livestream sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
-      //    )
-      //    return
-      // }
+      if (isLocalEnvironment()) {
+         logger.info(
+            "Skipping CustomerIO livestream sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
+         )
+         return
+      }
 
       try {
          const changeType = getChangeTypeEnum(event)
@@ -230,21 +228,6 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
                      )}`
                   )
                }
-               break
-            }
-
-            case ChangeType.DELETE: {
-               // Clean up all relationships before deleting the object
-               await deleteAllLivestreamRelationships(livestreamId)
-
-               await deleteCustomerIOObject(
-                  OBJECT_TYPES.LIVESTREAMS,
-                  livestreamId
-               )
-
-               logger.info(
-                  `Successfully deleted livestream ${livestreamId} and cleaned up relationships from CustomerIO`
-               )
                break
             }
 
