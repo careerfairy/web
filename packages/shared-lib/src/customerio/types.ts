@@ -5,6 +5,23 @@ import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
  * Type definitions for Customer.io data structure
  * Flattened for better performance and maintainability
  */
+
+/**
+ * Speaker data for Customer.io
+ * Excludes companyName and companyLogoUrl to reduce payload size
+ */
+export interface CustomerIOSpeaker {
+   id: string
+   avatar?: string
+   background?: string
+   firstName?: string
+   lastName?: string
+   position?: string
+   rank?: number
+   linkedInUrl?: string
+   groupId?: string
+}
+
 export interface CustomerIOUserData {
    // Basic Info
    auth_id: string
@@ -118,6 +135,7 @@ export interface CustomerIOLivestreamData {
    company_name: string
    company_logo_url: string
    group_ids: string[]
+   creator_ids: string[]
 
    // Event Status & Type
    is_test: boolean
@@ -149,13 +167,19 @@ export interface CustomerIOLivestreamData {
    content_topics_tag_ids: string[]
    content_topics_tag_names: string[]
    target_country_ids: string[]
-   target_university_ids: string[]
+
+   // Target universities split into max 2 arrays to stay within 1000 byte limit per property
+   target_university_ids_1?: string[]
+   target_university_ids_2?: string[]
+   target_university_count?: number
+
    target_field_of_study_ids: string[]
    target_level_of_study_ids: string[]
 
-   // Speakers
-   speaker_names?: string[]
-   speaker_positions?: string[]
+   // Speakers (up to 3 speakers as individual fields)
+   speaker1?: CustomerIOSpeaker
+   speaker2?: CustomerIOSpeaker
+   speaker3?: CustomerIOSpeaker
    speaker_count?: number
 
    // Call to Actions

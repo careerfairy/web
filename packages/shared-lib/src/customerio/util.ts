@@ -42,6 +42,48 @@ function truncateString(
 }
 
 /**
+ * Splits an array into max 2 chunks to fit within Customer.io's byte limit
+ * @param array Array of strings to chunk
+ * @param byteLimit Maximum bytes per chunk
+ * @returns Object with keys 1 and 2 containing the chunks
+ */
+function splitArrayIntoTwo(
+   array: string[],
+   byteLimit: number = CUSTOMERIO_BYTE_LIMIT
+): { 1?: string[]; 2?: string[] } {
+   if (!array || array.length === 0) return {}
+
+   const encoder = new TextEncoder()
+   const fullSize = encoder.encode(JSON.stringify(array)).length
+
+   // If the whole array fits, return it as chunk 1
+   if (fullSize <= byteLimit) {
+      return { 1: array }
+   }
+
+   // Split in half and adjust if needed
+   const midpoint = Math.ceil(array.length / 2)
+   const chunk1 = array.slice(0, midpoint)
+   const chunk2 = array.slice(midpoint)
+
+   // Fine-tune chunk1 to fit within limit
+   while (
+      encoder.encode(JSON.stringify(chunk1)).length > byteLimit &&
+      chunk1.length > 0
+   ) {
+      const item = chunk1.pop()
+      if (item) {
+         chunk2.unshift(item)
+      }
+   }
+
+   return {
+      1: chunk1.length > 0 ? chunk1 : undefined,
+      2: chunk2.length > 0 ? chunk2 : undefined,
+   }
+}
+
+/**
  * Converts a Firebase timestamp to Unix timestamp (seconds since epoch).
  * Uses Math.floor() as CustomerIO requires integer timestamps and does not accept decimal values.
  * @param timestamp Firebase timestamp
@@ -166,20 +208,61 @@ export function transformUserDataForCustomerIO(
  * Helper function to transform LivestreamEvent to CustomerIO format
  * Flattens livestream attributes for use in Customer.io segmentation and personalization
  *
- * The `name` field is formatted as: "[Company] Title (Date)"
- * Example: "[OnLogic] Discover Our Internship Program (May 15, 2024)"
+ * The `name` field is formatted as: "Title (Date)"
+ * Example: "Discover Our Internship Program (May 15, 2024)"
+ *
+ * Speaker data is flattened into speaker1, speaker2, speaker3 fields (excludes companyName/companyLogoUrl to reduce payload size).
+ * speaker_count reflects the total number of speakers.
  */
 export function transformLivestreamDataForCustomerIO(
    livestream: LivestreamEvent
 ): CustomerIOLivestreamData {
-   // Extract speaker information
+   // Extract speaker information (up to 3 speakers as individual fields)
+   // Remove companyName and companyLogoUrl to reduce payload size
    const speakers = livestream.speakers || []
-   const speakerNames = speakers
-      .map((s) => `${s.firstName || ""} ${s.lastName || ""}`.trim())
-      .filter(Boolean)
-   const speakerPositions = speakers
-      .map((s) => s.position)
-      .filter((p): p is string => !!p)
+   const speaker1 = speakers[0]
+      ? {
+           id: speakers[0].id,
+           avatar: speakers[0].avatar,
+           background: speakers[0].background,
+           firstName: speakers[0].firstName,
+           lastName: speakers[0].lastName,
+           position: speakers[0].position,
+           rank: speakers[0].rank,
+           linkedInUrl: speakers[0].linkedInUrl,
+           groupId: speakers[0].groupId,
+        }
+      : undefined
+   const speaker2 = speakers[1]
+      ? {
+           id: speakers[1].id,
+           avatar: speakers[1].avatar,
+           background: speakers[1].background,
+           firstName: speakers[1].firstName,
+           lastName: speakers[1].lastName,
+           position: speakers[1].position,
+           rank: speakers[1].rank,
+           linkedInUrl: speakers[1].linkedInUrl,
+           groupId: speakers[1].groupId,
+        }
+      : undefined
+   const speaker3 = speakers[2]
+      ? {
+           id: speakers[2].id,
+           avatar: speakers[2].avatar,
+           background: speakers[2].background,
+           firstName: speakers[2].firstName,
+           lastName: speakers[2].lastName,
+           position: speakers[2].position,
+           rank: speakers[2].rank,
+           linkedInUrl: speakers[2].linkedInUrl,
+           groupId: speakers[2].groupId,
+        }
+      : undefined
+
+   // Split university IDs into max 2 arrays to stay within 1000 byte limit
+   const universityIds = livestream.companyTargetedUniversities || []
+   const universityChunks = splitArrayIntoTwo(universityIds)
 
    return {
       // Basic Info
@@ -188,8 +271,8 @@ export function transformLivestreamDataForCustomerIO(
       title: livestream.title || "",
       /**
        * Reserved field in Customer.io used to identify the object.
-       * Format: "[Company] Title (Date)"
-       * Example: "[OnLogic] Discover Our Internship Program (May 15, 2024)"
+       * Format: "Title (Date)"
+       * Example: "Discover Our Internship Program (May 15, 2024)"
        */
       name: generateLivestreamObjectName(livestream),
       summary: truncateString(livestream.summary, CUSTOMERIO_BYTE_LIMIT),
@@ -201,6 +284,7 @@ export function transformLivestreamDataForCustomerIO(
       company_name: livestream.company,
       company_logo_url: livestream.companyLogoUrl,
       group_ids: livestream.groupIds || [],
+      creator_ids: livestream.creatorsIds || [],
 
       // Event Status & Type
       is_test: !!livestream.test,
@@ -230,16 +314,22 @@ export function transformLivestreamDataForCustomerIO(
          livestream.contentTopicsTagIds
       ),
       target_country_ids: livestream.targetCountries?.map((c) => c.id) || [],
-      target_university_ids: livestream.companyTargetedUniversities || [],
+
+      // Target universities split into max 2 arrays
+      target_university_ids_1: universityChunks[1],
+      target_university_ids_2: universityChunks[2],
+      target_university_count:
+         universityIds.length > 0 ? universityIds.length : undefined,
+
       target_field_of_study_ids:
          livestream.targetFieldsOfStudy?.map((f) => f.id) || [],
       target_level_of_study_ids:
          livestream.targetLevelsOfStudy?.map((l) => l.id) || [],
 
-      // Speakers
-      speaker_names: speakerNames.length > 0 ? speakerNames : undefined,
-      speaker_positions:
-         speakerPositions.length > 0 ? speakerPositions : undefined,
+      // Speakers (up to 3 as individual fields without company fields)
+      speaker1,
+      speaker2,
+      speaker3,
       speaker_count: speakers.length > 0 ? speakers.length : undefined,
 
       // Call to Actions
@@ -275,6 +365,5 @@ function generateLivestreamUrlWithUTM(livestreamId: string): string {
       link: baseUrl,
       source: "customerio",
       medium: "email",
-      campaign: "talent_mail",
    })
 }
