@@ -8,6 +8,11 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { relationshipsClient, userRepo } from "../../api/repositories"
 import { ChangeType, getChangeTypeEnum, isLocalEnvironment } from "../../util"
 
+/**
+ * Set to false when running relationship backfill to force sync all relationships
+ */
+const CHECK_FOR_RELATIONSHIP_CHANGES = true
+
 export const onUserRegistration = onDocumentWritten(
    {
       document: "livestreams/{livestreamId}/userLivestreamData/{userEmail}",
@@ -288,7 +293,15 @@ async function trackCustomerIORelationships(
       const hasSeen = Boolean(newUserLivestreamData?.seen?.firstSeenAt)
 
       // Handle registration changes
-      if (!wasRegistered && isRegistered) {
+      const shouldUpdateRegistration = CHECK_FOR_RELATIONSHIP_CHANGES
+         ? !wasRegistered && isRegistered // Only on new registration
+         : isRegistered // Force update during backfill if registered
+
+      const shouldClearRegistration = CHECK_FOR_RELATIONSHIP_CHANGES
+         ? wasRegistered && !isRegistered // Only on deregistration
+         : false // Never clear during backfill
+
+      if (shouldUpdateRegistration) {
          // User just registered - add registration data
          await relationshipsClient.updateRegistrationData(
             userAuthId,
@@ -304,7 +317,7 @@ async function trackCustomerIORelationships(
          logger.info(
             `Updated Customer.io registration data: user ${userAuthId} -> livestream ${livestreamId}`
          )
-      } else if (wasRegistered && !isRegistered) {
+      } else if (shouldClearRegistration) {
          // User deregistered - clear registration attributes
          await relationshipsClient.clearRegistrationData(
             userAuthId,
@@ -316,7 +329,11 @@ async function trackCustomerIORelationships(
       }
 
       // Handle participation changes
-      if (!wasParticipating && isParticipating) {
+      const shouldUpdateParticipation = CHECK_FOR_RELATIONSHIP_CHANGES
+         ? !wasParticipating && isParticipating // Only on new participation
+         : isParticipating // Force update during backfill if participated
+
+      if (shouldUpdateParticipation) {
          // User just participated - add participation data
          await relationshipsClient.updateParticipationData(
             userAuthId,
@@ -334,10 +351,12 @@ async function trackCustomerIORelationships(
       }
 
       // Handle seen data changes
-      if (
-         hasSeenDataChanged(oldUserLivestreamData, newUserLivestreamData) &&
-         hasSeen
-      ) {
+      const shouldUpdateSeen = CHECK_FOR_RELATIONSHIP_CHANGES
+         ? hasSeenDataChanged(oldUserLivestreamData, newUserLivestreamData) &&
+           hasSeen // Only on seen data change
+         : hasSeen // Force update during backfill if seen
+
+      if (shouldUpdateSeen) {
          // User has viewed the livestream - update seen data
          await relationshipsClient.updateSeenData(userAuthId, livestreamId, {
             firstSeenAt: toUnixTimestamp(
