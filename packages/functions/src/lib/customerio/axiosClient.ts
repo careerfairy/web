@@ -27,10 +27,6 @@ export function createCustomerIOAxiosInstance(): AxiosInstance {
       )
    }
 
-   if (!siteId || !apiKey) {
-      throw new Error("Customer.io credentials not configured")
-   }
-
    const auth = Buffer.from(`${siteId}:${apiKey}`).toString("base64")
 
    return axios.create({
