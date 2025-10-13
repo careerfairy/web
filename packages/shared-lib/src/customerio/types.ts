@@ -116,8 +116,8 @@ export interface CustomerIOLivestreamData {
 
    // Company/Host Info
    company_name: string
-   company_id: string
    company_logo_url: string
+   group_ids: string[]
 
    // Event Status & Type
    is_test: boolean

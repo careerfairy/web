@@ -199,8 +199,8 @@ export function transformLivestreamDataForCustomerIO(
 
       // Company/Host Info
       company_name: livestream.company,
-      company_id: livestream.companyId,
       company_logo_url: livestream.companyLogoUrl,
+      group_ids: livestream.groupIds || [],
 
       // Event Status & Type
       is_test: !!livestream.test,

@@ -1,8 +1,9 @@
 import { UTMParams } from "@careerfairy/shared-lib/commonTypes"
 import { ImpressionLocation } from "@careerfairy/shared-lib/livestreams"
-import axios, { AxiosInstance } from "axios"
+import { AxiosInstance } from "axios"
 import { logger } from "firebase-functions"
-import { isLocalEnvironment, isTestEnvironment } from "../../util"
+import { isTestEnvironment } from "../../util"
+import { createCustomerIOAxiosInstance } from "./axiosClient"
 import { OBJECT_TYPES } from "./objectsClient"
 
 /**
@@ -50,45 +51,17 @@ export interface SeenRelationshipData {
    lastUtm?: UTMParams
 }
 
-const CUSTOMERIO_TRACK_API_URL = "https://track-eu.customer.io"
-
 /**
  * Client for managing Customer.io livestream relationships
  */
 export class CustomerIORelationshipsClient {
-   private axiosInstance: AxiosInstance
+   private axiosInstance: AxiosInstance | null = null
 
-   constructor() {
-      if (isTestEnvironment()) {
-         logger.info("Using Customer.io relationships client mock")
-         // Create a stub axios instance for test environment
-         this.axiosInstance = axios.create()
-      } else {
-         let siteId = process.env.CUSTOMERIO_SITE_ID
-         let apiKey = process.env.CUSTOMERIO_TRACKING_API_KEY
-
-         if (isLocalEnvironment()) {
-            siteId = process.env.DEV_CUSTOMERIO_SITE_ID
-            apiKey = process.env.DEV_CUSTOMERIO_TRACKING_API_KEY
-            logger.info(
-               "Running in local environment. Ensure DEV_CUSTOMERIO_SITE_ID and DEV_CUSTOMERIO_TRACKING_API_KEY are set for testing."
-            )
-         }
-
-         if (!siteId || !apiKey) {
-            throw new Error("Customer.io credentials not configured")
-         }
-
-         const auth = Buffer.from(`${siteId}:${apiKey}`).toString("base64")
-
-         this.axiosInstance = axios.create({
-            baseURL: CUSTOMERIO_TRACK_API_URL,
-            headers: {
-               Authorization: `Basic ${auth}`,
-               "Content-Type": "application/json",
-            },
-         })
+   private getAxiosInstance(): AxiosInstance {
+      if (!this.axiosInstance) {
+         this.axiosInstance = createCustomerIOAxiosInstance()
       }
+      return this.axiosInstance
    }
 
    /**
@@ -118,7 +91,7 @@ export class CustomerIORelationshipsClient {
       )
 
       try {
-         await this.axiosInstance.post("/api/v2/entity", {
+         await this.getAxiosInstance().post("/api/v2/entity", {
             type: "person",
             action: "add_relationships",
             identifiers: {

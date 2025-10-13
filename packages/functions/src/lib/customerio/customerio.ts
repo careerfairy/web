@@ -10,18 +10,14 @@ import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/firestore"
 import { onRequest } from "firebase-functions/https"
 import { auth } from "../../api/firestoreAdmin"
-import { userRepo } from "../../api/repositories"
+import { objectsClient, userRepo } from "../../api/repositories"
 import {
    customerIOWebhookSignatureMiddleware,
    withMiddlewares,
 } from "../../middlewares-gen2/onRequest"
 import { ChangeType, getChangeTypeEnum, isLocalEnvironment } from "../../util"
 import { trackingClient } from "./client"
-import {
-   createOrUpdateObject,
-   deleteObject as deleteCustomerIOObject,
-   OBJECT_TYPES,
-} from "./objectsClient"
+import { OBJECT_TYPES } from "./objectsClient"
 import { CustomerIOWebhookEvent } from "./types"
 
 /**
@@ -180,7 +176,7 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
                   const livestreamData =
                      transformLivestreamDataForCustomerIO(livestream)
 
-                  await createOrUpdateObject(
+                  await objectsClient.createOrUpdateObject(
                      OBJECT_TYPES.LIVESTREAMS,
                      livestreamId,
                      livestreamData
@@ -206,7 +202,7 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
                   const livestreamData =
                      transformLivestreamDataForCustomerIO(livestream)
 
-                  await createOrUpdateObject(
+                  await objectsClient.createOrUpdateObject(
                      OBJECT_TYPES.LIVESTREAMS,
                      livestreamId,
                      livestreamData
@@ -217,7 +213,7 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
                   )
                } else {
                   // Livestream no longer qualifies (became test/hidden/draft)
-                  await deleteCustomerIOObject(
+                  await objectsClient.deleteObject(
                      OBJECT_TYPES.LIVESTREAMS,
                      livestreamId
                   )
@@ -228,6 +224,19 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
                      )}`
                   )
                }
+               break
+            }
+
+            case ChangeType.DELETE: {
+               // Document was deleted from Firestore, remove from CustomerIO
+               logger.info(
+                  `Processing deletion of livestream ${livestreamId} from CustomerIO (document deleted from Firestore)`
+               )
+
+               await objectsClient.deleteObject(
+                  OBJECT_TYPES.LIVESTREAMS,
+                  livestreamId
+               )
                break
             }
 

@@ -2,6 +2,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import { livestreamService } from "data/firebase/LivestreamService"
+import { errorLogAndNotify } from "util/CommonUtil"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
@@ -44,7 +45,13 @@ const useTrackLivestreamView = (livestream: LivestreamEvent) => {
 
          // Track seen data for authenticated users
          if (userData) {
-            await livestreamService.setUserHasSeenLivestream(id, userData)
+            await livestreamService
+               .setUserHasSeenLivestream(id, userData)
+               .catch((error) => {
+                  errorLogAndNotify(error, {
+                     message: "Failed to set user as seen livestream",
+                  })
+               })
          }
       }
       return trackDetailPageView(id, visitorId)

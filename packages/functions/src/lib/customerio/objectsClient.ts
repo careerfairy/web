@@ -1,6 +1,7 @@
-import axios from "axios"
+import { AxiosInstance } from "axios"
 import { logger } from "firebase-functions"
-import { isLocalEnvironment, isTestEnvironment } from "../../util"
+import { isTestEnvironment } from "../../util"
+import { createCustomerIOAxiosInstance } from "./axiosClient"
 
 export const OBJECT_TYPES = {
    LIVESTREAMS: "1",
@@ -10,94 +11,80 @@ type ObjectTypeId = (typeof OBJECT_TYPES)[keyof typeof OBJECT_TYPES]
 
 /**
  * Customer.io Objects API client
- * Uses HTTP requests directly since customerio-node v4.1.1 doesn't have built-in support for objects
+ * Uses HTTP requests directly since customerio-node v4.1.1 SDK doesn't have built-in support for objects
  */
+export class CustomerIOObjectsClient {
+   private axiosInstance: AxiosInstance | null = null
 
-const getApiCredentials = () => {
-   let siteId = process.env.CUSTOMERIO_SITE_ID
-   let apiKey = process.env.CUSTOMERIO_TRACKING_API_KEY
-
-   if (isLocalEnvironment()) {
-      siteId = process.env.DEV_CUSTOMERIO_SITE_ID
-      apiKey = process.env.DEV_CUSTOMERIO_TRACKING_API_KEY
+   private getAxiosInstance(): AxiosInstance {
+      if (!this.axiosInstance) {
+         this.axiosInstance = createCustomerIOAxiosInstance()
+      }
+      return this.axiosInstance
    }
 
-   return { siteId, apiKey }
-}
+   /**
+    * Removes undefined values from an object
+    * Customer.io doesn't accept undefined values in attributes
+    */
+   private cleanAttributes(
+      attributes: Record<string, any>
+   ): Record<string, any> {
+      const cleaned: Record<string, any> = {}
 
-const CUSTOMERIO_TRACK_API_URL = "https://track-eu.customer.io"
-
-/**
- * Removes undefined values from an object
- * Customer.io doesn't accept undefined values in attributes
- */
-function cleanAttributes(attributes: Record<string, any>): Record<string, any> {
-   const cleaned: Record<string, any> = {}
-
-   for (const [key, value] of Object.entries(attributes)) {
-      if (value !== undefined && value !== null) {
-         // Recursively clean nested objects
-         if (value && typeof value === "object" && !Array.isArray(value)) {
-            cleaned[key] = cleanAttributes(value)
-         } else if (Array.isArray(value)) {
-            // Filter out undefined/null values from arrays
-            const cleanedArray = value.filter(
-               (item) => item !== undefined && item !== null
-            )
-            if (cleanedArray.length > 0) {
-               cleaned[key] = cleanedArray
+      for (const [key, value] of Object.entries(attributes)) {
+         if (value !== undefined && value !== null) {
+            // Recursively clean nested objects
+            if (value && typeof value === "object" && !Array.isArray(value)) {
+               cleaned[key] = this.cleanAttributes(value)
+            } else if (Array.isArray(value)) {
+               // Filter out undefined/null values from arrays
+               const cleanedArray = value.filter(
+                  (item) => item !== undefined && item !== null
+               )
+               if (cleanedArray.length > 0) {
+                  cleaned[key] = cleanedArray
+               }
+            } else {
+               cleaned[key] = value
             }
-         } else {
-            cleaned[key] = value
          }
       }
+
+      return cleaned
    }
 
-   return cleaned
-}
-
-/**
- * Creates or updates an object in Customer.io
- * @param objectTypeId The type of object (e.g., "livestream")
- * @param objectId The unique identifier for the object
- * @param attributes The object attributes
- */
-export async function createOrUpdateObject(
-   objectTypeId: ObjectTypeId,
-   objectId: string,
-   attributes: Record<string, any>
-): Promise<void> {
-   if (isTestEnvironment()) {
-      logger.info(
-         `[TEST] Would create/update Customer.io object ${objectTypeId}:${objectId}`
-      )
-      return
-   }
-
-   const { siteId, apiKey } = getApiCredentials()
-
-   if (!siteId || !apiKey) {
-      throw new Error("Customer.io credentials not configured")
-   }
-
-   const url = `${CUSTOMERIO_TRACK_API_URL}/api/v2/entity`
-   const auth = Buffer.from(`${siteId}:${apiKey}`).toString("base64")
-
-   // Clean attributes to remove undefined/null values
-   const cleanedAttributes = cleanAttributes(attributes)
-
-   logger.info(
-      `Creating/updating Customer.io object ${objectTypeId}:${objectId}`,
-      {
-         attributeCount: Object.keys(cleanedAttributes).length,
-         sampleKeys: Object.keys(cleanedAttributes).slice(0, 5),
+   /**
+    * Creates or updates an object in Customer.io
+    * @param objectTypeId The type of object (e.g., "livestream")
+    * @param objectId The unique identifier for the object
+    * @param attributes The object attributes
+    */
+   public async createOrUpdateObject(
+      objectTypeId: ObjectTypeId,
+      objectId: string,
+      attributes: Record<string, any>
+   ): Promise<void> {
+      if (isTestEnvironment()) {
+         logger.info(
+            `[TEST] Would create/update Customer.io object ${objectTypeId}:${objectId}`
+         )
+         return
       }
-   )
 
-   try {
-      await axios.post(
-         url,
+      // Clean attributes to remove undefined/null values
+      const cleanedAttributes = this.cleanAttributes(attributes)
+
+      logger.info(
+         `Creating/updating Customer.io object ${objectTypeId}:${objectId}`,
          {
+            attributeCount: Object.keys(cleanedAttributes).length,
+            sampleKeys: Object.keys(cleanedAttributes).slice(0, 5),
+         }
+      )
+
+      try {
+         await this.getAxiosInstance().post("/api/v2/entity", {
             type: "object",
             action: "identify",
             identifiers: {
@@ -105,82 +92,73 @@ export async function createOrUpdateObject(
                object_id: objectId,
             },
             attributes: cleanedAttributes,
-         },
-         {
-            headers: {
-               Authorization: `Basic ${auth}`,
-               "Content-Type": "application/json",
-            },
-         }
-      )
-   } catch (error) {
-      logger.error(
-         `Failed to create/update Customer.io object ${objectTypeId}:${objectId}`,
-         {
-            error: error?.message,
-            response: error?.response?.data,
-            status: error?.response?.status,
-            objectId,
-            objectTypeId,
-         }
-      )
-      throw error
-   }
-}
-
-/**
- * Deletes an object from Customer.io
- * @param objectTypeId The type of object (e.g., "livestream")
- * @param objectId The unique identifier for the object
- */
-export async function deleteObject(
-   objectTypeId: ObjectTypeId,
-   objectId: string
-): Promise<void> {
-   if (isTestEnvironment()) {
-      logger.info(
-         `[TEST] Would delete Customer.io object ${objectTypeId}:${objectId}`
-      )
-      return
+         })
+      } catch (error) {
+         logger.error(
+            `Failed to create/update Customer.io object ${objectTypeId}:${objectId}`,
+            {
+               error: error?.message,
+               response: error?.response?.data,
+               status: error?.response?.status,
+               objectId,
+               objectTypeId,
+            }
+         )
+         throw error
+      }
    }
 
-   const { siteId, apiKey } = getApiCredentials()
+   /**
+    * Deletes an object from Customer.io
+    * @param objectTypeId The type of object (e.g., "livestream")
+    * @param objectId The unique identifier for the object
+    */
+   public async deleteObject(
+      objectTypeId: ObjectTypeId,
+      objectId: string
+   ): Promise<void> {
+      if (isTestEnvironment()) {
+         logger.info(
+            `[TEST] Would delete Customer.io object ${objectTypeId}:${objectId}`
+         )
+         return
+      }
 
-   if (!siteId || !apiKey) {
-      throw new Error("Customer.io credentials not configured")
-   }
+      logger.info(`Deleting Customer.io object ${objectTypeId}:${objectId}`)
 
-   const url = `${CUSTOMERIO_TRACK_API_URL}/api/v2/entity`
-   const auth = Buffer.from(`${siteId}:${apiKey}`).toString("base64")
-
-   try {
-      await axios.delete(url, {
-         headers: {
-            Authorization: `Basic ${auth}`,
-            "Content-Type": "application/json",
-         },
-         data: {
+      try {
+         await this.getAxiosInstance().post("/api/v2/entity", {
             type: "object",
             action: "delete",
             identifiers: {
                object_type_id: objectTypeId,
                object_id: objectId,
             },
-         },
-      })
-   } catch (error) {
-      // 404 errors are ok - object doesn't exist
-      if (error?.response?.status === 404) {
-         logger.info(
-            `Customer.io object ${objectTypeId}:${objectId} doesn't exist, skipping deletion`
-         )
-         return
-      }
+         })
 
-      logger.error(
-         `Failed to delete Customer.io object ${objectTypeId}:${objectId}`,
-         error
-      )
-      throw error
+         logger.info(
+            `Successfully deleted Customer.io object ${objectTypeId}:${objectId}`
+         )
+      } catch (error) {
+         // 404 errors are ok - object doesn't exist
+         if (error?.response?.status === 404) {
+            logger.info(
+               `Customer.io object ${objectTypeId}:${objectId} doesn't exist, skipping deletion`
+            )
+            return
+         }
+
+         logger.error(
+            `Failed to delete Customer.io object ${objectTypeId}:${objectId}`,
+            {
+               error: error?.message,
+               response: error?.response?.data,
+               status: error?.response?.status,
+               objectId,
+               objectTypeId,
+            }
+         )
+         throw error
+      }
    }
 }

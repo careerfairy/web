@@ -6,7 +6,7 @@ import { FieldValue } from "firebase-admin/firestore"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { relationshipsClient, userRepo } from "../../api/repositories"
-import { ChangeType, getChangeTypeEnum } from "../../util"
+import { ChangeType, getChangeTypeEnum, isLocalEnvironment } from "../../util"
 
 export const onUserRegistration = onDocumentWritten(
    {
@@ -66,7 +66,12 @@ export const onUserRegistration = onDocumentWritten(
             oldUserLivestreamData,
             newUserLivestreamData,
             userData
-         )
+         ).catch((error) => {
+            logger.error(
+               `Failed to track Customer.io relationships for user ${userEmail} and livestream ${livestreamId}:`,
+               error
+            )
+         })
 
          const registeredLivestreamsRef = admin
             .firestore()
@@ -263,6 +268,13 @@ async function trackCustomerIORelationships(
    newUserLivestreamData: UserLivestreamData,
    userData: UserData
 ): Promise<void> {
+   if (isLocalEnvironment()) {
+      logger.info(
+         `Skipping Customer.io relationships for user ${userData.id} and livestream ${livestreamId} in local environment`
+      )
+      return
+   }
+
    const userAuthId = userData.authId
 
    try {
