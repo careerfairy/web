@@ -1,9 +1,17 @@
-import { Box, Button, Dialog, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   Dialog,
+   IconButton,
+   Stack,
+   Typography,
+} from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import PlusCircleIcon from "components/views/common/icons/PlusCircleIcon"
 import BrandedSwipeableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
 import Image from "next/image"
 import Link from "next/link"
+import { X } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -40,6 +48,16 @@ const styles = sxStyles({
       ml: 23,
       mt: 4,
    },
+   closeButton: {
+      position: "absolute",
+      top: {
+         md: "12px",
+         xs: "32px",
+      },
+      right: "12px",
+      cursor: "pointer",
+      color: (theme) => theme.brand.white[50],
+   },
 })
 
 type OutOfEventsDialogProps = {
@@ -60,6 +78,9 @@ export const OutOfEventsDialog = ({
    const dialogContent = (
       <Stack spacing={"24px"} sx={styles.contentRoot}>
          <Stack minWidth="100%" alignItems="center">
+            <IconButton sx={styles.closeButton} onClick={onClose}>
+               <X size={24} />
+            </IconButton>
             <Box sx={styles.illustrationContainer} minWidth="100%">
                <Image
                   src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fcalendar.png?alt=media&token=9ec49476-8a85-4316-b7c9-748a79dd2145"
