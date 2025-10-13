@@ -49,7 +49,7 @@ const GeneralSettings = () => {
             placeholder="Insert your live stream title"
             requiredText="(required)"
          />
-         {livestream.isPanel ? <PanelLogoUploader /> : null}
+         {livestream.livestreamType === "panel" ? <PanelLogoUploader /> : null}
          {isCohostedEvent ? (
             <Stack
                sx={[

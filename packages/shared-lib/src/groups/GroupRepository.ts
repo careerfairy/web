@@ -1202,6 +1202,7 @@ export class FirebaseGroupRepository
          this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", group.id)
+            .where("livestreamType", "==", "livestream")
             .where("test", "==", false)
             .where("hidden", "==", false)
             .where("denyRecordingAccess", "==", false)
@@ -1310,6 +1311,7 @@ export class FirebaseGroupRepository
          this.firestore
             .collection("livestreams")
             .where("groupIds", "array-contains", group.id)
+            .where("livestreamType", "==", "livestream")
             .where("test", "==", false)
             .where("hidden", "==", false)
             .where("denyRecordingAccess", "==", false)
@@ -1389,6 +1391,7 @@ export class FirebaseGroupRepository
             this.firestore
                .collection("livestreams")
                .where("test", "==", false)
+               .where("livestreamType", "==", "livestream")
                .where("hidden", "==", false)
                .where("denyRecordingAccess", "==", false)
                .where("creatorsIds", "array-contains", creatorId)

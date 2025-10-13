@@ -127,7 +127,8 @@ const RegisterAskQuestionsView = () => {
                sx={styles.heroContent}
             >
                <Stack spacing={{ xs: 0.5, md: 3 }} sx={styles.heroContentStack}>
-                  {livestream.isPanel && livestream.panelLogoUrl ? (
+                  {livestream.livestreamType === "panel" &&
+                  livestream.panelLogoUrl ? (
                      <Box sx={styles.panelLogoContainer}>
                         <Image
                            src={getResizedUrl(livestream.panelLogoUrl, "lg")}

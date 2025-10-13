@@ -74,8 +74,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly denyRecordingAccess: boolean,
       public readonly hasJobs: boolean,
       public readonly useOldUI: boolean,
-      public readonly isPanel: boolean,
-
+      public readonly livestreamType: "livestream" | "panel",
       // ATS Jobs
       /**
        * During livestream creating, jobs can be associated with the livestream
@@ -137,6 +136,10 @@ export class LivestreamPresenter extends BaseModel {
 
    public setIsRecommended(isRecommended: boolean) {
       this.isRecommended = isRecommended
+   }
+
+   isPanel(): boolean {
+      return this.livestreamType === "panel"
    }
 
    isLive(): boolean {
@@ -290,7 +293,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.backgroundImageUrl ?? "",
          livestream.company ?? "",
          livestream.companyId ?? "",
-
          livestream.companyLogoUrl || "",
          toDate(livestream.created),
          toDate(livestream.start) || new Date(livestream.startDate),
@@ -325,7 +327,10 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess ?? false,
          livestream.hasJobs ?? false,
          livestream.useOldUI ?? false,
-         livestream.isPanel ?? false,
+         // Prefer livestreamType; treat missing as "livestream"; fallback to legacy isPanel
+         livestream.livestreamType === "panel" || livestream.isPanel
+            ? "panel"
+            : "livestream",
          livestream.jobs ?? [],
          livestream.targetCountries ?? [],
          livestream.targetUniversities ?? [],
@@ -394,7 +399,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.denyRecordingAccess,
          livestream.hasJobs,
          livestream.useOldUI,
-         livestream.isPanel,
+         livestream.livestreamType,
          livestream.jobs,
          livestream.targetCountries,
          livestream.targetUniversities,
@@ -504,7 +509,7 @@ export class LivestreamPresenter extends BaseModel {
          parentLivestream: this.parentLivestream,
          denyRecordingAccess: this.denyRecordingAccess,
          triGrams: this.triGrams,
-         isPanel: this.isPanel,
+         livestreamType: this.livestreamType,
       }
    }
 }

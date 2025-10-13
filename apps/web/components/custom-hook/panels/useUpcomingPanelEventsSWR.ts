@@ -57,7 +57,7 @@ export const useUpcomingPanelEventsSWR = (options?: Options) => {
             collection(firestore, "livestreams"),
             where("start", ">", getEarliestEventBufferTime()),
             where("test", "==", false),
-            where("isPanel", "==", true),
+            where("livestreamType", "==", "panel"),
             orderBy("start", "asc"),
             ...(includeHidden ? [] : [where("hidden", "==", false)]),
             firestoreLimit(limit)
