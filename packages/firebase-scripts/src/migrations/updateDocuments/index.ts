@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { UserData } from "@careerfairy/shared-lib/src/users/users"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import counterConstants from "../../lib/Counter/constants"
@@ -31,7 +31,7 @@ interface DefaultUpdateData {
  * query. Defaults to undefined.
  */
 interface UpdateDocumentsConfig<T = unknown> {
-   query: Query
+   query: Query<T>
    updateData:
       | Partial<{ [K in keyof T]: T[K] }>
       | ((data: T) => Partial<{ [K in keyof T]: T[K] }>)
@@ -42,25 +42,22 @@ interface UpdateDocumentsConfig<T = unknown> {
    customDataFilter?: (data: T) => boolean
 }
 
-const COLLECTION_NAME = "livestreams"
-const FIELD_TO_ORDER_BY = "start"
+const COLLECTION_NAME = "userData" // Change from "livestreams"
+const FIELD_TO_ORDER_BY = "createdAt" // Change from "start"
 
-// Configure your update here
-const config: UpdateDocumentsConfig<LivestreamEvent> = {
-   // Query for livestreams, excluding test livestreams
+const config: UpdateDocumentsConfig<UserData> = {
    query: firestore
       .collection(COLLECTION_NAME)
-      .where("test", "==", false)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
    updateData: {
-      migrationTrigger: Date.now(),
+      migrationTrigger: Date.now(), // This will trigger syncUserToCustomerIO
    },
-   batchSize: 200, // Increased batch size for faster processing
-   waitTimeBetweenBatches: 3_000, // Longer wait time to allow functions to process
-   dryRun: false, // Set to false to run the migration
+   batchSize: 200,
+   waitTimeBetweenBatches: 3_000,
+   dryRun: false, // Set to true first to test
 }
 
-const getTotalDocumentCount = async (query: Query) => {
+const getTotalDocumentCount = async (query: Query<UserData>) => {
    const totalDocumentsSnapshot = await query.count().get()
    return totalDocumentsSnapshot.data().count
 }
@@ -118,7 +115,7 @@ export async function run() {
          for (const doc of docs) {
             if (
                config.customDataFilter &&
-               !config.customDataFilter(doc.data() as LivestreamEvent)
+               !config.customDataFilter(doc.data())
             ) {
                skips++
                continue
@@ -130,7 +127,7 @@ export async function run() {
             if (!config.dryRun) {
                const updateData =
                   typeof config.updateData === "function"
-                     ? config.updateData(doc.data() as LivestreamEvent)
+                     ? config.updateData(doc.data())
                      : {
                           ...doc.data(),
                           ...config.updateData,
