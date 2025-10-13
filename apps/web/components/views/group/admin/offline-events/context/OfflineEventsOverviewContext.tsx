@@ -8,6 +8,7 @@ import {
    createContext,
    useCallback,
    useContext,
+   useEffect,
    useMemo,
    useState,
 } from "react"
@@ -109,6 +110,9 @@ export const OfflineEventsViewProvider = ({
 }: OfflineEventsViewProviderProps) => {
    const { group, groupPresenter } = useGroup()
    const { query } = useRouter()
+
+   const showOutOfEventsDialog = query.showOutOfEventsDialog === "true"
+
    const [sortBy, setSortBy] = useState<OfflineEventStatsSortOption>(
       OfflineEventStatsSortOption.STATUS_WITH_DATE
    )
@@ -123,7 +127,8 @@ export const OfflineEventsViewProvider = ({
       outOfEventsDialogOpen,
       handleOutOfEventsDialogOpen,
       handleOutOfEventsDialogClose,
-   ] = useDialogStateHandler()
+   ] = useDialogStateHandler(showOutOfEventsDialog)
+
    const [statusFilter, setStatusFilter] = useState<OfflineEventStatus[]>([])
    const [searchTerm, setSearchTerm] = useState("")
    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -137,7 +142,7 @@ export const OfflineEventsViewProvider = ({
    >(undefined)
    // Initialize stripeSessionId from query parameter
    const stripeSessionId = (query.stripe_session_id as string) || null
-   const { push } = useRouter()
+   const router = useRouter()
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
    const handleTableSort = useCallback(
@@ -206,10 +211,10 @@ export const OfflineEventsViewProvider = ({
          // Navigate to offline event view (with null-safe check)
          const eventId = stat.offlineEvent.id
          if (eventId) {
-            push(`/group/${group?.id}/offline-events/${eventId}`)
+            router.push(`/group/${group?.id}/offline-events/${eventId}`)
          }
       },
-      [group?.id, push]
+      [group?.id, router]
    )
 
    const handleShareOfflineEvent = useCallback(
@@ -228,12 +233,12 @@ export const OfflineEventsViewProvider = ({
          // Navigate to analytics view (with null-safe check)
          const eventId = stat.offlineEvent.id
          if (eventId) {
-            push(
+            router.push(
                `/group/${group?.id}/admin/analytics/offline-events/${eventId}`
             )
          }
       },
-      [group?.id, push]
+      [group?.id, router]
    )
 
    const handleEdit = useCallback(
@@ -241,10 +246,12 @@ export const OfflineEventsViewProvider = ({
          // Navigate to edit page (with null-safe check)
          const eventId = stat.offlineEvent.id
          if (eventId) {
-            push(`/group/${group?.id}/admin/content/offline-events/${eventId}`)
+            router.push(
+               `/group/${group?.id}/admin/content/offline-events/${eventId}`
+            )
          }
       },
-      [group?.id, push]
+      [group?.id, router]
    )
 
    const handleViewRegistration = useCallback(
@@ -265,10 +272,10 @@ export const OfflineEventsViewProvider = ({
          // Navigate to details view (with null-safe check)
          const eventId = stat.offlineEvent.id
          if (eventId) {
-            push(`/group/${group?.id}/offline-events/${eventId}`)
+            router.push(`/group/${group?.id}/offline-events/${eventId}`)
          }
       },
-      [group?.id, push]
+      [group?.id, router]
    )
 
    const handleDelete = useCallback((stat: OfflineEventsWithStats) => {
@@ -312,6 +319,27 @@ export const OfflineEventsViewProvider = ({
       [onPaginationReset]
    )
 
+   const handleOutOfEventsClose = useCallback(() => {
+      delete query["showOutOfEventsDialog"]
+
+      router.push(
+         {
+            pathname: router.pathname,
+            query: query,
+         },
+         undefined,
+         { shallow: true }
+      )
+
+      handleOutOfEventsDialogClose()
+   }, [router, handleOutOfEventsDialogClose, query])
+
+   useEffect(() => {
+      if (query.showOutOfEventsDialog === "true") {
+         handleOutOfEventsDialogOpen()
+      }
+   }, [query.showOutOfEventsDialog, handleOutOfEventsDialogOpen])
+
    const value = useMemo<OfflineEventsViewContextValue>(
       () => ({
          showBuyCTA,
@@ -320,7 +348,7 @@ export const OfflineEventsViewProvider = ({
          handleCheckoutDialogClose,
          outOfEventsDialogOpen,
          handleOutOfEventsDialogOpen,
-         handleOutOfEventsDialogClose,
+         handleOutOfEventsDialogClose: handleOutOfEventsClose,
          stripeSessionId,
          sortBy,
          setSortBy,
@@ -365,11 +393,11 @@ export const OfflineEventsViewProvider = ({
          showBuyCTA,
          checkoutDialogOpen,
          handleCheckoutDialogOpen,
-         handleCheckoutDialogClose,
          outOfEventsDialogOpen,
          handleOutOfEventsDialogOpen,
-         handleOutOfEventsDialogClose,
+         handleOutOfEventsClose,
          stripeSessionId,
+         handleCheckoutDialogClose,
       ]
    )
 
