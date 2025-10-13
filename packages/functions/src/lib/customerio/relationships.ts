@@ -14,6 +14,7 @@ import { OBJECT_TYPES } from "./objectsClient"
  * All data is preserved through prefixed attributes:
  * - registered_at, registration_utm, registration_origin_source
  * - participated_at, participation_utm
+ * - seen_first_at, seen_last_at, seen_view_count, seen_first_utm, seen_last_utm
  *
  * The presence of these attributes indicates the user's interaction history.
  */
@@ -35,6 +36,18 @@ export interface RegistrationRelationshipData {
 export interface ParticipationRelationshipData {
    participatedAt?: number
    utm?: UTMParams
+}
+
+/**
+ * Additional context data for seen relationships
+ * Note: Timestamps should be Unix timestamps (seconds since epoch)
+ */
+export interface SeenRelationshipData {
+   firstSeenAt?: number
+   lastSeenAt?: number
+   viewCount?: number
+   firstUtm?: UTMParams
+   lastUtm?: UTMParams
 }
 
 const getApiCredentials = () => {
@@ -132,114 +145,6 @@ export async function createUserLivestreamRelationship(
 }
 
 /**
- * Deletes the relationship between a user and a livestream object in Customer.io
- *
- * @param userAuthId The user's authentication ID
- * @param livestreamId The livestream identifier
- */
-export async function deleteUserLivestreamRelationship(
-   userAuthId: string,
-   livestreamId: string
-): Promise<void> {
-   if (isTestEnvironment()) {
-      logger.info(
-         `[TEST] Would delete Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`
-      )
-      return
-   }
-
-   const { siteId, apiKey } = getApiCredentials()
-
-   if (!siteId || !apiKey) {
-      throw new Error("Customer.io credentials not configured")
-   }
-
-   const url = `${CUSTOMERIO_TRACK_API_URL}/api/v2/entity`
-   const auth = Buffer.from(`${siteId}:${apiKey}`).toString("base64")
-
-   try {
-      await axios.post(
-         url,
-         {
-            type: "person",
-            action: "delete_relationships",
-            identifiers: {
-               id: userAuthId,
-            },
-            cio_relationships: [
-               {
-                  identifiers: {
-                     object_type_id: OBJECT_TYPES.LIVESTREAMS,
-                     object_id: livestreamId,
-                  },
-               },
-            ],
-         },
-         {
-            headers: {
-               Authorization: `Basic ${auth}`,
-               "Content-Type": "application/json",
-            },
-         }
-      )
-
-      logger.info(
-         `Successfully deleted Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`
-      )
-   } catch (error) {
-      // 404 errors are ok - relationship doesn't exist
-      if (error?.response?.status === 404) {
-         logger.info(
-            `Customer.io relationship doesn't exist: user ${userAuthId} -> livestream ${livestreamId}, skipping deletion`
-         )
-         return
-      }
-
-      logger.error(
-         `Failed to delete Customer.io relationship: user ${userAuthId} -> livestream ${livestreamId}`,
-         {
-            error: error?.message,
-            response: error?.response?.data,
-            status: error?.response?.status,
-            userAuthId,
-            livestreamId,
-         }
-      )
-      throw error
-   }
-}
-
-/**
- * Deletes all relationships for a specific livestream
- * This should be called when a livestream is deleted to clean up orphaned relationships
- *
- * @param livestreamId The livestream identifier
- */
-export async function deleteAllLivestreamRelationships(
-   livestreamId: string
-): Promise<void> {
-   if (isTestEnvironment()) {
-      logger.info(
-         `[TEST] Would delete all Customer.io relationships for livestream ${livestreamId}`
-      )
-      return
-   }
-
-   logger.info(
-      `Cleaning up all Customer.io relationships for livestream ${livestreamId}`
-   )
-
-   // Note: Customer.io doesn't provide a bulk delete endpoint for relationships
-   // In practice, when we delete the livestream object, Customer.io should automatically
-   // clean up associated relationships. This function serves as a placeholder for
-   // any additional cleanup logic that might be needed in the future.
-
-   logger.info(
-      `Customer.io will automatically clean up relationships when livestream object ${livestreamId} is deleted`
-   )
-}
-
-/**
  * Helper function to update registration data on a livestream relationship
  * Uses prefixed attribute names to preserve any existing participation data
  * @param userAuthId The user's authentication ID
@@ -301,19 +206,25 @@ export async function clearRegistrationData(
 }
 
 /**
- * Helper function to clear participation data from a livestream relationship
- * Sets participation attributes to null while preserving registration data
+ * Helper function to update seen data on a livestream relationship
+ * Uses prefixed attribute names to preserve any existing registration and participation data
  * @param userAuthId The user's authentication ID
  * @param livestreamId The livestream identifier
+ * @param data Optional seen data (firstSeenAt, lastSeenAt, viewCount, firstUtm, lastUtm)
  */
-export async function clearParticipationData(
+export async function updateSeenData(
    userAuthId: string,
-   livestreamId: string
+   livestreamId: string,
+   data?: SeenRelationshipData
 ): Promise<void> {
-   const attributes: Record<string, any> = {
-      participated_at: null,
-      participation_utm: null,
-   }
+   const attributes: Record<string, any> = {}
+
+   if (data?.firstSeenAt) attributes.seen_first_at = data.firstSeenAt
+   if (data?.lastSeenAt) attributes.seen_last_at = data.lastSeenAt
+   if (data?.viewCount !== undefined)
+      attributes.seen_view_count = data.viewCount
+   if (data?.firstUtm) attributes.seen_first_utm = data.firstUtm
+   if (data?.lastUtm) attributes.seen_last_utm = data.lastUtm
 
    return createUserLivestreamRelationship(userAuthId, livestreamId, attributes)
 }

@@ -8,10 +8,10 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore"
 import { userRepo } from "../../api/repositories"
 import { ChangeType, getChangeTypeEnum } from "../../util"
 import {
-   clearParticipationData,
    clearRegistrationData,
    updateParticipationData,
    updateRegistrationData,
+   updateSeenData,
 } from "../customerio/relationships"
 
 export const onUserRegistration = onDocumentWritten(
@@ -31,7 +31,7 @@ export const onUserRegistration = onDocumentWritten(
       const oldUserLivestreamData =
          event.data.before.data() as UserLivestreamData
 
-      // Check for both registration and participation changes
+      // Check for registration, participation, and seen data changes
       const registrationChanged = hasRegistrationChanged(
          oldUserLivestreamData,
          newUserLivestreamData
@@ -40,16 +40,20 @@ export const onUserRegistration = onDocumentWritten(
          oldUserLivestreamData,
          newUserLivestreamData
       )
+      const seenDataChanged = hasSeenDataChanged(
+         oldUserLivestreamData,
+         newUserLivestreamData
+      )
 
-      if (!registrationChanged && !participationChanged) {
+      if (!registrationChanged && !participationChanged && !seenDataChanged) {
          logger.info(
-            `No registration or participation change detected for live stream ${livestreamId} and user ${userEmail}`
+            `No registration, participation, or seen data change detected for live stream ${livestreamId} and user ${userEmail}`
          )
          return
       }
 
       logger.info(
-         `Registration or participation change detected for live stream ${livestreamId} and user ${userEmail}`
+         `Registration, participation, or seen data change detected for live stream ${livestreamId} and user ${userEmail}`
       )
 
       try {
@@ -179,6 +183,30 @@ function hasParticipationChanged(
    )
 }
 
+function hasSeenDataChanged(
+   oldData: UserLivestreamData,
+   newData: UserLivestreamData
+): boolean {
+   const hadSeen = Boolean(oldData?.seen?.firstSeenAt)
+   const hasSeen = Boolean(newData?.seen?.firstSeenAt)
+
+   // If seen status changed (first view or cleared)
+   if (hadSeen !== hasSeen) {
+      return true
+   }
+
+   // If user has seen the livestream, check if lastSeenAt or viewCount changed
+   if (hasSeen) {
+      return (
+         oldData?.seen?.lastSeenAt?.toMillis() !==
+            newData?.seen?.lastSeenAt?.toMillis() ||
+         oldData?.seen?.viewCount !== newData?.seen?.viewCount
+      )
+   }
+
+   return false
+}
+
 function getOrCreateRegisteredLivestreams(
    doc: FirebaseFirestore.DocumentSnapshot,
    userData: UserData | undefined
@@ -232,7 +260,7 @@ function updateRegisteredLivestreams(
 }
 
 /**
- * Tracks Customer.io relationship changes for both registration and participation
+ * Tracks Customer.io relationship changes for registration, participation, and seen data
  * Updates or clears specific attribute sets while preserving the relationship for future attributes
  */
 async function trackCustomerIORelationships(
@@ -244,13 +272,14 @@ async function trackCustomerIORelationships(
    const userAuthId = userData.authId
 
    try {
-      // Track registration and participation changes
+      // Track registration, participation, and seen changes
       const wasRegistered = Boolean(oldUserLivestreamData?.registered?.date)
       const isRegistered = Boolean(newUserLivestreamData?.registered?.date)
       const wasParticipating = Boolean(
          oldUserLivestreamData?.participated?.date
       )
       const isParticipating = Boolean(newUserLivestreamData?.participated?.date)
+      const hasSeen = Boolean(newUserLivestreamData?.seen?.firstSeenAt)
 
       // Handle registration changes
       if (!wasRegistered && isRegistered) {
@@ -285,11 +314,25 @@ async function trackCustomerIORelationships(
          logger.info(
             `Updated Customer.io participation data: user ${userAuthId} -> livestream ${livestreamId}`
          )
-      } else if (wasParticipating && !isParticipating) {
-         // User stopped participating - clear participation attributes
-         await clearParticipationData(userAuthId, livestreamId)
+      }
+
+      // Handle seen data changes
+      if (
+         hasSeenDataChanged(oldUserLivestreamData, newUserLivestreamData) &&
+         hasSeen
+      ) {
+         // User has viewed the livestream - update seen data
+         await updateSeenData(userAuthId, livestreamId, {
+            firstSeenAt: toUnixTimestamp(
+               newUserLivestreamData.seen?.firstSeenAt
+            ),
+            lastSeenAt: toUnixTimestamp(newUserLivestreamData.seen?.lastSeenAt),
+            viewCount: newUserLivestreamData.seen?.viewCount,
+            firstUtm: newUserLivestreamData.seen?.firstUtm,
+            lastUtm: newUserLivestreamData.seen?.lastUtm,
+         })
          logger.info(
-            `Cleared Customer.io participation data: user ${userAuthId} -> livestream ${livestreamId}`
+            `Updated Customer.io seen data: user ${userAuthId} -> livestream ${livestreamId} (viewCount: ${newUserLivestreamData.seen?.viewCount})`
          )
       }
    } catch (error) {

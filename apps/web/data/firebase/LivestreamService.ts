@@ -444,6 +444,57 @@ export class LivestreamService {
    }
 
    /**
+    * Updates Firestore to track that a user has viewed the livestream details page.
+    * Tracks both first and last seen timestamps, plus view count.
+    *
+    * @param {string} livestreamId - Livestream ID.
+    * @param {UserData} userData - User data.
+    * @returns {Promise<void>} Resolves upon successful Firestore update.
+    */
+   async setUserHasSeenLivestream(
+      livestreamId: string,
+      userData: UserData
+   ): Promise<void> {
+      const userLivestreamDataRef = this.getUserLivestreamDataRef(
+         livestreamId,
+         userData.userEmail
+      )
+
+      const userLivestreamDataSnapshot = await getDoc(userLivestreamDataRef)
+      const existingData = userLivestreamDataSnapshot.data()
+      const isFirstView = !existingData?.seen?.firstSeenAt
+
+      const currentTimestamp = Timestamp.now()
+
+      const currentUtm = CookiesUtil.getUTMParams()
+
+      const updateData: UpdateData<UserLivestreamData> = {
+         user: userData as any,
+         userId: userData?.authId,
+         seen: {
+            // Only set firstSeenAt and firstUtm on first view, otherwise preserve existing values
+            ...(isFirstView
+               ? {
+                    firstSeenAt: currentTimestamp,
+                    firstUtm: currentUtm,
+                 }
+               : {}),
+            // Always update lastSeenAt, lastUtm, and increment viewCount
+            lastSeenAt: currentTimestamp,
+            lastUtm: currentUtm,
+            viewCount: increment(1),
+         },
+         registered: existingData?.registered || null,
+         talentPool: existingData?.talentPool || null,
+         participated: (existingData?.participated as any) || null,
+      }
+
+      return setDoc(userLivestreamDataRef, updateData, {
+         merge: true,
+      })
+   }
+
+   /**
     * Updates Firestore to mark a user as participating in a live stream. This involves updating the user's status in `userLivestreamData`.
     *
     * @param {string} livestreamId - Livestream ID.

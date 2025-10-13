@@ -361,12 +361,12 @@ export interface UserLivestreamData extends Identifiable {
       isRecommended?: boolean
       sparkId?: string
       originSource?: ImpressionLocation
-   }
+   } | null
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
       companyId: string
-   }
+   } | null
    participated?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
@@ -377,7 +377,19 @@ export interface UserLivestreamData extends Identifiable {
          date: firebase.firestore.Timestamp
       }
       utm?: UTMParams
-   }
+   } | null
+   seen?: {
+      // When the user first viewed the livestream details page
+      firstSeenAt: firebase.firestore.Timestamp
+      // When the user most recently viewed the livestream details page
+      lastSeenAt: firebase.firestore.Timestamp
+      // Number of times the user has viewed the livestream details page
+      viewCount: number
+      // UTM parameters from the first view
+      firstUtm?: UTMParams
+      // UTM parameters from the most recent view
+      lastUtm?: UTMParams
+   } | null
    jobApplications?: {
       [jobId: string]: LivestreamJobApplicationDetails
    }
