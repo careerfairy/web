@@ -21,6 +21,8 @@ type OfflineEventsViewContextValue = {
    checkoutDialogOpen: boolean
    handleCheckoutDialogOpen: () => void
    handleCheckoutDialogClose: () => void
+   // Plan confirmation dialog
+   stripeSessionId: string | null
    sortBy: OfflineEventStatsSortOption
    setSortBy: (sortBy: OfflineEventStatsSortOption) => void
    handleTableSort: (field: "title" | "date" | "views" | "clicks") => void
@@ -102,6 +104,7 @@ export const OfflineEventsViewProvider = ({
    children,
 }: OfflineEventsViewProviderProps) => {
    const { group, groupPresenter } = useGroup()
+   const { query } = useRouter()
    const [sortBy, setSortBy] = useState<OfflineEventStatsSortOption>(
       OfflineEventStatsSortOption.STATUS_WITH_DATE
    )
@@ -123,6 +126,8 @@ export const OfflineEventsViewProvider = ({
    const [onPaginationReset, setOnPaginationReset] = useState<
       (() => void) | undefined
    >(undefined)
+   // Initialize stripeSessionId from query parameter
+   const stripeSessionId = (query.stripe_session_id as string) || null
    const { push } = useRouter()
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
@@ -304,6 +309,7 @@ export const OfflineEventsViewProvider = ({
          checkoutDialogOpen,
          handleCheckoutDialogOpen,
          handleCheckoutDialogClose,
+         stripeSessionId,
          sortBy,
          setSortBy,
          handleTableSort,
@@ -348,6 +354,7 @@ export const OfflineEventsViewProvider = ({
          checkoutDialogOpen,
          handleCheckoutDialogOpen,
          handleCheckoutDialogClose,
+         stripeSessionId,
       ]
    )
 

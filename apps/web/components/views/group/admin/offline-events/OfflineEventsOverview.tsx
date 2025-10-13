@@ -7,6 +7,8 @@ import { Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useGroupOfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import CheckoutConfirmationDialog from "components/views/checkout/views/CheckoutConfirmationDialog"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
@@ -25,14 +27,7 @@ const OfflineEventsOverviewContent = () => {
    const router = useRouter()
    const groupId = router.query.groupId as string
    const isMobile = useIsMobile(700)
-   const { query } = useRouter()
 
-   // TODO: Use for confirmation dialog
-   const stripeSessionId = query.stripe_session_id as string
-   console.log(
-      "🚀 ~ OfflineEventsOverviewContent ~ stripeSessionId:",
-      stripeSessionId
-   )
    const {
       sortBy,
       statusFilter,
@@ -40,6 +35,7 @@ const OfflineEventsOverviewContent = () => {
       checkoutDialogOpen,
       handleCheckoutDialogClose,
       handleCheckoutDialogOpen,
+      stripeSessionId,
    } = useOfflineEventsOverview()
 
    const { group } = useGroup()
@@ -62,36 +58,45 @@ const OfflineEventsOverviewContent = () => {
    const checkoutData = getCheckoutData(group, userData?.userEmail)
 
    return (
-      <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
-         <OverviewHeader />
-         <CheckoutDialog
-            checkoutData={checkoutData}
-            open={checkoutDialogOpen}
-            onClose={handleCheckoutDialogClose}
-            onOpen={handleCheckoutDialogOpen}
-            title="Plan your next offline events"
-            subtitle="Select how many offline events you want to publish and reach more students."
-         />
-         {Boolean(isLoading) && <p>Loading stats...</p>}
-         {Boolean(error) && <p>Error loading stats: {error.message}</p>}
-         <Fragment>
-            {isMobile ? (
-               <MobileOfflineEventsView
-                  stats={stats}
-                  isEmptyNoEvents={!hasFilters && noResults}
-                  isEmptySearchFilter={Boolean(hasFilters && noResults)}
-                  onCreateOfflineEvent={createDraftOfflineEvent}
-               />
-            ) : (
-               <DesktopOfflineEventsView
-                  stats={stats}
-                  isEmptyNoEvents={!hasFilters && noResults}
-                  isEmptySearchFilter={Boolean(hasFilters && noResults)}
-                  onCreateOfflineEvent={createDraftOfflineEvent}
-               />
-            )}
-         </Fragment>
-      </Stack>
+      <>
+         <ConditionalWrapper condition={Boolean(stripeSessionId)}>
+            <CheckoutConfirmationDialog
+               successTitle="Your offline event credits have been purchased!"
+               successDescription="You can now create and publish offline events to reach more students and expand your university's presence."
+               successButtonText="Start creating events"
+            />
+         </ConditionalWrapper>
+         <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
+            <OverviewHeader />
+            <CheckoutDialog
+               checkoutData={checkoutData}
+               open={checkoutDialogOpen}
+               onClose={handleCheckoutDialogClose}
+               onOpen={handleCheckoutDialogOpen}
+               title="Plan your next offline events"
+               subtitle="Select how many offline events you want to publish and reach more students."
+            />
+            {Boolean(isLoading) && <p>Loading stats...</p>}
+            {Boolean(error) && <p>Error loading stats: {error.message}</p>}
+            <Fragment>
+               {isMobile ? (
+                  <MobileOfflineEventsView
+                     stats={stats}
+                     isEmptyNoEvents={!hasFilters && noResults}
+                     isEmptySearchFilter={Boolean(hasFilters && noResults)}
+                     onCreateOfflineEvent={createDraftOfflineEvent}
+                  />
+               ) : (
+                  <DesktopOfflineEventsView
+                     stats={stats}
+                     isEmptyNoEvents={!hasFilters && noResults}
+                     isEmptySearchFilter={Boolean(hasFilters && noResults)}
+                     onCreateOfflineEvent={createDraftOfflineEvent}
+                  />
+               )}
+            </Fragment>
+         </Stack>
+      </>
    )
 }
 
@@ -99,20 +104,13 @@ const getCheckoutData = (
    group: Group,
    userEmail: string
 ): OfflineEventFetchStripeCustomerSession => {
-   console.log(
-      "🚀 ~ getCheckoutData ~  process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID:",
-      process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID
-   )
-
    return {
       type: StripeProductType.OFFLINE_EVENT,
       customerName: group.universityName,
       customerEmail: userEmail,
       groupId: group.groupId,
-      priceId:
-         process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID ||
-         "price_1SFGClKcrPDGIq6mIh1P8EH4", // TODO: Remove test price id
-      successUrl: "/offline-event-success", // TODO: Update to the correct URL
+      priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID,
+      successUrl: `/group/${group.id}/admin/content/offline-events?stripe_session_id={CHECKOUT_SESSION_ID}`,
    }
 }
 

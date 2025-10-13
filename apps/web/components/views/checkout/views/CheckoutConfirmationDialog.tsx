@@ -37,7 +37,7 @@ const styles = sxStyles({
    },
    dialogContentWrapper: {
       p: "15px",
-      alignItems: "center"
+      alignItems: "center",
    },
    messageTitle: {
       maxWidth: "350px",
@@ -74,47 +74,67 @@ const styles = sxStyles({
    },
 })
 
-const PlanActivationConfirmationDialog = () => {
+type CheckoutConfirmationDialogProps = {
+   successTitle: string
+   successDescription: string
+   successButtonText: string
+}
+
+const CheckoutConfirmationDialog = ({
+   successTitle,
+   successDescription,
+   successButtonText,
+}: CheckoutConfirmationDialogProps) => {
    const { query } = useRouter()
 
    const stripeSessionId = query.stripe_session_id as string
 
    return (
       <ConditionalWrapper condition={Boolean(stripeSessionId)}>
-         <PaymentCompleteComponent sessionId={stripeSessionId} />
+         <PaymentCompleteComponent
+            sessionId={stripeSessionId}
+            successTitle={successTitle}
+            successDescription={successDescription}
+            successButtonText={successButtonText}
+         />
       </ConditionalWrapper>
    )
 }
 
 type PaymentCompleteComponentProps = {
    sessionId: string
+   successTitle: string
+   successDescription: string
+   successButtonText: string
 }
 const PaymentCompleteComponent = ({
    sessionId,
+   successTitle,
+   successDescription,
+   successButtonText,
 }: PaymentCompleteComponentProps) => {
    const { asPath, replace } = useRouter()
-   
+
    const [isOpen, setIsOpen] = useState(true)
    const isMobile = useIsMobile()
 
    const { data: sessionStatus } = useStripeSessionStatus(sessionId)
-
-   const closeDialog = () => {
-      setIsOpen(false)
-      replace(replaceUrl)
-   }
 
    // Replacing only this query string to prevent breaking other properties if needed
    const url = new URL(asPath, getBaseUrl())
    url.searchParams.delete("stripe_session_id")
    const replaceUrl = url.pathname + url.search
 
+   const closeDialog = () => {
+      setIsOpen(false)
+      replace(replaceUrl)
+   }
+
    const showSuccess =
       Boolean(sessionStatus) &&
       sessionStatus.status == "complete" &&
       sessionStatus.paymentStatus == "paid"
 
-   
    return (
       <Dialog
          sx={isMobile ? styles.containerMobile : styles.container}
@@ -130,7 +150,12 @@ const PaymentCompleteComponent = ({
             condition={showSuccess}
             fallback={<PaymentFailureComponent handleClose={closeDialog} />}
          >
-            <PaymentSuccessComponent handleClose={closeDialog} />
+            <PaymentSuccessComponent
+               handleClose={closeDialog}
+               successTitle={successTitle}
+               successDescription={successDescription}
+               successButtonText={successButtonText}
+            />
          </ConditionalWrapper>
       </Dialog>
    )
@@ -144,11 +169,7 @@ const PaymentFailureComponent = ({
    handleClose,
 }: PaymentDialogComponentProps) => {
    return (
-      <Stack
-         direction={"column"} 
-         sx={styles.dialogContentWrapper}
-         spacing={2}
-      >
+      <Stack direction={"column"} sx={styles.dialogContentWrapper} spacing={2}>
          <Stack alignItems={"center"} spacing={1}>
             <Box sx={styles.errorImageWrapper}>
                <AlertCircleIcon sx={styles.alertIcon} />
@@ -187,27 +208,28 @@ const PaymentFailureComponent = ({
    )
 }
 
+type PaymentSuccessComponentProps = {
+   handleClose: () => void
+   successTitle: string
+   successDescription: string
+   successButtonText: string
+}
+
 const PaymentSuccessComponent = ({
    handleClose,
-}: PaymentDialogComponentProps) => {
-   const { query } = useRouter()
-
-   const planName = query.planName as string
+   successTitle,
+   successDescription,
+   successButtonText,
+}: PaymentSuccessComponentProps) => {
    return (
-      <Stack
-         direction={"column"} 
-         sx={styles.dialogContentWrapper}
-         spacing={2}
-      >
+      <Stack direction={"column"} sx={styles.dialogContentWrapper} spacing={2}>
          <Stack alignItems={"center"} spacing={1}>
             <Box sx={styles.imageWrapper} />
             <Typography variant="brandedH3" sx={styles.messageTitle}>
-               Your Sparks {planName} plan is now active!
+               {successTitle}
             </Typography>
             <Typography variant="brandedBody" sx={styles.messageDescription}>
-               Discover the latest trends thanks to comprehensive Sparks
-               analytics and engage even more your target audience by publishing
-               additional Sparks.
+               {successDescription}
             </Typography>
          </Stack>
 
@@ -217,9 +239,9 @@ const PaymentSuccessComponent = ({
             variant="contained"
             onClick={handleClose}
          >
-            Start using your plan
+            {successButtonText}
          </Button>
       </Stack>
    )
 }
-export default PlanActivationConfirmationDialog
+export default CheckoutConfirmationDialog
