@@ -29,8 +29,6 @@ export interface IStripeFunctionsRepository {
     */
    getTotalQuantityFromCheckoutSessionById(sessionId: string): Promise<number>
 
-   getTotalQuantityFromCheckoutSession(session: Stripe.Checkout.Session): number
-
    retrievePrice(priceId: string): Promise<Stripe.Price>
 
    retrieveCheckoutSession(sessionId: string): Promise<Stripe.Checkout.Session>
@@ -121,17 +119,7 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
          expand: ["line_items"],
       })
 
-      return this.getTotalQuantityFromCheckoutSession(session)
-   }
-
-   // Utility functions
-
-   getTotalQuantityFromCheckoutSession(
-      session: Stripe.Checkout.Session
-   ): number {
-      const lineItems = session.line_items?.data || []
-
-      return lineItems.reduce((acc, item) => acc + (item.quantity || 0), 0)
+      return getTotalQuantityFromCheckoutSession(session)
    }
 
    async retrievePrice(priceId: string): Promise<Stripe.Price> {
@@ -159,4 +147,14 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
    ): Stripe.Event {
       return Stripe.webhooks.constructEvent(payload, signature, secret)
    }
+}
+
+// Utility functions
+
+const getTotalQuantityFromCheckoutSession = (
+   session: Stripe.Checkout.Session
+): number => {
+   const lineItems = session.line_items?.data || []
+
+   return lineItems.reduce((acc, item) => acc + (item.quantity || 0), 0)
 }
