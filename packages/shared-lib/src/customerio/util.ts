@@ -14,9 +14,12 @@ export function toUnixTimestamp(timestamp: Timestamp): number | undefined {
 
 /**
  * Helper function to transform UserData to CustomerIO format
+ * @param userData User data to transform
+ * @param highestProficiencyLanguage User's highest proficiency language (optional, defaults to empty string)
  */
 export function transformUserDataForCustomerIO(
-   userData: UserData
+   userData: UserData,
+   highestProficiencyLanguage: string = ""
 ): CustomerIOUserData {
    return {
       // Basic Info
@@ -43,6 +46,7 @@ export function transformUserDataForCustomerIO(
       linkedin_url: userData.linkedinUrl,
       position: userData.position,
       spoken_languages: userData.spokenLanguages,
+      highest_proficiency_language: highestProficiencyLanguage,
 
       // Interests & Preferences
       business_functions: userData.businessFunctionsTagIds,

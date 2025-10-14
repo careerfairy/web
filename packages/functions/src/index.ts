@@ -408,6 +408,7 @@ exports.getFollowedCreators = levels.getFollowedCreators
 
 // CustomerIO
 exports.syncUserToCustomerIO = customerio.syncUserToCustomerIO
+exports.syncUserLanguagesToCustomerIO = customerio.syncUserLanguagesToCustomerIO
 exports.customerIOWebhook = customerio.customerIOWebhook
 exports[FUNCTION_NAMES.customerIORecommendedLivestreamsWebhook] =
    customerio.customerIORecommendedLivestreamsWebhook

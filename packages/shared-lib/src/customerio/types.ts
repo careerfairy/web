@@ -44,6 +44,7 @@ export interface CustomerIOUserData {
    linkedin_url: string
    position: string
    spoken_languages: string[]
+   highest_proficiency_language: string
 
    // Interests & Preferences
    business_functions?: string[]
