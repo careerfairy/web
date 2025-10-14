@@ -7,9 +7,6 @@ import { sxStyles } from "types/commonTypes"
 const styles = sxStyles({
    childStyles: {
       position: "absolute",
-      top: "initial",
-      left: "50%",
-      transform: "translateX(-50%)",
    },
 })
 

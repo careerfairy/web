@@ -164,13 +164,11 @@ export const Spotlight = ({ stream }: Props) => {
                   >
                      <SpotlightProvider stream={stream}>
                         {Content[livestreamMode]}
-                        {!isHost && (
-                           <Overlay
-                              isFullScreen={isFullScreen}
-                              handleFullscreenClick={handleFullscreenClick}
-                              showOverlay={showOverlay}
-                           />
-                        )}
+                        <Overlay
+                           isFullScreen={isFullScreen}
+                           handleFullscreenClick={handleFullscreenClick}
+                           showOverlay={showOverlay}
+                        />
                      </SpotlightProvider>
                   </FramerBox>
                </Box>
