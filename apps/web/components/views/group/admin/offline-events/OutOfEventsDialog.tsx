@@ -16,6 +16,7 @@ import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
    desktopPaper: {
+      maxWidth: "516px",
       borderRadius: {
          xs: "12px 12px 0 0",
          sm: "12px 12px 0 0",
@@ -162,7 +163,6 @@ export const OutOfEventsDialog = ({
       <Dialog
          open={open}
          onClose={onClose}
-         maxWidth="sm"
          fullWidth
          PaperProps={{
             sx: styles.desktopPaper,
