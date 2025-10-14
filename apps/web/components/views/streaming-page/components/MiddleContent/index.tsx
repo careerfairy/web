@@ -31,6 +31,7 @@ const styles = sxStyles({
       flex: 1,
       height: "fill-available",
       minHeight: "1px",
+      minWidth: 0,
    },
    stackMobileLandscape: {
       flexDirection: "column",
