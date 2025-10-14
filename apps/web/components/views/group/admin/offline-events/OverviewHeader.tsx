@@ -20,14 +20,28 @@ const styles = sxStyles({
       borderBottomRightRadius: "12px",
       p: "12px",
       width: "100%",
-      borderLeft: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderTop: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      borderRight: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      borderBottom: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      borderLeft: "none",
    },
    getMoreEventsDesktop: {
       borderTopRightRadius: "12px",
       borderBottomRightRadius: "12px",
       p: "14px 12px",
       width: "100%",
-      borderLeft: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      borderTop: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      borderRight: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      borderBottom: (theme) => `1px solid ${theme.palette.neutral[50]}`,
+      borderLeft: "none",
    },
    eventsCounterRoot: {
       height: "48px",
@@ -35,7 +49,9 @@ const styles = sxStyles({
    },
    eventsCounterRootMobile: {
       minWidth: "100%",
-      height: "40px",
+      height: "48px",
+      display: "flex",
+      alignItems: "stretch",
    },
    moreEventsNoneAvailable: {
       backgroundColor: (theme) => theme.brand.purple[500],
@@ -104,7 +120,9 @@ export const OverviewHeader = () => {
                ]}
                onClick={handleCheckoutDialogOpen}
             >
-               <Typography variant="small">Promote more events</Typography>
+               <Typography variant="small" sx={{ whiteSpace: "nowrap" }}>
+                  Promote more events
+               </Typography>
             </ButtonBase>
          </Stack>
       </Stack>
