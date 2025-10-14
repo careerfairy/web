@@ -25,7 +25,7 @@ import { MobileOfflineEventsView } from "./offline-events-table/MobileOfflineEve
 import { OfflineEventsPromotionView } from "./promotion/OfflineEventsPromotionView"
 import { useOfflineEventRouting } from "./useOfflineEventRouting"
 
-const OfflineEventsOverviewDetails = () => {
+const OfflineEventsOverviewContent = () => {
    const router = useRouter()
    const groupId = router.query.groupId as string
    const isMobile = useIsMobile(700)
@@ -131,7 +131,7 @@ export const OfflineEventsOverview = () => {
    return (
       <AdminContainer>
          <OfflineEventsViewProvider>
-            <OfflineEventsOverviewDetails />
+            <OfflineEventsOverviewContent />
          </OfflineEventsViewProvider>
       </AdminContainer>
    )
