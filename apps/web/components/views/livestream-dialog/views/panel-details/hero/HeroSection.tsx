@@ -95,10 +95,11 @@ export const HeroSection = forwardRef<HTMLDivElement, HeroProps>(
          serverUserEmail,
          closeDialog,
          handleBack,
+         originSource,
       } = useLiveStreamDialog()
       const { handleRegisterClick } = useRegistrationHandler()
       const isMobile = useIsMobile()
-      const viewRef = useTrackLivestreamView(livestream)
+      const viewRef = useTrackLivestreamView(livestream, originSource)
 
       return (
          <Box

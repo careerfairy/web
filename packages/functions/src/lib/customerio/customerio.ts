@@ -225,7 +225,7 @@ export const syncLivestreamToCustomerIO = onDocumentWritten(
                      `Successfully updated livestream ${livestreamId} in CustomerIO`
                   )
                } else {
-                  // Livestream no longer qualifies (became test/hidden/draft)
+                  // Livestream no longer qualifies (became test)
                   await objectsClient.deleteObject(
                      OBJECT_TYPES.LIVESTREAMS,
                      livestreamId
@@ -413,6 +413,8 @@ const trackCustomerIORelationships = async (
             viewCount: newUserLivestreamData.seen?.viewCount,
             firstUtm: newUserLivestreamData.seen?.firstUtm,
             lastUtm: newUserLivestreamData.seen?.lastUtm,
+            firstOriginSource: newUserLivestreamData.seen?.firstOriginSource,
+            lastOriginSource: newUserLivestreamData.seen?.lastOriginSource,
          })
          logger.info(
             `Updated Customer.io seen data: user ${userAuthId} -> livestream ${livestreamId} (viewCount: ${newUserLivestreamData.seen?.viewCount})`

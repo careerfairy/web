@@ -49,6 +49,8 @@ export interface SeenRelationshipData {
    viewCount?: number
    firstUtm?: UTMParams
    lastUtm?: UTMParams
+   firstOriginSource?: ImpressionLocation
+   lastOriginSource?: ImpressionLocation
 }
 
 /**
@@ -204,7 +206,7 @@ export class CustomerIORelationshipsClient {
     * Uses prefixed attribute names to preserve any existing registration and participation data
     * @param userAuthId The user's authentication ID
     * @param livestreamId The livestream identifier
-    * @param data Optional seen data (firstSeenAt, lastSeenAt, viewCount, firstUtm, lastUtm)
+    * @param data Optional seen data (firstSeenAt, lastSeenAt, viewCount, firstUtm, lastUtm, firstOriginSource, lastOriginSource)
     */
    public async updateSeenData(
       userAuthId: string,
@@ -219,6 +221,10 @@ export class CustomerIORelationshipsClient {
          attributes.seen_view_count = data.viewCount
       if (data?.firstUtm) attributes.seen_first_utm = data.firstUtm
       if (data?.lastUtm) attributes.seen_last_utm = data.lastUtm
+      if (data?.firstOriginSource)
+         attributes.seen_first_origin_source = data.firstOriginSource
+      if (data?.lastOriginSource)
+         attributes.seen_last_origin_source = data.lastOriginSource
 
       return this.createUserLivestreamRelationship(
          userAuthId,

@@ -449,11 +449,13 @@ export class LivestreamService {
     *
     * @param {string} livestreamId - Livestream ID.
     * @param {UserData} userData - User data.
+    * @param {string} [originSource] - Optional origin source of the view.
     * @returns {Promise<void>} Resolves upon successful Firestore update.
     */
    async setUserHasSeenLivestream(
       livestreamId: string,
-      userData: UserData
+      userData: UserData,
+      originSource?: string
    ): Promise<void> {
       const userLivestreamDataRef = this.getUserLivestreamDataRef(
          livestreamId,
@@ -472,16 +474,20 @@ export class LivestreamService {
          user: userData as any,
          userId: userData?.authId,
          seen: {
-            // Only set firstSeenAt and firstUtm on first view, otherwise preserve existing values
+            // Only set firstSeenAt, firstUtm, and firstOriginSource on first view, otherwise preserve existing values
             ...(isFirstView
                ? {
                     firstSeenAt: currentTimestamp,
                     firstUtm: currentUtm,
+                    ...(originSource && {
+                       firstOriginSource: originSource as any,
+                    }),
                  }
                : {}),
-            // Always update lastSeenAt, lastUtm, and increment viewCount
+            // Always update lastSeenAt, lastUtm, lastOriginSource, and increment viewCount
             lastSeenAt: currentTimestamp,
             lastUtm: currentUtm,
+            ...(originSource && { lastOriginSource: originSource as any }),
             viewCount: increment(1),
          },
          registered: existingData?.registered || null,

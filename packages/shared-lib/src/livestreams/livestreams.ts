@@ -389,6 +389,10 @@ export interface UserLivestreamData extends Identifiable {
       firstUtm?: UTMParams
       // UTM parameters from the most recent view
       lastUtm?: UTMParams
+      // Origin source from the first view
+      firstOriginSource?: ImpressionLocation
+      // Origin source from the most recent view
+      lastOriginSource?: ImpressionLocation
    } | null
    jobApplications?: {
       [jobId: string]: LivestreamJobApplicationDetails

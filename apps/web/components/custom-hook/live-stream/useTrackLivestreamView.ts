@@ -20,7 +20,10 @@ type TrackProps = {
  * Increases the Livestream page views and popularity
  * For authenticated users, also tracks seen data in userLivestreamData
  */
-const useTrackLivestreamView = (livestream: LivestreamEvent) => {
+const useTrackLivestreamView = (
+   livestream: LivestreamEvent,
+   originSource?: string | null
+) => {
    const { trackDetailPageView } = useFirebaseService()
    const { userData, isLoadingUserData } = useAuth()
 
@@ -46,7 +49,11 @@ const useTrackLivestreamView = (livestream: LivestreamEvent) => {
          // Track seen data for authenticated users
          if (userData) {
             await livestreamService
-               .setUserHasSeenLivestream(id, userData)
+               .setUserHasSeenLivestream(
+                  id,
+                  userData,
+                  originSource || undefined
+               )
                .catch((error) => {
                   errorLogAndNotify(error, {
                      message: "Failed to set user as seen livestream",

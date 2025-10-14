@@ -5,7 +5,6 @@ import {
 import { Timestamp } from "../firebaseTypes"
 import { LivestreamEvent, Speaker } from "../livestreams"
 import { UserData } from "../users"
-import { addUtmTagsToLink } from "../utils"
 import { makeLivestreamEventDetailsUrl } from "../utils/urls"
 import {
    CustomerIOLivestreamData,
@@ -338,21 +337,7 @@ export function transformLivestreamDataForCustomerIO(
       deny_recording_access: livestream.denyRecordingAccess,
 
       // Marketing & Automation
-      livestream_url: generateLivestreamUrlWithUTM(livestream.id),
+      // UTMs are added by Customer.io directly, not in the URL
+      livestream_url: makeLivestreamEventDetailsUrl(livestream.id),
    }
-}
-
-/**
- * Generates a full livestream URL with predefined UTM parameters for talent mail campaigns
- * @param livestreamId The livestream identifier
- * @returns Full URL with UTM parameters for Customer.io talent mail campaigns
- */
-function generateLivestreamUrlWithUTM(livestreamId: string): string {
-   const baseUrl = makeLivestreamEventDetailsUrl(livestreamId)
-
-   return addUtmTagsToLink({
-      link: baseUrl,
-      source: "customerio",
-      medium: "email",
-   })
 }
