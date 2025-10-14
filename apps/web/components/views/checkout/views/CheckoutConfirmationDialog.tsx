@@ -1,4 +1,12 @@
-import { Box, Button, Dialog, Link, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   Dialog,
+   IconButton,
+   Link,
+   Stack,
+   Typography,
+} from "@mui/material"
 import useStripeSessionStatus from "components/custom-hook/stripe/useStripeSessionStatus"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { getBaseUrl } from "components/helperFunctions/HelperFunctions"
@@ -7,6 +15,7 @@ import AlertCircleIcon from "components/views/common/icons/AlertCircleIcon"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { useRouter } from "next/router"
 import { useState } from "react"
+import { X } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -71,6 +80,20 @@ const styles = sxStyles({
       height: "76px",
       ml: "16px",
       mt: "6px",
+   },
+   xCloseButton: {
+      position: "absolute",
+      top: {
+         md: "8px",
+         xs: "16px",
+         sm: "16px",
+      },
+      right: {
+         md: "8px",
+         xs: "16px",
+         sm: "16px",
+      },
+      cursor: "pointer",
    },
 })
 
@@ -146,6 +169,9 @@ const PaymentCompleteComponent = ({
          }}
          TransitionComponent={SlideUpTransition}
       >
+         <IconButton onClick={closeDialog} sx={styles.xCloseButton}>
+            <X size={24} />
+         </IconButton>
          <ConditionalWrapper
             condition={showSuccess}
             fallback={<PaymentFailureComponent handleClose={closeDialog} />}
