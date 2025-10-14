@@ -124,7 +124,7 @@ export const OutOfEventsDialog = ({
                   fullWidth
                   onClick={onPromoteEvents}
                >
-                  Promote more offline events
+                  {isMobile ? "Buy" : "Promote"} more offline events
                </Button>
                <Button
                   variant="outlined"
