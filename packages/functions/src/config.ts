@@ -16,6 +16,8 @@ const config = {
          "https://hooks.slack.com/services/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",
       offlineEventPublished:
          "https://hooks.slack.com/services/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",
+      offlineEventPurchased:
+         "https://hooks.slack.com/services/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",
    },
 
    // Firebase Hosting Domain
@@ -34,6 +36,7 @@ if (process.env.NODE_ENV !== "production") {
    config.slackWebhooks.livestreamCreated = testSlackIntegrationsChannel
    config.slackWebhooks.sparksTrialStarted = testSlackIntegrationsChannel
    config.slackWebhooks.offlineEventPublished = testSlackIntegrationsChannel
+   config.slackWebhooks.offlineEventPurchased = testSlackIntegrationsChannel
 
    // Target the firebase functions emulator when loading the bundles
    // locally, no need to use cache (firebase hosting)
