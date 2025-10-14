@@ -66,7 +66,7 @@ const styles = sxStyles({
 export const OverviewHeader = () => {
    const isMobile = useIsMobile(700)
    const { group, groupPresenter } = useGroup()
-   const { searchTerm, setSearchTerm, handleOutOfEventsDialogOpen } =
+   const { searchTerm, setSearchTerm, handleCheckoutDialogOpen } =
       useOfflineEventsOverview()
 
    return (
@@ -118,7 +118,7 @@ export const OverviewHeader = () => {
                      ? styles.moreEventsNoneAvailable
                      : styles.moreEvents,
                ]}
-               onClick={handleOutOfEventsDialogOpen}
+               onClick={handleCheckoutDialogOpen}
             >
                <Typography variant="small" sx={{ whiteSpace: "nowrap" }}>
                   Promote more events
