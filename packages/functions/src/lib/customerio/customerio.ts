@@ -475,6 +475,15 @@ export const syncUserLivestreamRelationships = onDocumentWritten(
             return
          }
 
+         if (!shouldSyncUser(userData)) {
+            logger.info(
+               `Skipping Customer.io relationship sync for user ${userEmail} - Reason: ${getReasonForExclusion(
+                  userData
+               )}`
+            )
+            return
+         }
+
          await trackCustomerIORelationships(
             livestreamId,
             oldUserLivestreamData,
