@@ -288,6 +288,68 @@ export const notifyOfflineEventPublished = (
    })
 }
 
+/**
+ * Sends a Slack notification when a group purchases offline event credits.
+ *
+ * @returns Promise that resolves when the notification is sent
+ */
+export const notifyOfflineEventPurchased = (
+   webhookUrl: string,
+   params: {
+      groupName: string
+      groupId: string
+      quantityPurchased: number
+      customerEmail: string
+   }
+) => {
+   const groupAdminOfflineEvents = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
+
+   const body: Record<string, string> = {
+      Group: params.groupName,
+      "Credits Purchased": params.quantityPurchased.toString(),
+      "Customer Email": params.customerEmail,
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `Offline Event Credits Purchased: *${params.groupName}*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+            accessory: {
+               type: "image",
+               image_url:
+                  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Fcalendar.png?alt=media&token=f86c0885-7def-435e-b1d3-5dce3f75c1f6",
+               alt_text: "Offline Event Credits Purchased",
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Admin Events Page",
+                  },
+                  url: groupAdminOfflineEvents,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
 function formatEventStartDate(date) {
    const luxonDate = DateTime.fromJSDate(date)
    return luxonDate.toLocaleString(DateTime.DATETIME_FULL)
