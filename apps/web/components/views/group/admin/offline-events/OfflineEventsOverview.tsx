@@ -22,9 +22,10 @@ import {
 import { CheckoutDialog } from "./detail/CheckoutDialog"
 import { DesktopOfflineEventsView } from "./offline-events-table/DesktopOfflineEventsView"
 import { MobileOfflineEventsView } from "./offline-events-table/MobileOfflineEventsView"
+import { OfflineEventsPromotionView } from "./promotion/OfflineEventsPromotionView"
 import { useOfflineEventRouting } from "./useOfflineEventRouting"
 
-const OfflineEventsOverviewContent = () => {
+const OfflineEventsOverviewDetails = () => {
    const router = useRouter()
    const groupId = router.query.groupId as string
    const isMobile = useIsMobile(700)
@@ -41,7 +42,8 @@ const OfflineEventsOverviewContent = () => {
       stripeSessionId,
    } = useOfflineEventsOverview()
 
-   const { group } = useGroup()
+   const { group, groupPresenter } = useGroup()
+   const showPromotionView = !groupPresenter?.canCreateOfflineEvents(true)
    const { userData } = useAuth()
    const { createDraftOfflineEvent } = useOfflineEventRouting()
 
@@ -69,40 +71,44 @@ const OfflineEventsOverviewContent = () => {
                successButtonText="Start creating events"
             />
          </ConditionalWrapper>
-         <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
-            <OverviewHeader />
-            <OutOfEventsDialog
-               open={outOfEventsDialogOpen}
-               onClose={handleOutOfEventsDialogClose}
-               onPromoteEvents={handleCheckoutDialogOpen}
-            />
-            <CheckoutDialog
-               checkoutData={checkoutData}
-               open={checkoutDialogOpen}
-               onClose={handleCheckoutDialogClose}
-               title="Plan your next offline events"
-               subtitle="Select how many offline events you want to publish and reach more students."
-            />
-            {Boolean(isLoading) && <p>Loading stats...</p>}
-            {Boolean(error) && <p>Error loading stats: {error.message}</p>}
-            <Fragment>
-               {isMobile ? (
-                  <MobileOfflineEventsView
-                     stats={stats}
-                     isEmptyNoEvents={!hasFilters && noResults}
-                     isEmptySearchFilter={Boolean(hasFilters && noResults)}
-                     onCreateOfflineEvent={createDraftOfflineEvent}
-                  />
-               ) : (
-                  <DesktopOfflineEventsView
-                     stats={stats}
-                     isEmptyNoEvents={!hasFilters && noResults}
-                     isEmptySearchFilter={Boolean(hasFilters && noResults)}
-                     onCreateOfflineEvent={createDraftOfflineEvent}
-                  />
-               )}
-            </Fragment>
-         </Stack>
+         <OutOfEventsDialog
+            open={outOfEventsDialogOpen}
+            onClose={handleOutOfEventsDialogClose}
+            onPromoteEvents={handleCheckoutDialogOpen}
+         />
+         <CheckoutDialog
+            checkoutData={checkoutData}
+            open={checkoutDialogOpen}
+            onClose={handleCheckoutDialogClose}
+            title="Plan your next offline events"
+            subtitle="Select how many offline events you want to publish and reach more students."
+         />
+         {showPromotionView ? (
+            <OfflineEventsPromotionView />
+         ) : (
+            <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
+               <OverviewHeader />
+               {Boolean(isLoading) && <p>Loading stats...</p>}
+               {Boolean(error) && <p>Error loading stats: {error.message}</p>}
+               <Fragment>
+                  {isMobile ? (
+                     <MobileOfflineEventsView
+                        stats={stats}
+                        isEmptyNoEvents={!hasFilters && noResults}
+                        isEmptySearchFilter={Boolean(hasFilters && noResults)}
+                        onCreateOfflineEvent={createDraftOfflineEvent}
+                     />
+                  ) : (
+                     <DesktopOfflineEventsView
+                        stats={stats}
+                        isEmptyNoEvents={!hasFilters && noResults}
+                        isEmptySearchFilter={Boolean(hasFilters && noResults)}
+                        onCreateOfflineEvent={createDraftOfflineEvent}
+                     />
+                  )}
+               </Fragment>
+            </Stack>
+         )}
       </>
    )
 }
@@ -125,7 +131,7 @@ export const OfflineEventsOverview = () => {
    return (
       <AdminContainer>
          <OfflineEventsViewProvider>
-            <OfflineEventsOverviewContent />
+            <OfflineEventsOverviewDetails />
          </OfflineEventsViewProvider>
       </AdminContainer>
    )
