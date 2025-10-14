@@ -3,11 +3,15 @@ import {
    CUTOFF_DATE,
    transformUserDataForCustomerIO,
 } from "@careerfairy/shared-lib/customerio"
-import { UserData } from "@careerfairy/shared-lib/users"
+import {
+   LanguageProficiencyOrderMap,
+   languageOptionCodesMap,
+} from "@careerfairy/shared-lib/constants/forms"
+import { ProfileLanguage, UserData } from "@careerfairy/shared-lib/users"
 import { logger } from "firebase-functions"
 import { onDocumentWritten } from "firebase-functions/firestore"
 import { onRequest } from "firebase-functions/https"
-import { auth } from "../../api/firestoreAdmin"
+import { auth, firestore } from "../../api/firestoreAdmin"
 import { userRepo } from "../../api/repositories"
 import {
    customerIOWebhookSignatureMiddleware,
@@ -65,8 +69,16 @@ export const syncUserToCustomerIO = onDocumentWritten(
             return
          }
 
+         // Fetch highest proficiency language
+         const highestProficiencyLanguage = await getHighestProficiencyLanguage(
+            after.id
+         )
+
          const oldData = before ? transformUserDataForCustomerIO(before) : null
-         const newData = transformUserDataForCustomerIO(after)
+         const newData = transformUserDataForCustomerIO(
+            after,
+            highestProficiencyLanguage
+         )
 
          // Only sync if data has actually changed
          if (CHECK_FOR_CHANGES && !hasCustomerIODataChanged(oldData, newData)) {
@@ -129,6 +141,57 @@ const getReasonForExclusion = (user: UserData) => {
 }
 
 /**
+ * Fetches the highest proficiency language for a user
+ * Returns the language name or empty string if no languages found
+ */
+const getHighestProficiencyLanguage = async (
+   userId: string
+): Promise<string> => {
+   try {
+      const languagesSnapshot = await firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("languages")
+         .get()
+
+      if (languagesSnapshot.empty) {
+         return ""
+      }
+
+      const languages = languagesSnapshot.docs.map(
+         (doc) => doc.data() as ProfileLanguage
+      )
+
+      // Sort by proficiency (highest first), then alphabetically by language name
+      languages.sort((a, b) => {
+         const proficiencyDiff = b.proficiency - a.proficiency
+         if (proficiencyDiff !== 0) {
+            return proficiencyDiff
+         }
+         // If same proficiency, sort alphabetically
+         const nameA =
+            languageOptionCodesMap[a.languageId]?.name || a.languageId
+         const nameB =
+            languageOptionCodesMap[b.languageId]?.name || b.languageId
+         return nameA.localeCompare(nameB)
+      })
+
+      // Get the language name from the language code
+      const highestLanguage = languages[0]
+      return (
+         languageOptionCodesMap[highestLanguage.languageId]?.name ||
+         highestLanguage.languageId
+      )
+   } catch (error) {
+      logger.error(
+         `Failed to fetch highest proficiency language for user ${userId}`,
+         error
+      )
+      return ""
+   }
+}
+
+/**
  * Checks if CustomerIO data has changed between versions using deep comparison
  */
 const hasCustomerIODataChanged = (
@@ -138,6 +201,81 @@ const hasCustomerIODataChanged = (
    if (!oldData) return true
    return JSON.stringify(oldData) !== JSON.stringify(newData)
 }
+
+/**
+ * Syncs user to CustomerIO when languages are updated
+ * This ensures the highest proficiency language is kept in sync
+ */
+export const syncUserLanguagesToCustomerIO = onDocumentWritten(
+   {
+      document: "userData/{userId}/languages/{languageId}",
+      maxInstances: 70,
+      concurrency: 1,
+   },
+   async (event) => {
+      if (isLocalEnvironment()) {
+         logger.info(
+            "Skipping CustomerIO sync in local environment, remove this check if you want to sync to CustomerIO dev workspace"
+         )
+         return
+      }
+
+      const userId = event.params.userId
+
+      try {
+         // Fetch the user document
+         const userDoc = await firestore.collection("userData").doc(userId).get()
+
+         if (!userDoc.exists) {
+            logger.warn(
+               `User document not found for userId ${userId}, skipping sync`
+            )
+            return
+         }
+
+         const userData = userDoc.data() as UserData
+         const authId = userData.authId
+
+         if (!shouldSyncUser(userData)) {
+            logger.info(
+               `User ${authId} should not be synced to CustomerIO - Reason: ${getReasonForExclusion(
+                  userData
+               )}`
+            )
+            return
+         }
+
+         const userRecord = await auth.getUser(authId)
+
+         if (!userRecord?.emailVerified) {
+            logger.info(
+               `User ${authId} email not verified, skipping sync to CustomerIO`
+            )
+            return
+         }
+
+         // Fetch highest proficiency language
+         const highestProficiencyLanguage = await getHighestProficiencyLanguage(
+            userId
+         )
+
+         const newData = transformUserDataForCustomerIO(
+            userData,
+            highestProficiencyLanguage
+         )
+
+         await trackingClient.identify(authId, newData)
+         logger.info(
+            `Synced user ${authId} to CustomerIO after language update`
+         )
+      } catch (error) {
+         logger.error(
+            `Failed to sync user languages to CustomerIO for userId ${userId}`,
+            error
+         )
+      }
+   }
+)
 
 /**
  * Handles Customer.io webhook events for unsubscribes, subscribes. To add other events, go to:
