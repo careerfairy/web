@@ -17,7 +17,7 @@ const config = {
       offlineEventPublished:
          "https://hooks.slack.com/services/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",
       offlineEventPurchased:
-         "https://hooks.slack.com/services/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",
+         "https://hooks.slack.com/services/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",
    },
 
    // Firebase Hosting Domain
