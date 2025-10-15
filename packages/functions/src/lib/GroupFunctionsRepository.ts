@@ -332,6 +332,42 @@ export class GroupFunctionsRepository
       const snaps = await q.get()
       return snaps.docs.map((d) => d.data())
    }
+
+   async updateGroupMetadata(
+      groupId: string,
+      metadata: Pick<
+         Group,
+         | "extraInfo"
+         | "companySize"
+         | "companyIndustries"
+         | "companyCountry"
+         | "targetedCountries"
+         | "targetedUniversities"
+         | "targetedFieldsOfStudy"
+         | "privacyPolicyActive"
+         | "privacyPolicyUrl"
+         | "universityName"
+         | "normalizedUniversityName"
+         | "careerPageUrl"
+      >
+   ): Promise<void> {
+      // Check if university name is being changed and if it's unique
+      if (metadata.universityName) {
+         const isUnique = await this.isUniversityNameUnique(
+            metadata.universityName,
+            groupId
+         )
+         if (!isUnique) {
+            throw new Error(
+               `A group with the name "${metadata.universityName}" already exists. Please choose a different name.`
+            )
+         }
+         // Update normalizedUniversityName to match the new universityName
+         metadata.normalizedUniversityName = metadata.universityName.toLowerCase()
+      }
+
+      return super.updateGroupMetadata(groupId, metadata)
+   }
    /*
     * Stores the group admin role in the user's custom claims
     * */
@@ -419,6 +455,18 @@ export class GroupFunctionsRepository
       userEmail: string,
       groupQuestions?: GroupQuestion[]
    ): Promise<Group> {
+      // Check if university name is unique
+      if (group.universityName) {
+         const isUnique = await this.isUniversityNameUnique(
+            group.universityName
+         )
+         if (!isUnique) {
+            throw new Error(
+               `A group with the name "${group.universityName}" already exists. Please choose a different name.`
+            )
+         }
+      }
+
       const batch = this.firestore.batch()
 
       // Create group ref

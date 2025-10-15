@@ -261,6 +261,17 @@ export interface IGroupRepository {
    creatorEmailIsUnique(groupId: string, email: string): Promise<boolean>
 
    /**
+    * Checks if a university name is unique across all groups
+    * @param universityName the university name to check
+    * @param excludeGroupId optional group ID to exclude from the check (for updates)
+    * @returns true if the university name is unique, false otherwise
+    */
+   isUniversityNameUnique(
+      universityName: string,
+      excludeGroupId?: string
+   ): Promise<boolean>
+
+   /**
     * Gets a creator by their ID
     * @param groupId the group to get creators from
     * @param creatorId the creator to get
@@ -1113,6 +1124,33 @@ export class FirebaseGroupRepository
          .limit(1)
 
       return creatorRef.get().then((snap) => snap.empty)
+   }
+
+   async isUniversityNameUnique(
+      universityName: string,
+      excludeGroupId?: string
+   ): Promise<boolean> {
+      const normalizedName = universityName.toLowerCase()
+      const groupsQuery = this.firestore
+         .collection("careerCenterData")
+         .where("normalizedUniversityName", "==", normalizedName)
+         .limit(2) // Limit to 2 to handle the exclude case efficiently
+
+      const snapshot = await groupsQuery.get()
+
+      if (snapshot.empty) {
+         return true
+      }
+
+      // If we're excluding a group (during update), check if the only match is the excluded group
+      if (excludeGroupId) {
+         const matchingGroups = snapshot.docs.filter(
+            (doc) => doc.id !== excludeGroupId
+         )
+         return matchingGroups.length === 0
+      }
+
+      return false
    }
 
    async getCreatorByGroupAndId(
