@@ -27,6 +27,7 @@ import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { firestore } from "firebase-admin"
 import { UserRecord } from "firebase-admin/auth"
+import { UpdateData } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { cloneDeep, isEmpty, union } from "lodash"
 import { DateTime } from "luxon"
@@ -678,9 +679,11 @@ export class GroupFunctionsRepository
          .collection(this.COLLECTION_NAME)
          .doc(groupId)
 
-      return groupRef.update({
+      const updateData: UpdateData<Group> = {
          availableOfflineEvents: FieldValue.increment(quantity),
-      })
+      }
+
+      return groupRef.update(updateData)
    }
 
    async sendTrialWelcomeEmail(
