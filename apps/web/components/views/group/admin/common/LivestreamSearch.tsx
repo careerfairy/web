@@ -1,18 +1,18 @@
-import React, { FC, useMemo, useState } from "react"
-import { Box, Grid, Stack, Typography } from "@mui/material"
-import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
-import { sxStyles } from "../../../../../types/commonTypes"
+import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import { Box, Grid, Stack, Typography } from "@mui/material"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
-import AutocompleteSearch from "../../../common/AutocompleteSearch"
 import {
    FilterOptions,
    useLivestreamSearchAlgolia,
 } from "components/custom-hook/live-stream/useLivestreamSearchAlgolia"
-import { LivestreamSearchResult } from "types/algolia"
 import SanitizedHTML from "components/util/SanitizedHTML"
+import React, { FC, useEffect, useMemo, useState } from "react"
 import { Tag } from "react-feather"
-import { LivestreamReplicaType } from "@careerfairy/shared-lib/livestreams/search"
+import { LivestreamSearchResult } from "types/algolia"
+import { sxStyles } from "../../../../../types/commonTypes"
+import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
+import AutocompleteSearch from "../../../common/AutocompleteSearch"
 
 const styles = sxStyles({
    root: {
@@ -48,6 +48,14 @@ const styles = sxStyles({
    },
 })
 
+const getOptionLabel = (option: LivestreamSearchResult) =>
+   typeof option === "string" ? option : option.title
+
+const isOptionEqualToValue = (
+   option: LivestreamSearchResult,
+   value: LivestreamSearchResult
+) => option.id === value.id
+
 type Props = {
    value: LivestreamSearchResult
    handleChange: (value: LivestreamSearchResult | null) => void
@@ -81,8 +89,22 @@ const LivestreamSearch: FC<Props> = ({
 }) => {
    const [open, setOpen] = useState(false)
 
+   // Sync inputValue with current value when dropdown is closed (not searching)
+   useEffect(() => {
+      if (value && !open) {
+         setInputValue(getOptionLabel(value))
+      }
+   }, [value, open, setInputValue])
+
+   // When dropdown opens, clear input to show all options
+   // When user is actively typing, use their input for search
+   const searchQuery =
+      open && value && inputValue === getOptionLabel(value)
+         ? ""
+         : debouncedInputValue ?? inputValue
+
    const { data } = useLivestreamSearchAlgolia(
-      debouncedInputValue ?? inputValue,
+      searchQuery,
       filterOptions,
       targetReplica
    )
@@ -183,13 +205,5 @@ const renderOption = (
       </Box>
    )
 }
-
-const isOptionEqualToValue = (
-   option: LivestreamSearchResult,
-   value: LivestreamSearchResult
-) => option.id === value.id
-
-const getOptionLabel = (option: LivestreamSearchResult) =>
-   typeof option === "string" ? option : option.title
 
 export default LivestreamSearch
