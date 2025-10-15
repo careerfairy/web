@@ -53,6 +53,7 @@ export async function handleOfflineEventCheckoutSessionCompleted(
                config.slackWebhooks.offlineEventPurchased,
                {
                   groupName: group.universityName ?? metadata.groupId,
+                  groupLogoUrl: group.logoUrl,
                   groupId: metadata.groupId,
                   quantityPurchased: totalQuantityBought,
                   customerEmail: metadata.userEmail,
