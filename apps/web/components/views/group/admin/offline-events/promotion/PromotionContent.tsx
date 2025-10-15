@@ -80,7 +80,7 @@ const styles = sxStyles({
       flexShrink: 0,
    },
    slide: {
-      flex: "0 0 100%",
+      flex: "0 0 95%",
    },
 })
 

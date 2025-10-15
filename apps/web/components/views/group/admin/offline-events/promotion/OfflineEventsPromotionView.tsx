@@ -42,10 +42,11 @@ export const OfflineEventsPromotionView = () => {
             <PromotionContent />
             <Stack spacing={"12px"} alignItems={"center"}>
                <Typography
-                  fontSize={"40px"}
+                  fontSize={{ xs: "28px", md: "40px" }}
                   fontWeight={800}
                   color={"neutral.800"}
                   textAlign="center"
+                  sx={{ maxWidth: { xs: "280px", md: "100%" } }}
                >
                   Make your offline events visible
                </Typography>

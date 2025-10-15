@@ -12,11 +12,11 @@ const styles = sxStyles({
       width: {
          xs: "100%",
          sm: "100%",
-         md: "fit-content",
+         md: "680px",
       },
       background: "#FAFDFF",
       borderRadius: "24px",
-      justifyContent: "center",
+      justifyContent: "space-between",
       alignItems: {
          xs: "flex-start",
          sm: "flex-start",
@@ -81,9 +81,14 @@ const PricingCard = () => {
       label: string
    }) => {
       return (
-         <Stack direction={"row"} alignItems={"center"} spacing={"4px"}>
-            <Box component={icon} size={16} />
-            <Typography variant="medium" color={"neutral.700"}>
+         <Stack
+            direction={"row"}
+            alignItems={"center"}
+            spacing={"4px"}
+            pb={"4px"}
+         >
+            <Box component={icon} size={14} />
+            <Typography variant="small" color={"neutral.700"}>
                {label}
             </Typography>
          </Stack>
@@ -98,6 +103,12 @@ const PricingCard = () => {
                fontWeight={900}
                color={"neutral.800"}
                fontStyle={"italic"}
+               sx={{
+                  fontSize: {
+                     xs: "24px",
+                     md: undefined,
+                  },
+               }}
             >
                Offline events
             </Typography>
@@ -107,6 +118,12 @@ const PricingCard = () => {
                   fontWeight={700}
                   color={"neutral.800"}
                   fontStyle={"italic"}
+                  sx={{
+                     fontSize: {
+                        xs: "20px",
+                        md: undefined,
+                     },
+                  }}
                >
                   {price}
                </Typography>
