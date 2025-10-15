@@ -5,8 +5,10 @@ import { sxStyles } from "../../../../types/commonTypes"
 const styles = sxStyles({
    banner: {
       background: {
-         xs: "linear-gradient(148deg, #2ABAA5 19.92%, #F5B07E 107.66%)",
-         md: "linear-gradient(98deg, #2ABAA5 0%, #F5B07E 100%)",
+         xs: (theme) =>
+            `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
+         md: (theme) =>
+            `linear-gradient(98deg, ${theme.palette.primary[600]} 0%, #F5B07E 100%)`,
       },
       borderRadius: "12px",
       p: 3,
@@ -24,19 +26,19 @@ const styles = sxStyles({
       width: { xs: "100%", md: "60%" },
    },
    title: {
-      color: (theme) => theme.brand.white[50],
+      color: "common.white",
       fontWeight: 600,
    },
    description: {
-      color: (theme) => theme.brand.white[50],
+      color: "common.white",
    },
    button: {
-      borderColor: (theme) => theme.brand.tq[600],
-      color: (theme) => theme.brand.tq[600],
+      borderColor: "primary.600",
+      color: "primary.600",
       "&:hover": {
-         backgroundColor: (theme) => theme.brand.tq[50],
-         borderColor: (theme) => theme.brand.tq[600],
-         color: (theme) => theme.brand.tq[600],
+         backgroundColor: "primary.50",
+         borderColor: "primary.600",
+         color: "primary.600",
       },
    },
    backgroundImage: {
