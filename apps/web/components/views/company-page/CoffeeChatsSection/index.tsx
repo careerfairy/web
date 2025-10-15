@@ -21,9 +21,20 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       alignItems: { xs: "center", md: "flex-start" },
+      // Switch to mobile layout when banner width < 355px on desktop
+      "@media (min-width: 900px) and (max-width: 1100px)": {
+         alignItems: "center",
+         pb: 0,
+      },
    },
    textContent: {
       width: { xs: "100%", md: "60%" },
+      position: "relative",
+      zIndex: 2,
+      // Switch to mobile layout when banner width < 355px on desktop
+      "@media (min-width: 900px) and (max-width: 1100px)": {
+         width: "100%",
+      },
    },
    title: {
       color: "common.white",
@@ -47,6 +58,12 @@ const styles = sxStyles({
       top: { xs: "auto", md: 0 },
       bottom: { xs: "-130px", md: 0 },
       pointerEvents: "none",
+      // Switch to mobile layout when banner width < 355px on desktop
+      "@media (min-width: 900px) and (max-width: 1100px)": {
+         right: 0,
+         top: "auto",
+         bottom: "-130px",
+      },
    },
    modelImage: {
       position: { xs: "relative", md: "absolute" },
@@ -56,6 +73,14 @@ const styles = sxStyles({
       bottom: { xs: "auto", md: 0 },
       display: "block",
       pointerEvents: "none",
+      // Switch to mobile layout when banner width < 355px on desktop
+      "@media (min-width: 900px) and (max-width: 1100px)": {
+         position: "relative",
+         height: "auto",
+         width: "70%",
+         right: "auto",
+         bottom: "auto",
+      },
    },
 })
 
