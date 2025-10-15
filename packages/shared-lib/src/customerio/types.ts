@@ -133,6 +133,9 @@ export interface CustomerIOLivestreamData {
    // Company/Host Info
    company_name: string
    company_logo_url: string
+   company_industries: string[]
+   company_sizes: string[]
+   company_countries: string[]
    group_ids: string[]
    creator_ids: string[]
 

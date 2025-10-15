@@ -261,9 +261,9 @@ export function transformLivestreamDataForCustomerIO(
       livestream_id: livestream.id,
       title: livestream.title || "",
       /**
-       * Reserved field in Customer.io used to identify the object.
-       * Format: "Title (Date)"
-       * Example: "Discover Our Internship Program (May 15, 2024)"
+       * Name field for Customer.io livestream objects.
+       * Format: "Title [Company] (Date)"
+       * Example: "Discover Our Internship Program [OnLogic] (May 15, 2024)"
        */
       name: generateLivestreamObjectName(livestream),
       summary: truncateString(livestream.summary, CUSTOMERIO_BYTE_LIMIT),
@@ -274,6 +274,9 @@ export function transformLivestreamDataForCustomerIO(
       // Company/Host Info
       company_name: livestream.company,
       company_logo_url: livestream.companyLogoUrl,
+      company_industries: livestream.companyIndustries || [],
+      company_sizes: livestream.companySizes || [],
+      company_countries: livestream.companyCountries || [],
       group_ids: livestream.groupIds || [],
 
       // Event Status & Type
