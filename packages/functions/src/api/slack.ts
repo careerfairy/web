@@ -232,6 +232,8 @@ export const notifyOfflineEventPublished = (
    webhookUrl: string,
    params: {
       companyName: string
+      publisherName: string
+      publisherEmail: string
       eventTitle: string
       eventId: string
       eventDate: Date
@@ -245,6 +247,7 @@ export const notifyOfflineEventPublished = (
 
    const body: Record<string, string> = {
       "Company Name": params.companyName,
+      Publisher: `${params.publisherName} (${params.publisherEmail})`,
       "Event Date": formatEventStartDate(params.eventDate),
       "Remaining Credits": params.remainingCredits.toString(),
    }
@@ -301,14 +304,14 @@ export const notifyOfflineEventPurchased = (
       groupId: string
       quantityPurchased: number
       customerEmail: string
+      customerName: string
    }
 ) => {
    const groupAdminOfflineEvents = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
 
    const body: Record<string, string> = {
-      Group: params.groupName,
-      "Credits Purchased": params.quantityPurchased.toString(),
-      "Customer Email": params.customerEmail,
+      "Credits purchased": params.quantityPurchased.toString(),
+      "Bought by": `${params.customerName} (${params.customerEmail})`,
    }
 
    return generateRequest(webhookUrl, {

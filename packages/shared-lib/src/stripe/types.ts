@@ -13,6 +13,7 @@ export type StripeCustomerSessionData = {
 export interface BaseStripeSessionMetadata {
    groupId: string
    userEmail: string
+   userName?: string
    type: StripeProductType
 }
 
@@ -97,8 +98,8 @@ export type FetchStripeCustomerSession =
  */
 export interface BaseSessionPayload {
    type: StripeProductType
-   customerName: string
-   customerEmail: string
+   customerName: string // Name of the user that is buying the product
+   customerEmail: string // Email of the user that is buying the product
    groupId: string
    priceId: string
    successUrl: string
