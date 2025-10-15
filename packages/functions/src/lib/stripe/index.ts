@@ -5,6 +5,7 @@ import {
    STRIPE_CUSTOMER_METADATA_VERSION,
 } from "@careerfairy/shared-lib/stripe/types"
 import { Stripe } from "stripe"
+import { groupRepo } from "../../api/repositories"
 import functions = require("firebase-functions")
 
 export interface IStripeFunctionsRepository {
@@ -78,7 +79,7 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
    async createOrUpdateStripeCustomer(
       payload: BaseSessionPayload
    ): Promise<Stripe.Customer> {
-      const { groupId, customerName, customerEmail } = payload
+      const { groupId, customerName } = payload
 
       const query = `metadata['groupId']:'${groupId}'`
 
@@ -91,15 +92,33 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
       const createCustomer = !groupCustomer
 
       if (createCustomer) {
-         groupCustomer = await this._stripe.customers.create({
-            name: customerName,
-            email: customerEmail,
-            metadata: {
-               groupId: groupId,
-               version: STRIPE_CUSTOMER_METADATA_VERSION,
-            },
-         })
-         functions.logger.info("Created customer:", groupCustomer)
+         groupCustomer = await this._stripe.customers
+            .create({
+               name: customerName,
+               metadata: {
+                  groupId: groupId,
+                  version: STRIPE_CUSTOMER_METADATA_VERSION,
+               },
+            })
+            .then(async (customer) => {
+               await groupRepo
+                  .updateGroupData(groupId, {
+                     stripeCustomerId: customer.id,
+                  })
+                  .catch((error) => {
+                     functions.logger.error(
+                        "Error updating group data with stripe customer id: ",
+                        error
+                     )
+                  })
+
+               return customer
+            })
+
+         functions.logger.info(
+            `Created customer: ${groupCustomer.id} for group ${groupId}`,
+            groupCustomer
+         )
       } else {
          groupCustomer = await this._stripe.customers.update(groupCustomer.id, {
             metadata: {
