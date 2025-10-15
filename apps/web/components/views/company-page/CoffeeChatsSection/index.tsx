@@ -3,10 +3,10 @@ import { useCompanyPage } from ".."
 import { sxStyles } from "../../../../types/commonTypes"
 
 const styles = sxStyles({
-   banner: {
+   banner: (theme) => ({
       borderRadius: "12px",
       p: 3,
-      pb: { xs: 0, md: 3 },
+      pb: 0,
       width: "100%",
       height: "auto",
       position: "relative",
@@ -14,32 +14,35 @@ const styles = sxStyles({
       mx: 0,
       display: "flex",
       flexDirection: "column",
-      alignItems: { xs: "center", md: "flex-start" },
+      alignItems: "center",
       // Mobile gradient
-      background: (theme) =>
-         `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
+      background: `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
       // Desktop gradient
-      "@media (min-width: 900px)": {
-         background: (theme) =>
-            `linear-gradient(98deg, ${theme.palette.primary[600]} 0%, #F5B07E 100%)`,
+      [theme.breakpoints.up("md")]: {
+         pb: 3,
+         alignItems: "flex-start",
+         background: `linear-gradient(98deg, ${theme.palette.primary[600]} 0%, #F5B07E 100%)`,
+         // Switch to mobile layout when banner width < 355px on desktop
+         [theme.breakpoints.down(1150)]: {
+            alignItems: "center",
+            pb: 0,
+            background: `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
+         },
       },
-      // Switch to mobile layout when banner width < 355px on desktop
-      "@media (min-width: 900px) and (max-width: 1150px)": {
-         alignItems: "center",
-         pb: 0,
-         background: (theme) =>
-            `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
-      },
-   },
-   textContent: {
-      width: { xs: "100%", md: "60%" },
+   }),
+   textContent: (theme) => ({
+      width: "100%",
       position: "relative",
       zIndex: 2,
-      // Switch to mobile layout when banner width < 355px on desktop
-      "@media (min-width: 900px) and (max-width: 1150px)": {
-         width: "100%",
+      // Desktop layout
+      [theme.breakpoints.up("md")]: {
+         width: "60%",
+         // Switch to mobile layout when banner width < 355px on desktop
+         [theme.breakpoints.down(1150)]: {
+            width: "100%",
+         },
       },
-   },
+   }),
    title: {
       color: "common.white",
       fontWeight: 600,
@@ -56,36 +59,53 @@ const styles = sxStyles({
          color: "primary.600",
       },
    },
-   backgroundImage: {
+   backgroundImage: (theme) => ({
       position: "absolute",
-      right: { xs: 0, md: "-120px" },
-      top: { xs: "auto", md: 0 },
-      bottom: { xs: "-130px", md: 0 },
+      right: "auto",
+      top: "auto",
+      bottom: "-130px",
       pointerEvents: "none",
-      // Switch to mobile layout when banner width < 355px on desktop
-      "@media (min-width: 900px) and (max-width: 1150px)": {
-         right: 0,
-         top: "auto",
-         bottom: "-130px",
+      // Desktop layout
+      [theme.breakpoints.up("md")]: {
+         right: "-120px",
+         top: 0,
+         bottom: 0,
+         // Switch to mobile layout when banner width < 355px on desktop
+         [theme.breakpoints.down(1150)]: {
+            right: "auto",
+            top: "auto",
+            bottom: "-130px",
+         },
       },
-   },
-   modelImage: {
-      position: { xs: "relative", md: "absolute" },
-      height: { xs: "auto", md: "100%" },
-      width: { xs: "70%", md: "auto" },
-      right: { xs: "auto", md: "-20px" },
-      bottom: { xs: "auto", md: 0 },
+   }),
+   modelImage: (theme) => ({
+      position: "relative",
+      maxHeight: "200px",
+      height: "auto",
+      width: "auto",
+      right: "auto",
+      bottom: "auto",
       display: "block",
       pointerEvents: "none",
-      // Switch to mobile layout when banner width < 355px on desktop
-      "@media (min-width: 900px) and (max-width: 1150px)": {
-         position: "relative",
-         height: "auto",
-         width: "70%",
-         right: "auto",
-         bottom: "auto",
+      // Desktop layout
+      [theme.breakpoints.up("md")]: {
+         position: "absolute",
+         maxHeight: "none",
+         height: "100%",
+         width: "auto",
+         right: "-20px",
+         bottom: 0,
+         // Switch to mobile layout when banner width < 355px on desktop
+         [theme.breakpoints.down(1150)]: {
+            position: "relative",
+            maxHeight: "200px",
+            height: "auto",
+            width: "auto",
+            right: "auto",
+            bottom: "auto",
+         },
       },
-   },
+   }),
 })
 
 export const CoffeeChatsSection = () => {
