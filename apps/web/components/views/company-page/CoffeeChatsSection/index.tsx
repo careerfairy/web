@@ -4,12 +4,6 @@ import { sxStyles } from "../../../../types/commonTypes"
 
 const styles = sxStyles({
    banner: {
-      background: {
-         xs: (theme) =>
-            `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
-         md: (theme) =>
-            `linear-gradient(98deg, ${theme.palette.primary[600]} 0%, #F5B07E 100%)`,
-      },
       borderRadius: "12px",
       p: 3,
       pb: { xs: 0, md: 3 },
@@ -21,10 +15,20 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       alignItems: { xs: "center", md: "flex-start" },
+      // Mobile gradient
+      background: (theme) =>
+         `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
+      // Desktop gradient
+      "@media (min-width: 900px)": {
+         background: (theme) =>
+            `linear-gradient(98deg, ${theme.palette.primary[600]} 0%, #F5B07E 100%)`,
+      },
       // Switch to mobile layout when banner width < 355px on desktop
-      "@media (min-width: 900px) and (max-width: 1100px)": {
+      "@media (min-width: 900px) and (max-width: 1150px)": {
          alignItems: "center",
          pb: 0,
+         background: (theme) =>
+            `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
       },
    },
    textContent: {
@@ -32,7 +36,7 @@ const styles = sxStyles({
       position: "relative",
       zIndex: 2,
       // Switch to mobile layout when banner width < 355px on desktop
-      "@media (min-width: 900px) and (max-width: 1100px)": {
+      "@media (min-width: 900px) and (max-width: 1150px)": {
          width: "100%",
       },
    },
@@ -59,7 +63,7 @@ const styles = sxStyles({
       bottom: { xs: "-130px", md: 0 },
       pointerEvents: "none",
       // Switch to mobile layout when banner width < 355px on desktop
-      "@media (min-width: 900px) and (max-width: 1100px)": {
+      "@media (min-width: 900px) and (max-width: 1150px)": {
          right: 0,
          top: "auto",
          bottom: "-130px",
@@ -74,7 +78,7 @@ const styles = sxStyles({
       display: "block",
       pointerEvents: "none",
       // Switch to mobile layout when banner width < 355px on desktop
-      "@media (min-width: 900px) and (max-width: 1100px)": {
+      "@media (min-width: 900px) and (max-width: 1150px)": {
          position: "relative",
          height: "auto",
          width: "70%",
