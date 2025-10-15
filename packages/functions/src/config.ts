@@ -15,9 +15,9 @@ const config = {
       sparksTrialStarted:
          "https://hooks.slack.com/services/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",
       offlineEventPublished:
-         "https://hooks.slack.com/services/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",
+         "https://hooks.slack.com/services/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",
       offlineEventPurchased:
-         "https://hooks.slack.com/services/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",
+         "https://hooks.slack.com/services/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",
    },
 
    // Firebase Hosting Domain
