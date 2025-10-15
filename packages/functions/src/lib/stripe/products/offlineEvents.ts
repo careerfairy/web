@@ -17,6 +17,7 @@ export async function handleOfflineEventSession(
    const metadata: OfflineEventSessionMetadata = {
       groupId: data.groupId,
       userEmail: data.customerEmail,
+      userName: data.customerName,
       type: StripeProductType.OFFLINE_EVENT,
    }
 
@@ -57,6 +58,7 @@ export async function handleOfflineEventCheckoutSessionCompleted(
                   groupId: metadata.groupId,
                   quantityPurchased: totalQuantityBought,
                   customerEmail: metadata.userEmail,
+                  customerName: metadata.userName,
                }
             ).catch((slackError) => {
                functions.logger.error(
