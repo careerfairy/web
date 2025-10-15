@@ -8,31 +8,35 @@ import { sxStyles } from "types/commonTypes"
 const PROMOTION_CONTENT_CARDS = [
    {
       headerImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Foffline-promotion-image-1.png?alt=media&token=802da5b5-328a-4f6d-92c2-26df387a4115",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FImage%201.png?alt=media&token=be2ce073-1680-41dc-9504-711fda38e6a2",
       title: "Reach students where they are",
       subtitle:
          "Gen Z expects everything, everywhere all at once: create attraction journeys which are both online (live streams) and offline (recruiting events)",
+      background: "#FBEDFD",
    },
    {
       headerImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Foffline-promotion-image-2.png?alt=media&token=ff4c4351-b884-470c-adce-97652d27e52d",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FImage%202.png?alt=media&token=4c00752e-fd25-450e-a311-14429a99f8ff",
       title: "Target with precision",
       subtitle:
          "Promote events by field of study, university. Ensure you reach the profiles that matter among a career-focussed audience",
+      background: "#FBF8E6",
    },
    {
       headerImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Foffline-promotion-image-3.png?alt=media&token=1c93eab4-4087-4c12-b203-3bd1b80de97e",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FImage%203.png?alt=media&token=587ec690-a323-4a1a-9182-5c8f8206e9fd",
       title: "Simplify your outreach",
       subtitle:
          "Manage all your recruiting activities in one place. Keep your student engagement consistent.",
+      background: "#FBE6E6",
    },
    {
       headerImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Foffline-promotion-image-4.png?alt=media&token=40e5262f-24c2-4a4e-8504-2c94e2143b5c",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FImage%204.png?alt=media&token=19de5259-ef8b-4bec-9a3b-ec61934f6ce8",
       title: "Track what matters",
       subtitle:
          "Move beyond guesswork. See how many students viewed your event and clicked to register",
+      background: "#E6F6FB",
    },
 ]
 
@@ -109,11 +113,13 @@ export const PromotionContent = () => {
                      headerImageUrl={PROMOTION_CONTENT_CARDS[0].headerImageUrl}
                      title={PROMOTION_CONTENT_CARDS[0].title}
                      subtitle={PROMOTION_CONTENT_CARDS[0].subtitle}
+                     background={PROMOTION_CONTENT_CARDS[0].background}
                   />
                   <PromotionContentCard
                      headerImageUrl={PROMOTION_CONTENT_CARDS[2].headerImageUrl}
                      title={PROMOTION_CONTENT_CARDS[2].title}
                      subtitle={PROMOTION_CONTENT_CARDS[2].subtitle}
+                     background={PROMOTION_CONTENT_CARDS[2].background}
                   />
                </Stack>
                <Stack spacing={"16px"}>
@@ -121,11 +127,13 @@ export const PromotionContent = () => {
                      headerImageUrl={PROMOTION_CONTENT_CARDS[1].headerImageUrl}
                      title={PROMOTION_CONTENT_CARDS[1].title}
                      subtitle={PROMOTION_CONTENT_CARDS[1].subtitle}
+                     background={PROMOTION_CONTENT_CARDS[1].background}
                   />
                   <PromotionContentCard
                      headerImageUrl={PROMOTION_CONTENT_CARDS[3].headerImageUrl}
                      title={PROMOTION_CONTENT_CARDS[3].title}
                      subtitle={PROMOTION_CONTENT_CARDS[3].subtitle}
+                     background={PROMOTION_CONTENT_CARDS[3].background}
                   />
                </Stack>
             </Stack>
@@ -146,6 +154,7 @@ export const PromotionContent = () => {
                            headerImageUrl={card.headerImageUrl}
                            title={card.title}
                            subtitle={card.subtitle}
+                           background={card.background}
                         />
                      </GenericCarousel.Slide>
                   )
@@ -160,12 +169,14 @@ type PromotionContentCardProps = {
    headerImageUrl: string
    title: string
    subtitle: string
+   background: string
 }
 
 const PromotionContentCard = ({
    headerImageUrl,
    title,
    subtitle,
+   background,
 }: PromotionContentCardProps) => {
    return (
       <Stack spacing={"12px"} sx={styles.promotionContentCard}>
@@ -176,6 +187,7 @@ const PromotionContentCard = ({
                paddingBottom: "42.86%", // 21:9 aspect ratio (9/21 = 0.4286)
                borderRadius: "4px",
                backgroundImage: `url(${headerImageUrl})`,
+               backgroundColor: background,
                backgroundSize: "cover",
                backgroundPosition: "center",
                position: "relative",
