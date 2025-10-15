@@ -20,7 +20,7 @@ export class LivestreamsAdminPage extends CommonPage {
       })
       this.applyFilterButton = this.page.getByRole("button", { name: "Apply" })
       this.searchField = this.page.getByPlaceholder(
-         "Search by title or company"
+         "Search"
       )
       this.livestreamQuestionsDialog = this.page.getByTestId(
          "livestream-questions-dialog"
