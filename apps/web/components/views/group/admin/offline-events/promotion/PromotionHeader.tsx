@@ -14,6 +14,12 @@ export const PromotionHeader = () => {
                fontWeight={700}
                color={"neutral.800"}
                textAlign="center"
+               sx={{
+                  fontSize: {
+                     xs: "24px",
+                     md: undefined,
+                  },
+               }}
             >
                {HEADER_TITLE}
             </Typography>
@@ -21,6 +27,7 @@ export const PromotionHeader = () => {
                variant="medium"
                color={"neutral.700"}
                textAlign={"center"}
+               sx={{ maxWidth: "560px" }}
             >
                {HEADER_SUBTITLE}
             </Typography>
