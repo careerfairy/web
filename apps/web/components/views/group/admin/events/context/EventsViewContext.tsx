@@ -220,7 +220,7 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
    const handleShareRecording = useCallback((stat: LiveStreamStats) => {
       if (stat.livestream.isDraft) return
 
-      setEnterStreamDialogLivestreamId(stat.livestream.id)
+      setPromoteDialogLivestream(stat.livestream)
    }, [])
 
    const handleViewRecording = useCallback((stat: LiveStreamStats) => {
