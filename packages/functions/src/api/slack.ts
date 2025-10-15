@@ -297,6 +297,7 @@ export const notifyOfflineEventPurchased = (
    webhookUrl: string,
    params: {
       groupName: string
+      groupLogoUrl: string
       groupId: string
       quantityPurchased: number
       customerEmail: string
@@ -327,9 +328,8 @@ export const notifyOfflineEventPurchased = (
             },
             accessory: {
                type: "image",
-               image_url:
-                  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Fcalendar.png?alt=media&token=f86c0885-7def-435e-b1d3-5dce3f75c1f6",
-               alt_text: "Offline Event Credits Purchased",
+               image_url: params.groupLogoUrl,
+               alt_text: `${params.groupName} Logo`,
             },
          },
          {
