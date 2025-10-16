@@ -1,5 +1,5 @@
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
-import { Box, IconButton, Stack, Typography } from "@mui/material"
+import { Box, Collapse, IconButton, Stack, Typography } from "@mui/material"
 import LinkifyText from "components/util/LinkifyText"
 import { useAuth } from "HOCs/AuthProvider"
 import { forwardRef, memo, useEffect, useState } from "react"
@@ -64,6 +64,10 @@ const styles = sxStyles({
       py: 0.5,
       borderRadius: "60px",
       backgroundColor: (theme) => theme.brand.white[500],
+      transition: "background-color 0.2s ease",
+   },
+   reactionCountActive: {
+      backgroundColor: "primary.100",
    },
 })
 
@@ -98,18 +102,21 @@ export const ChatEntry = memo(
 
       const showOptions = Boolean(isMe || isHost || userData?.isAdmin)
 
+      // Use agoraUserId as the unique identifier for reactions to support multiple speakers
+      const userId = agoraUserId || authenticatedUser.uid
+      
       const { addReaction, removeReaction } = useToggleChatReaction(
          livestreamId,
-         authenticatedUser.uid
+         userId
       )
 
       const thumbsUpCount = entry.thumbsUp?.length || 0
-      const hasUserReacted = authenticatedUser.uid 
-         ? entry.thumbsUp?.includes(authenticatedUser.uid)
+      const hasUserReacted = userId 
+         ? entry.thumbsUp?.includes(userId)
          : false
 
       const handleReactionClick = async () => {
-         if (!authenticatedUser.uid) {
+         if (!userId) {
             console.warn("User must be authenticated to react to messages")
             return
          }
@@ -159,14 +166,23 @@ export const ChatEntry = memo(
                   {timeSinceEntry}
                </Typography>
                <Stack direction="row" alignItems="center" ml="auto" gap={1}>
-                  {thumbsUpCount > 0 && (
-                     <Box sx={styles.reactionCount}>
+                  <Collapse 
+                     in={thumbsUpCount > 0} 
+                     orientation="horizontal"
+                     timeout={300}
+                  >
+                     <Box 
+                        sx={[
+                           styles.reactionCount, 
+                           hasUserReacted && styles.reactionCountActive
+                        ]}
+                     >
                         <Typography variant="xsmall">👍</Typography>
                         <Typography variant="xsmall" color="neutral.800">
                            {thumbsUpCount}
                         </Typography>
                      </Box>
-                  )}
+                  </Collapse>
                   <Box
                      component="img"
                      src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/Chat-reaction-icon.svg?alt=media&token=6dc8149c-ee79-4fc7-88e5-44e24899b07c"
