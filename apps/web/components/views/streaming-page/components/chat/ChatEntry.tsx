@@ -44,7 +44,6 @@ const styles = sxStyles({
    reactionContainer: {
       display: "flex",
       alignItems: "center",
-      gap: 1,
    },
    reactionIcon: {
       width: 24,
@@ -148,21 +147,23 @@ export const ChatEntry = memo(
                <Typography color="neutral.200" variant="xsmall">
                   {timeSinceEntry}
                </Typography>
-               {thumbsUpCount > 0 && (
-                  <Box sx={styles.reactionCount}>
-                     <Typography variant="xsmall">👍</Typography>
-                     <Typography variant="xsmall" color="neutral.800">
-                        {thumbsUpCount}
-                     </Typography>
-                  </Box>
-               )}
-               <Box
-                  component="img"
-                  src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/Chat-reaction-icon.svg?alt=media&token=6dc8149c-ee79-4fc7-88e5-44e24899b07c"
-                  alt="React to message"
-                  sx={styles.reactionIcon}
-                  onClick={handleReactionClick}
-               />
+               <Stack direction="row" alignItems="center" ml="auto" gap={1}>
+                  {thumbsUpCount > 0 && (
+                     <Box sx={styles.reactionCount}>
+                        <Typography variant="xsmall">👍</Typography>
+                        <Typography variant="xsmall" color="neutral.800">
+                           {thumbsUpCount}
+                        </Typography>
+                     </Box>
+                  )}
+                  <Box
+                     component="img"
+                     src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/Chat-reaction-icon.svg?alt=media&token=6dc8149c-ee79-4fc7-88e5-44e24899b07c"
+                     alt="React to message"
+                     sx={styles.reactionIcon}
+                     onClick={handleReactionClick}
+                  />
+               </Stack>
             </Stack>
          </Stack>
       )
