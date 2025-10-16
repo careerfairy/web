@@ -1,4 +1,4 @@
-import { UserData } from "@careerfairy/shared-lib/src/users"
+import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import counterConstants from "../../lib/Counter/constants"
@@ -42,19 +42,22 @@ interface UpdateDocumentsConfig<T = unknown> {
    customDataFilter?: (data: T) => boolean
 }
 
-const COLLECTION_NAME = "userData" // Change from "livestreams"
-const FIELD_TO_ORDER_BY = "createdAt" // Change from "start"
+const COLLECTION_NAME = "livestreams"
+const FIELD_TO_ORDER_BY = "start"
 
-const config: UpdateDocumentsConfig<UserData> = {
+// Configure your update here
+const config: UpdateDocumentsConfig<LivestreamEvent> = {
+   // Query for livestreams, excluding test livestreams
    query: firestore
       .collection(COLLECTION_NAME)
+      .where("test", "==", false)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
    updateData: {
-      migrationTrigger: Date.now(), // This will trigger syncUserToCustomerIO
+      migrationTrigger: Date.now(),
    },
-   batchSize: 200,
-   waitTimeBetweenBatches: 3_000,
-   dryRun: true, // Set to true first to test
+   batchSize: 200, // Increased batch size for faster processing
+   waitTimeBetweenBatches: 3_000, // Longer wait time to allow functions to process
+   dryRun: false, // Set to false to run the migration
 }
 
 const getTotalDocumentCount = async (query: Query) => {
@@ -115,7 +118,7 @@ export async function run() {
          for (const doc of docs) {
             if (
                config.customDataFilter &&
-               !config.customDataFilter(doc.data() as UserData)
+               !config.customDataFilter(doc.data() as LivestreamEvent)
             ) {
                skips++
                continue
@@ -127,7 +130,7 @@ export async function run() {
             if (!config.dryRun) {
                const updateData =
                   typeof config.updateData === "function"
-                     ? config.updateData(doc.data() as UserData)
+                     ? config.updateData(doc.data() as LivestreamEvent)
                      : {
                           ...doc.data(),
                           ...config.updateData,
