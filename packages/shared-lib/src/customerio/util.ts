@@ -1,7 +1,4 @@
-import {
-   BusinessFunctionsTagValues,
-   ContentTopicsTagValues,
-} from "../constants/tags"
+import { TagValuesLookup } from "../constants/tags"
 import { Timestamp } from "../firebaseTypes"
 import { LivestreamEvent, Speaker } from "../livestreams"
 import { UserData } from "../users"
@@ -20,6 +17,9 @@ const CUSTOMERIO_BYTE_LIMIT = 950
 
 /**
  * Truncates a string to fit within the byte limit
+ * @example
+ * truncateString("A very long description that exceeds the byte limit...", 50)
+ * // Returns: "A very long description that exce..."
  */
 function truncateString(
    str: string | undefined,
@@ -49,6 +49,9 @@ function truncateString(
  * @param array Array of strings to chunk
  * @param byteLimit Maximum bytes per chunk
  * @returns Object with keys 1 and 2 containing the chunks
+ * @example
+ * splitArrayIntoTwo(["university1", "university2", "university3", ...], 950)
+ * // Returns: { 1: ["university1", "university2"], 2: ["university3", ...] }
  */
 function splitArrayIntoTwo(
    array: string[],
@@ -100,6 +103,9 @@ export function toUnixTimestamp(timestamp: Timestamp): number | undefined {
  * Formats a date for use in Customer.io object names
  * @param date The date to format
  * @returns Formatted date string like "May 15, 2024"
+ * @example
+ * formatDateForCustomerIO(new Date('2024-05-15'))
+ * // Returns: "May 15, 2024"
  */
 function formatDateForCustomerIO(date: Date): string {
    if (!date) return "No Date"
@@ -126,29 +132,25 @@ function generateLivestreamObjectName(livestream: LivestreamEvent): string {
 }
 
 /**
- * Maps business function tag IDs to their display names
+ * Maps business function tag IDs to their display names using the shared TagValuesLookup
+ * @example
+ * mapBusinessFunctionTagIdsToNames(["Marketing", "Finance", "InformationTechnology"])
+ * // Returns: ["Marketing", "Finance", "Information technology"]
  */
 function mapBusinessFunctionTagIdsToNames(tagIds?: string[]): string[] {
    if (!tagIds || tagIds.length === 0) return []
-   const tagMap: Map<string, string> = new Map(
-      BusinessFunctionsTagValues.map((t) => [t.id, t.name])
-   )
-   return tagIds
-      .map((id) => tagMap.get(id))
-      .filter((name) => name !== undefined) as string[]
+   return tagIds.map((id) => TagValuesLookup[id]).filter(Boolean)
 }
 
 /**
- * Maps content topic tag IDs to their display names
+ * Maps content topic tag IDs to their display names using the shared TagValuesLookup
+ * @example
+ * mapContentTopicTagIdsToNames(["ApplicationProcess", "CompanyCulture", "Jobs"])
+ * // Returns: ["Application process", "Company culture", "Jobs"]
  */
 function mapContentTopicTagIdsToNames(tagIds?: string[]): string[] {
    if (!tagIds || tagIds.length === 0) return []
-   const tagMap: Map<string, string> = new Map(
-      ContentTopicsTagValues.map((t) => [t.id, t.name])
-   )
-   return tagIds
-      .map((id) => tagMap.get(id))
-      .filter((name) => name !== undefined) as string[]
+   return tagIds.map((id) => TagValuesLookup[id]).filter(Boolean)
 }
 
 /**
