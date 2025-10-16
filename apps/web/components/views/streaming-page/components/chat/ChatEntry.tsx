@@ -104,13 +104,24 @@ export const ChatEntry = memo(
       )
 
       const thumbsUpCount = entry.thumbsUp?.length || 0
-      const hasUserReacted = entry.thumbsUp?.includes(authenticatedUser.uid)
+      const hasUserReacted = authenticatedUser.uid 
+         ? entry.thumbsUp?.includes(authenticatedUser.uid)
+         : false
 
       const handleReactionClick = async () => {
-         if (hasUserReacted) {
-            await removeReaction(entry.id, "thumbsUp")
-         } else {
-            await addReaction(entry.id, "thumbsUp")
+         if (!authenticatedUser.uid) {
+            console.warn("User must be authenticated to react to messages")
+            return
+         }
+
+         try {
+            if (hasUserReacted) {
+               await removeReaction(entry.id, "thumbsUp")
+            } else {
+               await addReaction(entry.id, "thumbsUp")
+            }
+         } catch (error) {
+            console.error("Failed to toggle reaction:", error)
          }
       }
 
