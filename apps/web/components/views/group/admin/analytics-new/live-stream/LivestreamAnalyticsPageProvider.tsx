@@ -2,6 +2,7 @@ import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
+import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { createLookup } from "@careerfairy/shared-lib/utils"
 import { useRouter } from "next/router"
@@ -16,6 +17,7 @@ import {
 } from "react"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import useGroupLivestreamStat from "../../../../../custom-hook/live-stream/useGroupLivestreamStat"
+import { useLivestreamSWR } from "../../../../../custom-hook/live-stream/useLivestreamSWR"
 import { useFirestoreCollection } from "../../../../../custom-hook/utils/useFirestoreCollection"
 import useClosestLivestreamStats from "./useClosestLivestreamStats"
 
@@ -40,6 +42,7 @@ type ILivestreamAnalyticsPageContext = {
    setUserType: Dispatch<SetStateAction<LivestreamUserType>>
    fieldsOfStudyLookup: Record<string, string>
    levelsOfStudyLookup: Record<string, string>
+   groupQuestionsMap: LivestreamGroupQuestionsMap | Record<string, never>
    setCurrentStreamStats: Dispatch<
       SetStateAction<ILivestreamAnalyticsPageContext["currentStreamStats"]>
    >
@@ -53,6 +56,7 @@ const initialValues: ILivestreamAnalyticsPageContext = {
    userType: initialUserType,
    fieldsOfStudyLookup: {},
    levelsOfStudyLookup: {},
+   groupQuestionsMap: {},
    setCurrentStreamStats: () => {},
    setUserType: () => {},
 }
@@ -87,6 +91,9 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
       "levelsOfStudy",
       queryOptions
    )
+
+   // Fetch the full livestream to access registration questions (groupQuestionsMap)
+   const { data: fullLivestream } = useLivestreamSWR(livestreamId)
 
    const levelsOfStudyLookup = useMemo(
       () => createLookup(levelsOfStudy, "name"),
@@ -131,8 +138,16 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
          userType,
          setCurrentStreamStats,
          setUserType,
+         groupQuestionsMap: (fullLivestream?.groupQuestionsMap ||
+            {}) as LivestreamGroupQuestionsMap,
       }
-   }, [fieldsOfStudyLookup, levelsOfStudyLookup, stats, userType])
+   }, [
+      fieldsOfStudyLookup,
+      levelsOfStudyLookup,
+      stats,
+      userType,
+      fullLivestream,
+   ])
 
    return (
       <LivestreamAnalyticsPageContext.Provider value={value}>
