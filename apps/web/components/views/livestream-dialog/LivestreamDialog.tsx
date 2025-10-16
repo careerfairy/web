@@ -355,7 +355,6 @@ const Content: FC<ContentProps> = ({
    isRecommendationsListVisible,
    setIsRecommendationsListVisible,
    providedOriginSource,
-   shouldBypassMultiSelection,
 }) => {
    const router = useRouter()
    /**
@@ -599,15 +598,9 @@ const Content: FC<ContentProps> = ({
       registrationDispatch({
          type: "set-should-bypass-multi-selection",
          // at the moment, only panels have multi-registration
-         payload: livestreamPresenter?.isPanel
-            ? shouldBypassMultiSelection
-            : true,
+         payload: true,
       })
-   }, [
-      shouldBypassMultiSelection,
-      registrationDispatch,
-      livestreamPresenter?.isPanel,
-   ])
+   }, [registrationDispatch])
 
    const isRedirecting = useRedirectToEventRoom(
       livestreamPresenter,
