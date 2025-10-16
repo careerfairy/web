@@ -13,6 +13,8 @@ const styles = sxStyles({
    root: {
       width: "100%",
       height: "100%",
+      backgroundColor: (theme) => theme.brand.white[500],
+      borderRadius: "12px",
       "& .videoTrackWrapper": {
          borderRadius: "10px",
       },
