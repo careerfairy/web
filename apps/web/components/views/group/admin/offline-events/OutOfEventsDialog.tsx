@@ -9,6 +9,7 @@ import {
 import useIsMobile from "components/custom-hook/useIsMobile"
 import PlusCircleIcon from "components/views/common/icons/PlusCircleIcon"
 import BrandedSwipeableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
+import { SlideUpTransition } from "components/views/common/transitions"
 import Image from "next/image"
 import Link from "next/link"
 import { X } from "react-feather"
@@ -167,6 +168,7 @@ export const OutOfEventsDialog = ({
          PaperProps={{
             sx: styles.desktopPaper,
          }}
+         TransitionComponent={SlideUpTransition}
       >
          {dialogContent}
       </Dialog>
