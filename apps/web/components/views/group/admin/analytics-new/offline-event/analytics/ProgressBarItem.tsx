@@ -17,6 +17,7 @@ const progressBarStyles = sxStyles({
    },
    mobileName: {
       flex: 1,
+      minWidth: 0,
       lineHeight: "24px",
       whiteSpace: "nowrap",
       overflow: "hidden",
@@ -52,6 +53,7 @@ const progressBarStyles = sxStyles({
    },
    desktopName: {
       width: 200,
+      minWidth: 0,
       lineHeight: "24px",
       whiteSpace: "nowrap",
       overflow: "hidden",
@@ -89,7 +91,11 @@ export const ProgressBarItem = ({
       return (
          <Box sx={progressBarStyles.mobileRow}>
             <Box sx={progressBarStyles.mobileHeader}>
-               <BrandedTooltip title={name} arrow>
+               <BrandedTooltip 
+                  title={name} 
+                  arrow 
+                  wrapperStyles={{ flex: 1, minWidth: 0 }}
+               >
                   <Typography
                      variant="medium"
                      color="neutral.700"
@@ -119,7 +125,11 @@ export const ProgressBarItem = ({
    return (
       <Box sx={progressBarStyles.desktopRow}>
          <Box sx={progressBarStyles.desktopBarContainer}>
-            <BrandedTooltip title={name} arrow>
+            <BrandedTooltip 
+               title={name} 
+               arrow 
+               wrapperStyles={{ width: 200, minWidth: 0 }}
+            >
                <Typography
                   variant="medium"
                   color="neutral.700"
