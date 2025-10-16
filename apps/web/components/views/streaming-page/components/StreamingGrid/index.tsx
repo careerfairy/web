@@ -17,10 +17,12 @@ const styles = sxStyles({
       display: "flex",
       position: "relative",
       mt: "-8px !important",
+      minWidth: 0,
    },
    content: {
       width: "100%",
       height: "100%",
+      minWidth: 0,
    },
 })
 
