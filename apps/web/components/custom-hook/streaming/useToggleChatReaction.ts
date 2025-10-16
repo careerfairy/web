@@ -64,7 +64,12 @@ export const useToggleChatReaction = (
          )
 
          try {
-            console.log("Adding reaction:", { entryId, reactionType, userId })
+            console.log("Adding reaction:", { 
+               entryId, 
+               reactionType, 
+               userId,
+               livestreamId 
+            })
             await updateDoc(entryRef, {
                [reactionType]: arrayUnion(userId),
             })
@@ -93,7 +98,12 @@ export const useToggleChatReaction = (
          )
 
          try {
-            console.log("Removing reaction:", { entryId, reactionType, userId })
+            console.log("Removing reaction:", { 
+               entryId, 
+               reactionType, 
+               userId,
+               livestreamId 
+            })
             await updateDoc(entryRef, {
                [reactionType]: arrayRemove(userId),
             })
