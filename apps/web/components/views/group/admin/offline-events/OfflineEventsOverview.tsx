@@ -80,7 +80,6 @@ const OfflineEventsOverviewContent = () => {
                checkoutData={checkoutData}
                open={checkoutDialogOpen}
                onClose={handleCheckoutDialogClose}
-               onOpen={handleCheckoutDialogOpen}
                title="Plan your next offline events"
                subtitle="Select how many offline events you want to publish and reach more students."
             />
