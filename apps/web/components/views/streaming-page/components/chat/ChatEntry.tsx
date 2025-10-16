@@ -1,5 +1,5 @@
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
-import { IconButton, Stack, Typography } from "@mui/material"
+import { Box, IconButton, Stack, Typography } from "@mui/material"
 import LinkifyText from "components/util/LinkifyText"
 import { useAuth } from "HOCs/AuthProvider"
 import { forwardRef, memo, useEffect, useState } from "react"
@@ -10,6 +10,7 @@ import { useStreamingContext } from "../../context"
 import { UserType } from "../../util"
 import { UserDetails } from "../UserDetails"
 import { getChatAuthor, getIsMe } from "./util"
+import { useToggleChatReaction } from "components/custom-hook/streaming/useToggleChatReaction"
 
 const styles = sxStyles({
    root: {
@@ -40,6 +41,31 @@ const styles = sxStyles({
          color: (theme) => theme.brand.black[600],
       },
    },
+   reactionContainer: {
+      display: "flex",
+      alignItems: "center",
+      gap: 1,
+   },
+   reactionIcon: {
+      width: 24,
+      height: 24,
+      cursor: "pointer",
+      opacity: 0.6,
+      transition: "opacity 0.2s",
+      "&:hover": {
+         opacity: 1,
+      },
+   },
+   reactionCount: {
+      display: "flex",
+      alignItems: "center",
+      gap: 0.5,
+      height: 24,
+      px: 1.5,
+      py: 0.5,
+      borderRadius: "60px",
+      backgroundColor: (theme) => theme.brand.white[500],
+   },
 })
 
 type Props = {
@@ -48,20 +74,21 @@ type Props = {
 }
 
 /**
- * Prevents unnecessary re-renders by comparing document ids in props.
+ * Prevents unnecessary re-renders by comparing document ids and reactions in props.
  * @param prevProps Previous component props.
  * @param nextProps Next component props.
  * @returns True if the props are equal, false otherwise.
  */
 const propsAreEqual = (prevProps: Props, nextProps: Props) =>
-   prevProps.entry.id === nextProps.entry.id
+   prevProps.entry.id === nextProps.entry.id &&
+   prevProps.entry.thumbsUp?.length === nextProps.entry.thumbsUp?.length
 
 export const ChatEntry = memo(
    forwardRef<HTMLDivElement, Props>(({ entry, onOptionsClick }, ref) => {
       const userType = getChatAuthor(entry)
       const timeSinceEntry = useTimeSinceEntry(entry)
       const { authenticatedUser, userData } = useAuth()
-      const { isHost, agoraUserId } = useStreamingContext()
+      const { isHost, agoraUserId, livestreamId } = useStreamingContext()
 
       const isMe = getIsMe(
          entry,
@@ -71,6 +98,22 @@ export const ChatEntry = memo(
       )
 
       const showOptions = Boolean(isMe || isHost || userData?.isAdmin)
+
+      const { addReaction, removeReaction } = useToggleChatReaction(
+         livestreamId,
+         authenticatedUser.uid
+      )
+
+      const thumbsUpCount = entry.thumbsUp?.length || 0
+      const hasUserReacted = entry.thumbsUp?.includes(authenticatedUser.uid)
+
+      const handleReactionClick = async () => {
+         if (hasUserReacted) {
+            await removeReaction(entry.id, "thumbsUp")
+         } else {
+            await addReaction(entry.id, "thumbsUp")
+         }
+      }
 
       return (
          <Stack
@@ -101,9 +144,26 @@ export const ChatEntry = memo(
             >
                <LinkifyText>{entry.message}</LinkifyText>
             </Typography>
-            <Typography color="neutral.200" variant="xsmall">
-               {timeSinceEntry}
-            </Typography>
+            <Stack direction="row" sx={styles.reactionContainer}>
+               <Typography color="neutral.200" variant="xsmall">
+                  {timeSinceEntry}
+               </Typography>
+               {thumbsUpCount > 0 && (
+                  <Box sx={styles.reactionCount}>
+                     <Typography variant="xsmall">👍</Typography>
+                     <Typography variant="xsmall" color="neutral.800">
+                        {thumbsUpCount}
+                     </Typography>
+                  </Box>
+               )}
+               <Box
+                  component="img"
+                  src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/Chat-reaction-icon.svg?alt=media&token=6dc8149c-ee79-4fc7-88e5-44e24899b07c"
+                  alt="React to message"
+                  sx={styles.reactionIcon}
+                  onClick={handleReactionClick}
+               />
+            </Stack>
          </Stack>
       )
    }),
