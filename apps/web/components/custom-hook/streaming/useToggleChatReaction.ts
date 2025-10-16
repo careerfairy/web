@@ -50,7 +50,10 @@ export const useToggleChatReaction = (
 
    const addReaction = useCallback(
       async (entryId: string, reactionType: ReactionType = "thumbsUp") => {
-         if (!userId) return
+         if (!userId) {
+            console.warn("Cannot add reaction: userId is undefined")
+            return
+         }
 
          const entryRef = doc(
             FirestoreInstance,
@@ -61,9 +64,11 @@ export const useToggleChatReaction = (
          )
 
          try {
+            console.log("Adding reaction:", { entryId, reactionType, userId })
             await updateDoc(entryRef, {
                [reactionType]: arrayUnion(userId),
             })
+            console.log("Reaction added successfully")
          } catch (error) {
             console.error("Error adding chat reaction:", error)
             throw error
@@ -74,7 +79,10 @@ export const useToggleChatReaction = (
 
    const removeReaction = useCallback(
       async (entryId: string, reactionType: ReactionType = "thumbsUp") => {
-         if (!userId) return
+         if (!userId) {
+            console.warn("Cannot remove reaction: userId is undefined")
+            return
+         }
 
          const entryRef = doc(
             FirestoreInstance,
@@ -85,9 +93,11 @@ export const useToggleChatReaction = (
          )
 
          try {
+            console.log("Removing reaction:", { entryId, reactionType, userId })
             await updateDoc(entryRef, {
                [reactionType]: arrayRemove(userId),
             })
+            console.log("Reaction removed successfully")
          } catch (error) {
             console.error("Error removing chat reaction:", error)
             throw error
