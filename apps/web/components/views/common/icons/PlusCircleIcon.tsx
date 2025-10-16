@@ -18,24 +18,24 @@ const PlusCircleIcon = (props: SvgIconProps) => {
                <path
                   d="M71.5707 96.4913C85.2502 96.4913 96.3396 85.4019 96.3396 71.7224C96.3396 58.0429 85.2502 46.9535 71.5707 46.9535C57.8912 46.9535 46.8018 58.0429 46.8018 71.7224C46.8018 85.4019 57.8912 96.4913 71.5707 96.4913Z"
                   stroke="#CCF6DA"
-                  stroke-width="1.10084"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeWidth="1.10084"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                />
             </g>
             <path
                d="M61.6641 71.7229H81.4792"
                stroke="#00BD40"
-               stroke-width="4.40336"
-               stroke-linecap="round"
-               stroke-linejoin="round"
+               strokeWidth="4.40336"
+               strokeLinecap="round"
+               strokeLinejoin="round"
             />
             <path
                d="M71.5713 61.8149V81.6301"
                stroke="#00BD40"
-               stroke-width="4.40336"
-               stroke-linecap="round"
-               stroke-linejoin="round"
+               strokeWidth="4.40336"
+               strokeLinecap="round"
+               strokeLinejoin="round"
             />
             <defs>
                <filter
@@ -45,9 +45,9 @@ const PlusCircleIcon = (props: SvgIconProps) => {
                   width="143.109"
                   height="143.109"
                   filterUnits="userSpaceOnUse"
-                  color-interpolation-filters="sRGB"
+                  colorInterpolationFilters="sRGB"
                >
-                  <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                  <feFlood floodOpacity="0" result="BackgroundImageFix" />
                   <feColorMatrix
                      in="SourceAlpha"
                      type="matrix"
