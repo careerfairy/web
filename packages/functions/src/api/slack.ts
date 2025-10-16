@@ -303,6 +303,8 @@ export const notifyOfflineEventPurchased = (
       groupLogoUrl: string
       groupId: string
       quantityPurchased: number
+      updatedCredits: number
+      previousCredits: number
       customerEmail: string
       customerName: string
    }
@@ -311,6 +313,8 @@ export const notifyOfflineEventPurchased = (
 
    const body: Record<string, string> = {
       "Credits purchased": params.quantityPurchased.toString(),
+      "Previous Credits": params.previousCredits.toString(),
+      "Updated Credits": params.updatedCredits.toString(),
       "Bought by": `${params.customerName} (${params.customerEmail})`,
    }
 
@@ -321,6 +325,72 @@ export const notifyOfflineEventPurchased = (
             text: {
                type: "mrkdwn",
                text: `Offline Event Credits Purchased: *${params.groupName}*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+            accessory: {
+               type: "image",
+               image_url: params.groupLogoUrl,
+               alt_text: `${params.groupName} Logo`,
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Admin Events Page",
+                  },
+                  url: groupAdminOfflineEvents,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
+/**
+ * Sends a Slack notification when increasing bought offline events fails.
+ *
+ * @returns Promise that resolves when the notification is sent
+ */
+export const notifyOfflineEventIncreaseFailed = (
+   webhookUrl: string,
+   params: {
+      groupName: string
+      groupLogoUrl: string
+      groupId: string
+      currentCredits: string
+      expectedCredits: string
+      quantityToIncrease: string
+      customerEmail: string
+      customerName: string
+   }
+) => {
+   const groupAdminOfflineEvents = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
+
+   const body: Record<string, string> = {
+      "Current Credits": params.currentCredits,
+      "Expected Credits": params.expectedCredits,
+      "Failed to increase by": params.quantityToIncrease,
+      "Purchased by": `${params.customerName} (${params.customerEmail})`,
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `🚨 Offline Event Credits Increase Failed: *${params.groupName}*`,
             },
          },
          {
