@@ -2,7 +2,7 @@ import { doc, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { useCallback } from "react"
 
-type ReactionType = "thumbsUp" | "heart" | "wow"
+type ReactionType = "thumbsUp" | "heart" | "wow" | "laughing"
 
 export const useToggleChatReaction = (
    livestreamId: string,
