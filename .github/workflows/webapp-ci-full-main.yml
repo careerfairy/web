@@ -192,20 +192,19 @@ jobs:
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v4
+         - uses: actions/setup-node@v4
+           with:
+              node-version: "22"
          - name: Deploy to Vercel
-           uses: BetaHuhn/deploy-to-vercel-action@v1.10.1
+           uses: amondnet/vercel-action@v25
            id: vercel-deploy
            with:
-              VERCEL_SCOPE: careerfairy-ssr
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-              VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-              VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-              PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
-              PR_LABELS: false
-              ALIAS_DOMAINS: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' ) || '' }}
-              DELETE_EXISTING_COMMENT: true
-              PR_PREVIEW_DOMAIN: "careerfairy-ssr-webapp-pr-{PR}.vercel.app"
+              vercel-token: ${{ secrets.VERCEL_TOKEN }}
+              vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+              vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+              vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
+              scope: careerfairy-ssr
+              alias-domains: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' ) || '' }}
          - name: preview-url
            run: |
-              echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
+              echo ${{ steps.vercel-deploy.outputs.preview-url }}
