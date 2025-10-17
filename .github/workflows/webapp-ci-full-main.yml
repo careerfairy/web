@@ -192,6 +192,18 @@ jobs:
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v4
+         - uses: actions/setup-node@v4
+           with:
+              node-version: "22"
+         - name: Cache node modules
+           id: cache-nodemodules
+           uses: actions/cache@v4
+           with:
+              path: "**/node_modules"
+              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+         - name: Install Dependencies
+           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           run: npm ci --ignore-scripts
          - name: Deploy to Vercel
            uses: BetaHuhn/deploy-to-vercel-action@v1
            id: vercel-deploy
@@ -206,6 +218,7 @@ jobs:
               ALIAS_DOMAINS: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' ) || '' }}
               DELETE_EXISTING_COMMENT: true
               PR_PREVIEW_DOMAIN: "careerfairy-ssr-webapp-pr-{PR}.vercel.app"
+              WORKING_DIRECTORY: apps/web
          - name: preview-url
            run: |
               echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
