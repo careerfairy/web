@@ -37,7 +37,7 @@ import { useCopyToClipboard } from "react-use"
 import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 import { AnalyticsEvents } from "util/analyticsConstants"
-import { dataLayerOfflineEvent } from "util/analyticsUtils"
+import { dataLayerEvent, dataLayerOfflineEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 import CookiesUtil from "util/CookiesUtil"
 import DateUtil from "util/DateUtil"
@@ -193,14 +193,10 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
 
       copyEventLinkToClipboard(eventUrl)
 
-      // Track analytics event for GTM and Customer.io
-      dataLayerOfflineEvent(
-         AnalyticsEvents.OfflineEventShare,
-         eventFromServer,
-         {
-            medium: "Copy Link",
-         }
-      )
+      dataLayerEvent(AnalyticsEvents.OfflineEventShare, {
+         medium: "Copy Link",
+         eventId: eventFromServer.id,
+      })
 
       successNotification(
          "Event link has been copied to your clipboard",
@@ -321,8 +317,6 @@ const Content = ({
          hasTrackedView.current = true
          const utm = CookiesUtil.getUTMParams()
 
-         // Track analytics event for GTM and Customer.io
-         console.log("🚀 ~ Content ~ analytics:")
          dataLayerOfflineEvent(AnalyticsEvents.OfflineEventView, event)
 
          offlineEventService
