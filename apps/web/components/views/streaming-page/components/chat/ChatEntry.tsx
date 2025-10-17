@@ -200,20 +200,33 @@ export const ChatEntry = memo(
 
       const [showReactionMenu, setShowReactionMenu] = useState(false)
       const [menuVisible, setMenuVisible] = useState(false)
+      const [shouldRenderMenu, setShouldRenderMenu] = useState(false)
       const hideMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+      const unmountTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
       useEffect(() => {
          if (showReactionMenu) {
-            // Clear any pending hide timeout
+            // Clear any pending timeouts
             if (hideMenuTimeoutRef.current) {
                clearTimeout(hideMenuTimeoutRef.current)
             }
-            // Trigger animation after mount
+            if (unmountTimeoutRef.current) {
+               clearTimeout(unmountTimeoutRef.current)
+            }
+            
+            // Mount the menu
+            setShouldRenderMenu(true)
+            // Trigger enter animation after mount
             requestAnimationFrame(() => {
                setMenuVisible(true)
             })
          } else {
+            // Trigger exit animation
             setMenuVisible(false)
+            // Unmount after animation completes (200ms transition)
+            unmountTimeoutRef.current = setTimeout(() => {
+               setShouldRenderMenu(false)
+            }, 200)
          }
       }, [showReactionMenu])
 
@@ -358,7 +371,7 @@ export const ChatEntry = memo(
                      onMouseEnter={handleMouseEnter}
                      onMouseLeave={handleMouseLeave}
                   >
-                     {showReactionMenu && (
+                     {shouldRenderMenu && (
                         <Box 
                            sx={[
                               styles.reactionMenu,
@@ -382,12 +395,28 @@ export const ChatEntry = memo(
                            )}
                         </Box>
                      )}
-                     <Box
-                        component="img"
-                        src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/Chat-reaction-icon.svg?alt=media&token=6dc8149c-ee79-4fc7-88e5-44e24899b07c"
-                        alt="React to message"
-                        sx={styles.reactionIcon}
-                     />
+                     {userSelectedReaction ? (
+                        <Box
+                           sx={[
+                              styles.reactionIcon,
+                              { 
+                                 fontSize: "18px",
+                                 display: "flex",
+                                 alignItems: "center",
+                                 justifyContent: "center",
+                              }
+                           ]}
+                        >
+                           {REACTION_EMOJIS[userSelectedReaction]}
+                        </Box>
+                     ) : (
+                        <Box
+                           component="img"
+                           src="https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/Chat-reaction-icon.svg?alt=media&token=6dc8149c-ee79-4fc7-88e5-44e24899b07c"
+                           alt="React to message"
+                           sx={styles.reactionIcon}
+                        />
+                     )}
                   </Box>
                </Stack>
             </Stack>
