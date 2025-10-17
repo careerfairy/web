@@ -58,6 +58,16 @@ const styles = sxStyles({
       position: "relative",
       display: "flex",
       alignItems: "center",
+      // Add padding-top to create a hover bridge to the menu
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         top: "-40px", // Cover the gap between icon and menu
+         left: 0,
+         right: 0,
+         height: "48px",
+         pointerEvents: "none",
+      },
    },
    reactionIcon: {
       width: 24,
@@ -76,7 +86,7 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.brand.white[50],
       border: (theme) => `0.5px solid ${theme.brand.white[500]}`,
       boxShadow: "0 0 8px 0 rgba(20, 20, 20, 0.06)",
-      borderRadius: "8px",
+      borderRadius: "28px",
       p: 1,
       display: "flex",
       gap: 0.75,
@@ -299,6 +309,8 @@ export const ChatEntry = memo(
                               styles.reactionMenu,
                               menuVisible && styles.reactionMenuVisible
                            ]}
+                           onMouseEnter={() => setShowReactionMenu(true)}
+                           onMouseLeave={() => setShowReactionMenu(false)}
                         >
                            {(Object.entries(REACTION_EMOJIS) as [ReactionType, string][]).map(
                               ([type, emoji]) => (
