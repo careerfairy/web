@@ -2,7 +2,7 @@ import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
 import { Box, Collapse, Fade, IconButton, Stack, Typography } from "@mui/material"
 import LinkifyText from "components/util/LinkifyText"
 import { useAuth } from "HOCs/AuthProvider"
-import { forwardRef, memo, useEffect, useState } from "react"
+import { forwardRef, memo, useEffect, useRef, useState } from "react"
 import { MoreVertical } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
@@ -90,7 +90,7 @@ const styles = sxStyles({
       gap: 0.75,
       zIndex: 10,
       opacity: 0,
-      transform: "translateY(-4px)",
+      transform: "translateY(4px)", // Slide from bottom (positive Y)
       transition: "opacity 0.2s ease, transform 0.2s ease",
    },
    reactionMenuVisible: {
@@ -104,21 +104,40 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
       cursor: "pointer",
-      borderRadius: "6px",
+      borderRadius: "40px",
       fontSize: "18px",
       transition: "background-color 0.2s, transform 0.1s",
-      "&:hover": {
-         backgroundColor: (theme) => theme.brand.black[300],
-         transform: "scale(1.1)",
-      },
       "&:active": {
          transform: "scale(0.95)",
       },
    },
    reactionOptionActive: {
       backgroundColor: "primary.100",
-      "&:hover": {
-         backgroundColor: "primary.200",
+   },
+   reactionOptionHover: {
+      thumbsUp: {
+         "&:hover": {
+            backgroundColor: "primary.100",
+            transform: "scale(1.1)",
+         },
+      },
+      heart: {
+         "&:hover": {
+            backgroundColor: "#FFE8E8",
+            transform: "scale(1.1)",
+         },
+      },
+      wow: {
+         "&:hover": {
+            backgroundColor: "#FFF4E6",
+            transform: "scale(1.1)",
+         },
+      },
+      laughing: {
+         "&:hover": {
+            backgroundColor: "#FFF9E6",
+            transform: "scale(1.1)",
+         },
       },
    },
    reactionCount: {
@@ -181,9 +200,14 @@ export const ChatEntry = memo(
 
       const [showReactionMenu, setShowReactionMenu] = useState(false)
       const [menuVisible, setMenuVisible] = useState(false)
+      const hideMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
       useEffect(() => {
          if (showReactionMenu) {
+            // Clear any pending hide timeout
+            if (hideMenuTimeoutRef.current) {
+               clearTimeout(hideMenuTimeoutRef.current)
+            }
             // Trigger animation after mount
             requestAnimationFrame(() => {
                setMenuVisible(true)
@@ -192,6 +216,22 @@ export const ChatEntry = memo(
             setMenuVisible(false)
          }
       }, [showReactionMenu])
+
+      const handleMouseLeave = () => {
+         // Add 200ms delay before hiding
+         hideMenuTimeoutRef.current = setTimeout(() => {
+            setShowReactionMenu(false)
+         }, 200)
+      }
+
+      const handleMouseEnter = () => {
+         // Clear any pending hide timeout
+         if (hideMenuTimeoutRef.current) {
+            clearTimeout(hideMenuTimeoutRef.current)
+            hideMenuTimeoutRef.current = null
+         }
+         setShowReactionMenu(true)
+      }
 
       // Get reaction counts and check if user reacted for each type
       const reactions = {
@@ -315,8 +355,8 @@ export const ChatEntry = memo(
                   </Collapse>
                   <Box 
                      sx={styles.reactionIconWrapper}
-                     onMouseEnter={() => setShowReactionMenu(true)}
-                     onMouseLeave={() => setShowReactionMenu(false)}
+                     onMouseEnter={handleMouseEnter}
+                     onMouseLeave={handleMouseLeave}
                   >
                      {showReactionMenu && (
                         <Box 
@@ -331,6 +371,7 @@ export const ChatEntry = memo(
                                     key={type}
                                     sx={[
                                        styles.reactionOption,
+                                       styles.reactionOptionHover[type],
                                        reactions[type].hasUserReacted && styles.reactionOptionActive
                                     ]}
                                     onClick={() => handleReactionClick(type)}
