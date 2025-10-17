@@ -192,10 +192,8 @@ jobs:
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v4
-         - name: Install Vercel CLI
-           run: npm install --global vercel@latest
          - name: Deploy to Vercel
-           uses: BetaHuhn/deploy-to-vercel-action@v1.10.0
+           uses: BetaHuhn/deploy-to-vercel-action@v1.10.1
            id: vercel-deploy
            with:
               VERCEL_SCOPE: careerfairy-ssr
