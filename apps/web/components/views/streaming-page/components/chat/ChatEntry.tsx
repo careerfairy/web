@@ -112,7 +112,18 @@ const styles = sxStyles({
       },
    },
    reactionOptionActive: {
-      backgroundColor: "primary.100",
+      thumbsUp: {
+         backgroundColor: "primary.100",
+      },
+      heart: {
+         backgroundColor: "#FFE8E8",
+      },
+      wow: {
+         backgroundColor: "#FFF4E6",
+      },
+      laughing: {
+         backgroundColor: "#FFF9E6",
+      },
    },
    reactionOptionHover: {
       thumbsUp: {
@@ -152,7 +163,18 @@ const styles = sxStyles({
       transition: "background-color 0.2s ease",
    },
    reactionCountActive: {
-      backgroundColor: "primary.100",
+      thumbsUp: {
+         backgroundColor: "primary.100",
+      },
+      heart: {
+         backgroundColor: "#FFE8E8",
+      },
+      wow: {
+         backgroundColor: "#FFF4E6",
+      },
+      laughing: {
+         backgroundColor: "#FFF9E6",
+      },
    },
 })
 
@@ -350,7 +372,7 @@ export const ChatEntry = memo(
                         <Box 
                            sx={[
                               styles.reactionCount, 
-                              userSelectedReaction && styles.reactionCountActive
+                              userSelectedReaction && styles.reactionCountActive[userSelectedReaction]
                            ]}
                         >
                            {activeReactions.length > 0 && (
@@ -385,7 +407,7 @@ export const ChatEntry = memo(
                                     sx={[
                                        styles.reactionOption,
                                        styles.reactionOptionHover[type],
-                                       reactions[type].hasUserReacted && styles.reactionOptionActive
+                                       reactions[type].hasUserReacted && styles.reactionOptionActive[type]
                                     ]}
                                     onClick={() => handleReactionClick(type)}
                                  >
@@ -397,15 +419,16 @@ export const ChatEntry = memo(
                      )}
                      {userSelectedReaction ? (
                         <Box
-                           sx={[
-                              styles.reactionIcon,
-                              { 
-                                 fontSize: "18px",
-                                 display: "flex",
-                                 alignItems: "center",
-                                 justifyContent: "center",
-                              }
-                           ]}
+                           sx={{ 
+                              width: 24,
+                              height: 24,
+                              cursor: "pointer",
+                              opacity: 1,
+                              fontSize: "18px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                           }}
                         >
                            {REACTION_EMOJIS[userSelectedReaction]}
                         </Box>
