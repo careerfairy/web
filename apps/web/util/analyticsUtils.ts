@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { UserData } from "@careerfairy/shared-lib/users"
 import CookiesUtil from "./CookiesUtil"
 
@@ -151,6 +152,27 @@ export const dataLayerSparkEvent = (
       companyId: spark.group.id, // GTM Variable
       categoryId: spark.category.id, // GTM Variable
       mentorId: spark.creator?.id, // GTM Variable
+   })
+}
+
+/**
+ * Data layer event that receives an offline event object and sends extra metadata as variables
+ * @param eventName
+ * @param offlineEvent
+ * @param optionalVariables Additional properties that are not already in the offline event object
+ */
+export const dataLayerOfflineEvent = (
+   eventName: AnalyticsEvent,
+   offlineEvent: OfflineEvent,
+   optionalVariables = {}
+) => {
+   console.log("🚀 ~ dataLayerOfflineEvent ~ eventName:", eventName)
+   dataLayerEvent(eventName, {
+      ...optionalVariables,
+      offlineEventId: offlineEvent?.id, // GTM Variable
+      offlineEventTitle: offlineEvent?.title, // GTM Variable
+      companyName: offlineEvent?.group?.universityName, // GTM Variable
+      companyId: offlineEvent?.group?.id, // GTM Variable
    })
 }
 
