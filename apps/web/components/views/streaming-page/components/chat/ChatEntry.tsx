@@ -59,8 +59,8 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       // Extend the hover area to include the menu space
-      paddingTop: "64px",
-      marginTop: "-64px",
+      paddingTop: "52px",
+      marginTop: "-52px",
       paddingRight: "16px",
       marginRight: "-16px",
       paddingLeft: "16px",
@@ -78,7 +78,8 @@ const styles = sxStyles({
    },
    reactionMenu: {
       position: "absolute",
-      bottom: "calc(100% + 4px)",
+      bottom: "100%",
+      marginBottom: "4px",
       right: 0,
       backgroundColor: (theme) => theme.brand.white[50],
       border: (theme) => `0.5px solid ${theme.brand.white[500]}`,
