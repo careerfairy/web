@@ -12,7 +12,6 @@ import { UserDetails } from "../UserDetails"
 import { getChatAuthor, getIsMe } from "./util"
 import { useToggleChatReaction } from "components/custom-hook/streaming/useToggleChatReaction"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
-import { useStreamIsMobile } from "components/custom-hook/streaming"
 
 type ReactionType = "thumbsUp" | "wow" | "laughing" | "heart"
 
