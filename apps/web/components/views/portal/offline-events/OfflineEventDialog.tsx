@@ -5,13 +5,13 @@ import {
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { makeOfflineEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import {
+   alpha,
    Box,
    Button,
    Dialog,
    IconButton,
    Stack,
    Typography,
-   alpha,
 } from "@mui/material"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -37,7 +37,7 @@ import { useCopyToClipboard } from "react-use"
 import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 import { AnalyticsEvents } from "util/analyticsConstants"
-import { dataLayerEvent } from "util/analyticsUtils"
+import { dataLayerOfflineEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 import CookiesUtil from "util/CookiesUtil"
 import DateUtil from "util/DateUtil"
@@ -193,10 +193,14 @@ export const OfflineEventDialog = ({ eventFromServer }: Props) => {
 
       copyEventLinkToClipboard(eventUrl)
 
-      dataLayerEvent(AnalyticsEvents.OfflineEventShare, {
-         medium: "Copy Link",
-         eventId: eventFromServer.id,
-      })
+      // Track analytics event for GTM and Customer.io
+      dataLayerOfflineEvent(
+         AnalyticsEvents.OfflineEventShare,
+         eventFromServer,
+         {
+            medium: "Copy Link",
+         }
+      )
 
       successNotification(
          "Event link has been copied to your clipboard",
@@ -317,6 +321,10 @@ const Content = ({
          hasTrackedView.current = true
          const utm = CookiesUtil.getUTMParams()
 
+         // Track analytics event for GTM and Customer.io
+         console.log("🚀 ~ Content ~ analytics:")
+         dataLayerOfflineEvent(AnalyticsEvents.OfflineEventView, event)
+
          offlineEventService
             .trackOfflineEventAction(
                event.id,
@@ -345,6 +353,9 @@ const Content = ({
    const handleRegisterClick = useCallback(() => {
       if (event) {
          const utm = CookiesUtil.getUTMParams()
+
+         // Track analytics event for GTM and Customer.io
+         dataLayerOfflineEvent(AnalyticsEvents.OfflineEventRegister, event)
 
          // Track click for both authenticated and anonymous users
          if (userData || fingerprint) {

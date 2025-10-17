@@ -158,6 +158,10 @@ export const AnalyticsEvents = {
     * Dispatched when the offline event view is loaded
     */
    OfflineEventView: "offline_event_view",
+   /**
+    * Dispatched when the offline event register button is clicked
+    */
+   OfflineEventRegister: "offline_event_register",
 
    // Value Scoring
    Purchase: "Purchase",
