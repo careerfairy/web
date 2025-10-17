@@ -59,8 +59,8 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       // Extend the hover area to include the menu space
-      paddingTop: "52px",
-      marginTop: "-52px",
+      paddingTop: "8px",
+      marginTop: "-8px",
       paddingRight: "16px",
       marginRight: "-16px",
       paddingLeft: "16px",
