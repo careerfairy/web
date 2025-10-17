@@ -58,16 +58,11 @@ const styles = sxStyles({
       position: "relative",
       display: "flex",
       alignItems: "center",
-      // Add padding-top to create a hover bridge to the menu
-      "&::before": {
-         content: '""',
-         position: "absolute",
-         top: "-40px", // Cover the gap between icon and menu
-         left: 0,
-         right: 0,
-         height: "48px",
-         pointerEvents: "none",
-      },
+      // Extend the hover area to include the menu space
+      paddingTop: "56px",
+      marginTop: "-56px",
+      paddingRight: "8px",
+      marginRight: "-8px",
    },
    reactionIcon: {
       width: 24,
@@ -309,8 +304,6 @@ export const ChatEntry = memo(
                               styles.reactionMenu,
                               menuVisible && styles.reactionMenuVisible
                            ]}
-                           onMouseEnter={() => setShowReactionMenu(true)}
-                           onMouseLeave={() => setShowReactionMenu(false)}
                         >
                            {(Object.entries(REACTION_EMOJIS) as [ReactionType, string][]).map(
                               ([type, emoji]) => (
