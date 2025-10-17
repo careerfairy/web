@@ -11,6 +11,8 @@ import { UserType } from "../../util"
 import { UserDetails } from "../UserDetails"
 import { getChatAuthor, getIsMe } from "./util"
 import { useToggleChatReaction } from "components/custom-hook/streaming/useToggleChatReaction"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
 
 type ReactionType = "thumbsUp" | "wow" | "laughing" | "heart"
 
@@ -202,6 +204,7 @@ export const ChatEntry = memo(
       const timeSinceEntry = useTimeSinceEntry(entry)
       const { authenticatedUser, userData } = useAuth()
       const { isHost, agoraUserId, livestreamId } = useStreamingContext()
+      const isMobile = useStreamIsMobile()
 
       const isMe = getIsMe(
          entry,
@@ -397,7 +400,8 @@ export const ChatEntry = memo(
                         <Box 
                            sx={[
                               styles.reactionMenu,
-                              menuVisible && styles.reactionMenuVisible
+                              menuVisible && styles.reactionMenuVisible,
+                              isMobile && { marginRight: "16px" }
                            ]}
                         >
                            {(Object.entries(REACTION_EMOJIS) as [ReactionType, string][]).map(
