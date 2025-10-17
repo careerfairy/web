@@ -348,7 +348,6 @@ const Content = ({
       if (event) {
          const utm = CookiesUtil.getUTMParams()
 
-         // Track analytics event for GTM and Customer.io
          dataLayerOfflineEvent(AnalyticsEvents.OfflineEventRegister, event)
 
          // Track click for both authenticated and anonymous users

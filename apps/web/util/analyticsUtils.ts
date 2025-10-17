@@ -166,7 +166,6 @@ export const dataLayerOfflineEvent = (
    offlineEvent: OfflineEvent,
    optionalVariables = {}
 ) => {
-   console.log("🚀 ~ dataLayerOfflineEvent ~ eventName:", eventName)
    dataLayerEvent(eventName, {
       ...optionalVariables,
       offlineEventId: offlineEvent?.id, // GTM Variable
