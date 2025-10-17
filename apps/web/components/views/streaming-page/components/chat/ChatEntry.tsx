@@ -59,10 +59,12 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       // Extend the hover area to include the menu space
-      paddingTop: "56px",
-      marginTop: "-56px",
-      paddingRight: "8px",
-      marginRight: "-8px",
+      paddingTop: "64px",
+      marginTop: "-64px",
+      paddingRight: "16px",
+      marginRight: "-16px",
+      paddingLeft: "16px",
+      marginLeft: "-16px",
    },
    reactionIcon: {
       width: 24,
@@ -76,7 +78,7 @@ const styles = sxStyles({
    },
    reactionMenu: {
       position: "absolute",
-      bottom: "calc(100% + 8px)",
+      bottom: "calc(100% + 4px)",
       right: 0,
       backgroundColor: (theme) => theme.brand.white[50],
       border: (theme) => `0.5px solid ${theme.brand.white[500]}`,
@@ -110,6 +112,12 @@ const styles = sxStyles({
       },
       "&:active": {
          transform: "scale(0.95)",
+      },
+   },
+   reactionOptionActive: {
+      backgroundColor: "primary.100",
+      "&:hover": {
+         backgroundColor: "primary.200",
       },
    },
    reactionCount: {
@@ -210,10 +218,14 @@ export const ChatEntry = memo(
          0
       )
 
-      // Find the most used reaction to display in the counter
-      const primaryReaction = (Object.entries(reactions) as [ReactionType, typeof reactions.thumbsUp][])
+      // Get all reactions that have at least 1 count, sorted by count descending
+      const activeReactions = (Object.entries(reactions) as [ReactionType, typeof reactions.thumbsUp][])
          .filter(([_, r]) => r.count > 0)
-         .sort((a, b) => b[1].count - a[1].count)[0]
+         .sort((a, b) => b[1].count - a[1].count)
+
+      // Find which reaction the current user has selected (if any)
+      const userSelectedReaction = (Object.entries(reactions) as [ReactionType, typeof reactions.thumbsUp][])
+         .find(([_, r]) => r.hasUserReacted)?.[0]
 
       const handleReactionClick = async (reactionType: ReactionType) => {
          if (!userId) {
@@ -223,9 +235,16 @@ export const ChatEntry = memo(
 
          try {
             const reaction = reactions[reactionType]
+            
+            // If clicking the same reaction, remove it
             if (reaction.hasUserReacted) {
                await removeReaction(entry.id, reactionType)
             } else {
+               // Remove any existing reaction first (one reaction per user)
+               if (userSelectedReaction) {
+                  await removeReaction(entry.id, userSelectedReaction)
+               }
+               // Add the new reaction
                await addReaction(entry.id, reactionType)
             }
             setShowReactionMenu(false)
@@ -277,13 +296,13 @@ export const ChatEntry = memo(
                         <Box 
                            sx={[
                               styles.reactionCount, 
-                              primaryReaction && reactions[primaryReaction[0]].hasUserReacted && styles.reactionCountActive
+                              userSelectedReaction && styles.reactionCountActive
                            ]}
                         >
-                           {primaryReaction && (
+                           {activeReactions.length > 0 && (
                               <>
                                  <Typography variant="xsmall">
-                                    {REACTION_EMOJIS[primaryReaction[0]]}
+                                    {activeReactions.map(([type]) => REACTION_EMOJIS[type]).join("")}
                                  </Typography>
                                  <Typography variant="xsmall" color="neutral.800">
                                     {totalReactions}
@@ -309,7 +328,10 @@ export const ChatEntry = memo(
                               ([type, emoji]) => (
                                  <Box
                                     key={type}
-                                    sx={styles.reactionOption}
+                                    sx={[
+                                       styles.reactionOption,
+                                       reactions[type].hasUserReacted && styles.reactionOptionActive
+                                    ]}
                                     onClick={() => handleReactionClick(type)}
                                  >
                                     {emoji}
