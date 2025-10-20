@@ -22,6 +22,13 @@ const REACTION_EMOJIS: Record<ReactionType, string> = {
    heart: "❤️",
 }
 
+const REACTION_COLORS: Record<ReactionType, string> = {
+   thumbsUp: "primary.100",
+   heart: "#FFE8E8",
+   wow: "#FFF4E6",
+   laughing: "#FFF9E6",
+}
+
 const styles = sxStyles({
    root: {
       position: "relative",
@@ -110,46 +117,6 @@ const styles = sxStyles({
       transition: "background-color 0.2s, transform 0.1s",
       "&:active": {
          transform: "scale(0.95)",
-      },
-   },
-   reactionOptionActive: {
-      thumbsUp: {
-         backgroundColor: "primary.100",
-      },
-      heart: {
-         backgroundColor: "#FFE8E8",
-      },
-      wow: {
-         backgroundColor: "#FFF4E6",
-      },
-      laughing: {
-         backgroundColor: "#FFF9E6",
-      },
-   },
-   reactionOptionHover: {
-      thumbsUp: {
-         "&:hover": {
-            backgroundColor: "primary.100",
-            transform: "scale(1.1)",
-         },
-      },
-      heart: {
-         "&:hover": {
-            backgroundColor: "#FFE8E8",
-            transform: "scale(1.1)",
-         },
-      },
-      wow: {
-         "&:hover": {
-            backgroundColor: "#FFF4E6",
-            transform: "scale(1.1)",
-         },
-      },
-      laughing: {
-         "&:hover": {
-            backgroundColor: "#FFF9E6",
-            transform: "scale(1.1)",
-         },
       },
    },
    reactionCount: {
@@ -374,7 +341,9 @@ export const ChatEntry = memo(
                         <Box 
                            sx={[
                               styles.reactionCount, 
-                              userSelectedReaction && styles.reactionCountActive[userSelectedReaction]
+                              userSelectedReaction && {
+                                 backgroundColor: REACTION_COLORS[userSelectedReaction],
+                              }
                            ]}
                         >
                            {activeReactions.length > 0 && (
@@ -409,8 +378,15 @@ export const ChatEntry = memo(
                                     key={type}
                                     sx={[
                                        styles.reactionOption,
-                                       styles.reactionOptionHover[type],
-                                       reactions[type].hasUserReacted && styles.reactionOptionActive[type]
+                                       {
+                                          "&:hover": {
+                                             backgroundColor: REACTION_COLORS[type],
+                                             transform: "scale(1.1)",
+                                          },
+                                       },
+                                       reactions[type].hasUserReacted && {
+                                          backgroundColor: REACTION_COLORS[type],
+                                       }
                                     ]}
                                     onClick={() => handleReactionClick(type)}
                                  >
@@ -476,3 +452,4 @@ const useTimeSinceEntry = (entry: LivestreamChatEntry) => {
 }
 
 ChatEntry.displayName = "ChatEntry"
+
