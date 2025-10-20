@@ -172,6 +172,8 @@ export const dataLayerOfflineEvent = (
       offlineEventTitle: offlineEvent?.title, // GTM Variable
       companyName: offlineEvent?.group?.universityName, // GTM Variable
       companyId: offlineEvent?.group?.id, // GTM Variable
+      shadowView: offlineEvent?.published,
+      shadowRegister: offlineEvent?.published,
    })
 }
 
