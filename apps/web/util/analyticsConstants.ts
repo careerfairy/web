@@ -149,7 +149,8 @@ export const AnalyticsEvents = {
    ToggleTheme: "toggle_theme",
 
    // Offline Events
-
+   OfflineEventShadowView: "offline_event_shadow_view",
+   OfflineEventShadowRegister: "offline_event_shadow_register",
    /**
     * Dispatched when the offline event share button is clicked
     */

@@ -318,6 +318,7 @@ const Content = ({
          const utm = CookiesUtil.getUTMParams()
 
          dataLayerOfflineEvent(AnalyticsEvents.OfflineEventView, event)
+         dataLayerOfflineEvent(AnalyticsEvents.OfflineEventShadowView, event)
 
          offlineEventService
             .trackOfflineEventAction(
@@ -349,6 +350,10 @@ const Content = ({
          const utm = CookiesUtil.getUTMParams()
 
          dataLayerOfflineEvent(AnalyticsEvents.OfflineEventRegister, event)
+         dataLayerOfflineEvent(
+            AnalyticsEvents.OfflineEventShadowRegister,
+            event
+         )
 
          // Track click for both authenticated and anonymous users
          if (userData || fingerprint) {
