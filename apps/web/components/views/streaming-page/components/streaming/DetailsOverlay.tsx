@@ -97,7 +97,6 @@ export const DetailsOverlay = ({
                         src={streamerDetails.companyLogoUrl}
                         size={36}
                         alt={`${streamerDetails.companyName || "Company"} logo`}
-                        objectFit="cover"
                         sx={styles.companyLogo}
                      />
                   ) : null}
