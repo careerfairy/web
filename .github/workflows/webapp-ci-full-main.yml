@@ -195,30 +195,29 @@ jobs:
          - uses: actions/setup-node@v4
            with:
               node-version: "22"
-         - name: Cache node modules
-           id: cache-nodemodules
-           uses: actions/cache@v4
-           with:
-              path: "**/node_modules"
-              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-         - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --ignore-scripts
-         - name: Deploy to Vercel
-           uses: BetaHuhn/deploy-to-vercel-action@v1
-           id: vercel-deploy
-           with:
-              VERCEL_SCOPE: careerfairy-ssr
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-              VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-              VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-              PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
-              PR_LABELS: false
-              ALIAS_DOMAINS: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' ) || '' }}
-              DELETE_EXISTING_COMMENT: true
-              PR_PREVIEW_DOMAIN: "careerfairy-ssr-webapp-pr-{PR}.vercel.app"
-              WORKING_DIRECTORY: apps/web
-         - name: preview-url
+         - name: Install Vercel CLI
+           run: npm install --global vercel@latest
+         - name: Pull Vercel Environment Information
+           run: vercel pull --yes --environment=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'production' || 'preview' }} --token=${{ secrets.VERCEL_TOKEN }}
+           working-directory: apps/web
+         - name: Build Project Artifacts
+           run: vercel build ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+           working-directory: apps/web
+         - name: Deploy Project Artifacts to Vercel
+           id: deploy
            run: |
-              echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
+              url=$(vercel deploy --prebuilt ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }})
+              echo "url=$url" >> $GITHUB_OUTPUT
+              echo "Deployed to: $url"
+           working-directory: apps/web
+         - name: Comment on PR
+           if: github.event_name == 'pull_request'
+           uses: actions/github-script@v7
+           with:
+              script: |
+                 github.rest.issues.createComment({
+                   issue_number: context.issue.number,
+                   owner: context.repo.owner,
+                   repo: context.repo.repo,
+                   body: '✅ Preview deployed to: ${{ steps.deploy.outputs.url }}'
+                 })
