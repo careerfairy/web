@@ -5,10 +5,7 @@ import {
 } from "components/custom-hook/streaming"
 import { StreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import {
-   getMaxLineStyles,
-   getResizedUrl,
-} from "components/helperFunctions/HelperFunctions"
+import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
 import { Info, MicOff } from "react-feather"
 import { useIsPanel } from "store/selectors/streamingAppSelectors"
@@ -80,6 +77,9 @@ export const DetailsOverlay = ({
       streamerDetails.companyName &&
       streamerDetails.role !== "Moderator"
 
+   const showCompanyLogo =
+      isPanel && !isStreamerMobile && Boolean(streamerDetails?.companyLogoUrl)
+
    return (
       <>
          <FloatingContent sx={styles.root}>
@@ -92,12 +92,9 @@ export const DetailsOverlay = ({
                spacing={0.3}
             >
                <Stack direction="row" spacing={1.25} sx={styles.leftContainer}>
-                  {isPanel && !isStreamerMobile ? (
+                  {showCompanyLogo ? (
                      <CircularLogo
-                        src={getResizedUrl(
-                           streamerDetails.companyLogoUrl,
-                           "sm"
-                        )}
+                        src={streamerDetails.companyLogoUrl}
                         size={36}
                         alt={`${streamerDetails.companyName || "Company"} logo`}
                         objectFit="cover"
