@@ -1,12 +1,13 @@
 import useSWR, { SWRConfiguration } from "swr"
 
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo } from "react"
+import Stripe from "stripe"
+import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
-import Stripe from "stripe"
-import { errorLogAndNotify } from "util/CommonUtil"
-import { useGroup } from "layouts/GroupDashboardLayout"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -38,7 +39,11 @@ const useStripePrice = (priceId: string) => {
          groupId: group.id,
       }
    }, [group.id, priceId])
-   return useSWR(["fetchStripePrice", options], fetcher, swrOptions)
+   return useSWR(
+      [FUNCTION_NAMES.fetchStripePrice, options],
+      fetcher,
+      swrOptions
+   )
 }
 
 export default useStripePrice
