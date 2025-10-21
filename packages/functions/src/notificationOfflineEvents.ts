@@ -3,6 +3,7 @@ import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-eve
 import * as functions from "firebase-functions"
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { firestore } from "./api/firestoreAdmin"
+import { userRepo } from "./api/repositories"
 import { notifyOfflineEventPublished } from "./api/slack"
 import config from "./config"
 import { defaultTriggerRunTimeConfig } from "./lib/triggers/util"
@@ -42,6 +43,10 @@ export const notifySlackWhenOfflineEventIsPublished = onDocumentUpdated(
                .doc(offlineEvent.group.id)
                .get()
 
+            const lastUpdatedBy = await userRepo.getUserDataByUid(
+               offlineEvent.lastUpdatedBy.authUid
+            )
+
             const group = groupDoc.data() as Group
 
             const remainingCredits = group?.availableOfflineEvents || 0
@@ -50,6 +55,8 @@ export const notifySlackWhenOfflineEventIsPublished = onDocumentUpdated(
                config.slackWebhooks.offlineEventPublished,
                {
                   companyName: group.universityName,
+                  publisherName: `${lastUpdatedBy.firstName} ${lastUpdatedBy.lastName}`,
+                  publisherEmail: lastUpdatedBy.userEmail,
                   eventTitle: offlineEvent.title,
                   eventId: offlineEvent.id,
                   eventDate: offlineEvent.startAt.toDate(),

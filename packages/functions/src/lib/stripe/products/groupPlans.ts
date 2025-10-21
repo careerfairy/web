@@ -16,6 +16,7 @@ export async function handleGroupPlanSession(
    const metadata: GroupPlanSessionMetadata = {
       groupId: data.groupId,
       userEmail: data.customerEmail,
+      userName: data.customerName,
       type: StripeProductType.GROUP_PLAN,
       plan: data.plan,
    }
