@@ -119,6 +119,8 @@ export type UserDataEntry = {
    resumeUrl: string
    linkedInUrl: string
    avatar?: string
+   // Map of "Question name" -> "Answer label" for pre-registration questions
+   preRegAnswers?: Record<string, string>
 }
 
 const baseOptions: Options<UserDataEntry> = {

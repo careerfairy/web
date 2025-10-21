@@ -1,8 +1,8 @@
+import { getDocs, Query } from "@firebase/firestore"
+import JSZip from "jszip"
+import { CSVData } from "../../../../../custom-hook/useMetaDataActions"
 import { prettyLocalizedDate } from "../../../../../helperFunctions/HelperFunctions"
 import { UserDataEntry } from "./UserLivestreamDataTable"
-import JSZip from "jszip"
-import { getDocs, Query } from "@firebase/firestore"
-import { CSVData } from "../../../../../custom-hook/useMetaDataActions"
 
 export type DownloadData = {
    url: string
@@ -67,7 +67,10 @@ export const makeFileNameWindowsFriendly = (string: string): string => {
    return string.replace(/[/*|:<>?"\\]/gi, "_")
 }
 
-const userDataEntryColumnMapper: Record<keyof UserDataEntry, string> = {
+const userDataEntryColumnMapper: Record<
+   Exclude<keyof UserDataEntry, "preRegAnswers">,
+   string
+> = {
    firstName: "First Name",
    lastName: "Last Name",
    email: "Email",
@@ -88,20 +91,33 @@ export const getCSVDialogData = (
    title: string
    data: CSVData
 } => {
+   // Collect dynamic question columns from all users
+   const dynamicQuestionTitles = Array.from(
+      new Set(
+         users
+            .flatMap((u) => Object.keys(u.preRegAnswers || {}))
+            .filter(Boolean)
+      )
+   )
+
    return {
       title: title,
       data: users.map((user) => {
-         const nameAndTitle = Object.keys(userDataEntryColumnMapper).map(
+         const baseEntries = Object.keys(userDataEntryColumnMapper).map(
             (key) => ({
                title: userDataEntryColumnMapper[key],
                value: user[key],
             })
          )
 
-         return nameAndTitle.reduce(
-            (a, v) => ({ ...a, [v.title]: v.value }),
-            {}
-         )
+         const questionEntries = dynamicQuestionTitles.map((questionTitle) => ({
+            title: questionTitle,
+            value: user.preRegAnswers?.[questionTitle] || "",
+         }))
+
+         const allEntries = [...baseEntries, ...questionEntries]
+
+         return allEntries.reduce((a, v) => ({ ...a, [v.title]: v.value }), {})
       }),
    }
 }
