@@ -39,11 +39,13 @@ const useStripePrice = (priceId: string) => {
          groupId: group.id,
       }
    }, [group.id, priceId])
-   return useSWR(
-      [FUNCTION_NAMES.fetchStripePrice, options],
-      fetcher,
-      swrOptions
-   )
+   return useSWR([FUNCTION_NAMES.fetchStripePrice, options], fetcher, {
+      ...swrOptions,
+      onError: (error) =>
+         errorLogAndNotify(error, {
+            message: `Error fetching Stripe price with options: ${options}`,
+         }),
+   })
 }
 
 export default useStripePrice
