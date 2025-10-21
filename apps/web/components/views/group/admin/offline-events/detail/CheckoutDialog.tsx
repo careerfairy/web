@@ -2,7 +2,6 @@ import { BaseFetchStripeCustomerSession } from "@careerfairy/shared-lib/stripe/t
 import {
    Box,
    CircularProgress,
-   Dialog,
    IconButton,
    Stack,
    Typography,
@@ -10,7 +9,7 @@ import {
 import { useStripeCustomerSession } from "components/custom-hook/stripe/useStripeCustomerSession"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import StripeCheckoutComponent from "components/views/checkout/forms/StripeCheckoutComponent"
-import BrandedSwipeableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
+import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { ReactNode } from "react"
 import { X } from "react-feather"
@@ -78,7 +77,6 @@ type Props<T extends BaseFetchStripeCustomerSession> = {
    checkoutData: T
    open: boolean // Explicitly set as a request to stripe is being made to create a customer session
    onClose: () => void
-   onOpen: () => void
    title: string
    subtitle: string
 }
@@ -86,7 +84,6 @@ type Props<T extends BaseFetchStripeCustomerSession> = {
 export const CheckoutDialog = <T extends BaseFetchStripeCustomerSession>({
    open,
    onClose,
-   onOpen,
    checkoutData,
    title,
    subtitle,
@@ -102,35 +99,12 @@ export const CheckoutDialog = <T extends BaseFetchStripeCustomerSession>({
       </IconButton>
    )
 
-   if (isMobile) {
-      return (
-         <BrandedSwipeableDrawer
-            open={open}
-            onClose={onClose}
-            onOpen={onOpen}
-            PaperProps={{
-               sx: styles.mobilePaper,
-            }}
-         >
-            <CheckoutDetails
-               clientSecret={sessionData?.customerSessionSecret}
-               title={title}
-               subtitle={subtitle}
-               isLoading={isLoading}
-            />
-         </BrandedSwipeableDrawer>
-      )
-   }
    return (
-      <Dialog
-         open={open}
-         onClose={onClose}
-         PaperProps={{
-            sx: styles.desktopPaper,
-         }}
-         maxWidth="md"
-         fullWidth
+      <ResponsiveDialogLayout
          TransitionComponent={SlideUpTransition}
+         open={open}
+         handleClose={onClose}
+         dialogPaperStyles={isMobile ? styles.mobilePaper : styles.desktopPaper}
       >
          <CheckoutDetails
             clientSecret={sessionData?.customerSessionSecret}
@@ -139,7 +113,7 @@ export const CheckoutDialog = <T extends BaseFetchStripeCustomerSession>({
             isLoading={isLoading}
             closeButton={CloseButton}
          />
-      </Dialog>
+      </ResponsiveDialogLayout>
    )
 }
 

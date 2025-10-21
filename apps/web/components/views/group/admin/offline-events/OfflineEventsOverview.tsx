@@ -13,6 +13,7 @@ import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
 import { AdminContainer } from "../common/Container"
+import { OutOfEventsDialog } from "./OutOfEventsDialog"
 import { OverviewHeader } from "./OverviewHeader"
 import {
    OfflineEventsViewProvider,
@@ -35,6 +36,8 @@ const OfflineEventsOverviewContent = () => {
       checkoutDialogOpen,
       handleCheckoutDialogClose,
       handleCheckoutDialogOpen,
+      outOfEventsDialogOpen,
+      handleOutOfEventsDialogClose,
       stripeSessionId,
    } = useOfflineEventsOverview()
 
@@ -68,11 +71,15 @@ const OfflineEventsOverviewContent = () => {
          </ConditionalWrapper>
          <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
             <OverviewHeader />
+            <OutOfEventsDialog
+               open={outOfEventsDialogOpen}
+               onClose={handleOutOfEventsDialogClose}
+               onPromoteEvents={handleCheckoutDialogOpen}
+            />
             <CheckoutDialog
                checkoutData={checkoutData}
                open={checkoutDialogOpen}
                onClose={handleCheckoutDialogClose}
-               onOpen={handleCheckoutDialogOpen}
                title="Plan your next offline events"
                subtitle="Select how many offline events you want to publish and reach more students."
             />
