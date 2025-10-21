@@ -1,26 +1,27 @@
-import React, { useMemo } from "react"
 import {
-   LivestreamUserType,
-   useLivestreamsAnalyticsPageContext,
-} from "../LivestreamAnalyticsPageProvider"
+   LivestreamGroupQuestionsMap,
+   LivestreamUserAction,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/livestreams"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { collection } from "firebase/firestore"
+import { useMemo } from "react"
+import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
+import { useAuth } from "../../../../../../../HOCs/AuthProvider"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import UserDataTableProvider, {
+   DocumentPaths,
+} from "../../../common/table/UserDataTableProvider"
 import UserLivestreamDataTable, {
    DataPrivacyTable,
    TableSkeleton,
    UserDataEntry,
 } from "../../../common/table/UserLivestreamDataTable"
 import {
-   LivestreamUserAction,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/livestreams"
-import UserDataTableProvider, {
-   DocumentPaths,
-} from "../../../common/table/UserDataTableProvider"
-import { collection } from "firebase/firestore"
-import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
-import { universityCountryMap } from "@careerfairy/shared-lib/universities"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { useAuth } from "../../../../../../../HOCs/AuthProvider"
+   LivestreamUserType,
+   useLivestreamsAnalyticsPageContext,
+} from "../LivestreamAnalyticsPageProvider"
 
 const UsersTable = () => {
    const { group } = useGroup()
@@ -56,6 +57,7 @@ const DataTable = () => {
       fieldsOfStudyLookup,
       levelsOfStudyLookup,
       userType,
+      groupQuestionsMap,
    } = useLivestreamsAnalyticsPageContext()
 
    const collectionQuery = useMemo(
@@ -89,13 +91,21 @@ const DataTable = () => {
       [userType]
    )
 
+   const converterFnWrapper = useMemo(
+      () => (doc: unknown) => {
+         const userLivestreamData = doc as UserLivestreamData
+         return converterFn(userLivestreamData, groupQuestionsMap)
+      },
+      [groupQuestionsMap]
+   )
+
    return (
       <UserDataTableProvider
          fieldsOfStudyLookup={fieldsOfStudyLookup}
          levelsOfStudyLookup={levelsOfStudyLookup}
          documentPaths={documentPaths}
          targetCollectionQuery={collectionQuery}
-         converterFn={converterFn}
+         converterFn={converterFnWrapper}
          title={getTitle(userType, currentStreamStats)}
          userType={userType}
       >
@@ -104,19 +114,59 @@ const DataTable = () => {
    )
 }
 
-const converterFn = (doc: UserLivestreamData): UserDataEntry => ({
-   email: doc.user.userEmail,
-   firstName: doc.user.firstName || "",
-   lastName: doc.user.lastName || "",
-   universityName: doc.user.university?.name || "",
-   universityCountryCode: doc.user.universityCountryCode || "",
-   fieldOfStudy: doc.user.fieldOfStudy?.name || "",
-   levelOfStudy: doc.user.levelOfStudy?.name || "",
-   linkedInUrl: doc.user.linkedinUrl || "",
-   resumeUrl: doc.user.userResume || "",
-   universityCountryName:
-      universityCountryMap?.[doc.user.universityCountryCode] || "",
-})
+const converterFn = (
+   doc: UserLivestreamData,
+   groupQuestionsMap: LivestreamGroupQuestionsMap | Record<string, never>
+): UserDataEntry => {
+   const answersByQuestionName: Record<string, string> = {}
+   const questionsMap = groupQuestionsMap || {}
+   const answers = doc?.answers || {}
+
+   // Iterate through each group that the user answered questions for
+   Object.keys(answers).forEach((groupId) => {
+      const groupAnswer = (answers as any)[groupId] || {}
+      const groupQuestionConfig = (questionsMap as any)?.[groupId]
+      const questionsConfig = groupQuestionConfig?.questions || {}
+
+      // For each question in this group, map the user's answer IDs to option names
+      Object.keys(groupAnswer).forEach((questionId) => {
+         const rawOptionIds = groupAnswer[questionId]
+         // Handle both single answers (string) and multiple answers (array)
+         const optionIds: string[] = Array.isArray(rawOptionIds)
+            ? (rawOptionIds as string[])
+            : rawOptionIds
+            ? [rawOptionIds as string]
+            : []
+         const questionConfig = questionsConfig?.[questionId]
+         const questionName = questionConfig?.name as string | undefined
+
+         if (!questionName) return
+
+         // Convert option IDs to human-readable option names
+         const optionNameList = optionIds
+            .map((optionId) => questionConfig?.options?.[optionId]?.name)
+            .filter(Boolean) as string[]
+
+         // Store as comma-separated list for CSV export
+         answersByQuestionName[questionName] = optionNameList.join(", ")
+      })
+   })
+
+   return {
+      email: doc.user.userEmail,
+      firstName: doc.user.firstName || "",
+      lastName: doc.user.lastName || "",
+      universityName: doc.user.university?.name || "",
+      universityCountryCode: doc.user.universityCountryCode || "",
+      fieldOfStudy: doc.user.fieldOfStudy?.name || "",
+      levelOfStudy: doc.user.levelOfStudy?.name || "",
+      linkedInUrl: doc.user.linkedinUrl || "",
+      resumeUrl: doc.user.userResume || "",
+      universityCountryName:
+         universityCountryMap?.[doc.user.universityCountryCode] || "",
+      preRegAnswers: answersByQuestionName,
+   }
+}
 
 const getUserType = (userType: LivestreamUserType): LivestreamUserAction => {
    switch (userType) {
