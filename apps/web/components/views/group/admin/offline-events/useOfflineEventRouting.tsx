@@ -41,7 +41,7 @@ export const useOfflineEventRouting = (): Result => {
    const [isCreating, setIsCreating] = useState(false)
 
    const handleCreateDraftOfflineEvent = async () => {
-      if (group.availableOfflineEvents <= 0) {
+      if (!group.availableOfflineEvents) {
          router.push(
             `/group/${group.id}/admin/content/offline-events?showOutOfEventsDialog=true`
          )

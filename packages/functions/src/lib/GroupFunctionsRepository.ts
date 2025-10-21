@@ -681,6 +681,7 @@ export class GroupFunctionsRepository
 
       const updateData: UpdateData<Group> = {
          availableOfflineEvents: FieldValue.increment(quantity),
+         hasPurchasedOfflineEvents: true,
       }
 
       return groupRef.update(updateData)
