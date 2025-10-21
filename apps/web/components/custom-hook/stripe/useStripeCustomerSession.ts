@@ -1,9 +1,10 @@
 import useSWR, { SWRConfiguration } from "swr"
 
 import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
-import { Group, GroupPlanType } from "@careerfairy/shared-lib/groups"
-import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
-import { useMemo } from "react"
+import {
+   BaseFetchStripeCustomerSession,
+   StripeCustomerSessionData,
+} from "@careerfairy/shared-lib/stripe/types"
 import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
@@ -29,55 +30,58 @@ type Result = {
    loading: boolean
    error: unknown
 }
-const CUSTOMER_ID_PREFIX = "Group_"
+
 /**
- * Creates a session based on the given details, creates or updates an existing Stripe customer
- * with the additional details.
- * @param group Group object, the groupId is used as customerId
- * @param plan  The plan for the group to subscribe to
- * @param userEmail Current HR rep email
+ * Generic hook for creating Stripe customer sessions for different product types.
+ * The hook accepts options that extend BaseFetchStripeCustomerSession (mandatory fields) and infers the correct
+ * typing based on the StripeProductType. Some product types might needed additional data to be passed in the options (for example, the plan type for group plans).
+ *
+ * In the case of Offline Events, the are basically no options, since this product type doesn't require any additional data. In this case, the options are the same as the BaseFetchStripeCustomerSession but with
+ * the type set to StripeProductType.OFFLINE_EVENT.
+ *
+ * @param options Session options that extend BaseFetchStripeCustomerSession
  * @returns customerSessionSecret Stripe customer session to be used in the checkout process
+ *
+ * @example
+ * // For group plans (backward compatible):
+ * const { data } = useStripeCustomerSession({
+ *   type: StripeProductType.GROUP_PLAN,
+ *   plan: GroupPlanType.PREMIUM,
+ *   customerName: group.universityName,
+ *   customerEmail: userEmail,
+ *   groupId: group.groupId,
+ *   priceId: "price_123",
+ *   successUrl: "/success"
+ * })
+ *
+ * @example
+ * // For offline events:
+ * const { data } = useStripeCustomerSession({
+ *   type: StripeProductType.OFFLINE_EVENT,
+ *   customerName: group.universityName,
+ *   customerEmail: userEmail,
+ *   groupId: group.groupId,
+ *   priceId: "price_456",
+ *   successUrl: "/offline-event-success"
+ * })
  */
-const useStripeCustomerSession = (
-   group: Group,
-   plan: GroupPlanType,
-   userEmail: string
+export const useStripeCustomerSession = <
+   T extends BaseFetchStripeCustomerSession
+>(
+   options: T
 ) => {
    const fetcher = useFunctionsSWR<Result[]>()
 
-   const options = useMemo(() => {
-      return {
-         customerId: CUSTOMER_ID_PREFIX.concat(group.groupId),
-         plan: plan,
-         customerEmail: userEmail,
-         groupId: group.groupId,
-         customerName: group.universityName,
-         priceId: PLAN_CONSTANTS[plan].stripe.priceId(group.companyCountry?.id),
-         successUrl: `/group/${group.groupId}/admin/sparks?stripe_session_id={CHECKOUT_SESSION_ID}&planName=${PLAN_CONSTANTS[plan].name}`,
-      }
-   }, [
-      group.companyCountry?.id,
-      group.groupId,
-      group.universityName,
-      plan,
-      userEmail,
-   ])
-   const { data, isLoading, error } = useSWR(
+   return useSWR<StripeCustomerSessionData>(
       [FUNCTION_NAMES.fetchStripeCustomerSession, options],
       fetcher,
-      swrOptions
-   )
-
-   if (error) {
-      console.error("Error fetching stripe customer session: ", error)
-   }
-   return useMemo(() => {
-      return {
-         customerSessionSecret: data.customerSessionSecret,
-         loading: isLoading,
-         error: error,
+      {
+         ...swrOptions,
+         onError: (error) =>
+            errorLogAndNotify(error, {
+               message: `Error fetching Stripe Customer Session with`,
+               options,
+            }),
       }
-   }, [data.customerSessionSecret, isLoading, error])
+   )
 }
-
-export default useStripeCustomerSession
