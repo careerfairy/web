@@ -14,6 +14,7 @@ type Props = {
    trackDocumentId: string
    handleTrack: (props: TrackProps) => Promise<void>
    extraData?: unknown
+   skip?: boolean
 }
 /**
  * Track page views
@@ -26,13 +27,14 @@ const useTrackPageView = ({
    trackDocumentId,
    handleTrack,
    extraData,
+   skip,
 }: Props): InViewHookResponse["ref"] => {
    const { data: visitorId } = useFingerPrint()
 
    const { ref } = useInView({
       triggerOnce: true, // only ever trigger once per element
       delay: 1000, // Element must be at least visible for 1 second before triggering
-      skip: visitorId === undefined, // Will only start tracking view when visitorId is available/loaded
+      skip: visitorId === undefined || skip, // Will only start tracking view when visitorId is available/loaded
       onChange: (inView) => {
          if (inView && visitorId) {
             handleTrack({ id: trackDocumentId, visitorId, extraData }).catch(
