@@ -42,6 +42,7 @@ const LivestreamDetailsView = () => {
       closeDialog,
       previousView,
       handleBack,
+      originSource,
    } = useLiveStreamDialog()
 
    const { handleRegisterClick } = useRegistrationHandler()
@@ -50,7 +51,7 @@ const LivestreamDetailsView = () => {
 
    const isMobile = useIsMobile()
 
-   const viewRef = useTrackLivestreamView(livestream)
+   const viewRef = useTrackLivestreamView(livestream, originSource)
    const { authenticatedUser } = useAuth()
 
    const { showRecording } = useRecordingAccess(

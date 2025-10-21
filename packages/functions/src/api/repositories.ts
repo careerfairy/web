@@ -51,6 +51,8 @@ import {
    sparkSecondsWatchedHanlder,
 } from "../lib/bigQuery/sparks/SparksBigQueryServices"
 import { apiClient } from "../lib/customerio/client"
+import { CustomerIOObjectsClient } from "../lib/customerio/objectsClient"
+import { CustomerIORelationshipsClient } from "../lib/customerio/relationshipsClient"
 import {
    INotificationService,
    NotificationService,
@@ -75,6 +77,10 @@ export const groupRepo: IGroupFunctionsRepository =
 
 export const notificationService: INotificationService =
    new NotificationService(apiClient)
+
+export const objectsClient = new CustomerIOObjectsClient()
+
+export const relationshipsClient = new CustomerIORelationshipsClient()
 
 export const userRepo: IUserFunctionsRepository = new UserFunctionsRepository(
    firestore as any,
