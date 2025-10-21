@@ -79,9 +79,11 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
    async createOrUpdateStripeCustomer(
       payload: BaseSessionPayload
    ): Promise<Stripe.Customer> {
-      const { groupId, customerName } = payload
+      const { groupId } = payload
 
-      const query = `metadata['groupId']:'${groupId}'`
+      const group = await groupRepo.getGroupById(groupId)
+
+      const query = `metadata['groupId']:'${group.id}'`
 
       const customers = await this._stripe.customers.search({
          query: query,
@@ -94,15 +96,15 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
       if (createCustomer) {
          groupCustomer = await this._stripe.customers
             .create({
-               name: customerName,
+               name: group.universityName,
                metadata: {
-                  groupId: groupId,
+                  groupId: group.id,
                   version: STRIPE_CUSTOMER_METADATA_VERSION,
                },
             })
             .then(async (customer) => {
                await groupRepo
-                  .updateGroupData(groupId, {
+                  .updateGroupData(group.id, {
                      stripeCustomerId: customer.id,
                   })
                   .catch((error) => {
@@ -116,13 +118,13 @@ export class StripeFunctionsRepository implements IStripeFunctionsRepository {
             })
 
          functions.logger.info(
-            `Created customer: ${groupCustomer.id} for group ${groupId}`,
+            `Created customer: ${groupCustomer.id} for group ${group.id}`,
             groupCustomer
          )
       } else {
          groupCustomer = await this._stripe.customers.update(groupCustomer.id, {
             metadata: {
-               groupId: groupId,
+               groupId: group.id,
                version: STRIPE_CUSTOMER_METADATA_VERSION,
             },
          })

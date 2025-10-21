@@ -1,8 +1,4 @@
-import { Group } from "@careerfairy/shared-lib/groups/groups"
-import {
-   OfflineEventFetchStripeCustomerSession,
-   StripeProductType,
-} from "@careerfairy/shared-lib/stripe/types"
+import { StripeProductType } from "@careerfairy/shared-lib/stripe/types"
 import { Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useGroupOfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
@@ -60,14 +56,12 @@ const OfflineEventsOverviewContent = () => {
    const hasFilters = Boolean(statusFilter.length > 0 || searchTerm.trim())
    const noResults = stats.length === 0
 
-   const checkoutData = getCheckoutData(group, userData?.userEmail)
-
    return (
       <>
          <ConditionalWrapper condition={Boolean(stripeSessionId)}>
             <CheckoutConfirmationDialog
                successTitle="Your offline event credits have been purchased!"
-               successDescription="You can now create and publish offline events to reach more students and expand your university's presence."
+               successDescription="You can now create and publish offline events to reach more students and expand your university's presence"
                successButtonText="Start creating events"
             />
          </ConditionalWrapper>
@@ -77,7 +71,14 @@ const OfflineEventsOverviewContent = () => {
             onPromoteEvents={handleCheckoutDialogOpen}
          />
          <CheckoutDialog
-            checkoutData={checkoutData}
+            checkoutData={{
+               type: StripeProductType.OFFLINE_EVENT,
+               customerName: `${userData.firstName} ${userData.lastName}`,
+               customerEmail: userData.userEmail,
+               groupId: group.groupId,
+               priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID,
+               successUrl: `/group/${group.id}/admin/content/offline-events?stripe_session_id={CHECKOUT_SESSION_ID}`,
+            }}
             open={checkoutDialogOpen}
             onClose={handleCheckoutDialogClose}
             title="Plan your next offline events"
@@ -111,20 +112,6 @@ const OfflineEventsOverviewContent = () => {
          )}
       </>
    )
-}
-
-const getCheckoutData = (
-   group: Group,
-   userEmail: string
-): OfflineEventFetchStripeCustomerSession => {
-   return {
-      type: StripeProductType.OFFLINE_EVENT,
-      customerName: group.universityName,
-      customerEmail: userEmail,
-      groupId: group.groupId,
-      priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID,
-      successUrl: `/group/${group.id}/admin/content/offline-events?stripe_session_id={CHECKOUT_SESSION_ID}`,
-   }
 }
 
 export const OfflineEventsOverview = () => {
