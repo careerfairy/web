@@ -92,4 +92,10 @@ export const FUNCTION_NAMES = {
    onCreateLivestreamRatingAnswer: "onCreateLivestreamRatingAnswer_v2",
    syncLivestreamStats: "syncLivestreamStats_v2",
    checkExpiredPlans: "checkExpiredPlans_v2",
+
+   // Stripe functions
+   stripeWebHook: "stripeWebHook_v2",
+   fetchStripeCustomerSession: "fetchStripeCustomerSession_v2",
+   fetchStripePrice: "fetchStripePrice_v2",
+   fetchStripeSessionStatus: "fetchStripeSessionStatus_v2",
 } as const
