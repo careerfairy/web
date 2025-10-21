@@ -94,7 +94,27 @@ const WebflowPage: NextPage<WebflowProps> = (props) => {
    return (
       <>
          <Head>{parseHtml(props.headContent, parseOptions)}</Head>
-         {parseHtml(props.bodyContent, parseOptions)}
+         <div
+            style={{
+               position: "fixed",
+               top: 0,
+               left: 0,
+               right: 0,
+               zIndex: 9999,
+               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+               color: "white",
+               padding: "12px 20px",
+               textAlign: "center",
+               fontWeight: "bold",
+               fontSize: "16px",
+               boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+            }}
+         >
+            🚀 Live Development Environment - Real-time Testing Active! 🚀
+         </div>
+         <div style={{ marginTop: "48px" }}>
+            {parseHtml(props.bodyContent, parseOptions)}
+         </div>
       </>
    )
 }
