@@ -1,9 +1,9 @@
 import { Box, CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import GroupPlansDialog from "../GroupPlansDialog"
-import { sxStyles } from "types/commonTypes"
 import { useSelector } from "react-redux"
 import { clientSecret } from "store/selectors/groupSelectors"
+import { sxStyles } from "types/commonTypes"
+import GroupPlansDialog from "../GroupPlansDialog"
 import StripeCheckoutComponent from "../forms/StripeCheckoutComponent"
 
 const styles = sxStyles({
@@ -20,7 +20,7 @@ const styles = sxStyles({
       justifyItems: "center",
       alignContent: "center",
       justifyContent: "center",
-      mb: "560px",
+      mb: "16px",
    },
 })
 
@@ -55,7 +55,11 @@ const View = () => {
                }}
             />
             <Box sx={styles.stripeButtonWrapper}>
-               <StripeCheckoutComponent clientSecret={generatedClientSecret} />
+               <Box width={"800px"} height={"500px"}>
+                  <StripeCheckoutComponent
+                     clientSecret={generatedClientSecret}
+                  />
+               </Box>
             </Box>
             <Box
                mb={{
