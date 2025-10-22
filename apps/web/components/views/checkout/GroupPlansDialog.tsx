@@ -27,8 +27,8 @@ import {
 } from "store/selectors/groupSelectors"
 import { combineStyles, sxStyles } from "types/commonTypes"
 import { SlideUpTransition } from "../common/transitions"
+import CheckoutConfirmationDialog from "./views/CheckoutConfirmationDialog"
 import GroupPlansMobileView from "./views/GroupPlansMobileView"
-import PlanActivationConfirmationDialog from "./views/PlanActivationConfirmationDialog"
 
 const actionsHeight = 87
 const mobileBreakpoint = "md"
@@ -147,7 +147,11 @@ const GroupPlansDialog = () => {
    return (
       <>
          <ConditionalWrapper condition={Boolean(stripeSessionId)}>
-            <PlanActivationConfirmationDialog />
+            <CheckoutConfirmationDialog
+               successTitle="Your Sparks plan is now active!"
+               successDescription="Discover the latest trends thanks to comprehensive Sparks analytics and engage even more your target audience by publishing additional Sparks."
+               successButtonText="Start using your plan"
+            />
          </ConditionalWrapper>
          <ConditionalWrapper
             condition={!isMobile}

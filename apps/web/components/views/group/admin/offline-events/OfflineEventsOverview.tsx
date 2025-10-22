@@ -1,27 +1,46 @@
-import { Box, Stack, Typography } from "@mui/material"
+import { StripeProductType } from "@careerfairy/shared-lib/stripe/types"
+import { Stack } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import { useGroupOfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { BrandedSearchField } from "components/views/common/inputs/BrandedSearchField"
+import ConditionalWrapper from "components/util/ConditionalWrapper"
+import CheckoutConfirmationDialog from "components/views/checkout/views/CheckoutConfirmationDialog"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
-import { Calendar } from "react-feather"
 import { AdminContainer } from "../common/Container"
+import { OutOfEventsDialog } from "./OutOfEventsDialog"
+import { OverviewHeader } from "./OverviewHeader"
 import {
    OfflineEventsViewProvider,
    useOfflineEventsOverview,
 } from "./context/OfflineEventsOverviewContext"
+import { CheckoutDialog } from "./detail/CheckoutDialog"
 import { DesktopOfflineEventsView } from "./offline-events-table/DesktopOfflineEventsView"
 import { MobileOfflineEventsView } from "./offline-events-table/MobileOfflineEventsView"
+import { OfflineEventsPromotionView } from "./promotion/OfflineEventsPromotionView"
 import { useOfflineEventRouting } from "./useOfflineEventRouting"
 
 const OfflineEventsOverviewContent = () => {
    const router = useRouter()
    const groupId = router.query.groupId as string
-   const isMobile = useIsMobile()
-   const { sortBy, statusFilter, searchTerm, setSearchTerm } =
-      useOfflineEventsOverview()
-   const { group } = useGroup()
+   const isMobile = useIsMobile(700)
+
+   const {
+      sortBy,
+      statusFilter,
+      searchTerm,
+      checkoutDialogOpen,
+      handleCheckoutDialogClose,
+      handleCheckoutDialogOpen,
+      outOfEventsDialogOpen,
+      handleOutOfEventsDialogClose,
+      stripeSessionId,
+   } = useOfflineEventsOverview()
+
+   const { group, groupPresenter } = useGroup()
+   const showPromotionView = !groupPresenter?.canCreateOfflineEvents(true)
+   const { userData } = useAuth()
    const { createDraftOfflineEvent } = useOfflineEventRouting()
 
    const {
@@ -38,68 +57,60 @@ const OfflineEventsOverviewContent = () => {
    const noResults = stats.length === 0
 
    return (
-      <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
-         <Stack
-            direction={isMobile ? "column" : "row"}
-            justifyContent="space-between"
-            alignItems="center"
-            spacing={1}
-         >
-            <BrandedSearchField
-               value={searchTerm}
-               onChange={setSearchTerm}
-               placeholder="Search"
-               fullWidth
+      <>
+         <ConditionalWrapper condition={Boolean(stripeSessionId)}>
+            <CheckoutConfirmationDialog
+               successTitle="Your offline event credits have been purchased!"
+               successDescription="You can now create and publish offline events to reach more students and expand your university's presence."
+               successButtonText="Start creating events"
             />
-            <Box
-               sx={{
-                  borderRadius: 3,
-                  border: (theme) => `1px solid ${theme.palette.secondary[50]}`,
-                  p: 1.5,
-                  background: (theme) => theme.brand.white[100],
-                  height: "48px",
-                  width: isMobile ? "100%" : "auto",
-                  alignItems: "center",
-                  display: "flex",
-               }}
-            >
-               <Stack direction="row" alignItems="center" spacing={1}>
-                  <Box component={Calendar} size={16} color={"neutral.700"} />
-                  <Typography
-                     variant="small"
-                     color={"neutral.700"}
-                     sx={{
-                        whiteSpace: "nowrap",
-                     }}
-                  >
-                     {group?.availableOfflineEvents ?? 0}{" "}
-                     {group?.availableOfflineEvents === 1 ? "event" : "events"}{" "}
-                     available
-                  </Typography>
-               </Stack>
-            </Box>
-         </Stack>
-
-         {Boolean(isLoading) && <p>Loading stats...</p>}
-         {Boolean(error) && <p>Error loading stats: {error.message}</p>}
-         <Fragment>
-            {isMobile ? (
-               <MobileOfflineEventsView
-                  stats={stats}
-                  isEmptyNoEvents={!hasFilters && noResults}
-                  isEmptySearchFilter={Boolean(hasFilters && noResults)}
-                  onCreateOfflineEvent={createDraftOfflineEvent}
-               />
-            ) : (
-               <DesktopOfflineEventsView
-                  stats={stats}
-                  isEmptyNoEvents={!hasFilters && noResults}
-                  isEmptySearchFilter={Boolean(hasFilters && noResults)}
-                  onCreateOfflineEvent={createDraftOfflineEvent}
-               />
-            )}
-         </Fragment>
-      </Stack>
+         </ConditionalWrapper>
+         <OutOfEventsDialog
+            open={outOfEventsDialogOpen}
+            onClose={handleOutOfEventsDialogClose}
+            onPromoteEvents={handleCheckoutDialogOpen}
+         />
+         <CheckoutDialog
+            checkoutData={{
+               type: StripeProductType.OFFLINE_EVENT,
+               customerName: `${userData.firstName} ${userData.lastName}`,
+               customerEmail: userData.userEmail,
+               groupId: group.groupId,
+               priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID,
+               successUrl: `/group/${group.id}/admin/content/offline-events?stripe_session_id={CHECKOUT_SESSION_ID}`,
+            }}
+            open={checkoutDialogOpen}
+            onClose={handleCheckoutDialogClose}
+            title="Plan your next offline events"
+            subtitle="Select how many offline events you want to publish and reach more students."
+         />
+         {showPromotionView ? (
+            <OfflineEventsPromotionView />
+         ) : (
+            <Stack spacing={1} pt={isMobile ? 2 : 3.5} pb={3}>
+               <OverviewHeader />
+               {Boolean(isLoading) && <p>Loading stats...</p>}
+               {Boolean(error) && <p>Error loading stats: {error.message}</p>}
+               <Fragment>
+                  {isMobile ? (
+                     <MobileOfflineEventsView
+                        stats={stats}
+                        isEmptyNoEvents={!hasFilters && noResults}
+                        isEmptySearchFilter={Boolean(hasFilters && noResults)}
+                        onCreateOfflineEvent={createDraftOfflineEvent}
+                     />
+                  ) : (
+                     <DesktopOfflineEventsView
+                        stats={stats}
+                        isEmptyNoEvents={!hasFilters && noResults}
+                        isEmptySearchFilter={Boolean(hasFilters && noResults)}
+                        onCreateOfflineEvent={createDraftOfflineEvent}
+                     />
+                  )}
+               </Fragment>
+            </Stack>
+         )}
+      </>
    )
 }
 

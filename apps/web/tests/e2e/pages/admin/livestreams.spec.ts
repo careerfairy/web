@@ -2,6 +2,7 @@ import JobsSeed from "@careerfairy/seed-data/jobs"
 import LivestreamSeed from "@careerfairy/seed-data/livestreams"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { setupLivestreamData } from "tests/e2e/setupData"
+import { sleep } from "tests/e2e/utils"
 import { groupAdminFixture as test } from "../../fixtures"
 
 test.describe("Group Admin Livestreams", () => {
@@ -94,6 +95,7 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.fillLivestreamForm({ title })
       // new title should be visible
       await groupPage.goToLivestreams()
+      await sleep(5000)
       await groupPage.assertTextIsVisible(title)
    })
 

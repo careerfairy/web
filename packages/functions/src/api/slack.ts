@@ -232,6 +232,8 @@ export const notifyOfflineEventPublished = (
    webhookUrl: string,
    params: {
       companyName: string
+      publisherName: string
+      publisherEmail: string
       eventTitle: string
       eventId: string
       eventDate: Date
@@ -245,6 +247,7 @@ export const notifyOfflineEventPublished = (
 
    const body: Record<string, string> = {
       "Company Name": params.companyName,
+      Publisher: `${params.publisherName} (${params.publisherEmail})`,
       "Event Date": formatEventStartDate(params.eventDate),
       "Remaining Credits": params.remainingCredits.toString(),
    }
@@ -268,6 +271,138 @@ export const notifyOfflineEventPublished = (
                type: "image",
                image_url: params.eventImageUrl,
                alt_text: "Offline Event Published",
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Admin Events Page",
+                  },
+                  url: groupAdminOfflineEvents,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
+/**
+ * Sends a Slack notification when a group purchases offline event credits.
+ *
+ * @returns Promise that resolves when the notification is sent
+ */
+export const notifyOfflineEventPurchased = (
+   webhookUrl: string,
+   params: {
+      groupName: string
+      groupLogoUrl: string
+      groupId: string
+      quantityPurchased: number
+      updatedCredits: number
+      previousCredits: number
+      customerEmail: string
+      customerName: string
+   }
+) => {
+   const groupAdminOfflineEvents = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
+
+   const body: Record<string, string> = {
+      "Credits purchased": params.quantityPurchased.toString(),
+      "Previous Credits": params.previousCredits.toString(),
+      "Updated Credits": params.updatedCredits.toString(),
+      "Bought by": `${params.customerName} (${params.customerEmail})`,
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `Offline Event Credits Purchased: *${params.groupName}*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+            accessory: {
+               type: "image",
+               image_url: params.groupLogoUrl,
+               alt_text: `${params.groupName} Logo`,
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Admin Events Page",
+                  },
+                  url: groupAdminOfflineEvents,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
+/**
+ * Sends a Slack notification when increasing bought offline events fails.
+ *
+ * @returns Promise that resolves when the notification is sent
+ */
+export const notifyOfflineEventIncreaseFailed = (
+   webhookUrl: string,
+   params: {
+      groupName: string
+      groupLogoUrl: string
+      groupId: string
+      currentCredits: string
+      expectedCredits: string
+      quantityToIncrease: string
+      customerEmail: string
+      customerName: string
+   }
+) => {
+   const groupAdminOfflineEvents = `https://www.careerfairy.io/group/${params.groupId}/admin/content/offline-events`
+
+   const body: Record<string, string> = {
+      "Current Credits": params.currentCredits,
+      "Expected Credits": params.expectedCredits,
+      "Failed to increase by": params.quantityToIncrease,
+      "Purchased by": `${params.customerName} (${params.customerEmail})`,
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `🚨 Offline Event Credits Increase Failed: *${params.groupName}*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+            accessory: {
+               type: "image",
+               image_url: params.groupLogoUrl,
+               alt_text: `${params.groupName} Logo`,
             },
          },
          {
