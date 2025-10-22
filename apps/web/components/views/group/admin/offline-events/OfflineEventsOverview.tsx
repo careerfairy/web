@@ -61,7 +61,7 @@ const OfflineEventsOverviewContent = () => {
          <ConditionalWrapper condition={Boolean(stripeSessionId)}>
             <CheckoutConfirmationDialog
                successTitle="Your offline event credits have been purchased!"
-               successDescription="You can now create and publish offline events to reach more students and expand your university's presence"
+               successDescription="You can now create and publish offline events to reach more students and expand your university's presence."
                successButtonText="Start creating events"
             />
          </ConditionalWrapper>
