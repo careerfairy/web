@@ -159,10 +159,12 @@ exports.updateUserLiveStreamDataOnUserChange =
    user.updateUserLiveStreamDataOnUserChange
 
 // Stripe
-exports.stripeWebHook = stripe.stripeWebHook
-exports.fetchStripeCustomerSession = stripe.fetchStripeCustomerSession
-exports.fetchStripePrice = stripe.fetchStripePrice
-exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
+exports[FUNCTION_NAMES.stripeWebHook] = stripe.stripeWebHook
+exports[FUNCTION_NAMES.fetchStripeCustomerSession] =
+   stripe.fetchStripeCustomerSession
+exports[FUNCTION_NAMES.fetchStripePrice] = stripe.fetchStripePrice
+exports[FUNCTION_NAMES.fetchStripeSessionStatus] =
+   stripe.fetchStripeSessionStatus
 
 // Livestreams
 exports[FUNCTION_NAMES.sendLivestreamRegistrationConfirmationEmail] =

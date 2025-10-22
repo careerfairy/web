@@ -5,13 +5,13 @@ import {
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { makeOfflineEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import {
+   alpha,
    Box,
    Button,
    Dialog,
    IconButton,
    Stack,
    Typography,
-   alpha,
 } from "@mui/material"
 import useFingerPrint from "components/custom-hook/useFingerPrint"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -37,7 +37,7 @@ import { useCopyToClipboard } from "react-use"
 import useSWR from "swr"
 import { sxStyles } from "types/commonTypes"
 import { AnalyticsEvents } from "util/analyticsConstants"
-import { dataLayerEvent } from "util/analyticsUtils"
+import { dataLayerEvent, dataLayerOfflineEvent } from "util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 import CookiesUtil from "util/CookiesUtil"
 import DateUtil from "util/DateUtil"
@@ -317,6 +317,8 @@ const Content = ({
          hasTrackedView.current = true
          const utm = CookiesUtil.getUTMParams()
 
+         dataLayerOfflineEvent(AnalyticsEvents.OfflineEventView, event)
+
          offlineEventService
             .trackOfflineEventAction(
                event.id,
@@ -345,6 +347,8 @@ const Content = ({
    const handleRegisterClick = useCallback(() => {
       if (event) {
          const utm = CookiesUtil.getUTMParams()
+
+         dataLayerOfflineEvent(AnalyticsEvents.OfflineEventRegister, event)
 
          // Track click for both authenticated and anonymous users
          if (userData || fingerprint) {

@@ -27,10 +27,11 @@ import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { firestore } from "firebase-admin"
 import { UserRecord } from "firebase-admin/auth"
+import { UpdateData } from "firebase-admin/firestore"
 import { Change } from "firebase-functions"
 import { cloneDeep, isEmpty, union } from "lodash"
 import { DateTime } from "luxon"
-import { Timestamp, auth } from "../api/firestoreAdmin"
+import { FieldValue, Timestamp, auth } from "../api/firestoreAdmin"
 import type { FunctionsLogger } from "../util"
 import { getWebBaseUrl } from "../util"
 import BigQueryCreateInsertService from "./bigQuery/BigQueryCreateInsertService"
@@ -213,6 +214,11 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    ): Promise<void>
 
    trackGroupEvents(events: GroupEventServer[]): Promise<void>
+
+   increaseAvailableOfflineEvents(
+      groupId: string,
+      quantity: number
+   ): Promise<void>
 }
 
 export class GroupFunctionsRepository
@@ -663,6 +669,22 @@ export class GroupFunctionsRepository
          .doc(groupId)
 
       return groupRef.update({ "plan.expiresAt": Timestamp.now() })
+   }
+
+   async increaseAvailableOfflineEvents(
+      groupId: string,
+      quantity: number
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection(this.COLLECTION_NAME)
+         .doc(groupId)
+
+      const updateData: UpdateData<Group> = {
+         availableOfflineEvents: FieldValue.increment(quantity),
+         hasPurchasedOfflineEvents: true,
+      }
+
+      return groupRef.update(updateData)
    }
 
    async sendTrialWelcomeEmail(
