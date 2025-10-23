@@ -525,6 +525,10 @@ const moduleExports = {
       contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
    },
    webpack: (config) => {
+      // Exclude 'canvas' npm package (Node.js server module) - react-pdf uses browser's native Canvas API
+      // Reference: https://github.com/wojtekmaj/react-pdf#standard-browserify-and-others
+      config.resolve.alias.canvas = false
+
       config.module.rules.push({
          test: /\.wav$/,
          loader: "file-loader",
