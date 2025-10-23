@@ -14,6 +14,6 @@ Updates the `userStats` documents:
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/fixUserReferralsCount
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/users/fixUserReferralsCount
 
 ```

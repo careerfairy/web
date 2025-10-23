@@ -87,6 +87,11 @@ export interface Group extends Identifiable {
     */
    hasPurchasedOfflineEvents?: boolean
    availableOfflineEvents?: number // Number of offline events the group has available to use
+
+   /**
+    * Stripe customer id, set during the creation of a Stripe customer
+    */
+   stripeCustomerId?: string
    /**
     * Deprecated
     * */

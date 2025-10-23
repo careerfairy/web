@@ -27,7 +27,7 @@ import { combineStyles, sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 
 // Card container
-const StyledCard = styled(motion(Card))(({ theme }) => ({
+const StyledCard = styled(motion.create(Card))(({ theme }) => ({
    position: "relative",
    backgroundColor: theme.palette.common.white,
    borderRadius: 16,
@@ -59,18 +59,20 @@ const EventBanner = styled(Box)(({ theme }) => ({
    flexDirection: "column",
 }))
 
-const EventBannerLowerContentContainer = styled(motion(Box))(({ theme }) => ({
-   display: "flex",
-   flexDirection: "column",
-   gap: 8,
-   padding: "8px 16px",
-   borderBottomRightRadius: "14px",
-   borderBottomLeftRadius: "14px",
-   borderWidth: 1,
-   borderColor: theme.brand.white[500],
-   backgroundColor: theme.brand.white[200],
-   borderStyle: "solid",
-}))
+const EventBannerLowerContentContainer = styled(motion.create(Box))(
+   ({ theme }) => ({
+      display: "flex",
+      flexDirection: "column",
+      gap: 8,
+      padding: "8px 16px",
+      borderBottomRightRadius: "14px",
+      borderBottomLeftRadius: "14px",
+      borderWidth: 1,
+      borderColor: theme.brand.white[500],
+      backgroundColor: theme.brand.white[200],
+      borderStyle: "solid",
+   })
+)
 
 // Banner image container
 const BannerImageContainer = styled(Box)(({ theme }) => ({
@@ -110,7 +112,7 @@ const QRCodeContainer = styled(Box)({
 })
 
 // QR Code image using styled(Image)
-const StyledQRCodeImage = styled(motion(Image))(({ theme }) => ({
+const StyledQRCodeImage = styled(motion.create(Image))(({ theme }) => ({
    width: 120,
    height: 120,
    backgroundColor: theme.palette.common.white,
@@ -119,9 +121,9 @@ const StyledQRCodeImage = styled(motion(Image))(({ theme }) => ({
    padding: 6,
 }))
 
-const AnimatedCircularLogo = motion(CircularLogo)
-const AnimatedCalendarIcon = motion(CalendarIcon)
-const AnimatedTypography = motion(Typography)
+const AnimatedCircularLogo = motion.create(CircularLogo)
+const AnimatedCalendarIcon = motion.create(CalendarIcon)
+const AnimatedTypography = motion.create(Typography)
 
 const styles = sxStyles({
    panelLogoContainer: {

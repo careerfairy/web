@@ -5,5 +5,5 @@ Will fetch all live streams and update their speakers with the new attribute 'gr
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/livestreams/backFillLivestreamSpeakers
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/livestreams/backFillLivestreamSpeakers
 ```

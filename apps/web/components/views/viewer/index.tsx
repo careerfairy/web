@@ -1,24 +1,25 @@
-import React, { Fragment, useCallback } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import ViewerComponent from "./viewer-component/ViewerComponent"
-import MiniChatContainer from "../streaming/sharedComponents/chat/MiniChatContainer"
-import IconsContainer from "../streaming/icons-container/IconsContainer"
-import RatingContainer from "./rating-container/RatingContainer"
-import { Backdrop } from "@mui/material"
-import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded"
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
-import { useCurrentStream } from "../../../context/stream/StreamContext"
-import StreamNotifications from "../streaming/sharedComponents/StreamNotifications"
-import AudienceDrawer from "../streaming/AudienceDrawer"
-import ButtonComponent from "../streaming/sharedComponents/ButtonComponent"
-import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCountdown"
+import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded"
+import { Backdrop } from "@mui/material"
+import { Theme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import { useRouter } from "next/router"
+import { Fragment, useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import { useRouter } from "next/router"
-import { focusModeEnabledSelector } from "../../../store/selectors/streamSelectors"
+import { useCurrentStream } from "../../../context/stream/StreamContext"
 import { RootState } from "../../../store"
+import { focusModeEnabledSelector } from "../../../store/selectors/streamSelectors"
+import AudienceDrawer from "../streaming/AudienceDrawer"
+import IconsContainer from "../streaming/icons-container/IconsContainer"
+import ButtonComponent from "../streaming/sharedComponents/ButtonComponent"
+import MiniChatContainer from "../streaming/sharedComponents/chat/MiniChatContainer"
+import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCountdown"
+import StreamNotifications from "../streaming/sharedComponents/StreamNotifications"
+import RatingContainer from "./rating-container/RatingContainer"
+import ViewerComponent from "./viewer-component/ViewerComponent"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    iconsContainer: {
       position: "absolute",
       // @ts-ignore
@@ -122,13 +123,13 @@ const ViewerOverview = ({
                />
             )}
          </div>
-         {enableEmotions && (
+         {Boolean(enableEmotions) && (
             <IconsContainer
                className={classes.iconsContainer}
                livestreamId={currentLivestream.id}
             />
          )}
-         {currentLivestream && !currentLivestream.hasNoRatings && (
+         {Boolean(currentLivestream && !currentLivestream.hasNoRatings) && (
             <RatingContainer
                livestreamId={currentLivestream.id}
                livestream={currentLivestream}
@@ -136,7 +137,7 @@ const ViewerOverview = ({
          )}
          <StreamNotifications isStreamer={false} />
          <Backdrop
-            open={videoIsMuted && !isRecordingWindow}
+            open={Boolean(videoIsMuted && !isRecordingWindow)}
             className={classes.backdrop}
             onClick={unmuteMutedRemoteVideosAfterFail}
          >
@@ -146,7 +147,7 @@ const ViewerOverview = ({
             </div>
          </Backdrop>
          <Backdrop
-            open={videoIsPaused && !isRecordingWindow}
+            open={Boolean(videoIsPaused && !isRecordingWindow)}
             className={classes.backdrop}
             onClick={unpauseRemoteVideosAfterFail}
          >

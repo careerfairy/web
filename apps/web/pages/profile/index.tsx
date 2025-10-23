@@ -1,4 +1,4 @@
-import { useTheme } from "@mui/styles"
+import { useTheme } from "@mui/material/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { TalentProfileView } from "layouts/UserLayout/TalentProfile/TalentProfileView"
 import { TAB_VALUES } from "layouts/UserLayout/TalentProfile/constants"

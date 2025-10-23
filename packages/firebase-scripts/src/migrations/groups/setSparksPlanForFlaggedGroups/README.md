@@ -5,7 +5,7 @@ This script sets a sparks plan for all groups with `group.sparksAdminPageFlag` s
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/setSparksPlanForFlaggedGroups
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/setSparksPlanForFlaggedGroups
 ```
 
 This script fetches all groups, filters those with `sparksAdminPageFlag` set to true that don't already have a plan, and sets a sparks plan for each of these groups using the `bulkWriter` for efficient batch writing. The `handleBulkWriterSuccess` and `handleBulkWriterError` functions are used to handle the success and error cases respectively.

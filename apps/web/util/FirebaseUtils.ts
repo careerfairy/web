@@ -10,9 +10,13 @@ if (typeof window !== "undefined" && shouldUseEmulators() === false) {
    console["error"] = function (...args) {
       if (args.length === 2) {
          if (
+            // eslint-disable-next-line prefer-rest-params
             typeof arguments[0] === "string" &&
+            // eslint-disable-next-line prefer-rest-params
             arguments[0].indexOf("@firebase/firestore") !== -1 &&
+            // eslint-disable-next-line prefer-rest-params
             typeof arguments[1] === "string" &&
+            // eslint-disable-next-line prefer-rest-params
             arguments[1].indexOf(
                "Could not reach Cloud Firestore backend. Backend didn't respond within "
             ) !== -1

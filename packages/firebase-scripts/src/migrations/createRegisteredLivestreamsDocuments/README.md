@@ -14,7 +14,7 @@ This script triggers the backfill process for the `registeredLivestreams` collec
 Execute the following command:
 
 ```shell
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/createRegisteredLivestreamsDocuments
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/createRegisteredLivestreamsDocuments
 ```
 
 ## Output

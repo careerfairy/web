@@ -14,13 +14,15 @@
       "test": "jest --verbose",
       "test-watch": "jest --verbose --watch",
       "test-coverage": "jest --coverage --verbose",
-      "update-dependencies": "npx npm-check-updates -u"
+      "update-dependencies": "pnpm dlx npm-check-updates -u"
    },
    "dependencies": {
-      "@careerfairy/shared-lib": "*",
-      "@careerfairy/config-mui": "*"
+      "@careerfairy/shared-lib": "workspace:*",
+      "@careerfairy/config-mui": "workspace:*",
+      "@mui/material": "^5.14.0",
+      "@mui/system": "^5.14.0"
    },
    "devDependencies": {
-      "@careerfairy/config-tsconfig": "*"
+      "@careerfairy/config-tsconfig": "workspace:*"
    }
 }

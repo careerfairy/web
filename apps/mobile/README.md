@@ -6,10 +6,10 @@ This is a React Native app built using Expo. Follow the steps below to get start
 
 ### 1. Install Dependencies
 
-First, install the required dependencies using npm inside mobile (apps/mobile) folder:
+First, install the required dependencies using pnpm inside mobile (apps/mobile) folder:
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2. Setup of base url and search criteria
@@ -27,7 +27,7 @@ expo start -c
 or
 
 ```bash
-npm run native:cache
+pnpm run native:cache
 ```
 
 from the root of the project.
@@ -43,7 +43,7 @@ You have two options to run the app, either from the project root or from the \`
 Run the following command from the root of project
 
 ```bash
-npm run native
+pnpm run native
 ```
 
 #### Option 2: From the \`mobile\` Folder
@@ -52,7 +52,7 @@ Navigate to the mobile folder and then start the app:
 
 ```bash
 cd apps/mobile
-npm run start
+pnpm run start
 ```
 
 ### 4. QR Code Launch
@@ -74,23 +74,23 @@ Note: New versions of the app won't run with Expo Go. You will need to follow th
 
 ### 1. Install Dependencies
 
-First, install the required dependencies using npm globally for eas support:
+First, install the required dependencies globally for eas support:
 
 ```bash
-npm install -g eas-cli
+pnpm add -g eas-cli
 ```
 
 and
 
 ```bash
-npm install -g expo-cli
+pnpm add -g expo-cli
 ```
 
 Also, add this line of code to .zshrc file if you get error: zsh: command not found: eas.
 Then, restart the terminal and go to next steps
 
 ```
-export PATH="$PATH:$(npm get prefix)/bin"
+export PATH="$PATH:$(pnpm bin -g)"
 ```
 
 ### 2. Login to expo account
@@ -123,7 +123,7 @@ eas build --profile development
 or from the root
 
 ```bash
-npm run native-build:develop
+pnpm run native-build:develop
 ```
 
 If you want to run the build in an iOS simulator, you will need a preview build instead:
@@ -135,7 +135,7 @@ eas build --profile preview
 or from the root
 
 ```bash
-npm run native-build:preview
+pnpm run native-build:preview
 ```
 
 2. Staging (for PR testing): After running the command, choose which platforms, Android, iOS or both
@@ -147,7 +147,7 @@ eas build --profile staging
 or from the root
 
 ```bash
-npm run native-build:staging
+pnpm run native-build:staging
 ```
 
 The isolated development build is primarily used for testing PRs remotely. Unlike regular development builds:
@@ -166,7 +166,7 @@ eas build --profile production
 or from the root
 
 ```bash
-npm run native-build:prod
+pnpm run native-build:prod
 ```
 
 Note: If you are running a build for a new release on the app store, you will need to bump the version on the app.json file.
@@ -194,16 +194,16 @@ Run one of the following commands based on your platform:
 # For iOS
 eas build:run -p ios
 # or from mobile directory
-npm run run:ios
+pnpm run run:ios
 # or from project root
-npm run native-run:ios
+pnpm run native-run:ios
 
 # For Android
 eas build:run -p android
 # or from mobile directory
-npm run run:android
+pnpm run run:android
 # or from project root
-npm run native-run:android
+pnpm run native-run:android
 ```
 
 The command will automatically download the latest development build for your platform and install it on your connected device or running simulator.
@@ -215,13 +215,13 @@ The command will automatically download the latest development build for your pl
 1. Run
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 2. On next terminal window, run (from root)
 
 ```bash
-npm run native:cache
+pnpm run native:cache
 ```
 
 #### For iOS (Only local build)

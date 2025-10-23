@@ -8,6 +8,7 @@ import {
    Grid,
    Grow,
 } from "@mui/material"
+import { Theme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { useContext, useState } from "react"
 import { AnalyticsEvents } from "util/analyticsConstants"
@@ -19,7 +20,7 @@ import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import GroupLogo from "../common/GroupLogo"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    root: {
       width: "100%",
       display: "flex",

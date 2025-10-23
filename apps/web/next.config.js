@@ -524,7 +524,7 @@ const moduleExports = {
       // Restrictive CSP for SVG content to mitigate potential security risks
       contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
    },
-   webpack: (config) => {
+   webpack: (config, { webpack }) => {
       config.module.rules.push({
          test: /\.wav$/,
          loader: "file-loader",
@@ -533,6 +533,23 @@ const moduleExports = {
          test: /\.svg$/,
          use: ["@svgr/webpack"],
       })
+
+      // Add fallbacks for Node.js built-in modules (needed for pnpm compatibility)
+      config.resolve.fallback = {
+         ...config.resolve.fallback,
+         assert: require.resolve("assert/"),
+         zlib: require.resolve("browserify-zlib"),
+         stream: require.resolve("stream-browserify"),
+         util: require.resolve("util/"),
+         buffer: require.resolve("buffer/"),
+      }
+
+      // Handle node: protocol imports (needed for pnpm compatibility with expo-server-sdk)
+      config.plugins.push(
+         new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
+            resource.request = resource.request.replace(/^node:/, "")
+         })
+      )
 
       return config
    },

@@ -1,11 +1,13 @@
 {
    "functions": {
       "source": "packages/functions",
-      "predeploy": ["npm run lint:functions", "npm run build:functions"],
+      "predeploy": ["pnpm run lint:functions", "pnpm run build:functions"],
       "ignore": [
          "**/node_modules/**",
          "**/firebase-export-*",
-         "**/emulatorData/**"
+         "**/emulatorData/**",
+         "**/__tests__/**",
+         "**/*.test.ts"
       ]
    },
    "firestore": {

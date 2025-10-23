@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
+import { Theme } from "@mui/material/styles"
 import { Collapse } from "@mui/material"
 import BreakoutRoomBanner from "../../../banners/BreakoutRoomBanner"
 import HandRaiseStreamerBanner from "../../../banners/HandRaiseStreamerBanner"
@@ -8,7 +9,7 @@ import HandRaiseViewerBanner from "../../../banners/HandRaiseViewerBanner"
 import { useRouter } from "next/router"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    bannerTop: {
       "& > :last-child": {},
       "& > *": {

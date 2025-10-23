@@ -1,8 +1,8 @@
 import { Box } from "@mui/material"
-import { styled, useTheme } from "@mui/styles"
+import { styled, Theme, useTheme } from "@mui/material/styles"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 
-const StatusIcon = styled(Box)(({ theme }) => ({
+const StatusIcon = styled(Box)(({ theme }: { theme: Theme }) => ({
    width: theme.spacing(2),
    height: theme.spacing(2),
    borderRadius: "50%",

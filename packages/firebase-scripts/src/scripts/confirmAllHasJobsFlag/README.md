@@ -5,7 +5,7 @@
 To run the script, use the following command:
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/confirmAllHasJobsFlag
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./scripts/confirmAllHasJobsFlag
 ```
 
 ## What it does

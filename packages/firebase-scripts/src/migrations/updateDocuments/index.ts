@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Query } from "firebase-admin/firestore"
 import Counter from "../../lib/Counter"
 import counterConstants from "../../lib/Counter/constants"

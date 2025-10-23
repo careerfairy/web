@@ -7,7 +7,7 @@ This is a script that fetches and removes legacy feedbacks for upcoming livestre
 You can execute the script by running the following command:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/removeLegacyFeedbacksForUpcomingEvents
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/removeLegacyFeedbacksForUpcomingEvents
 ```
 
 ## What it does

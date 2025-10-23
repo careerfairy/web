@@ -8,7 +8,6 @@ import { useRouter } from "next/router"
 import { useMemo } from "react"
 import { Calendar, Radio as LiveStreamsIcon } from "react-feather"
 import { openSparkDialog } from "store/reducers/adminSparksReducer"
-import { useGroup } from "."
 import { JobsIcon } from "../../components/views/common/icons/JobsIcon"
 import { SparksIcon } from "../../components/views/common/icons/SparksIcon"
 import BrandedResponsiveMenu, {
@@ -36,8 +35,6 @@ export const CreateMenu = ({
       useOfflineEventRouting()
    const { query, push } = useRouter()
    const hasAccessToSparks = useHasAccessToSparks()
-   const { groupPresenter } = useGroup()
-   const canGroupCreateOfflineEvents = groupPresenter.canCreateOfflineEvents()
    const groupId = query.groupId as string
    const dispatch = useAppDispatch()
 
@@ -68,10 +65,7 @@ export const CreateMenu = ({
                handleClose()
             },
          },
-      ]
-
-      if (canGroupCreateOfflineEvents) {
-         options.push({
+         {
             label: "Offline event",
             icon: <Calendar size={16} />,
             handleClick: async () => {
@@ -82,19 +76,18 @@ export const CreateMenu = ({
                await createDraftOfflineEvent()
                handleClose()
             },
-         })
-      }
-
-      options.push({
-         label: "Job opening",
-         icon: <JobsIcon />,
-         handleClick: () => {
-            push(
-               `/group/${groupId}/admin/jobs?${JOB_DIALOG_QUERY_KEYS.jobDialog}=true`
-            )
-            handleClose()
          },
-      })
+         {
+            label: "Job opening",
+            icon: <JobsIcon />,
+            handleClick: () => {
+               push(
+                  `/group/${groupId}/admin/jobs?${JOB_DIALOG_QUERY_KEYS.jobDialog}=true`
+               )
+               handleClose()
+            },
+         },
+      ]
 
       return options
    }, [
@@ -107,7 +100,6 @@ export const CreateMenu = ({
       dispatch,
       isCreatingOfflineEvent,
       createDraftOfflineEvent,
-      canGroupCreateOfflineEvents,
    ])
 
    return (

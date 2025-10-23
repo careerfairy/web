@@ -12,7 +12,7 @@ Steps for this script:
 4. Run the script:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/fieldsOfStudy/saveFieldAndLevelOfStudyMappingsToJson
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./scripts/fieldsOfStudy/saveFieldAndLevelOfStudyMappingsToJson
 ```
 
 #### What it does:

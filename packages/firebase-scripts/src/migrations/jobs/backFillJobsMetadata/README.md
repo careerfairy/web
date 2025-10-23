@@ -16,5 +16,5 @@ The metadata is only updated if any of the specific fields are altered in any wa
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/jobs/backFillJobsMetadata
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/jobs/backFillJobsMetadata
 ```

@@ -1,4 +1,7 @@
-import React, { useContext, useEffect, useState } from "react"
+import {
+   LivestreamQuestion,
+   hasUpvotedLivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    Button,
@@ -9,23 +12,20 @@ import {
    Hidden,
    useMediaQuery,
 } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
+import { Theme, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { RegistrationContext } from "context/registration/RegistrationContext"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import { useRouter } from "next/router"
-import GroupLogo from "../../common/GroupLogo"
-import QuestionVotingContainer from "../../../QuestionVotingContainer"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { livestreamService } from "data/firebase/LivestreamService"
-import {
-   LivestreamQuestion,
-   hasUpvotedLivestreamQuestion,
-} from "@careerfairy/shared-lib/livestreams"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { useRouter } from "next/router"
+import { useContext, useEffect, useState } from "react"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import QuestionVotingContainer from "../../../QuestionVotingContainer"
+import GroupLogo from "../../common/GroupLogo"
 
 const questionsContainerHeight = 400
 const mobileQuestionsContainerHeight = 300
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    root: {},
    actions: {
       display: "flex",

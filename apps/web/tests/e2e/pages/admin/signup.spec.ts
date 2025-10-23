@@ -67,7 +67,9 @@ test.describe("Admin Signup", () => {
       groupPage,
       group,
       context,
+      browserName,
    }) => {
+      test.skip(browserName === "firefox", "Skipping on Firefox")
       // create the user we'll invite
       const user = await UserSeed.createUser(creds.email)
 

@@ -1,12 +1,12 @@
 import { Tooltip, tooltipClasses } from "@mui/material"
 import { TooltipProps } from "@mui/material/Tooltip"
-import { styled } from "@mui/styles"
+import { styled, Theme } from "@mui/material/styles"
 
 const StyledToolTip = styled(({ className, ...props }: TooltipProps) => (
    <Tooltip arrow {...props} classes={{ popper: className }}>
       {props.children}
    </Tooltip>
-))(({ theme }) => ({
+))(({ theme }: { theme: Theme }) => ({
    [`& .${tooltipClasses.tooltip}`]: {
       backgroundColor: "white",
       color: "rgba(0, 0, 0, 0.87)",

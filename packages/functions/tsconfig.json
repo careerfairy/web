@@ -8,7 +8,7 @@
       "sourceMap": true,
       "strict": false,
       "target": "ES2021",
-      "lib": ["ES2021"],
+      "lib": ["ES2021", "dom"],
       "allowJs": true,
       "experimentalDecorators": true,
       "resolveJsonModule": true,
@@ -20,5 +20,5 @@
    },
    "compileOnSave": true,
    "include": ["src"],
-   "exclude": ["dist"]
+   "exclude": ["dist", "**/*.test.ts", "**/__tests__/**", "**/testHelpers.ts"]
 }

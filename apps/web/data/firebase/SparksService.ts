@@ -384,7 +384,7 @@ export class SparksService {
 
       if (toggledLike) {
          // If liked is true, add the sparkId to the sparks map for the current year
-         await setDoc<LikedSparks>(
+         await setDoc(
             docRef,
             this.createLikedSparksObject(
                userId,
@@ -402,7 +402,7 @@ export class SparksService {
             where(`sparks.${sparkId}`, "!=", null)
          ).withConverter(createGenericConverter<LikedSparks>())
 
-         const allLikedSparks = await getDocs<LikedSparks>(allLikedSparksQuery)
+         const allLikedSparks = await getDocs(allLikedSparksQuery)
 
          const promises = allLikedSparks.docs.map((doc) => {
             const year = parseInt(doc.id)
@@ -410,7 +410,7 @@ export class SparksService {
                createGenericConverter<LikedSparks>()
             )
 
-            return setDoc<LikedSparks>(
+            return setDoc(
                yearRef,
                this.createLikedSparksObject(userId, sparkId, year, toggledLike),
                { merge: true }
@@ -506,7 +506,7 @@ export class SparksService {
          },
       }
 
-      await setDoc<SharedSparks>(docRef, createShareSparksDoc, { merge: true })
+      await setDoc(docRef, createShareSparksDoc, { merge: true })
    }
 
    private createLikedSparksObject(

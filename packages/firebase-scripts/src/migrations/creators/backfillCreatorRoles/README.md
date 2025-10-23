@@ -5,5 +5,5 @@ After the release of the new live stream creation flow (with feature flag `lives
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/creators/backfillCreatorRoles
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/creators/backfillCreatorRoles
 ```

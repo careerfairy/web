@@ -1,7 +1,7 @@
 ### Add participated field to all UserLivestreamData after Jan 31 2023:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/addParticipatedField
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/addParticipatedField
 ```
 
 #### What it does:

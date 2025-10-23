@@ -1,47 +1,69 @@
 # CareerFairy Apps
 
-Monorepo with all the apps, managed by npm workspaces and turborepo.
+Monorepo with all the apps, managed by pnpm workspaces and turborepo.
 
 ### Requirements
 
 -  `node` (v22.10.0 - specified in .nvmrc)
--  `npm` (>=v10.9.2)
+-  `pnpm` (>=v9.0.0)
 
 Check our [Development Environment Setup Guide](https://www.notion.so/Development-Environment-Setup-Guide-a5f414de756245aabde5a7d4e9a48350) article for instructions on how to setup your machine.
 
 ## Setup root folder
 
-Since we're using npm workspaces, only run `npm` commands on the root folder. There will be a shared `node_modules`
+Since we're using pnpm workspaces, only run `pnpm` commands on the root folder. There will be a shared `node_modules`
 folder at the root folder for all the apps/packages.
 
 ```sh
 # install deps for all workspaces (app/*, packages/*)
-npm install
+pnpm install
 
 # runs only once after cloning, will setup husky hooks
-npm run prepare
+pnpm run prepare
 ```
 
 Make a copies in place for the `env.local.example` file for the [web app](./apps/web/.env.local.example) and the [functions package](./packages/functions/.env.local.example) and rename them to `env.local`. Ask your colleagues for the values of the environment values.
 For ImageKit check [this section](#configure-environment-variables).
 
-## NPM Commands
+## PNPM Commands
 
 ```sh
 # Builds all the workspaces
-npm run build
+pnpm run build
 
-# Fetches a remote production backup and stores on emulatorData/fetched
-npm run start -w @careerfairy/fetch-firestore-data
+# Fetch production backup (downloads from gs://careerfairy-backup/fetched)
+# See packages/fetch-firestore-data/README.md for details
+pnpm run fetch-data
 
-# Dev environment with hot reload
-# web app + local emulators with data imported from emulatorData/fetched
-# Since this runs the firebase emulators, you need 10GB of memory available, check (/packages/fetch-firestore-data/README.md)
-npm run dev
+# Dev environment - requires TWO TERMINALS:
+
+# Terminal 1: Start Firebase emulators (requires 10GB memory)
+# Imports data from emulatorData/fetched and exports on Ctrl+C
+pnpm emulators
+
+# Terminal 2: Start all dev servers with hot reload
+# Web app + TypeScript watchers
+pnpm dev
 
 # Installing a dependency, you need to specify the workspace
-npm install --workspace @careerfairy/webapp lodash
+pnpm add --filter @careerfairy/webapp lodash
 ```
+
+### Removing a Package
+
+To remove a dependency from a specific workspace, use the following command, specifying the workspace (using `--filter`) and the package name you want to remove:
+
+```sh
+# Remove lodash from the webapp workspace
+pnpm remove --filter @careerfairy/webapp lodash
+```
+
+For changes to workspace packages themselves (for example, deleting an entire app or package):
+
+1. Delete the package folder from the relevant location (e.g., `apps/<name>` or `packages/<name>`).
+2. Remove its reference from the `pnpm-workspace.yaml` if necessary.
+3. Run `pnpm install` at the root to clean up the workspace dependencies.
+4. Search your codebase for any remaining imports/usages of the removed package.
 
 ## Existing Git Hooks
 
@@ -53,7 +75,7 @@ npm install --workspace @careerfairy/webapp lodash
 ## Development
 
 ```sh
-npm run dev -w @careerfairy/webapp
+pnpm run dev --filter @careerfairy/webapp
 ```
 
 ## Testing
@@ -63,16 +85,28 @@ There are two types of tests that you can run
 -  Unit Tests with Jest:
 
 ```sh
-npm run test
+pnpm run test
 # To run all normal unit test files located in apps/packages that have them
 ```
 
 -  End-To-End Tests with Playwright:
 
 ```sh
-npm run test:e2e-webapp
-# Run the end-to-end tests for the web app
-# using the functions, firestore and auth emulators
+# Run all E2E tests
+pnpm run test:e2e-webapp
+
+# Run a specific test file
+pnpm run test:e2e-webapp -- tests/e2e/pages/admin/livestreams.spec.ts
+
+# Run by filename or test name pattern (using -g flag)
+pnpm run test:e2e-webapp -- -g "livestreams.spec.ts"
+pnpm run test:e2e-webapp -- -g "draft livestream"
+
+# Run on a specific browser
+pnpm run test:e2e-webapp -- --project=firefox
+
+# Debug mode (opens Playwright inspector)
+pnpm run test:e2e-webapp-debug
 ```
 
 Upon test completion or failure a report html folder is generated which can be accessed
@@ -84,7 +118,7 @@ what produced the failure as seen below:
 
 There are two ways in which you can open up the report:
 
--  Running the root script `npm run webapp:report`
+-  Running the root script `pnpm run webapp:report`
 -  Running the index.html file within `./apps/web/playwright-report`
 
 ## CI
@@ -98,53 +132,62 @@ stored in a zip file attached to the pipeline as seen below:
 ## Build
 
 ```sh
-npm run build -w @careerfairy/functions
-# or npm run build
+pnpm run build --filter @careerfairy/functions
+# or pnpm run build
 ```
 
 ## Deploy a function
 
 ```sh
 cd packages/functions
-npx firelink deploy --only functions:slackHandleInteractions
+pnpm exec firelink deploy --only functions:slackHandleInteractions
 ```
 
 ## Deploy a bundle
 
 ```sh
 cd packages/functions
-npx firelink deploy --only functions:bundle-pastYearLivestreams
+pnpm exec firelink deploy --only functions:bundle-pastYearLivestreams
 ```
 
 When adding new bundles, it's likely that you'd want to ensure the Firebase Hosting mappings are also updated
 
 ```sh
 cd packages/functions
-npx firebase deploy --only hosting
+pnpm exec firebase deploy --only hosting
 ```
 
 To verify the deployment of your bundle and ensure it is mapped correctly, visit: https://functions.careerfairy.io/bundle-pastYearLivestreams
 
 ## Start the firebase emulators with data
 
-Run the script `packages/fetch-firestore-data` (check its readme for more info):
+**Before first run:** You need to export production data to create a "fetched" backup (only one team member needs to do this):
 
 ```sh
-# Fetches a remote production backup and stores on emulatorData/fetched
-npm run start -w @careerfairy/fetch-firestore-data
+pnpm run fetch-data:export  # Creates backup at gs://careerfairy-backup/fetched (~5 min)
 ```
+
+**Then download and import the backup:**
+
+```sh
+pnpm run fetch-data  # Downloads backup to emulatorData/fetched
+```
+
+For more details, see `packages/fetch-firestore-data/README.md`
 
 ### Emulator UI
 
-When running `npm run dev` or `npm run dev -w @careerfairy-functions` the emulators will be started.
+When running `pnpm emulators` the Firebase Emulator UI will be available at:
 
 http://localhost:4000/
+
+**Important:** Press Ctrl+C once to stop emulators. Wait for "Export complete" message to ensure data is saved.
 
 ## Firestore Rules
 
 Update the `firestore.rules` file with your new rules, test them using the local emulators.
 
-Create a Pull Request with the new changes, and only after approval, should you deploy them using `npm run deploy:rules`.
+Create a Pull Request with the new changes, and only after approval, should you deploy them using `pnpm run deploy:rules`.
 
 ### Run E2E tests on a linux docker container
 
@@ -152,17 +195,23 @@ Useful to find test flaws that appear during CI.
 Adjust the docker resources to match the CI runners specs (2cpu, 7GB memory).
 
 ```sh
-# Build the image first, it will install all deps (linux use different binaries - swc, turbo, etc)
-docker build -t tests -f apps/web/Dockerfile.test .
+# Build the image first (matches CI: Node 22, Playwright v1.49.0, ubuntu-22.04)
+docker build -t careerfairy-tests -f apps/web/Dockerfile.test .
 
-# Run the tests inside the built docker image
-# You can modify the app files without building the image again
-docker run  -p 9323:9323 \
-            -p 8080:8080 \
-            -v $(pwd)/apps/web/:/app/apps/web \
-            -it --entrypoint "" \
-            -e DEBUG=pw:webserver tests \
-            npm run test:e2e-webapp -- -- --project=firefox -g "Create a draft livestream from the main page"
+# Run all tests
+docker run -p 9323:9323 -p 8080:8080 -p 5001:5001 -p 9099:9099 -p 9199:9199 \
+  -e NEXT_PUBLIC_UNIQUE_WORKFLOW_ID="local-test" \
+  careerfairy-tests
+
+# Run specific shard (e.g., shard 3 of 5)
+docker run -p 9323:9323 -p 8080:8080 -p 5001:5001 -p 9099:9099 -p 9199:9199 \
+  -e NEXT_PUBLIC_UNIQUE_WORKFLOW_ID="local-test-shard-3" \
+  careerfairy-tests -- --shard=3/5
+
+# Run specific test with Firefox
+docker run -p 9323:9323 -p 8080:8080 -p 5001:5001 -p 9099:9099 -p 9199:9199 \
+  -e NEXT_PUBLIC_UNIQUE_WORKFLOW_ID="local-test-firefox" \
+  careerfairy-tests -- --project=firefox -g "Create a draft livestream from the main page"
 ```
 
 ### Emulator Functions - Sending Emails
@@ -180,13 +229,13 @@ are setup to use their sandbox environments.
 This will execute the script using the firestore emulator db.
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=<path-to-script>
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=<path-to-script>
 ```
 
 In order to run the script on production you need to add a flag `useProd=true` to the command.
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- useProd=true scriptPath=<path-to-script>
+pnpm run script --filter @careerfairy/firebase-scripts -- useProd=true scriptPath=<path-to-script>
 ```
 
 # ImageKit Setup

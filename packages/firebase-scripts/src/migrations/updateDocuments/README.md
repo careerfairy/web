@@ -28,7 +28,7 @@ The script can be configured by modifying the `config` object in `index.ts`:
 To run the script, use the following command:
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/updateDocuments
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/updateDocuments
 ```
 
 ## What it does

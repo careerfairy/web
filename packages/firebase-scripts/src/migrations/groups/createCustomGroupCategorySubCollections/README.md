@@ -1,7 +1,7 @@
 ### Backfill CareerCenterData Collection:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/createCustomGroupCategorySubCollections
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/createCustomGroupCategorySubCollections
 ```
 
 #### What it does:

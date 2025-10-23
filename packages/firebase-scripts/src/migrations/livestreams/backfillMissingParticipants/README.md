@@ -1,7 +1,7 @@
 ### Backfill Missing Participants for a Specific Live Stream
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backfillMissingParticipants
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backfillMissingParticipants
 ```
 
 #### What it does:

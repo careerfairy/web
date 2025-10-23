@@ -34,7 +34,6 @@ export const StudyDomainSelector = ({ name, collection }: Props) => {
          name={name}
          options={options}
          autocompleteProps={{
-            placeholder: "Select from the following list",
             id: name,
             disabled: isSubmitting,
             disableClearable: true,

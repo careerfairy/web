@@ -7,3 +7,5 @@ apps/web/playwright-report
 **/.turbo
 **/dist
 emulatorData
+**/firebase-export-*
+.cursor

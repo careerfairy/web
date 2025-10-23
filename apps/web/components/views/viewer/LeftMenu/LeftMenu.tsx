@@ -1,7 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
 import { Drawer, Fab } from "@mui/material"
-import { alpha, useTheme } from "@mui/material/styles"
+import { alpha, Theme, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import clsx from "clsx"
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -24,7 +24,7 @@ import QuestionCategory from "../../streaming/sharedComponents/QuestionCategory"
 import HandRaiseCategory from "./categories/HandRaiseCategory"
 import PollCategory from "./categories/PollCategory"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    viewRoot: {
       position: "relative",
       height: "100%",

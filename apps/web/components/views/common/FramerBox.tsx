@@ -8,7 +8,7 @@ const BoxComponent = forwardRef<HTMLDivElement, BoxProps>((props, ref) => (
 
 BoxComponent.displayName = "BoxComponent"
 
-const FramerBox = motion(BoxComponent)
+const FramerBox = motion.create(BoxComponent)
 
 export type FramerBoxProps = ComponentProps<typeof FramerBox>
 

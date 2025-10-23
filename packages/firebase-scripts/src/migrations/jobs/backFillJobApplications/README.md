@@ -9,5 +9,5 @@ This backfill is needed as for the new job hub concept users will be able to che
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/jobs/backFillJobApplications
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/jobs/backFillJobApplications
 ```

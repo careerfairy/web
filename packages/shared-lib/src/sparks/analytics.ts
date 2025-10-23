@@ -1,4 +1,4 @@
-import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
+import { Identifiable } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
 import { Spark } from "./sparks"
 

@@ -1,20 +1,20 @@
-import React, { useMemo } from "react"
-import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
-import Drawer from "@mui/material/Drawer"
-import { AppBar, Box, IconButton, Tab, Tabs } from "@mui/material"
-import SwipeableViews from "react-swipeable-views"
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
-import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
-import BreakdownTab from "./BreakdownTab"
-import { useCurrentStream } from "../../../../context/stream/StreamContext"
-import PeopleWhoJoinedTab from "./PeopleWhoJoinedTab"
-import useStreamRef from "../../../custom-hook/useStreamRef"
-import useCollection from "../../../custom-hook/useCollection"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { UserLivestreamData } from "@careerfairy/shared-lib/src/livestreams"
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
+import { AppBar, Box, IconButton, Tab, Tabs } from "@mui/material"
+import Drawer from "@mui/material/Drawer"
+import { Theme, useTheme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import React, { useMemo } from "react"
+import SwipeableViews from "react-swipeable-views"
+import { useCurrentStream } from "../../../../context/stream/StreamContext"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
+import useCollection from "../../../custom-hook/useCollection"
+import useStreamRef from "../../../custom-hook/useStreamRef"
+import BreakdownTab from "./BreakdownTab"
+import PeopleWhoJoinedTab from "./PeopleWhoJoinedTab"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    drawerContent: {
       height: "100%",
       display: "flex",
@@ -57,6 +57,7 @@ const DrawerContent = ({ isStreamer, hideAudience }: ContentProps) => {
    const query = useMemo(
       () =>
          livestreamRepo.livestreamUsersQueryWithRef(streamRef, "participated"),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       [streamId, streamRef]
    )
    const { data: participatingStudents } = useCollection<UserLivestreamData>(

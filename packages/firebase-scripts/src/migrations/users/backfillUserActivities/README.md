@@ -7,5 +7,5 @@ Creates `/userData/$id/activities/` based on past user actions (livestream regis
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillUserActivities
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillUserActivities
 ```

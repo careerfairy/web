@@ -1,7 +1,7 @@
 ### Deletes all Custom Jobs related collections
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/deleteAllCustomJobsRelatedCollections
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./scripts/deleteAllCustomJobsRelatedCollections
 ```
 
 #### What it does:

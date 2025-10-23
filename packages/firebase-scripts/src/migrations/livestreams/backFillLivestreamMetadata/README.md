@@ -22,5 +22,5 @@ If there are no company hosts, then the metadata will be taken from the universi
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillLivestreamMetadata
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillLivestreamMetadata
 ```

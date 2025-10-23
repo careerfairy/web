@@ -1,4 +1,7 @@
-import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEventPublicData,
+   LivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import { useAllLivestreamQuestions } from "components/custom-hook/streaming/question/useAllLivestreamQuestions"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -63,7 +66,9 @@ export const QuestionsDialog = ({
       itemsPerPage: ITEMS_PER_PAGE,
    })
 
-   const displayQuestions = isMobile ? visibleQuestions : paginatedQuestions
+   const displayQuestions = (
+      isMobile ? visibleQuestions : paginatedQuestions
+   ) as LivestreamQuestion[]
 
    const formatQuestionsForCSV = () => {
       if (!questions.length) return []

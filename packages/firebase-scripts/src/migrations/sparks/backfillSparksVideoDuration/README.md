@@ -5,5 +5,5 @@ Will fetch all sparks, and for each spark will get the video duration and update
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/sparks/backfillSparksVideoDuration
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/sparks/backfillSparksVideoDuration
 ```

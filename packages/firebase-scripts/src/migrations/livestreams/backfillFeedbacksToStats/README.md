@@ -5,5 +5,5 @@ Will fetch all the livestream ratings, aggregate them and update the correspondi
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backfillFeedbacksToStats
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backfillFeedbacksToStats
 ```

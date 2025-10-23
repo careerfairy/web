@@ -7,7 +7,7 @@ This script backfills the new fields `sparks`, `published` and turns `deadline` 
 To run the script, use the following command:
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/jobs/backfillNewFields
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/jobs/backfillNewFields
 ```
 
 ## What it does

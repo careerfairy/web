@@ -11,7 +11,7 @@ import {
 } from "@mui/material"
 
 import { Group } from "@careerfairy/shared-lib/groups"
-import { useTheme } from "@mui/styles"
+import { useTheme } from "@mui/material/styles"
 import useCompanyPageSocials from "components/custom-hook/useCompanyPageSocials"
 import { SocialPlatformType } from "components/custom-hook/useSocials"
 import ReferralWidget from "components/views/common/ReferralWidget"

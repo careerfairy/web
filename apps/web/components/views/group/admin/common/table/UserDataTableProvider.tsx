@@ -11,7 +11,7 @@ import React, {
    useState,
 } from "react"
 import { universityCountriesMap } from "../../../../../util/constants/universityCountries"
-import { CollectionReference, Query } from "@firebase/firestore"
+import { CollectionReference, Query } from "firebase/firestore"
 import { UserDataEntry } from "./UserLivestreamDataTable"
 
 /*

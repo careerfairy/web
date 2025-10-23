@@ -1,23 +1,26 @@
-import React, {
+import { TimelineCountry } from "@careerfairy/shared-lib/universities/universityTimeline"
+import { Box, Button, IconButton, Paper, Typography } from "@mui/material"
+import { useTheme } from "@mui/material/styles"
+import { useTimelineCountries } from "components/custom-hook/university-timeline/useTimelineCountries"
+import { universityCountriesMap } from "components/util/constants/universityCountries"
+import SingleListSelect from "components/views/common/SingleListSelect"
+import { UniversityTimelineInstance as timelineService } from "data/firebase/UniversityTimelineService"
+import {
    createContext,
    useCallback,
    useContext,
    useMemo,
    useState,
 } from "react"
-import { Box, Button, IconButton, Paper, Typography } from "@mui/material"
+import {
+   PlusCircle as AddIcon,
+   Check as CheckIcon,
+   X as XIcon,
+} from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { PlusCircle as AddIcon } from "react-feather"
-import { useTimelineCountries } from "components/custom-hook/university-timeline/useTimelineCountries"
 import { AcademicYearType, AcademicYears, getAcademicYears } from "../utils"
 import AcademicYearSelector from "./AcademicYearSelector"
 import TimelineCountryAccordion from "./TimelineCountryAccordion"
-import SingleListSelect from "components/views/common/SingleListSelect"
-import { universityCountriesMap } from "components/util/constants/universityCountries"
-import { Check as CheckIcon, X as XIcon } from "react-feather"
-import { useTheme } from "@mui/styles"
-import { UniversityTimelineInstance as timelineService } from "data/firebase/UniversityTimelineService"
-import { TimelineCountry } from "@careerfairy/shared-lib/universities/universityTimeline"
 
 const styles = sxStyles({
    headerContainer: {

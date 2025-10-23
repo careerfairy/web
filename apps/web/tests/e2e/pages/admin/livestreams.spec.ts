@@ -70,6 +70,7 @@ test.describe("Group Admin Livestreams", () => {
       // Deleting before calling random to force recalculation, if not these values would be transported from the base stream
       delete overrideFields["contentTopicsTagIds"]
       delete overrideFields["summary"]
+      delete overrideFields["speakers"]
 
       const livestreamToPublish: LivestreamEvent =
          LivestreamSeed.random(overrideFields)
@@ -93,7 +94,8 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.clickManageLivestream()
       await groupPage.fillLivestreamForm({ title })
       // new title should be visible
-      await groupPage.goToLivestreams()
+      const livestreamsPage2 = await groupPage.goToLivestreams()
+      await livestreamsPage2.filterByStatus("Published")
       await groupPage.assertTextIsVisible(title)
    })
 

@@ -1,13 +1,29 @@
 {
    "$schema": "https://turborepo.org/schema.json",
-   "pipeline": {
+   "globalEnv": [
+      "NODE_ENV",
+      "ENABLE_ROOT_PATH_BUILD_CACHE",
+      "SENTRY_AUTH_TOKEN",
+      "GRAPHCMS_PROJECT_API",
+      "GRAPHCMS_PROD_AUTH_TOKEN",
+      "GRAPHCMS_DEV_AUTH_TOKEN",
+      "GRAPHCMS_PREVIEW_SECRET",
+      "WEBFLOW_URL",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+      "POSTMARK_TEMPLATE_TRIAL_END_SPARKS",
+      "POSTMARK_TEMPLATE_MANUAL_EMAIL",
+      "HYGRAPH_TALENT_GUIDE_PROD_TOKEN",
+      "HYGRAPH_TALENT_GUIDE_PREVIEW_TOKEN",
+      "HYGRAPH_TALENT_GUIDE_PREVIEW_SECRET"
+   ],
+   "tasks": {
       "build": {
          "dependsOn": ["^build"],
-         "outputs": ["dist/**", ".next/**", "build/**", "!.next/cache/**"]
+         "outputs": ["dist/**", ".next/**", "build/**"]
       },
       "test": {
-         "dependsOn": ["build"],
-         "outputs": ["coverage/**"]
+         "dependsOn": ["build"]
       },
       "clean": {
          "dependsOn": ["^clean"]
@@ -32,6 +48,5 @@
       "native": {
          "cache": false
       }
-   },
-   "globalEnv": ["NODE_ENV"]
+   }
 }

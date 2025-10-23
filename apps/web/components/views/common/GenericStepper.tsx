@@ -1,4 +1,4 @@
-import { styled } from "@mui/styles"
+import Check from "@mui/icons-material/Check"
 import {
    Box,
    Step,
@@ -9,36 +9,38 @@ import {
    Typography,
 } from "@mui/material"
 import { stepConnectorClasses } from "@mui/material/StepConnector"
-import Check from "@mui/icons-material/Check"
-import React from "react"
-import { MultiStepComponentType } from "./MultiStepWrapper"
+import { Theme } from "@mui/material/styles"
+import { styled } from "@mui/styles"
 import useIsMobile from "../../custom-hook/useIsMobile"
+import { MultiStepComponentType } from "./MultiStepWrapper"
 
-const StepperConnector = styled(StepConnector)(({ theme }) => ({
-   [`&.${stepConnectorClasses.alternativeLabel}`]: {
-      top: 10,
-      left: "calc(-50% + 15px)",
-      right: "calc(50% + 15px)",
-   },
-   [`&.${stepConnectorClasses.active}`]: {
-      [`& .${stepConnectorClasses.line}`]: {
-         borderColor: theme.palette.primary.main,
+const StepperConnector = styled(StepConnector)(
+   ({ theme }: { theme: Theme }) => ({
+      [`&.${stepConnectorClasses.alternativeLabel}`]: {
+         top: 10,
+         left: "calc(-50% + 15px)",
+         right: "calc(50% + 15px)",
       },
-   },
-   [`&.${stepConnectorClasses.completed}`]: {
-      [`& .${stepConnectorClasses.line}`]: {
-         borderColor: theme.palette.primary.main,
+      [`&.${stepConnectorClasses.active}`]: {
+         [`& .${stepConnectorClasses.line}`]: {
+            borderColor: theme.palette.primary.main,
+         },
       },
-   },
-   [`& .${stepConnectorClasses.line}`]: {
-      borderColor: theme.palette.grey.main,
-      borderTopWidth: 4,
-      borderRadius: 1,
-   },
-}))
+      [`&.${stepConnectorClasses.completed}`]: {
+         [`& .${stepConnectorClasses.line}`]: {
+            borderColor: theme.palette.primary.main,
+         },
+      },
+      [`& .${stepConnectorClasses.line}`]: {
+         borderColor: theme.palette.grey.main,
+         borderTopWidth: 4,
+         borderRadius: 1,
+      },
+   })
+)
 
 const StepperIconRoot = ({ active, children, className }) => {
-   const StyledIcons = styled("div")(({ theme }) => ({
+   const StyledIcons = styled("div")(({ theme }: { theme: Theme }) => ({
       color: theme.palette.grey.main,
       display: "flex",
       height: 22,
@@ -86,7 +88,7 @@ const GenericStepper = ({ currentStep, steps }: GenericStepperProps) => {
 
    return (
       <>
-         {isMobile && (
+         {Boolean(isMobile) && (
             <Box textAlign="center" mb={1}>
                <Typography variant="body2" fontWeight="bold">
                   {steps[currentStep].description}

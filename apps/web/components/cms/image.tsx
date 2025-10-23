@@ -1,5 +1,4 @@
 import Image, { ImageProps } from "next/legacy/image"
-import { GraphCMSImageLoader } from "./util"
 import React from "react"
 import { ICmsImage } from "../../types/cmsTypes"
 
@@ -15,7 +14,6 @@ const CmsImage = ({ imageProps, cmsImage }: Props) => {
          height={cmsImage?.height}
          alt={cmsImage?.alt || cmsImage?.caption}
          {...imageProps}
-         loader={GraphCMSImageLoader}
       />
    )
 }

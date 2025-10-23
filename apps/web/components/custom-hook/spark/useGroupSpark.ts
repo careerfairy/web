@@ -1,6 +1,6 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
-import { limit } from "@firebase/firestore"
+import { limit } from "firebase/firestore"
 import { collection, documentId, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"

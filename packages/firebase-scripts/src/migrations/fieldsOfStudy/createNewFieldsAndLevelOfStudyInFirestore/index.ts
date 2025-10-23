@@ -1,7 +1,7 @@
-import * as mappings from "@careerfairy/firebase-scripts/data/fieldAndLevelOfStudyMapping.json"
-import { firestore } from "../../../lib/firebase"
 import { WriteBatch } from "firebase-admin/firestore"
+import * as mappings from "../../../../data/fieldAndLevelOfStudyMapping.json"
 import config from "../../../config"
+import { firestore } from "../../../lib/firebase"
 //
 export async function run() {
    const batch = firestore.batch()

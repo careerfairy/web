@@ -1,21 +1,25 @@
-FROM mcr.microsoft.com/playwright:v1.39.0-jammy
+FROM ubuntu:22.04
 
-COPY ../../. /app
+COPY . /app
 
 ENV CI=true
+ENV DEBIAN_FRONTEND=noninteractive
 
-# install java for the emulators
+# install Node 22, java, uuid-runtime and playwright system dependencies
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get -y install default-jre-headless && \
+    apt-get -y install default-jre-headless uuid-runtime curl && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-RUN npm install
-RUN npx playwright install
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @careerfairy/webapp exec playwright install --with-deps
 
-ENV NODE_ENV test
-RUN npm run build
+ENV NODE_ENV=test
+ENV NODE_OPTIONS=--max-old-space-size=4096
+RUN pnpm run build
 
-ENTRYPOINT ["npm", "run", "test:e2e-webapp"]
+ENTRYPOINT ["pnpm", "run", "test:e2e-webapp"]

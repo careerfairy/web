@@ -1,6 +1,6 @@
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
 
-import { limit } from "@firebase/firestore"
+import { limit } from "firebase/firestore"
 import { useFirestoreCollection } from "components/custom-hook/utils/useFirestoreCollection"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { collection, documentId, query, where } from "firebase/firestore"

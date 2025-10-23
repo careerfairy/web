@@ -1,6 +1,6 @@
 import { Group } from "@careerfairy/shared-lib/groups"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { limit } from "@firebase/firestore"
+import { limit } from "firebase/firestore"
 import { collection, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import { FirestoreInstance } from "../../data/firebase/FirebaseInstance"

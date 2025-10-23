@@ -42,6 +42,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# Compiled TypeScript output in src directories (should only be in dist/)
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/src/**/*.js.map
+!packages/*/src/**/*.test.js
+!packages/*/src/**/*.spec.js
+
 # production
 /build
 .cursor/mcp.json
+.vercel

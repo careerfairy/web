@@ -42,6 +42,7 @@ import * as streaming from "./lib/streaming"
 import * as warming from "./lib/warming"
 
 // Imported Individual Cloud functions
+import examples = require("./examples")
 import auth = require("./auth")
 import agora = require("./agora")
 import backup = require("./backup")
@@ -159,10 +160,12 @@ exports.updateUserLiveStreamDataOnUserChange =
    user.updateUserLiveStreamDataOnUserChange
 
 // Stripe
-exports.stripeWebHook = stripe.stripeWebHook
-exports.fetchStripeCustomerSession = stripe.fetchStripeCustomerSession
-exports.fetchStripePrice = stripe.fetchStripePrice
-exports.fetchStripeSessionStatus = stripe.fetchStripeSessionStatus
+exports[FUNCTION_NAMES.stripeWebHook] = stripe.stripeWebHook
+exports[FUNCTION_NAMES.fetchStripeCustomerSession] =
+   stripe.fetchStripeCustomerSession
+exports[FUNCTION_NAMES.fetchStripePrice] = stripe.fetchStripePrice
+exports[FUNCTION_NAMES.fetchStripeSessionStatus] =
+   stripe.fetchStripeSessionStatus
 
 // Livestreams
 exports[FUNCTION_NAMES.sendLivestreamRegistrationConfirmationEmail] =
@@ -457,3 +460,6 @@ exports[FUNCTION_NAMES.sendLivestreamNoShowReminder] =
 exports[FUNCTION_NAMES.keepFunctionsWarm] = warming.keepFunctionsWarm
 exports[FUNCTION_NAMES.keepOnCallFunctionsWarm] =
    warming.keepOnCallFunctionsWarm
+
+// Examples
+exports.exampleHttpFunction = examples.exampleHttpFunction

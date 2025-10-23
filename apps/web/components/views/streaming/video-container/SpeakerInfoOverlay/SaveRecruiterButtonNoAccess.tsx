@@ -3,7 +3,7 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import SaveIcon from "@mui/icons-material/Save"
 import { Button, Tooltip, TooltipProps, Typography } from "@mui/material"
 import IconButton from "@mui/material/IconButton"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { Theme } from "@mui/material/styles"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import {
    careerSkillsLinkWithContext,
@@ -17,7 +17,7 @@ const styles = sxStyles({
    tooltip: {
       backgroundColor: "background.paper",
       color: "text.primary",
-      boxShadow: (theme: DefaultTheme) => theme.legacy.boxShadows.dark_8_25_10,
+      boxShadow: (theme: Theme) => theme.legacy.boxShadows.dark_8_25_10,
       padding: 1,
       borderRadius: "10px",
    },

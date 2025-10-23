@@ -1,6 +1,5 @@
 import { CssBaseline, PaletteMode } from "@mui/material"
-import { responsiveFontSizes, ThemeProvider } from "@mui/material/styles"
-import { DefaultTheme } from "@mui/styles"
+import { responsiveFontSizes, Theme, ThemeProvider } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { useRouter } from "next/router"
 import { SnackbarProvider } from "notistack"
@@ -44,7 +43,7 @@ const ThemeProviderWrapper = ({
    overrideTheme,
 }: {
    children: ReactNode
-   overrideTheme?: DefaultTheme
+   overrideTheme?: Theme
 }) => {
    const { pathname } = useRouter()
 

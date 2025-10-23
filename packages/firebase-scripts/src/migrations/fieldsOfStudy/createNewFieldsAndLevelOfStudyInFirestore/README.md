@@ -1,7 +1,7 @@
 ### createNewFieldsAndLevelOfStudyInFirestore
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/fieldsOfStudy/createNewFieldsAndLevelOfStudyInFirestore
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/fieldsOfStudy/createNewFieldsAndLevelOfStudyInFirestore
 ```
 
 #### What it does:
