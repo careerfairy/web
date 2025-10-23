@@ -23,7 +23,6 @@ type Props = {
    parentHeight: number
    livestreamId: string
    setPdfNumberOfPages: (numPages: number) => void
-   isHost: boolean
 }
 
 const calculateAdjustedDimensions = (
