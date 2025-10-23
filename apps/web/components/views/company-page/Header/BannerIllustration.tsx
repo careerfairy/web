@@ -28,14 +28,10 @@ const styles = sxStyles({
    },
 })
 const BannerIllustration = () => {
-   const { group, groupPresenter, editMode } = useCompanyPage()
+   const { group, editMode } = useCompanyPage()
 
-   const { 
-      handleUploadImage, 
-      isLoading,
-      progress,
-      uploading
-   } = useUploadGroupBanner(group.id)
+   const { handleUploadImage, isLoading, progress, uploading } =
+      useUploadGroupBanner(group.id)
 
    const handleUploadBannerPhoto = async (photo: File): Promise<void> => {
       await handleUploadImage(photo)

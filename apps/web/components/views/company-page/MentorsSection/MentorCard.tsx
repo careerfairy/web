@@ -6,7 +6,7 @@ import { useIsTargetedUser } from "components/views/sparks/components/spark-card
 import Image from "next/image"
 import Link from "next/link"
 import { ReactNode, SyntheticEvent } from "react"
-import { Edit2, Linkedin } from "react-feather"
+import { Edit2, Linkedin, Trash2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { buildMentorPageLink } from "util/routes"
 import { useCompanyPage } from ".."
@@ -81,7 +81,13 @@ const styles = sxStyles({
       top: 4,
       zIndex: 1,
    },
-   linkedInContainer: (theme) => ({
+   delete: {
+      position: "absolute",
+      right: 40,
+      top: 4,
+      zIndex: 1,
+   },
+   linkedInContainer: {
       position: "absolute",
       top: 8,
       right: 8,
@@ -93,7 +99,7 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
       zIndex: 2,
-   }),
+   },
    logoOverlay: {
       position: "absolute",
       bottom: 1,
@@ -136,12 +142,14 @@ type MentorCardProps = {
    creator: PublicCreator
    isEditMode?: boolean
    handleEdit?: () => void
+   handleDelete?: () => void
 }
 
 export const MentorCard = ({
    creator,
    isEditMode,
    handleEdit,
+   handleDelete,
 }: MentorCardProps) => {
    const creatorName = `${creator.firstName} ${creator.lastName}`
    const theme = useTheme()
@@ -152,6 +160,12 @@ export const MentorCard = ({
       ev.preventDefault()
       ev.stopPropagation()
       handleEdit?.()
+   }
+
+   const _handleDelete = (ev: SyntheticEvent) => {
+      ev.preventDefault()
+      ev.stopPropagation()
+      handleDelete?.()
    }
 
    const shouldShowLinkedInIcon = Boolean(
@@ -178,13 +192,22 @@ export const MentorCard = ({
             </Box>
          ) : null}
          {isEditMode ? (
-            <IconButton sx={styles.edit} onClick={_handleEdit}>
-               <Edit2 size={20} color={theme.brand.white[100]} />
-            </IconButton>
+            <>
+               <IconButton sx={styles.edit} onClick={_handleEdit}>
+                  <Edit2 size={20} color={theme.brand.white[100]} />
+               </IconButton>
+               <IconButton sx={styles.delete} onClick={_handleDelete}>
+                  <Trash2 size={20} color={theme.brand.white[100]} />
+               </IconButton>
+            </>
          ) : null}
          {shouldShowLinkedInIcon ? (
             <Box sx={styles.linkedInContainer}>
-               <Linkedin size={14} color={theme.brand.info[700]} fill={theme.brand.info[700]} />
+               <Linkedin
+                  size={14}
+                  color={theme.brand.info[700]}
+                  fill={theme.brand.info[700]}
+               />
             </Box>
          ) : null}
          <Box sx={styles.avatarContainer}>
