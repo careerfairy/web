@@ -1,8 +1,5 @@
 import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
-import type {
-   AddressAutofillFeatureSuggestion,
-   AddressAutofillOptions,
-} from "@mapbox/search-js-core"
+import type { AddressAutofillOptions } from "@mapbox/search-js-core"
 import { useAddressAutofillCore } from "@mapbox/search-js-react"
 import { AutocompleteInputChangeReason, Box, Typography } from "@mui/material"
 import { GeoPoint } from "firebase/firestore"
@@ -184,7 +181,7 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
    const autofill = useAddressAutofillCore({
       accessToken: process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN!,
       ...options,
-   })
+   } as any)
 
    // Sync inputValue with field value when field changes externally
    useEffect(() => {
@@ -261,7 +258,7 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
 
          try {
             const response = await autofill.retrieve(
-               selectedOption.suggestion,
+               selectedOption.suggestion as any,
                {
                   sessionToken,
                }
@@ -334,7 +331,7 @@ export const FormLocationAutoFill: FC<LocationAutoFillProps> = ({
  * @returns Object with location (GeoPoint) and geoHash, or undefined if invalid
  */
 function extractLocationFromSuggestion(
-   suggestion: AddressAutofillFeatureSuggestion
+   suggestion: any
 ): OfflineEvent["address"] {
    // Properties may include context and text fields for address components
    const { properties } = suggestion

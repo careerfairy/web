@@ -200,8 +200,14 @@ async function downloadRemoteBucket(): Promise<CommandOutput> {
    }
 
    // download remote folder
+   // Use -m for parallel transfer, disable multiprocessing but increase thread count
+   // See: https://bugs.python.org/issue33725
    return execute("gsutil", [
       "-m",
+      "-o",
+      "GSUtil:parallel_process_count=1",
+      "-o",
+      "GSUtil:parallel_thread_count=24",
       "cp",
       "-r",
       `gs://${config.BUCKET}/${config.BUCKET_FOLDER}`,

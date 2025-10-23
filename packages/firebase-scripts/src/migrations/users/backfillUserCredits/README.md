@@ -10,6 +10,6 @@ Updates every `userData` document:
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillUserCredits
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillUserCredits
 
 ```

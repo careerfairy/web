@@ -1,6 +1,3 @@
-import React, { useEffect, useRef, useState } from "react"
-import { Doughnut } from "react-chartjs-2"
-import "chartjs-plugin-labels"
 import {
    Box,
    Checkbox,
@@ -10,13 +7,15 @@ import {
    ListItemText,
    Typography,
 } from "@mui/material"
-import { PollQuestion } from "../../../../materialUI/GlobalTitles"
-import { colorsArray } from "../../../util/colors"
 import { useTheme } from "@mui/material/styles"
+import { useEffect, useRef, useState } from "react"
+import { Doughnut } from "react-chartjs-2"
 import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
+import { PollQuestion } from "../../../../materialUI/GlobalTitles"
 import useMapPollVoters from "../../../custom-hook/useMapPollVoters"
 import useStreamRef from "../../../custom-hook/useStreamRef"
+import { colorsArray } from "../../../util/colors"
 
 const CurrentPollGraph = ({
    currentPoll: { options, question, id: pollId, demoVotes },
@@ -86,6 +85,7 @@ const CurrentPollGraph = ({
             ],
          },
       })
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    useEffect(() => {
@@ -96,6 +96,7 @@ const CurrentPollGraph = ({
             id: option.id,
          }))
       )
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [question])
 
    useEffect(() => {
@@ -116,12 +117,14 @@ const CurrentPollGraph = ({
             },
          ],
       })
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [pollId, theme.palette.mode])
 
    useEffect(() => {
       if (chartRef.current) {
          setLegendElements(chartRef.current.chartInstance.legend.legendItems)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [chartRef.current])
 
    const getTotalVotes = () => {

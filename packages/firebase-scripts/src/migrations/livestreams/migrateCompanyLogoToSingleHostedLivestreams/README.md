@@ -7,5 +7,5 @@ We have to update the logos of existing livestreams to ensure those changes get 
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/migrateCompanyLogoToSingleHostedLivestreams
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/migrateCompanyLogoToSingleHostedLivestreams
 ```

@@ -10,5 +10,5 @@ proficiency of `Advanced` for all users present in collection `userData`.
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/users/backfillUserLanguages
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/users/backfillUserLanguages
 ```

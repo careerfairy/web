@@ -1,7 +1,7 @@
 ### Backfill Livestreams Collection:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/makeAllUserLivestreamDataRegisteredForEvent
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/makeAllUserLivestreamDataRegisteredForEvent
 ```
 
 #### What it does:

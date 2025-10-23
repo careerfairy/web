@@ -11,5 +11,5 @@ It's required to update the following collections:
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backfillPublicGroupFields
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backfillPublicGroupFields
 ```

@@ -20,9 +20,8 @@ import IconButton from "@mui/material/IconButton"
 import StepConnector, {
    stepConnectorClasses,
 } from "@mui/material/StepConnector"
-import { alpha, styled } from "@mui/material/styles"
+import { alpha, styled, Theme } from "@mui/material/styles"
 import { createStyles } from "@mui/styles"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
 import CareerCoinIcon from "components/views/common/CareerCoinIcon"
 import { useCallback, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -42,7 +41,7 @@ const styles = createStyles({
    tooltip: {
       backgroundColor: "background.paper",
       color: "text.primary",
-      boxShadow: (theme: DefaultTheme) => theme.legacy.boxShadows.dark_8_25_10,
+      boxShadow: (theme: Theme) => theme.legacy.boxShadows.dark_8_25_10,
       padding: 2,
       borderRadius: "10px",
    },
@@ -60,16 +59,15 @@ const styles = createStyles({
       textAlign: "center",
    },
    iconCurrent: {
-      backgroundColor: (theme: DefaultTheme) =>
+      backgroundColor: (theme: Theme) =>
          alpha(theme.palette.secondary.main, 0.1),
       "&:hover": {
-         backgroundColor: (theme: DefaultTheme) =>
+         backgroundColor: (theme: Theme) =>
             alpha(theme.palette.secondary.main, 0.15),
       },
    },
    stepperIconCheck: {
-      border: (theme: DefaultTheme) =>
-         `3px solid ${theme.palette.secondary.main}`,
+      border: (theme: Theme) => `3px solid ${theme.palette.secondary.main}`,
       borderRadius: "50%",
       width: "1.2em",
       height: "1.2em",

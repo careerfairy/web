@@ -1,7 +1,7 @@
 ### Backfill Livestreams Collection:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/storeGroupQuestionsOnLivestreams
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/storeGroupQuestionsOnLivestreams
 ```
 
 #### What it does:

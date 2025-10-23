@@ -1,7 +1,7 @@
 ### Delete Spark Stats:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/deleteSparkStats
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./scripts/deleteSparkStats
 ```
 
 #### What it does:

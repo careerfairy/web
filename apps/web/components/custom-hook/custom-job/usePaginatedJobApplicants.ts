@@ -11,9 +11,9 @@ const usePaginatedJobApplicants = (
    limit = 10,
    sort: "desc" | "asc" = "desc"
 ) => {
-   const options: UsePaginatedCollection<CustomJobApplicant> = useMemo(
+   const options = useMemo(
       () => ({
-         query: query<CustomJobApplicant>(
+         query: query(
             // @ts-ignore
             collection(FirestoreInstance, "jobApplications"),
             where("jobId", "==", jobId),
@@ -28,7 +28,9 @@ const usePaginatedJobApplicants = (
       [jobId, limit, sort]
    )
 
-   return usePaginatedCollection<CustomJobApplicant>(options)
+   return usePaginatedCollection<CustomJobApplicant>(
+      options as UsePaginatedCollection<CustomJobApplicant>
+   )
 }
 
 export default usePaginatedJobApplicants

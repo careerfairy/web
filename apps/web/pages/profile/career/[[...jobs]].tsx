@@ -1,5 +1,5 @@
 import { CustomJobApplicationSourceTypes } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { useTheme } from "@mui/styles"
+import { useTheme } from "@mui/material/styles"
 import { CustomJobDialogLayout } from "components/views/jobs/components/custom-jobs/CustomJobDialogLayout"
 import { TalentProfileView } from "layouts/UserLayout/TalentProfile/TalentProfileView"
 import { useRouter } from "next/router"

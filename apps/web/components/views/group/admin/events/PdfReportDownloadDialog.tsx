@@ -33,7 +33,7 @@ const PdfReportDownloadDialogContent = ({
       return (
          <>
             <DialogContent>
-               <DialogContentText>Download your PDF </DialogContentText>
+               <DialogContentText>Download your PDF</DialogContentText>
             </DialogContent>
             <DialogActions>
                <Button onClick={handleClose}>Close</Button>
@@ -44,6 +44,7 @@ const PdfReportDownloadDialogContent = ({
                   fileName={`General Report ${reportPdfData.summary.livestream.title} ${reportPdfData.summary.livestream.id}.pdf`}
                   document={<EventPdfReport {...reportPdfData} />}
                >
+                  {/* @ts-ignore - PDFDownloadLink children type mismatch */}
                   {({ loading, error }) =>
                      error ? (
                         <Alert severity="error">

@@ -18,7 +18,7 @@ This script was created to comply with data privacy regulations by ensuring pers
 ## Usage
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/removePersonalEmailData
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/removePersonalEmailData
 ```
 
 ## Dry Run Mode

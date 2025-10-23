@@ -13,7 +13,7 @@ It follows the established migration patterns (progress bars, counters, and batc
 To run this script, use the following command:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/creators/backfillCompanyFieldsFromGroup
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/creators/backfillCompanyFieldsFromGroup
 ```
 
 ## Notes

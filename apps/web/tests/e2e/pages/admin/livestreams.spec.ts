@@ -71,6 +71,7 @@ test.describe("Group Admin Livestreams", () => {
       // Deleting before calling random to force recalculation, if not these values would be transported from the base stream
       delete overrideFields["contentTopicsTagIds"]
       delete overrideFields["summary"]
+      delete overrideFields["speakers"]
 
       const livestreamToPublish: LivestreamEvent =
          LivestreamSeed.random(overrideFields)

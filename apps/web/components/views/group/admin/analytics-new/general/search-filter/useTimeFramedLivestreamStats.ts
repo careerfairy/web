@@ -10,7 +10,7 @@ import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseIn
 import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { OrderByDirection } from "@firebase/firestore"
+import { OrderByDirection } from "firebase/firestore"
 import { TimeFrame, TimeFrames } from "../GeneralPageProvider"
 
 type Props = {

@@ -1,4 +1,4 @@
-import { getCountFromServer, Query } from "@firebase/firestore"
+import { getCountFromServer, Query } from "firebase/firestore"
 import { useEffect, useMemo, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 

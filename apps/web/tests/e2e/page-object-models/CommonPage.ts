@@ -217,28 +217,29 @@ export const materialSelectOption = async (
    newSelectedValue: string,
    cssSelector: string
 ) => {
-   return page.evaluate(
-      ({ newSelectedValue, cssSelector }) => {
-         const clickEvent = new MouseEvent("mousedown", {
-            bubbles: true,
-            cancelable: true,
-         })
-         const selectNode = document.querySelector(cssSelector)
-         selectNode.dispatchEvent(clickEvent)
+   // Open the dropdown
+   await page.evaluate((cssSelector) => {
+      const clickEvent = new MouseEvent("mousedown", {
+         bubbles: true,
+         cancelable: true,
+      })
+      const selectNode = document.querySelector(cssSelector)
+      selectNode.dispatchEvent(clickEvent)
+   }, cssSelector)
 
-         // Wait for a short period of time to allow the dropdown to render
-         setTimeout(() => {
-            // eslint-disable-next-line no-extra-semi
-            ;[...document.querySelectorAll("li")]
-               .filter((el) => el.innerText == newSelectedValue)[0]
-               .click()
-         }, 250)
-      },
-      {
-         newSelectedValue,
-         cssSelector,
-      }
-   )
+   // Wait for the dropdown menu to be visible
+   await page.waitForSelector('[role="listbox"]', { state: "visible" })
+
+   // Click the option
+   await page.evaluate((newSelectedValue) => {
+      // eslint-disable-next-line no-extra-semi
+      ;[...document.querySelectorAll("li")]
+         .filter((el) => el.innerText == newSelectedValue)[0]
+         .click()
+   }, newSelectedValue)
+
+   // Wait for the dropdown menu to close
+   await page.waitForSelector('[role="listbox"]', { state: "hidden" })
 }
 
 const promiseTimeout = (

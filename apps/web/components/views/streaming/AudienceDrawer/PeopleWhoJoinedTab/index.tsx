@@ -1,5 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import {
    FormControl,
    Grid,
@@ -8,13 +7,15 @@ import {
    Select,
    TextField,
 } from "@mui/material"
-import UserList from "./UserList"
+import { Theme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import { Fragment, useEffect, useState } from "react"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import EmptyDisplay from "../displays/EmptyDisplay"
 import LoadingDisplay from "../displays/LoadingDisplay"
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import UserList from "./UserList"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    searchGridWrapper: {
       padding: theme.spacing(1, 1, 0, 1),
    },
@@ -51,6 +52,7 @@ const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }: Props) => {
 
    useEffect(() => {
       setFilteredAudience(handleFilter(participatingStudents))
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [participatingStudents, searchParams, currentOption])
 
    const handleSearch = (e) => {
@@ -73,7 +75,7 @@ const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }: Props) => {
                   label="Search for people..."
                />
             </Grid>
-            {isStreamer && (
+            {Boolean(isStreamer) && (
                <Grid item xs={3}>
                   <FormControl variant="standard" fullWidth>
                      <InputLabel id="audience-select">filter:</InputLabel>

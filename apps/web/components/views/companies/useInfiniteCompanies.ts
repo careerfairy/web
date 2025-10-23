@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { limit, Query, QueryConstraint } from "@firebase/firestore"
+import { limit, Query, QueryConstraint } from "firebase/firestore"
 import { collection, orderBy, query, where } from "firebase/firestore"
 import useInfiniteCollection, {
    UseInfiniteCollection,

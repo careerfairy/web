@@ -2,7 +2,7 @@ import {
    ChildProcessWithoutNullStreams,
    SpawnOptionsWithoutStdio,
 } from "child_process"
-import * as spawn from "cross-spawn"
+import spawn from "cross-spawn"
 import config from "../config"
 import { log } from "./util"
 

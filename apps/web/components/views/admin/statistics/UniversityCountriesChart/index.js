@@ -1,6 +1,4 @@
-import React, { useRef } from "react"
-import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
+import ExportCSVIcon from "@mui/icons-material/GetApp"
 import {
    Box,
    Card,
@@ -9,23 +7,25 @@ import {
    IconButton,
    Tooltip,
 } from "@mui/material"
-import { useSelector } from "react-redux"
+import { useTheme } from "@mui/material/styles"
+import Chart from "chart.js"
+import { useRef } from "react"
 import { Doughnut } from "react-chartjs-2"
+import { useSelector } from "react-redux"
+import { createSelector } from "reselect"
+import CustomLegend from "../../../../../materialUI/Legends"
+import { convertStringToArray } from "../../../../helperFunctions/HelperFunctions"
 import {
    doughnutOptions,
    exportChartDataToCsv,
    randomColor,
 } from "../../../../util/chartUtils"
-import CustomLegend from "../../../../../materialUI/Legends"
-import { createSelector } from "reselect"
-import { convertStringToArray } from "../../../../helperFunctions/HelperFunctions"
 import { colorsArray } from "../../../../util/colors"
-import Chart from "chart.js"
-import ExportCSVIcon from "@mui/icons-material/GetApp"
 import { universityCountriesMap } from "../../../../util/constants/universityCountries"
 
-Chart.defaults.global.plugins.labels = false
-const useStyles = makeStyles((theme) => ({}))
+if (typeof window !== "undefined" && Chart.defaults.global) {
+   Chart.defaults.global.plugins.labels = false
+}
 
 const distributionSelector = createSelector(
    (state) => state.firestore.data["universityCountryDistribution"],
@@ -33,7 +33,7 @@ const distributionSelector = createSelector(
    (universityCountryDistribution, theme) => {
       const mapOfTotals = universityCountryDistribution?.totalByCountry || {}
       const dataArray = Object.keys(mapOfTotals)
-         .map((key, index) => ({
+         .map((key) => ({
             code: key,
             value: mapOfTotals[key],
             countryName: universityCountriesMap[key] || "Unknown",
@@ -61,7 +61,6 @@ const distributionSelector = createSelector(
 
 const UniversityCountriesChart = () => {
    const chartRef = useRef()
-   const classes = useStyles()
    const theme = useTheme()
    const { data, colors, dataArray } = useSelector((state) =>
       distributionSelector(state, { theme })

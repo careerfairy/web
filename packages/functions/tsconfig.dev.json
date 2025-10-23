@@ -1,3 +1,10 @@
 {
-   "include": [".eslintrc.js"]
+   "extends": "./tsconfig.json",
+   "include": [
+      ".eslintrc.js",
+      "src/**/*.test.ts",
+      "src/**/__tests__/**/*",
+      "src/**/testHelpers.ts"
+   ],
+   "exclude": []
 }

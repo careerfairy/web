@@ -1,7 +1,7 @@
 ### Backfill UserData Collection:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillUsers targetBackfill=userData
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillUsers targetBackfill=userData
 ```
 
 #### What it does:
@@ -51,7 +51,7 @@ Example Output:
 ### Backfill TalentPool/Registered/Participating Collection:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillUsers (targetBackfill=registeredStudent OR targetBackfill=participatingStudent OR targetBackfill=talentPoolStudent)
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillUsers (targetBackfill=registeredStudent OR targetBackfill=participatingStudent OR targetBackfill=talentPoolStudent)
 ```
 
 #### What it does:

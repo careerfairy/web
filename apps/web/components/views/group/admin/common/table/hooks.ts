@@ -1,4 +1,8 @@
+import { Query } from "firebase/firestore"
 import { useCallback, useMemo, useState } from "react"
+import { useCopyToClipboard } from "react-use"
+import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
+import { UserDataEntry } from "./UserLivestreamDataTable"
 import {
    batchPDFDownload,
    DownloadData,
@@ -7,10 +11,6 @@ import {
    getFileName,
    handleDownloadPDF,
 } from "./util"
-import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
-import { useCopyToClipboard } from "react-use"
-import { UserDataEntry } from "./UserLivestreamDataTable"
-import { Query } from "@firebase/firestore"
 
 export const useDownloadCV = (user: UserDataEntry) => {
    const { errorNotification } = useSnackbarNotifications()
@@ -118,6 +118,7 @@ export const useCopyAllEmails = (
 ) => {
    const [copyingEmails, setCopyingEmails] = useState(false)
    const { successNotification, errorNotification } = useSnackbarNotifications()
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
    const [_, copyToClipboard] = useCopyToClipboard()
 
    const handleCopyAllEmails = useCallback(async () => {

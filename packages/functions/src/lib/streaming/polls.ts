@@ -9,7 +9,7 @@ import {
    basePollShape,
 } from "@careerfairy/shared-lib/livestreams"
 import { onCall } from "firebase-functions/https"
-import { v4 as uuid } from "uuid"
+import uuid from "uuid-random"
 import * as yup from "yup"
 import { livestreamsRepo } from "../../api/repositories"
 import { middlewares } from "../../middlewares/middlewares"

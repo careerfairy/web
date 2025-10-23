@@ -1,14 +1,11 @@
-import React from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import { Box } from "@mui/material"
-import RegistrationModal from "../common/registration-modal"
-import {
-   LivestreamEvent,
-   LivestreamGroupQuestionsMap,
-} from "@careerfairy/shared-lib/dist/livestreams"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { Box } from "@mui/material"
+import { Theme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import RegistrationModal from "../common/registration-modal"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    root: {
       height: "100vh",
       width: "100vw",

@@ -53,33 +53,56 @@ jobs:
          workflow: ${{ steps.changes.outputs.workflow }}
       steps:
          - uses: actions/checkout@v4
+         - uses: pnpm/action-setup@v4
+           with:
+              version: 9.15.9
+
+         - name: Get pnpm store directory
+           shell: bash
+           run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+         - name: Cache pnpm store
+           uses: actions/cache@v4
+           with:
+              path: ${{ env.STORE_PATH }}
+              key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+              restore-keys: |
+                 ${{ runner.os }}-pnpm-store-
+
          - uses: actions/setup-node@v4
            with:
               node-version: "22"
-         - name: Cache node modules
-           id: cache-nodemodules
-           uses: actions/cache@v4
-           with:
-              path: "**/node_modules"
-              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
          - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --ignore-scripts
+           run: pnpm install --frozen-lockfile --ignore-scripts
 
          - name: Cache .next/cache folder
            uses: actions/cache@v4
            with:
               path: ${{ github.workspace }}/apps/web/.next/cache
-              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('apps/web/**/*.[jt]s', 'apps/web/**/*.[jt]sx', 'packages/**/*.[jt]s', 'packages/**/*.[jt]sx') }}
               # If source files changed but packages didn't, rebuild from a prior cache.
               restore-keys: |
-                 ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+                 ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+                 ${{ runner.os }}-nextjs-
 
          - name: Build
-           run: npm run build
+           run: pnpm run build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
+              NODE_OPTIONS: --max-old-space-size=4096
+
+         - name: Cache build artifacts
+           uses: actions/cache/save@v4
+           with:
+              path: |
+                 ${{ github.workspace }}/apps/web/.next
+                 ${{ github.workspace }}/packages/*/dist
+                 ${{ github.workspace }}/.turbo
+                 ${{ github.workspace }}/apps/*/.turbo
+                 ${{ github.workspace }}/packages/*/.turbo
+              key: ${{ runner.os }}-build-${{ github.sha }}
 
          # Check which folders have changed
          # So that we can skip future jobs
@@ -117,21 +140,42 @@ jobs:
          NODE_ENV: test
       steps:
          - uses: actions/checkout@v4
+         - uses: pnpm/action-setup@v4
+           with:
+              version: 9.15.9
+
+         - name: Get pnpm store directory
+           shell: bash
+           run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+         - name: Cache pnpm store
+           uses: actions/cache@v4
+           with:
+              path: ${{ env.STORE_PATH }}
+              key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+              restore-keys: |
+                 ${{ runner.os }}-pnpm-store-
+
          - uses: actions/setup-node@v4
            with:
               node-version: "22"
-         - name: Cache node modules
-           id: cache-nodemodules
-           uses: actions/cache@v4
-           with:
-              path: "**/node_modules"
-              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
          - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --ignore-scripts
+           run: pnpm install --frozen-lockfile
+
+         - name: Restore build artifacts
+           uses: actions/cache/restore@v4
+           with:
+              path: |
+                 ${{ github.workspace }}/apps/web/.next
+                 ${{ github.workspace }}/packages/*/dist
+                 ${{ github.workspace }}/.turbo
+                 ${{ github.workspace }}/apps/*/.turbo
+                 ${{ github.workspace }}/packages/*/.turbo
+              key: ${{ runner.os }}-build-${{ github.sha }}
 
          - name: Run Jest Unit Tests
-           run: npm run test
+           run: pnpm run test
 
    # Run E2E Tests
    e2e_tests:
@@ -153,21 +197,58 @@ jobs:
       timeout-minutes: 25
       steps:
          - uses: actions/checkout@v4
+         - uses: pnpm/action-setup@v4
+           with:
+              version: 9.15.9
+
+         - name: Get pnpm store directory
+           shell: bash
+           run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+         - name: Cache pnpm store
+           uses: actions/cache@v4
+           with:
+              path: ${{ env.STORE_PATH }}
+              key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+              restore-keys: |
+                 ${{ runner.os }}-pnpm-store-
+
          - uses: actions/setup-node@v4
            with:
               node-version: "22"
-         - name: Cache node modules
-           id: cache-nodemodules
+
+         - name: Install Dependencies
+           run: pnpm install --frozen-lockfile
+
+         - name: Cache Firebase Emulators
            uses: actions/cache@v4
            with:
-              path: "**/node_modules"
-              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-         - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --ignore-scripts
+              path: ~/.cache/firebase/emulators
+              key: ${{ runner.os }}-firebase-emulators-${{ hashFiles('**/pnpm-lock.yaml') }}
+              restore-keys: |
+                 ${{ runner.os }}-firebase-emulators-
+
+         - name: Restore build artifacts
+           id: restore-build
+           uses: actions/cache/restore@v4
+           with:
+              path: |
+                 ${{ github.workspace }}/apps/web/.next
+                 ${{ github.workspace }}/packages/*/dist
+                 ${{ github.workspace }}/.turbo
+                 ${{ github.workspace }}/apps/*/.turbo
+                 ${{ github.workspace }}/packages/*/.turbo
+              key: ${{ runner.os }}-build-${{ github.sha }}
 
          - name: Install Playwright's dependencies
-           run: npx playwright install --with-deps
+           run: pnpm --filter @careerfairy/webapp exec playwright install --with-deps
+
+         - name: Build webapp and dependencies for E2E (only if cache miss)
+           if: steps.restore-build.outputs.cache-hit != 'true'
+           env:
+              NODE_ENV: test
+              NODE_OPTIONS: --max-old-space-size=4096
+           run: pnpm run build
          - name: Install uuid-runtime
            run: sudo apt-get install uuid-runtime
          - name: Generate UUID
@@ -177,7 +258,8 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
+              NODE_OPTIONS: --max-old-space-size=4096
+           run: pnpm run test:e2e-webapp -- --shard=${{ matrix.shard }}/${{ matrix.total }}
 
          - name: Upload test results
            if: ${{ failure() }}

@@ -1,5 +1,5 @@
 import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
-import { Query } from "@firebase/firestore"
+import { Query } from "firebase/firestore"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import type firebase from "firebase/compat/app"
 import { collection } from "firebase/firestore"

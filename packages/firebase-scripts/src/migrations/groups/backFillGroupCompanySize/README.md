@@ -5,5 +5,5 @@ We are required to modify all entries in the database related to groups and live
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backFillGroupCompanySize
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backFillGroupCompanySize
 ```

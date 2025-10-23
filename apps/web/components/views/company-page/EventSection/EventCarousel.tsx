@@ -1,12 +1,12 @@
-import React, { MutableRefObject } from "react"
-import { sxStyles } from "../../../../types/commonTypes"
-import Grid from "@mui/material/Grid"
-import Box from "@mui/material/Box"
-import Slider from "react-slick"
-import "slick-carousel/slick/slick.css"
-import "slick-carousel/slick/slick-theme.css"
-import { useTheme } from "@mui/styles"
 import { useMediaQuery } from "@mui/material"
+import Box from "@mui/material/Box"
+import Grid from "@mui/material/Grid"
+import { useTheme } from "@mui/material/styles"
+import React, { MutableRefObject } from "react"
+import Slider from "react-slick"
+import "slick-carousel/slick/slick-theme.css"
+import "slick-carousel/slick/slick.css"
+import { sxStyles } from "../../../../types/commonTypes"
 
 type Props = {
    sliderRef: MutableRefObject<any>

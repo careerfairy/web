@@ -4,17 +4,17 @@
    "version": "0.0.0",
    "main": "./dist/index.js",
    "scripts": {
-      "build": "npm run clean && tsc",
-      "start": "node ./dist/index.js",
-      "production:export": "node ./dist/export.js",
-      "dev": "npm run clean && tsc --watch",
+      "build": "pnpm run clean && tsc",
+      "start": "node ./dist/fetch-firestore-data/src/index.js",
+      "production:export": "node ./dist/fetch-firestore-data/src/export.js",
+      "dev": "pnpm run clean && tsc --watch",
       "clean": "rimraf dist/"
    },
    "devDependencies": {
       "@types/cross-spawn": "^6.0.2"
    },
    "dependencies": {
-      "@careerfairy/seed-data": "*",
+      "@careerfairy/seed-data": "workspace:*",
       "axios": "^0.27.2",
       "cross-spawn": "^7.0.3"
    }

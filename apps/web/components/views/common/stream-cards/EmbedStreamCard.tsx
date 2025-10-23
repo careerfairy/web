@@ -21,7 +21,7 @@ import {
 import Avatar from "@mui/material/Avatar"
 import Box from "@mui/material/Box"
 import CardMedia from "@mui/material/CardMedia"
-import { alpha, useTheme } from "@mui/material/styles"
+import { alpha, Theme, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import cx from "clsx"
 import React, {
@@ -37,7 +37,7 @@ import { MainLogo } from "../../../logos"
 import MobileCarousel from "../carousels/MobileCarousel"
 import EmbedTimeDisplay from "../time-display/EmbedTimeDisplay"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    // @ts-ignore
    color: ({ color }) => ({
       "&:before": {

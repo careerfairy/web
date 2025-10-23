@@ -12,5 +12,5 @@ contentTopicsTagIds?: string[]
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/livestreams/backfillLivestreamTags
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/livestreams/backfillLivestreamTags
 ```

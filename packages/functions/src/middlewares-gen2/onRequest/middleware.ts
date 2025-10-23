@@ -1,4 +1,4 @@
-import { Response } from "express"
+import type { Response } from "express"
 import { Request } from "firebase-functions/v2/https"
 
 export type Handler = (

@@ -1,7 +1,7 @@
 ### Add addNormalizedUniversityName field on CareerCenterData's documents:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/addNormalizedUniversityName
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./scripts/addNormalizedUniversityName
 ```
 
 #### What it does:

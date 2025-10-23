@@ -1,7 +1,7 @@
+import { type ProjectCollectionId } from "@careerfairy/shared-lib/constants/collections"
 import config from "./config"
 import { execute } from "./lib/executor"
 import { debug, h1Text, log } from "./lib/util"
-import { type ProjectCollectionId } from "@careerfairy/shared-lib/dist/constants/collections"
 
 /**
  * Export Firestore collections into a Bucket `fetched`
@@ -48,7 +48,7 @@ async function exportCollections() {
    log(
       `You can run the following command to download the backup to your emulators:`
    )
-   log(`npm run start -w @careerfairy/fetch-firestore-data`)
+   log(`pnpm run start --filter @careerfairy/fetch-firestore-data`)
 }
 
 /**

@@ -1,14 +1,16 @@
-import { useMemo, useState } from "react"
+import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
+import { triGrams } from "@careerfairy/shared-lib/utils/search"
 import {
    CollectionReference,
    limit,
+   orderBy,
+   query,
    QueryConstraint,
-} from "@firebase/firestore"
-import { orderBy, query, where } from "firebase/firestore"
-import { triGrams } from "@careerfairy/shared-lib/utils/search"
+   where,
+} from "firebase/firestore"
+import { useMemo, useState } from "react"
 import { useDebounce } from "react-use"
 import { useFirestoreCollection } from "./useFirestoreCollection"
-import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
 
 /**
  * A type for the emptyOrderBy option of the useSearch hook.
@@ -66,7 +68,7 @@ export function useSearch<T extends Identifiable>(
          searchConstraints.push(where(`triGrams.${name}`, "==", true))
       })
 
-      let constraints: QueryConstraint[] = [
+      const constraints: QueryConstraint[] = [
          ...searchConstraints,
          ...(options.additionalConstraints || []),
          limit(maxResults),

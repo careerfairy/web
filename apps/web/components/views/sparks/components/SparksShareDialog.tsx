@@ -9,7 +9,7 @@ import {
    Typography,
 } from "@mui/material"
 
-import { useTheme } from "@mui/styles"
+import { useTheme } from "@mui/material/styles"
 import useSocials, {
    SocialPlatformObject,
    SocialPlatformType,

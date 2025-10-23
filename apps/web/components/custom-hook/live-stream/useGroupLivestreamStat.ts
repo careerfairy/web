@@ -1,7 +1,6 @@
 import { useMemo } from "react"
-import { collectionGroup, query, where } from "firebase/firestore"
+import { collectionGroup, limit, query, where } from "firebase/firestore"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { limit } from "@firebase/firestore"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 

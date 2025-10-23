@@ -1,4 +1,4 @@
-import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
+import { Identifiable } from "../commonTypes"
 import { LivestreamEvent } from "../livestreams"
 import { SparkStats } from "../sparks/sparks"
 import {

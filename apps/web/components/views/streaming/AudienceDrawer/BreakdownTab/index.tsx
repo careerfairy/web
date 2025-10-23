@@ -1,5 +1,6 @@
 import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { Grid } from "@mui/material"
+import { Theme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { useMemo } from "react"
 import { isEmpty, isLoaded } from "react-redux-firebase"
@@ -8,7 +9,7 @@ import LoadingDisplay from "../displays/LoadingDisplay"
 import AudienceCategoryChart from "./AudienceCategoryChart"
 import TalentPoolPercentage from "./TalentPoolPercentage"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    root: {
       padding: theme.spacing(1),
    },

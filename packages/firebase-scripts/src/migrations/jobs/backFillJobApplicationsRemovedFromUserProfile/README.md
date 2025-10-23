@@ -9,5 +9,5 @@ This backfill is needed in order to remove in memory filtering currently being d
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/jobs/backFillJobApplicationsRemovedFromUserProfile
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/jobs/backFillJobApplicationsRemovedFromUserProfile
 ```

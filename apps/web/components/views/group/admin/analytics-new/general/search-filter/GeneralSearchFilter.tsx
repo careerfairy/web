@@ -13,7 +13,7 @@ import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import LivestreamAutoComplete from "./LivestreamAutoComplete"
-import { OrderByDirection } from "@firebase/firestore"
+import { OrderByDirection } from "firebase/firestore"
 
 const spacing = 1
 

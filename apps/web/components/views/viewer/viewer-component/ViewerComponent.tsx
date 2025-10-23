@@ -1,6 +1,7 @@
 import { HandRaiseState } from "@careerfairy/shared-lib/src/livestreams/hand-raise"
 import { Typography } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
+import { Theme } from "@mui/material/styles"
 import { useRouter } from "next/router"
 import React, {
    Fragment,
@@ -37,7 +38,7 @@ import EmoteButtons from "../EmoteButtons"
 import EndOfStreamView from "./EndOfStreamView"
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    waitingOverlay: {
       position: "absolute",
       top: "0",

@@ -1,4 +1,4 @@
-import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
+import { RichTextContent } from "@graphcms/rich-text-types"
 import { ButtonProps } from "@mui/material"
 import { IColors } from "./commonTypes"
 
@@ -48,48 +48,6 @@ export interface HygraphResponseSeo {
    image: ICmsImage
 }
 
-export interface CompanyCaseStudyPreview {
-   company: Company
-   title: string
-   id: string
-   published: Date
-   formattedPublished?: string
-   coverImage: ICmsImage
-   slug: Slug
-   authors: Person[]
-}
-
-export interface CompanyCaseStudy {
-   id: string
-   formattedPublished?: string
-   published: Date
-   title: string
-   company: Company
-   industry: string[]
-   aboutTheCompany: string
-   storyContentSection: {
-      raw: RichTextContent
-      references: EmbedReferences
-   }
-   coverVideo: ICmsVideo
-   statisticsContentSection: {
-      raw: RichTextContent
-      references: EmbedReferences
-   }
-   storySideImage: ICmsImage
-   statisticStats: StatisticStat[]
-   ogImage: ICmsImage
-   coverImage: ICmsImage
-   authors: Person[]
-   slug: Slug
-   seo: HygraphResponseSeo
-}
-
-export interface Carousel {
-   images: ICmsImage[]
-   title: string
-}
-
 export interface Testimonial {
    id: string
    content?: string
@@ -105,21 +63,6 @@ export interface HygraphResponseButton {
    variant: ButtonProps["variant"]
    color: ButtonProps["color"]
    size: ButtonProps["size"]
-}
-
-export interface HygraphResponseHero {
-   __typename: string
-   id: string
-   slug: string
-   image: ICmsImage
-   video?: ICmsVideo
-   selectorLabel?: string
-   buttonSelectorLabel?: string
-   buttons: HygraphResponseButton[]
-   heroTitle?: string
-   heroSubtitle?: string
-   fullScreenImage?: boolean
-   component?: HygraphFieldOfStudySelectResponse
 }
 
 export interface HygraphResponseCompanyValues {
@@ -158,16 +101,6 @@ export interface HygraphResponseTestimonialListValue {
    sliderArrowColor?: IColors
 }
 
-export interface HygraphFieldOfStudySelectResponse {
-   __typename: string
-   id: string
-   placeHolderText: string
-   label: string
-   fallbackMarketingLandingPage: {
-      slug: string
-   }
-}
-
 export interface HygraphResponseCompanyLogosValue {
    __typename: string
    id: string
@@ -202,58 +135,6 @@ export interface HygraphResponseHighlight {
    thumbnail?: ICmsImage
    video?: ICmsVideo
    logo?: ICmsImage
-}
-
-export type PageTypes =
-   | "COMPANY_CASE_STUDY"
-   | "MARKETING_LANDING_PAGE"
-   | "LANDING_PAGE"
-
-export interface HygraphRemoteFieldOfStudyResponse {
-   fieldOfStudyId: string
-   fieldOfStudyName: string
-   marketingLandingPage: {
-      slug: string
-   }
-}
-
-export interface HygraphResponseMarketingPage {
-   id: string
-   slug: string
-   fieldOfStudies: HygraphRemoteFieldOfStudyResponse[]
-   pageType: PageTypes
-   seo: HygraphResponseSeo
-   blocks: (
-      | HygraphResponseEventsSection
-      | HygraphResponseMarketingSignup
-      | HygraphResponseHero
-   )[]
-}
-export interface HygraphResponsePage {
-   id: string
-   title: string
-   subtitle: string
-   slug: string
-   seo: HygraphResponseSeo
-   image: ICmsImage
-   hero: HygraphResponseHero
-}
-
-export interface HygraphResponseEventsSection {
-   __typename: string
-   id: string
-   typeOfEvent: string
-   eventsTitle: string
-}
-export interface HygraphResponseMarketingSignup {
-   __typename: string
-   id: string
-   formTitle: string
-   title: string
-   shortText: string
-   icon?: ICmsImage
-   slug: string
-   button: HygraphResponseButton
 }
 
 // language=GraphQL
@@ -299,72 +180,6 @@ export const seoQueryProps = `
         keywords
         image ${imageQueryProps}
         noIndex
-    }
-`
-// language=GraphQL
-export const fieldOfStudySelectQueryProps = `
-    {
-        id
-        __typename
-        placeHolderText
-        label
-        id
-        fallbackMarketingLandingPage {
-            slug
-        }
-    }
-`
-
-// language=GraphQL
-export const heroQueryProps = `
-    {
-        __typename
-        id
-        slug
-        image ${imageQueryProps}
-        video ${videoQueryProps}
-        buttons ${buttonQueryProps}
-        selectorLabel,
-        buttonSelectorLabel,
-        heroTitle
-        heroSubtitle
-        fullScreenImage
-        component {
-            ... on FieldOfStudySelect ${fieldOfStudySelectQueryProps}
-        }
-    }
-`
-
-// language=GraphQL
-export const eventsSectionQueryProps = `
-    {
-        __typename
-        id
-        typeOfEvent
-        eventsTitle
-    }
-`
-// language=GraphQL
-export const marketingSignupQueryProps = `
-    {
-        id
-        __typename
-        title
-        shortText
-        formTitle
-        slug
-        icon ${imageQueryProps}
-        button ${buttonQueryProps}
-    }
-`
-// language=GraphQL
-export const fieldOfStudyQueryProps = `
-    {
-        marketingLandingPage {
-            slug
-        }
-        fieldOfStudyId
-        fieldOfStudyName
     }
 `
 // language=GraphQL

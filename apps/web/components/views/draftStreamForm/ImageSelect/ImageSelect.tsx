@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useState } from "react"
+import PublishIcon from "@mui/icons-material/Publish"
 import {
    Avatar,
    Box,
@@ -8,17 +8,17 @@ import {
    FormHelperText,
    Typography,
 } from "@mui/material"
-import PublishIcon from "@mui/icons-material/Publish"
-import { uploadLogo } from "../../../helperFunctions/HelperFunctions"
-import FilePickerContainer from "../../../ssr/FilePickerContainer"
+import { Theme, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { useTheme } from "@mui/material/styles"
+import { FC, useCallback, useEffect, useState } from "react"
+import { uploadLogo } from "../../../helperFunctions/HelperFunctions"
+import FilePickerContainer from "../../../ssr/FilePickerContainer"
 
 const logoPlaceholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fplaceholder_logo.png?alt=media&token=ef6c8d5a-af92-4b69-a946-ce78a9997382"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    media: {
       display: "flex",
       justifyContent: "center",
@@ -219,6 +219,7 @@ const ImageSelect = ({
                   px={1}
                   sx={{ height: "370px !important" }}
                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={value} className={classes.image} alt={formName} />
                </Box>
                <ResolutionInfo resolution={resolution} />
@@ -247,6 +248,7 @@ const ImageSelect = ({
                </Box>
 
                <Box className={classes.media} my={2}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                      src={logoPlaceholder}
                      className={classes.image}

@@ -152,7 +152,6 @@ const TargetTalent: FC = () => {
                            value={values.targetedUniversities}
                            disableCloseOnSelect
                            multiple
-                           placeholder="haiii"
                            disabled={values.targetedCountries.length === 0}
                            limit={maxUniversities}
                            onChange={(_, selected) => {

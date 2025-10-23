@@ -32,8 +32,7 @@ const AcademicYearSelector = () => {
          <Select
             sx={styles.select}
             value={academicYear}
-            input={<Input />}
-            disableUnderline
+            input={<Input disableUnderline />}
             onChange={handleYearChange}
             inputProps={selectListCustomProps}
          >

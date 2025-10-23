@@ -5,5 +5,5 @@ Will fetch all the users in Firebase Auth and update the userData documents with
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillLastActivity
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/users/backfillLastActivity
 ```

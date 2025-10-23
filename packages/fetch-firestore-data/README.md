@@ -20,17 +20,25 @@ These binaries should be on your shell PATH:
 
 ## Run
 
+You can run these commands from anywhere in the monorepo:
+
 ```sh
-# Build
-npm run build:fetch-firestore-data
+# Step 1: Export production data to create the "fetched" backup
+# Do this every now and then to have an updated data set. Only one team member needs to run this.
+# The export will be saved to gs://careerfairy-backup/fetched
+# This task generates lots of document reads and takes ~5 minutes
+pnpm run fetch-data:export
 
-# Start a Production export of certain collections, do this every now and then to have an
-# updated data set, only one member of the team needs to run this. The export will be
-# present at the `fetched` bucket. This task generates lots of document reads
-npm run production:export -w @careerfairy/fetch-firestore-data
+# Step 2: Download the "fetched" backup, start emulators, and import the data
+# This downloads from gs://careerfairy-backup/fetched to emulatorData/fetched
+pnpm run fetch-data
+```
 
-# Fetches the `fetched` bucket, starts the emulators and imports the data
-npm run start -w @careerfairy/fetch-firestore-data
+Alternatively, if you're in the `packages/fetch-firestore-data` directory, you can run:
+
+```sh
+pnpm run production:export  # Step 1
+pnpm run start              # Step 2
 ```
 
 By default, the existing users data will not be exported / imported. If you want to include it (e.g to have correct analytics), you need to set an environment variable:
@@ -41,8 +49,8 @@ export INCLUDE_USERDATA=true
 # fish shell: set -x INCLUDE_USERDATA true
 
 # Run the script commands that read the environment variables
-npm run production:export -w @careerfairy/fetch-firestore-data
-npm run start -w @careerfairy/fetch-firestore-data
+pnpm run fetch-data:export
+pnpm run fetch-data
 ```
 
 ### Java Heap Memory Increase (15GB)

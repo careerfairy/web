@@ -7,7 +7,7 @@ import {
    query,
    Query,
    startAfter,
-} from "@firebase/firestore"
+} from "firebase/firestore"
 import { orderBy } from "firebase/firestore"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { ObservableStatus, useFirestoreCollection } from "reactfire"
