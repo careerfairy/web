@@ -1,20 +1,20 @@
-import { CardHeader, Grid, Typography } from "@mui/material"
-import React, { useCallback, useEffect, useState } from "react"
-import Box from "@mui/material/Box"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import Link from "../../common/Link"
-import ContentCard from "../../../../layouts/UserLayout/ContentCard"
-import Button from "@mui/material/Button"
-import { RecruiterCard } from "./RecruiterCard"
-import Skeleton from "@mui/material/Skeleton"
-import Card from "@mui/material/Card"
 import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
-import { styles } from "../profileStyles"
-import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
-import { DefaultTheme } from "@mui/styles"
-import NoAccessView from "../../common/NoAccessView"
+import { CardHeader, Grid, Typography } from "@mui/material"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import Card from "@mui/material/Card"
+import Skeleton from "@mui/material/Skeleton"
+import { Theme } from "@mui/material/styles"
+import { useCallback, useEffect, useState } from "react"
 import { My_Recruiters_NoAccess } from "../../../../constants/contextInfoCareerSkills"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import ContentCard from "../../../../layouts/UserLayout/ContentCard"
+import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import Link from "../../common/Link"
+import NoAccessView from "../../common/NoAccessView"
+import { styles } from "../profileStyles"
+import { RecruiterCard } from "./RecruiterCard"
 
 const MyRecruitersTab = () => {
    const { userPresenter } = useAuth()
@@ -100,7 +100,7 @@ const EmptyList = () => {
             <Card
                sx={{
                   padding: 2,
-                  boxShadow: (theme: DefaultTheme) =>
+                  boxShadow: (theme: Theme) =>
                      theme.legacy.boxShadows.dark_8_25_10,
                }}
             >

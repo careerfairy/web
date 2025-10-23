@@ -6,5 +6,7 @@
    },
    "git": {
       "deploymentEnabled": false
-   }
+   },
+   "installCommand": "pnpm install --frozen-lockfile",
+   "buildCommand": "pnpm -w run build:webapp"
 }

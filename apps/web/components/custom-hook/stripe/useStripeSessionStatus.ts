@@ -1,12 +1,13 @@
 import useSWR, { SWRConfiguration } from "swr"
 
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo } from "react"
+import Stripe from "stripe"
+import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
-import Stripe from "stripe"
-import { errorLogAndNotify } from "util/CommonUtil"
-import { useGroup } from "layouts/GroupDashboardLayout"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -42,7 +43,11 @@ const useStripeSessionStatus = (sessionId: string): Result => {
          groupId: group.id,
       }
    }, [group.id, sessionId])
-   return useSWR(["fetchStripeSessionStatus", options], fetcher, swrOptions)
+   return useSWR(
+      [FUNCTION_NAMES.fetchStripeSessionStatus, options],
+      fetcher,
+      swrOptions
+   )
 }
 
 export default useStripeSessionStatus

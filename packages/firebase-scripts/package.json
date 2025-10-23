@@ -4,8 +4,8 @@
    "version": "0.0.0",
    "main": "./dist/index.js",
    "scripts": {
-      "build": "npm run clean && npm run copy-files && tsc",
-      "dev": "npm run clean && npm run copy-files && tsc --watch",
+      "build": "pnpm run clean && pnpm run copy-files && tsc",
+      "dev": "pnpm run clean && pnpm run copy-files && tsc --watch",
       "copy-files": "cpx \"src/**/*.{json}\" dist/",
       "clean": "rimraf dist/",
       "script": "node dist/",
@@ -13,7 +13,7 @@
       "backfill-fieldOfStudy": "node ./dist/migrations/backfill-fieldOfStudy.js"
    },
    "dependencies": {
-      "@careerfairy/shared-lib": "*",
+      "@careerfairy/shared-lib": "workspace:*",
       "@qualdesk/firestore-big-batch": "^0.0.2",
       "cli-progress": "^3.11.2",
       "csv-parse": "^5.2.2",

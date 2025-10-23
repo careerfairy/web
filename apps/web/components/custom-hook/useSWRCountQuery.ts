@@ -1,4 +1,4 @@
-import { getCountFromServer, Query } from "@firebase/firestore"
+import { getCountFromServer, Query } from "firebase/firestore"
 import { queryEqual } from "firebase/firestore"
 import { ReactFireGlobals } from "reactfire"
 import useSWR, { KeyedMutator, SWRConfiguration } from "swr"

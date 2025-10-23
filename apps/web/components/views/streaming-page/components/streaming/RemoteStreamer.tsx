@@ -95,7 +95,7 @@ export const RemoteStreamer = ({
    playVideo = playVideo ?? user?.hasVideo
    playAudio = playAudio ?? user?.hasAudio
 
-   useAutoPlayVideoTrack(videoTrack, playVideo, videoTrackDiv)
+   useAutoPlayVideoTrack(videoTrack, playVideo, undefined, videoTrackDiv)
 
    return (
       <VideoTrackWrapper {...props}>

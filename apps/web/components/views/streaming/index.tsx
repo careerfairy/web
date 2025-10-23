@@ -1,27 +1,27 @@
-import React, { useCallback, useEffect, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import VideoContainer from "./video-container/VideoContainer"
-import NotificationsContainer from "./notifications-container/NotificationsContainer"
-import MiniChatContainer from "./sharedComponents/chat/MiniChatContainer"
-import IconsContainer from "./icons-container/IconsContainer"
-import { useCurrentStream } from "../../../context/stream/StreamContext"
-import StreamNotifications from "./sharedComponents/StreamNotifications"
-import AudienceDrawer from "./AudienceDrawer"
-import ButtonComponent from "./sharedComponents/ButtonComponent"
-import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded"
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded"
+import VolumeUpRoundedIcon from "@mui/icons-material/VolumeUpRounded"
 import { Backdrop } from "@mui/material"
+import { alpha, Theme } from "@mui/material/styles"
+import makeStyles from "@mui/styles/makeStyles"
+import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import HandRaiseNotifier from "./LeftMenu/categories/hand-raise/active/HandRaiseNotifier"
-import { alpha } from "@mui/material/styles"
+import { useCurrentStream } from "../../../context/stream/StreamContext"
 import {
    showActionButtonsSelector,
    streamingSelector,
 } from "../../../store/selectors/streamSelectors"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
+import AudienceDrawer from "./AudienceDrawer"
+import IconsContainer from "./icons-container/IconsContainer"
+import HandRaiseNotifier from "./LeftMenu/categories/hand-raise/active/HandRaiseNotifier"
+import NotificationsContainer from "./notifications-container/NotificationsContainer"
+import ButtonComponent from "./sharedComponents/ButtonComponent"
+import MiniChatContainer from "./sharedComponents/chat/MiniChatContainer"
+import StreamNotifications from "./sharedComponents/StreamNotifications"
+import VideoContainer from "./video-container/VideoContainer"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    blackFrame: {
       // @ts-ignore
       transitionTimingFunction: theme.transitions.easeInOut,
@@ -113,6 +113,7 @@ const StreamerOverview = ({
       if (!smallScreen) {
          dispatch(actions.showActionButtons())
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [smallScreen])
 
    /**
@@ -181,7 +182,7 @@ const StreamerOverview = ({
                includeJobs={currentLivestream.hasJobs}
                questionsAreDisabled={currentLivestream.questionsDisabled}
             />
-            {showTapHint && (
+            {Boolean(showTapHint) && (
                <div className={classes.infoText}>Tap to hide controllers</div>
             )}
          </div>

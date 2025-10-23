@@ -3,23 +3,23 @@ import {
    UniversityPeriod,
    UniversityPeriodType,
 } from "@careerfairy/shared-lib/universities/universityTimeline"
-import React, { useCallback, useMemo, useRef, useState } from "react"
-import { useTheme } from "@mui/material/styles"
-import BrandedTextField from "components/views/common/inputs/BrandedTextField"
-import { Calendar as CalendarIcon, PlusCircle as PlusIcon } from "react-feather"
-import DatePicker from "react-datepicker"
-import "react-datepicker/dist/react-datepicker.css"
-import { sxStyles } from "types/commonTypes"
+import DeleteCalendarIcon from "@mui/icons-material/EventBusy"
 import { Box, Button, Typography } from "@mui/material"
-import { useCalendarManager } from "./TimelineCountriesManager"
+import { useTheme } from "@mui/material/styles"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
+import BrandedTextField from "components/views/common/inputs/BrandedTextField"
+import GBLocale from "date-fns/locale/en-GB"
 import { Timestamp } from "firebase/firestore"
 import ConfirmationDialog, {
    ConfirmationDialogAction,
 } from "materialUI/GlobalModals/ConfirmationDialog"
-import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import DeleteCalendarIcon from "@mui/icons-material/EventBusy"
-import GBLocale from "date-fns/locale/en-GB"
+import React, { useCallback, useMemo, useRef, useState } from "react"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
+import { Calendar as CalendarIcon, PlusCircle as PlusIcon } from "react-feather"
+import { sxStyles } from "types/commonTypes"
 import { datePickerDefaultStyles } from "../utils"
+import { useCalendarManager } from "./TimelineCountriesManager"
 
 const styles = sxStyles({
    buttonsContainer: {
@@ -190,7 +190,6 @@ const PeriodDatesPicker = ({
                      ) : (
                         <PlusIcon color={theme.palette.grey.dark} />
                      ),
-                     disableUnderline: true,
                      readOnly: true,
                   }}
                />
@@ -246,8 +245,6 @@ type DeletePeriodProps = {
 }
 
 const ConfirmDeletePeriodDialog = ({
-   university,
-   period,
    handleCloseDialog,
    handleDeletePeriod,
    isDialogOpen,

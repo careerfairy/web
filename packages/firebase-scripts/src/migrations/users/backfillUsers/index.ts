@@ -1,4 +1,14 @@
-import { firestore } from "../../../lib/firebase"
+import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import {
+   Group,
+   UserGroupData,
+   UserGroupQuestionsWithAnswerMap,
+} from "@careerfairy/shared-lib/dist/groups"
+import {
+   FALLBACK_DATE,
+   LivestreamUserAction,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import {
    ParticipatingStudent,
    RegisteredStudent,
@@ -6,48 +16,38 @@ import {
    UserData,
    UserReadableGroupQuestionsWithAnswerMap,
 } from "@careerfairy/shared-lib/dist/users"
-import Counter from "../../../lib/Counter"
-import {
-   Group,
-   UserGroupData,
-   UserGroupQuestionsWithAnswerMap,
-} from "@careerfairy/shared-lib/dist/groups"
-import {
-   possibleFieldsOfStudy,
-   possibleLevelsOfStudy,
-   possibleOthers,
-} from "../../../constants"
 import { RegisteredGroup } from "@careerfairy/shared-lib/dist/users/users"
-import {
-   checkIfHasMatch,
-   throwMigrationError,
-   trimAndLowerCase,
-} from "../../../util/misc"
-import * as mappings from "@careerfairy/firebase-scripts/data/fieldAndLevelOfStudyMapping.json"
+import { removeDuplicates } from "@careerfairy/shared-lib/dist/utils"
+import { GroupCategory } from "@careerfairy/shared-lib/src/groups"
+import { ReadableQuestionAndAnswer } from "@careerfairy/shared-lib/src/users"
 import {
    BulkWriter,
    DocumentReference,
    FieldValue,
    Timestamp,
 } from "firebase-admin/firestore"
-import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { groupRepo, livestreamRepo, userRepo } from "../../../repositories"
-import { getArgValue } from "../../../index"
+import * as mappings from "../../../../data/fieldAndLevelOfStudyMapping.json"
 import {
-   FALLBACK_DATE,
-   LivestreamUserAction,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import { ReadableQuestionAndAnswer } from "@careerfairy/shared-lib/src/users"
-import { GroupCategory } from "@careerfairy/shared-lib/src/groups"
+   possibleFieldsOfStudy,
+   possibleLevelsOfStudy,
+   possibleOthers,
+} from "../../../constants"
+import { getArgValue } from "../../../index"
+import Counter from "../../../lib/Counter"
+import counterConstants from "../../../lib/Counter/constants"
+import { firestore } from "../../../lib/firebase"
+import { groupRepo, livestreamRepo, userRepo } from "../../../repositories"
 import {
    handleBulkWriterError,
    handleBulkWriterSuccess,
    loopProgressBar,
    writeProgressBar,
 } from "../../../util/bulkWriter"
-import counterConstants from "../../../lib/Counter/constants"
-import { removeDuplicates } from "@careerfairy/shared-lib/dist/utils"
+import {
+   checkIfHasMatch,
+   throwMigrationError,
+   trimAndLowerCase,
+} from "../../../util/misc"
 
 const customCountKeys = {
    numTotalUsers: "Total Users",
@@ -635,6 +635,7 @@ const setUserLivestreamData = (
    // if is userData document just update user
    if (documentType === "userData") {
       bulkWriter
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
          .update(userRef, updateData as any)
          .then(() => handleBulkWriterSuccess(counter))
          .catch((err) => handleBulkWriterError(err, counter))

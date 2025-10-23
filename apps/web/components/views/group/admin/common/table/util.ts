@@ -1,4 +1,4 @@
-import { getDocs, Query } from "@firebase/firestore"
+import { getDocs, Query } from "firebase/firestore"
 import JSZip from "jszip"
 import { CSVData } from "../../../../../custom-hook/useMetaDataActions"
 import { prettyLocalizedDate } from "../../../../../helperFunctions/HelperFunctions"

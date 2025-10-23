@@ -24,5 +24,5 @@ This migration backfills the `endedAt` field for livestream events that don't ha
 ## Usage
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillEndedAt
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillEndedAt
 ```

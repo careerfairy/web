@@ -1,8 +1,8 @@
 import { Box, CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { sxStyles } from "types/commonTypes"
 import { useSelector } from "react-redux"
 import { clientSecret } from "store/selectors/groupSelectors"
+import { sxStyles } from "types/commonTypes"
 import StripeCheckoutComponent from "../forms/StripeCheckoutComponent"
 
 const styles = sxStyles({
@@ -18,7 +18,7 @@ const styles = sxStyles({
       justifyItems: "center",
       alignContent: "center",
       justifyContent: "center",
-      mb: "680px",
+      mb: "16px",
    },
 })
 

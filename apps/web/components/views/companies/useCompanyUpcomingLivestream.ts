@@ -1,7 +1,7 @@
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { limit, QueryConstraint } from "@firebase/firestore"
+import { limit, QueryConstraint } from "firebase/firestore"
 import { useFirestoreCollection } from "../../custom-hook/utils/useFirestoreCollection"
 
 const now = new Date()
@@ -15,7 +15,7 @@ const useCompanyUpcomingLivestream = (
       constraints.push(where("hidden", "==", false))
    }
 
-   const q = query<LivestreamEvent>(
+   const q = query(
       // @ts-ignore
       collection(FirestoreInstance, "livestreams"),
       where("groupIds", "array-contains", groupId),

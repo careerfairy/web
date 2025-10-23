@@ -18,7 +18,6 @@ import { GroupStats } from "@careerfairy/shared-lib/dist/groups/stats"
 import { Spark, SparkStats } from "@careerfairy/shared-lib/dist/sparks/sparks"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import * as admin from "firebase-admin"
-import firebase from "firebase/compat/app"
 import { DataWithRef } from "../util/types"
 
 export interface IGroupScriptsRepository extends IGroupRepository {
@@ -90,8 +89,12 @@ export class GroupScriptsRepository
    implements IGroupScriptsRepository
 {
    constructor(
-      protected readonly firestore: firebase.firestore.Firestore,
-      protected readonly fieldValue: typeof firebase.firestore.FieldValue,
+      // Leaviing as any for now as this is not mission critical
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      protected readonly firestore: any,
+      // Leaving as any for now as this is not mission critical
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      protected readonly fieldValue: any,
       protected readonly auth: admin.auth.Auth
    ) {
       super(firestore, fieldValue)

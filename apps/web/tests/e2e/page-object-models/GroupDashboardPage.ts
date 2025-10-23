@@ -329,7 +329,16 @@ export class GroupDashboardPage extends CommonPage {
             })
          )
 
+         // Wait for any animations/transitions to complete before closing
+         await this.page.waitForTimeout(300)
+
+         // Click the input again to close the dropdown
          await this.page.locator(`input[id='${dropdownId}']`).click()
+
+         // Wait for the dropdown to actually close
+         await this.page.waitForSelector('[role="listbox"]', {
+            state: "hidden",
+         })
       }
    }
 
@@ -354,7 +363,18 @@ export class GroupDashboardPage extends CommonPage {
             })
          )
 
-         await this.page.getByLabel("Close").click()
+         // Wait for any animations/transitions to complete before closing
+         await this.page.waitForTimeout(300)
+
+         // Wait for the Close button to be stable and clickable
+         const closeButton = this.page.getByLabel("Close")
+         await closeButton.waitFor({ state: "visible" })
+         await closeButton.click()
+
+         // Wait for the dropdown to actually close
+         await this.page.waitForSelector('[role="listbox"]', {
+            state: "hidden",
+         })
       }
    }
 
@@ -374,6 +394,8 @@ export class GroupDashboardPage extends CommonPage {
             const speakerExists = await existingSpeaker.isVisible()
 
             if (speakerExists) {
+               // Select the existing speaker if not already selected
+               await existingSpeaker.click()
                await this.page.getByLabel("Close").click()
                continue
             }
@@ -404,13 +426,25 @@ export class GroupDashboardPage extends CommonPage {
             }
 
             await this.clickAndUploadFiles(
-               this.page.getByRole("button", {
-                  name: "Upload speaker picture",
-               }),
+               this.page
+                  .locator("button")
+                  .filter({ hasText: "Upload speaker picture" }),
                "tests/e2e/assets/creatorAvatar.png"
             )
 
             await this.page.getByRole("button", { name: "Create" }).click()
+
+            // After creating a speaker, they are automatically selected
+            // Just close the dropdown by clicking the close button or outside
+            // Wait for the create dialog to close
+            await this.page.waitForTimeout(500)
+         }
+
+         // Close the dropdown after all speakers are created/selected
+         // Check if dropdown is still open and close it
+         const closeButton = this.page.getByLabel("Close")
+         if (await closeButton.isVisible()) {
+            await closeButton.click()
          }
       }
    }

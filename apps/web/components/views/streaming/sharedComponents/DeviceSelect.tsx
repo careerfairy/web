@@ -1,11 +1,12 @@
-import React, {
-   ReactNode,
-   useCallback,
-   useEffect,
-   useMemo,
-   useRef,
-   useState,
-} from "react"
+import BlurOffIcon from "@mui/icons-material/BlurOff"
+import BlurOnIcon from "@mui/icons-material/BlurOn"
+import HideImageIcon from "@mui/icons-material/HideImage"
+import ImageIcon from "@mui/icons-material/Image"
+import MicIcon from "@mui/icons-material/Mic"
+import MicOffIcon from "@mui/icons-material/MicOff"
+import VideocamIcon from "@mui/icons-material/Videocam"
+import VideocamOffIcon from "@mui/icons-material/VideocamOff"
+import LoadingButton from "@mui/lab/LoadingButton"
 import {
    Box,
    capitalize,
@@ -18,31 +19,30 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
-import VideocamOffIcon from "@mui/icons-material/VideocamOff"
-import LoadingButton from "@mui/lab/LoadingButton"
-import VideocamIcon from "@mui/icons-material/Videocam"
-import MicIcon from "@mui/icons-material/Mic"
+import { Theme } from "@mui/material/styles"
+import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+import {
+   ReactNode,
+   useCallback,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
+import { useSelector } from "react-redux"
+import useVirtualBackgroundActions from "../../../../context/agora/useVirtualBackgroundActions"
+import { RootState } from "../../../../store"
+import { videoOptionsSelector } from "../../../../store/selectors/streamSelectors"
 import {
    DeviceList,
    LocalMediaHandlers,
    LocalStream,
    MediaControls,
 } from "../../../../types/streaming"
-import { Theme } from "@mui/system"
-import { useSelector } from "react-redux"
-import { RootState } from "../../../../store"
-import SoundLevelDisplay from "../../common/SoundLevelDisplay"
-import MicOffIcon from "@mui/icons-material/MicOff"
-import BlurOnIcon from "@mui/icons-material/BlurOn"
-import useVirtualBackgroundActions from "../../../../context/agora/useVirtualBackgroundActions"
-import { videoOptionsSelector } from "../../../../store/selectors/streamSelectors"
-import BlurOffIcon from "@mui/icons-material/BlurOff"
-import ImageIcon from "@mui/icons-material/Image"
-import HideImageIcon from "@mui/icons-material/HideImage"
-import FilePickerContainer from "../../../ssr/FilePickerContainer"
-import { uploadLogo } from "../../../helperFunctions/HelperFunctions"
-import { firebaseServiceInstance } from "data/firebase/FirebaseService"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { uploadLogo } from "../../../helperFunctions/HelperFunctions"
+import FilePickerContainer from "../../../ssr/FilePickerContainer"
+import SoundLevelDisplay from "../../common/SoundLevelDisplay"
 
 const styles = {
    gridItemContent: {
@@ -168,10 +168,12 @@ const DeviceSelect = ({
       ) {
          testVideoRef.current.srcObject = displayableMediaStream
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [displayableMediaStream, openModal, testVideoRef.current, isCamera])
 
    useEffect(() => {
       setHasEnabledDevice(localStorage.getItem(localStorageKey) === "true")
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [])
 
    const deviceInUseByAnotherApp = useSelector((state: RootState) => {
@@ -194,7 +196,13 @@ const DeviceSelect = ({
          return `This ${deviceName} is currently being used by another app`
       }
       return activateLabel
-   }, [noDevices, deviceDenied, deviceInUseByAnotherApp, hasEnabledDevice])
+   }, [
+      isCamera,
+      deviceDenied,
+      hasEnabledDevice,
+      noDevices,
+      deviceInUseByAnotherApp,
+   ])
 
    const handleChangeDevice = useCallback(
       async (event) => {
@@ -224,6 +232,7 @@ const DeviceSelect = ({
       if (!disableInitialize && hasEnabledDevice && openModal) {
          handleInitializeDevice().catch(console.error)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [hasEnabledDevice, openModal, disableInitialize])
 
    const currentDeviceIsBeingUsedButThereAreOtherOnesAvailable =
@@ -231,7 +240,7 @@ const DeviceSelect = ({
 
    return (
       <Box sx={styles.gridItemContent}>
-         {title && <Typography sx={styles.title}>{title}</Typography>}
+         {Boolean(title) && <Typography sx={styles.title}>{title}</Typography>}
          {localStream?.[track] ||
          currentDeviceIsBeingUsedButThereAreOtherOnesAvailable ? (
             <>
@@ -313,7 +322,7 @@ const DeviceSelect = ({
                               flex: 1,
                            }}
                         >
-                           {showSoundMeter && (
+                           {Boolean(showSoundMeter) && (
                               <SoundLevelDisplay
                                  localStream={localStream}
                                  showSoundMeter={showSoundMeter}
@@ -324,7 +333,7 @@ const DeviceSelect = ({
                   </>
                )}
                <Box sx={styles.iconWrapper}>
-                  {showDisableIcon && isCamera && (
+                  {Boolean(showDisableIcon && isCamera) && (
                      <IconButton
                         aria-label={"turn-off-video-icon"}
                         size="medium"
@@ -334,7 +343,7 @@ const DeviceSelect = ({
                      </IconButton>
                   )}
 
-                  {showDisableIcon && !isCamera && (
+                  {Boolean(showDisableIcon && !isCamera) && (
                      <IconButton
                         aria-label={"turn-off-mic-icon"}
                         size="medium"
@@ -343,7 +352,7 @@ const DeviceSelect = ({
                         <MicOffIcon fontSize="inherit" />
                      </IconButton>
                   )}
-                  {isCamera && (
+                  {Boolean(isCamera) && (
                      <CameraControlButtons localStream={localStream} />
                   )}
                </Box>
@@ -462,7 +471,9 @@ const CameraControlButtons = ({ localStream }: CameraControlButtonsProps) => {
             disabled={!deviceIsCompatible}
             disabledChildren={<HideImageIcon />}
          >
-            {isBackgroundImageEnabled && <ImageIcon color={"primary"} />}
+            {Boolean(isBackgroundImageEnabled) && (
+               <ImageIcon color={"primary"} />
+            )}
 
             {!isBackgroundImageEnabled && (
                <ImageUpload onImageUploadFinished={toggleBackgroundImage}>

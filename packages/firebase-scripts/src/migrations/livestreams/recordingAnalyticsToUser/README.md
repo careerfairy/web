@@ -5,5 +5,5 @@ Populate the `recordingStatsUser` subcollection with old recording analytics.
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/recordingAnalyticsToUser
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/recordingAnalyticsToUser
 ```

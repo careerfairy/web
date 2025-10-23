@@ -10,5 +10,5 @@ Users with invalid fields of study are then reconciled based on the `id` field.
 To run the script, use the following command:
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/reconcileFieldsOfStudy
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./scripts/reconcileFieldsOfStudy
 ```

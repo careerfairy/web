@@ -4,22 +4,28 @@
    "version": "0.0.0",
    "main": "./dist/index.js",
    "scripts": {
-      "build": "npm run clean && npm run copy-files && tsc",
-      "dev": "npm run clean && npm run copy-files && tsc --watch",
+      "build": "pnpm run clean && pnpm run copy-files && tsc",
+      "dev": "pnpm run clean && pnpm run copy-files && tsc --watch",
       "test": "jest",
       "copy-files": "cpx \"src/**/*.{json}\" dist/",
       "clean": "rimraf dist/"
    },
    "dependencies": {
+      "firebase-admin": "^13.3.0",
+      "lodash": "^4.17.20",
       "lodash.clonedeep": "^4.5.0",
       "lodash.uniq": "^4.5.0",
+      "luxon": "^1.22.0",
       "object-hash": "^3.0.0",
       "uuid": "^9.0.0"
    },
    "peerDependencies": {
       "axios": "^0.27.2",
-      "firebase": "^9.9.0",
+      "firebase": "^10.12.5",
       "yup": "^0.32.11"
    },
-   "devDependencies": {}
+   "devDependencies": {
+      "@types/lodash": "^4.17.0",
+      "@types/luxon": "^1.27.1"
+   }
 }

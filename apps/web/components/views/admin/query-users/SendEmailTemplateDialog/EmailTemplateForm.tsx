@@ -1,5 +1,3 @@
-import React, { useCallback, useState } from "react"
-import { Formik } from "formik"
 import {
    Box,
    Button,
@@ -11,22 +9,25 @@ import {
    Typography,
 } from "@mui/material"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import { Formik } from "formik"
+import { useCallback, useState } from "react"
 
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { Theme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
-import DateUtil from "../../../../../util/DateUtil"
-import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import SendTestEmailDialog from "./SendTestEmailDialog"
-import ImageSelect from "../../../draftStreamForm/ImageSelect/ImageSelect"
+import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
+import DateUtil from "../../../../../util/DateUtil"
 import { getDownloadUrl } from "../../../../helperFunctions/streamFormFunctions"
+import ImageSelect from "../../../draftStreamForm/ImageSelect/ImageSelect"
 import { TemplateDialogStepProps } from "./SendEmailTemplateDialog"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import SendTestEmailDialog from "./SendTestEmailDialog"
 
 const now = new Date()
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    actions: {
       display: "flex",
       padding: theme.spacing(1, 0, 0, 0),

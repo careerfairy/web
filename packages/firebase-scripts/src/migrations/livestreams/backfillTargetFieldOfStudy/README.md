@@ -7,5 +7,5 @@ This backfill script will replace all empty target field of study values of live
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backfillTargetFieldOfStudy
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backfillTargetFieldOfStudy
 ```

@@ -1,9 +1,8 @@
-import React from "react"
-import WhatshotIcon from "@mui/icons-material/Whatshot"
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople"
 import LanguageIcon from "@mui/icons-material/Language"
+import WhatshotIcon from "@mui/icons-material/Whatshot"
 import { Chip, Tooltip } from "@mui/material"
-import ConditionalWrapper from "../../../../ConditionalWrapper"
+import { ConditionalWrapper } from "../../../../ConditionalWrapper"
 
 const styles = {
    warningChip: {
@@ -28,7 +27,7 @@ export const LimitedRegistrationsBadge = ({
       <Chip
          icon={<WhatshotIcon style={{ color: "white" }} />}
          sx={[styles.warningChip, white && styles.badgeWhite, sx]}
-         variant={white && "outlined"}
+         variant={white ? "outlined" : null}
          label={
             numberOfSpotsRemaining < MIN_NUMBER_OF_DISPLAYED_SPOTS
                ? `${numberOfSpotsRemaining} spots left`
@@ -45,7 +44,7 @@ export const InPersonEventBadge = ({ white, sx, ...resProps }) => {
          icon={<EmojiPeopleIcon style={{ color: "white" }} />}
          label="In-Person Event"
          sx={[white && styles.badgeWhite, sx]}
-         variant={white && "outlined"}
+         variant={white ? "outlined" : null}
          color="secondary"
          {...resProps}
       />
@@ -61,7 +60,7 @@ export const LanguageBadge = ({
 }) => {
    return streamLanguage ? (
       <ConditionalWrapper
-         condition={!Boolean(noTip)}
+         condition={!noTip}
          wrapper={(children) => (
             <Tooltip
                placement="top"
@@ -76,7 +75,7 @@ export const LanguageBadge = ({
             icon={<LanguageIcon />}
             label={streamLanguage.code.toUpperCase()}
             sx={[white && styles.badgeWhite, sx]}
-            variant={white && "outlined"}
+            variant={white ? "outlined" : null}
             color="info"
             {...restProps}
          />

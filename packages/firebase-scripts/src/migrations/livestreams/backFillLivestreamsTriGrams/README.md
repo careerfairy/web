@@ -20,5 +20,5 @@ best to disable the following functions while running this migration:
 To disable the functions, edit on the gcloud and update the trigger Document Path from `livestreams/{documentId}` to `livestreams2/{documentId}` temporarily.
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillLivestreamsTriGrams
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillLivestreamsTriGrams
 ```

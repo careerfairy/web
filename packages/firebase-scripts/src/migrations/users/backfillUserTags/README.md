@@ -17,5 +17,5 @@ Based on old interests the user data shall be updated with new tag category valu
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/users/backFillUserTags
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/users/backFillUserTags
 ```

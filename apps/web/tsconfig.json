@@ -17,6 +17,7 @@
       "isolatedModules": true,
       "jsx": "preserve",
       "downlevelIteration": true,
+      "preserveSymlinks": false,
       "paths": {
          "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"],
          "@careerfairy/seed-data/*": ["../../packages/seed-data/src/*"],

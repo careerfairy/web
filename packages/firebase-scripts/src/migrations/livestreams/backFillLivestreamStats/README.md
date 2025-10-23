@@ -15,5 +15,5 @@ It will only update the specific stats as opposed to overwriting the entire stat
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillLivestreamStats
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillLivestreamStats
 ```

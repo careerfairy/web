@@ -3,11 +3,7 @@ import usePaginatedCollection, {
 } from "components/custom-hook/utils/usePaginatedCollection"
 import { query, where } from "firebase/firestore"
 import { useMemo } from "react"
-import {
-   CollectionReference,
-   Query,
-   QueryConstraint,
-} from "@firebase/firestore"
+import { CollectionReference, Query, QueryConstraint } from "firebase/firestore"
 import { University } from "@careerfairy/shared-lib/universities"
 import {
    FieldOfStudy,
@@ -76,7 +72,7 @@ const usePaginatedUsersCollection = (
       }
 
       return {
-         query: query<unknown>(
+         query: query(
             // @ts-ignore
             targetCollectionRef,
             ...constraints

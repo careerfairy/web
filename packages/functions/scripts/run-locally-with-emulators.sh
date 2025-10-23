@@ -12,11 +12,11 @@ export NEXT_PUBLIC_FIREBASE_EMULATORS="true"
 
 # Check if we have an argument
 if [ -z "$1" ]; then
-  npx firebase emulators:exec --ui --only firestore,auth,functions "cd src/app; npm run dev"
+  pnpm exec firebase emulators:exec --ui --only firestore,auth,functions "cd src/app; pnpm run dev"
 else
   # Our dataset is big, increase firestore emulator heap
   export JAVA_TOOL_OPTIONS="-Xmx10g"
   ADDITIONAL_ARG=${2:-""} # --export-on-exit
 
-  npx firebase emulators:exec --ui --only firestore,auth,functions $ADDITIONAL_ARG --import "$1" "cd src/app; npm run dev"
+  pnpm exec firebase emulators:exec --ui --only firestore,auth,functions $ADDITIONAL_ARG --import "$1" "cd src/app; pnpm run dev"
 fi

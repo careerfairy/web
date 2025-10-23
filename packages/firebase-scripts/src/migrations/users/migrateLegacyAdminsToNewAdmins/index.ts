@@ -3,7 +3,6 @@ import {
    GROUP_DASHBOARD_ROLE,
    Group,
 } from "@careerfairy/shared-lib/dist/groups"
-import firebase from "firebase/compat/app"
 import * as fs from "fs"
 import config from "../../../config"
 import { getArgValue } from "../../../index"
@@ -167,13 +166,15 @@ export async function run() {
 }
 
 const getParentCollectionNameOfLegacyAdmin = (
-   ref: firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   ref: any
 ) => {
    return ref.parent.parent.parent.id
 }
 
 const getGroupIdOfLegacyAdminRef = (
-   ref: firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   ref: any
 ) => {
    return ref.parent.parent.id
 }

@@ -29,5 +29,5 @@ Updating this field to be an array where the first position will be filed with t
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backfillMultipleCompanyIndustries
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backfillMultipleCompanyIndustries
 ```

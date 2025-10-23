@@ -11,6 +11,7 @@ import {
    Slide,
    TextField,
 } from "@mui/material"
+import { Theme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { livestreamService } from "data/firebase/LivestreamService"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
@@ -25,7 +26,7 @@ import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import GroupLogo from "../common/GroupLogo"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles<Theme>((theme) => ({
    root: {
       width: "100%",
       display: "flex",

@@ -17,7 +17,7 @@ This script is designed to migrate the IDs of creators in the Firestore database
 To run this script, use the following command:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/creators/migrateCreatorIds
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/creators/migrateCreatorIds
 ```
 
 Please note that this script should be used with caution as it modifies the Firestore database directly. Always make sure to have a backup of your data before running this script.

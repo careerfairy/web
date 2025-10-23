@@ -1,4 +1,4 @@
-import { useTheme } from "@mui/styles"
+import { useTheme } from "@mui/material/styles"
 import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import NotFoundView from "components/views/livestream-dialog/views/common/NotFoundView"
 import { TalentProfileView } from "layouts/UserLayout/TalentProfile/TalentProfileView"

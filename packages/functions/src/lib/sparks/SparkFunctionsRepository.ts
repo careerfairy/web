@@ -1,4 +1,5 @@
 import BaseFirebaseRepository from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { Identifiable, OptionGroup } from "@careerfairy/shared-lib/commonTypes"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group, pickPublicDataFromGroup } from "@careerfairy/shared-lib/groups"
 import {
@@ -27,10 +28,6 @@ import {
    SparkInteractionSources,
    SparkSecondWatched,
 } from "@careerfairy/shared-lib/sparks/telemetry"
-import {
-   Identifiable,
-   OptionGroup,
-} from "@careerfairy/shared-lib/src/commonTypes"
 import { UserSparksNotification } from "@careerfairy/shared-lib/users"
 import { UserNotification } from "@careerfairy/shared-lib/users/userNotifications"
 import { getArrayDifference, shuffle } from "@careerfairy/shared-lib/utils"

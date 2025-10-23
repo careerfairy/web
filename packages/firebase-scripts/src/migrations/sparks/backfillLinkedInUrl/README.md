@@ -7,7 +7,7 @@ This script backfills the `linkedInUrl` field from `spark` documents based on it
 To run the script, use the following command:
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/sparks/backfillLinkedInUrl
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/sparks/backfillLinkedInUrl
 ```
 
 ## What it does

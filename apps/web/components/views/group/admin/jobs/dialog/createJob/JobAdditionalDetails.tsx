@@ -227,7 +227,6 @@ const JobAdditionalDetails = ({ quillInputRef }: Props) => {
                                              }
                                           />
                                        ),
-                                       disableUnderline: true,
                                        readOnly: true,
                                        disabled: isSubmitting,
                                     }}

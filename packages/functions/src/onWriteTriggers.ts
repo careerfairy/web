@@ -5,7 +5,7 @@ import { hasCustomJobsGroupMetaDataChanged } from "@careerfairy/shared-lib/group
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { hasMetadataChanged as hasGroupMetadataChanged } from "@careerfairy/shared-lib/livestreams/metadata"
 import { Spark } from "@careerfairy/shared-lib/sparks/sparks"
-import { UserStats } from "@careerfairy/shared-lib/src/users"
+import { UserStats } from "@careerfairy/shared-lib/users"
 import { firestore } from "./api/firestoreAdmin"
 import {
    customJobRepo,

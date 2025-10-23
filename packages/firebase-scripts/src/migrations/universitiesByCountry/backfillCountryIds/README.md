@@ -1,7 +1,7 @@
 ### Backfill UniversitiesByCountry Collection:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/universitiesByCountry/backfillCountryIds
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/universitiesByCountry/backfillCountryIds
 ```
 
 #### What it does:

@@ -4,15 +4,15 @@
    "version": "0.0.0",
    "main": "./dist/index.js",
    "scripts": {
-      "build": "npm run clean && tsc",
-      "dev": "npm run clean && tsc --watch",
+      "build": "pnpm run clean && tsc",
+      "dev": "pnpm run clean && tsc --watch",
       "clean": "rimraf dist/"
    },
    "devDependencies": {
       "@types/uuid": "^9.0.0"
    },
    "dependencies": {
-      "@careerfairy/shared-lib": "*",
+      "@careerfairy/shared-lib": "workspace:*",
       "@faker-js/faker": "^6.1.2",
       "axios": "^0.27.2",
       "firebase-admin": "^13.3.0",

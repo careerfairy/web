@@ -5,7 +5,6 @@ import useIsDesktop from "components/custom-hook/useIsDesktop"
 import { useHasAccessToSparks } from "components/views/admin/sparks/useHasAccesToSparks"
 import { useLivestreamRouting } from "components/views/group/admin/events/useLivestreamRouting"
 import { useOfflineEventRouting } from "components/views/group/admin/offline-events/useOfflineEventRouting"
-import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { useCallback } from "react"
 import { Briefcase, Calendar, PlayCircle, Radio } from "react-feather"
@@ -60,9 +59,6 @@ export const QuickActions = () => {
    const { push, query } = useRouter()
    const hasAccessToSparks = useHasAccessToSparks()
    const dispatch = useAppDispatch()
-   const { groupPresenter } = useGroup()
-
-   const canGroupCreateOfflineEvents = groupPresenter.canCreateOfflineEvents()
 
    const groupId = query.groupId as string
 
@@ -116,18 +112,16 @@ export const QuickActions = () => {
                   Schedule a live stream
                </Typography>
             </Button>
-            {canGroupCreateOfflineEvents ? (
-               <Button
-                  sx={styles.quickActionButton}
-                  startIcon={<Calendar size={24} />}
-                  onClick={handleOfflineEventCreation}
-                  disabled={isCreatingOfflineEvent}
-               >
-                  <Typography variant="brandedBody">
-                     Publish an offline event
-                  </Typography>
-               </Button>
-            ) : null}
+            <Button
+               sx={styles.quickActionButton}
+               startIcon={<Calendar size={24} />}
+               onClick={handleOfflineEventCreation}
+               disabled={isCreatingOfflineEvent}
+            >
+               <Typography variant="brandedBody">
+                  Publish an offline event
+               </Typography>
+            </Button>
             <Button
                sx={styles.quickActionButton}
                startIcon={<PlayCircle size={24} />}

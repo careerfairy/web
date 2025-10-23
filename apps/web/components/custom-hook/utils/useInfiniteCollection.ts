@@ -6,7 +6,7 @@ import {
    startAfter,
    collection,
    limit,
-} from "@firebase/firestore"
+} from "firebase/firestore"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"

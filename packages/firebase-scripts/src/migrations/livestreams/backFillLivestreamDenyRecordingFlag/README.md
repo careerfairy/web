@@ -5,5 +5,5 @@ Backfills the `denyRecordingAccess` flag to `false` of all the live streams that
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillLivestreamDenyRecordingFlag
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/backFillLivestreamDenyRecordingFlag
 ```

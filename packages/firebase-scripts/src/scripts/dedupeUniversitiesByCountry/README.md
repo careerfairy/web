@@ -16,5 +16,5 @@ Some deleted universities might be in usage on the `userData` collection. This s
 To run the script, use the following command:
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/dedupeUniversitiesByCountry
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./scripts/dedupeUniversitiesByCountry
 ```

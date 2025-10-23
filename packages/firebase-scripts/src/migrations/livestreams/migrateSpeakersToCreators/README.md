@@ -24,7 +24,7 @@ Deprecates `email` field from `livestream.speakers[]` and backfills speaker data
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/migrateSpeakersToCreators
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/livestreams/migrateSpeakersToCreators
 ```
 
 ## Configuration

@@ -13,5 +13,5 @@ sum up the stats for each group. The stats that are not set by this script will 
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backFillGroupStats
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backFillGroupStats
 ```

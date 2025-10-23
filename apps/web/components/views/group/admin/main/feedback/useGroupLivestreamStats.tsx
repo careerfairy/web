@@ -14,7 +14,7 @@ const useGroupLivestreamStats = (
    // @ts-ignore we're sorting by a nested field livestream.start
    const options: UsePaginatedCollection<LiveStreamStats> = useMemo(
       () => ({
-         query: query<LiveStreamStats>(
+         query: query(
             // @ts-ignore
             collectionGroup(FirestoreInstance, "stats"),
             where("id", "==", "livestreamStats"),

@@ -7,5 +7,5 @@ No other fields will be updated.
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backFillGroupTriGrams
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/groups/backFillGroupTriGrams
 ```

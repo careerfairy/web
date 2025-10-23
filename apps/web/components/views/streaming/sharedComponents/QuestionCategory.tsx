@@ -143,7 +143,7 @@ const QuestionCategory = ({
    const [showQuestionModal, setShowQuestionModal] = useState(false)
    const [touched, setTouched] = useState(false)
    const [value, setValue] = useState(0)
-   const sessionUuid = useMemo(uuidv4, [])
+   const sessionUuid = useMemo(() => uuidv4(), [])
    const [submittingQuestion, setSubmittingQuestion] = useState(false)
    const [newQuestionTitle, setNewQuestionTitle] = useState("")
    const [openQuestionId, setOpenQuestionId] = useState("")

@@ -13,12 +13,12 @@
       "lint": "eslint --max-warnings 0 .",
       "lint-fix": "eslint --fix .",
       "tsc": "tsc -p tsconfig.json",
-      "update-dependencies": "npx npm-check-updates -u"
+      "update-dependencies": "pnpm dlx npm-check-updates -u"
    },
    "dependencies": {
-      "@careerfairy/config-mui": "*"
+      "@careerfairy/config-mui": "workspace:*"
    },
    "devDependencies": {
-      "@careerfairy/config-tsconfig": "*"
+      "@careerfairy/config-tsconfig": "workspace:*"
    }
 }

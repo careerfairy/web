@@ -1,4 +1,7 @@
-import "chartjs-plugin-labels"
+// Import chart.js plugin only on client-side to avoid SSR issues
+if (typeof window !== "undefined") {
+   require("chartjs-plugin-labels")
+}
 import { CsvBuilder } from "filefy"
 
 export const percentageDonutConfig = [

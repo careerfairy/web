@@ -10,5 +10,5 @@ contentTopicsTagIds?: string[]
 ## Run
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts scriptPath=./migrations/sparks/backfillSparkContentTopicTags
+pnpm run script --filter @careerfairy/firebase-scripts scriptPath=./migrations/sparks/backfillSparkContentTopicTags
 ```

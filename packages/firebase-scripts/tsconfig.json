@@ -1,5 +1,6 @@
 {
    "compilerOptions": {
+      "baseUrl": ".",
       "noImplicitReturns": true,
       "noUnusedLocals": true,
       "outDir": "dist",
@@ -7,11 +8,15 @@
       "module": "commonjs",
       "strict": false,
       "target": "ES2021",
-      "lib": ["ES2021"],
+      "lib": ["ES2021", "dom"],
       "allowJs": false,
       "declaration": true,
       "resolveJsonModule": true,
-      "skipLibCheck": true
+      "skipLibCheck": true,
+      "esModuleInterop": true,
+      "paths": {
+         "@careerfairy/shared-lib/*": ["../shared-lib/src/*"]
+      }
    },
    "compileOnSave": true,
    "include": ["src"]

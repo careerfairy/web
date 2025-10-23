@@ -1,13 +1,13 @@
 ### Migrate roles:
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/migrateLegacyAdminsToNewAdmins
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/users/migrateLegacyAdminsToNewAdmins
 ```
 
 ### If you want to re-run the script, you can add the `clearNewAdmins=true` flag to reset the new admins sub-collection and claims
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/migrateLegacyAdminsToNewAdmins clearNewAdmins=true
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/users/migrateLegacyAdminsToNewAdmins clearNewAdmins=true
 ```
 
 ### What it does:

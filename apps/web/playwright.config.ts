@@ -119,9 +119,8 @@ const config: PlaywrightTestConfig = {
 
    /* Run your local dev server before starting the tests */
    webServer: {
-      command: `npx firebase emulators:exec "npm run start -w @careerfairy/webapp" ${
-         process.env.CI ? "" : "--ui"
-      } --only auth,firestore,functions,storage`,
+      // Always run Next.js in production (start) inside emulators:exec; build happens via Turbo before tests
+      command: `pnpm exec firebase emulators:exec "pnpm --filter @careerfairy/webapp run start" --only auth,firestore,functions,storage`,
       cwd: "../../",
       env: {
          FIREBASE_AUTH_EMULATOR_HOST: "127.0.0.1:9099",
@@ -133,9 +132,10 @@ const config: PlaywrightTestConfig = {
          NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
             process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
          NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+         NODE_OPTIONS: "--max-old-space-size=4096",
       },
       port: 3000,
-      // emulators need some time to boot
+      // Allow enough time for emulators and Next.js to boot
       timeout: 40 * 1000,
    },
 }

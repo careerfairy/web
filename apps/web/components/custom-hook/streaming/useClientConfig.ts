@@ -44,10 +44,15 @@ export const useClientConfig = (client: IAgoraRTCClient, options: Options) => {
    }, [client, isConnected, options.hostCondition])
 
    useEffect(() => {
-      if (options.enableDualStream) {
-         client.enableDualStream().catch(errorLogAndNotify)
+      if (options.enableDualStream && isConnected) {
+         client.enableDualStream().catch((err) => {
+            // Ignore error if dual stream is already enabled
+            if (err.code !== "INVALID_OPERATION") {
+               errorLogAndNotify(err)
+            }
+         })
       }
-   }, [client, currentRole, options.enableDualStream])
+   }, [client, isConnected, options.enableDualStream])
 
    useEffect(() => {
       if (isConnected) {

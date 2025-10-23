@@ -7,7 +7,7 @@ This script backfills the `industries`, `location`, `size` fields from the linke
 To run the script, use the following command:
 
 ```bash
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/sparks/backfillSparkStats
+pnpm run script --filter @careerfairy/firebase-scripts -- scriptPath=./migrations/sparks/backfillSparkStats
 ```
 
 ## What it does
