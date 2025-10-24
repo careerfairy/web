@@ -84,7 +84,8 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
       } | null,
       public readonly featured: FeaturedGroup,
       public readonly availableOfflineEvents: number,
-      public readonly hasPurchasedOfflineEvents: boolean
+      public readonly hasPurchasedOfflineEvents: boolean,
+      public readonly hasCoffeeChats: boolean
    ) {}
 
    setFeatureFlags(featureFlags: FeatureFlagsState): void {
@@ -123,7 +124,8 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
          createPlanObject(group.plan),
          group.featured,
          group.availableOfflineEvents || 0,
-         group.hasPurchasedOfflineEvents || false
+         group.hasPurchasedOfflineEvents || false,
+         group.hasCoffeeChats || false
       )
    }
 

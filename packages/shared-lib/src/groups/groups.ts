@@ -92,6 +92,11 @@ export interface Group extends Identifiable {
     * Stripe customer id, set during the creation of a Stripe customer
     */
    stripeCustomerId?: string
+
+   /**
+    * Coffee chats
+    */
+   hasCoffeeChats?: boolean
    /**
     * Deprecated
     * */
