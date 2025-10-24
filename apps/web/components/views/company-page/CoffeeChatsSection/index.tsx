@@ -3,14 +3,10 @@ import { useCompanyPage } from ".."
 import { sxStyles } from "../../../../types/commonTypes"
 
 const styles = sxStyles({
-   banner: {
-      background: {
-         xs: "linear-gradient(148deg, #2ABAA5 19.92%, #F5B07E 107.66%)",
-         md: "linear-gradient(98deg, #2ABAA5 0%, #F5B07E 100%)",
-      },
+   banner: (theme) => ({
       borderRadius: "12px",
       p: 3,
-      pb: { xs: 0, md: 3 },
+      pb: 0,
       width: "100%",
       height: "auto",
       position: "relative",
@@ -18,43 +14,98 @@ const styles = sxStyles({
       mx: 0,
       display: "flex",
       flexDirection: "column",
-      alignItems: { xs: "center", md: "flex-start" },
-   },
-   textContent: {
-      width: { xs: "100%", md: "60%" },
-   },
+      alignItems: "center",
+      // Mobile gradient
+      background: `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
+      // Desktop gradient
+      [theme.breakpoints.up("md")]: {
+         pb: 3,
+         alignItems: "flex-start",
+         background: `linear-gradient(98deg, ${theme.palette.primary[600]} 0%, #F5B07E 100%)`,
+         // Switch to mobile layout when banner width < 355px on desktop
+         [theme.breakpoints.down(1150)]: {
+            alignItems: "center",
+            pb: 0,
+            background: `linear-gradient(148deg, ${theme.palette.primary[600]} 19.92%, #F5B07E 107.66%)`,
+         },
+      },
+   }),
+   textContent: (theme) => ({
+      width: "100%",
+      position: "relative",
+      zIndex: 2,
+      // Desktop layout
+      [theme.breakpoints.up("md")]: {
+         width: "60%",
+         // Switch to mobile layout when banner width < 355px on desktop
+         [theme.breakpoints.down(1150)]: {
+            width: "100%",
+         },
+      },
+   }),
    title: {
-      color: (theme) => theme.brand.white[50],
+      color: "common.white",
       fontWeight: 600,
    },
    description: {
-      color: (theme) => theme.brand.white[50],
+      color: "common.white",
    },
    button: {
-      borderColor: (theme) => theme.brand.tq[600],
-      color: (theme) => theme.brand.tq[600],
+      borderColor: "primary.600",
+      color: "primary.600",
       "&:hover": {
-         backgroundColor: (theme) => theme.brand.tq[50],
-         borderColor: (theme) => theme.brand.tq[600],
-         color: (theme) => theme.brand.tq[600],
+         backgroundColor: "primary.50",
+         borderColor: "primary.600",
+         color: "primary.600",
       },
    },
-   backgroundImage: {
+   backgroundImage: (theme) => ({
       position: "absolute",
-      right: { xs: 0, md: "-120px" },
-      top: { xs: "auto", md: 0 },
-      bottom: { xs: "-130px", md: 0 },
+      right: "auto",
+      top: "auto",
+      bottom: "-130px",
       pointerEvents: "none",
-   },
-   modelImage: {
-      position: { xs: "relative", md: "absolute" },
-      height: { xs: "auto", md: "100%" },
-      width: { xs: "70%", md: "auto" },
-      right: { xs: "auto", md: "-20px" },
-      bottom: { xs: "auto", md: 0 },
+      // Desktop layout
+      [theme.breakpoints.up("md")]: {
+         right: "-120px",
+         top: 0,
+         bottom: 0,
+         // Switch to mobile layout when banner width < 355px on desktop
+         [theme.breakpoints.down(1150)]: {
+            right: "auto",
+            top: "auto",
+            bottom: "-130px",
+         },
+      },
+   }),
+   modelImage: (theme) => ({
+      position: "relative",
+      maxHeight: "200px",
+      height: "auto",
+      width: "auto",
+      right: "auto",
+      bottom: "auto",
       display: "block",
       pointerEvents: "none",
-   },
+      // Desktop layout
+      [theme.breakpoints.up("md")]: {
+         position: "absolute",
+         maxHeight: "none",
+         height: "100%",
+         width: "auto",
+         right: "-20px",
+         bottom: 0,
+         // Switch to mobile layout when banner width < 355px on desktop
+         [theme.breakpoints.down(1150)]: {
+            position: "relative",
+            maxHeight: "200px",
+            height: "auto",
+            width: "auto",
+            right: "auto",
+            bottom: "auto",
+         },
+      },
+   }),
 })
 
 export const CoffeeChatsSection = () => {
