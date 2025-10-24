@@ -19,7 +19,10 @@ module.exports = {
       "react/boolean-prop-naming": "warn",
       "react/hook-use-state": "warn",
       "react/jsx-handler-names": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": [
+         "warn",
+         { argsIgnorePattern: "^_" },
+      ],
       "@typescript-eslint/ban-ts-ignore": "off",
       "@typescript-eslint/ban-ts-comment": "off",
       "no-extra-semi": "off",
