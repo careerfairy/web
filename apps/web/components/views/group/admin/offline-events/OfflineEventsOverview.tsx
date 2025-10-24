@@ -76,7 +76,7 @@ const OfflineEventsOverviewContent = () => {
                customerName: `${userData.firstName} ${userData.lastName}`,
                customerEmail: userData.userEmail,
                groupId: group.groupId,
-               priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID,
+               priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_STRIPE_PRICE_ID,
                successUrl: `/group/${group.id}/admin/content/offline-events?stripe_session_id={CHECKOUT_SESSION_ID}`,
             }}
             open={checkoutDialogOpen}

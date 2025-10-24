@@ -1,5 +1,6 @@
 import { StripeProductType } from "@careerfairy/shared-lib/stripe/types"
 import { Stripe } from "stripe"
+import { IStripeFunctionsRepository } from "./index"
 import { handleGroupPlanCheckoutSessionCompleted } from "./products/groupPlans"
 import { handleOfflineEventCheckoutSessionCompleted } from "./products/offlineEvents"
 import functions = require("firebase-functions")
@@ -13,16 +14,23 @@ export const checkoutSessionCompletedHandlers = {
       handleOfflineEventCheckoutSessionCompleted,
 }
 
-export const EventHandlers: Partial<
+export const createEventHandlers = (
+   stripeRepo: IStripeFunctionsRepository
+): Partial<
    Record<Stripe.Event.Type, (event: Stripe.Event) => Promise<void>>
-> = {
-   "checkout.session.completed": handleCheckoutSessionCompleted,
-}
+> => ({
+   "checkout.session.completed": (event: Stripe.Event) =>
+      handleCheckoutSessionCompleted(
+         event as Stripe.CheckoutSessionCompletedEvent,
+         stripeRepo
+      ),
+})
 
 // Additional handlers can be added here for other events, e.g. checkout.session.expired, checkout.session.async_payment_succeeded, etc.
 
 export async function handleCheckoutSessionCompleted(
-   event: Stripe.CheckoutSessionCompletedEvent
+   event: Stripe.CheckoutSessionCompletedEvent,
+   stripeRepo: IStripeFunctionsRepository
 ): Promise<void> {
    const metadata = event?.data?.object?.metadata
 
@@ -31,7 +39,7 @@ export async function handleCheckoutSessionCompleted(
          checkoutSessionCompletedHandlers[metadata.type as StripeProductType]
 
       if (handler) {
-         await handler(event)
+         await handler(event, stripeRepo)
       } else {
          functions.logger.error(
             "Could not process Stripe event checkout.session.completed - unknown type: ",

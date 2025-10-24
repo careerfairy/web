@@ -15,6 +15,7 @@ import { CommonPage } from "./CommonPage"
 import { ATSAdminPage } from "./admin/ATSAdminPage"
 import { FeedbackPage } from "./admin/FeedbackPage"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
+import { OfflineEventsAdminPage } from "./admin/OfflineEventsAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
@@ -108,6 +109,36 @@ export class GroupDashboardPage extends CommonPage {
       // The Content section should default to Live streams tab
 
       return new LivestreamsAdminPage(this)
+   }
+
+   public async goToOfflineEvents() {
+      // Offline events is under Content section
+      await this.goToPage("Content")
+      // Navigate to Offline events tab
+      await this.page.getByRole("link", { name: "Offline events" }).click()
+
+      await sleep(3000)
+      return new OfflineEventsAdminPage(this)
+   }
+
+   public async clickQuickActionsOfflineEvent() {
+      // Click "Publish an offline event" button from QuickActions
+      await this.page
+         .getByRole("button")
+         .filter({ hasText: "Publish an offline event" })
+         .click()
+
+      return new OfflineEventsAdminPage(this)
+   }
+
+   public async clickCreateMenuOfflineEvent() {
+      // Click the create menu button (top right, with + icon)
+      await this.page.getByRole("button", { name: "Create" }).first().click()
+
+      // Wait for menu to open and click "Offline event"
+      await this.page.getByRole("menuitem", { name: "Offline event" }).click()
+
+      return new OfflineEventsAdminPage(this)
    }
 
    public async goToATSPage() {

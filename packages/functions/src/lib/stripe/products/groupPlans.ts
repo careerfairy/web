@@ -5,13 +5,15 @@ import {
    StripeProductType,
 } from "@careerfairy/shared-lib/stripe/types"
 import { Stripe } from "stripe"
-import { groupRepo, stripeRepo } from "../../../api/repositories"
+import { groupRepo } from "../../../api/repositories"
+import { IStripeFunctionsRepository } from "../index"
 import functions = require("firebase-functions")
 
 export async function handleGroupPlanSession(
    customerId: string,
    returnUrl: string,
-   data: GroupPlanFetchStripeCustomerSession
+   data: GroupPlanFetchStripeCustomerSession,
+   stripeRepo: IStripeFunctionsRepository
 ): Promise<Stripe.Checkout.Session> {
    const metadata: GroupPlanSessionMetadata = {
       groupId: data.groupId,

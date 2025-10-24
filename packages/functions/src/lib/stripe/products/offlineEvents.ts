@@ -5,19 +5,21 @@ import {
    StripeProductType,
 } from "@careerfairy/shared-lib/stripe/types"
 import { Stripe } from "stripe"
-import { groupRepo, stripeRepo } from "../../../api/repositories"
+import { groupRepo } from "../../../api/repositories"
 import {
    notifyOfflineEventIncreaseFailed,
    notifyOfflineEventPurchased,
 } from "../../../api/slack"
 import config from "../../../config"
 import { logAndThrow } from "../../../lib/validations"
+import { IStripeFunctionsRepository } from "../index"
 import functions = require("firebase-functions")
 
 export async function handleOfflineEventSession(
    customerId: string,
    returnUrl: string,
-   data: OfflineEventFetchStripeCustomerSession
+   data: OfflineEventFetchStripeCustomerSession,
+   stripeRepo: IStripeFunctionsRepository
 ): Promise<Stripe.Checkout.Session> {
    const metadata: OfflineEventSessionMetadata = {
       groupId: data.groupId,
@@ -36,7 +38,8 @@ export async function handleOfflineEventSession(
 }
 
 export async function handleOfflineEventCheckoutSessionCompleted(
-   event: Stripe.CheckoutSessionCompletedEvent
+   event: Stripe.CheckoutSessionCompletedEvent,
+   stripeRepo: IStripeFunctionsRepository
 ): Promise<void> {
    // Being defensive about the event object (but should never happen), but if it does
    // it will crash in the try/catch block and notifity Slack of the error.
