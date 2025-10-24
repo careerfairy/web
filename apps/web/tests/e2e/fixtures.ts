@@ -6,7 +6,7 @@ import FieldOfStudySeed from "@careerfairy/seed-data/fieldsOfStudy"
 import GroupSeed from "@careerfairy/seed-data/groups"
 import JobsSeed from "@careerfairy/seed-data/jobs"
 import UserSeed from "@careerfairy/seed-data/users"
-import { CustomJob } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { GROUP_DASHBOARD_ROLE, Group } from "@careerfairy/shared-lib/groups"
 import { Interest } from "@careerfairy/shared-lib/interests"
@@ -16,6 +16,11 @@ import { loadTestEnv } from "envConfig"
 import { credentials } from "../constants"
 import { GroupDashboardPage } from "./page-object-models/GroupDashboardPage"
 import { LoginPage } from "./page-object-models/LoginPage"
+
+type OfflineEventStatus =
+   | "first-timer" // Never purchased offline events, shows promotion page
+   | "out-of-events" // Previously purchased but no credits left, shows table
+   | "has-available-events" // Has available offline event credits
 
 type GroupAdminFixtureOptions = {
    /**
@@ -38,6 +43,14 @@ type GroupAdminFixtureOptions = {
     * Whether or not to set the privacy policy for the group
     */
    privacyPolicy?: boolean
+
+   /**
+    * Offline events status for the group
+    * - "first-timer": Never purchased offline events, shows promotion page
+    * - "out-of-events": Previously purchased but no credits left, shows table
+    * - "has-available-events": Has available offline event credits
+    */
+   offlineEventStatus?: OfflineEventStatus
 }
 
 base.beforeEach(async () => {
@@ -64,22 +77,42 @@ export const groupAdminFixture = base.extend<{
       completedGroup: false,
       atsGroupType: "NONE",
       privacyPolicy: false,
+      offlineEventStatus: "first-timer",
    },
    group: async ({ options }, use) => {
       await clearAuthData()
       await clearFirestoreData()
 
-      let overrideFields: Partial<Group> = {}
+      const overrideFields: Partial<Group> = {}
 
       if (options.privacyPolicy === true) {
-         overrideFields = {
-            privacyPolicyActive: true,
-            privacyPolicyUrl: "https://careerfairy.io",
-         }
+         overrideFields.privacyPolicyActive = true
+         overrideFields.privacyPolicyUrl = "https://careerfairy.io"
       }
 
       if (!options.atsGroupType || options.atsGroupType === "NONE")
          overrideFields.atsAdminPageFlag = false
+
+      // Set offline events options based on status
+      if (options.offlineEventStatus) {
+         switch (options.offlineEventStatus) {
+            case "first-timer":
+               // Never purchased offline events, shows promotion page
+               overrideFields.hasPurchasedOfflineEvents = false
+               overrideFields.availableOfflineEvents = 0
+               break
+            case "out-of-events":
+               // Previously purchased but no credits left, shows table
+               overrideFields.hasPurchasedOfflineEvents = true
+               overrideFields.availableOfflineEvents = 0
+               break
+            case "has-available-events":
+               // Has available offline event credits
+               overrideFields.hasPurchasedOfflineEvents = true
+               overrideFields.availableOfflineEvents = 5
+               break
+         }
+      }
 
       let group: Group
 

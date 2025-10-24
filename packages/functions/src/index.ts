@@ -32,6 +32,7 @@ setGlobalOptions({
 })
 
 import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
+import { StripeEnvironments } from "@careerfairy/shared-lib/stripe/types"
 import { bundles } from "./bundles"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
@@ -158,13 +159,21 @@ exports.notificationOnboardingLivestream =
 exports.updateUserLiveStreamDataOnUserChange =
    user.updateUserLiveStreamDataOnUserChange
 
-// Stripe
-exports[FUNCTION_NAMES.stripeWebHook] = stripe.stripeWebHook
-exports[FUNCTION_NAMES.fetchStripeCustomerSession] =
+// Stripe - Production
+exports[FUNCTION_NAMES.stripeWebHook.prod] = stripe.stripeWebHook
+exports[FUNCTION_NAMES.fetchStripeCustomerSession.prod] =
    stripe.fetchStripeCustomerSession
-exports[FUNCTION_NAMES.fetchStripePrice] = stripe.fetchStripePrice
-exports[FUNCTION_NAMES.fetchStripeSessionStatus] =
+exports[FUNCTION_NAMES.fetchStripePrice.prod] = stripe.fetchStripePrice
+exports[FUNCTION_NAMES.fetchStripeSessionStatus.prod] =
    stripe.fetchStripeSessionStatus
+
+// Stripe - Test (No webhook for test environment for now)
+exports[FUNCTION_NAMES.fetchStripeCustomerSession[StripeEnvironments.Test]] =
+   stripe.fetchStripeCustomerSessionTest
+exports[FUNCTION_NAMES.fetchStripePrice[StripeEnvironments.Test]] =
+   stripe.fetchStripePriceTest
+exports[FUNCTION_NAMES.fetchStripeSessionStatus[StripeEnvironments.Test]] =
+   stripe.fetchStripeSessionStatusTest
 
 // Livestreams
 exports[FUNCTION_NAMES.sendLivestreamRegistrationConfirmationEmail] =

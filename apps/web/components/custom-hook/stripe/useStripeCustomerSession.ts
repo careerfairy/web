@@ -9,6 +9,7 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
+import { getStripeEnvironment } from "./useStripeEnvironment"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -71,9 +72,10 @@ export const useStripeCustomerSession = <
    options: T
 ) => {
    const fetcher = useFunctionsSWR<Result[]>()
-
+   const stripeEnv = getStripeEnvironment()
+   console.log("🚀 ~ getStripeEnvironment ~ stripeEnv:", stripeEnv)
    return useSWR<StripeCustomerSessionData>(
-      [FUNCTION_NAMES.fetchStripeCustomerSession, options],
+      [FUNCTION_NAMES.fetchStripeCustomerSession[stripeEnv], options],
       fetcher,
       {
          ...swrOptions,

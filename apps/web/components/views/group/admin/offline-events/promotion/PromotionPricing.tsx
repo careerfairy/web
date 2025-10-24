@@ -60,7 +60,7 @@ export const PromotionPricing = () => {
 
 const PricingCard = () => {
    const { data: priceData } = useStripePrice(
-      process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID
+      process.env.NEXT_PUBLIC_OFFLINE_EVENT_STRIPE_PRICE_ID
    )
 
    const stripePrice: Stripe.Price = priceData

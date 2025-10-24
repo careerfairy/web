@@ -8,6 +8,7 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
+import { getStripeEnvironment } from "./useStripeEnvironment"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -37,6 +38,7 @@ type Result = {
 const useStripeSessionStatus = (sessionId: string): Result => {
    const fetcher = useFunctionsSWR<Result[]>()
    const { group } = useGroup()
+   const stripeEnv = getStripeEnvironment()
    const options = useMemo(() => {
       return {
          sessionId: sessionId,
@@ -44,7 +46,7 @@ const useStripeSessionStatus = (sessionId: string): Result => {
       }
    }, [group.id, sessionId])
    return useSWR(
-      [FUNCTION_NAMES.fetchStripeSessionStatus, options],
+      [FUNCTION_NAMES.fetchStripeSessionStatus[stripeEnv], options],
       fetcher,
       swrOptions
    )

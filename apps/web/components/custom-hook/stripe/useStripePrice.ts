@@ -8,6 +8,7 @@ import { errorLogAndNotify } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
+import { getStripeEnvironment } from "./useStripeEnvironment"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -33,19 +34,24 @@ type Result = {
 const useStripePrice = (priceId: string) => {
    const fetcher = useFunctionsSWR<Result[]>()
    const { group } = useGroup()
+   const stripeEnv = getStripeEnvironment()
    const options = useMemo(() => {
       return {
          priceId: priceId,
          groupId: group.id,
       }
    }, [group.id, priceId])
-   return useSWR([FUNCTION_NAMES.fetchStripePrice, options], fetcher, {
-      ...swrOptions,
-      onError: (error) =>
-         errorLogAndNotify(error, {
-            message: `Error fetching Stripe price with options: ${options}`,
-         }),
-   })
+   return useSWR(
+      [FUNCTION_NAMES.fetchStripePrice[stripeEnv], options],
+      fetcher,
+      {
+         ...swrOptions,
+         onError: (error) =>
+            errorLogAndNotify(error, {
+               message: `Error fetching Stripe price with options: ${options}`,
+            }),
+      }
+   )
 }
 
 export default useStripePrice
