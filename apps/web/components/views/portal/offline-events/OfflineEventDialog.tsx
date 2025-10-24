@@ -318,7 +318,6 @@ const Content = ({
          const utm = CookiesUtil.getUTMParams()
 
          dataLayerOfflineEvent(AnalyticsEvents.OfflineEventView, event)
-         dataLayerOfflineEvent(AnalyticsEvents.OfflineEventShadowView, event)
 
          offlineEventService
             .trackOfflineEventAction(
