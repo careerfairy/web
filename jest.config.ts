@@ -29,10 +29,10 @@ const config: Config.InitialOptions = {
       "<rootDir>/pages/landing",
    ],
    moduleDirectories: ["node_modules", "<rootDir>"],
-   testEnvironment: "jsdom",
+   testEnvironment: "<rootDir>/../../packages/config-jest/jsdom-environment.js",
    transform: {
       /* Use babel-jest to transpile tests with the next/babel preset
-      https://jestjs.io/docs/configuration#transform-objectstring-pathtotransformer--pathtotransformer-object */
+      https://jestjs.io/docs/webpack#mocking-css-modules */
       "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest", { presets: ["next/babel"] }],
    },
    transformIgnorePatterns: [

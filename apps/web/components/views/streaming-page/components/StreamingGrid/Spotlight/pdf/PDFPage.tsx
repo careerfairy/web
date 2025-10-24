@@ -1,12 +1,18 @@
 import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
-import { Box, CircularProgress } from "@mui/material"
-import { useState } from "react"
+import { Box } from "@mui/material"
+import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
+import { useStreamingContext } from "components/views/streaming-page/context"
+import { useEffect, useState } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { PDFLoader } from "./PDFLoader"
 import { useDebouncedResize } from "./useDebouncedResize"
 
-// Worker needs to ba added as per docs
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
+// Worker hosted locally to avoid CDN whitelisting issues with corporate clients
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+   "pdfjs-dist/build/pdf.worker.min.js",
+   import.meta.url
+).toString()
 
 type PageDimensions = {
    width: number
@@ -45,11 +51,27 @@ export const PDFPage = ({
 }: Props) => {
    const isReady = useDebouncedResize(parentWidth, parentHeight)
 
+   const { agoraUserId, isHost } = useStreamingContext()
+   const { data: streamerDetails } = useStreamerDetails(agoraUserId)
+
    const [originalPageDimensions, setOriginalPageDimensions] =
       useState<PageDimensions>({
          width: 0,
          height: 0,
       })
+
+   // // Check for service worker support to detect corporate clients with strict security policies
+   useEffect(() => {
+      if (isHost && !("serviceWorker" in navigator)) {
+         errorLogAndNotify(new Error("Service Worker not supported"), {
+            message:
+               "Host device does not support Service Workers - may impact PDF rendering",
+            livestreamId,
+            streamerDetails,
+         })
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [isHost, livestreamId])
 
    const handleRenderError = (e: Error) => {
       errorLogAndNotify(e, {
@@ -92,13 +114,18 @@ export const PDFPage = ({
    }
 
    if (!isReady) {
-      return <CircularProgress />
+      return <PDFLoader parentHeight={parentHeight} aspectRatio={aspectRatio} />
    }
 
    return (
       <Box component="span">
          <Document
-            loading={<CircularProgress />}
+            loading={
+               <PDFLoader
+                  parentHeight={parentHeight}
+                  aspectRatio={aspectRatio}
+               />
+            }
             onLoadSuccess={({ numPages }) => {
                setPdfNumberOfPages(numPages)
             }}
@@ -106,15 +133,23 @@ export const PDFPage = ({
             onLoadError={handleLoadError}
          >
             <Page
-               renderTextLayer={false}
                renderAnnotationLayer={false}
+               renderTextLayer={false}
                pageNumber={presentation.page}
                onLoadSuccess={setOriginalPageDimensions}
                onLoadError={handleLoadError}
                onRenderError={handleRenderError}
+               loading={
+                  <PDFLoader
+                     parentHeight={parentHeight}
+                     aspectRatio={aspectRatio}
+                  />
+               }
                /** Page only allows one dimension to be set, so we need to set the other one to undefined */
                width={width}
                height={height}
+               // Greatly improve text rendering quality by increasing the device pixel ratio to 4x
+               devicePixelRatio={window.devicePixelRatio * 4}
             />
          </Document>
       </Box>
