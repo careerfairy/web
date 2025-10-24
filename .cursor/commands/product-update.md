@@ -27,7 +27,7 @@ Your job is to generate a Slack-friendly Product Update announcement from a PR n
 
    **Opening** (choose based on impact):
 
-   -  Major feature: `:rotating_light: @channel`
+   -  Major feature: `:rotating_light::rotating_light: @channel :rotating_light::rotating_light:`
    -  Regular update: `:rocket: Product Update`
    -  Bug fix/improvement: `:white_check_mark: Update`
 
@@ -50,7 +50,7 @@ Your job is to generate a Slack-friendly Product Update announcement from a PR n
 
    **Emoji Usage** (2-4 total, strategically placed):
 
-   -  Attention: `:rotating_light:` (major), `:rocket:` (regular)
+   -  Attention: `:rotating_light::rotating_light:` (major - use multiple for emphasis!), `:rocket:` (regular)
    -  Feature-specific: `:briefcase:` (jobs), `:video_camera:` (streaming), `:sparkles:` (new)
    -  Celebration: `:tada:`, `:raised_hands:`, `:clinking_glasses:`
 
@@ -79,12 +79,22 @@ Third paragraph about impact and what's next (if applicable).
 Link: https://www.careerfairy.io/[relevant-page]
 ```
 
+Example for major feature:
+
+```
+:rotating_light::rotating_light: @channel :rotating_light::rotating_light:
+
+*We just shipped reactions to Live Stream chat messages* :tada:
+
+[rest of announcement...]
+```
+
 **Note:** Do NOT include PR links in announcements - not all team members have GitHub access. Only include the production careerfairy.io link to the relevant feature/page.
 
 ## Examples of Good Opening Lines
 
--  "We just launched [Feature Name] :rocket:"
--  "Big news: [Feature Name] is now live in production :tada:"
+-  ":rotating_light::rotating_light: We just launched [Feature Name] :rocket:" (major feature)
+-  ":rotating_light::rotating_light: Big news: [Feature Name] is now live in production :tada:" (major feature)
 -  "[User Type] can now [action] with our new [Feature Name] :sparkles:"
 -  "We've shipped a major improvement to [Area] :white_check_mark:"
 
