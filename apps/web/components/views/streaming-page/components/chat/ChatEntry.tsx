@@ -38,6 +38,8 @@ const REACTION_COLORS: Record<ReactionType, string | ((theme: any) => string)> =
       laughing: "#FFF9E6",
    }
 
+const REACTION_TYPES = Object.keys(REACTION_EMOJIS) as ReactionType[]
+
 const styles = sxStyles({
    root: {
       position: "relative",
@@ -202,12 +204,29 @@ type Props = {
  * @param nextProps Next component props.
  * @returns True if the props are equal, false otherwise.
  */
-const propsAreEqual = (prevProps: Props, nextProps: Props) =>
-   prevProps.entry.id === nextProps.entry.id &&
-   prevProps.entry.thumbsUp?.length === nextProps.entry.thumbsUp?.length &&
-   prevProps.entry.wow?.length === nextProps.entry.wow?.length &&
-   prevProps.entry.laughing?.length === nextProps.entry.laughing?.length &&
-   prevProps.entry.heart?.length === nextProps.entry.heart?.length
+const propsAreEqual = (prevProps: Props, nextProps: Props) => {
+   // Always re-render if the entry ID changes
+   if (prevProps.entry.id !== nextProps.entry.id) {
+      return false
+   }
+
+   // Compare reaction arrays by sorting and stringifying (since they're just user ID strings)
+
+   for (const reactionType of REACTION_TYPES) {
+      const prevReactions = (prevProps.entry[reactionType] || [])
+         .sort()
+         .join(",")
+      const nextReactions = (nextProps.entry[reactionType] || [])
+         .sort()
+         .join(",")
+
+      if (prevReactions !== nextReactions) {
+         return false
+      }
+   }
+
+   return true
+}
 
 export const ChatEntry = memo(
    forwardRef<HTMLDivElement, Props>(({ entry, onOptionsClick }, ref) => {
