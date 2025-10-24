@@ -136,9 +136,8 @@ export const PDFPage = ({
                /** Page only allows one dimension to be set, so we need to set the other one to undefined */
                width={width}
                height={height}
-               scale={1}
-               // Greatly improve text rendering quality by increasing the device pixel ratio
-               devicePixelRatio={window.devicePixelRatio * 2}
+               // Greatly improve text rendering quality by increasing the device pixel ratio to 4x
+               devicePixelRatio={window.devicePixelRatio * 4}
             />
          </Document>
       </Box>
