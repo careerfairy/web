@@ -1,8 +1,18 @@
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
-import { Box, Collapse, Fade, IconButton, Stack, Typography } from "@mui/material"
+import {
+   Box,
+   Collapse,
+   Fade,
+   IconButton,
+   Stack,
+   Typography,
+} from "@mui/material"
+import { useStreamIsMobile } from "components/custom-hook/streaming"
+import { useToggleChatReaction } from "components/custom-hook/streaming/useToggleChatReaction"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import LinkifyText from "components/util/LinkifyText"
 import { useAuth } from "HOCs/AuthProvider"
-import { forwardRef, memo, useEffect, useRef, useState } from "react"
+import { forwardRef, memo, useEffect, useMemo, useRef, useState } from "react"
 import { MoreVertical } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
@@ -10,8 +20,6 @@ import { useStreamingContext } from "../../context"
 import { UserType } from "../../util"
 import { UserDetails } from "../UserDetails"
 import { getChatAuthor, getIsMe } from "./util"
-import { useToggleChatReaction } from "components/custom-hook/streaming/useToggleChatReaction"
-import { useStreamIsMobile } from "components/custom-hook/streaming"
 
 type ReactionType = "thumbsUp" | "wow" | "laughing" | "heart"
 
@@ -22,12 +30,13 @@ const REACTION_EMOJIS: Record<ReactionType, string> = {
    heart: "❤️",
 }
 
-const REACTION_COLORS: Record<ReactionType, string> = {
-   thumbsUp: "primary.100",
-   heart: "#FFE8E8",
-   wow: "#FFF4E6",
-   laughing: "#FFF9E6",
-}
+const REACTION_COLORS: Record<ReactionType, string | ((theme: any) => string)> =
+   {
+      thumbsUp: "#FFF0CC",
+      heart: (theme) => theme.brand.error[50],
+      wow: "#FFF4E6",
+      laughing: "#FFF9E6",
+   }
 
 const styles = sxStyles({
    root: {
@@ -119,6 +128,46 @@ const styles = sxStyles({
          transform: "scale(0.95)",
       },
    },
+   reactionOptionHover: {
+      thumbsUp: {
+         "&:hover": {
+            backgroundColor: REACTION_COLORS.thumbsUp,
+            transform: "scale(1.1)",
+         },
+      },
+      heart: {
+         "&:hover": {
+            backgroundColor: REACTION_COLORS.heart,
+            transform: "scale(1.1)",
+         },
+      },
+      wow: {
+         "&:hover": {
+            backgroundColor: REACTION_COLORS.wow,
+            transform: "scale(1.1)",
+         },
+      },
+      laughing: {
+         "&:hover": {
+            backgroundColor: REACTION_COLORS.laughing,
+            transform: "scale(1.1)",
+         },
+      },
+   },
+   reactionOptionActive: {
+      thumbsUp: {
+         backgroundColor: REACTION_COLORS.thumbsUp,
+      },
+      heart: {
+         backgroundColor: REACTION_COLORS.heart,
+      },
+      wow: {
+         backgroundColor: REACTION_COLORS.wow,
+      },
+      laughing: {
+         backgroundColor: REACTION_COLORS.laughing,
+      },
+   },
    reactionCount: {
       display: "flex",
       alignItems: "center",
@@ -130,19 +179,15 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.brand.white[500],
       transition: "background-color 0.2s ease",
    },
-   reactionCountActive: {
-      thumbsUp: {
-         backgroundColor: "primary.100",
-      },
-      heart: {
-         backgroundColor: "#FFE8E8",
-      },
-      wow: {
-         backgroundColor: "#FFF4E6",
-      },
-      laughing: {
-         backgroundColor: "#FFF9E6",
-      },
+   selectedReactionEmoji: {
+      width: 24,
+      height: 24,
+      cursor: "pointer",
+      opacity: 1,
+      fontSize: "18px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
    },
 })
 
@@ -171,6 +216,7 @@ export const ChatEntry = memo(
       const { authenticatedUser, userData } = useAuth()
       const { isHost, agoraUserId, livestreamId } = useStreamingContext()
       const isMobile = useStreamIsMobile()
+      const { errorNotification } = useSnackbarNotifications()
 
       const isMe = getIsMe(
          entry,
@@ -183,7 +229,7 @@ export const ChatEntry = memo(
 
       // Use agoraUserId as the unique identifier for reactions to support multiple speakers
       const userId = agoraUserId || authenticatedUser.uid
-      
+
       const { addReaction, removeReaction } = useToggleChatReaction(
          livestreamId,
          userId
@@ -204,7 +250,7 @@ export const ChatEntry = memo(
             if (unmountTimeoutRef.current) {
                clearTimeout(unmountTimeoutRef.current)
             }
-            
+
             // Mount the menu
             setShouldRenderMenu(true)
             // Trigger enter animation after mount
@@ -218,6 +264,16 @@ export const ChatEntry = memo(
             unmountTimeoutRef.current = setTimeout(() => {
                setShouldRenderMenu(false)
             }, 200)
+         }
+
+         // Cleanup function to clear timeouts on unmount or re-run
+         return () => {
+            if (hideMenuTimeoutRef.current) {
+               clearTimeout(hideMenuTimeoutRef.current)
+            }
+            if (unmountTimeoutRef.current) {
+               clearTimeout(unmountTimeoutRef.current)
+            }
          }
       }, [showReactionMenu])
 
@@ -238,24 +294,31 @@ export const ChatEntry = memo(
       }
 
       // Get reaction counts and check if user reacted for each type
-      const reactions = {
-         thumbsUp: {
-            count: entry.thumbsUp?.length || 0,
-            hasUserReacted: userId ? entry.thumbsUp?.includes(userId) : false,
-         },
-         wow: {
-            count: entry.wow?.length || 0,
-            hasUserReacted: userId ? entry.wow?.includes(userId) : false,
-         },
-         laughing: {
-            count: entry.laughing?.length || 0,
-            hasUserReacted: userId ? entry.laughing?.includes(userId) : false,
-         },
-         heart: {
-            count: entry.heart?.length || 0,
-            hasUserReacted: userId ? entry.heart?.includes(userId) : false,
-         },
-      }
+      const reactions = useMemo(
+         () => ({
+            thumbsUp: {
+               count: entry.thumbsUp?.length || 0,
+               hasUserReacted: userId
+                  ? entry.thumbsUp?.includes(userId)
+                  : false,
+            },
+            wow: {
+               count: entry.wow?.length || 0,
+               hasUserReacted: userId ? entry.wow?.includes(userId) : false,
+            },
+            laughing: {
+               count: entry.laughing?.length || 0,
+               hasUserReacted: userId
+                  ? entry.laughing?.includes(userId)
+                  : false,
+            },
+            heart: {
+               count: entry.heart?.length || 0,
+               hasUserReacted: userId ? entry.heart?.includes(userId) : false,
+            },
+         }),
+         [entry.thumbsUp, entry.wow, entry.laughing, entry.heart, userId]
+      )
 
       // Calculate total reactions to display
       const totalReactions = Object.values(reactions).reduce(
@@ -264,23 +327,32 @@ export const ChatEntry = memo(
       )
 
       // Get all reactions that have at least 1 count, sorted by count descending
-      const activeReactions = (Object.entries(reactions) as [ReactionType, typeof reactions.thumbsUp][])
+      const activeReactions = (
+         Object.entries(reactions) as [
+            ReactionType,
+            typeof reactions.thumbsUp
+         ][]
+      )
          .filter(([_, r]) => r.count > 0)
          .sort((a, b) => b[1].count - a[1].count)
 
       // Find which reaction the current user has selected (if any)
-      const userSelectedReaction = (Object.entries(reactions) as [ReactionType, typeof reactions.thumbsUp][])
-         .find(([_, r]) => r.hasUserReacted)?.[0]
+      const userSelectedReaction = (
+         Object.entries(reactions) as [
+            ReactionType,
+            typeof reactions.thumbsUp
+         ][]
+      ).find(([_, r]) => r.hasUserReacted)?.[0]
 
       const handleReactionClick = async (reactionType: ReactionType) => {
          if (!userId) {
-            console.warn("User must be authenticated to react to messages")
+            errorNotification("User must be authenticated to react to messages")
             return
          }
 
          try {
             const reaction = reactions[reactionType]
-            
+
             // If clicking the same reaction, remove it
             if (reaction.hasUserReacted) {
                await removeReaction(entry.id, reactionType)
@@ -294,7 +366,7 @@ export const ChatEntry = memo(
             }
             setShowReactionMenu(false)
          } catch (error) {
-            console.error("Failed to toggle reaction:", error)
+            errorNotification("Failed to toggle reaction:", error)
          }
       }
 
@@ -332,26 +404,32 @@ export const ChatEntry = memo(
                   {timeSinceEntry}
                </Typography>
                <Stack direction="row" alignItems="center" ml="auto" gap={1}>
-                  <Collapse 
-                     in={totalReactions > 0} 
+                  <Collapse
+                     in={totalReactions > 0}
                      orientation="horizontal"
                      timeout={300}
                   >
                      <Fade in={totalReactions > 0} timeout={300}>
-                        <Box 
+                        <Box
                            sx={[
-                              styles.reactionCount, 
+                              styles.reactionCount,
                               userSelectedReaction && {
-                                 backgroundColor: REACTION_COLORS[userSelectedReaction],
-                              }
+                                 backgroundColor:
+                                    REACTION_COLORS[userSelectedReaction],
+                              },
                            ]}
                         >
                            {activeReactions.length > 0 && (
                               <>
                                  <Typography variant="xsmall">
-                                    {activeReactions.map(([type]) => REACTION_EMOJIS[type]).join("")}
+                                    {activeReactions
+                                       .map(([type]) => REACTION_EMOJIS[type])
+                                       .join("")}
                                  </Typography>
-                                 <Typography variant="xsmall" color="neutral.800">
+                                 <Typography
+                                    variant="xsmall"
+                                    color="neutral.800"
+                                 >
                                     {totalReactions}
                                  </Typography>
                               </>
@@ -359,56 +437,42 @@ export const ChatEntry = memo(
                         </Box>
                      </Fade>
                   </Collapse>
-                  <Box 
+                  <Box
                      sx={styles.reactionIconWrapper}
                      onMouseEnter={handleMouseEnter}
                      onMouseLeave={handleMouseLeave}
                   >
-                     {shouldRenderMenu && (
-                        <Box 
+                     {shouldRenderMenu ? (
+                        <Box
                            sx={[
                               styles.reactionMenu,
                               menuVisible && styles.reactionMenuVisible,
-                              isMobile && { marginRight: "16px" }
+                              isMobile && { marginRight: "16px" },
                            ]}
                         >
-                           {(Object.entries(REACTION_EMOJIS) as [ReactionType, string][]).map(
-                              ([type, emoji]) => (
-                                 <Box
-                                    key={type}
-                                    sx={[
-                                       styles.reactionOption,
-                                       {
-                                          "&:hover": {
-                                             backgroundColor: REACTION_COLORS[type],
-                                             transform: "scale(1.1)",
-                                          },
-                                       },
-                                       reactions[type].hasUserReacted && {
-                                          backgroundColor: REACTION_COLORS[type],
-                                       }
-                                    ]}
-                                    onClick={() => handleReactionClick(type)}
-                                 >
-                                    {emoji}
-                                 </Box>
-                              )
-                           )}
+                           {(
+                              Object.entries(REACTION_EMOJIS) as [
+                                 ReactionType,
+                                 string
+                              ][]
+                           ).map(([type, emoji]) => (
+                              <Box
+                                 key={type}
+                                 sx={[
+                                    styles.reactionOption,
+                                    styles.reactionOptionHover[type],
+                                    reactions[type].hasUserReacted &&
+                                       styles.reactionOptionActive[type],
+                                 ]}
+                                 onClick={() => handleReactionClick(type)}
+                              >
+                                 {emoji}
+                              </Box>
+                           ))}
                         </Box>
-                     )}
+                     ) : null}
                      {userSelectedReaction ? (
-                        <Box
-                           sx={{ 
-                              width: 24,
-                              height: 24,
-                              cursor: "pointer",
-                              opacity: 1,
-                              fontSize: "18px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                           }}
-                        >
+                        <Box sx={styles.selectedReactionEmoji}>
                            {REACTION_EMOJIS[userSelectedReaction]}
                         </Box>
                      ) : (
@@ -452,4 +516,3 @@ const useTimeSinceEntry = (entry: LivestreamChatEntry) => {
 }
 
 ChatEntry.displayName = "ChatEntry"
-
