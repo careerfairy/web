@@ -171,7 +171,7 @@ curl -H "Authorization: Bearer $ACCESS_TOKEN" \
 
 ```
 
-#### 5.4 ADD TRIGGER G4A TAG
+#### 5.3 ADD TRIGGER G4A TAG
 
 -  Run the following command to add the trigger to the specific G4A tag (167), using the trigger ID the value CREATED_TRIGGER_ID stored from the previous step.
 
