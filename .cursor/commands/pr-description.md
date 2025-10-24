@@ -22,7 +22,7 @@ When the user provides ONLY a PR number (e.g., "1694" or "#1694"), automatically
 
 ### 3. Read Template
 
--  Read `@pull_request_template.md`
+-  Read `.github/pull_request_template.md`
 
 ### 4. Analyze & Generate
 
