@@ -186,7 +186,7 @@ curl -H "Authorization: Bearer $ACCESS_TOKEN" \
     -d @-
 ```
 
-#### 5.4.1 CHECK ADDED TRIGGER TO G4A TAg
+#### 5.4.1 CHECK ADDED TRIGGER TO G4A TAG
 
 ```sh
 curl -H "Authorization: Bearer $ACCESS_TOKEN" \
@@ -201,5 +201,5 @@ curl -H "Authorization: Bearer $ACCESS_TOKEN" \
 ### SWITCH TO ORIGINAL gcloud account
 
 ```sh
-gcloud config set account `ACCOUNT`
+gcloud config set account $ACCOUNT
 ```
