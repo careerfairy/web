@@ -1,10 +1,11 @@
 import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
-import { Box, CircularProgress } from "@mui/material"
+import { Box } from "@mui/material"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { useEffect, useState } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
 import { errorLogAndNotify } from "util/CommonUtil"
+import { PDFLoader } from "./PDFLoader"
 import { useDebouncedResize } from "./useDebouncedResize"
 
 // Worker hosted locally to avoid CDN whitelisting issues with corporate clients
@@ -113,13 +114,18 @@ export const PDFPage = ({
    }
 
    if (!isReady) {
-      return <CircularProgress />
+      return <PDFLoader parentHeight={parentHeight} aspectRatio={aspectRatio} />
    }
 
    return (
       <Box component="span">
          <Document
-            loading={<CircularProgress />}
+            loading={
+               <PDFLoader
+                  parentHeight={parentHeight}
+                  aspectRatio={aspectRatio}
+               />
+            }
             onLoadSuccess={({ numPages }) => {
                setPdfNumberOfPages(numPages)
             }}
@@ -133,6 +139,12 @@ export const PDFPage = ({
                onLoadSuccess={setOriginalPageDimensions}
                onLoadError={handleLoadError}
                onRenderError={handleRenderError}
+               loading={
+                  <PDFLoader
+                     parentHeight={parentHeight}
+                     aspectRatio={aspectRatio}
+                  />
+               }
                /** Page only allows one dimension to be set, so we need to set the other one to undefined */
                width={width}
                height={height}
