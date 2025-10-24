@@ -1,7 +1,8 @@
-import { Stack } from "@mui/material"
+import { Box, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCompanyPage } from ".."
 import AboutSection from "../AboutSection"
+import { CoffeeChatsSection } from "../CoffeeChatsSection"
 import EventSection from "../EventSection"
 import JobsSection from "../JobsSection"
 import { MentorsSection } from "../MentorsSection"
@@ -22,6 +23,11 @@ export const Overview = ({ editMode }: Props) => {
    return (
       <Stack spacing={{ xs: 2, md: 3 }}>
          <AboutSection />
+         {Boolean(group.hasCoffeeChats) && (
+            <Box display={{ xs: "block", md: "none" }}>
+               <CoffeeChatsSection />
+            </Box>
+         )}
          {customJobs?.length ? <JobsSection /> : null}
          {group.publicSparks && group.hasSparks ? (
             <SparksSection key={group.id} groupId={group.id} />
