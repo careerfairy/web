@@ -82,7 +82,7 @@ const OfflineEventsOverviewContent = () => {
             open={checkoutDialogOpen}
             onClose={handleCheckoutDialogClose}
             title="Plan your next offline events"
-            subtitle="Select how many offline events you want to publish and reach more students."
+            subtitle="Select how many offline events you want to publish and reach more students"
          />
          {showPromotionView ? (
             <OfflineEventsPromotionView />
