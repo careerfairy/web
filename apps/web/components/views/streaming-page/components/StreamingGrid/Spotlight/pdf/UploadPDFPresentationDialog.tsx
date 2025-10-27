@@ -1,4 +1,7 @@
-import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamModes,
+   PresentationConversionStatus,
+} from "@careerfairy/shared-lib/livestreams"
 import { Box, CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useAppDispatch } from "components/custom-hook/store"
@@ -43,6 +46,12 @@ export const UploadPDFPresentationDialog = () => {
       dispatch(setUploadPDFPresentationDialogOpen(false))
    }
 
+   const isConversionInProgress =
+      pdfPresentation?.conversionStatus ===
+         PresentationConversionStatus.PENDING ||
+      pdfPresentation?.conversionStatus ===
+         PresentationConversionStatus.CONVERTING
+
    return (
       <ConfirmationDialog
          width={589}
@@ -58,7 +67,10 @@ export const UploadPDFPresentationDialog = () => {
          primaryAction={{
             text: "Share slides",
             color: "primary",
-            disabled: !pdfPresentation?.downloadUrl || !readyToShare,
+            disabled:
+               !pdfPresentation?.downloadUrl ||
+               !readyToShare ||
+               isConversionInProgress,
             callback: () =>
                setLivestreamMode({
                   mode: LivestreamModes.PRESENTATION,

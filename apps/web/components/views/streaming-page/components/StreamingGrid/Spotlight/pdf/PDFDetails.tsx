@@ -1,4 +1,7 @@
-import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamPresentation,
+   PresentationConversionStatus,
+} from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    ButtonBase,
@@ -138,11 +141,22 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
       const presentation =
          data instanceof File ? null : (data as LivestreamPresentation)
       const conversionStatus = presentation?.conversionStatus
-      const conversionProgress = presentation?.conversionProgress
+      const convertedPages = presentation?.convertedPages
+      const totalPages = presentation?.totalPages
 
       if (!details) {
          return <PDFDetailsSkeleton />
       }
+
+      const isUploading = (uploadProgress ?? 0) > 0
+      const isConverting =
+         conversionStatus === PresentationConversionStatus.PENDING ||
+         conversionStatus === PresentationConversionStatus.CONVERTING
+      const conversionFailed =
+         conversionStatus === PresentationConversionStatus.FAILED
+
+      const showProgressBar =
+         isUploading || fileUpLoaded || isConverting || conversionFailed
 
       return (
          <Box ref={ref} sx={styles.root}>
@@ -159,12 +173,13 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
                      </IconButton>
                   </Box>
                </Stack>
-               {Boolean(uploadProgress) && (
+               {Boolean(showProgressBar) && (
                   <UploadProgressBar
                      progress={uploadProgress}
                      fileUpLoaded={fileUpLoaded}
                      conversionStatus={conversionStatus}
-                     conversionProgress={conversionProgress}
+                     convertedPages={convertedPages}
+                     totalPages={totalPages}
                   />
                )}
             </Stack>

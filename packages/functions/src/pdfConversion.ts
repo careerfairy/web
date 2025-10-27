@@ -81,7 +81,6 @@ async function convertPdfToImages(
    livestreamId: string
 ): Promise<string[]> {
    const bucket = storage.bucket()
-   const BATCH_SIZE = 1
 
    // Load the PDF
    const pdf = await getDocument({
@@ -99,36 +98,25 @@ async function convertPdfToImages(
    await presentationRef.update({
       conversionStatus: PresentationConversionStatus.CONVERTING,
       totalPages: pdf.numPages,
-      conversionProgress: `0 of ${pdf.numPages}`,
+      convertedPages: 0,
    })
 
    logger.info(
-      `Starting conversion of ${pdf.numPages} pages for livestream ${livestreamId} (batches of ${BATCH_SIZE})`
+      `Starting conversion of ${pdf.numPages} pages for livestream ${livestreamId}`
    )
 
    const imageUrls: string[] = []
 
-   // Process pages in batches
-   for (let i = 0; i < pdf.numPages; i += BATCH_SIZE) {
-      const batchStart = i + 1
-      const batchEnd = Math.min(i + BATCH_SIZE, pdf.numPages)
+   // Process pages sequentially
+   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      logger.info(`Processing page ${pageNum} of ${pdf.numPages}`)
 
-      logger.info(
-         `Processing batch: pages ${batchStart}-${batchEnd} of ${pdf.numPages}`
-      )
+      const imageUrl = await processPage(pdf, pageNum, livestreamId, bucket)
+      imageUrls.push(imageUrl)
 
-      // Process this batch in parallel
-      const batchPromises = []
-      for (let pageNum = batchStart; pageNum <= batchEnd; pageNum++) {
-         batchPromises.push(processPage(pdf, pageNum, livestreamId, bucket))
-      }
-
-      const batchUrls = await Promise.all(batchPromises)
-      imageUrls.push(...batchUrls)
-
-      // Update progress after each batch
+      // Update progress after each page
       await presentationRef.update({
-         conversionProgress: `${imageUrls.length} of ${pdf.numPages}`,
+         convertedPages: imageUrls.length,
       })
    }
 
@@ -193,7 +181,7 @@ export const onPresentationUpload = onObjectFinalized(
             imageUrls,
             imageConversionCompletedAt: FieldValue.serverTimestamp(),
             conversionStatus: PresentationConversionStatus.COMPLETED,
-            conversionProgress: `${imageUrls.length} of ${imageUrls.length}`,
+            convertedPages: imageUrls.length,
          })
 
          logger.info(

@@ -187,7 +187,7 @@ export const PDFPage = ({
                width={width}
                height={height}
                // Greatly improve text rendering quality by increasing the device pixel ratio to 4x
-               devicePixelRatio={window.devicePixelRatio * 4}
+               devicePixelRatio={window.devicePixelRatio * 2}
             />
          </Document>
       </Box>

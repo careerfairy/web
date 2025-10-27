@@ -991,6 +991,8 @@ export interface LivestreamPresentation extends Identifiable {
    conversionProgress?: string
    /** Total number of pages in the PDF */
    totalPages?: number
+   /** Number of pages that have been converted so far */
+   convertedPages?: number
 }
 
 /**
