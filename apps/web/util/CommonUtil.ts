@@ -248,6 +248,13 @@ export const getWorkflowId = (): string => {
       }
    }
 
+   // Check process.env first - this works during build AND runtime
+   // This is critical for CI environments where the variable is set during build
+   if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
+      return process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
+   }
+
+   // Fallback to getConfig for backwards compatibility (runtime only)
    const { publicRuntimeConfig } = getConfig()
    return (
       publicRuntimeConfig?.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
