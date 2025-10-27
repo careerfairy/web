@@ -34,6 +34,7 @@ export const usePublishLivestream = () => {
             allFieldsOfStudy,
             firebaseService
          )
+      livestreamObject.livestreamType = livestream.livestreamType
       livestreamObject.id = livestream.id
       livestreamObject.test = false
       livestreamObject.hasEnded = false
@@ -66,6 +67,7 @@ export const usePublishLivestream = () => {
       handlePublishStream,
       isValid,
       livestream.id,
+      livestream.livestreamType,
       values,
    ])
 

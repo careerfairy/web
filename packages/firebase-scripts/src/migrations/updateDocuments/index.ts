@@ -52,9 +52,11 @@ const config: UpdateDocumentsConfig<LivestreamEvent> = {
       .collection(COLLECTION_NAME)
       .where("test", "==", false)
       .orderBy(FIELD_TO_ORDER_BY, "desc"),
-   updateData: {
+   // Set livestreamType from legacy isPanel: panels => "panel", others => "livestream"
+   updateData: (data) => ({
+      livestreamType: data?.isPanel ? "panel" : "livestream",
       migrationTrigger: Date.now(),
-   },
+   }),
    batchSize: 200, // Increased batch size for faster processing
    waitTimeBetweenBatches: 3_000, // Longer wait time to allow functions to process
    dryRun: false, // Set to false to run the migration

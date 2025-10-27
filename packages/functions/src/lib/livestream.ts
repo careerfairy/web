@@ -162,25 +162,21 @@ export const getStreamsByDateWithRegisteredStudents = async (
    if (options?.excludeHidden) {
       query = query.where("hidden", "==", false)
    }
-
-   const panelsFilter = (stream: Pick<LivestreamEvent, "isPanel">) => {
-      if (options?.panelsOnly) {
-         return stream.isPanel === true
-      }
-
-      return stream.isPanel !== true
+   // Panel-aware filtering in the query: prefer livestreamType; fallback to legacy isPanel
+   if (options?.panelsOnly) {
+      query = query.where("livestreamType", "==", "panel")
+   } else {
+      query = query.where("livestreamType", "==", "livestream")
    }
 
    return query.get().then((querySnapshot) => {
-      const streams = querySnapshot.docs
-         ?.map(
-            (doc) =>
-               ({
-                  id: doc.id,
-                  ...doc.data(),
-               } as LivestreamEvent)
-         )
-         ?.filter(panelsFilter)
+      const streams = querySnapshot.docs?.map(
+         (doc) =>
+            ({
+               id: doc.id,
+               ...doc.data(),
+            } as LivestreamEvent)
+      )
 
       return addUsersDataOnStreams(streams, options?.skimData)
    })

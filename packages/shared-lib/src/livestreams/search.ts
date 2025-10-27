@@ -26,6 +26,7 @@ export const LIVESTREAM_FIELDS_TO_INDEX = [
    "maxRegistrants",
    "companyLogoUrl",
    "created",
+   "livestreamType",
    "withResume",
    "duration",
    "groupIds",
@@ -109,6 +110,7 @@ export const LIVESTREAM_SEARCHABLE_ATTRIBUTES = [
  * They must be a subset of the fields defined in LIVESTREAM_FIELDS_TO_INDEX.
  */
 export const LIVESTREAM_FILTERING_FIELDS = [
+   "livestreamType",
    "fieldOfStudyIdTags",
    "levelOfStudyIdTags",
    "denyRecordingAccess",

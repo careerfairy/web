@@ -674,8 +674,8 @@ const Content: FC<ContentProps> = ({
       if (activeViewIndex === getActiveViewIndexFromPage("details")) {
          // Use client-side data if available, otherwise use server-side data
          const isPanel = livestream
-            ? livestream.isPanel
-            : serverSideLivestream?.isPanel
+            ? livestream.livestreamType === "panel"
+            : serverSideLivestream?.livestreamType === "panel"
 
          if (isPanel) {
             return views.findIndex((v) => v.key === "panel-details")

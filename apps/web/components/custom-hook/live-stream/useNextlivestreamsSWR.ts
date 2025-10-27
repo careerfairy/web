@@ -41,8 +41,8 @@ export const useNextLivestreamsSWR = (options?: Options) => {
             where("start", ">", getEarliestEventBufferTime()),
             where("test", "==", false),
             ...(isPanel
-               ? [where("isPanel", "==", true)]
-               : [where("isPanel", "in", [false, null])]),
+               ? [where("livestreamType", "==", "panel")]
+               : [where("livestreamType", "==", "livestream")]),
             orderBy("start", "asc"),
             ...(includeHidden ? [] : [where("hidden", "==", false)]),
             firestoreLimit(limit)

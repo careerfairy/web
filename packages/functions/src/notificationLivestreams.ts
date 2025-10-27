@@ -36,7 +36,9 @@ export const notifyUsersWhenLivestreamStarts = onDocumentUpdated(
 
             await livestreamsRepo.createLivestreamStartPushNotifications(
                newValue,
-               newValue.isPanel ? options : null
+               newValue.livestreamType === "panel" || newValue.isPanel
+                  ? options
+                  : null
             )
          }
       } catch (error) {
@@ -89,9 +91,10 @@ export const notifyUsersOnLivestreamStart = onDocumentUpdated(
                campaign: "livestream_start",
             })
 
-            const templateId = livestream.isPanel
-               ? CUSTOMERIO_PUSH_TEMPLATES.PANEL_START
-               : CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START
+            const templateId =
+               livestream.livestreamType === "panel" || livestream.isPanel
+                  ? CUSTOMERIO_PUSH_TEMPLATES.PANEL_START
+                  : CUSTOMERIO_PUSH_TEMPLATES.LIVESTREAM_START
 
             const { successful, failed } =
                await notificationService.sendPushNotifications(

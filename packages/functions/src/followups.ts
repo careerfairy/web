@@ -334,12 +334,13 @@ const sendAttendeesReminder = async (
 
          const livestreamsToRemind =
             allLivestreamsToRemind?.filter(
-               (livestream) => !livestream.isPanel
+               (livestream) => livestream.livestreamType !== "panel"
             ) ?? []
 
          const panelsToRemind =
             allLivestreamsToRemind?.filter(
-               (livestream) => livestream.isPanel
+               (livestream) =>
+                  livestream.livestreamType === "panel" || livestream.isPanel
             ) ?? []
 
          const groupsByEventIds: Record<string, Group> = {}

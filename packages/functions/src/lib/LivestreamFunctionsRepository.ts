@@ -805,6 +805,8 @@ export class LivestreamFunctionsRepository
             q = q.where("hidden", "==", false)
          }
 
+         q = q.where("livestreamType", "==", "livestream")
+
          if (languageCodes?.length > 0) {
             q = q.where("language.code", "in", languageCodes)
          }

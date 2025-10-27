@@ -32,16 +32,16 @@ export const FUNCTION_NAMES = {
    upsertLivestreamSpeaker: "upsertLivestreamSpeaker_v4",
    deleteLivestream: "deleteLivestream",
    updateCreatorRoles: "updateCreatorRoles",
-   getLivestreamsICalendarEvents: "getLivestreamsICalendarEvents",
+   getLivestreamsICalendarEvents: "getLivestreamsICalendarEvents_v2",
 
    // Reminders functions
    onLivestreamStartScheduleNoShowReminder:
       "onLivestreamStartScheduleNoShowReminder",
-   sendLivestreamNoShowReminder: "sendLivestreamNoShowReminder_v2",
+   sendLivestreamNoShowReminder: "sendLivestreamNoShowReminder_v3",
 
    // Livestream functions
    sendLivestreamRegistrationConfirmationEmail:
-      "sendLivestreamRegistrationConfirmationEmail_v7",
+      "sendLivestreamRegistrationConfirmationEmail_v8",
    sendPhysicalEventRegistrationConfirmationEmail:
       "sendPhysicalEventRegistrationConfirmationEmail_v2",
    getRecommendedEvents: "getRecommendedEvents_v7",
