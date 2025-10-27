@@ -2,6 +2,7 @@ import { GroupPlanTypes } from "@careerfairy/shared-lib/groups"
 import {
    BaseSessionPayload,
    StripeCustomerSessionData,
+   StripeEnvironment,
    StripeEnvironments,
    StripeProductType,
 } from "@careerfairy/shared-lib/stripe/types"
@@ -14,7 +15,7 @@ import {
    onRequest,
 } from "firebase-functions/v2/https"
 import { Stripe } from "stripe"
-import { SchemaOf, object, string } from "yup"
+import { object, string } from "yup"
 import { stripeRepo } from "./api/repositories"
 import { createEventHandlers } from "./lib/stripe/events"
 import { IStripeFunctionsRepository } from "./lib/stripe/index"
@@ -34,6 +35,7 @@ import functions = require("firebase-functions")
 type FetchStripePrice = {
    groupId: string
    priceId: string
+   environment: StripeEnvironment
 }
 
 /**
@@ -43,6 +45,7 @@ type FetchStripePrice = {
 type FetchStripeSessionStatus = {
    sessionId: string
    groupId: string
+   environment: StripeEnvironment
 }
 
 /**
@@ -52,9 +55,10 @@ const runtimeSettings: GlobalOptions = {
    memory: "256MiB",
 }
 
-const fetchStripePriceSchema: SchemaOf<FetchStripePrice> = object().shape({
+const fetchStripePriceSchema = object().shape({
    groupId: string().required(),
    priceId: string().required(),
+   environment: string().oneOf(Object.values(StripeEnvironments)).required(),
 })
 
 const fetchStripeCustomerSessionSchema = object().shape({
@@ -64,6 +68,7 @@ const fetchStripeCustomerSessionSchema = object().shape({
    groupId: string().required(),
    priceId: string().required(),
    successUrl: string().required(),
+   environment: string().oneOf(Object.values(StripeEnvironments)).required(),
    plan: string().when("type", {
       is: StripeProductType.GROUP_PLAN,
       then: (schema) => schema.oneOf(Object.values(GroupPlanTypes)).required(),
@@ -71,11 +76,11 @@ const fetchStripeCustomerSessionSchema = object().shape({
    }),
 })
 
-const fetchStripeSessionStatusSchema: SchemaOf<FetchStripeSessionStatus> =
-   object().shape({
-      sessionId: string().required(),
-      groupId: string().required(),
-   })
+const fetchStripeSessionStatusSchema = object().shape({
+   sessionId: string().required(),
+   groupId: string().required(),
+   environment: string().oneOf(Object.values(StripeEnvironments)).required(),
+})
 
 /**
  * Core function: Fetches a Stripe Customer Session
@@ -231,6 +236,7 @@ async function handleStripeWebhook(
  * Fetches a Stripe Customer Session, if the customer does not exist, a new one will be created.
  * Customers are identified by their metadata.groupId
  * Supports multiple product types: group-plan, offline-event
+ * The environment parameter determines whether to use test or production Stripe account
  */
 export const fetchStripeCustomerSession = onCall(
    runtimeSettings,
@@ -238,16 +244,15 @@ export const fetchStripeCustomerSession = onCall(
       dataValidation(fetchStripeCustomerSessionSchema),
       userShouldBeGroupAdmin(),
       async (request) => {
-         return getStripeCustomerSession(
-            request,
-            stripeRepo[StripeEnvironments.Prod]
-         )
+         const { environment } = request.data
+         return getStripeCustomerSession(request, stripeRepo[environment])
       }
    )
 )
 
 /**
  * Fetch Stripe Price via ID using the Stripe API. Receives requests with data
+ * The environment parameter determines whether to use test or production Stripe account
  */
 export const fetchStripePrice = onCall(
    runtimeSettings,
@@ -255,13 +260,15 @@ export const fetchStripePrice = onCall(
       dataValidation(fetchStripePriceSchema),
       userShouldBeGroupAdmin(),
       async (request) => {
-         return getStripePrice(request, stripeRepo[StripeEnvironments.Prod])
+         const { environment } = request.data
+         return getStripePrice(request, stripeRepo[environment])
       }
    )
 )
 
 /**
  * Fetches Session status from Stripe API, returning null if any exception occurs (invalid id or other)
+ * The environment parameter determines whether to use test or production Stripe account
  */
 export const fetchStripeSessionStatus = onCall(
    runtimeSettings,
@@ -269,10 +276,8 @@ export const fetchStripeSessionStatus = onCall(
       dataValidation(fetchStripeSessionStatusSchema),
       userShouldBeGroupAdmin(),
       async (request) => {
-         return getStripeSessionStatus(
-            request,
-            stripeRepo[StripeEnvironments.Prod]
-         )
+         const { environment } = request.data
+         return getStripeSessionStatus(request, stripeRepo[environment])
       }
    )
 )
@@ -288,56 +293,4 @@ export const stripeWebHook = onRequest(
          stripeRepo[StripeEnvironments.Prod]
       )
    }
-)
-
-// ============================================================================
-// TEST VARIANTS - Using test Stripe account
-// ============================================================================
-
-/**
- * TEST: Fetches a Stripe Customer Session using the test Stripe account
- */
-export const fetchStripeCustomerSessionTest = onCall(
-   runtimeSettings,
-   middlewares<BaseSessionPayload>(
-      dataValidation(fetchStripeCustomerSessionSchema),
-      userShouldBeGroupAdmin(),
-      async (request) => {
-         return getStripeCustomerSession(
-            request,
-            stripeRepo[StripeEnvironments.Test]
-         )
-      }
-   )
-)
-
-/**
- * TEST: Fetch Stripe Price via ID using the test Stripe account
- */
-export const fetchStripePriceTest = onCall(
-   runtimeSettings,
-   middlewares<FetchStripePrice>(
-      dataValidation(fetchStripePriceSchema),
-      userShouldBeGroupAdmin(),
-      async (request) => {
-         return getStripePrice(request, stripeRepo[StripeEnvironments.Test])
-      }
-   )
-)
-
-/**
- * TEST: Fetches Session status from test Stripe account
- */
-export const fetchStripeSessionStatusTest = onCall(
-   runtimeSettings,
-   middlewares<FetchStripeSessionStatus>(
-      dataValidation(fetchStripeSessionStatusSchema),
-      userShouldBeGroupAdmin(),
-      async (request) => {
-         return getStripeSessionStatus(
-            request,
-            stripeRepo[StripeEnvironments.Test]
-         )
-      }
-   )
 )
