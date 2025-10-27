@@ -659,6 +659,7 @@ export class FirebaseLivestreamRepository
          .collection("livestreams")
          .where("groupIds", "array-contains", groupId)
          .where("test", "==", false)
+         .where("livestreamType", "==", "livestream")
 
       if (hideHidden) {
          query = query.where("hidden", "==", false)
@@ -698,6 +699,7 @@ export class FirebaseLivestreamRepository
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
+         .where("livestreamType", "==", "livestream")
          .orderBy("start", "asc")
 
       if (showHidden === false) {
@@ -743,6 +745,7 @@ export class FirebaseLivestreamRepository
             .where("start", ">", getEarliestEventBufferTime())
             .where("targetFieldsOfStudy", "array-contains-any", tempArray)
             .where("test", "==", false)
+            .where("livestreamType", "==", "livestream")
             .where("hidden", "==", false)
             .orderBy("start", "asc")
          if (limit) {
@@ -784,6 +787,7 @@ export class FirebaseLivestreamRepository
          .where("start", ">", options.fromDate)
          .where("start", "<", new Date())
          .where("test", "==", false)
+         .where("livestreamType", "==", "livestream")
          .orderBy("start", "desc")
 
       if (options.limit) {
@@ -895,6 +899,7 @@ export class FirebaseLivestreamRepository
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
+         .where("livestreamType", "==", "livestream")
          .where("hidden", "==", false)
          .where(
             "interestsIds",
@@ -908,6 +913,7 @@ export class FirebaseLivestreamRepository
       return this.firestore
          .collection("livestreams")
          .where("test", "==", false)
+         .where("livestreamType", "==", "livestream")
          .where("hidden", "==", false)
          .where("featured", "==", true)
          .orderBy("start", "desc")
@@ -1781,8 +1787,9 @@ export class FirebaseLivestreamRepository
    async getAllPanels(limit?: number): Promise<LivestreamEvent[]> {
       const docs = await this.firestore
          .collection("livestreams")
-         .where("isPanel", "==", true)
-         .where("hidden", "==", true)
+         .where("livestreamType", "==", "panel")
+         .where("hidden", "==", false)
+         .where("test", "==", false)
          .orderBy("start", "asc")
          .limit(limit)
          .get()

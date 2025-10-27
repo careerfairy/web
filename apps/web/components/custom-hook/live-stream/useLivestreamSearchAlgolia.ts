@@ -91,6 +91,9 @@ export const buildAlgoliaFilterString = (options: FilterOptions): string => {
 
    filters.push(generateDateFilterString(dateFilter))
 
+   // Always restrict to standard livestreams (exclude panels)
+   filters.push("livestreamType:livestream")
+
    return filters.filter(Boolean).join(" AND ")
 }
 

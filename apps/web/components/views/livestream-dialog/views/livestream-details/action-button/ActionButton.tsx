@@ -40,7 +40,7 @@ const ButtonElement = () => {
             <RegisterButton
                label={
                   registered
-                     ? livestreamPresenter.isPanel
+                     ? livestreamPresenter.isPanel()
                         ? "You attended this event"
                         : "You attended this live stream"
                      : "Recording Not Available"
@@ -71,7 +71,7 @@ const ButtonElement = () => {
       return (
          <RegisterButton
             label={
-               livestreamPresenter.isPanel ? "Join event" : "Join live stream"
+               livestreamPresenter.isPanel() ? "Join event" : "Join live stream"
             }
          />
       )
@@ -80,7 +80,7 @@ const ButtonElement = () => {
    return (
       <RegisterButton
          label={
-            livestreamPresenter.isPanel
+            livestreamPresenter.isPanel()
                ? "Register to event"
                : "Register to live stream"
          }

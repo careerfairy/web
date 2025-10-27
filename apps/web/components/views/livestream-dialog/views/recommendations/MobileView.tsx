@@ -194,7 +194,7 @@ const Recommendations = ({
                         exit="exit"
                      >
                         <Subtitle key="recommendations-subtitle">
-                           {livestream.isPanel ? (
+                           {livestream.livestreamType === "panel" ? (
                               "because you registered to this Master Class:"
                            ) : (
                               <>

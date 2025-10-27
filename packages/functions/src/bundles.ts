@@ -23,6 +23,7 @@ export const bundles = {
                .collection("livestreams")
                .where("start", ">", getEarliestEventBufferTime())
                .where("test", "==", false)
+               .where("livestreamType", "==", "livestream")
                .where("hidden", "==", false),
       },
    },
@@ -40,6 +41,7 @@ export const bundles = {
                   DateTime.local().plus({ days: 15 }).toJSDate()
                )
                .where("test", "==", false)
+               .where("livestreamType", "==", "livestream")
                .where("hidden", "==", false),
       },
    },
@@ -59,6 +61,7 @@ export const bundles = {
                )
                .where("start", "<", new Date())
                .where("test", "==", false)
+               .where("livestreamType", "==", "livestream")
                .where("hidden", "==", false),
       },
    },

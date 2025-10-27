@@ -31,7 +31,10 @@ const DOCS_PER_INDEXING = 250
  * 1. ALGOLIA_FULL_SYNC_SECRET_KEY in the .env file in functions package
  */
 export const fullIndexSync = onRequest(
-   defaultTriggerRunTimeConfigV2,
+   {
+      ...defaultTriggerRunTimeConfigV2,
+      memory: "512MiB",
+   },
    async (req, res) => {
       if (req.method !== "GET") {
          res.status(405).send("Method Not Allowed")

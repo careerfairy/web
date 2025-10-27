@@ -670,6 +670,8 @@ class FirebaseService {
          livestream.created = this.getServerTimestamp() as Timestamp
          livestream.currentSpeakerId = livestreamsRef.id
          livestream.id = livestreamsRef.id
+         // Ensure livestreamType is set on creation (published or draft)
+         livestream.livestreamType = livestream.livestreamType ?? "livestream"
          batch.set(livestreamsRef, livestream, { merge: true })
 
          if (collection === "livestreams") {
@@ -824,6 +826,7 @@ class FirebaseService {
          ),
          hidden: true,
          triGrams: {},
+         livestreamType: "livestream",
          title: "Test live stream",
       }
 

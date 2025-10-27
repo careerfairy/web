@@ -166,7 +166,9 @@ export const useRtcConnectionState = () =>
    useAppSelector((state) => state.streamingApp.rtcState.connectionState)
 
 export const useIsPanel = () =>
-   useAppSelector((state) => state.streamingApp.livestreamState.isPanel)
+   useAppSelector(
+      (state) => state.streamingApp.livestreamState.livestreamType === "panel"
+   )
 
 export const useLivestreamGroupIds = () =>
    useAppSelector((state) => state.streamingApp.livestreamState.groupIds)
