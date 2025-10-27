@@ -134,6 +134,12 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
    ({ data, uploadProgress, fileUpLoaded, isDeleting, handleDelete }, ref) => {
       const details = useMemo(() => getDetails(data), [data])
 
+      // Extract conversion status from presentation data (only LivestreamPresentation has these fields)
+      const presentation =
+         data instanceof File ? null : (data as LivestreamPresentation)
+      const conversionStatus = presentation?.conversionStatus
+      const conversionProgress = presentation?.conversionProgress
+
       if (!details) {
          return <PDFDetailsSkeleton />
       }
@@ -157,6 +163,8 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
                   <UploadProgressBar
                      progress={uploadProgress}
                      fileUpLoaded={fileUpLoaded}
+                     conversionStatus={conversionStatus}
+                     conversionProgress={conversionProgress}
                   />
                )}
             </Stack>

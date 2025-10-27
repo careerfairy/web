@@ -37,6 +37,7 @@ import {
    MarkLivestreamQuestionAsCurrentRequest,
    MarkLivestreamQuestionAsDoneRequest,
    ParticipantDetails,
+   PresentationConversionStatus,
    ResetLivestreamQuestionRequest,
    Speaker,
    ToggleActiveCTARequest,
@@ -1129,6 +1130,7 @@ export class LivestreamService {
          fileSize: fileSize || 0,
          id: ref.id,
          storagePath,
+         conversionStatus: PresentationConversionStatus.PENDING,
       })
    }
 

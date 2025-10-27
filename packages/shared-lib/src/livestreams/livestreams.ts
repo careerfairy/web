@@ -946,7 +946,30 @@ export type CategoryDataOption = {
 /**
  * A PDF presentation for a live stream
  * Document Path: livestreams/{livestreamId}/presentations/presentation
+ * Note: undefined = legacy presentation (before conversion feature)
  */
+export const PresentationConversionStatus = {
+   /**
+    * PDF uploaded, conversion not started
+    */
+   PENDING: "pending",
+   /**
+    * Conversion in progress
+    */
+   CONVERTING: "converting",
+   /**
+    * Conversion completed successfully
+    */
+   COMPLETED: "completed",
+   /**
+    * Conversion failed
+    */
+   FAILED: "failed",
+} as const
+
+export type PresentationConversionStatus =
+   (typeof PresentationConversionStatus)[keyof typeof PresentationConversionStatus]
+
 export interface LivestreamPresentation extends Identifiable {
    downloadUrl: string
    page: number
@@ -955,6 +978,19 @@ export interface LivestreamPresentation extends Identifiable {
    storagePath?: string
    /** The size of the PDF in bytes */
    fileSize?: number
+   /** High-resolution image URLs for each PDF page (generated server-side) */
+   imageUrls?: string[]
+   /** Timestamp when the image conversion completed */
+   imageConversionCompletedAt?: Timestamp
+   /**
+    * Status of the image conversion process.
+    * undefined = legacy presentation (uploaded before conversion feature was added)
+    */
+   conversionStatus?: PresentationConversionStatus
+   /** Current conversion progress (e.g., "5 of 20") */
+   conversionProgress?: string
+   /** Total number of pages in the PDF */
+   totalPages?: number
 }
 
 /**

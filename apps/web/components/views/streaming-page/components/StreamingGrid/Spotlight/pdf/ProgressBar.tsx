@@ -1,3 +1,4 @@
+import { PresentationConversionStatus } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    LinearProgress,
@@ -39,13 +40,64 @@ const styles = sxStyles({
 type Props = {
    progress: number
    fileUpLoaded: boolean
+   conversionStatus?: PresentationConversionStatus
+   conversionProgress?: string
 }
 
-export const UploadProgressBar = ({ progress, fileUpLoaded }: Props) => {
+export const UploadProgressBar = ({
+   progress,
+   fileUpLoaded,
+   conversionStatus,
+   conversionProgress,
+}: Props) => {
    if (!progress) {
       return null
    }
 
+   // Show conversion state based on explicit status
+   if (
+      fileUpLoaded &&
+      conversionStatus === PresentationConversionStatus.CONVERTING
+   ) {
+      return (
+         <Stack sx={styles.root} direction="row" spacing={2}>
+            <LinearProgress sx={styles.progress} variant="indeterminate" />
+            <Typography variant="small" color="neutral.700">
+               Converting to high-quality images
+               {conversionProgress ? ` (${conversionProgress})` : "..."}
+            </Typography>
+         </Stack>
+      )
+   }
+
+   if (
+      fileUpLoaded &&
+      conversionStatus === PresentationConversionStatus.PENDING
+   ) {
+      return (
+         <Stack sx={styles.root} direction="row" spacing={2}>
+            <LinearProgress sx={styles.progress} variant="indeterminate" />
+            <Typography variant="small" color="neutral.700">
+               Preparing to convert...
+            </Typography>
+         </Stack>
+      )
+   }
+
+   if (
+      fileUpLoaded &&
+      conversionStatus === PresentationConversionStatus.FAILED
+   ) {
+      return (
+         <Stack direction="row" spacing={1} sx={styles.root}>
+            <Typography variant="xsmall" color="error.main">
+               Conversion failed - using PDF fallback
+            </Typography>
+         </Stack>
+      )
+   }
+
+   // Show success for completed or legacy presentations (no status = old upload)
    if (fileUpLoaded) {
       return (
          <Stack direction="row" spacing={1} sx={styles.root}>
@@ -55,7 +107,7 @@ export const UploadProgressBar = ({ progress, fileUpLoaded }: Props) => {
                variant="xsmall"
                color="neutral.700"
             >
-               File uploaded
+               Ready to share
             </Typography>
          </Stack>
       )

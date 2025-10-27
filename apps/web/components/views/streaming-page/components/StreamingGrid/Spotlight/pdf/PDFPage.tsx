@@ -2,8 +2,10 @@ import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
 import { Box } from "@mui/material"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { useStreamingContext } from "components/views/streaming-page/context"
+import Image from "next/image"
 import { useEffect, useState } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
+import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { PDFLoader } from "./PDFLoader"
 import { useDebouncedResize } from "./useDebouncedResize"
@@ -13,6 +15,17 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
    "pdfjs-dist/build/pdf.worker.min.js",
    import.meta.url
 ).toString()
+
+const styles = sxStyles({
+   imageContainer: {
+      position: "relative",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      height: "100%",
+   },
+})
 
 type PageDimensions = {
    width: number
@@ -59,6 +72,19 @@ export const PDFPage = ({
          width: 0,
          height: 0,
       })
+
+   // If high-res images are available, use them instead of PDF rendering
+   const hasImages = Boolean(presentation?.imageUrls?.length)
+   const currentImageUrl = hasImages
+      ? presentation.imageUrls[presentation.page - 1]
+      : null
+
+   // Set the total number of pages when images are available
+   useEffect(() => {
+      if (hasImages) {
+         setPdfNumberOfPages(presentation.imageUrls!.length)
+      }
+   }, [hasImages, presentation.imageUrls, setPdfNumberOfPages])
 
    // // Check for service worker support to detect corporate clients with strict security policies
    useEffect(() => {
@@ -117,6 +143,18 @@ export const PDFPage = ({
       return <PDFLoader parentHeight={parentHeight} aspectRatio={aspectRatio} />
    }
 
+   // If high-res images are available, display the image instead of rendering PDF
+   if (currentImageUrl) {
+      return (
+         <PresentationImage
+            imageUrl={currentImageUrl}
+            pageNumber={presentation.page}
+            livestreamId={livestreamId}
+         />
+      )
+   }
+
+   // Fallback to PDF rendering when images are not yet available
    return (
       <Box component="span">
          <Document
@@ -152,6 +190,44 @@ export const PDFPage = ({
                devicePixelRatio={window.devicePixelRatio * 4}
             />
          </Document>
+      </Box>
+   )
+}
+
+type PresentationImageProps = {
+   imageUrl: string
+   pageNumber: number
+   livestreamId: string
+}
+
+const PresentationImage = ({
+   imageUrl,
+   pageNumber,
+   livestreamId,
+}: PresentationImageProps) => {
+   return (
+      <Box sx={styles.imageContainer}>
+         <Image
+            src={imageUrl}
+            alt={`Presentation page ${pageNumber}`}
+            fill
+            quality={100}
+            style={{
+               objectFit: "contain",
+            }}
+            priority
+            onError={() => {
+               errorLogAndNotify(
+                  new Error("Failed to load presentation image"),
+                  {
+                     message: "Image load error",
+                     imageUrl,
+                     livestreamId,
+                     presentationPage: pageNumber,
+                  }
+               )
+            }}
+         />
       </Box>
    )
 }

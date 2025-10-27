@@ -873,3 +873,35 @@ export const windowedShuffle = <T>(
 
    return result
 }
+
+/**
+ * Retry a function with exponential backoff
+ * @param fn - The async function to retry
+ * @param maxRetries - Maximum number of retry attempts (default: 3)
+ * @param delayMs - Initial delay in milliseconds (default: 1000)
+ * @returns The result of the function if successful
+ * @throws Error if all retries are exhausted
+ */
+export async function retryWithBackoff<T>(
+   fn: () => Promise<T>,
+   maxRetries = 3,
+   delayMs = 1000
+): Promise<T> {
+   let lastError: Error | undefined
+   for (let i = 0; i < maxRetries; i++) {
+      try {
+         return await fn()
+      } catch (error) {
+         lastError = error as Error
+         if (i < maxRetries - 1) {
+            const delay = delayMs * Math.pow(2, i)
+            await new Promise((resolve) => setTimeout(resolve, delay))
+         }
+      }
+   }
+   throw new Error(
+      `Failed after ${maxRetries} retries: ${
+         lastError?.message || "Unknown error"
+      }`
+   )
+}
