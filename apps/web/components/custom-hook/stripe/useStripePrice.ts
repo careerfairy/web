@@ -46,6 +46,7 @@ const useStripePrice = (priceId: string) => {
       fetcher,
       {
          ...swrOptions,
+         suspense: false,
          onError: (error) =>
             errorLogAndNotify(error, {
                message: `Error fetching Stripe price with options: ${options}`,

@@ -73,12 +73,12 @@ export const useStripeCustomerSession = <
 ) => {
    const fetcher = useFunctionsSWR<Result[]>()
    const stripeEnv = getStripeEnvironment()
-   console.log("🚀 ~ getStripeEnvironment ~ stripeEnv:", stripeEnv)
    return useSWR<StripeCustomerSessionData>(
       [FUNCTION_NAMES.fetchStripeCustomerSession[stripeEnv], options],
       fetcher,
       {
          ...swrOptions,
+         suspense: false,
          onError: (error) =>
             errorLogAndNotify(error, {
                message: `Error fetching Stripe Customer Session with`,
