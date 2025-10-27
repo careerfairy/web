@@ -5,11 +5,10 @@ import {
    BaseFetchStripeCustomerSession,
    StripeCustomerSessionData,
 } from "@careerfairy/shared-lib/stripe/types"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { errorLogAndNotify, getStripeEnvironment } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
-import { getStripeEnvironment } from "./useStripeEnvironment"
 
 const swrOptions: SWRConfiguration = {
    ...reducedRemoteCallsOptions,
@@ -73,8 +72,15 @@ export const useStripeCustomerSession = <
 ) => {
    const fetcher = useFunctionsSWR<Result[]>()
    const stripeEnv = getStripeEnvironment()
+
+   // Add environment to the options payload
+   const optionsWithEnv = {
+      ...options,
+      environment: stripeEnv,
+   }
+
    return useSWR<StripeCustomerSessionData>(
-      [FUNCTION_NAMES.fetchStripeCustomerSession[stripeEnv], options],
+      [FUNCTION_NAMES.fetchStripeCustomerSession, optionsWithEnv],
       fetcher,
       {
          ...swrOptions,
@@ -82,7 +88,7 @@ export const useStripeCustomerSession = <
          onError: (error) =>
             errorLogAndNotify(error, {
                message: `Error fetching Stripe Customer Session with`,
-               options,
+               options: optionsWithEnv,
             }),
       }
    )

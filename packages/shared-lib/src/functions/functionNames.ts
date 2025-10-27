@@ -1,5 +1,3 @@
-import { StripeEnvironment, StripeEnvironments } from "../stripe/types"
-
 /**
  * Centralized cloud function names to be shared between client and server
  */
@@ -95,20 +93,9 @@ export const FUNCTION_NAMES = {
    syncLivestreamStats: "syncLivestreamStats_v2",
    checkExpiredPlans: "checkExpiredPlans_v2",
 
-   // Stripe functions (environment-based)
-   stripeWebHook: {
-      [StripeEnvironments.Prod]: "stripeWebHook_v2",
-   } as Record<StripeEnvironment, string>,
-   fetchStripeCustomerSession: {
-      [StripeEnvironments.Prod]: "fetchStripeCustomerSession_v2",
-      [StripeEnvironments.Test]: "test_fetchStripeCustomerSession",
-   } as Record<StripeEnvironment, string>,
-   fetchStripePrice: {
-      [StripeEnvironments.Prod]: "fetchStripePrice_v2",
-      [StripeEnvironments.Test]: "test_fetchStripePrice",
-   } as Record<StripeEnvironment, string>,
-   fetchStripeSessionStatus: {
-      [StripeEnvironments.Prod]: "fetchStripeSessionStatus_v2",
-      [StripeEnvironments.Test]: "test_fetchStripeSessionStatus",
-   } as Record<StripeEnvironment, string>,
+   // Stripe functions
+   stripeWebHook: "stripeWebHook_v3",
+   fetchStripeCustomerSession: "fetchStripeCustomerSession_v3",
+   fetchStripePrice: "fetchStripePrice_v3",
+   fetchStripeSessionStatus: "fetchStripeSessionStatus_v3",
 } as const

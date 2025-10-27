@@ -81,6 +81,7 @@ export interface BaseFetchStripeCustomerSession {
    priceId: string
    successUrl: string
    type: StripeProductType
+   environment: StripeEnvironment
 }
 
 /**
@@ -117,6 +118,7 @@ export interface BaseSessionPayload {
    groupId: string
    priceId: string
    successUrl: string
+   environment: StripeEnvironment
    plan?: GroupPlanType
    [key: string]: unknown
 }

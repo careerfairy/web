@@ -1,4 +1,8 @@
 /* eslint-disable no-var */
+import {
+   StripeEnvironment,
+   StripeEnvironments,
+} from "@careerfairy/shared-lib/stripe/types"
 import * as Sentry from "@sentry/nextjs"
 import getConfig from "next/config"
 import { v4 as uuid } from "uuid"
@@ -225,6 +229,19 @@ export const shouldUseEmulators = () => {
    }
 
    return false
+}
+
+export const getStripeEnvironment = (): StripeEnvironment => {
+   let stripeEnv = null
+
+   if (isTestEnvironment() || shouldUseEmulators()) {
+      stripeEnv = StripeEnvironments.Test
+   } else {
+      stripeEnv = StripeEnvironments.Prod
+   }
+
+   console.log("🚀 ~ getStripeEnvironment ~ stripeEnv:", stripeEnv)
+   return stripeEnv
 }
 
 /**
