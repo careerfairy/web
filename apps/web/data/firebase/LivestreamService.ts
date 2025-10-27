@@ -577,30 +577,34 @@ export class LivestreamService {
          userData.userEmail
       )
 
-      const userLivestreamDataSnapshot = await getDoc(userLivestreamDataRef)
-      const existingData = userLivestreamDataSnapshot.data()
+      return runTransaction(FirestoreInstance, async (transaction) => {
+         const userLivestreamDataSnapshot = await transaction.get(
+            userLivestreamDataRef
+         )
+         const existingData = userLivestreamDataSnapshot.data()
 
-      // Check if already tracked (one-time tracking)
-      if (existingData?.addedToCalendar) {
-         return false // Already tracked, skip
-      }
+         // Check if already tracked (one-time tracking)
+         if (existingData?.addedToCalendar) {
+            return false // Already tracked, skip
+         }
 
-      const updateData: Partial<UserLivestreamData> = {
-         user: userData,
-         userId: userData?.authId,
-         addedToCalendar: {
-            date: Timestamp.now(),
-            calendarProvider,
-            utm: CookiesUtil.getUTMParams(),
-            ...(originSource && { originSource }),
-         },
-      }
+         const updateData: Partial<UserLivestreamData> = {
+            user: userData,
+            userId: userData?.authId,
+            addedToCalendar: {
+               date: Timestamp.now(),
+               calendarProvider,
+               utm: CookiesUtil.getUTMParams(),
+               ...(originSource && { originSource }),
+            },
+         }
 
-      await setDoc(userLivestreamDataRef, updateData, {
-         merge: true,
+         transaction.set(userLivestreamDataRef, updateData, {
+            merge: true,
+         })
+
+         return true // Successfully tracked
       })
-
-      return true // Successfully tracked
    }
 
    /**
