@@ -48,7 +48,10 @@ const useStripeSessionStatus = (sessionId: string): Result => {
    return useSWR(
       [FUNCTION_NAMES.fetchStripeSessionStatus[stripeEnv], options],
       fetcher,
-      swrOptions
+      {
+         ...swrOptions,
+         suspense: false,
+      }
    )
 }
 
