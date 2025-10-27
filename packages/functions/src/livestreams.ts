@@ -232,9 +232,10 @@ export const livestreamRegistrationConfirmationEmail = onCall(
 
       try {
          // Send email using notification repository
-         const templateId = livestream.isPanel
-            ? CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REGISTRATION
-            : CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION
+         const templateId =
+            livestream.livestreamType === "panel" || livestream.isPanel
+               ? CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REGISTRATION
+               : CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REGISTRATION
 
          const livestreamUrl = `${getWebBaseUrl()}/portal/livestream/${
             livestream.id
@@ -273,7 +274,9 @@ export const livestreamRegistrationConfirmationEmail = onCall(
             return baseData satisfies LivestreamRegistrationTemplateData
          }
 
-         const templateData = createTemplateData(livestream.isPanel)
+         const templateData = createTemplateData(
+            livestream.livestreamType === "panel" || livestream.isPanel
+         )
 
          const result = await notificationService.sendEmailNotifications([
             {
@@ -289,14 +292,18 @@ export const livestreamRegistrationConfirmationEmail = onCall(
 
          logger.info(
             `🚀 ~ ${
-               livestream.isPanel ? "Panel" : "Livestream"
+               livestream.livestreamType === "panel" || livestream.isPanel
+                  ? "Panel"
+                  : "Livestream"
             } registration confirmation email sent`,
             result
          )
          return {
             status: 200,
             data: `${
-               livestream.isPanel ? "Panel" : "Livestream"
+               livestream.livestreamType === "panel" || livestream.isPanel
+                  ? "Panel"
+                  : "Livestream"
             } registration confirmation email sent`,
          }
       } catch (error) {
@@ -318,7 +325,7 @@ export const sendPhysicalEventRegistrationConfirmationEmail = onCall<{
       throw new HttpsError("not-found", "Livestream not found")
    }
 
-   if (livestream.isPanel) {
+   if (livestream.livestreamType === "panel" || livestream.isPanel) {
       functions.logger.warn(
          `Livestream ${livestream.id} is a panel, skipping registration confirmation email`
       )

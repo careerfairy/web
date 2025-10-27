@@ -1641,6 +1641,7 @@ export class LivestreamService {
             collection(FirestoreInstance, "livestreams"),
             where("start", ">", earliestEventTime),
             where("test", "==", false),
+            where("livestreamType", "==", "livestream"),
             where("companyIndustries", "array-contains-any", industries),
             orderBy("start", "asc")
          ).withConverter(createGenericConverter<LivestreamEvent>())
@@ -1704,6 +1705,7 @@ export class LivestreamService {
             where("start", ">", fromDate),
             where("start", "<", now),
             where("test", "==", false),
+            where("livestreamType", "==", "livestream"),
             where("companyIndustries", "array-contains-any", industries),
             orderBy("start", "desc")
          ).withConverter(createGenericConverter<LivestreamEvent>())
