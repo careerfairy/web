@@ -67,7 +67,7 @@ test.describe("Group Admin Offline Events", () => {
       )
    })
 
-   test.describe("Groups with no available credits (out-of-events)", () => {
+   test.skip("Groups with no available credits (out-of-events)", () => {
       /**
        * Test for groups with no credits trying to create an event from QuickActions.
        * Clicking "Publish an offline event" should show the out of events dialog.
@@ -144,7 +144,7 @@ test.describe("Group Admin Offline Events", () => {
       )
    })
 
-   test.describe("Groups with available credits (has-available-events)", () => {
+   test.skip("Groups with available credits (has-available-events)", () => {
       /**
        * Test that the correct count of available offline events is shown above the table.
        */

@@ -25,20 +25,13 @@ export const getStripeEnvironment = (): StripeEnvironment => {
    console.log("🚀 ~ getStripeEnvironment ~ useEmulators:", useEmulators)
    console.log(
       "🚀 ~ getStripeEnvironment ~ process.env.NEXT_PUBLIC_DEV_NAME:",
-      process.env.NEXT_PUBLIC_DEV_NAME
+      process?.env?.NEXT_PUBLIC_DEV_NAME
    )
 
    const stripeEnv =
       useEmulators || workflowId !== "unknown" || isTestEnvironment()
          ? StripeEnvironments.Test
          : StripeEnvironments.Prod
-
-   // Debug log to verify correct environment in CI
-   if (typeof window !== "undefined") {
-      console.log(
-         `🚀 ~ [Stripe Environment] Using: ${stripeEnv} (workflowId: ${workflowId}, useEmulators: ${useEmulators})`
-      )
-   }
 
    console.log("🚀 ~ getStripeEnvironment ~ stripeEnv:", stripeEnv)
    return StripeEnvironments.Test
