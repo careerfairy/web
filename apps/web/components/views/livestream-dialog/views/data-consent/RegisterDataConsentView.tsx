@@ -130,7 +130,7 @@ const GroupQuestionsForm = () => {
 
    const policiesToAccept = groupsWithPolicies?.length > 0
 
-   if (livestream.isPanel) {
+   if (livestream.livestreamType === "panel") {
       return (
          <PanelsConsentView
             goToPrevious={goToPrevious}

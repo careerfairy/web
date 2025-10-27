@@ -252,7 +252,7 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
                         sx={styles.askQuestionCopy}
                      >
                         Be the first one to ask{" "}
-                        {livestream.isPanel
+                        {livestream.livestreamType === "panel"
                            ? "the speakers"
                            : livestream.company}{" "}
                         a question
@@ -262,7 +262,7 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
                         sx={styles.askQuestionCopy2}
                      >
                         Got a question? Get answers directly from{" "}
-                        {livestream.isPanel
+                        {livestream.livestreamType === "panel"
                            ? "the speakers"
                            : `${livestream.company}'s employees`}
                         . The community can upvote the most valuable questions.
