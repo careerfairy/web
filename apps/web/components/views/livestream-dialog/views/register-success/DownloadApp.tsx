@@ -214,11 +214,12 @@ const ActionsMobile = () => {
 
 const AddToCalendarButton = () => {
    const isMobile = useIsMobile()
-   const { livestream } = useLiveStreamDialog()
+   const { livestream, originSource } = useLiveStreamDialog()
    return (
       <AddToCalendar
          event={livestream}
          filename={`${livestream.company}-event`}
+         originSource={originSource}
       >
          {(handleClick) => (
             <Button

@@ -390,9 +390,19 @@ export interface UserLivestreamData extends Identifiable {
       // UTM parameters from the most recent view
       lastUtm?: UTMParams
       // Origin source from the first view
-      firstOriginSource?: ImpressionLocation
+      firstOriginSource?: ImpressionLocation | string
       // Origin source from the most recent view
-      lastOriginSource?: ImpressionLocation
+      lastOriginSource?: ImpressionLocation | string
+   } | null
+   addedToCalendar?: {
+      // When the user added the livestream to their calendar
+      date: firebase.firestore.Timestamp
+      // Which calendar provider the user used
+      calendarProvider: "google" | "apple" | "outlook" | "yahoo" | "ics"
+      // UTM parameters at time of adding to calendar
+      utm?: UTMParams
+      // Origin source when added to calendar
+      originSource?: ImpressionLocation | string
    } | null
    jobApplications?: {
       [jobId: string]: LivestreamJobApplicationDetails

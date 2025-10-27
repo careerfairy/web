@@ -310,8 +310,13 @@ const Header = ({ isSparksOpen }) => {
 
 const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
    const route = useRouter()
-   const { closeDialog, livestream, goToView, isDiscoverCompanySparksOpen } =
-      useLiveStreamDialog()
+   const {
+      closeDialog,
+      livestream,
+      goToView,
+      isDiscoverCompanySparksOpen,
+      originSource,
+   } = useLiveStreamDialog()
    const { data: group } = useGroup(livestream.groupIds[0])
    const groupHasSparks = group?.publicSparks
    const eventDetailsDialogVisibility = useSelector(
@@ -346,6 +351,7 @@ const ActionButtons = ({ handleDiscoverSparks, isSparksOpen }) => {
                event={livestream}
                filename={`${livestream.company}-event`}
                onCalendarClick={() => groupHasSparks && handleDiscoverSparks()}
+               originSource={originSource}
             >
                {(handleClick) => (
                   <Button

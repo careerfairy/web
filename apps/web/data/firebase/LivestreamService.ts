@@ -480,14 +480,14 @@ export class LivestreamService {
                     firstSeenAt: currentTimestamp,
                     firstUtm: currentUtm,
                     ...(originSource && {
-                       firstOriginSource: originSource as any,
+                       firstOriginSource: originSource,
                     }),
                  }
                : {}),
             // Always update lastSeenAt, lastUtm, lastOriginSource, and increment viewCount
             lastSeenAt: currentTimestamp,
             lastUtm: currentUtm,
-            ...(originSource && { lastOriginSource: originSource as any }),
+            ...(originSource && { lastOriginSource: originSource }),
             viewCount: increment(1),
          },
          registered: existingData?.registered || null,
@@ -555,6 +555,54 @@ export class LivestreamService {
 
       return batch.commit()
    }
+
+   /**
+    * Updates Firestore to mark that a user added a livestream to their calendar.
+    * Only tracks the first time (one-time tracking) to preserve the original data.
+    *
+    * @param {string} livestreamId - Livestream ID.
+    * @param {UserData} userData - User data.
+    * @param {string} calendarProvider - The calendar provider used (google, apple, outlook, yahoo, ics).
+    * @param {string} [originSource] - Optional origin source when added to calendar.
+    * @returns {Promise<boolean>} Returns true if tracked, false if already tracked.
+    */
+   async setUserAddedToCalendar(
+      livestreamId: string,
+      userData: UserData,
+      calendarProvider: "google" | "apple" | "outlook" | "yahoo" | "ics",
+      originSource?: string
+   ): Promise<boolean> {
+      const userLivestreamDataRef = this.getUserLivestreamDataRef(
+         livestreamId,
+         userData.userEmail
+      )
+
+      const userLivestreamDataSnapshot = await getDoc(userLivestreamDataRef)
+      const existingData = userLivestreamDataSnapshot.data()
+
+      // Check if already tracked (one-time tracking)
+      if (existingData?.addedToCalendar) {
+         return false // Already tracked, skip
+      }
+
+      const updateData: Partial<UserLivestreamData> = {
+         user: userData,
+         userId: userData?.authId,
+         addedToCalendar: {
+            date: Timestamp.now(),
+            calendarProvider,
+            utm: CookiesUtil.getUTMParams(),
+            ...(originSource && { originSource }),
+         },
+      }
+
+      await setDoc(userLivestreamDataRef, updateData, {
+         merge: true,
+      })
+
+      return true // Successfully tracked
+   }
+
    /**
     * Sets the status of a live stream to either started or not started.
     * If `shouldStart` is true, performs a transaction to ensure the stream isn't restarted if already started.
