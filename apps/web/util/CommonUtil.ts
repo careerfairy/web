@@ -232,16 +232,15 @@ export const shouldUseEmulators = () => {
 }
 
 export const getStripeEnvironment = (): StripeEnvironment => {
-   let stripeEnv = null
-
-   if (isTestEnvironment() || shouldUseEmulators()) {
-      stripeEnv = StripeEnvironments.Test
-   } else {
-      stripeEnv = StripeEnvironments.Prod
+   if (
+      isTestEnvironment() ||
+      shouldUseEmulators() ||
+      process.env.NEXT_PUBLIC_IS_VERCEL_PREVIEW === "true"
+   ) {
+      return StripeEnvironments.Test
    }
 
-   console.log("🚀 ~ getStripeEnvironment ~ stripeEnv:", stripeEnv)
-   return stripeEnv
+   return StripeEnvironments.Prod
 }
 
 /**
@@ -265,13 +264,6 @@ export const getWorkflowId = (): string => {
       }
    }
 
-   // Check process.env first - this works during build AND runtime
-   // This is critical for CI environments where the variable is set during build
-   if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
-      return process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
-   }
-
-   // Fallback to getConfig for backwards compatibility (runtime only)
    const { publicRuntimeConfig } = getConfig()
    return (
       publicRuntimeConfig?.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
