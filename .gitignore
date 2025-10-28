@@ -48,3 +48,7 @@ yarn-error.log*
 
 # local keys
 gtm-service-account-key.json
+
+# Claude Code configuration (personal)
+.claude/
+CLAUDE.md
