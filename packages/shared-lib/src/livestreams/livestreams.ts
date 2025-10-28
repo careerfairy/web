@@ -946,43 +946,70 @@ export type CategoryDataOption = {
 /**
  * A PDF presentation for a live stream
  * Document Path: livestreams/{livestreamId}/presentations/presentation
- * Note: undefined = legacy presentation (before conversion feature)
  */
-export const PresentationConversionStatus = {
-   /**
-    * PDF uploaded, conversion not started
-    */
+
+/**
+ * Status values for image conversion
+ */
+export const ImageConversionStatus = {
+   /** PDF uploaded, conversion not started yet */
    PENDING: "pending",
-   /**
-    * Conversion in progress (PDF to images)
-    */
+   /** PDF parsing and conversion setup in progress */
    CONVERTING: "converting",
-   /**
-    * Uploading converted images to storage
-    */
+   /** Converting PDF pages to images and uploading to storage */
    UPLOADING: "uploading",
-   /**
-    * Conversion completed successfully
-    */
+   /** Conversion completed successfully */
    COMPLETED: "completed",
-   /**
-    * Conversion failed
-    */
+   /** Conversion failed with error */
    FAILED: "failed",
 } as const
 
-export function getIsProcessingPresentation(
-   conversionStatus: PresentationConversionStatus
+export type ImageConversionStatusValue =
+   (typeof ImageConversionStatus)[keyof typeof ImageConversionStatus]
+
+/**
+ * Discriminated union representing the state of image conversion for a PDF presentation
+ */
+export type ImageConversionState =
+   | {
+        status: typeof ImageConversionStatus.PENDING
+     }
+   | {
+        status: typeof ImageConversionStatus.CONVERTING
+        totalPages: number
+        convertedPages: number
+     }
+   | {
+        status: typeof ImageConversionStatus.UPLOADING
+        totalPages: number
+        convertedPages: number
+     }
+   | {
+        status: typeof ImageConversionStatus.COMPLETED
+        totalPages: number
+        imageUrls: string[]
+        completedAt: Timestamp
+     }
+   | {
+        status: typeof ImageConversionStatus.FAILED
+        error: string
+        totalPages?: number
+        convertedPages?: number
+     }
+
+/**
+ * Helper function to check if image conversion is in progress
+ */
+export function getIsProcessingImageConversion(
+   imageConversion: ImageConversionState | undefined
 ): boolean {
+   if (!imageConversion) return false
    return (
-      conversionStatus === PresentationConversionStatus.PENDING ||
-      conversionStatus === PresentationConversionStatus.CONVERTING ||
-      conversionStatus === PresentationConversionStatus.UPLOADING
+      imageConversion.status === ImageConversionStatus.PENDING ||
+      imageConversion.status === ImageConversionStatus.CONVERTING ||
+      imageConversion.status === ImageConversionStatus.UPLOADING
    )
 }
-
-export type PresentationConversionStatus =
-   (typeof PresentationConversionStatus)[keyof typeof PresentationConversionStatus]
 
 export interface LivestreamPresentation extends Identifiable {
    downloadUrl: string
@@ -992,23 +1019,10 @@ export interface LivestreamPresentation extends Identifiable {
    storagePath?: string
    /** The size of the PDF in bytes */
    fileSize?: number
-   /** High-resolution image URLs for each PDF page (generated server-side) */
-   imageUrls?: string[]
-   /** Timestamp when the image conversion completed */
-   imageConversionCompletedAt?: Timestamp
    /**
-    * Status of the image conversion process.
-    * undefined = legacy presentation (uploaded before conversion feature was added)
+    * Image conversion state (undefined = legacy presentation before image conversion feature)
     */
-   conversionStatus?: PresentationConversionStatus
-   /** Current conversion progress (e.g., "5 of 20") */
-   conversionProgress?: string
-   /** Total number of pages in the PDF */
-   totalPages?: number
-   /** Number of pages that have been converted so far */
-   convertedPages?: number
-   /** Error message if conversion failed */
-   conversionError?: string
+   imageConversion?: ImageConversionState
 }
 
 /**

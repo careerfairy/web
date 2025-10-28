@@ -1,12 +1,10 @@
 import { STORAGE_PATHS } from "@careerfairy/shared-lib/constants/storagePaths"
-import { PresentationConversionStatus } from "@careerfairy/shared-lib/livestreams"
-import { livestreamService } from "data/firebase/LivestreamService"
 import {
-   deleteField,
-   increment,
-   serverTimestamp,
-   updateDoc,
-} from "firebase/firestore"
+   ImageConversionStatus,
+   type ImageConversionState,
+} from "@careerfairy/shared-lib/livestreams"
+import { livestreamService } from "data/firebase/LivestreamService"
+import { increment, serverTimestamp, updateDoc } from "firebase/firestore"
 import { useCallback, useMemo } from "react"
 import { errorLogAndNotify, sanitizeFileName } from "util/CommonUtil"
 import { v4 as uuid } from "uuid"
@@ -33,31 +31,39 @@ const useUploadPDFPresentation = (livestreamId: string) => {
             : uuid()
 
          const pdfStoragePath = `${STORAGE_PATHS.presentations}/${generatedName}.${fileExtension}`
+         const presentationRef =
+            livestreamService.getPresentationRef(livestreamId)
 
-         // 1) Upload original PDF to storage
-         const pdfMeta = await pdfUpload.handleUploadFile(file, generatedName)
-
-         // 2) Create presentation doc with PDF download URL (fallback)
+         // 1) Create presentation doc with PENDING status FIRST (before upload starts)
+         // This ensures imageConversion state exists from the very beginning
          await livestreamService.setLivestreamPDFPresentation({
             livestreamId,
-            downloadUrl: pdfMeta.url,
+            downloadUrl: "", // Will be updated after upload
             storagePath: pdfStoragePath,
             fileSize: file.size,
             fileName: file.name,
          })
 
-         // 3) Client-side conversion: render pages to PNG and upload
-         const presentationRef =
-            livestreamService.getPresentationRef(livestreamId)
+         // 2) Upload original PDF to storage (progress tracked in PENDING state)
+         const pdfMeta = await pdfUpload.handleUploadFile(file, generatedName)
 
-         // Mark as converting and reset fields
+         // 3) Update document with PDF download URL
          await updateDoc(presentationRef, {
-            conversionStatus: PresentationConversionStatus.CONVERTING,
-            convertedPages: 0,
-            imageUrls: [],
-            imageConversionCompletedAt: deleteField(),
-            conversionError: deleteField(),
+            downloadUrl: pdfMeta.url,
          })
+
+         // 4) Mark as converting (now we'll convert PDF to images)
+         const convertingState: ImageConversionState = {
+            status: ImageConversionStatus.CONVERTING,
+            totalPages: 0,
+            convertedPages: 0,
+         }
+         await updateDoc(presentationRef, {
+            imageConversion: convertingState,
+         })
+
+         let totalPages = 0
+         let imageUrls: string[] = []
 
          try {
             // Load PDF.js lazily on client
@@ -74,17 +80,22 @@ const useUploadPDFPresentation = (livestreamId: string) => {
             const loadingTask = anyPdfjs.getDocument({ data: arrayBuffer })
             const pdf = await loadingTask.promise
 
-            const totalPages: number = pdf.numPages
+            totalPages = pdf.numPages
 
-            await updateDoc(presentationRef, {
-               conversionStatus: PresentationConversionStatus.UPLOADING,
+            // Mark as uploading (now we know totalPages)
+            const uploadingState: ImageConversionState = {
+               status: ImageConversionStatus.UPLOADING,
                totalPages,
+               convertedPages: 0,
+            }
+            await updateDoc(presentationRef, {
+               imageConversion: uploadingState,
             })
 
             // High-quality rendering at 1080p resolution
             const TARGET_WIDTH = 1920 // Full HD width (1920x1080)
             const CONCURRENCY = Math.min(3, totalPages)
-            const imageUrls: string[] = new Array(totalPages)
+            imageUrls = new Array(totalPages)
 
             let currentPage = 1
             const runWorker = async () => {
@@ -132,31 +143,40 @@ const useUploadPDFPresentation = (livestreamId: string) => {
 
                   imageUrls[pageIndex - 1] = url
 
-                  // Update progress
+                  // Update progress (increment convertedPages in nested imageConversion)
                   await updateDoc(presentationRef, {
-                     convertedPages: increment(1),
+                     "imageConversion.convertedPages": increment(1),
                   })
                }
             }
 
             await Promise.all(Array.from({ length: CONCURRENCY }, runWorker))
 
-            // Finalize
-            await updateDoc(presentationRef, {
+            // Finalize - mark as completed
+            const completedState: ImageConversionState = {
+               status: ImageConversionStatus.COMPLETED,
+               totalPages: imageUrls.length,
                imageUrls,
-               imageConversionCompletedAt: serverTimestamp(),
-               conversionStatus: PresentationConversionStatus.COMPLETED,
-               convertedPages: imageUrls.length,
+               // eslint-disable-next-line @typescript-eslint/no-explicit-any
+               completedAt: serverTimestamp() as any,
+            }
+            await updateDoc(presentationRef, {
+               imageConversion: completedState,
             })
          } catch (e) {
             errorLogAndNotify(e, {
                message: "Error during PDF conversion",
                livestreamId,
             })
+
+            const failedState: ImageConversionState = {
+               status: ImageConversionStatus.FAILED,
+               error: e instanceof Error ? e.message : "Unknown error",
+               totalPages,
+               convertedPages: imageUrls.filter(Boolean).length,
+            }
             await updateDoc(presentationRef, {
-               conversionStatus: PresentationConversionStatus.FAILED,
-               conversionError:
-                  e instanceof Error ? e.message : "Unknown error",
+               imageConversion: failedState,
             })
 
             throw e

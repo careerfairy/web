@@ -1,4 +1,7 @@
-import { PresentationConversionStatus } from "@careerfairy/shared-lib/livestreams"
+import {
+   ImageConversionStatus,
+   type ImageConversionState,
+} from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    LinearProgress,
@@ -40,62 +43,62 @@ const styles = sxStyles({
 type Props = {
    progress: number
    fileUpLoaded: boolean
-   conversionStatus?: PresentationConversionStatus
-   convertedPages?: number
-   totalPages?: number
+   imageConversion?: ImageConversionState
 }
 
 export const UploadProgressBar = ({
    progress,
    fileUpLoaded: _fileUpLoaded,
-   conversionStatus,
-   convertedPages,
-   totalPages,
+   imageConversion,
 }: Props) => {
-   // Map the entire process to a single 0-100% progress bar
-   // 0-30%: PDF upload (PENDING)
-   // 30-40%: PDF parsing and conversion setup (CONVERTING)
-   // 40-95%: Image conversion and upload (UPLOADING)
-   // 100%: Complete (COMPLETED)
+   // Map the entire process to a single 0-100% progress bar:
+   // 0-30%:  PDF upload (pending or no imageConversion yet)
+   // 30-40%: PDF parsing and conversion setup (converting)
+   // 40-95%: Image conversion and upload (uploading)
+   // 100%:   Complete (completed)
 
    const getOverallProgress = (): number => {
-      // PENDING: Uploading original PDF (0-30%)
-      if (conversionStatus === PresentationConversionStatus.PENDING) {
-         return progress ? progress * 0.3 : 0
-      }
-
-      // CONVERTING: PDF parsing and setup (30-40%)
-      if (conversionStatus === PresentationConversionStatus.CONVERTING) {
-         return 35
-      }
-
-      // UPLOADING: Converting and uploading images (40-95%)
-      if (conversionStatus === PresentationConversionStatus.UPLOADING) {
-         if (convertedPages !== undefined && totalPages && totalPages > 0) {
-            const imageProgress = (convertedPages / totalPages) * 55 // 55% of total range
-            return 40 + imageProgress
-         }
-         return 40
-      }
-
-      // COMPLETED: Done (100%)
-      if (conversionStatus === PresentationConversionStatus.COMPLETED) {
-         return 100
-      }
-
-      // FAILED: Show error state
-      if (conversionStatus === PresentationConversionStatus.FAILED) {
+      // If imageConversion doesn't exist yet, return 0 (should rarely happen)
+      if (!imageConversion) {
          return 0
       }
 
-      // Fallback
-      return progress || 0
+      switch (imageConversion.status) {
+         case ImageConversionStatus.PENDING:
+            // Uploading original PDF to storage (0-30%)
+            return progress ? progress * 0.3 : 0
+
+         case ImageConversionStatus.CONVERTING:
+            // PDF parsing and setup (30-40%)
+            return 35
+
+         case ImageConversionStatus.UPLOADING: {
+            // Converting and uploading images (40-95%)
+            const { convertedPages, totalPages } = imageConversion
+            if (totalPages > 0) {
+               const imageProgress = (convertedPages / totalPages) * 55 // 55% of total range
+               return 40 + imageProgress
+            }
+            return 40
+         }
+
+         case ImageConversionStatus.COMPLETED:
+            // Done (100%)
+            return 100
+
+         case ImageConversionStatus.FAILED:
+            // Show error state
+            return 0
+
+         default:
+            return 0
+      }
    }
 
    const overallProgress = getOverallProgress()
 
    // FAILED: show error message
-   if (conversionStatus === PresentationConversionStatus.FAILED) {
+   if (imageConversion?.status === ImageConversionStatus.FAILED) {
       return (
          <Stack direction="row" spacing={1} sx={styles.root}>
             <Typography variant="xsmall" color="error.main">
@@ -106,7 +109,7 @@ export const UploadProgressBar = ({
    }
 
    // COMPLETED: show success message
-   if (conversionStatus === PresentationConversionStatus.COMPLETED) {
+   if (imageConversion?.status === ImageConversionStatus.COMPLETED) {
       return (
          <Stack direction="row" spacing={1} sx={styles.root}>
             <Box sx={styles.checkCircle} component={CheckCircle} />

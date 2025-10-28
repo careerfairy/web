@@ -1,5 +1,5 @@
 import {
-   getIsProcessingPresentation,
+   getIsProcessingImageConversion,
    LivestreamModes,
 } from "@careerfairy/shared-lib/livestreams"
 import { Box, CircularProgress } from "@mui/material"
@@ -46,8 +46,8 @@ export const UploadPDFPresentationDialog = () => {
       dispatch(setUploadPDFPresentationDialogOpen(false))
    }
 
-   const isConversionInProgress = getIsProcessingPresentation(
-      pdfPresentation?.conversionStatus
+   const isConversionInProgress = getIsProcessingImageConversion(
+      pdfPresentation?.imageConversion
    )
 
    // Enable "Share slides" if:

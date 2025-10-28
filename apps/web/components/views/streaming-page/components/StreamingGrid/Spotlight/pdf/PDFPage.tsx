@@ -1,4 +1,7 @@
-import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
+import {
+   ImageConversionStatus,
+   LivestreamPresentation,
+} from "@careerfairy/shared-lib/livestreams"
 import { Box, CircularProgress } from "@mui/material"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { useStreamingContext } from "components/views/streaming-page/context"
@@ -84,17 +87,19 @@ export const PDFPage = ({
       })
 
    // If high-res images are available, use them instead of PDF rendering
-   const hasImages = Boolean(presentation?.imageUrls?.length)
-   const currentImageUrl = hasImages
-      ? presentation.imageUrls[presentation.page - 1]
-      : null
+   const imageUrls =
+      presentation?.imageConversion?.status === ImageConversionStatus.COMPLETED
+         ? presentation.imageConversion.imageUrls
+         : undefined
+   const hasImages = Boolean(imageUrls?.length)
+   const currentImageUrl = hasImages ? imageUrls[presentation.page - 1] : null
 
    // Set the total number of pages when images are available
    useEffect(() => {
-      if (hasImages) {
-         setPdfNumberOfPages(presentation.imageUrls!.length)
+      if (hasImages && imageUrls) {
+         setPdfNumberOfPages(imageUrls.length)
       }
-   }, [hasImages, presentation.imageUrls, setPdfNumberOfPages])
+   }, [hasImages, imageUrls, setPdfNumberOfPages])
 
    // // Check for service worker support to detect corporate clients with strict security policies
    useEffect(() => {

@@ -1,7 +1,6 @@
 import {
-   getIsProcessingPresentation,
+   getIsProcessingImageConversion,
    LivestreamPresentation,
-   PresentationConversionStatus,
 } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
@@ -138,21 +137,19 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
    ({ data, uploadProgress, fileUpLoaded, isDeleting, handleDelete }, ref) => {
       const details = useMemo(() => getDetails(data), [data])
 
-      // Extract conversion status from presentation data (only LivestreamPresentation has these fields)
+      // Extract image conversion state from presentation data (only LivestreamPresentation has this field)
       const presentation =
          data instanceof File ? null : (data as LivestreamPresentation)
-      const conversionStatus = presentation?.conversionStatus
-      const convertedPages = presentation?.convertedPages
-      const totalPages = presentation?.totalPages
+      const imageConversion = presentation?.imageConversion
 
       if (!details) {
          return <PDFDetailsSkeleton />
       }
 
       const isUploading = (uploadProgress ?? 0) > 0
-      const isProcessing = getIsProcessingPresentation(conversionStatus)
+      const isProcessing = getIsProcessingImageConversion(imageConversion)
 
-      const isFailed = conversionStatus === PresentationConversionStatus.FAILED
+      const isFailed = imageConversion?.status === "failed"
 
       const showProgressBar =
          isUploading || fileUpLoaded || isProcessing || isFailed
@@ -176,9 +173,7 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
                   <UploadProgressBar
                      progress={uploadProgress}
                      fileUpLoaded={fileUpLoaded}
-                     conversionStatus={conversionStatus}
-                     convertedPages={convertedPages}
-                     totalPages={totalPages}
+                     imageConversion={imageConversion}
                   />
                )}
             </Stack>
