@@ -1,4 +1,4 @@
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group, PublicGroup } from "@careerfairy/shared-lib/groups"
 import { InteractionSourcesType } from "@careerfairy/shared-lib/groups/telemetry"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import {
@@ -14,7 +14,9 @@ import {
 } from "@mui/material"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
+import { useUserIsCompanyTargeted } from "components/custom-hook/group/useUserIsCompanyTargeted"
 import useCountGroupUpcomingLivestreams from "components/custom-hook/live-stream/useCountGroupUpcomingLivestreams"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import useIsUserFeaturedCompany from "components/custom-hook/user/useIsUserFeaturedCompany"
 import Image from "next/legacy/image"
 import { FC } from "react"
@@ -34,6 +36,7 @@ import {
    CompanyIndustryTag,
    CompanySizeTag,
 } from "../common/company/company-tags"
+import { CoffeeChatsBadge } from "../common/icons/CoffeeChatsIcon"
 import PublicSparksBadge from "../common/icons/PublicSparksBadge"
 import CircularLogo from "../common/logos/CircularLogo"
 import { getCompanySizeLabel } from "../company-page/Header"
@@ -179,8 +182,14 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
    const { count: upcomingLivestreamCount } = useCountGroupUpcomingLivestreams(
       company.id
    )
+   const isInCoffeeChatsAudience = useUserIsCompanyTargeted(
+      company as PublicGroup
+   )
+   const flags = useFeatureFlags()
 
    const hasUpcomingLivestreams = upcomingLivestreamCount > 0
+
+   const hasCoffeeChats = company?.hasCoffeeChats
 
    return (
       <CardActionArea
@@ -271,6 +280,11 @@ const CompanyCard: FC<Props> = ({ company, interactionSource }) => {
 
                      {company.publicSparks ? (
                         <PublicSparksBadge sx={styles.badge} />
+                     ) : null}
+                     {hasCoffeeChats &&
+                     isInCoffeeChatsAudience &&
+                     flags?.coffeeChatsFlag ? (
+                        <CoffeeChatsBadge sx={styles.badge} />
                      ) : null}
                   </Stack>
                   <Stack spacing={"6px"} sx={{ width: "100%", minWidth: 0 }}>
