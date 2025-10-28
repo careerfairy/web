@@ -37,9 +37,8 @@ export class OfflineEventsAdminPage extends CommonPage {
       return expect(eventCell).toBeVisible()
    }
 
-   public async assertEventIsNotVisible(title: string) {
-      const eventCell = this.page.getByRole("cell", { name: title })
-      return expect(eventCell).not.toBeVisible()
+   public async goBackToEventsList() {
+      await this.page.getByText("Offline event creation").click()
    }
 
    // Promotion page methods
@@ -122,13 +121,21 @@ export class OfflineEventsAdminPage extends CommonPage {
       }
       if (data.address) {
          const addressInput = this.page.getByLabel("Address")
-         // Search for Lisbon since the company is set to Portugal
-         await addressInput.fill("Lisbon")
-         // Wait for dropdown to appear with suggestions
-         await this.page.waitForTimeout(1000)
-         // Select the first item in the dropdown
-         await this.page.keyboard.press("ArrowDown")
-         await this.page.keyboard.press("Enter")
+         // Fill the address input which triggers Mapbox suggestions
+         await addressInput.fill(data.address)
+
+         const listbox = this.page.getByRole("listbox", {
+            name: "Address (required)",
+         })
+         // Wait for the dropdown to open by checking aria-expanded attribute
+         await listbox.waitFor({ state: "attached" })
+         await expect(listbox).toBeVisible()
+
+         // Wait for at least one option to be visible
+         await expect(listbox.locator('[role="option"]').first()).toBeVisible()
+
+         // Click the first option
+         await listbox.locator('[role="option"]').first().click()
       }
       if (data.registrationUrl) {
          await this.page
@@ -143,16 +150,10 @@ export class OfflineEventsAdminPage extends CommonPage {
          path
       )
 
-      // Wait for the cropper dialog to appear
-      await this.page.waitForTimeout(1000)
-
-      // Click the Apply button to confirm the crop
       const applyButton = this.page.getByRole("button", { name: "Apply" })
-      await applyButton.waitFor({ state: "visible", timeout: 5000 })
-      await applyButton.click()
 
-      // Wait for the upload to complete
-      await this.page.waitForTimeout(1000)
+      await applyButton.waitFor({ state: "visible" })
+      await applyButton.click()
    }
 
    public async fillStartDate() {
@@ -174,9 +175,7 @@ export class OfflineEventsAdminPage extends CommonPage {
    }
 
    public async confirmPublish() {
-      await expect(this.page.getByText("Publish Offline Event")).toBeVisible({
-         timeout: 5000,
-      })
+      await expect(this.page.getByText("Publish Offline Event")).toBeVisible()
 
       await this.page
          .getByRole("button", { name: "Publish", exact: true })
@@ -187,35 +186,6 @@ export class OfflineEventsAdminPage extends CommonPage {
    public async waitForPublishSuccess() {
       await expect(
          this.page.getByText("Offline event published successfully!")
-      ).toBeVisible({ timeout: 10000 })
-   }
-
-   // Delete methods
-   public async clickMoreActionsMenu(eventTitle: string) {
-      const row = this.page.getByRole("row").filter({ hasText: eventTitle })
-      await row
-         .locator("button")
-         .filter({ has: this.page.locator("svg") })
-         .click()
-   }
-
-   public async clickDeleteInMenu() {
-      await this.page.getByText("Delete event").click()
-   }
-
-   public async confirmDelete() {
-      await expect(this.page.getByText("Delete this event?")).toBeVisible({
-         timeout: 5000,
-      })
-
-      await this.page
-         .getByRole("button", { name: "Delete", exact: true })
-         .click()
-   }
-
-   public async waitForDeleteSuccess() {
-      await expect(
-         this.page.getByText("Event deleted successfully")
-      ).toBeVisible({ timeout: 10000 })
+      ).toBeVisible()
    }
 }

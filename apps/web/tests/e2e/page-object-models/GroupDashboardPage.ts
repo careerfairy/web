@@ -117,7 +117,6 @@ export class GroupDashboardPage extends CommonPage {
       // Navigate to Offline events tab
       await this.page.getByRole("link", { name: "Offline events" }).click()
 
-      await sleep(3000)
       return new OfflineEventsAdminPage(this)
    }
 
