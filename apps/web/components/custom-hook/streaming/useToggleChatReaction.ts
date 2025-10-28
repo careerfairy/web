@@ -3,7 +3,7 @@ import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore"
 import { useCallback } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 
-type ReactionType = "thumbsUp" | "heart" | "wow" | "laughing"
+type ReactionType = "thumbsUp" | "heart" | "wow" // | "laughing"
 
 export const useToggleChatReaction = (
    livestreamId: string,
