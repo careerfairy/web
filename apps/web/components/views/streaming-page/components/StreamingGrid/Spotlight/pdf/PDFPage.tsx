@@ -1,5 +1,5 @@
 import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
-import { Box } from "@mui/material"
+import { Box, CircularProgress } from "@mui/material"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { useStreamingContext } from "components/views/streaming-page/context"
 import Image from "next/image"
@@ -24,6 +24,16 @@ const styles = sxStyles({
       alignItems: "center",
       width: "100%",
       height: "100%",
+   },
+   loaderOverlay: {
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: (theme) => theme.brand.white[500],
+      opacity: 0.6,
+      pointerEvents: "none",
    },
 })
 
@@ -205,6 +215,13 @@ const PresentationImage = ({
    pageNumber,
    livestreamId,
 }: PresentationImageProps) => {
+   const { isHost } = useStreamingContext()
+   const [isLoading, setIsLoading] = useState(true)
+
+   useEffect(() => {
+      setIsLoading(true)
+   }, [imageUrl])
+
    return (
       <Box sx={styles.imageContainer}>
          <Image
@@ -215,8 +232,11 @@ const PresentationImage = ({
             style={{
                objectFit: "contain",
             }}
+            unoptimized={isHost}
             priority
+            onLoadingComplete={() => setIsLoading(false)}
             onError={() => {
+               setIsLoading(false)
                errorLogAndNotify(
                   new Error("Failed to load presentation image"),
                   {
@@ -228,6 +248,11 @@ const PresentationImage = ({
                )
             }}
          />
+         {isLoading ? (
+            <Box sx={styles.loaderOverlay}>
+               <CircularProgress size={40} />
+            </Box>
+         ) : null}
       </Box>
    )
 }

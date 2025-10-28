@@ -1,4 +1,5 @@
 import {
+   getIsProcessingPresentation,
    LivestreamPresentation,
    PresentationConversionStatus,
 } from "@careerfairy/shared-lib/livestreams"
@@ -149,14 +150,12 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
       }
 
       const isUploading = (uploadProgress ?? 0) > 0
-      const isConverting =
-         conversionStatus === PresentationConversionStatus.PENDING ||
-         conversionStatus === PresentationConversionStatus.CONVERTING
-      const conversionFailed =
-         conversionStatus === PresentationConversionStatus.FAILED
+      const isProcessing = getIsProcessingPresentation(conversionStatus)
+
+      const isFailed = conversionStatus === PresentationConversionStatus.FAILED
 
       const showProgressBar =
-         isUploading || fileUpLoaded || isConverting || conversionFailed
+         isUploading || fileUpLoaded || isProcessing || isFailed
 
       return (
          <Box ref={ref} sx={styles.root}>
@@ -173,6 +172,7 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
                      </IconButton>
                   </Box>
                </Stack>
+               <span>status: {conversionStatus}</span>
                {Boolean(showProgressBar) && (
                   <UploadProgressBar
                      progress={uploadProgress}

@@ -63,43 +63,44 @@ export const UploadProgressBar = ({
       return (convertedPages / totalPages) * 100
    }
 
-   // Show conversion state based on explicit status (these take precedence over upload progress)
-   if (
-      fileUpLoaded &&
-      conversionStatus === PresentationConversionStatus.CONVERTING
-   ) {
-      const conversionPercentage = getConversionPercentage()
+   // CONVERTING: always show indeterminate loader (PDF to PNG conversion)
+   if (conversionStatus === PresentationConversionStatus.CONVERTING) {
+      return (
+         <Stack sx={styles.root} direction="row" spacing={2}>
+            <LinearProgress sx={styles.progress} variant="indeterminate" />
+         </Stack>
+      )
+   }
+
+   // UPLOADING: show progress bar with percentage
+   if (conversionStatus === PresentationConversionStatus.UPLOADING) {
+      const uploadPercentage = getConversionPercentage()
 
       return (
          <Stack sx={styles.root} direction="row" spacing={2}>
             <LinearProgress
                sx={styles.progress}
                variant="determinate"
-               value={conversionPercentage}
+               value={uploadPercentage}
             />
             <Typography variant="small" color="neutral.700">
-               {conversionPercentage.toFixed(0)}%
+               {uploadPercentage.toFixed(0)}%
             </Typography>
          </Stack>
       )
    }
 
-   if (
-      fileUpLoaded &&
-      conversionStatus === PresentationConversionStatus.PENDING
-   ) {
-      return <LinearProgress sx={styles.progress} variant="indeterminate" />
+   // PENDING: show indeterminate loader
+   if (conversionStatus === PresentationConversionStatus.PENDING) {
+      return (
+         <Stack sx={styles.root} direction="row" spacing={2}>
+            <LinearProgress sx={styles.progress} variant="indeterminate" />
+         </Stack>
+      )
    }
 
-   // If no upload progress, don't show anything (unless we're in a conversion state above)
-   if (!progress) {
-      return null
-   }
-
-   if (
-      fileUpLoaded &&
-      conversionStatus === PresentationConversionStatus.FAILED
-   ) {
+   // FAILED: show error message
+   if (conversionStatus === PresentationConversionStatus.FAILED) {
       return (
          <Stack direction="row" spacing={1} sx={styles.root}>
             <Typography variant="xsmall" color="error.main">
@@ -109,11 +110,8 @@ export const UploadProgressBar = ({
       )
    }
 
-   // Show success for completed presentations
-   if (
-      fileUpLoaded &&
-      conversionStatus === PresentationConversionStatus.COMPLETED
-   ) {
+   // COMPLETED: show success message
+   if (conversionStatus === PresentationConversionStatus.COMPLETED) {
       return (
          <Stack direction="row" spacing={1} sx={styles.root}>
             <Box sx={styles.checkCircle} component={CheckCircle} />
@@ -131,7 +129,20 @@ export const UploadProgressBar = ({
    // If file is uploaded but no conversion status yet (waiting for backend to start conversion)
    // Show indeterminate progress to bridge the gap between upload and conversion
    if (fileUpLoaded && !conversionStatus) {
-      return <LinearProgress sx={styles.progress} variant="indeterminate" />
+      return (
+         <Stack sx={styles.root} direction="row" spacing={2}>
+            <LinearProgress sx={styles.progress} variant="indeterminate" />
+         </Stack>
+      )
+   }
+
+   // Default: Show upload progress or indeterminate loader
+   if (!progress) {
+      return (
+         <Stack sx={styles.root} direction="row" spacing={2}>
+            <LinearProgress sx={styles.progress} variant="indeterminate" />
+         </Stack>
+      )
    }
 
    return (

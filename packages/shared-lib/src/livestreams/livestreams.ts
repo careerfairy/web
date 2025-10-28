@@ -954,9 +954,13 @@ export const PresentationConversionStatus = {
     */
    PENDING: "pending",
    /**
-    * Conversion in progress
+    * Conversion in progress (PDF to images)
     */
    CONVERTING: "converting",
+   /**
+    * Uploading converted images to storage
+    */
+   UPLOADING: "uploading",
    /**
     * Conversion completed successfully
     */
@@ -966,6 +970,16 @@ export const PresentationConversionStatus = {
     */
    FAILED: "failed",
 } as const
+
+export function getIsProcessingPresentation(
+   conversionStatus: PresentationConversionStatus
+): boolean {
+   return (
+      conversionStatus === PresentationConversionStatus.PENDING ||
+      conversionStatus === PresentationConversionStatus.CONVERTING ||
+      conversionStatus === PresentationConversionStatus.UPLOADING
+   )
+}
 
 export type PresentationConversionStatus =
    (typeof PresentationConversionStatus)[keyof typeof PresentationConversionStatus]
@@ -993,6 +1007,8 @@ export interface LivestreamPresentation extends Identifiable {
    totalPages?: number
    /** Number of pages that have been converted so far */
    convertedPages?: number
+   /** Error message if conversion failed */
+   conversionError?: string
 }
 
 /**

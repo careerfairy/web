@@ -92,7 +92,6 @@ import levels = require("./levels")
 import remindersNew = require("./reminders-new")
 import followups = require("./followups")
 import livestreamPromotion = require("./livestreamPromotion")
-import pdfConversion = require("./pdfConversion")
 
 // Auth
 exports[FUNCTION_NAMES.createNewUserAccount] = auth.createNewUserAccount
@@ -449,9 +448,6 @@ exports.sendReminderEmailAboutApplicationLink_v2 =
 exports.schedule14DayPromotionEmails =
    livestreamPromotion.schedule14DayPromotionEmails
 exports.manualPromotionEmails = livestreamPromotion.manualPromotionEmails
-
-// PDF Conversion
-exports.onPresentationUpload = pdfConversion.onPresentationUpload
 
 // Reminders Post
 exports[FUNCTION_NAMES.onLivestreamStartScheduleNoShowReminder] =
