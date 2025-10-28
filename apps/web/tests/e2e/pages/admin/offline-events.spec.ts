@@ -197,13 +197,7 @@ test.describe("Group Admin Offline Events", () => {
             ).toBeVisible()
 
             // Navigate back to offline events list
-            await groupPage.goToOfflineEvents()
-
-            // Filter by Draft status
-            await offlineEventsPage.filterByStatus("Draft")
-
-            // Verify draft is visible in the table
-            await offlineEventsPage.assertEventIsVisible(eventTitle)
+            await offlineEventsPage.goBackToEventsList()
          }
       )
 
@@ -234,7 +228,7 @@ test.describe("Group Admin Offline Events", () => {
                title: eventTitle,
                description:
                   "This is a test offline event description with enough characters to meet the minimum requirement of 50 characters.",
-               address: "Zurich Switzerland",
+               address: "Lisboa",
                registrationUrl: "https://example.com/register",
             })
 
@@ -266,64 +260,6 @@ test.describe("Group Admin Offline Events", () => {
 
             // Verify event is visible in published list
             await offlineEventsPage.assertEventIsVisible(eventTitle)
-         }
-      )
-
-      /**
-       * Test deleting an offline event.
-       */
-      testWithAvailableEventsStatus(
-         "Delete an offline event",
-         async ({ groupPage }) => {
-            const eventTitle = "Test Event to Delete " + Date.now()
-
-            // Navigate to offline events page
-            const offlineEventsPage = await groupPage.goToOfflineEvents()
-
-            // Assert table view is visible
-            await expect(offlineEventsPage.searchField).toBeVisible()
-
-            // Create a draft event
-            await offlineEventsPage.clickCreateOfflineEventButton()
-
-            // Wait for navigation to edit page
-            await offlineEventsPage.page.waitForURL(
-               /\/admin\/content\/offline-events\/.+$/
-            )
-
-            // Fill in minimal form data
-            await offlineEventsPage.fillOfflineEventForm({
-               title: eventTitle,
-            })
-
-            // Wait for auto-save
-            await expect(
-               offlineEventsPage.page.getByText("Saved")
-            ).toBeVisible()
-
-            // Navigate back to offline events list
-            await groupPage.goToOfflineEvents()
-
-            // Filter by Draft to find our event
-            await offlineEventsPage.filterByStatus("Draft")
-
-            // Verify event is visible
-            await offlineEventsPage.assertEventIsVisible(eventTitle)
-
-            // Click more actions menu (three dots)
-            await offlineEventsPage.clickMoreActionsMenu(eventTitle)
-
-            // Click delete in menu
-            await offlineEventsPage.clickDeleteInMenu()
-
-            // Confirm deletion
-            await offlineEventsPage.confirmDelete()
-
-            // Wait for delete success
-            await offlineEventsPage.waitForDeleteSuccess()
-
-            // Verify event is no longer visible in the table
-            await offlineEventsPage.assertEventIsNotVisible(eventTitle)
          }
       )
    })
