@@ -172,7 +172,6 @@ export const PDFProgress = forwardRef<HTMLDivElement, PDFProgressProps>(
                      </IconButton>
                   </Box>
                </Stack>
-               <span>status: {conversionStatus}</span>
                {Boolean(showProgressBar) && (
                   <UploadProgressBar
                      progress={uploadProgress}

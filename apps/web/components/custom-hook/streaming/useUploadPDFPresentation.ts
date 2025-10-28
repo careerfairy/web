@@ -8,7 +8,7 @@ import {
    updateDoc,
 } from "firebase/firestore"
 import { useCallback, useMemo } from "react"
-import { sanitizeFileName } from "util/CommonUtil"
+import { errorLogAndNotify, sanitizeFileName } from "util/CommonUtil"
 import { v4 as uuid } from "uuid"
 import useFirebaseUpload from "../useFirebaseUpload"
 import useUploadFile from "../useUploadFile"
@@ -19,26 +19,14 @@ import useUploadFile from "../useUploadFile"
  * @returns An object containing upload related state and methods.
  */
 const useUploadPDFPresentation = (livestreamId: string) => {
-   const pdfUpload = useUploadFile(
-      STORAGE_PATHS.presentations,
-      (downloadUrl, storagePath, file) => {
-         // Finalize metadata (downloadUrl, etc.) after upload completes
-         livestreamService.setLivestreamPDFPresentation({
-            livestreamId,
-            downloadUrl,
-            storagePath,
-            fileSize: file.size,
-            fileName: file.name,
-         })
-      }
-   )
+   // Upload handler for the main PDF (without callback to avoid race conditions)
+   const pdfUpload = useUploadFile(STORAGE_PATHS.presentations)
 
    // Low-level uploader for page images
    const [uploadToStorage] = useFirebaseUpload()
 
    const handleUploadFile = useCallback(
       async (file: File, customFileName?: string) => {
-         // 1) Pre-create the presentation doc BEFORE upload
          const fileExtension = file.name.split(".").pop() || "pdf"
          const generatedName = customFileName
             ? sanitizeFileName(customFileName)
@@ -46,16 +34,17 @@ const useUploadPDFPresentation = (livestreamId: string) => {
 
          const pdfStoragePath = `${STORAGE_PATHS.presentations}/${generatedName}.${fileExtension}`
 
+         // 1) Upload original PDF to storage
+         const pdfMeta = await pdfUpload.handleUploadFile(file, generatedName)
+
+         // 2) Create presentation doc with PDF download URL (fallback)
          await livestreamService.setLivestreamPDFPresentation({
             livestreamId,
-            downloadUrl: "",
+            downloadUrl: pdfMeta.url,
             storagePath: pdfStoragePath,
             fileSize: file.size,
             fileName: file.name,
          })
-
-         // 2) Upload original PDF to storage
-         const pdfMeta = await pdfUpload.handleUploadFile(file, generatedName)
 
          // 3) Client-side conversion: render pages to PNG and upload
          const presentationRef =
@@ -160,11 +149,16 @@ const useUploadPDFPresentation = (livestreamId: string) => {
                convertedPages: imageUrls.length,
             })
          } catch (e) {
+            errorLogAndNotify(e, {
+               message: "Error during PDF conversion",
+               livestreamId,
+            })
             await updateDoc(presentationRef, {
                conversionStatus: PresentationConversionStatus.FAILED,
                conversionError:
                   e instanceof Error ? e.message : "Unknown error",
             })
+
             throw e
          }
 

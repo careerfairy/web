@@ -47,64 +47,59 @@ type Props = {
 
 export const UploadProgressBar = ({
    progress,
-   fileUpLoaded,
+   fileUpLoaded: _fileUpLoaded,
    conversionStatus,
    convertedPages,
    totalPages,
 }: Props) => {
-   // Calculate conversion progress percentage
-   const getConversionPercentage = (): number => {
-      if (
-         convertedPages === undefined ||
-         totalPages === undefined ||
-         totalPages === 0
-      )
+   // Map the entire process to a single 0-100% progress bar
+   // 0-30%: PDF upload (PENDING)
+   // 30-40%: PDF parsing and conversion setup (CONVERTING)
+   // 40-95%: Image conversion and upload (UPLOADING)
+   // 100%: Complete (COMPLETED)
+
+   const getOverallProgress = (): number => {
+      // PENDING: Uploading original PDF (0-30%)
+      if (conversionStatus === PresentationConversionStatus.PENDING) {
+         return progress ? progress * 0.3 : 0
+      }
+
+      // CONVERTING: PDF parsing and setup (30-40%)
+      if (conversionStatus === PresentationConversionStatus.CONVERTING) {
+         return 35
+      }
+
+      // UPLOADING: Converting and uploading images (40-95%)
+      if (conversionStatus === PresentationConversionStatus.UPLOADING) {
+         if (convertedPages !== undefined && totalPages && totalPages > 0) {
+            const imageProgress = (convertedPages / totalPages) * 55 // 55% of total range
+            return 40 + imageProgress
+         }
+         return 40
+      }
+
+      // COMPLETED: Done (100%)
+      if (conversionStatus === PresentationConversionStatus.COMPLETED) {
+         return 100
+      }
+
+      // FAILED: Show error state
+      if (conversionStatus === PresentationConversionStatus.FAILED) {
          return 0
-      return (convertedPages / totalPages) * 100
+      }
+
+      // Fallback
+      return progress || 0
    }
 
-   // CONVERTING: always show indeterminate loader (PDF to PNG conversion)
-   if (conversionStatus === PresentationConversionStatus.CONVERTING) {
-      return (
-         <Stack sx={styles.root} direction="row" spacing={2}>
-            <LinearProgress sx={styles.progress} variant="indeterminate" />
-         </Stack>
-      )
-   }
-
-   // UPLOADING: show progress bar with percentage
-   if (conversionStatus === PresentationConversionStatus.UPLOADING) {
-      const uploadPercentage = getConversionPercentage()
-
-      return (
-         <Stack sx={styles.root} direction="row" spacing={2}>
-            <LinearProgress
-               sx={styles.progress}
-               variant="determinate"
-               value={uploadPercentage}
-            />
-            <Typography variant="small" color="neutral.700">
-               {uploadPercentage.toFixed(0)}%
-            </Typography>
-         </Stack>
-      )
-   }
-
-   // PENDING: show indeterminate loader
-   if (conversionStatus === PresentationConversionStatus.PENDING) {
-      return (
-         <Stack sx={styles.root} direction="row" spacing={2}>
-            <LinearProgress sx={styles.progress} variant="indeterminate" />
-         </Stack>
-      )
-   }
+   const overallProgress = getOverallProgress()
 
    // FAILED: show error message
    if (conversionStatus === PresentationConversionStatus.FAILED) {
       return (
          <Stack direction="row" spacing={1} sx={styles.root}>
             <Typography variant="xsmall" color="error.main">
-               Conversion failed - using PDF fallback
+               Upload failed
             </Typography>
          </Stack>
       )
@@ -126,34 +121,16 @@ export const UploadProgressBar = ({
       )
    }
 
-   // If file is uploaded but no conversion status yet (waiting for backend to start conversion)
-   // Show indeterminate progress to bridge the gap between upload and conversion
-   if (fileUpLoaded && !conversionStatus) {
-      return (
-         <Stack sx={styles.root} direction="row" spacing={2}>
-            <LinearProgress sx={styles.progress} variant="indeterminate" />
-         </Stack>
-      )
-   }
-
-   // Default: Show upload progress or indeterminate loader
-   if (!progress) {
-      return (
-         <Stack sx={styles.root} direction="row" spacing={2}>
-            <LinearProgress sx={styles.progress} variant="indeterminate" />
-         </Stack>
-      )
-   }
-
+   // Single progress bar for all stages
    return (
       <Stack sx={styles.root} direction="row" spacing={2}>
          <LinearProgress
             sx={styles.progress}
             variant="determinate"
-            value={progress}
+            value={overallProgress}
          />
          <Typography variant="small" color="neutral.700">
-            {progress.toFixed(0)}%
+            {overallProgress.toFixed(0)}%
          </Typography>
       </Stack>
    )
