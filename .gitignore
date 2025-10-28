@@ -45,7 +45,3 @@ yarn-error.log*
 # production
 /build
 .cursor/mcp.json
-
-# Claude Code configuration (personal)
-.claude/
-CLAUDE.md
