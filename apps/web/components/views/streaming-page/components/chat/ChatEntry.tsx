@@ -21,12 +21,12 @@ import { UserType } from "../../util"
 import { UserDetails } from "../UserDetails"
 import { getChatAuthor, getIsMe } from "./util"
 
-type ReactionType = "thumbsUp" | "wow" | "laughing" | "heart"
+type ReactionType = "thumbsUp" | "wow" | /* "laughing" | */ "heart"
 
 const REACTION_EMOJIS: Record<ReactionType, string> = {
    thumbsUp: "👍",
    wow: "😮",
-   laughing: "😂",
+   // laughing: "😂",
    heart: "❤️",
 }
 
@@ -35,7 +35,7 @@ const REACTION_COLORS: Record<ReactionType, string | ((theme: any) => string)> =
       thumbsUp: "#FFF0CC",
       heart: (theme) => theme.brand.error[50],
       wow: "#FFF4E6",
-      laughing: "#FFF9E6",
+      // laughing: "#FFF9E6",
    }
 
 const REACTION_TYPES = Object.keys(REACTION_EMOJIS) as ReactionType[]
@@ -149,12 +149,12 @@ const styles = sxStyles({
             transform: "scale(1.1)",
          },
       },
-      laughing: {
-         "&:hover": {
-            backgroundColor: REACTION_COLORS.laughing,
-            transform: "scale(1.1)",
-         },
-      },
+      // laughing: {
+      //    "&:hover": {
+      //       backgroundColor: REACTION_COLORS.laughing,
+      //       transform: "scale(1.1)",
+      //    },
+      // },
    },
    reactionOptionActive: {
       thumbsUp: {
@@ -166,9 +166,9 @@ const styles = sxStyles({
       wow: {
          backgroundColor: REACTION_COLORS.wow,
       },
-      laughing: {
-         backgroundColor: REACTION_COLORS.laughing,
-      },
+      // laughing: {
+      //    backgroundColor: REACTION_COLORS.laughing,
+      // },
    },
    reactionCount: {
       display: "flex",
@@ -325,18 +325,18 @@ export const ChatEntry = memo(
                count: entry.wow?.length || 0,
                hasUserReacted: userId ? entry.wow?.includes(userId) : false,
             },
-            laughing: {
-               count: entry.laughing?.length || 0,
-               hasUserReacted: userId
-                  ? entry.laughing?.includes(userId)
-                  : false,
-            },
+            // laughing: {
+            //    count: entry.laughing?.length || 0,
+            //    hasUserReacted: userId
+            //       ? entry.laughing?.includes(userId)
+            //       : false,
+            // },
             heart: {
                count: entry.heart?.length || 0,
                hasUserReacted: userId ? entry.heart?.includes(userId) : false,
             },
          }),
-         [entry.thumbsUp, entry.wow, entry.laughing, entry.heart, userId]
+         [entry.thumbsUp, entry.wow, /* entry.laughing, */ entry.heart, userId]
       )
 
       // Calculate total reactions to display
