@@ -229,6 +229,10 @@ export function transformUserDataForCustomerIO(
 
       // Engagement Metrics
       credits: userData.credits,
+
+      // Denormalized highest proficiency language for messaging
+      highest_proficiency_language_code:
+         userData.highestProficiencyLanguageCode,
    }
 }
 

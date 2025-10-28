@@ -11,6 +11,7 @@ import {
    languageOptionCodesMap,
    regionGroupId,
 } from "@careerfairy/shared-lib/constants/forms"
+import { getHighestProficiencyLanguageCode } from "@careerfairy/shared-lib/users"
 import {
    Box,
    Button,
@@ -192,6 +193,21 @@ const LocationInformation = () => {
                authId: userData.authId,
                id: language.id,
             })
+
+            const candidateLanguages = [
+               ...userLanguages,
+               {
+                  id: language.id,
+                  languageId: language.id,
+                  proficiency: LanguageProficiencyOrderMap[proficiency.id],
+                  authId: userData.authId,
+               },
+            ]
+            const highestCode =
+               getHighestProficiencyLanguageCode(candidateLanguages)
+            await userRepo.updateUserData(user.email, {
+               highestProficiencyLanguageCode: highestCode,
+            })
          } catch (error) {
             errorNotification(
                "An error occurred while adding the language, rest assured we're on it."
@@ -199,12 +215,25 @@ const LocationInformation = () => {
             errorLogAndNotify(error, "Error adding language")
          }
       }
-   }, [language, proficiency, user.email, userData.authId, errorNotification])
+   }, [
+      language,
+      proficiency,
+      user.email,
+      userData.authId,
+      errorNotification,
+      userLanguages,
+   ])
 
    const handleLanguageDelete = useCallback(
       async (languageId: string) => {
          try {
             await userRepo.deleteLanguage(user.email, languageId)
+
+            const remaining = userLanguages.filter((l) => l.id !== languageId)
+            const highestCode = getHighestProficiencyLanguageCode(remaining)
+            await userRepo.updateUserData(user.email, {
+               highestProficiencyLanguageCode: highestCode,
+            })
          } catch (error) {
             errorNotification(
                "An error occurred while deleting the language, rest assured we're on it."
@@ -212,7 +241,7 @@ const LocationInformation = () => {
             errorLogAndNotify(error, "Error deleting language")
          }
       },
-      [user.email, errorNotification]
+      [user.email, errorNotification, userLanguages]
    )
 
    useEffect(() => {

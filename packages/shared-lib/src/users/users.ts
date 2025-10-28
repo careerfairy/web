@@ -84,6 +84,7 @@ export interface UserData extends Identifiable {
    }
    gender?: string
    spokenLanguages?: string[]
+   highestProficiencyLanguageCode?: string
    countriesOfInterest?: string[]
    regionsOfInterest?: string[]
    isLookingForJob?: boolean
@@ -218,6 +219,26 @@ export interface ProfileLanguage extends Identifiable {
    authId: string
    languageId: string
    proficiency: number
+}
+
+/**
+ * Returns the language code of the language with the highest proficiency
+ * among all given languages. If multiple languages have the same highest
+ * proficiency level, returns the one with the lexicographically first
+ * languageId. Returns null if no languages are provided.
+ */
+export const getHighestProficiencyLanguageCode = (
+   languages: ProfileLanguage[]
+): string | null => {
+   if (!languages?.length) return null
+
+   const sorted = [...languages].sort((a, b) => {
+      const byLevel = b.proficiency - a.proficiency
+      if (byLevel !== 0) return byLevel
+      return a.languageId.localeCompare(b.languageId)
+   })
+
+   return sorted[0]?.languageId || null
 }
 
 // Collection /seenJobs/:userAuthId_jobId
