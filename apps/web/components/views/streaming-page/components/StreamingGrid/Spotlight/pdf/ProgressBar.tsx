@@ -1,4 +1,8 @@
 import {
+   ImageConversionStatus,
+   type ImageConversionState,
+} from "@careerfairy/shared-lib/livestreams"
+import {
    Box,
    LinearProgress,
    Stack,
@@ -39,14 +43,73 @@ const styles = sxStyles({
 type Props = {
    progress: number
    fileUpLoaded: boolean
+   imageConversion?: ImageConversionState
 }
 
-export const UploadProgressBar = ({ progress, fileUpLoaded }: Props) => {
-   if (!progress) {
-      return null
+export const UploadProgressBar = ({
+   progress,
+   fileUpLoaded: _fileUpLoaded,
+   imageConversion,
+}: Props) => {
+   // Map the entire process to a single 0-100% progress bar:
+   // 0-30%:  PDF upload (pending or no imageConversion yet)
+   // 30-40%: PDF parsing and conversion setup (converting)
+   // 40-95%: Image conversion and upload (uploading)
+   // 100%:   Complete (completed)
+
+   const getOverallProgress = (): number => {
+      // If imageConversion doesn't exist yet, return 0 (should rarely happen)
+      if (!imageConversion) {
+         return 0
+      }
+
+      switch (imageConversion.status) {
+         case ImageConversionStatus.PENDING:
+            // Uploading original PDF to storage (0-30%)
+            return progress ? progress * 0.3 : 0
+
+         case ImageConversionStatus.CONVERTING:
+            // PDF parsing and setup (30-40%)
+            return 35
+
+         case ImageConversionStatus.UPLOADING: {
+            // Converting and uploading images (40-95%)
+            const { convertedPages, totalPages } = imageConversion
+            if (totalPages > 0) {
+               const imageProgress = (convertedPages / totalPages) * 55 // 55% of total range
+               return 40 + imageProgress
+            }
+            return 40
+         }
+
+         case ImageConversionStatus.COMPLETED:
+            // Done (100%)
+            return 100
+
+         case ImageConversionStatus.FAILED:
+            // Show error state
+            return 0
+
+         default:
+            return 0
+      }
    }
 
-   if (fileUpLoaded) {
+   const overallProgress = getOverallProgress()
+
+   // FAILED: show error message
+   if (imageConversion?.status === ImageConversionStatus.FAILED) {
+      return (
+         <Stack direction="row" spacing={1} sx={styles.root}>
+            <Typography variant="xsmall" color="error.main">
+               Upload failed
+            </Typography>
+         </Stack>
+      )
+   }
+
+   // COMPLETED: show success message
+   if (imageConversion?.status === ImageConversionStatus.COMPLETED) {
       return (
          <Stack direction="row" spacing={1} sx={styles.root}>
             <Box sx={styles.checkCircle} component={CheckCircle} />
@@ -55,21 +118,22 @@ export const UploadProgressBar = ({ progress, fileUpLoaded }: Props) => {
                variant="xsmall"
                color="neutral.700"
             >
-               File uploaded
+               Ready to share
             </Typography>
          </Stack>
       )
    }
 
+   // Single progress bar for all stages
    return (
       <Stack sx={styles.root} direction="row" spacing={2}>
          <LinearProgress
             sx={styles.progress}
             variant="determinate"
-            value={progress}
+            value={overallProgress}
          />
          <Typography variant="small" color="neutral.700">
-            {progress.toFixed(0)}%
+            {overallProgress.toFixed(0)}%
          </Typography>
       </Stack>
    )
