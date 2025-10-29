@@ -1,34 +1,19 @@
 /* eslint-disable no-empty-pattern */
 import GroupSeed from "@careerfairy/seed-data/groups"
-import LivestreamSeed from "@careerfairy/seed-data/livestreams"
-import { Group } from "@careerfairy/shared-lib/groups"
-import {
-   LivestreamEvent,
-   LivestreamJobAssociation,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { expect } from "@playwright/test"
 import { groupAdminFixture as test } from "../../fixtures"
-import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
-import { ViewerPage } from "../../page-object-models/StreamingPage"
 import { expectText } from "../../utils/assertions"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const testWithATSThatNeedsApplicationTest = test.extend({
-   options: async ({}, use) => {
+   options: async ({}, use: any) => {
       await use({
          createUser: true,
          atsGroupType: "NEEDS_APPLICATION_TEST",
       })
    },
-}).skip
-
-const testWithCompletlySetupATS = test.extend({
-   options: async ({}, use) => {
-      await use({
-         createUser: true,
-         atsGroupType: "COMPLETE",
-      })
-   },
-})
+} as any).skip
 
 test.describe("ATS Integration", () => {
    test.skip("Can successfully link account & test application", async ({
@@ -108,38 +93,6 @@ testWithATSThatNeedsApplicationTest(
    }
 )
 
-testWithCompletlySetupATS(
-   "Can apply to job in-stream",
-   async ({ groupPage, group }) => {
-      test.skip()
-      const { livestream } = await setupData(group)
-
-      // go to Dialog page
-      const livestreamDialogPage = new LivestreamDialogPage(
-         groupPage.page,
-         livestream
-      )
-      await livestreamDialogPage.page.goto("/portal")
-      await livestreamDialogPage.openDialog(false)
-      await livestreamDialogPage.assertJobsAreVisible(livestream.jobs)
-      await livestreamDialogPage.clickRegistrationButton()
-
-      await livestreamDialogPage.page.waitForURL(
-         `**/streaming/${livestream.id}/viewer`
-      )
-
-      const viewerPage = new ViewerPage(livestreamDialogPage.page)
-
-      // Viewer page flow
-      await viewerPage.clickJobsTab()
-      await viewerPage.clickJobButton(variables.jobs[0].name)
-      await viewerPage.clickUploadCvButton()
-      await viewerPage.uploadCv()
-      await viewerPage.clickApplyButton()
-      await viewerPage.assertJobApplyCongratsMessage()
-   }
-)
-
 const variables = {
    apiKey: "088ec780160bea9d7d3b23dca4966889-3",
    jobs: [
@@ -149,29 +102,6 @@ const variables = {
       { name: "Job 4", description: "Job description 4", id: "4" },
       { name: "Job 5", description: "Job description 5", id: "5" },
    ],
-}
-
-async function setupData(group: Group) {
-   let overrideLivestreamDetails: Partial<LivestreamEvent> = {}
-
-   // associate the group with the livestream
-   overrideLivestreamDetails = {
-      groupIds: [group.id],
-      hasJobs: true,
-      jobs: [
-         generateJobAssociation(
-            group.id,
-            variables.jobs[0].id,
-            variables.jobs[0].name
-         ),
-      ],
-   }
-
-   const livestream = await LivestreamSeed.createLive(overrideLivestreamDetails)
-
-   const secureToken = await LivestreamSeed.generateSecureToken(livestream.id)
-
-   return { livestream, secureToken }
 }
 
 const generateJobAssociation = (
