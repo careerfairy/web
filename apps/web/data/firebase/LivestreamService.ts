@@ -19,6 +19,7 @@ import {
    EmoteType,
    EventRatingAnswer,
    FeedbackQuestionUserAnswer,
+   ImageConversionStatus,
    LivestreamCTA,
    LivestreamCTAUserInteraction,
    CategoryDataOption as LivestreamCategoryDataOption,
@@ -1129,6 +1130,9 @@ export class LivestreamService {
          fileSize: fileSize || 0,
          id: ref.id,
          storagePath,
+         imageConversion: {
+            status: ImageConversionStatus.PENDING,
+         },
       })
    }
 

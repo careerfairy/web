@@ -25,6 +25,12 @@ export const PDFLoader = ({ parentHeight, aspectRatio }: Props) => (
          },
       ]}
    >
-      <CircularProgress size={40} />
+      <CircularProgress
+         size={40}
+         sx={{
+            color: (theme) => theme.brand.black[700],
+            opacity: 0.5,
+         }}
+      />
    </Box>
 )

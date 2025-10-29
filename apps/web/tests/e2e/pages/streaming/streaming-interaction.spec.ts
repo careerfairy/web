@@ -185,15 +185,25 @@ test.describe("New Streaming Interactions", () => {
       // Streamer starts to share a pdf
       await streamerPage.sharePDF()
 
+      // The new implementation uses high-res images as a fallback, check for either:
+      // 1. Image element (new image-based approach)
+      // 2. Canvas element (fallback PDF rendering)
+      const presentationImage = viewerPage.page.locator(
+         'img[alt*="Presentation page"]'
+      )
       const presentationCanvas = viewerPage.page.locator(
          ".react-pdf__Page__canvas"
       )
-      // Viewer should see the action on their end
-      await expect(presentationCanvas).toBeVisible()
+
+      // Viewer should see the presentation (either as image or canvas)
+      await expect(presentationImage.or(presentationCanvas)).toBeVisible({
+         timeout: 10000,
+      })
 
       // Stop sharing
       await streamerPage.stopSharingPDF()
       await sleep(1500) // give some time for action to propagate between agora and viewer
+      await expect(presentationImage).not.toBeVisible()
       await expect(presentationCanvas).not.toBeVisible()
    })
 })
