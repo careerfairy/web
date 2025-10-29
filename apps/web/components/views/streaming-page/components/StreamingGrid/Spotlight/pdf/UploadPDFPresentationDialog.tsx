@@ -38,11 +38,13 @@ export const UploadPDFPresentationDialog = () => {
    const { trigger: setLivestreamMode, isMutating } =
       useSetLivestreamMode(livestreamId)
    const [readyToShare, setReadyToShare] = useState(false)
+   const [isActiveUpload, setIsActiveUpload] = useState(false)
 
    const dispatch = useAppDispatch()
 
    const closeMenu = () => {
       setReadyToShare(false)
+      setIsActiveUpload(false)
       dispatch(setUploadPDFPresentationDialogOpen(false))
    }
 
@@ -51,11 +53,15 @@ export const UploadPDFPresentationDialog = () => {
    )
 
    // Enable "Share slides" if:
-   // 1. We have a PDF URL (step 2 completed)
-   // 2. Conversion is not in progress
-   // Note: If conversion fails (FAILED status), we can still share using PDF fallback
+   // 1. We have a PDF URL
+   // 2. User has selected the PDF (readyToShare = true)
+   // 3. If user is actively uploading, conversion must be complete
+   // This allows users to share existing PDFs immediately using PDF fallback,
+   // while the active uploader waits for the full conversion to complete
    const canShare = Boolean(
-      pdfPresentation?.downloadUrl && !isConversionInProgress
+      pdfPresentation?.downloadUrl &&
+         readyToShare &&
+         (!isActiveUpload || !isConversionInProgress)
    )
 
    return (
@@ -88,6 +94,7 @@ export const UploadPDFPresentationDialog = () => {
                   livestreamId={livestreamId}
                   setReadyToShare={setReadyToShare}
                   readyToShare={readyToShare}
+                  setIsActiveUpload={setIsActiveUpload}
                />
             </SuspenseWithBoundary>
          }
