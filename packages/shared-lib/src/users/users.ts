@@ -224,17 +224,31 @@ export interface ProfileLanguage extends Identifiable {
 /**
  * Returns the language code of the language with the highest proficiency
  * among all given languages. If multiple languages have the same highest
- * proficiency level, returns the one with the lexicographically first
- * languageId. Returns null if no languages are provided.
+ * proficiency level, prioritizes German ("de"), then English ("en"),
+ * then falls back to lexicographic ordering. Returns null if no languages
+ * are provided.
  */
 export const getHighestProficiencyLanguageCode = (
    languages: ProfileLanguage[]
 ): string | null => {
    if (!languages?.length) return null
 
+   const getLanguagePriority = (languageId: string): number => {
+      if (languageId === "de") return 0 // German has highest priority
+      if (languageId === "en") return 1 // English has second priority
+      return 2 // All other languages have lower priority
+   }
+
    const sorted = [...languages].sort((a, b) => {
       const byLevel = b.proficiency - a.proficiency
       if (byLevel !== 0) return byLevel
+
+      // If proficiency levels are equal, prioritize by language preference
+      const priorityDiff =
+         getLanguagePriority(a.languageId) - getLanguagePriority(b.languageId)
+      if (priorityDiff !== 0) return priorityDiff
+
+      // If both have same priority, sort lexicographically
       return a.languageId.localeCompare(b.languageId)
    })
 
