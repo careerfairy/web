@@ -15,7 +15,8 @@ import { OBJECT_TYPES } from "./objectsClient"
  * All data is preserved through prefixed attributes:
  * - registered_at, registration_utm, registration_origin_source
  * - participated_at, participation_utm
- * - seen_first_at, seen_last_at, seen_view_count, seen_first_utm, seen_last_utm
+ * - seen_first_at, seen_last_at, seen_view_count, seen_first_utm, seen_last_utm, seen_first_origin_source, seen_last_origin_source
+ * - added_to_calendar_at, calendar_provider, calendar_utm, calendar_origin_source
  *
  * The presence of these attributes indicates the user's interaction history.
  */
@@ -49,8 +50,19 @@ export interface SeenRelationshipData {
    viewCount?: number
    firstUtm?: UTMParams
    lastUtm?: UTMParams
-   firstOriginSource?: ImpressionLocation
-   lastOriginSource?: ImpressionLocation
+   firstOriginSource?: ImpressionLocation | string
+   lastOriginSource?: ImpressionLocation | string
+}
+
+/**
+ * Additional context data for calendar relationships
+ * Note: addedToCalendarAt should be a Unix timestamp (seconds since epoch)
+ */
+export interface CalendarRelationshipData {
+   addedToCalendarAt?: number
+   calendarProvider?: string
+   utm?: UTMParams
+   originSource?: ImpressionLocation | string
 }
 
 /**
@@ -225,6 +237,35 @@ export class CustomerIORelationshipsClient {
          attributes.seen_first_origin_source = data.firstOriginSource
       if (data?.lastOriginSource)
          attributes.seen_last_origin_source = data.lastOriginSource
+
+      return this.createUserLivestreamRelationship(
+         userAuthId,
+         livestreamId,
+         attributes
+      )
+   }
+
+   /**
+    * Helper function to update calendar data on a livestream relationship
+    * Uses prefixed attribute names to preserve any existing registration, participation, and seen data
+    * @param userAuthId The user's authentication ID
+    * @param livestreamId The livestream identifier
+    * @param data Optional calendar data (addedToCalendarAt, calendarProvider, utm, originSource)
+    */
+   public async updateCalendarData(
+      userAuthId: string,
+      livestreamId: string,
+      data?: CalendarRelationshipData
+   ): Promise<void> {
+      const attributes: Record<string, any> = {}
+
+      if (data?.addedToCalendarAt)
+         attributes.added_to_calendar_at = data.addedToCalendarAt
+      if (data?.calendarProvider)
+         attributes.calendar_provider = data.calendarProvider
+      if (data?.utm) attributes.calendar_utm = data.utm
+      if (data?.originSource)
+         attributes.calendar_origin_source = data.originSource
 
       return this.createUserLivestreamRelationship(
          userAuthId,

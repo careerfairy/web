@@ -4,6 +4,7 @@ import { appQrCodeLSRegistration } from "constants/images"
 import { useAuth } from "HOCs/AuthProvider"
 import { useMemo } from "react"
 import { MobileUtils } from "util/mobile.utils"
+import { useLiveStreamDialog } from "../.."
 import { LivestreamEvent } from "../../../../../../../packages/shared-lib/src/livestreams/livestreams"
 import { AddToCalendar } from "../../../common/AddToCalendar"
 import {
@@ -42,6 +43,7 @@ export const GetNotifiedCard = ({
 }: Props) => {
    const { authenticatedUser, userData } = useAuth()
    const isDesktopDefault = !useIsMobile()
+   const { originSource } = useLiveStreamDialog()
 
    const shouldDownloadApp = useMemo(() => {
       return userIsTargetedApp(userData) && !MobileUtils.webViewPresence()
@@ -60,6 +62,7 @@ export const GetNotifiedCard = ({
          event={livestream}
          events={registeredLivestreams}
          filename={`${livestream.company}-event`}
+         originSource={originSource}
       >
          {(handleAddToCalendar) => (
             <GetNotifiedCardPresentation

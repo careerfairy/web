@@ -95,6 +95,62 @@
       {
          "name": "jobApplications",
          "type": "stringified_map"
+      },
+      {
+         "fields": [
+            {
+               "name": "firstSeenAt",
+               "type": "timestamp"
+            },
+            {
+               "name": "lastSeenAt",
+               "type": "timestamp"
+            },
+            {
+               "name": "viewCount",
+               "type": "number"
+            },
+            {
+               "name": "firstUtm",
+               "type": "stringified_map"
+            },
+            {
+               "name": "lastUtm",
+               "type": "stringified_map"
+            },
+            {
+               "name": "firstOriginSource",
+               "type": "string"
+            },
+            {
+               "name": "lastOriginSource",
+               "type": "string"
+            }
+         ],
+         "name": "seen",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
+               "name": "date",
+               "type": "timestamp"
+            },
+            {
+               "name": "calendarProvider",
+               "type": "string"
+            },
+            {
+               "name": "utm",
+               "type": "stringified_map"
+            },
+            {
+               "name": "originSource",
+               "type": "string"
+            }
+         ],
+         "name": "addedToCalendar",
+         "type": "map"
       }
    ]
 }
