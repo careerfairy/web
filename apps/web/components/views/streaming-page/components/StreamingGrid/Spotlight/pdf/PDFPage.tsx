@@ -35,7 +35,7 @@ const styles = sxStyles({
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: (theme) => theme.brand.white[500],
-      opacity: 0.6,
+      opacity: 0.3,
       pointerEvents: "none",
    },
 })
@@ -255,7 +255,13 @@ const PresentationImage = ({
          />
          {isLoading ? (
             <Box sx={styles.loaderOverlay}>
-               <CircularProgress size={40} />
+               <CircularProgress
+                  size={40}
+                  sx={{
+                     color: (theme) => theme.brand.black[700],
+                     opacity: 0.5,
+                  }}
+               />
             </Box>
          ) : null}
       </Box>
