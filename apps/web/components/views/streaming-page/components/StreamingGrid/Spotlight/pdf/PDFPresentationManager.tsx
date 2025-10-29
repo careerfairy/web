@@ -20,6 +20,7 @@ type Props = {
    pdfPresentation: LivestreamPresentation
    readyToShare: boolean
    setReadyToShare: Dispatch<SetStateAction<boolean>>
+   setIsActiveUpload: Dispatch<SetStateAction<boolean>>
 }
 
 export const PDFPresentationManager = ({
@@ -27,6 +28,7 @@ export const PDFPresentationManager = ({
    pdfPresentation,
    readyToShare,
    setReadyToShare,
+   setIsActiveUpload,
 }: Props) => {
    const [pdfFile, setPdfFile] = useState<File | null>(null)
 
@@ -42,6 +44,7 @@ export const PDFPresentationManager = ({
       onValidated: async (file) => {
          const newFile = Array.isArray(file) ? file[0] : file
          setPdfFile(newFile)
+         setIsActiveUpload(true) // Mark that this user is actively uploading
          await handleUploadFile(newFile, livestreamId)
 
          setReadyToShare(true)
