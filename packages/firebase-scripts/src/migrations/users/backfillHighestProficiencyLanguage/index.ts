@@ -117,14 +117,13 @@ const backfillHighestLanguageWithPagination = async (
          const userId = userDoc.id
          const userData = userDoc.data()
 
-         // Fetch user's top languages by proficiency (optimized query)
-         // We fetch top 3 to handle potential ties at the highest proficiency level
+         // Fetch all user languages sorted by proficiency
+         // getHighestProficiencyLanguageCode handles the prioritization logic
          const languagesSnap = await firestore
             .collection("userData")
             .doc(userId)
             .collection("languages")
             .orderBy("proficiency", "desc")
-            .limit(3)
             .get()
 
          const languages: ProfileLanguage[] = languagesSnap.empty
