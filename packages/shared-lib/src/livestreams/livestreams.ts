@@ -947,6 +947,70 @@ export type CategoryDataOption = {
  * A PDF presentation for a live stream
  * Document Path: livestreams/{livestreamId}/presentations/presentation
  */
+
+/**
+ * Status values for image conversion
+ */
+export const ImageConversionStatus = {
+   /** PDF uploaded, conversion not started yet */
+   PENDING: "pending",
+   /** PDF parsing and conversion setup in progress */
+   CONVERTING: "converting",
+   /** Converting PDF pages to images and uploading to storage */
+   UPLOADING: "uploading",
+   /** Conversion completed successfully */
+   COMPLETED: "completed",
+   /** Conversion failed with error */
+   FAILED: "failed",
+} as const
+
+export type ImageConversionStatusValue =
+   (typeof ImageConversionStatus)[keyof typeof ImageConversionStatus]
+
+/**
+ * Discriminated union representing the state of image conversion for a PDF presentation
+ */
+export type ImageConversionState =
+   | {
+        status: typeof ImageConversionStatus.PENDING
+     }
+   | {
+        status: typeof ImageConversionStatus.CONVERTING
+        totalPages: number
+        convertedPages: number
+     }
+   | {
+        status: typeof ImageConversionStatus.UPLOADING
+        totalPages: number
+        convertedPages: number
+     }
+   | {
+        status: typeof ImageConversionStatus.COMPLETED
+        totalPages: number
+        imageUrls: string[]
+        completedAt: Timestamp
+     }
+   | {
+        status: typeof ImageConversionStatus.FAILED
+        error: string
+        totalPages?: number
+        convertedPages?: number
+     }
+
+/**
+ * Helper function to check if image conversion is in progress
+ */
+export function getIsProcessingImageConversion(
+   imageConversion: ImageConversionState | undefined
+): boolean {
+   if (!imageConversion) return false
+   return (
+      imageConversion.status === ImageConversionStatus.PENDING ||
+      imageConversion.status === ImageConversionStatus.CONVERTING ||
+      imageConversion.status === ImageConversionStatus.UPLOADING
+   )
+}
+
 export interface LivestreamPresentation extends Identifiable {
    downloadUrl: string
    page: number
@@ -955,6 +1019,10 @@ export interface LivestreamPresentation extends Identifiable {
    storagePath?: string
    /** The size of the PDF in bytes */
    fileSize?: number
+   /**
+    * Image conversion state (undefined = legacy presentation before image conversion feature)
+    */
+   imageConversion?: ImageConversionState
 }
 
 /**

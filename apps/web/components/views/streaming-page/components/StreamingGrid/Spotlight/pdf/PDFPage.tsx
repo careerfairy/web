@@ -1,9 +1,14 @@
-import { LivestreamPresentation } from "@careerfairy/shared-lib/livestreams"
-import { Box } from "@mui/material"
+import {
+   ImageConversionStatus,
+   LivestreamPresentation,
+} from "@careerfairy/shared-lib/livestreams"
+import { Box, CircularProgress } from "@mui/material"
 import { useStreamerDetails } from "components/custom-hook/streaming/useStreamerDetails"
 import { useStreamingContext } from "components/views/streaming-page/context"
+import Image from "next/image"
 import { useEffect, useState } from "react"
 import { Document, Page, pdfjs } from "react-pdf"
+import { sxStyles } from "types/commonTypes"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { PDFLoader } from "./PDFLoader"
 import { useDebouncedResize } from "./useDebouncedResize"
@@ -13,6 +18,27 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
    "pdfjs-dist/build/pdf.worker.min.js",
    import.meta.url
 ).toString()
+
+const styles = sxStyles({
+   imageContainer: {
+      position: "relative",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      width: "100%",
+      height: "100%",
+   },
+   loaderOverlay: {
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: (theme) => theme.brand.white[500],
+      opacity: 0.3,
+      pointerEvents: "none",
+   },
+})
 
 type PageDimensions = {
    width: number
@@ -59,6 +85,21 @@ export const PDFPage = ({
          width: 0,
          height: 0,
       })
+
+   // If high-res images are available, use them instead of PDF rendering
+   const imageUrls =
+      presentation?.imageConversion?.status === ImageConversionStatus.COMPLETED
+         ? presentation.imageConversion.imageUrls
+         : undefined
+   const hasImages = Boolean(imageUrls?.length)
+   const currentImageUrl = hasImages ? imageUrls[presentation.page - 1] : null
+
+   // Set the total number of pages when images are available
+   useEffect(() => {
+      if (hasImages && imageUrls) {
+         setPdfNumberOfPages(imageUrls.length)
+      }
+   }, [hasImages, imageUrls, setPdfNumberOfPages])
 
    // // Check for service worker support to detect corporate clients with strict security policies
    useEffect(() => {
@@ -117,6 +158,18 @@ export const PDFPage = ({
       return <PDFLoader parentHeight={parentHeight} aspectRatio={aspectRatio} />
    }
 
+   // If high-res images are available, display the image instead of rendering PDF
+   if (currentImageUrl) {
+      return (
+         <PresentationImage
+            imageUrl={currentImageUrl}
+            pageNumber={presentation.page}
+            livestreamId={livestreamId}
+         />
+      )
+   }
+
+   // Fallback to PDF rendering when images are not yet available
    return (
       <Box component="span">
          <Document
@@ -149,9 +202,68 @@ export const PDFPage = ({
                width={width}
                height={height}
                // Greatly improve text rendering quality by increasing the device pixel ratio to 4x
-               devicePixelRatio={window.devicePixelRatio * 4}
+               devicePixelRatio={window.devicePixelRatio * 2}
             />
          </Document>
+      </Box>
+   )
+}
+
+type PresentationImageProps = {
+   imageUrl: string
+   pageNumber: number
+   livestreamId: string
+}
+
+const PresentationImage = ({
+   imageUrl,
+   pageNumber,
+   livestreamId,
+}: PresentationImageProps) => {
+   const { isHost } = useStreamingContext()
+   const [isLoading, setIsLoading] = useState(true)
+
+   useEffect(() => {
+      setIsLoading(true)
+   }, [imageUrl])
+
+   return (
+      <Box sx={styles.imageContainer}>
+         <Image
+            src={imageUrl}
+            alt={`Presentation page ${pageNumber}`}
+            fill
+            quality={100}
+            style={{
+               objectFit: "contain",
+            }}
+            unoptimized={isHost}
+            priority
+            onLoadingComplete={() => setIsLoading(false)}
+            onError={() => {
+               setIsLoading(false)
+               errorLogAndNotify(
+                  new Error("Failed to load presentation image"),
+                  {
+                     message: "Image load error",
+                     imageUrl,
+                     livestreamId,
+                     presentationPage: pageNumber,
+                  }
+               )
+            }}
+         />
+         {isLoading ? (
+            <Box sx={styles.loaderOverlay}>
+               <CircularProgress
+                  size={40}
+                  sx={{
+                     color: (theme) => theme.brand.black[700],
+                     opacity: 0.5,
+                  }}
+               />
+            </Box>
+         ) : null}
       </Box>
    )
 }

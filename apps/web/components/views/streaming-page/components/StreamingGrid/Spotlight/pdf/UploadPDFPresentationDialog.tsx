@@ -1,4 +1,7 @@
-import { LivestreamModes } from "@careerfairy/shared-lib/livestreams"
+import {
+   getIsProcessingImageConversion,
+   LivestreamModes,
+} from "@careerfairy/shared-lib/livestreams"
 import { Box, CircularProgress } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { useAppDispatch } from "components/custom-hook/store"
@@ -43,6 +46,18 @@ export const UploadPDFPresentationDialog = () => {
       dispatch(setUploadPDFPresentationDialogOpen(false))
    }
 
+   const isConversionInProgress = getIsProcessingImageConversion(
+      pdfPresentation?.imageConversion
+   )
+
+   // Enable "Share slides" if:
+   // 1. We have a PDF URL (step 2 completed)
+   // 2. Conversion is not in progress
+   // Note: If conversion fails (FAILED status), we can still share using PDF fallback
+   const canShare = Boolean(
+      pdfPresentation?.downloadUrl && !isConversionInProgress
+   )
+
    return (
       <ConfirmationDialog
          width={589}
@@ -58,7 +73,7 @@ export const UploadPDFPresentationDialog = () => {
          primaryAction={{
             text: "Share slides",
             color: "primary",
-            disabled: !pdfPresentation?.downloadUrl || !readyToShare,
+            disabled: !canShare,
             callback: () =>
                setLivestreamMode({
                   mode: LivestreamModes.PRESENTATION,
