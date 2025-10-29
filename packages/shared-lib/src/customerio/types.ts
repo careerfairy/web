@@ -104,6 +104,12 @@ export interface CustomerIOLivestreamRelationshipAttributes {
    // Participation data
    participated_at?: number // Unix timestamp
    participation_utm?: UTMParams // UTM parameters at time of participation
+
+   // Calendar data
+   added_to_calendar_at?: number // Unix timestamp
+   calendar_provider?: string // Which calendar service they used (google, apple, outlook, yahoo, ics)
+   calendar_utm?: UTMParams // UTM parameters at time of adding to calendar
+   calendar_origin_source?: string // Origin source when added to calendar
 }
 
 /**

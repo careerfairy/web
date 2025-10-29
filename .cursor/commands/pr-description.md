@@ -29,10 +29,16 @@ When the user provides ONLY a PR number (e.g., "1694" or "#1694"), automatically
 -  Analyze diff for changes and context
 -  Generate concise title and description
 -  Auto-detect and add appropriate checklists:
-   -  **Function Deployment**: When functions are created or versions change (e.g., new functions, `_v4` → `_v5`)
-      -  Functions might also not have their version updated, so based on the changes, if any file related to a function or config is updated but the version is not changed, it means that the same function must be redeployed, so these functions must also be added to the Function Deployment section list.
+   -  **Function Deployment**:
+      -  Callable/HTTP functions: When created or versions change (e.g., `_v4` → `_v5`), or when implementation/dependencies change
+      -  Trigger functions: Never versioned - ALWAYS redeploy if their code or dependencies change
+      -  When ANY file in `packages/functions/src/` is modified (identify which functions use that code)
+      -  When shared libraries used by functions are modified (`packages/shared-lib/`, Customer.io code, etc.)
    -  **Firestore Rules**: When `firestore.rules` file is modified
-   -  **BigQuery Schema**: When schema files in `packages/bigquery-import/schema-views/` are updated/created
+   -  **BigQuery Schema**:
+      -  When schema files in `packages/bigquery-import/schema-views/` are updated/created
+      -  When TypeScript types in `packages/shared-lib/src/` that have corresponding schema files are modified (e.g., UserLivestreamData, UserData, Livestream)
+      -  Schema file must be updated to reflect type changes before deployment
    -  **Migration Script**: When migration scripts are present
    -  **Post-Merge Cleanup**: When cleanup tasks are needed
 
@@ -59,13 +65,30 @@ Present the output in this copy-ready format:
 
 ### Function Deployment Checklist
 
-**Trigger:** New functions added or function name changes with version (e.g., new function files, `startPlan_v4` → `startPlan_v5`)
+**Triggers:**
+1. **Callable/HTTP Functions with versions**: New functions or version changes (e.g., `startPlan_v4` → `startPlan_v5`)
+2. **Trigger Functions (Firestore, Auth, PubSub, etc.)**: Never versioned, always same name
+   - MUST be redeployed if their code or any dependencies change
+3. **Any changes in `packages/functions/src/`** - including utilities, helpers, lib code, or function implementations
+4. Changes to shared code that functions depend on:
+   - `packages/shared-lib/src/` (types, interfaces, utilities used by functions)
+   - Customer.io integration code (`customerio.ts`, `relationshipsClient.ts`, etc.)
+5. Changes to function configuration files
+
+**Detection Strategy:**
+- **Trigger Functions**: Always redeploy if their code or any code they use is modified (no versioning)
+- **Callable/HTTP Functions**: Redeploy if implementation/dependencies changed, even if version unchanged
+- If ANY file in `packages/functions/src/` is modified, identify which deployed functions use that code
+- For library/utility changes (e.g., Customer.io tracking), list ALL functions that call those utilities
+- Be specific about which functions need redeployment based on the code paths affected
 
 ```
 
 ### Function Deployment
 
--  [ ] Deploy `functionName` function (or `functionName_v5` for version updates)
+-  [ ] Deploy `triggerFunctionName` (trigger function - no version)
+-  [ ] Deploy `callableFunctionName_v5` (callable/HTTP function with version)
+-  [ ] Deploy all functions that use modified utilities (e.g., functions calling Customer.io tracking)
 
 ```
 
@@ -84,13 +107,31 @@ Present the output in this copy-ready format:
 
 ### BigQuery Schema Checklist
 
-**Trigger:** Schema files updated/created in `packages/bigquery-import/schema-views/`
+**Triggers:**
+1. Schema files updated/created in `packages/bigquery-import/schema-views/`
+2. **TypeScript interfaces/types modified that have corresponding schema files:**
+   - `UserLivestreamData` → `userLivestreamData.json`
+   - `UserData` → `userData.json`
+   - `Livestream` → `livestreams.json`
+   - `Group` → `groups.json`
+   - `Spark` → `sparks.json`
+   - `JobApplication` → `jobApplications.json`
+   - `UserStats` → `userStats.json`
+   - `UserActivity` → `userActivities.json`
+   - And other types with corresponding schema files
+
+**Detection Strategy:**
+- When a TypeScript interface/type in `packages/shared-lib/src/` is modified, check if a corresponding schema file exists
+- If changes add/remove/modify fields in the type, the schema file MUST be updated
+- Compare the modified type fields against the schema file to identify what needs updating
+- List the specific schema file(s) that need redeployment
 
 ```
 
 ### BigQuery Schema Deployment
 
--  [ ] Delete existing schema views from BigQuery (if updating)
+-  [ ] Update schema file: `packages/bigquery-import/schema-views/[SCHEMA_FILE].json` to match type changes
+-  [ ] Delete existing schema views from BigQuery (if updating): Table `[TABLE_NAME]`
 -  [ ] Deploy updated schemas using: `npx @firebaseextensions/fs-bq-schema-views --non-interactive --project=careerfairy-e1fd9 --big-query-project=careerfairy-e1fd9 --dataset=firestore_export --table-name-prefix=[TABLE_NAME] --schema-files=./packages/bigquery-import/schema-views/[SCHEMA_FILE].json`
 -  [ ] Verify schema deployment completed successfully
 

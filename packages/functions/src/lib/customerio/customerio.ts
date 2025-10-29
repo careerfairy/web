@@ -420,6 +420,39 @@ const trackCustomerIORelationships = async (
             `Updated Customer.io seen data: user ${userAuthId} -> livestream ${livestreamId} (viewCount: ${newUserLivestreamData.seen?.viewCount})`
          )
       }
+
+      // Handle calendar data changes
+      const wasAddedToCalendar = Boolean(
+         oldUserLivestreamData?.addedToCalendar?.date
+      )
+      const isAddedToCalendar = Boolean(
+         newUserLivestreamData?.addedToCalendar?.date
+      )
+
+      const shouldUpdateCalendar = CHECK_FOR_RELATIONSHIP_CHANGES
+         ? !wasAddedToCalendar && isAddedToCalendar // Only on first calendar add
+         : isAddedToCalendar // Force update during backfill if added to calendar
+
+      if (shouldUpdateCalendar) {
+         // User added event to calendar - update calendar data
+         await relationshipsClient.updateCalendarData(
+            userAuthId,
+            livestreamId,
+            {
+               addedToCalendarAt: toUnixTimestamp(
+                  newUserLivestreamData.addedToCalendar?.date
+               ),
+               calendarProvider:
+                  newUserLivestreamData.addedToCalendar?.calendarProvider,
+               utm: newUserLivestreamData.addedToCalendar?.utm,
+               originSource:
+                  newUserLivestreamData.addedToCalendar?.originSource,
+            }
+         )
+         logger.info(
+            `Updated Customer.io calendar data: user ${userAuthId} -> livestream ${livestreamId} (provider: ${newUserLivestreamData.addedToCalendar?.calendarProvider})`
+         )
+      }
    } catch (error) {
       // Log error but don't fail the entire registration process
       logger.error(
