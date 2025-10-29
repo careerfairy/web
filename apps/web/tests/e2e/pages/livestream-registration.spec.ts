@@ -7,8 +7,8 @@ import { signedInFixture as test } from "../fixtures"
 import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
 import { LoginPage } from "../page-object-models/LoginPage"
 import { SignupPage } from "../page-object-models/SignupPage"
+import { ViewerPage } from "../page-object-models/streaming/ViewerPage"
 import { setupLivestreamData, setupUserSignUpData } from "../setupData"
-import { expectExactText } from "../utils/assertions"
 
 test.describe("Livestream Registration Signed In", () => {
    test("successful registration on a livestream event from the portal page", async ({
@@ -339,9 +339,8 @@ test.describe("Livestream Registration Signed In", () => {
 
       await page.waitForURL(`**/streaming/viewer/${livestream.id}`)
 
-      // assert we're on the streaming page
-      expect(page.url()).toContain(`/streaming/viewer/${livestream.id}`)
-      await expectExactText(page, "Add a Question")
+      const viewerPage = new ViewerPage(page)
+      await viewerPage.assertIsLive()
    })
 })
 
