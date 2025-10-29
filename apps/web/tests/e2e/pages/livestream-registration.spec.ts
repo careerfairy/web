@@ -337,10 +337,10 @@ test.describe("Livestream Registration Signed In", () => {
 
       await livestreamDialogPage.registrationButton.click()
 
-      await page.waitForURL(`**/streaming/${livestream.id}/viewer`)
+      await page.waitForURL(`**/streaming/viewer/${livestream.id}`)
 
       // assert we're on the streaming page
-      expect(page.url()).toContain(`/streaming/${livestream.id}/viewer`)
+      expect(page.url()).toContain(`/streaming/viewer/${livestream.id}`)
       await expectExactText(page, "Add a Question")
    })
 })
