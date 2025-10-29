@@ -164,7 +164,6 @@ export const PDFPage = ({
          <PresentationImage
             imageUrl={currentImageUrl}
             pageNumber={presentation.page}
-            livestreamId={livestreamId}
          />
       )
    }
@@ -212,13 +211,11 @@ export const PDFPage = ({
 type PresentationImageProps = {
    imageUrl: string
    pageNumber: number
-   livestreamId: string
 }
 
 const PresentationImage = ({
    imageUrl,
    pageNumber,
-   livestreamId,
 }: PresentationImageProps) => {
    const { isHost } = useStreamingContext()
    const [isLoading, setIsLoading] = useState(true)
@@ -237,21 +234,17 @@ const PresentationImage = ({
             style={{
                objectFit: "contain",
             }}
+            onError={() => {
+               setIsLoading(false)
+               console.error("Image load error", {
+                  message: "Image load error",
+                  imageUrl,
+                  presentationPage: pageNumber,
+               })
+            }}
             unoptimized={isHost}
             priority
             onLoadingComplete={() => setIsLoading(false)}
-            onError={() => {
-               setIsLoading(false)
-               errorLogAndNotify(
-                  new Error("Failed to load presentation image"),
-                  {
-                     message: "Image load error",
-                     imageUrl,
-                     livestreamId,
-                     presentationPage: pageNumber,
-                  }
-               )
-            }}
          />
          {isLoading ? (
             <Box sx={styles.loaderOverlay}>
