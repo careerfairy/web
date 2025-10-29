@@ -168,6 +168,7 @@ export const AnalyticsEvents = {
 
    // Coffee Chats
    CompanyPageCoffeeChatsClick: "company_page_coffee_chats_click",
+   LivestreamDialogCoffeeChatsClick: "livestream_dialog_coffee_chats_click",
 } as const
 
 export type AnalyticsEvent =
