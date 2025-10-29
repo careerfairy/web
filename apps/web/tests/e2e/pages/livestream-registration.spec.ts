@@ -322,7 +322,6 @@ test.describe("Livestream Registration Signed In", () => {
       const { livestream } = await setupLivestreamData(undefined, {
          overrideLivestreamDetails: {
             groupQuestionsMap: null,
-            useOldUI: true,
          },
          livestreamType: "createLive",
       })
