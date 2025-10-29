@@ -58,6 +58,7 @@ type ResponsiveDialogProps = {
    SlideProps?: SwipeableDrawerProps["SlideProps"]
    TransitionProps?: DialogProps["TransitionProps"]
    dataTestId?: string
+   drawerStyles?: SxProps
 }
 
 /**
@@ -73,6 +74,7 @@ export const ResponsiveDialogLayout = ({
    SlideProps,
    TransitionProps,
    dataTestId,
+   drawerStyles,
 }: ResponsiveDialogProps) => {
    const isMobile = useIsMobile()
 
@@ -81,8 +83,9 @@ export const ResponsiveDialogLayout = ({
          <BrandedSwipeableDrawer
             open={open}
             anchor="bottom"
+            sx={drawerStyles}
             PaperProps={{
-               sx: styles.drawer,
+               sx: combineStyles(styles.drawer, dialogPaperStyles),
                "data-testid": dataTestId,
             }}
             onOpen={() => {}}
