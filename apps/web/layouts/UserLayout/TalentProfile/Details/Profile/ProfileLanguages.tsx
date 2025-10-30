@@ -3,7 +3,10 @@ import {
    LanguageProficiencyOrderMap,
    LanguageProficiencyValues,
 } from "@careerfairy/shared-lib/constants/forms"
-import { ProfileLanguage } from "@careerfairy/shared-lib/users"
+import {
+   ProfileLanguage,
+   getHighestProficiencyLanguageCode,
+} from "@careerfairy/shared-lib/users"
 import { Box, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -142,6 +145,26 @@ const FormDialogWrapper = () => {
             await userRepo.updateLanguage(userData.id, newLanguage)
          }
 
+         // Compute updated language list
+         const allCurrentLanguages = languages || []
+         let updatedLanguages: ProfileLanguage[]
+
+         if (!data?.id) {
+            // Adding new language
+            updatedLanguages = [...allCurrentLanguages, newLanguage]
+         } else {
+            // Updating existing language
+            updatedLanguages = allCurrentLanguages.map((lang) =>
+               lang.id === newLanguage.id ? newLanguage : lang
+            )
+         }
+
+         // Find and persist highest proficiency language code
+         const highestCode = getHighestProficiencyLanguageCode(updatedLanguages)
+         await userRepo.updateUserData(userData.id, {
+            highestProficiencyLanguageCode: highestCode,
+         })
+
          handleCloseLanguageDialog()
          successNotification(
             `${data.id ? "Updated" : "Added a new"} language 🗣️`,
@@ -221,6 +244,7 @@ type LanguageCardProps = {
 const LanguageCard = ({ language }: LanguageCardProps) => {
    const isMobile = useIsMobile()
    const { userData } = useAuth()
+   const { data: allLanguages } = useUserLanguages()
    const [isDeleting, setIsDeleting] = useState<boolean>(false)
    const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
       useState<boolean>(false)
@@ -243,6 +267,12 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
 
       await userRepo.deleteLanguage(userData.id, language.id)
 
+      const remaining = (allLanguages || []).filter((l) => l.id !== language.id)
+      const highestCode = getHighestProficiencyLanguageCode(remaining)
+      await userRepo.updateUserData(userData.id, {
+         highestProficiencyLanguageCode: highestCode,
+      })
+
       setIsDeleting(false)
       setIsConfirmDeleteDialogOpen(false)
       successNotification(
@@ -250,7 +280,14 @@ const LanguageCard = ({ language }: LanguageCardProps) => {
          undefined,
          isMobile ? NOTIFICATION_OPTIONS : undefined
       )
-   }, [language, userData.id, successNotification, isMobile])
+   }, [
+      userData.id,
+      language.id,
+      language.languageId,
+      allLanguages,
+      successNotification,
+      isMobile,
+   ])
 
    return (
       <Fragment>
