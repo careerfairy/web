@@ -2,12 +2,14 @@ import { StripeProductType } from "@careerfairy/shared-lib/stripe/types"
 import { Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import { useGroupOfflineEventsWithStats } from "components/custom-hook/offline-event/useGroupOfflineEventsWithStats"
+
 import useIsMobile from "components/custom-hook/useIsMobile"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import CheckoutConfirmationDialog from "components/views/checkout/views/CheckoutConfirmationDialog"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { Fragment } from "react"
+import { getStripeEnvironment } from "util/CommonUtil"
 import { AdminContainer } from "../common/Container"
 import { OutOfEventsDialog } from "./OutOfEventsDialog"
 import { OverviewHeader } from "./OverviewHeader"
@@ -42,7 +44,7 @@ const OfflineEventsOverviewContent = () => {
    const showPromotionView = !groupPresenter?.canCreateOfflineEvents(true)
    const { userData } = useAuth()
    const { createDraftOfflineEvent } = useOfflineEventRouting()
-
+   const stripeEnv = getStripeEnvironment()
    const {
       data: stats,
       isLoading,
@@ -76,7 +78,8 @@ const OfflineEventsOverviewContent = () => {
                customerName: `${userData.firstName} ${userData.lastName}`,
                customerEmail: userData.userEmail,
                groupId: group.groupId,
-               priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_PRICE_ID,
+               environment: stripeEnv,
+               priceId: process.env.NEXT_PUBLIC_OFFLINE_EVENT_STRIPE_PRICE_ID,
                successUrl: `/group/${group.id}/admin/content/offline-events?stripe_session_id={CHECKOUT_SESSION_ID}`,
             }}
             open={checkoutDialogOpen}

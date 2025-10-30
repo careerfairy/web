@@ -1,11 +1,15 @@
 import { PLAN_CONSTANTS } from "@careerfairy/shared-lib/groups/planConstants"
-import { StripeProductType } from "@careerfairy/shared-lib/stripe/types"
+import {
+   GroupPlanFetchStripeCustomerSession,
+   StripeProductType,
+} from "@careerfairy/shared-lib/stripe/types"
 import { useAuth } from "HOCs/AuthProvider"
 import { useSparksPlansForm } from "components/views/checkout/GroupPlansDialog"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { FormEvent } from "react"
 import { useSelector } from "react-redux"
 import { selectedPlanSelector } from "store/selectors/groupSelectors"
+import { getStripeEnvironment } from "util/CommonUtil"
 import { useStripeCustomerSession } from "./useStripeCustomerSession"
 
 const useStripePlanCheckout = () => {
@@ -13,16 +17,17 @@ const useStripePlanCheckout = () => {
    const { group } = useGroup()
    const { goToCheckoutView: goToSelectPlanView, setClientSecret } =
       useSparksPlansForm()
-
+   const stripeEnv = getStripeEnvironment()
    const selectedPlan = useSelector(selectedPlanSelector)
 
    const {
       data: customerSession,
       isLoading: loadingSecret,
       error: error,
-   } = useStripeCustomerSession({
+   } = useStripeCustomerSession<GroupPlanFetchStripeCustomerSession>({
       type: StripeProductType.GROUP_PLAN,
       plan: selectedPlan,
+      environment: stripeEnv,
       customerEmail: userData.userEmail,
       customerName: `${userData.firstName} ${userData.lastName}`,
       groupId: group.groupId,
