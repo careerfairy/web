@@ -86,6 +86,7 @@ export interface CustomerIOUserData {
    has_job_applications: boolean
    has_resume: boolean
    has_completed_sparks_onboarding: boolean
+   highest_proficiency_language_code?: string
 }
 
 /**
