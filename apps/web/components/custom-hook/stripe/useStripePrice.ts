@@ -4,7 +4,7 @@ import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo } from "react"
 import Stripe from "stripe"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { errorLogAndNotify, getStripeEnvironment } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
@@ -33,14 +33,17 @@ type Result = {
 const useStripePrice = (priceId: string) => {
    const fetcher = useFunctionsSWR<Result[]>()
    const { group } = useGroup()
+   const stripeEnv = getStripeEnvironment()
    const options = useMemo(() => {
       return {
          priceId: priceId,
          groupId: group.id,
+         environment: stripeEnv,
       }
-   }, [group.id, priceId])
+   }, [group.id, priceId, stripeEnv])
    return useSWR([FUNCTION_NAMES.fetchStripePrice, options], fetcher, {
       ...swrOptions,
+      suspense: false,
       onError: (error) =>
          errorLogAndNotify(error, {
             message: `Error fetching Stripe price with options: ${options}`,

@@ -4,7 +4,7 @@ import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useMemo } from "react"
 import Stripe from "stripe"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { errorLogAndNotify, getStripeEnvironment } from "util/CommonUtil"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
@@ -37,17 +37,18 @@ type Result = {
 const useStripeSessionStatus = (sessionId: string): Result => {
    const fetcher = useFunctionsSWR<Result[]>()
    const { group } = useGroup()
+   const stripeEnv = getStripeEnvironment()
    const options = useMemo(() => {
       return {
          sessionId: sessionId,
          groupId: group.id,
+         environment: stripeEnv,
       }
-   }, [group.id, sessionId])
-   return useSWR(
-      [FUNCTION_NAMES.fetchStripeSessionStatus, options],
-      fetcher,
-      swrOptions
-   )
+   }, [group.id, sessionId, stripeEnv])
+   return useSWR([FUNCTION_NAMES.fetchStripeSessionStatus, options], fetcher, {
+      ...swrOptions,
+      suspense: false,
+   })
 }
 
 export default useStripeSessionStatus

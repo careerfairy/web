@@ -45,6 +45,7 @@ import {
 
 import { IPublicSparksNotificationsRepository } from "@careerfairy/shared-lib/sparks/public-notifications/IPublicSparksNotificationsRepository"
 import PublicSparksNotificationsRepository from "@careerfairy/shared-lib/sparks/public-notifications/PublicSparksNotificationsRepository"
+import { StripeEnvironment } from "@careerfairy/shared-lib/stripe/types"
 import Stripe from "stripe"
 import {
    CustomJobFunctionsRepository,
@@ -163,5 +164,16 @@ export const emailNotificationsRepo: IEmailNotificationRepository =
 export const offlineEventRepo: IOfflineEventFunctionsRepository =
    new OfflineEventFunctionsRepository(firestore, logger)
 
-export const stripeRepo: IStripeFunctionsRepository =
-   new StripeFunctionsRepository(new Stripe(process.env.STRIPE_SECRET_KEY))
+const prodStripeRepo = new StripeFunctionsRepository(
+   new Stripe(process.env.STRIPE_SECRET_KEY)
+)
+
+const testStripeRepo = new StripeFunctionsRepository(
+   new Stripe(process.env.TEST_STRIPE_SECRET_KEY)
+)
+
+export const stripeRepo: Record<StripeEnvironment, IStripeFunctionsRepository> =
+   {
+      prod: prodStripeRepo,
+      test: testStripeRepo,
+   }

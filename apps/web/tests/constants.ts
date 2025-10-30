@@ -2,6 +2,7 @@ import {
    dummyFieldsOfStudy,
    dummyLevelsOfStudy,
 } from "@careerfairy/seed-data/fieldsOfStudy"
+import path from "path"
 
 export const credentials = {
    correctEmail: "john@careerfairy.io",
@@ -27,9 +28,12 @@ export const credentials = {
    correctLevelOfStudyName: dummyLevelsOfStudy[0].name,
 }
 
-export const imageLogoPath = "tests/e2e/assets/logo.png"
-export const pdfSamplePath = "tests/e2e/assets/sample.pdf"
-export const creatorAvatarImagePath = "tests/e2e/assets/creatorAvatar.png"
+export const imageLogoPath = path.resolve(__dirname, "e2e/assets/logo.png")
+export const pdfSamplePath = path.resolve(__dirname, "e2e/assets/sample.pdf")
+export const creatorAvatarImagePath = path.resolve(
+   __dirname,
+   "e2e/assets/creatorAvatar.png"
+)
 
 export const streaming = {
    streamer: {

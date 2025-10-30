@@ -3,6 +3,20 @@ import { GroupPlanType } from "../groups"
 export const STRIPE_CUSTOMER_METADATA_VERSION = "0.1"
 export const STRIPE_CUSTOMER_SESSION_METADATA_VERSION = "0.1"
 
+/**
+ * Stripe environment constants for type-safe access
+ */
+export const StripeEnvironments = {
+   Prod: "prod",
+   Test: "test",
+} as const
+
+/**
+ * Stripe environment types derived from StripeEnvironments
+ */
+export type StripeEnvironment =
+   (typeof StripeEnvironments)[keyof typeof StripeEnvironments]
+
 export type StripeCustomerSessionData = {
    customerSessionSecret: string
 }
@@ -67,6 +81,7 @@ export interface BaseFetchStripeCustomerSession {
    priceId: string
    successUrl: string
    type: StripeProductType
+   environment: StripeEnvironment
 }
 
 /**
@@ -103,6 +118,7 @@ export interface BaseSessionPayload {
    groupId: string
    priceId: string
    successUrl: string
+   environment: StripeEnvironment
    plan?: GroupPlanType
    [key: string]: unknown
 }
