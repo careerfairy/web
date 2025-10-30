@@ -553,7 +553,10 @@ const CompanyPageOverview = ({
                   {tabValue === TabValue.overview ? (
                      <Box mt={0} width={"100%"}>
                         <Stack spacing={2}>
-                           {Boolean(group.hasCoffeeChats) && (
+                           {Boolean(
+                              group.hasCoffeeChats &&
+                                 featureFlags?.coffeeChatsFlag
+                           ) && (
                               <Box display={{ xs: "none", md: "block" }}>
                                  <CoffeeChatsSection />
                               </Box>
