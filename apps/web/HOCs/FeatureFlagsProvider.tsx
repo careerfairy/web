@@ -77,6 +77,13 @@ export const flagsInitialState = {
    newEventsTableFlag: {
       enabled: true,
    },
+   /**
+    * Coffee Chats rollout
+    * Hide or Show
+    */
+   coffeeChatsFlag: {
+      enabled: false,
+   },
 } satisfies FeatureFlagsDetails
 
 /**
