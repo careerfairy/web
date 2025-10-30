@@ -1,5 +1,6 @@
 import { Box, Stack } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
 import { useCompanyPage } from ".."
 import AboutSection from "../AboutSection"
 import { CoffeeChatsSection } from "../CoffeeChatsSection"
@@ -16,6 +17,7 @@ type Props = {
 export const Overview = ({ editMode }: Props) => {
    const { isLoggedIn, isLoggedOut } = useAuth()
    const { group, customJobs } = useCompanyPage()
+   const flags = useFeatureFlags()
 
    const showFollowCompanyCta = isLoggedIn && !editMode
    const showSignUpCta = isLoggedOut && !editMode
@@ -23,7 +25,7 @@ export const Overview = ({ editMode }: Props) => {
    return (
       <Stack spacing={{ xs: 2, md: 3 }}>
          <AboutSection />
-         {Boolean(group.hasCoffeeChats) && (
+         {Boolean(group.hasCoffeeChats && flags?.coffeeChatsFlag) && (
             <Box display={{ xs: "block", md: "none" }}>
                <CoffeeChatsSection />
             </Box>
