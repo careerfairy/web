@@ -172,6 +172,14 @@ docker run  -p 9323:9323 \
 docker run --rm --entrypoint "/bin/bash" careerfairy-test
 ```
 
+**Docker flags reference:**
+
+-  `--rm` - Automatically remove the container when it exits (cleans up stopped containers)
+-  `-p HOST:CONTAINER` - Publish container ports to host (e.g., `-p 8080:8080` maps port 8080)
+-  `-v HOST:CONTAINER` - Mount a host directory as a volume (allows live file editing from host)
+-  `-e VAR=value` - Set environment variables inside the container
+-  `--entrypoint` - Override the default entrypoint command
+
 > The container entrypoint now generates `NEXT_PUBLIC_UNIQUE_WORKFLOW_ID` automatically (and appends the shard number when provided), so the runtime environment matches the GitHub Actions runners without additional flags.
 
 ### Emulator Functions - Sending Emails
