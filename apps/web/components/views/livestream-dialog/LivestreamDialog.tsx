@@ -796,6 +796,7 @@ type DialogContextType = {
    handleStartSuccessAnimation: () => void
    isRecommendationsListVisible: boolean
    setIsRecommendationsListVisible: Dispatch<SetStateAction<boolean>>
+   showingSuccessAnimation: boolean
    originSource: string | null
 }
 
@@ -844,6 +845,7 @@ const DialogContext = createContext<DialogContextType>({
    handleStartSuccessAnimation: () => {},
    isRecommendationsListVisible: false,
    setIsRecommendationsListVisible: () => {},
+   showingSuccessAnimation: false,
    originSource: null,
 })
 
