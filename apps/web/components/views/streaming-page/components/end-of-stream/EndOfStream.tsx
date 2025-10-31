@@ -1,7 +1,12 @@
 import { MESSAGING_TYPE } from "@careerfairy/shared-lib/messaging"
 import { Box, BoxProps, Stack } from "@mui/material"
+import { useUserIsCompanyTargeted } from "components/custom-hook/group/useUserIsCompanyTargeted"
+import useLivestreamCompanyHostSWR from "components/custom-hook/live-stream/useLivestreamCompanyHostSWR"
+import useFeatureFlags from "components/custom-hook/useFeatureFlags"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import CoffeeChatsDialog from "components/views/coffee-chats/CoffeeChatsDialog"
 import { useAuth } from "HOCs/AuthProvider"
-import { ReactNode, forwardRef, useEffect } from "react"
+import { ReactNode, forwardRef, useEffect, useState } from "react"
 import {
    useIsRecordingWindow,
    useShowEndScreen,
@@ -9,6 +14,7 @@ import {
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { MobileUtils } from "util/mobile.utils"
+import { useStreamingContext } from "../../context/Streaming"
 import { EndOfStreamHeader } from "./EndOfStreamHeader"
 import { Hero } from "./Hero"
 import { Jobs } from "./Jobs"
@@ -51,7 +57,14 @@ export const EndOfStream = ({ children, isHost }: Props) => {
    }, [showEndScreen])
 
    if (showEndScreen) {
-      return <EndOfStreamView />
+      return (
+         <>
+            <EndOfStreamView />
+            <SuspenseWithBoundary fallback={null}>
+               <CoffeeChatsPrompt />
+            </SuspenseWithBoundary>
+         </>
+      )
    }
 
    return <>{children}</>
@@ -78,3 +91,47 @@ const EndOfStreamView = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
 })
 
 EndOfStreamView.displayName = "EndOfStreamView"
+
+const CoffeeChatsPrompt = () => {
+   const { livestreamId } = useStreamingContext()
+
+   // Get host company
+   const { data: hostCompany } = useLivestreamCompanyHostSWR(livestreamId)
+   const flags = useFeatureFlags()
+
+   const hasCoffeeChats = Boolean(hostCompany?.hasCoffeeChats)
+   const isInCoffeeChatsAudience = useUserIsCompanyTargeted(hostCompany)
+
+   const [isOpen, setIsOpen] = useState(false)
+   const [hasTriggered, setHasTriggered] = useState(false)
+
+   // Open once when eligible on end-of-stream
+   useEffect(() => {
+      if (
+         flags?.coffeeChatsFlag &&
+         hasCoffeeChats &&
+         isInCoffeeChatsAudience &&
+         !hasTriggered
+      ) {
+         setIsOpen(true)
+         setHasTriggered(true)
+      }
+   }, [
+      flags?.coffeeChatsFlag,
+      hasCoffeeChats,
+      isInCoffeeChatsAudience,
+      hasTriggered,
+   ])
+
+   if (!isOpen) return null
+
+   return (
+      <CoffeeChatsDialog
+         open={isOpen}
+         onClose={() => setIsOpen(false)}
+         companyName={hostCompany?.universityName}
+         bookChatLink={"https://tally.so/r/mKqrbD"}
+         source="streamingPage"
+      />
+   )
+}
