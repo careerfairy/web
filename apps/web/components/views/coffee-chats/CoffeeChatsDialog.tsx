@@ -18,6 +18,7 @@ type CoffeeChatsDialogProps = {
    onClose: () => void
    companyName?: string
    bookChatLink: string
+   source?: "livestreamDialog" | "streamingPage"
    TransitionComponent?: DialogProps["TransitionComponent"]
 }
 
@@ -141,11 +142,18 @@ export const CoffeeChatsDialog = ({
    companyName = "Zurich Schweiz Versicherung",
    TransitionComponent,
    bookChatLink,
+   source = "livestreamDialog",
 }: CoffeeChatsDialogProps) => {
    const handleBookChat = () => {
-      dataLayerEvent(AnalyticsEvents.LivestreamDialogCoffeeChatsClick, {
-         companyName: companyName,
-      })
+      if (source === "livestreamDialog") {
+         dataLayerEvent(AnalyticsEvents.LivestreamDialogCoffeeChatsClick, {
+            companyName: companyName,
+         })
+      } else if (source === "streamingPage") {
+         dataLayerEvent(AnalyticsEvents.StreamingPageCoffeeChatsClick, {
+            companyName: companyName,
+         })
+      }
       window.open(bookChatLink, "_blank")
       onClose()
    }
