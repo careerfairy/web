@@ -1,4 +1,5 @@
 import { Box, Button, Stack, Typography } from "@mui/material"
+import { useUserIsCompanyTargeted } from "components/custom-hook/group/useUserIsCompanyTargeted"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerEvent } from "util/analyticsUtils"
 import { useCompanyPage } from ".."
@@ -112,6 +113,7 @@ const styles = sxStyles({
 
 export const CoffeeChatsSection = () => {
    const { group } = useCompanyPage()
+   const isUserCompanyTargeted = useUserIsCompanyTargeted(group)
 
    const handleClick = () => {
       dataLayerEvent(AnalyticsEvents.CompanyPageCoffeeChatsClick, {
@@ -120,6 +122,8 @@ export const CoffeeChatsSection = () => {
       })
       window.open("https://tally.so/r/mKqrbD", "_blank")
    }
+
+   if (!isUserCompanyTargeted) return null
 
    return (
       <Box sx={styles.banner}>
