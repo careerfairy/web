@@ -148,33 +148,40 @@ Create a Pull Request with the new changes, and only after approval, should you 
 
 ### Run E2E tests on a linux docker container
 
-Useful to find test flaws that appear during CI.
-Adjust the docker resources to match the CI runners specs (2cpu, 7GB memory).
+Useful to find test flaws that appear during CI. Matches CI runner specs (2 CPU, 7GB memory).
+
+**Prerequisite:** Set Docker Desktop → Settings → Resources → Memory to at least 10GB (Docker Desktop needs overhead beyond the container's 8GB limit).
 
 ```sh
 # Build the image once (installs the linux-specific binaries used in CI)
 docker build -t careerfairy-test -f apps/web/Dockerfile.test .
 
-# Run the full Playwright suite inside the container (defaults match CI)
-docker run --rm careerfairy-test
+# Run the full Playwright suite inside the container
+docker run --rm --memory=8g --cpus=2 careerfairy-test
 
 # Run a single shard locally, mirroring the CI matrix
-docker run --rm careerfairy-test -- -- --shard=1/5
+docker run --rm --memory=8g --cpus=2 careerfairy-test -- -- --shard=1/5
 
 # Optional: run with additional flags / mounts (e.g. live-edit web app files)
-docker run  -p 9323:9323 \
+docker run  --memory=8g --cpus=2 \
+            -p 9323:9323 \
             -p 8080:8080 \
             -v "$(pwd)/apps/web":/app/apps/web \
             -e DEBUG=pw:webserver \
             --rm careerfairy-test -- -- --project=chromium -g "Create a draft livestream from the main page"
 
 # If you need to run a completely custom command, override the entrypoint
-docker run --rm --entrypoint "/bin/bash" careerfairy-test
+docker run --rm --memory=8g --cpus=2 --entrypoint "/bin/bash" careerfairy-test
+
+# Run with Playwright --project and -g flag (example: filter tests by name pattern)
+docker run --rm --memory=8g --cpus=2 careerfairy-test -- -- --project=chromium -g "Create a draft livestream"
 ```
 
 **Docker flags reference:**
 
 -  `--rm` - Automatically remove the container when it exits (cleans up stopped containers)
+-  `--memory=8g` - Set memory limit to 8GB (provides headroom for emulators + Next.js + Playwright, prevents OOM errors)
+-  `--cpus=2` - Set CPU limit to 2 cores (matches CI runner specs)
 -  `-p HOST:CONTAINER` - Publish container ports to host (e.g., `-p 8080:8080` maps port 8080)
 -  `-v HOST:CONTAINER` - Mount a host directory as a volume (allows live file editing from host)
 -  `-e VAR=value` - Set environment variables inside the container

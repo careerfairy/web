@@ -133,6 +133,8 @@ const config: PlaywrightTestConfig = {
          NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
             process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
          NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+         // Reduce Java heap size for Firestore/Storage emulators (default is much higher)
+         JAVA_TOOL_OPTIONS: "-Xmx2g",
       },
       port: 3000,
       // emulators need some time to boot
