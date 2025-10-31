@@ -60,22 +60,11 @@ interface UseGroupLivestreamsWithStatsOptions {
 }
 
 /**
- * Fetches and processes livestream stats for a group with optional filtering and sorting.
+ * Fetches livestreams with stats for a group, with optional filtering and sorting.
  *
- * This hook performs the following operations:
- * 1. Fetches published livestream stats using a collection group query on "stats" documents
- * 2. Fetches draft livestreams from the "draftLivestreams" collection
- * 3. Transforms draft livestreams into stats format with empty statistics
- * 4. Combines published and draft data into a unified array
- * 5. Applies client-side search filtering by title or company name
- * 6. Sorts the results on the client side according to the specified criteria
- *
- * The hook handles both published livestreams (with real stats) and draft livestreams
- * (with mock stats) to provide a complete view of all livestreams associated with the group.
- *
- * @param groupId - The ID of the group to fetch livestreams for
- * @param options - Configuration options for filtering and sorting
- * @returns SWR response with processed LiveStreamStats array containing both published and draft livestreams
+ * @param groupId - Group ID to fetch livestreams for
+ * @param options - Filtering and sorting options
+ * @returns SWR response with LiveStreamStats array (published + drafts)
  */
 export const useGroupLivestreamsWithStats = (
    groupId: string,
@@ -124,17 +113,26 @@ export const useGroupLivestreamsWithStats = (
 
          const livestreams = livestreamsSnapshot.docs.map((doc) => doc.data())
 
-         const livestreamStats: LiveStreamStats[] = statsSnapshot.docs.map(
-            (statsDoc) => {
-               const latestLivestreamData = livestreams.find(
-                  (livestream) =>
-                     livestream.id === statsDoc.data().livestream.id
+         // Base the array on livestreams (not stats) to avoid race condition
+         // where stats document may not exist yet when livestream is first published
+         const livestreamStats: LiveStreamStats[] = livestreams.map(
+            (livestream) => {
+               // Try to find existing stats for this livestream
+               const existingStats = statsSnapshot.docs.find(
+                  (statsDoc) =>
+                     statsDoc.data()?.livestream?.id === livestream?.id
                )
 
-               return {
-                  ...statsDoc.data(),
-                  livestream:
-                     latestLivestreamData || statsDoc.data().livestream,
+               if (existingStats) {
+                  // Stats exist, use them with the latest livestream data
+                  return {
+                     ...existingStats.data(),
+                     livestream,
+                  }
+               } else {
+                  // No stats yet (race condition), create client-side stats
+                  // Stats will update via SWR revalidation once trigger completes
+                  return createLiveStreamStatsDoc(livestream, livestream?.id)
                }
             }
          )
