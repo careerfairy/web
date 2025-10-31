@@ -49,6 +49,7 @@ export const COMPANY_FIELDS_TO_INDEX = [
    "hasJobs",
    "hasUpcomingEvents",
    "hasSparks",
+   "hasCoffeeChats",
    "featured",
    "contentLanguages",
 ] satisfies (keyof TransformedGroup)[]
