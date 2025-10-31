@@ -152,18 +152,27 @@ Useful to find test flaws that appear during CI.
 Adjust the docker resources to match the CI runners specs (2cpu, 7GB memory).
 
 ```sh
-# Build the image first, it will install all deps (linux use different binaries - swc, turbo, etc)
-docker build -t tests -f apps/web/Dockerfile.test .
+# Build the image once (installs the linux-specific binaries used in CI)
+docker build -t careerfairy-test -f apps/web/Dockerfile.test .
 
-# Run the tests inside the built docker image
-# You can modify the app files without building the image again
+# Run the full Playwright suite inside the container (defaults match CI)
+docker run --rm careerfairy-test
+
+# Run a single shard locally, mirroring the CI matrix
+docker run --rm careerfairy-test -- -- --shard=1/5
+
+# Optional: run with additional flags / mounts (e.g. live-edit web app files)
 docker run  -p 9323:9323 \
             -p 8080:8080 \
-            -v $(pwd)/apps/web/:/app/apps/web \
-            -it --entrypoint "" \
-            -e DEBUG=pw:webserver tests \
-            npm run test:e2e-webapp -- -- --project=firefox -g "Create a draft livestream from the main page"
+            -v "$(pwd)/apps/web":/app/apps/web \
+            -e DEBUG=pw:webserver \
+            --rm careerfairy-test -- -- --project=chromium -g "Create a draft livestream from the main page"
+
+# If you need to run a completely custom command, override the entrypoint
+docker run --rm --entrypoint "/bin/bash" careerfairy-test
 ```
+
+> The container entrypoint now generates `NEXT_PUBLIC_UNIQUE_WORKFLOW_ID` automatically (and appends the shard number when provided), so the runtime environment matches the GitHub Actions runners without additional flags.
 
 ### Emulator Functions - Sending Emails
 
