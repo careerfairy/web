@@ -82,7 +82,7 @@ export const flagsInitialState = {
     * Hide or Show
     */
    coffeeChatsFlag: {
-      enabled: false,
+      enabled: true,
    },
 } satisfies FeatureFlagsDetails
 
