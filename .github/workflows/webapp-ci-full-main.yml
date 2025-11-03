@@ -172,10 +172,6 @@ jobs:
            run: sudo apt-get install uuid-runtime
          - name: Generate UUID
            run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
-         - name: List tests in this shard
-           run: |
-              echo "Tests in shard ${{ matrix.shard }}/${{ matrix.total }}:"
-              npx playwright test --list --shard=${{ matrix.shard }}/${{ matrix.total }}
          - name: Run Playwright End to End tests
            timeout-minutes: 20
            env:
