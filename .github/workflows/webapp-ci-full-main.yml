@@ -173,7 +173,6 @@ jobs:
          - name: Generate UUID
            run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
          - name: Run Playwright End to End tests
-           timeout-minutes: 20
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
@@ -181,7 +180,7 @@ jobs:
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
-           if: always()
+           if: ${{ failure() || cancelled() }}
            uses: actions/upload-artifact@v4
            with:
               name: ${{ matrix.shard }}-playwright-report
@@ -189,7 +188,7 @@ jobs:
               retention-days: 30
 
          - name: Upload debug logs
-           if: always()
+           if: ${{ failure() || cancelled() }}
            uses: actions/upload-artifact@v4
            with:
               name: ${{ matrix.shard }}-debug-logs
