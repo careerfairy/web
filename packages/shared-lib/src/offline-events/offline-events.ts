@@ -50,6 +50,18 @@ export interface OfflineEvent extends Identifiable {
    hidden?: boolean
 }
 
+/**
+ * Extended interface for offline events that includes distance information
+ * Used when filtering events by geographical proximity
+ */
+export interface OfflineEventWithDistance extends OfflineEvent {
+   /**
+    * Distance in kilometers from the user's location
+    * Rounded to 1 decimal place
+    */
+   distanceInKm: number
+}
+
 export interface OfflineEventTargetAudience {
    universities: UniversityOption[]
    levelOfStudies: LevelOfStudy[]
