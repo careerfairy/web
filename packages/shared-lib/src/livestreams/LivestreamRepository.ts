@@ -201,6 +201,8 @@ export interface ILivestreamRepository {
     * */
    getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
 
+   getLivestreamById(id: string): Promise<LivestreamEvent>
+
    getDraftLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
 
    getLivestreamRecordingToken(livestreamId: string): Promise<RecordingToken>
@@ -1114,6 +1116,12 @@ export class FirebaseLivestreamRepository
       )
 
       return this.handlePromiseAllSettled<LivestreamEvent>(promises)
+   }
+
+   async getLivestreamById(id: string): Promise<LivestreamEvent> {
+      const snap = await this.firestore.collection("livestreams").doc(id).get()
+
+      return snap.data() as LivestreamEvent
    }
 
    async getDraftLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
