@@ -17,11 +17,12 @@ import {
 import { useEffect } from "react"
 import { useLocalStorage } from "react-use"
 import useSWR, { preload } from "swr"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { errorLogAndNotify, getRandom } from "util/CommonUtil"
 import useUserCountryCode from "../useUserCountryCode"
 
 // Constants
 const SPARKS_LIMIT = 10
+const PUBLIC_SPARKS_FETCH_LIMIT = 50 // Fetch more sparks for logged-out users to enable shuffling
 const STORAGE_KEY = "userCountryCode"
 
 // Types
@@ -54,7 +55,7 @@ const createPublicSparksQuery = () =>
       collection(FirestoreInstance, "sparks"),
       where("group.publicSparks", "==", true),
       orderBy("publishedAt", "desc"),
-      limit(SPARKS_LIMIT)
+      limit(PUBLIC_SPARKS_FETCH_LIMIT)
    ).withConverter<Spark>(createGenericConverter())
 
 // Fetcher functions
@@ -90,14 +91,18 @@ const fetchPublicSparks = async (countryCode?: string): Promise<Spark[]> => {
 
       snapshots = await getDocs(countryFilteredQuery)
 
-      if (snapshots.size < SPARKS_LIMIT) {
+      if (snapshots.size < PUBLIC_SPARKS_FETCH_LIMIT) {
          snapshots = await getDocs(baseQuery)
       }
    } else {
       snapshots = await getDocs(baseQuery)
    }
 
-   return snapshots.docs.map((doc) => doc.data())
+   const sparks = snapshots.docs.map((doc) => doc.data())
+
+   // Shuffle and limit to display count for diversity
+   const shuffled = getRandom(sparks, sparks.length)
+   return shuffled.slice(0, SPARKS_LIMIT)
 }
 
 const fetcher = async ({ userId, countryCode }: FetcherParams) => {
