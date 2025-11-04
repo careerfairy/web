@@ -104,6 +104,8 @@ export const LocalTracksProvider: FC<LocalTracksProviderProps> = ({
       encoderConfig: withHighQuality
          ? "high_quality_stereo"
          : "speech_standard",
+      AEC: true,
+      ANS: true,
    })
 
    const {
