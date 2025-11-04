@@ -5,9 +5,9 @@ import {
 import { Group } from "@careerfairy/shared-lib/groups"
 import { InteractionSources } from "@careerfairy/shared-lib/groups/telemetry"
 import {
-   getAuthUidFromUserLivestreamData,
    LiveStreamEventWithUsersLivestreamData,
    ReminderEmailStatus,
+   getAuthUidFromUserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { generateCalendarEventProperties } from "@careerfairy/shared-lib/utils/calendarEvents"
 import {
@@ -21,7 +21,7 @@ import {
 import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import { error, info, log } from "firebase-functions/logger"
 import { HttpsError, onRequest } from "firebase-functions/v2/https"
-import { onSchedule, ScheduleOptions } from "firebase-functions/v2/scheduler"
+import { ScheduleOptions, onSchedule } from "firebase-functions/v2/scheduler"
 import ical from "ical-generator"
 import { DateTime } from "luxon"
 import { firestore } from "./api/firestoreAdmin"
@@ -395,8 +395,8 @@ const handleSendEmails = async (
 
       if (
          reminder.templateId ===
-            CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H ||
-         CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_24H
+         (CUSTOMERIO_EMAIL_TEMPLATES.LIVESTREAM_REMINDER_24H ||
+            CUSTOMERIO_EMAIL_TEMPLATES.PANEL_REMINDER_24H)
       ) {
          info(`This is a ${reminder.templateId} reminder, attaching ICS file`)
          // Generate ICS file content
