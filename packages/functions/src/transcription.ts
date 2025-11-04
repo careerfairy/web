@@ -4,13 +4,17 @@ import { logger } from "firebase-functions/v2"
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { livestreamsRepo } from "./api/repositories"
-import { TranscriptionService } from "./lib/transcription/TranscriptionService"
+import {
+   TranscriptionService,
+   getErrorMessage,
+} from "./lib/transcription/TranscriptionService"
 
 /**
  * Runtime configuration for transcription functions
+ * Timeout set to 1 hour to accommodate full retry cycle (up to 61 minutes with backoff)
  */
 const transcriptionConfig = {
-   timeoutSeconds: 540, // 9 minutes - safe buffer under 10 min limit
+   timeoutSeconds: 3600, // 1 hour - accommodates full retry cycle
    memory: "1GiB" as const,
 }
 
@@ -45,16 +49,21 @@ export const initiateTranscriptionOnRecordingAvailable = onDocumentUpdated(
 
       try {
          logger.info("Transcription initiated successfully", { livestreamId })
+
          await service.processTranscription(livestreamId, recordingUrl)
+
+         logger.info(
+            "Transcription process completed (including all retries)",
+            {
+               livestreamId,
+            }
+         )
       } catch (error) {
-         logger.error("Failed to initiate transcription", {
+         logger.error("Transcription failed after all retries", {
             livestreamId,
             error,
-            errorMessage:
-               error instanceof Error ? error.message : String(error),
+            errorMessage: getErrorMessage(error),
          })
-         // Error is already logged and handled in the processor
-         // The processor will handle retries automatically
       }
    }
 )
@@ -102,18 +111,20 @@ export const manualTranscription = onRequest(
       const service = new TranscriptionService(livestreamsRepo)
 
       try {
-         await service.processTranscription(livestreamId, recordingUrl)
+         await service.processTranscription(livestreamId, recordingUrl, {
+            force: true,
+         })
 
          res.status(200).json({
             success: true,
-            message: "Transcription execution done, check transcription status",
+            message:
+               "Transcription completed successfully (including all retries if needed).",
             livestreamId,
          })
       } catch (error) {
-         const errorMessage =
-            error instanceof Error ? error.message : String(error)
+         const errorMessage = getErrorMessage(error)
 
-         logger.error("Manual transcription failed", {
+         logger.error("Manual transcription failed after all retries", {
             livestreamId,
             error,
             errorMessage,
@@ -121,7 +132,7 @@ export const manualTranscription = onRequest(
 
          res.status(500).json({
             success: false,
-            error: "Transcription execution failed, check transcription status",
+            error: "Transcription failed after all retry attempts",
             message: errorMessage,
             livestreamId,
          })
