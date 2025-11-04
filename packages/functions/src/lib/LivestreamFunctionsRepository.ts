@@ -10,13 +10,17 @@ import {
    mapCreatorToSpeaker,
 } from "@careerfairy/shared-lib/groups/creators"
 import {
+   ASRProviders,
    EventRating,
    EventRatingAnswer,
+   LLMProviders,
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamQueryOptions,
    LivestreamReminderTask,
+   LivestreamTranscription,
    Speaker,
+   TranscriptionStatus,
    UserLivestreamData,
    getEarliestEventBufferTime,
    pickPublicDataFromLivestream,
@@ -355,6 +359,82 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string,
       collection: "livestreams" | "draftLivestreams"
    ): Promise<void>
+
+   /**
+    * Initiate transcription by creating or updating the status to "transcribing"
+    * @param livestreamId - The livestream ID
+    * @param transcriptionProvider - ASR provider (default: "deepgram")
+    * @param chapterProvider - LLM provider (default: "openai")
+    * @returns The document ID
+    */
+   initiateTranscription(
+      livestreamId: string,
+      transcriptionProvider?: ASRProviders,
+      chapterProvider?: LLMProviders
+   ): Promise<string>
+
+   /**
+    * Create a new transcription status document in Firestore
+    * @param livestreamId - The livestream ID
+    * @param status - Initial transcription status
+    * @param transcriptionProvider - ASR provider (default: "deepgram")
+    * @param chapterProvider - LLM provider (default: "openai")
+    * @returns The created document ID
+    */
+   createTranscriptionStatus(
+      livestreamId: string,
+      status: TranscriptionStatus,
+      transcriptionProvider?: ASRProviders,
+      chapterProvider?: LLMProviders
+   ): Promise<string>
+
+   /**
+    * Update an existing transcription status document in Firestore
+    * @param livestreamId - The livestream ID
+    * @param status - Updated transcription status
+    * @returns true if update was successful
+    */
+   updateTranscriptionStatus(
+      livestreamId: string,
+      status: TranscriptionStatus
+   ): Promise<boolean>
+
+   /**
+    * Get transcription status for a livestream
+    * @param livestreamId - The livestream ID
+    * @returns The transcription document or null if not found
+    */
+   getTranscriptionStatus(
+      livestreamId: string
+   ): Promise<LivestreamTranscription | null>
+
+   /**
+    * Update the livestream document to mark transcription as completed
+    * @param livestreamId - The livestream ID
+    * @returns true if update was successful
+    */
+   updateLivestreamTranscriptionCompleted(
+      livestreamId: string
+   ): Promise<boolean>
+
+   /**
+    * Check if transcription is already in progress or completed
+    * @param livestreamId - The livestream ID
+    * @returns true if transcription is in progress or completed
+    */
+   isTranscriptionInProgress(
+      livestreamId: string,
+      maxRetries: number
+   ): Promise<boolean>
+
+   /**
+    * Get the livestream recording token document
+    * @param livestreamId - The livestream ID
+    * @returns The recording token data or null if not found
+    */
+   getRecordingToken(
+      livestreamId: string
+   ): Promise<{ sid: string; resourceId: string } | null>
 }
 
 export class LivestreamFunctionsRepository
@@ -1451,6 +1531,249 @@ export class LivestreamFunctionsRepository
          functions.logger.info("Livestream stats deleted", {
             livestreamId,
          })
+      }
+   }
+
+   async initiateTranscription(
+      livestreamId: string,
+      transcriptionProvider: ASRProviders = "deepgram",
+      chapterProvider: LLMProviders = "openai"
+   ): Promise<string> {
+      functions.logger.info("Initiating transcription", { livestreamId })
+
+      const now = Timestamp.now()
+      const doc: LivestreamTranscription = {
+         id: livestreamId,
+         livestreamId,
+         transcriptionProvider,
+         chapterProvider,
+         status: {
+            state: "transcribing",
+            startedAt: now,
+         },
+         createdAt: now,
+         updatedAt: now,
+      }
+
+      // Use set with merge to handle both create and update cases
+      await this.firestore
+         .collection("livestreamTranscriptions")
+         .doc(livestreamId)
+         .set(doc, { merge: true })
+
+      functions.logger.info("Transcription initiated successfully", {
+         livestreamId,
+      })
+
+      return livestreamId
+   }
+
+   async createTranscriptionStatus(
+      livestreamId: string,
+      status: TranscriptionStatus,
+      transcriptionProvider: ASRProviders = "deepgram",
+      chapterProvider: LLMProviders = "openai"
+   ): Promise<string> {
+      functions.logger.info("Creating transcription status", { livestreamId })
+
+      const now = Timestamp.now()
+      const doc: LivestreamTranscription = {
+         id: livestreamId,
+         livestreamId,
+         transcriptionProvider,
+         chapterProvider,
+         status,
+         createdAt: now,
+         updatedAt: now,
+      }
+
+      try {
+         await this.firestore
+            .collection("livestreamTranscriptions")
+            .doc(livestreamId)
+            .set(doc)
+
+         functions.logger.info("Transcription status created successfully", {
+            livestreamId,
+            docId: livestreamId,
+         })
+
+         return livestreamId
+      } catch (error) {
+         functions.logger.error("Failed to create transcription status", {
+            livestreamId,
+            error,
+            errorMessage:
+               error instanceof Error ? error.message : String(error),
+         })
+         throw error
+      }
+   }
+
+   async updateTranscriptionStatus(
+      livestreamId: string,
+      status: TranscriptionStatus
+   ): Promise<boolean> {
+      functions.logger.info("Updating transcription status", {
+         livestreamId,
+         status,
+      })
+
+      try {
+         const updatedAt = Timestamp.now()
+         await this.firestore
+            .collection("livestreamTranscriptions")
+            .doc(livestreamId)
+            .update({
+               status,
+               updatedAt,
+            })
+
+         functions.logger.info("Transcription status updated successfully", {
+            livestreamId,
+         })
+
+         return true
+      } catch (error) {
+         functions.logger.error("Failed to update transcription status", {
+            livestreamId,
+            error,
+            errorMessage:
+               error instanceof Error ? error.message : String(error),
+         })
+         throw error
+      }
+   }
+
+   async getTranscriptionStatus(
+      livestreamId: string
+   ): Promise<LivestreamTranscription | null> {
+      functions.logger.info("Fetching transcription status", { livestreamId })
+
+      try {
+         const doc = await this.firestore
+            .collection("livestreamTranscriptions")
+            .doc(livestreamId)
+            .get()
+
+         if (!doc.exists) {
+            functions.logger.info("Transcription status not found", {
+               livestreamId,
+            })
+            return null
+         }
+
+         const data = doc.data() as LivestreamTranscription
+         functions.logger.info("Transcription status fetched successfully", {
+            livestreamId,
+            state: data.status.state,
+         })
+
+         return data
+      } catch (error) {
+         functions.logger.error("Failed to fetch transcription status", {
+            livestreamId,
+            error,
+            errorMessage:
+               error instanceof Error ? error.message : String(error),
+         })
+         throw error
+      }
+   }
+
+   async updateLivestreamTranscriptionCompleted(
+      livestreamId: string
+   ): Promise<boolean> {
+      functions.logger.info(
+         "Updating livestream transcription completed flag",
+         {
+            livestreamId,
+         }
+      )
+
+      try {
+         await this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .update({
+               transcriptionCompleted: true,
+            })
+
+         functions.logger.info(
+            "Livestream transcription completed flag updated successfully",
+            { livestreamId }
+         )
+
+         return true
+      } catch (error) {
+         functions.logger.error(
+            "Failed to update livestream transcription completed flag",
+            {
+               livestreamId,
+               error,
+               errorMessage:
+                  error instanceof Error ? error.message : String(error),
+            }
+         )
+         throw error
+      }
+   }
+
+   async isTranscriptionInProgress(
+      livestreamId: string,
+      maxRetries: number
+   ): Promise<boolean> {
+      const status = await this.getTranscriptionStatus(livestreamId)
+
+      if (!status) {
+         return false
+      }
+
+      const state = status.status.state
+
+      return (
+         state === "transcribing" ||
+         state === "generating-chapter" ||
+         (status.status.state === "chapterization-failed" &&
+            status.status.retryCount < maxRetries) ||
+         (status.status.state === "transcription-failed" &&
+            status.status.retryCount < maxRetries)
+      )
+   }
+
+   async getRecordingToken(
+      livestreamId: string
+   ): Promise<{ sid: string; resourceId: string } | null> {
+      functions.logger.info("Fetching recording token", { livestreamId })
+
+      try {
+         const doc = await this.firestore
+            .collection("livestreams")
+            .doc(livestreamId)
+            .collection("recordingToken")
+            .doc("token")
+            .get()
+
+         if (!doc.exists) {
+            functions.logger.info("Recording token not found", { livestreamId })
+            return null
+         }
+
+         const data = doc.data() as { sid: string; resourceId: string }
+         functions.logger.info("Recording token fetched successfully", {
+            livestreamId,
+            sid: data.sid,
+         })
+
+         return data
+      } catch (error) {
+         functions.logger.error("Failed to fetch recording token", {
+            livestreamId,
+            error,
+            errorMessage:
+               error instanceof Error ? error.message : String(error),
+         })
+         return null
       }
    }
 }

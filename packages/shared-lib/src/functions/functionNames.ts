@@ -98,6 +98,11 @@ export const FUNCTION_NAMES = {
    fetchStripeCustomerSession: "fetchStripeCustomerSession_v3",
    fetchStripePrice: "fetchStripePrice_v3",
    fetchStripeSessionStatus: "fetchStripeSessionStatus_v3",
+
+   // Transcription functions
+   initiateTranscriptionOnRecordingAvailable:
+      "initiateTranscriptionOnRecordingAvailable",
+   manualTranscription: "manualTranscription_v1",
 } as const
 
 /**
