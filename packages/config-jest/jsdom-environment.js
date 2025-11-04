@@ -17,11 +17,15 @@
 const JSDOMEnvironment = require("jest-environment-jsdom").TestEnvironment
 
 // Pre-populate require cache with empty canvas module to prevent native module loading
-require.cache[require.resolve("canvas")] = {
-   id: require.resolve("canvas"),
-   filename: require.resolve("canvas"),
-   loaded: true,
-   exports: {},
+try {
+   require.cache[require.resolve("canvas")] = {
+      id: require.resolve("canvas"),
+      filename: require.resolve("canvas"),
+      loaded: true,
+      exports: {},
+   }
+} catch (e) {
+   // Canvas module not found - that's ok, we only need to mock it if it exists
 }
 
 module.exports = JSDOMEnvironment
