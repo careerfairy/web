@@ -7,10 +7,10 @@ import {
    OfflineEvent,
    OfflineEventStats,
    OfflineEventStatsAction,
+   OfflineEventWithDistance,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { UserData } from "@careerfairy/shared-lib/users"
 import {
-   Timestamp,
    collection,
    deleteDoc,
    doc,
@@ -21,10 +21,15 @@ import {
    orderBy,
    query,
    setDoc,
+   Timestamp,
    updateDoc,
    where,
 } from "firebase/firestore"
 import { httpsCallable } from "firebase/functions"
+import {
+   deserializeDocument,
+   SerializedDocument,
+} from "util/firebaseSerializer"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 
 export class OfflineEventService {
@@ -126,20 +131,27 @@ export class OfflineEventService {
    }
 
    /**
-    * Get offline events
-    * @returns Array of offline events
+    * Get offline events within 150km of user's location
+    * Uses Vercel's geolocation headers to automatically determine user's location
+    * @returns Array of offline events with distance information, sorted by proximity
     */
-   async getOfflineEvents(): Promise<OfflineEvent[]> {
-      const snapshots = await getDocs(
-         query(
-            collection(FirestoreInstance, "offlineEvents"),
-            where("hidden", "==", false),
-            where("published", "==", true),
-            where("startAt", ">", new Date())
-         ).withConverter(createGenericConverter<OfflineEvent>())
-      )
+   async getOfflineEvents(): Promise<OfflineEventWithDistance[]> {
+      try {
+         const response = await fetch("/api/offline-events/nearby")
 
-      return snapshots.docs.map((doc) => doc.data())
+         if (!response.ok) {
+            console.error(`API request failed with status: ${response.status}`)
+            return []
+         }
+
+         const serializedEvents: SerializedDocument<OfflineEventWithDistance>[] =
+            await response.json()
+
+         return serializedEvents.map(deserializeDocument)
+      } catch (error) {
+         console.error("Error fetching offline events by location:", error)
+         return []
+      }
    }
 
    /**
