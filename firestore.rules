@@ -820,6 +820,14 @@ service cloud.firestore {
             }
         }
 
+        match /livestreamTranscriptions/{transcriptionId} {
+            // Transcription documents are managed by Cloud Functions
+            // Read access for authenticated users to check transcription status
+            // Write access only for server-side operations
+            allow read: if isSignedIn();
+            allow write: if false; // Only functions can write
+        }
+
         match /wishes/{slug} {
             allow read: if true;
             allow create: if isSignedIn();
