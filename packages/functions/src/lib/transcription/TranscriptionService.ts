@@ -49,7 +49,6 @@ function calculateBackoffDelay(retryCount: number): number {
  * including retries with exponential backoff
  */
 export class TranscriptionService {
-   // private deepgramClient: DeepgramClient
    private transcriptionClient: ITranscriptionClient
    private livestreamRepo: ILivestreamFunctionsRepository
 
