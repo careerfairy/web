@@ -177,7 +177,7 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
+           run: npm run test:e2e-webapp -- --reporter=github --reporter=list -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
            if: ${{ failure() || cancelled() }}
