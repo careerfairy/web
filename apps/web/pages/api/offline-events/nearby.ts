@@ -3,10 +3,17 @@ import {
    OfflineEvent,
    OfflineEventWithDistance,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
-import { collection, GeoPoint, getDocs, query, where } from "firebase/firestore"
+import { State } from "country-state-city"
+import {
+   GeoPoint,
+   getDocs,
+   getDocsFromCache,
+   loadBundle,
+   namedQuery,
+} from "firebase/firestore"
 import { distanceBetween, geohashQueryBounds } from "geofire-common"
 import type { NextApiRequest, NextApiResponse } from "next"
-import { State } from "country-state-city"
+import { getHostingUrl, isTestEnvironment } from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import {
    SerializedDocument,
@@ -46,10 +53,74 @@ function getStateCoordinates(
    }
 }
 
+type Location = {
+   latitude: number
+   longitude: number
+   source: string
+}
+
 /**
- * API route to get offline events within 150km of user's location
- * Prioritizes user's profile location over IP-based geolocation
- * Uses Vercel's geolocation headers as fallback
+ * Loads the offline events bundle into Firestore cache
+ *
+ * Using bundles to avoid fetching hundreds of documents from Firestore on every portal page load.
+ * The bundle is pre-generated and served from CDN cache (15min TTL), significantly reducing read costs.
+ */
+async function loadOfflineEventsBundle(): Promise<void> {
+   const hostingUrl = getHostingUrl()
+   const bundleUrl = `${hostingUrl}/bundle-allFutureOfflineEvents`
+
+   console.log(`📦 Loading offline events bundle from: ${bundleUrl}`)
+
+   const response = await fetch(bundleUrl)
+   if (!response.ok) {
+      throw new Error(
+         `Bundle fetch failed with status ${response.status}: ${bundleUrl}`
+      )
+   }
+
+   const bundleData = await response.text()
+   await loadBundle(FirestoreInstance, bundleData)
+
+   console.log(`✅ Bundle loaded successfully`)
+}
+
+/**
+ * Gets offline events from bundle cache
+ */
+async function getOfflineEventsFromBundle(): Promise<OfflineEvent[]> {
+   // Load bundle into cache
+   await loadOfflineEventsBundle()
+
+   // Use named query from bundle cache
+   const namedQueryRef = await namedQuery(
+      FirestoreInstance,
+      "future-offline-events-query"
+   )
+
+   if (!namedQueryRef) {
+      throw new Error(
+         "Named query 'future-offline-events-query' not found in bundle"
+      )
+   }
+
+   console.log(`📦 Fetching events from bundle cache`)
+
+   const queryExecutor = isTestEnvironment() ? getDocs : getDocsFromCache
+
+   const snapshot = await queryExecutor(
+      namedQueryRef.withConverter(createGenericConverter<OfflineEvent>())
+   )
+
+   const events = snapshot.docs.map((doc) => doc.data())
+
+   console.log(`✅ Retrieved ${events.length} events from bundle cache`)
+   return events
+}
+
+/**
+ * API route to get offline events within 150km of user's location(s)
+ * Queries both profile location (state ISO code) and IP-based location simultaneously
+ * Merges results and uses minimum distance when events appear in both sets
  * Falls back to Zurich, Switzerland for local development
  */
 export default async function handler(
@@ -62,104 +133,99 @@ export default async function handler(
       const RADIUS_KM = 150
       const RADIUS_METERS = RADIUS_KM * 1000
 
-      let latitude: number
-      let longitude: number
-      let locationSource: string
+      // Collect all available locations
+      const locations: Location[] = []
 
-      // Priority 1: Check for user profile location in query params
+      // Check for user profile location in query params
       const userStateCode = req.query.stateCode as string | undefined
       const userCountryCode = req.query.countryCode as string | undefined
 
       if (userStateCode && userCountryCode) {
-         // Get coordinates from user's profile location using country-state-city package
          const coords = getStateCoordinates(userStateCode, userCountryCode)
          if (coords) {
-            latitude = coords.latitude
-            longitude = coords.longitude
-            locationSource = "profile"
+            locations.push({
+               latitude: coords.latitude,
+               longitude: coords.longitude,
+               source: "profile",
+            })
             console.log(
-               `📍 Using profile location (${userStateCode}, ${userCountryCode}): [${latitude}, ${longitude}]`
+               `📍 Profile location (${userStateCode}, ${userCountryCode}): [${coords.latitude}, ${coords.longitude}]`
             )
          } else {
             console.warn(
                `⚠️  Failed to get coordinates for profile location: ${userStateCode}, ${userCountryCode}`
             )
-            // Fall through to IP-based location
          }
       }
 
-      // Priority 2: Get coordinates from Vercel headers (IP-based)
-      if (!latitude || !longitude) {
-         const latStr = req.headers["x-vercel-ip-latitude"] as
-            | string
-            | undefined
-         const lonStr = req.headers["x-vercel-ip-longitude"] as
-            | string
-            | undefined
+      // Get coordinates from Vercel headers (IP-based)
+      const latStr = req.headers["x-vercel-ip-latitude"] as string | undefined
+      const lonStr = req.headers["x-vercel-ip-longitude"] as string | undefined
 
-         if (latStr && lonStr) {
-            latitude = parseFloat(latStr)
-            longitude = parseFloat(lonStr)
-            locationSource = "ip"
-            console.log(
-               `📍 Using IP geolocation: [${latitude}, ${longitude}]`
-            )
+      if (latStr && lonStr) {
+         const ipLat = parseFloat(latStr)
+         const ipLon = parseFloat(lonStr)
+         if (!isNaN(ipLat) && !isNaN(ipLon)) {
+            locations.push({
+               latitude: ipLat,
+               longitude: ipLon,
+               source: "ip",
+            })
+            console.log(`📍 IP geolocation: [${ipLat}, ${ipLon}]`)
          }
       }
 
-      // Priority 3: Local development fallback - Zurich, Switzerland
-      if (!latitude || !longitude) {
-         latitude = 47.3769
-         longitude = 8.5417
-         locationSource = "fallback"
+      // Local development fallback - Zurich, Switzerland
+      if (locations.length === 0) {
+         locations.push({
+            latitude: 47.3769,
+            longitude: 8.5417,
+            source: "fallback",
+         })
          console.log(
-            `📍 Local development detected, using Zurich coordinates: [${latitude}, ${longitude}]`
+            `📍 Local development detected, using Zurich coordinates: [47.3769, 8.5417]`
          )
       }
 
-      // Validate coordinates
-      if (isNaN(latitude) || isNaN(longitude)) {
-         console.error("Invalid coordinates received")
+      // Validate we have at least one location
+      if (locations.length === 0) {
+         console.error("No valid locations available")
          return res.status(200).json([])
       }
 
       console.log(
-         `🔍 Searching for offline events within ${RADIUS_KM}km of [${latitude}, ${longitude}]`
+         `🔍 Searching for offline events within ${RADIUS_KM}km of ${locations.length} location(s)`
       )
 
-      // Calculate geohash query bounds for the search radius
-      const bounds = geohashQueryBounds([latitude, longitude], RADIUS_METERS)
+      // Generate geohash query bounds for all locations and merge them
+      const allBounds: Array<[string, string]> = []
+      for (const location of locations) {
+         const bounds = geohashQueryBounds(
+            [location.latitude, location.longitude],
+            RADIUS_METERS
+         )
+         allBounds.push(...bounds)
+      }
 
       console.log(
-         `📊 Generated ${bounds.length} geohash query bounds for proximity search`
+         `📊 Generated ${allBounds.length} geohash query bounds across ${locations.length} location(s)`
       )
 
-      // Query Firestore for future events only
-      // Note: We filter by startAt in the query (to eliminate past events)
-      // and do geohash filtering in-memory (fewer records to check)
-      const now = new Date()
-      const snapshot = await getDocs(
-         query(
-            collection(FirestoreInstance, "offlineEvents"),
-            where("hidden", "==", false),
-            where("published", "==", true),
-            where("startAt", ">", now)
-         ).withConverter(createGenericConverter<OfflineEvent>())
-      )
+      // Get offline events from bundle cache
+      const allEvents = await getOfflineEventsFromBundle()
 
       console.log(
-         `📊 Found ${snapshot.size} future events, filtering by geohash bounds`
+         `📊 Found ${allEvents.length} future events, filtering by geohash bounds`
       )
 
       // Collect events that fall within any of the geohash bounds
       const eventMap = new Map<string, OfflineEvent>()
-      for (const doc of snapshot.docs) {
-         const event = doc.data()
+      for (const event of allEvents) {
          if (!event || !event.address?.geoHash) continue
 
          // Check if event's geohash falls within any of our query bounds
          const eventGeoHash = event.address.geoHash
-         const isWithinBounds = bounds.some(
+         const isWithinBounds = allBounds.some(
             (bound) => eventGeoHash >= bound[0] && eventGeoHash <= bound[1]
          )
 
@@ -170,8 +236,8 @@ export default async function handler(
 
       console.log(`✅ Found ${eventMap.size} events within geohash bounds`)
 
-      // Calculate exact distances and filter by radius
-      const eventsWithDistance: OfflineEventWithDistance[] = []
+      // Calculate distances from all locations and track minimum per event
+      const eventsWithDistanceMap = new Map<string, OfflineEventWithDistance>()
 
       for (const event of eventMap.values()) {
          // Skip events without valid geoPoint
@@ -186,25 +252,37 @@ export default async function handler(
          }
 
          const eventGeoPoint = event.address.geoPoint
-         const distanceKm = distanceBetween(
-            [latitude, longitude],
-            [eventGeoPoint.latitude, eventGeoPoint.longitude]
-         )
+         const distances: number[] = []
 
-         // Only include events within the radius
-         if (distanceKm <= RADIUS_KM) {
-            eventsWithDistance.push({
+         // Calculate distance from each available location
+         for (const location of locations) {
+            const distanceKm = distanceBetween(
+               [location.latitude, location.longitude],
+               [eventGeoPoint.latitude, eventGeoPoint.longitude]
+            )
+
+            // Only consider distances within radius
+            if (distanceKm <= RADIUS_KM) {
+               distances.push(distanceKm)
+            }
+         }
+
+         // If event is within radius of at least one location, use minimum distance
+         if (distances.length > 0) {
+            const minDistance = Math.min(...distances)
+            eventsWithDistanceMap.set(event.id, {
                ...event,
-               distanceInKm: Math.round(distanceKm * 10) / 10, // Round to 1 decimal place
+               distanceInKm: Math.round(minDistance * 10) / 10, // Round to 1 decimal place
             })
          }
       }
 
-      // Sort by distance (nearest first)
+      // Convert map to array and sort by distance (nearest first)
+      const eventsWithDistance = Array.from(eventsWithDistanceMap.values())
       eventsWithDistance.sort((a, b) => a.distanceInKm - b.distanceInKm)
 
       console.log(
-         `🎯 Returning ${eventsWithDistance.length} offline events within ${RADIUS_KM}km`
+         `🎯 Returning ${eventsWithDistance.length} offline events within ${RADIUS_KM}km (from ${locations.length} location(s))`
       )
 
       // Serialize Firestore Timestamps and GeoPoints before sending
