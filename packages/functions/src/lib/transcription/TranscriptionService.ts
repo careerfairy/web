@@ -1,25 +1,18 @@
+import { TranscriptionStatus } from "@careerfairy/shared-lib/livestreams/transcriptions"
 import { Timestamp } from "firebase-admin/firestore"
 import { logger } from "firebase-functions/v2"
-import { storage } from "../../api/firestoreAdmin"
 import { ILivestreamFunctionsRepository } from "../LivestreamFunctionsRepository"
-import { ITranscriptionClient, ITranscriptionResult } from "./types"
+import { IChapterizationClient } from "../chapterization/types"
+import { BaseTranscriptionService } from "./BaseTranscriptionService"
+import {
+   fetchTranscriptionFromGCS,
+   getTranscriptionFilePath,
+   saveTranscriptionToGCS,
+} from "./storage"
+import { ITranscriptionClient } from "./types"
+import { calculateBackoffDelay, getErrorMessage } from "./utils"
 
-export const STORAGE_BUCKET = "careerfairy-e1fd9.appspot.com"
-export const MAX_RETRIES = 5
-
-const GCS_BASE_PATH = "transcriptions/livestreams"
-const BASE_DELAY_MS = 180_000 // 3 minutes
-const MAX_DELAY_MS = 1_200_000 // 20 minutes
-
-/**
- * Extract error message from unknown error type
- *
- * @param error - The error to extract message from
- * @returns The error message string
- */
-export function getErrorMessage(error: unknown): string {
-   return error instanceof Error ? error.message : String(error)
-}
+const MAX_RETRIES = 5
 
 type ProcessTranscriptionOptions = {
    retryCount?: number
@@ -27,107 +20,21 @@ type ProcessTranscriptionOptions = {
 }
 
 /**
- * Calculate exponential backoff delay with progression:
- * - Retry 1: 3 minutes
- * - Retry 2: 6 minutes
- * - Retry 3: 12 minutes
- * - Retry 4: 20 minutes (capped)
- * - Retry 5: 20 minutes (capped)
- * Total: ~61 minutes, utilizing most of the 1-hour function timeout
- *
- * @param retryCount - Current retry attempt (0-based)
- * @returns Delay in milliseconds
- */
-function calculateBackoffDelay(retryCount: number): number {
-   const delay = BASE_DELAY_MS * Math.pow(2, retryCount)
-   return Math.min(delay, MAX_DELAY_MS)
-}
-
-/**
  * TranscriptionService handles the entire transcription workflow
  * including retries with exponential backoff
  */
-export class TranscriptionService {
+export class TranscriptionService extends BaseTranscriptionService {
    private transcriptionClient: ITranscriptionClient
-   private livestreamRepo: ILivestreamFunctionsRepository
+   private chapterizationClient?: IChapterizationClient
 
    constructor(
       livestreamRepo: ILivestreamFunctionsRepository,
-      transcriptionClient: ITranscriptionClient
+      transcriptionClient: ITranscriptionClient,
+      chapterizationClient?: IChapterizationClient
    ) {
+      super(livestreamRepo)
       this.transcriptionClient = transcriptionClient
-      this.livestreamRepo = livestreamRepo
-   }
-
-   /**
-    * Mark transcription as completed with results
-    */
-   private async markTranscriptionCompleted(
-      livestreamId: string,
-      result: ITranscriptionResult,
-      recordingUrl: string,
-      gcsPath: string
-   ): Promise<void> {
-      const transcriptText = result.transcript.substring(0, 500)
-
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
-         state: "transcription-completed",
-         completedAt: Timestamp.now(),
-         transcriptText,
-         confidenceAvg: result.confidence,
-         metadata: {
-            language: result.language,
-            languageConfidence: result.languageConfidence,
-            recordingId: recordingUrl,
-            transcriptionFilePath: gcsPath,
-         },
-      })
-
-      await this.livestreamRepo.updateLivestreamTranscriptionCompleted(
-         livestreamId
-      )
-   }
-
-   /**
-    * Mark transcription as failed with retry information
-    */
-   private async markTranscriptionFailedWithRetry(
-      livestreamId: string,
-      error: unknown,
-      retryCount: number,
-      recordingUrl: string,
-      nextRetryAt: Timestamp
-   ): Promise<void> {
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
-         state: "transcription-failed",
-         errorMessage: getErrorMessage(error),
-         failedAt: Timestamp.now(),
-         retryCount,
-         nextRetryAt,
-         metadata: {
-            recordingId: recordingUrl,
-         },
-      })
-   }
-
-   /**
-    * Mark transcription as permanently failed after all retries exhausted
-    */
-   private async markTranscriptionPermanentlyFailed(
-      livestreamId: string,
-      error: unknown,
-      retryCount: number,
-      recordingUrl: string
-   ): Promise<void> {
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
-         state: "transcription-failed",
-         errorMessage: `Max retries reached: ${getErrorMessage(error)}`,
-         failedAt: Timestamp.now(),
-         retryCount,
-         metadata: {
-            recordingId: recordingUrl,
-         },
-      })
+      this.chapterizationClient = chapterizationClient
    }
 
    /**
@@ -273,81 +180,108 @@ export class TranscriptionService {
       }
    }
 
-   async chapterizeTranscription(livestreamId: string): Promise<void> {
-      logger.info("Chapterizing transcription", { livestreamId })
+   /**
+    * Process chapterization for a livestream with retry logic.
+    * This method will await all retry attempts before returning.
+    *
+    * @param livestreamId - The livestream ID
+    * @returns Promise that resolves when chapterization completes or all retries are exhausted
+    */
+   async processChapterization(livestreamId: string): Promise<void> {
+      if (!this.chapterizationClient) {
+         throw new Error("Chapterization client not provided")
+      }
 
-      const transcription = null // await this.livestreamRepo.getTranscription(livestreamId)
+      logger.info("Starting chapterization process", {
+         livestreamId,
+      })
 
-      if (!transcription) {
-         logger.error("Transcription not found", { livestreamId })
-         return
+      try {
+         // Get transcription status to check if chapterization is already in progress
+         const transcriptionStatus =
+            await this.livestreamRepo.getTranscriptionStatus(livestreamId)
+
+         if (!transcriptionStatus) {
+            throw new Error("Transcription status not found")
+         }
+
+         // Get transcription file path from metadata
+         const transcriptionFilePath = getTranscriptionFilePath(livestreamId)
+
+         // Update status to generating-chapter
+         await this.livestreamRepo.updateTranscriptionStatus(
+            livestreamId,
+            {
+               state: "generating-chapter",
+               startedAt: Timestamp.now(),
+            } as TranscriptionStatus,
+            { chapterProvider: this.chapterizationClient.provider }
+         )
+
+         // Fetch transcription from GCS
+         const transcriptionData = await fetchTranscriptionFromGCS(livestreamId)
+
+         logger.info("Transcription fetched successfully", {
+            livestreamId,
+            transcriptLength: transcriptionData.transcript.length,
+         })
+
+         logger.info(`Calling ${this.chapterizationClient.provider} API`, {
+            livestreamId,
+            transcriptLength: transcriptionData.transcript.length,
+         })
+
+         // Generate chapters
+         const { chapters } = await this.chapterizationClient.generateChapters(
+            transcriptionData,
+            MAX_RETRIES
+         )
+
+         if (!chapters?.length) {
+            throw new Error("No chapters generated")
+         }
+
+         logger.info(
+            `${this.chapterizationClient.provider} chapterization completed`,
+            {
+               livestreamId,
+               chaptersCount: chapters.length,
+            }
+         )
+
+         // Save chapters to Firestore
+         await this.saveChaptersToFirestore(livestreamId, chapters)
+
+         // Mark chapterization as completed
+         await this.markChapterizationCompleted(
+            livestreamId,
+            chapters,
+            transcriptionFilePath
+         )
+
+         logger.info("Chapterization process completed successfully", {
+            livestreamId,
+            chaptersCount: chapters.length,
+         })
+      } catch (error) {
+         logger.error("Chapterization process failed", {
+            livestreamId,
+            error,
+            errorMessage: getErrorMessage(error),
+         })
+
+         await this.markChapterizationPermanentlyFailed(
+            livestreamId,
+            error,
+            MAX_RETRIES,
+            getTranscriptionFilePath(livestreamId)
+         )
+         throw error
       }
    }
 }
 
-/**
- * Get the GCS file path for a transcription
- *
- * @param livestreamId - The livestream ID
- * @returns The GCS path for the transcription file
- */
-export function getTranscriptionFilePath(livestreamId: string): string {
-   return `${GCS_BASE_PATH}/${livestreamId}/transcription.json`
-}
-
-/**
- * Save transcription data to Google Cloud Storage
- *
- * @param livestreamId - The livestream ID
- * @param transcriptionData - The transcription data to save
- * @returns The GCS path where the file was saved
- */
-export async function saveTranscriptionToGCS(
-   livestreamId: string,
-   transcriptionData: ITranscriptionResult
-): Promise<string> {
-   logger.info("Saving transcription to GCS", { livestreamId })
-
-   const bucket = storage.bucket(STORAGE_BUCKET)
-   const filePath = getTranscriptionFilePath(livestreamId)
-   const file = bucket.file(filePath)
-
-   try {
-      // Convert data to JSON string
-      const jsonData = JSON.stringify(transcriptionData, null, 2)
-
-      // Convert to Buffer for proper upload
-      const buffer = Buffer.from(jsonData, "utf-8")
-
-      // Save to GCS using save method with Buffer
-      await file.save(buffer, {
-         contentType: "application/json",
-         metadata: {
-            metadata: {
-               livestreamId,
-               uploadedAt: new Date().toISOString(),
-            },
-         },
-      })
-
-      logger.info("Transcription saved to GCS successfully", {
-         livestreamId,
-         filePath,
-         size: buffer.length,
-      })
-
-      // Return the GCS path
-      return `gs://${bucket.name}/${filePath}`
-   } catch (error) {
-      logger.error("Failed to save transcription to GCS", {
-         livestreamId,
-         filePath,
-         error,
-         errorMessage: getErrorMessage(error),
-      })
-      throw error
-   }
-}
+// Helper functions
 
 function sleep(ms: number): Promise<void> {
    return new Promise((resolve) => setTimeout(resolve, ms))

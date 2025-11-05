@@ -3,9 +3,9 @@ import { LLMProviders } from "@careerfairy/shared-lib/livestreams/transcriptions
 import { LanguageModel, generateObject } from "ai"
 import { logger } from "firebase-functions/v2"
 import { ITranscriptionResult } from "src/lib/transcription/types"
+import { getErrorMessage } from "src/lib/transcription/utils"
 import { z } from "zod"
 import { ChaptersSchema } from "../../../lib/transcription/schemas"
-import { getErrorMessage } from "../../transcription/TranscriptionService"
 import { IChapterizationClient, IChapterizationResult } from "../types"
 
 export class ClaudeChapterClient implements IChapterizationClient {

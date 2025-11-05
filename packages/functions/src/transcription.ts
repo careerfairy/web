@@ -10,15 +10,12 @@ import { logger } from "firebase-functions/v2"
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { livestreamsRepo } from "./api/repositories"
-import { ChapterizationService } from "./lib/chapterization/ChapterizationService"
 import { ClaudeChapterClient } from "./lib/chapterization/clients/ClaudeChapterClient"
 import { IChapterizationClient } from "./lib/chapterization/types"
-import {
-   TranscriptionService,
-   getErrorMessage,
-} from "./lib/transcription/TranscriptionService"
+import { TranscriptionService } from "./lib/transcription/TranscriptionService"
 import { DeepgramTranscriptionClient } from "./lib/transcription/clients/DeepgramTranscriptionClient"
 import { ITranscriptionClient } from "./lib/transcription/types"
+import { getErrorMessage } from "./lib/transcription/utils"
 
 const TRANSCRIPTION_PROVIDER: ASRProviders = "deepgram"
 const CHAPTERIZATION_PROVIDER: LLMProviders = "anthropic"
@@ -81,8 +78,9 @@ export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
       }
 
       // Initialize service and start chapterization
-      const service = new ChapterizationService(
+      const service = new TranscriptionService(
          livestreamsRepo,
+         transcriptionProviders[TRANSCRIPTION_PROVIDER],
          chapterizationProviders[CHAPTERIZATION_PROVIDER]
       )
 
@@ -127,8 +125,9 @@ export const manualLivestreamChapterization = onRequest(
          return
       }
 
-      const service = new ChapterizationService(
+      const service = new TranscriptionService(
          livestreamsRepo,
+         transcriptionProviders[TRANSCRIPTION_PROVIDER],
          chapterizationProviders[CHAPTERIZATION_PROVIDER]
       )
 
