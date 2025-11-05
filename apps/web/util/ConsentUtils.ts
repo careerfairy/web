@@ -16,6 +16,12 @@ interface UC_UI {
    closeCMP(): void
 }
 
+interface UCEventDetail {
+   type: "ACCEPT_ALL" | "DENY_ALL" | "SAVE"
+   event?: string
+   [key: string]: any
+}
+
 /**
  * Name of the services on UC
  */
@@ -67,4 +73,30 @@ export const enableConsentFor = (name: UC_SERVICES): Promise<void> => {
  */
 export const closePrivacyWall = () => {
    getWindow()?.UC_UI?.closeCMP()
+}
+
+/**
+ * Listen for Usercentrics consent events (accept/deny/save)
+ * @param callback Function to call when user makes a consent decision
+ * @returns Cleanup function to remove the event listener
+ */
+export const onConsentChange = (
+   callback: (detail: UCEventDetail) => void
+): (() => void) => {
+   const win = getWindow()
+   if (!win) return () => {}
+
+   const handler = (event: CustomEvent<UCEventDetail>) => {
+      if (event.detail) {
+         callback(event.detail)
+      }
+   }
+
+   // Usercentrics fires this event when users interact with the consent dialog
+   win.addEventListener("UC_UI_CMP_EVENT", handler as EventListener)
+
+   // Return cleanup function
+   return () => {
+      win.removeEventListener("UC_UI_CMP_EVENT", handler as EventListener)
+   }
 }
