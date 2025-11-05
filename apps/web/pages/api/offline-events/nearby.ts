@@ -13,7 +13,11 @@ import {
 } from "firebase/firestore"
 import { distanceBetween, geohashQueryBounds } from "geofire-common"
 import type { NextApiRequest, NextApiResponse } from "next"
-import { getHostingUrl, isTestEnvironment } from "util/CommonUtil"
+import {
+   getHostingUrl,
+   isTestEnvironment,
+   shouldUseEmulators,
+} from "util/CommonUtil"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import {
    SerializedDocument,
@@ -176,7 +180,7 @@ export default async function handler(
       }
 
       // Local development fallback - Zurich, Switzerland
-      if (locations.length === 0) {
+      if (locations.length === 0 && shouldUseEmulators()) {
          locations.push({
             latitude: 47.3769,
             longitude: 8.5417,
