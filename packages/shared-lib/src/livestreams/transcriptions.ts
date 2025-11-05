@@ -2,7 +2,42 @@ import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
 import Timestamp = firebase.firestore.Timestamp
 
-// Collection: /livestreamTranscriptions
+/**
+ * Collection: /livestreamTranscriptions
+ * Document in the livestreamTranscriptions collection track the status of
+ * transcription and chapter generation for a livestream (whole process end to end, not just transcription).
+ */
+export interface LivestreamTranscription extends Identifiable {
+   /**
+    * The identifiable.id could be the livestreamId or the recordingId as well
+    */
+   livestreamId: string // Could also be just the recording link, id
+
+   /**
+    * Having providers listed is not very useful, only for quick view
+    */
+   transcriptionProvider: ASRProviders
+
+   /**
+    * Provider used for chapter generation
+    */
+   chapterProvider: LLMProviders
+
+   /**
+    * Current status of the transcription/chapter generation process
+    */
+   status: TranscriptionStatus
+
+   /**
+    * Timestamp when the document was last updated
+    */
+   updatedAt: Timestamp
+
+   /**
+    * Timestamp when the document was created
+    */
+   createdAt: Timestamp
+}
 
 /**
  * Metadata for transcription results
@@ -27,6 +62,25 @@ export type ChaptersMetadata = {
     */
    chaptersCount: number
 }
+
+/**
+ * Union type representing all possible transcription states
+ */
+export type TranscriptionStatus =
+   | RunningState
+   | CompletedState
+   | FailedState
+   | CancelledState
+
+/**
+ * Automatic speech recognition providers
+ */
+export type ASRProviders = "google" | "deepgram" | "aws"
+
+/**
+ * Language model providers
+ */
+export type LLMProviders = "openai" | "google" | "whisper"
 
 /**
  * Base state for running processes
@@ -109,59 +163,4 @@ type CancelledState = {
    state: "cancelled"
    cancelledAt: Timestamp
    cancelledReason: string
-}
-
-/**
- * Union type representing all possible transcription states
- */
-export type TranscriptionStatus =
-   | RunningState
-   | CompletedState
-   | FailedState
-   | CancelledState
-
-/**
- * Automatic speech recognition providers
- */
-export type ASRProviders = "google" | "deepgram" | "aws"
-
-/**
- * Language model providers
- */
-export type LLMProviders = "openai" | "google" | "whisper"
-
-/**
- * Document in the livestreamTranscriptions collection
- * Tracks the status of transcription and chapter generation for a livestream
- */
-export interface LivestreamTranscription extends Identifiable {
-   /**
-    * The identifiable.id could be the livestreamId or the recordingId as well
-    */
-   livestreamId: string // Could also be just the recording link, id
-
-   /**
-    * Having providers listed is not very useful, only for quick view
-    */
-   transcriptionProvider: ASRProviders
-
-   /**
-    * Provider used for chapter generation
-    */
-   chapterProvider: LLMProviders
-
-   /**
-    * Current status of the transcription/chapter generation process
-    */
-   status: TranscriptionStatus
-
-   /**
-    * Timestamp when the document was last updated
-    */
-   updatedAt: Timestamp
-
-   /**
-    * Timestamp when the document was created
-    */
-   createdAt: Timestamp
 }
