@@ -57,6 +57,7 @@ import {
    wasInCreatorFeedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
+import { clearPortalSparks, readPortalSparks } from "util/portalSparksStorage"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 const SparksPage: NextPage<
@@ -114,8 +115,38 @@ const SparksPage: NextPage<
       dispatch(setUserEmail(userEmail))
 
       const originalSpark = SparkPresenter.deserialize(serializedSpark)
-      dispatch(setSparks([originalSpark]))
-      dispatch(setOriginalSparkId(originalSpark.id))
+       let initialSparks: SparkPresenter[] | null = null
+
+       if (!userEmail && typeof window !== "undefined") {
+          const storedPortalSparks = readPortalSparks()
+
+          if (storedPortalSparks?.sparks?.length) {
+             const presenters = storedPortalSparks.sparks.map((spark) =>
+                SparkPresenter.deserialize(spark)
+             )
+
+             const originalIndex = presenters.findIndex(
+                (spark) => spark.id === originalSpark.id
+             )
+
+             if (originalIndex >= 0) {
+                initialSparks = [
+                   ...presenters.slice(originalIndex),
+                   ...presenters.slice(0, originalIndex),
+                ]
+             } else {
+                initialSparks = [
+                   originalSpark,
+                   ...presenters.filter((spark) => spark.id !== originalSpark.id),
+                ]
+             }
+          }
+
+          clearPortalSparks()
+       }
+
+       dispatch(setSparks(initialSparks ?? [originalSpark]))
+       dispatch(setOriginalSparkId(originalSpark.id))
    }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {
