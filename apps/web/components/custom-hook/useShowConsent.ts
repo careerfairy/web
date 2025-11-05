@@ -2,15 +2,21 @@ import { useRouter } from "next/router"
 import { useEffect, useRef } from "react"
 import { AnalyticsEvents } from "../../util/analyticsConstants"
 import { analyticsTrackEvent } from "../../util/analyticsUtils"
-import { onConsentChange } from "../../util/ConsentUtils"
+import {
+   hasUserDeclinedConsent,
+   onConsentChange,
+} from "../../util/ConsentUtils"
 import { getWindow } from "../../util/PathUtils"
 
 /**
  * Custom hook to automatically show the Usercentrics consent dialog
  * when the URL contains ?showConsent=true query parameter.
  *
- * Can be used in email campaigns, notifications, or other contexts where
- * users need to manage their consent preferences.
+ * The dialog will ONLY show for users who have previously declined cookies.
+ * First-time visitors or users who have already accepted will not see the dialog.
+ *
+ * Can be used in email campaigns or notifications to re-engage users who
+ * previously declined consent.
  */
 const useShowConsent = () => {
    const router = useRouter()
@@ -24,11 +30,32 @@ const useShowConsent = () => {
          const ucUI = getWindow()?.UC_UI
 
          if (ucUI && typeof ucUI.showSecondLayer === "function") {
+            // Check if user has previously declined consent
+            const userHasDeclined = hasUserDeclinedConsent()
+
+            if (!userHasDeclined) {
+               // Clean up URL parameter
+               const { showConsent: _showConsent, ...remainingQuery } =
+                  router.query
+               router.replace(
+                  {
+                     pathname: router.pathname,
+                     query: remainingQuery,
+                  },
+                  undefined,
+                  { shallow: true }
+               )
+
+               return // Exit early - don't show dialog
+            }
+
+            // User has declined - show the dialog
             // Track that the consent dialog was opened via URL parameter
             try {
                analyticsTrackEvent(AnalyticsEvents.ConsentDialogOpened, {
                   page: router.pathname,
                   url: window.location.href,
+                  userPreviouslyDeclined: true,
                })
             } catch (error) {
                console.error("Failed to track consent dialog event:", error)

@@ -14,6 +14,8 @@ interface UC_UI {
    showSecondLayer(): void
    restartEmbeddings(): void
    closeCMP(): void
+   isConsentRequired(): boolean
+   areAllConsentsAccepted(): boolean
 }
 
 interface UCEventDetail {
@@ -98,5 +100,45 @@ export const onConsentChange = (
    // Return cleanup function
    return () => {
       win.removeEventListener("UC_UI_CMP_EVENT", handler as EventListener)
+   }
+}
+
+/**
+ * Checks if the user has specifically declined (denied) consent
+ *
+ * Uses Usercentrics API methods to determine if:
+ * 1. The user has made a consent decision (isConsentRequired = false)
+ * 2. The user did NOT accept all consents (areAllConsentsAccepted = false)
+ *
+ * This means the user either declined all or made partial selections.
+ *
+ * @returns true if user has declined consent, false otherwise
+ */
+export const hasUserDeclinedConsent = (): boolean => {
+   try {
+      const ucUI = getWindow()?.UC_UI
+      if (!ucUI) return false
+
+      // Check if Usercentrics API methods are available
+      if (
+         typeof ucUI.isConsentRequired !== "function" ||
+         typeof ucUI.areAllConsentsAccepted !== "function"
+      ) {
+         console.warn(
+            "Usercentrics API methods not available. Cannot determine consent status."
+         )
+         return false
+      }
+
+      // User has declined if:
+      // - They've made a decision (isConsentRequired = false)
+      // - They didn't accept all (areAllConsentsAccepted = false)
+      const hasDeclined =
+         !ucUI.isConsentRequired() && !ucUI.areAllConsentsAccepted()
+
+      return hasDeclined
+   } catch (e) {
+      console.error("Error checking declined consent:", e)
+      return false
    }
 }
