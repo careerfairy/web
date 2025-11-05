@@ -1,5 +1,6 @@
 import { RecordingToken } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { downloadLink } from "@careerfairy/shared-lib/livestreams/recordings"
+import { ASRProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
 import { logger } from "firebase-functions/v2"
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
@@ -8,7 +9,14 @@ import {
    TranscriptionService,
    getErrorMessage,
 } from "./lib/transcription/TranscriptionService"
+import { DeepgramTranscriptionClient } from "./lib/transcription/clients/DeepgramTranscriptionClient"
+import { ITranscriptionClient } from "./lib/transcription/types"
 
+const TRANSCRIPTION_PROVIDER: ASRProviders = "deepgram"
+
+const transcriptionProviders: Record<ASRProviders, ITranscriptionClient> = {
+   deepgram: new DeepgramTranscriptionClient(),
+}
 /**
  * Runtime configuration for transcription functions
  * Timeout set to 1 hour to accommodate full retry cycle (up to 61 minutes with backoff)
@@ -43,7 +51,10 @@ export const initiateTranscriptionOnRecordingAvailable = onDocumentUpdated(
       }
 
       // Initialize service and start transcription
-      const service = new TranscriptionService(livestreamsRepo)
+      const service = new TranscriptionService(
+         livestreamsRepo,
+         transcriptionProviders[TRANSCRIPTION_PROVIDER]
+      )
 
       const recordingUrl = downloadLink(livestreamId, recordingTokenData.sid)
 
@@ -108,7 +119,10 @@ export const manualLivestreamTranscription = onRequest(
 
       const recordingUrl = downloadLink(livestreamId, tokenData.sid)
       // Initialize service and start transcription
-      const service = new TranscriptionService(livestreamsRepo)
+      const service = new TranscriptionService(
+         livestreamsRepo,
+         transcriptionProviders[TRANSCRIPTION_PROVIDER]
+      )
 
       try {
          await service.processTranscription(livestreamId, recordingUrl, {

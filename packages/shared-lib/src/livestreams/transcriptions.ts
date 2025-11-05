@@ -75,7 +75,7 @@ export type TranscriptionStatus =
 /**
  * Automatic speech recognition providers
  */
-export type ASRProviders = "google" | "deepgram" | "aws"
+export type ASRProviders = "deepgram"
 
 /**
  * Language model providers
