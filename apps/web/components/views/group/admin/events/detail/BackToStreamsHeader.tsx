@@ -21,9 +21,13 @@ const styles = sxStyles({
 
 type Props = {
    groupId: string
+   isRecording?: boolean
 }
 
-export const BackToStreamsHeader = ({ groupId }: Props) => {
+export const BackToStreamsHeader = ({
+   groupId,
+   isRecording = false,
+}: Props) => {
    const router = useRouter()
 
    const handleClick = () => {
@@ -37,7 +41,7 @@ export const BackToStreamsHeader = ({ groupId }: Props) => {
    return (
       <Box sx={styles.root} onClick={handleClick}>
          <Box component={ChevronLeft} />
-         {"Live stream details"}
+         {isRecording ? "Recording" : "Live stream details"}
       </Box>
    )
 }
