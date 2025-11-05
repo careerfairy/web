@@ -70,7 +70,7 @@ export const initiateTranscriptionOnRecordingAvailable = onDocumentUpdated(
 
 /**
  * Manual HTTP function for testing transcription
- * Usage: GET /manualTranscription?livestreamId=<id>
+ * Usage: GET /manualLivestreamTranscription?livestreamId=<id>
  */
 export const manualLivestreamTranscription = onRequest(
    transcriptionConfig,

@@ -1576,21 +1576,21 @@ export class LivestreamFunctionsRepository
       livestreamId: string,
       maxRetries: number
    ): Promise<boolean> {
-      const status = await this.getTranscriptionStatus(livestreamId)
+      const livestreamTranscription = await this.getTranscriptionStatus(
+         livestreamId
+      )
 
-      if (!status) {
+      if (!livestreamTranscription) {
          return false
       }
 
-      const state = status.status.state
+      const transcriptionStatus = livestreamTranscription.status
+      const state = transcriptionStatus.state
 
       return (
          state === "transcribing" ||
-         // state === "generating-chapter" ||
-         // (status.status.state === "chapterization-failed" &&
-         //    status.status.retryCount < maxRetries) ||
-         (status.status.state === "transcription-failed" &&
-            status.status.retryCount < maxRetries)
+         (state === "transcription-failed" &&
+            transcriptionStatus.retryCount < maxRetries)
       )
    }
 }

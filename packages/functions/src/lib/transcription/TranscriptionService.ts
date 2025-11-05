@@ -157,7 +157,6 @@ export class TranscriptionService {
       })
 
       try {
-         // Kind of useless
          const inProgress = await this.livestreamRepo.isTranscriptionInProgress(
             livestreamId,
             MAX_RETRIES
