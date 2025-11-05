@@ -1,6 +1,8 @@
+import { TranscriptionStatus } from "@careerfairy/shared-lib/livestreams"
 import { downloadLink } from "@careerfairy/shared-lib/livestreams/recordings"
 import { ASRProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
 import { logger } from "firebase-functions/v2"
+import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { livestreamsRepo } from "./api/repositories"
 import {
@@ -24,6 +26,33 @@ const transcriptionConfig = {
    memory: "1GiB" as const,
 }
 
+
+export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
+   {
+      ...transcriptionConfig,
+      document: "livestreamTranscriptions/{livestreamId}",
+   },
+   async (event) => {
+      const livestreamId = event.params.livestreamId
+
+      logger.info("Initiating chapterization on transcription completed", {
+         livestreamId,
+      })
+
+      const transcriptionStatus =
+         event.data?.after?.data() as TranscriptionStatus
+
+      if (transcriptionStatus.state !== "transcription-completed") {
+         logger.info(
+            "Transcription is not completed, skipping chapterization",
+            {
+               livestreamId,
+            }
+         )
+         return
+      }
+   }
+)
 /**
  * Manual HTTP function for testing transcription
  * Usage: GET /manualLivestreamTranscription?livestreamId=<id>

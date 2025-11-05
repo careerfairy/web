@@ -273,6 +273,17 @@ export class TranscriptionService {
          }
       }
    }
+
+   async chapterizeTranscription(livestreamId: string): Promise<void> {
+      logger.info("Chapterizing transcription", { livestreamId })
+
+      const transcription = null // await this.livestreamRepo.getTranscription(livestreamId)
+
+      if (!transcription) {
+         logger.error("Transcription not found", { livestreamId })
+         return
+      }
+   }
 }
 
 /**
