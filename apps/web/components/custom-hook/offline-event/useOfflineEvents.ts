@@ -5,10 +5,15 @@ import useSWR from "swr"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
 export const useOfflineEvents = () => {
-   const { userData } = useAuth()
+   const { userData, isLoadingUserData } = useAuth()
+
+   // Only fetch when auth/userData is fully loaded
+   const shouldFetch = !isLoadingUserData
 
    return useSWR<OfflineEventWithDistance[]>(
-      ["offline-events", userData?.stateIsoCode, userData?.countryIsoCode],
+      shouldFetch
+         ? ["offline-events", userData?.stateIsoCode, userData?.countryIsoCode]
+         : null, // null key prevents fetching
       async () => {
          // Pass user's profile location if available
          const userLocation =
