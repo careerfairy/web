@@ -147,9 +147,7 @@ export class BaseTranscriptionService {
       let writeCount = 0
 
       try {
-         for (let index = 0; index < chapters.length; index++) {
-            const chapter = chapters[index]
-
+         for (const [index, chapter] of chapters.entries()) {
             const chapterRef = firestore
                .collection("livestreams")
                .doc(livestreamId)
@@ -167,9 +165,7 @@ export class BaseTranscriptionService {
 
             bulkWriter
                .set(chapterRef, livestreamChapter)
-               .then(() => {
-                  writeCount++
-               })
+               .then(() => writeCount++)
                .catch((error) => {
                   logger.error("bulkWriter.set failed for chapter", {
                      livestreamId,

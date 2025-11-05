@@ -7,12 +7,12 @@ import {
    createClient,
 } from "@deepgram/sdk"
 import { logger } from "firebase-functions/v2"
-import { getErrorMessage } from "../TranscriptionService"
 import {
    ITranscriptionClient,
    ITranscriptionResult,
    TranscriptionParagraph,
 } from "../types"
+import { getErrorMessage } from "../utils"
 
 export class DeepgramTranscriptionClient implements ITranscriptionClient {
    provider: ASRProviders = "deepgram"
