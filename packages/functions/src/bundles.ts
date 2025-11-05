@@ -77,6 +77,23 @@ export const bundles = {
                .where("deleted", "==", false),
       },
    },
+   allFutureOfflineEvents: {
+      name: "allFutureOfflineEvents",
+      cacheControl: "public, max-age=900", // 15min
+      queries: {
+         "future-offline-events-query": (firestore) =>
+            firestore
+               .collection("offlineEvents")
+               .where("hidden", "==", false)
+               .where("published", "==", true)
+               // Include events from today onwards (start of today) so events happening today are still shown
+               .where(
+                  "startAt",
+                  ">",
+                  DateTime.local().startOf("day").toJSDate()
+               ),
+      },
+   },
 } satisfies { [key: string]: Bundle }
 
 export type BundleName = keyof typeof bundles
