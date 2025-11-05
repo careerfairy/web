@@ -31,7 +31,6 @@ export class DeepgramTranscriptionClient implements ITranscriptionClient {
    async transcribeAudio(audioUrl: string): Promise<ITranscriptionResult> {
       return this.transcribe(audioUrl, {
          punctuate: true,
-         utterances: true,
          paragraphs: true,
          detect_language: true,
       })
@@ -46,16 +45,9 @@ export class DeepgramTranscriptionClient implements ITranscriptionClient {
     */
    async transcribe(
       audioUrl: string,
-      options?: Partial<PrerecordedSchema>
+      options: Partial<PrerecordedSchema>
    ): Promise<ITranscriptionResult> {
       logger.info("Starting Deepgram transcription", { audioUrl })
-
-      const defaultOptions: PrerecordedSchema = {
-         punctuate: true,
-         paragraphs: true,
-         detect_language: true,
-         ...options,
-      }
 
       const source: UrlSource = {
          url: audioUrl,
@@ -63,10 +55,7 @@ export class DeepgramTranscriptionClient implements ITranscriptionClient {
 
       try {
          const { result, error } =
-            await this.client.listen.prerecorded.transcribeUrl(
-               source,
-               defaultOptions
-            )
+            await this.client.listen.prerecorded.transcribeUrl(source, options)
 
          if (error) {
             logger.error("Deepgram transcription returned error", {
