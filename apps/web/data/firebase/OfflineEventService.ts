@@ -133,18 +133,18 @@ export class OfflineEventService {
    /**
     * Get offline events within 150km of user's location
     * Prioritizes user's profile location over IP-based geolocation
-    * @param userData - Optional user data containing profile location (stateName, countryIsoCode)
+    * @param userData - Optional user data containing profile location (stateIsoCode, countryIsoCode)
     * @returns Array of offline events with distance information, sorted by proximity
     */
    async getOfflineEvents(
-      userData?: Pick<UserData, "stateName" | "countryIsoCode">
+      userData?: Pick<UserData, "stateIsoCode" | "countryIsoCode">
    ): Promise<OfflineEventWithDistance[]> {
       try {
          // Build query params with user's profile location if available
          const params = new URLSearchParams()
-         if (userData?.stateName && userData?.countryIsoCode) {
-            params.append("city", userData.stateName)
-            params.append("country", userData.countryIsoCode)
+         if (userData?.stateIsoCode && userData?.countryIsoCode) {
+            params.append("stateCode", userData.stateIsoCode)
+            params.append("countryCode", userData.countryIsoCode)
          }
 
          const url = `/api/offline-events/nearby${params.toString() ? `?${params.toString()}` : ""}`
