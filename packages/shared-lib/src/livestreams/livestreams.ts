@@ -276,11 +276,6 @@ export interface LivestreamEvent extends Identifiable {
     * The trailer url of the panel
     */
    panelTrailerUrl?: string
-
-   /**
-    * Indicates whether the transcription is finished for the live stream.
-    */
-   transcriptionCompleted?: boolean
 }
 
 const LivestreamTypes = {
@@ -429,6 +424,23 @@ export interface UserLivestreamData extends Identifiable {
    }
 }
 
+/**
+ * Base chapter type, used in chapterization result and in @type LivestreamChapter.
+ */
+export interface Chapter {
+   title: string
+   startSec: number
+   endSec: number
+   summary: string
+}
+
+// Collection Path: livestreams/{livestreamId}/chapters/{chapterId}
+export interface LivestreamChapter extends Identifiable, Chapter {
+   documentType: "livestreamChapter"
+   chapterIndex: number
+   livestreamId: string
+   createdAt: Timestamp
+}
 export interface RecordingToken extends Identifiable {
    recourseId: string
    sid: string
