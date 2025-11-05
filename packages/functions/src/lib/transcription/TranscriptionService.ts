@@ -73,7 +73,7 @@ export class TranscriptionService {
       const transcriptText = result.transcript.substring(0, 500)
 
       await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
-         state: "completed",
+         state: "transcriptioncompleted",
          completedAt: Timestamp.now(),
          transcriptText,
          confidenceAvg: result.confidence,
@@ -170,7 +170,10 @@ export class TranscriptionService {
             return
          }
 
-         await this.livestreamRepo.initiateTranscription(livestreamId)
+         await this.livestreamRepo.initiateTranscription(
+            livestreamId,
+            "deepgram"
+         )
 
          logger.info("Calling Deepgram API", { livestreamId, recordingUrl })
 

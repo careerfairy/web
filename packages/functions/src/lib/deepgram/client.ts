@@ -15,9 +15,7 @@ export class DeepgramClient {
    private readonly client: DeepgramSDKClient
 
    constructor() {
-      const apiKey =
-         process.env.DEEPGRAM_API_KEY ||
-         "f91e0707a49b664966f7c6b8743c74344f0dc6a4"
+      const apiKey = process.env.DEEPGRAM_API_KEY
 
       if (!apiKey) {
          throw new Error("DEEPGRAM_API_KEY environment variable is not set")
