@@ -21,10 +21,15 @@ const styles = sxStyles({
    },
 })
 
+type SparkClickContext = {
+   sparks: Spark[]
+   index: number
+}
+
 type SparksCarouselProps = {
    header?: ReactNode
    seeAll?: ReactNode
-   handleSparksClicked?: (spark: Spark) => void
+    handleSparksClicked?: (spark: Spark, context?: SparkClickContext) => void
    containerSx?: SxProps<Theme>
    headerSx?: SxProps<Theme>
    sparks: Spark[]
@@ -68,11 +73,18 @@ export const SparksCarousel = ({
             seeAll={seeAll}
             disableArrows={disableArrows}
          >
-            {sparks.map((spark, index) => (
-               <SparkPreviewCard
-                  key={spark.id}
-                  spark={spark}
-                  onClick={!disableClick && handleSparksClicked}
+              {sparks.map((spark, index) => (
+                 <SparkPreviewCard
+                    key={spark.id}
+                    spark={spark}
+                    onClick={
+                       !disableClick &&
+                       (() =>
+                          handleSparksClicked?.(spark, {
+                             sparks,
+                             index,
+                          }))
+                    }
                   questionLimitLines={true}
                   onGoNext={moveToNextSlide}
                   muted // there is never a case where we want to play audio on a carousel

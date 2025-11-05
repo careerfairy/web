@@ -136,7 +136,7 @@ const PortalPage = ({
    customJobDialogData,
    serializedOfflineEvent,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-   const { authenticatedUser, userData } = useAuth()
+  const { authenticatedUser, userData, isLoggedOut } = useAuth()
    const router = useRouter()
    const isMobile = useIsMobile()
 
@@ -151,16 +151,32 @@ const PortalPage = ({
       [comingUpNextEvents]
    )
 
-   const handleSparksClicked = (spark: Spark) => {
+  const handleSparksClicked = (
+     spark: Spark,
+     context?: { sparks: Spark[] }
+  ) => {
       if (!spark) return
 
-      return router.push({
-         pathname: `/sparks/${spark.id}`,
-         query: {
-            ...router.query, // spread current query params
-            interactionSource: SparkInteractionSources.Portal,
-         },
-      })
+     const portalSparkIds =
+        isLoggedOut && context?.sparks?.length
+           ? context.sparks.map((item) => item.id).filter(Boolean)
+           : []
+
+     const queryParams = {
+        ...router.query,
+        interactionSource: SparkInteractionSources.Portal,
+     }
+
+     if (portalSparkIds.length) {
+        queryParams.portalSparkIds = portalSparkIds.join(",")
+     } else {
+        delete queryParams.portalSparkIds
+     }
+
+     return router.push({
+        pathname: `/sparks/${spark.id}`,
+        query: queryParams,
+     })
    }
 
    return (

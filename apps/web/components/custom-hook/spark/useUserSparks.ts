@@ -18,7 +18,6 @@ import { useEffect } from "react"
 import { useLocalStorage } from "react-use"
 import useSWR, { preload } from "swr"
 import { errorLogAndNotify, getRandom } from "util/CommonUtil"
-import { clearPortalSparks, storePortalSparks } from "util/portalSparksStorage"
 import useUserCountryCode from "../useUserCountryCode"
 
 // Constants
@@ -156,21 +155,6 @@ export const useUserSparks = (options: Options = {}) => {
          },
       }
    )
-
-   useEffect(() => {
-      if (typeof window === "undefined" || isLoading) return
-
-      if (authenticatedUser?.email) {
-         clearPortalSparks()
-         return
-      }
-
-      if (data?.length) {
-         storePortalSparks(data)
-      } else {
-         clearPortalSparks()
-      }
-   }, [authenticatedUser?.email, data, isLoading])
 
    return { sparks: data, isLoading }
 }
