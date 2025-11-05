@@ -58,16 +58,27 @@ type TranscriptionChapterRunningState = {
 type RunningState = BaseRunningState &
    (TranscriptionRunningState | TranscriptionChapterRunningState)
 
+type TranscriptionCompletedState = {
+   state: "transcriptioncompleted"
+   transcriptText: string // minimal denormalized result for quick reads
+   metadata: TranscriptMetadata
+}
+
+type ChapterizationCompletedState = {
+   state: "completed"
+   chaptersCount: number
+   metadata: ChaptersMetadata
+}
+
+type BaseCompletedState = {
+   completedAt: Timestamp
+   confidenceAvg: number
+}
 /**
  * State when transcription or chapter generation is completed
  */
-type CompletedState = {
-   state: "completed"
-   completedAt: Timestamp
-   transcriptText: string // minimal denormalized result for quick reads
-   confidenceAvg: number
-   metadata: TranscriptMetadata | ChaptersMetadata
-}
+type CompletedState = BaseCompletedState &
+   (TranscriptionCompletedState | ChapterizationCompletedState)
 
 type TranscriptionFailedState = {
    state: "transcription-failed"

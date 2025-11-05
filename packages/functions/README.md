@@ -42,25 +42,6 @@ They will load the secrets on the file `.secrets.local`.
 
 Docs: https://firebase.google.com/docs/functions/config-env#secrets_and_credentials_in_the_emulator
 
-## Environment Variables
-
-Some configuration values are stored in environment variables via a `.env` file in the functions directory.
-
-### Setting up Environment Variables
-
-1. Create a `.env` file in the `packages/functions` directory (copy from `.env.example` if available)
-2. Add the following variables:
-
-```sh
-# Deepgram API Key for transcription services
-# Get your API key from https://console.deepgram.com/
-DEEPGRAM_API_KEY=your_deepgram_api_key_here
-```
-
-3. The `.env` file is automatically loaded by the functions via `dotenv.config()` in `index.ts`
-
-**Note:** Never commit the `.env` file to version control. It should be in `.gitignore`.
-
 # BigQuery Schemas
 
 This package contains the schemas for custom events we send directly to BigQuery via cloud functions.
