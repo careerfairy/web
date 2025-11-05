@@ -1,11 +1,11 @@
-import { AnthropicProviderOptions, createAnthropic } from "@ai-sdk/anthropic"
+import { AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic"
 import { LLMProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
 import { LanguageModel, generateObject } from "ai"
 import { logger } from "firebase-functions/v2"
 import { ITranscriptionResult } from "src/lib/transcription/types"
-import { getErrorMessage } from "src/lib/transcription/utils"
 import { z } from "zod"
 import { ChaptersSchema } from "../../../lib/transcription/schemas"
+import { getErrorMessage } from "../../../lib/transcription/utils"
 import { IChapterizationClient, IChapterizationResult } from "../types"
 
 export class ClaudeChapterClient implements IChapterizationClient {
@@ -19,13 +19,7 @@ export class ClaudeChapterClient implements IChapterizationClient {
          throw new Error("ANTHROPIC_API_KEY environment variable is not set")
       }
 
-      // Create Anthropic provider instance with explicit API key
-      // The default anthropic instance would auto-read from ANTHROPIC_API_KEY,
-      // but we're being explicit here for clarity
-      const anthropicProvider = createAnthropic({ apiKey })
-
-      // Using Claude Sonnet 3.5
-      this.model = anthropicProvider("claude-sonnet-4-5")
+      this.model = anthropic("claude-sonnet-4-5")
    }
 
    async generateChapters(
@@ -70,7 +64,7 @@ export class ClaudeChapterClient implements IChapterizationClient {
       } catch (error) {
          logger.error("Claude chapterization failed", {
             error,
-            errorMessage: getErrorMessage(error?.data?.error),
+            errorMessage: getErrorMessage(error),
          })
          throw error
       }

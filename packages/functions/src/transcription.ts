@@ -94,7 +94,7 @@ export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
             {
                livestreamId,
                chaptersCount: chapters.length,
-               firstChapter: chapters?.at(0),
+               firstChapter: chapters.at(0),
             }
          )
       } catch (error) {
