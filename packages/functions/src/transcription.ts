@@ -28,6 +28,12 @@ const chapterizationProviders: Record<LLMProviders, IChapterizationClient> = {
    anthropic: new ClaudeChapterClient(),
 }
 
+const transcriptionService = new TranscriptionService(
+   livestreamsRepo,
+   transcriptionProviders[TRANSCRIPTION_PROVIDER],
+   chapterizationProviders[CHAPTERIZATION_PROVIDER]
+)
+
 /**
  * Runtime configuration for transcription functions
  * Timeout set to 1 hour to accommodate full retry cycle (up to 61 minutes with backoff)
@@ -36,7 +42,6 @@ const transcriptionConfig = {
    timeoutSeconds: 3600, // 1 hour - accommodates full retry cycle
    memory: "1GiB" as const,
 }
-
 
 /**
  * Could be on /livestreams and check for transcriptionCompleted but prefer to use the transcription status document
@@ -77,22 +82,19 @@ export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
          return
       }
 
-      // Initialize service and start chapterization
-      const service = new TranscriptionService(
-         livestreamsRepo,
-         transcriptionProviders[TRANSCRIPTION_PROVIDER],
-         chapterizationProviders[CHAPTERIZATION_PROVIDER]
-      )
-
       try {
          logger.info("Chapterization initiated successfully", { livestreamId })
 
-         await service.processChapterization(livestreamId)
+         const chapters = await transcriptionService.processChapterization(
+            livestreamId
+         )
 
          logger.info(
             "Chapterization process completed (including all retries)",
             {
                livestreamId,
+               chaptersCount: chapters.length,
+               firstChapter: chapters?.at(0),
             }
          )
       } catch (error) {
@@ -125,19 +127,16 @@ export const manualLivestreamChapterization = onRequest(
          return
       }
 
-      const service = new TranscriptionService(
-         livestreamsRepo,
-         transcriptionProviders[TRANSCRIPTION_PROVIDER],
-         chapterizationProviders[CHAPTERIZATION_PROVIDER]
+      const chapters = await transcriptionService.processChapterization(
+         livestreamId
       )
-
-      await service.processChapterization(livestreamId)
 
       res.status(200)
          .json({
             success: true,
             message: "Chapterization completed successfully",
             livestreamId,
+            chapters,
          })
          .end()
    }
@@ -182,15 +181,14 @@ export const manualLivestreamTranscription = onRequest(
 
       const recordingUrl = downloadLink(livestreamId, tokenData.sid)
       // Initialize service and start transcription
-      const service = new TranscriptionService(
-         livestreamsRepo,
-         transcriptionProviders[TRANSCRIPTION_PROVIDER]
-      )
-
       try {
-         await service.processTranscription(livestreamId, recordingUrl, {
-            force: true,
-         })
+         await transcriptionService.processTranscription(
+            livestreamId,
+            recordingUrl,
+            {
+               force: true,
+            }
+         )
 
          res.status(200).json({
             success: true,

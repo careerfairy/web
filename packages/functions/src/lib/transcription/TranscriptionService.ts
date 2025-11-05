@@ -1,3 +1,4 @@
+import { Chapter } from "@careerfairy/shared-lib/livestreams"
 import { TranscriptionStatus } from "@careerfairy/shared-lib/livestreams/transcriptions"
 import { Timestamp } from "firebase-admin/firestore"
 import { logger } from "firebase-functions/v2"
@@ -25,12 +26,12 @@ type ProcessTranscriptionOptions = {
  */
 export class TranscriptionService extends BaseTranscriptionService {
    private transcriptionClient: ITranscriptionClient
-   private chapterizationClient?: IChapterizationClient
+   private chapterizationClient: IChapterizationClient
 
    constructor(
       livestreamRepo: ILivestreamFunctionsRepository,
       transcriptionClient: ITranscriptionClient,
-      chapterizationClient?: IChapterizationClient
+      chapterizationClient: IChapterizationClient
    ) {
       super(livestreamRepo)
       this.transcriptionClient = transcriptionClient
@@ -187,11 +188,7 @@ export class TranscriptionService extends BaseTranscriptionService {
     * @param livestreamId - The livestream ID
     * @returns Promise that resolves when chapterization completes or all retries are exhausted
     */
-   async processChapterization(livestreamId: string): Promise<void> {
-      if (!this.chapterizationClient) {
-         throw new Error("Chapterization client not provided")
-      }
-
+   async processChapterization(livestreamId: string): Promise<Chapter[]> {
       logger.info("Starting chapterization process", {
          livestreamId,
       })
@@ -263,6 +260,8 @@ export class TranscriptionService extends BaseTranscriptionService {
             livestreamId,
             chaptersCount: chapters.length,
          })
+
+         return chapters
       } catch (error) {
          logger.error("Chapterization process failed", {
             livestreamId,
