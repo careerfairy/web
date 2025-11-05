@@ -1,19 +1,22 @@
-import type {
-   DeepgramClient as DeepgramSDKClient,
+import { ASRProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
+import {
+   DeepgramClient,
    PrerecordedSchema,
    SyncPrerecordedResponse,
    UrlSource,
+   createClient,
 } from "@deepgram/sdk"
-import { createClient } from "@deepgram/sdk"
 import { logger } from "firebase-functions/v2"
-import { getErrorMessage } from "../transcription/TranscriptionService"
-import { ProcessedTranscription } from "./types"
+import { getErrorMessage } from "../TranscriptionService"
+import {
+   ITranscriptionClient,
+   ITranscriptionResult,
+   TranscriptionParagraph,
+} from "../types"
 
-/**
- * Client for interacting with the Deepgram API using the official SDK
- */
-export class DeepgramClient {
-   private readonly client: DeepgramSDKClient
+export class DeepgramTranscriptionClient implements ITranscriptionClient {
+   provider: ASRProviders = "deepgram"
+   private readonly client: DeepgramClient
 
    constructor() {
       const apiKey = process.env.DEEPGRAM_API_KEY
@@ -25,6 +28,15 @@ export class DeepgramClient {
       this.client = createClient(apiKey)
    }
 
+   async transcribeAudio(audioUrl: string): Promise<ITranscriptionResult> {
+      return this.transcribe(audioUrl, {
+         punctuate: true,
+         utterances: true,
+         paragraphs: true,
+         detect_language: true,
+      })
+   }
+
    /**
     * Transcribe audio from a URL using Deepgram API
     *
@@ -32,15 +44,14 @@ export class DeepgramClient {
     * @param options - Optional transcription parameters
     * @returns Processed transcription result
     */
-   async transcribeAudio(
+   async transcribe(
       audioUrl: string,
       options?: Partial<PrerecordedSchema>
-   ): Promise<ProcessedTranscription> {
+   ): Promise<ITranscriptionResult> {
       logger.info("Starting Deepgram transcription", { audioUrl })
 
       const defaultOptions: PrerecordedSchema = {
          punctuate: true,
-         utterances: true,
          paragraphs: true,
          detect_language: true,
          ...options,
@@ -94,7 +105,7 @@ export class DeepgramClient {
     */
    private processResponse(
       response: SyncPrerecordedResponse
-   ): ProcessedTranscription {
+   ): ITranscriptionResult {
       const channel = response.results?.channels?.[0]
       if (!channel) {
          throw new Error("No channels found in Deepgram response")
@@ -108,19 +119,12 @@ export class DeepgramClient {
       // Extract transcript
       const transcript = alternative.transcript || ""
 
-      // Calculate average confidence
-      const words = alternative.words || []
-      const confidence =
-         words.length > 0
-            ? words.reduce((sum, word) => sum + (word.confidence || 0), 0) /
-              words.length
-            : alternative.confidence || 0
+      const confidence = alternative.confidence
 
-      // Extract utterances
-      const utterances = response.results?.utterances || []
-
-      // Extract paragraphs
-      const paragraphs = alternative.paragraphs?.paragraphs || []
+      // Extract paragraphs, no need to map here as the SDK already returns ta type
+      // that matches our type
+      const paragraphs: TranscriptionParagraph[] =
+         alternative.paragraphs?.paragraphs || []
 
       // Get detected language and confidence
       const language = channel.detected_language || "en"
@@ -135,9 +139,7 @@ export class DeepgramClient {
          languageConfidence,
          confidence,
          duration,
-         utterances,
          paragraphs,
-         rawResponse: response,
       }
    }
 }

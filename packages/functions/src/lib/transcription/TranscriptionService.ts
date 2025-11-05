@@ -2,7 +2,8 @@ import { Timestamp } from "firebase-admin/firestore"
 import { logger } from "firebase-functions/v2"
 import { storage } from "../../api/firestoreAdmin"
 import { ILivestreamFunctionsRepository } from "../LivestreamFunctionsRepository"
-import { DeepgramClient } from "../deepgram/client"
+
+import { ITranscriptionClient, ITranscriptionResult } from "./types"
 
 const GCS_BASE_PATH = "transcriptions/livestreams"
 const STORAGE_BUCKET = "careerfairy-e1fd9.appspot.com"
@@ -48,11 +49,15 @@ function calculateBackoffDelay(retryCount: number): number {
  * including retries with exponential backoff
  */
 export class TranscriptionService {
-   private deepgramClient: DeepgramClient
+   // private deepgramClient: DeepgramClient
+   private transcriptionClient: ITranscriptionClient
    private livestreamRepo: ILivestreamFunctionsRepository
 
-   constructor(livestreamRepo: ILivestreamFunctionsRepository) {
-      this.deepgramClient = new DeepgramClient()
+   constructor(
+      livestreamRepo: ILivestreamFunctionsRepository,
+      transcriptionClient: ITranscriptionClient
+   ) {
+      this.transcriptionClient = transcriptionClient
       this.livestreamRepo = livestreamRepo
    }
 
@@ -61,12 +66,7 @@ export class TranscriptionService {
     */
    private async markTranscriptionCompleted(
       livestreamId: string,
-      result: {
-         transcript: string
-         confidence: number
-         language: string
-         languageConfidence: number
-      },
+      result: ITranscriptionResult,
       recordingUrl: string,
       gcsPath: string
    ): Promise<void> {
@@ -171,25 +171,30 @@ export class TranscriptionService {
 
          await this.livestreamRepo.initiateTranscription(
             livestreamId,
-            "deepgram"
+            this.transcriptionClient.provider
          )
 
-         logger.info("Calling Deepgram API", { livestreamId, recordingUrl })
-
-         const result = await this.deepgramClient.transcribeAudio(recordingUrl)
-
-         logger.info("Deepgram transcription completed", {
+         logger.info(`Calling ${this.transcriptionClient.provider} API`, {
             livestreamId,
-            transcriptLength: result.transcript.length,
-            confidence: result.confidence,
-            duration: result.duration,
+            recordingUrl,
          })
 
-         // Save to GCS
-         const gcsPath = await saveTranscriptionToGCS(
-            livestreamId,
-            result.rawResponse
+         const result = await this.transcriptionClient.transcribeAudio(
+            recordingUrl
          )
+
+         logger.info(
+            `${this.transcriptionClient.provider} transcription completed`,
+            {
+               livestreamId,
+               transcriptLength: result.transcript.length,
+               confidence: result.confidence,
+               duration: result.duration,
+            }
+         )
+
+         // Save to GCS
+         const gcsPath = await saveTranscriptionToGCS(livestreamId, result)
 
          // Mark transcription as completed
          await this.markTranscriptionCompleted(
@@ -290,7 +295,7 @@ export function getTranscriptionFilePath(livestreamId: string): string {
  */
 export async function saveTranscriptionToGCS(
    livestreamId: string,
-   transcriptionData: any
+   transcriptionData: ITranscriptionResult
 ): Promise<string> {
    logger.info("Saving transcription to GCS", { livestreamId })
 
