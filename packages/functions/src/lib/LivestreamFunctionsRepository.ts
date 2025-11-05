@@ -363,8 +363,8 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
     * Initiate transcription by creating or updating the status to "transcribing"
     * @param livestreamId - The livestream ID
-    * @param transcriptionProvider - ASR provider (default: "deepgram")
-    * @param chapterProvider - LLM provider (default: "openai")
+    * @param transcriptionProvider - ASR provider
+    * @param chapterProvider - LLM provider
     * @returns The document ID
     */
    initiateTranscription(
