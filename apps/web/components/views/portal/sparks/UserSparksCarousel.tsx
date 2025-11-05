@@ -18,7 +18,10 @@ const styles = sxStyles({
 
 type Props = {
    header: ReactNode
-   handleSparksClicked: (spark: Spark) => void
+   handleSparksClicked: (
+      spark: Spark,
+      context?: { sparks: Spark[]; index: number }
+   ) => void
 }
 
 export const UserSparksCarousel = ({ header, ...props }: Props) => {

@@ -273,6 +273,56 @@ export const fetchNextSparksFromSearch = createAsyncThunk(
    }
 )
 
+export const fetchInitialSparksFromPortal = createAsyncThunk(
+   "sparks/fetchInitialFromPortal",
+   async (sparkIds: string[], { getState }) => {
+      if (!sparkIds?.length) {
+         return {
+            sparks: [],
+            hasMore: false,
+         }
+      }
+
+      const uniqueSparkIds = Array.from(new Set(sparkIds))
+
+      const portalSparks = await sparkService.getSparksByIds(uniqueSparkIds)
+
+      const state = getState() as RootState
+      const originalSpark = state.sparksFeed.sparks[0]
+
+      const orderedSparks = uniqueSparkIds
+         .map((id) => portalSparks.find((spark) => spark.id === id))
+         .filter((spark): spark is SparkPresenter => Boolean(spark))
+
+      let combinedSparks = orderedSparks
+
+      if (originalSpark) {
+         const originalIndex = orderedSparks.findIndex(
+            (spark) => spark.id === originalSpark.id
+         )
+
+         if (originalIndex > 0) {
+            combinedSparks = [
+               ...orderedSparks.slice(originalIndex),
+               ...orderedSparks.slice(0, originalIndex),
+            ]
+         }
+
+         if (!combinedSparks.length || combinedSparks[0].id !== originalSpark.id) {
+            combinedSparks = [
+               originalSpark,
+               ...combinedSparks.filter((spark) => spark.id !== originalSpark.id),
+            ]
+         }
+      }
+
+      return {
+         sparks: combinedSparks,
+         hasMore: true,
+      }
+   }
+)
+
 const sparksFeedSlice = createSlice({
    name: "Sparks Feed",
    initialState,
@@ -620,6 +670,33 @@ const sparksFeedSlice = createSlice({
          .addCase(fetchNextSparksFromSearch.rejected, (state, action) => {
             state.fetchNextSparksStatus = "failed"
             state.fetchNextError = action.error.message
+         })
+         .addCase(fetchInitialSparksFromPortal.pending, (state) => {
+            state.initialFetchStatus = "loading"
+         })
+         .addCase(
+            fetchInitialSparksFromPortal.fulfilled,
+            (
+               state,
+               action: PayloadAction<{
+                  sparks: SparkPresenter[]
+                  hasMore: boolean
+               }>
+            ) => {
+               state.initialFetchStatus = "idle"
+               state.initialSparksFetched = true
+
+               state.sparks = insertNotificationIfNeeded(
+                  state,
+                  action.payload.sparks
+               )
+
+               state.hasMoreSparks = action.payload.hasMore
+            }
+         )
+         .addCase(fetchInitialSparksFromPortal.rejected, (state, action) => {
+            state.initialFetchStatus = "failed"
+            state.initialFetchError = action.error.message
          })
    },
 })

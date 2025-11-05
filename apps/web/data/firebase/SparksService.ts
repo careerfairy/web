@@ -306,6 +306,35 @@ export class SparksService {
       }
    }
 
+   async getSparksByIds(sparkIds: string[]): Promise<SparkPresenter[]> {
+      if (!sparkIds?.length) {
+         return []
+      }
+
+      const uniqueSparkIds = Array.from(new Set(sparkIds))
+
+      const snapshots = await Promise.all(
+         uniqueSparkIds.map((sparkId) =>
+            getDoc(
+               doc(FirestoreInstance, "sparks", sparkId).withConverter(
+                  sparkPresenterConverter
+               )
+            )
+         )
+      )
+
+      const sparks = snapshots
+         .filter((snapshot) => snapshot.exists())
+         .map((snapshot) => snapshot.data())
+         .filter((spark) => spark?.group?.publicSparks && spark?.published)
+
+      const sparkMap = new Map(sparks.map((spark) => [spark.id, spark]))
+
+      return uniqueSparkIds
+         .map((sparkId) => sparkMap.get(sparkId))
+         .filter((spark): spark is SparkPresenter => Boolean(spark))
+   }
+
    /**
     * Check if a user has ever seen any Spark
     * @param userId The user to check

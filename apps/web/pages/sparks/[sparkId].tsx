@@ -18,11 +18,12 @@ import { Fragment, useEffect, useMemo } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useMountedState } from "react-use"
 import { RootState } from "store"
-import {
+  import {
    AddCardNotificationPayload,
    addCardNotificationToSparksList,
    fetchInitialSparksFeed,
    fetchInitialSparksFromSearch,
+    fetchInitialSparksFromPortal,
    fetchNextSparks,
    fetchNextSparksFromSearch,
    removeCreatorId,
@@ -57,18 +58,18 @@ import {
    wasInCreatorFeedSelector,
 } from "store/selectors/sparksFeedSelectors"
 import { getUserTokenFromCookie } from "util/serverUtil"
-import { clearPortalSparks, readPortalSparks } from "util/portalSparksStorage"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 
 const SparksPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({
+  > = ({
    serializedSpark,
    groupId,
    userEmail,
    conversionInterval,
    interactionSource,
    contentTopic,
+    portalSparkIds,
 }) => {
    const isFullScreen = useSparksFeedIsFullScreen()
    const mounted = useMountedState()
@@ -102,7 +103,7 @@ const SparksPage: NextPage<
       (state: RootState) => state.sparksFeed.searchParameters
    )
    const isSearchMode = Boolean(searchParameters.query)
-   const { userData } = useAuth()
+     const { userData } = useAuth()
 
    useEffect(() => {
       if ("userActivation" in navigator) {
@@ -110,44 +111,15 @@ const SparksPage: NextPage<
       }
    }, [dispatch])
 
-   useEffect(() => {
-      dispatch(setGroupId(groupId))
-      dispatch(setUserEmail(userEmail))
+     useEffect(() => {
+        dispatch(setGroupId(groupId))
+        dispatch(setUserEmail(userEmail))
 
-      const originalSpark = SparkPresenter.deserialize(serializedSpark)
-       let initialSparks: SparkPresenter[] | null = null
+        const originalSpark = SparkPresenter.deserialize(serializedSpark)
 
-       if (!userEmail && typeof window !== "undefined") {
-          const storedPortalSparks = readPortalSparks()
-
-          if (storedPortalSparks?.sparks?.length) {
-             const presenters = storedPortalSparks.sparks.map((spark) =>
-                SparkPresenter.deserialize(spark)
-             )
-
-             const originalIndex = presenters.findIndex(
-                (spark) => spark.id === originalSpark.id
-             )
-
-             if (originalIndex >= 0) {
-                initialSparks = [
-                   ...presenters.slice(originalIndex),
-                   ...presenters.slice(0, originalIndex),
-                ]
-             } else {
-                initialSparks = [
-                   originalSpark,
-                   ...presenters.filter((spark) => spark.id !== originalSpark.id),
-                ]
-             }
-          }
-
-          clearPortalSparks()
-       }
-
-       dispatch(setSparks(initialSparks ?? [originalSpark]))
-       dispatch(setOriginalSparkId(originalSpark.id))
-   }, [dispatch, groupId, serializedSpark, userEmail])
+        dispatch(setSparks([originalSpark]))
+        dispatch(setOriginalSparkId(originalSpark.id))
+     }, [dispatch, groupId, serializedSpark, userEmail])
 
    useEffect(() => {
       if (!contentTopic) {
@@ -208,20 +180,22 @@ const SparksPage: NextPage<
          dispatch(removeGroupId())
       }
 
-      const isSearchMode = Boolean(query.q)
+        const isSearchMode = Boolean(query.q)
+        const hasPortalOrder = !userEmail && portalSparkIds?.length
 
-      // Use search-based fetching if coming from search, otherwise use regular feed
-      if (isSearchMode) {
-         dispatch(fetchInitialSparksFromSearch())
-      } else {
-         dispatch(fetchInitialSparksFeed())
-      }
+        if (hasPortalOrder) {
+           dispatch(fetchInitialSparksFromPortal(portalSparkIds))
+        } else if (isSearchMode) {
+           dispatch(fetchInitialSparksFromSearch())
+        } else {
+           dispatch(fetchInitialSparksFeed())
+        }
 
       return () => {
          dispatch(resetSparksFeed())
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [groupId, query.q])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+     }, [dispatch, groupId, portalSparkIds, query.q, userEmail])
 
    useEffect(() => {
       if (!interactionSource) {
@@ -406,7 +380,8 @@ type SparksPageProps = {
    userEmail: string | null
    conversionInterval: number
    interactionSource: string | null
-   contentTopic: string
+   contentTopic: string | null
+   portalSparkIds: string[]
 }
 
 export const getServerSideProps: GetServerSideProps<
@@ -428,9 +403,20 @@ export const getServerSideProps: GetServerSideProps<
       ? context.query.interactionSource.toString()
       : null
 
-   const contentTopic = context.query.contentTopic
+  const contentTopic = context.query.contentTopic
       ? context.query.contentTopic.toString()
       : null
+
+  const portalSparkIdsParam = context.query.portalSparkIds
+  const portalSparkIds = Array.isArray(portalSparkIdsParam)
+     ? portalSparkIdsParam
+     : portalSparkIdsParam
+     ? portalSparkIdsParam.split(",")
+     : []
+
+  const sanitizedPortalSparkIds = portalSparkIds
+     .map((id) => id.trim())
+     .filter((id) => id.length > 0)
 
    const token = getUserTokenFromCookie(context)
 
@@ -454,7 +440,8 @@ export const getServerSideProps: GetServerSideProps<
          userEmail: token?.email ?? null,
          conversionInterval: +conversionInterval,
          interactionSource,
-         contentTopic: contentTopic,
+          contentTopic: contentTopic,
+          portalSparkIds: sanitizedPortalSparkIds,
       },
    }
 }
