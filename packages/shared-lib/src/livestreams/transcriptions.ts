@@ -113,13 +113,13 @@ type RunningState = BaseRunningState &
    (TranscriptionRunningState | TranscriptionChapterRunningState)
 
 type TranscriptionCompletedState = {
-   state: "transcriptioncompleted"
+   state: "transcription-completed"
    transcriptText: string // minimal denormalized result for quick reads
    metadata: TranscriptMetadata
 }
 
 type ChapterizationCompletedState = {
-   state: "completed"
+   state: "chapterization-completed"
    chaptersCount: number
    metadata: ChaptersMetadata
 }

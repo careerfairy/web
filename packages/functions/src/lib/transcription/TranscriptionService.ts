@@ -73,7 +73,7 @@ export class TranscriptionService {
       const transcriptText = result.transcript.substring(0, 500)
 
       await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
-         state: "transcriptioncompleted",
+         state: "transcription-completed",
          completedAt: Timestamp.now(),
          transcriptText,
          confidenceAvg: result.confidence,
