@@ -132,12 +132,23 @@ export class OfflineEventService {
 
    /**
     * Get offline events within 150km of user's location
-    * Uses Vercel's geolocation headers to automatically determine user's location
+    * Prioritizes user's profile location over IP-based geolocation
+    * @param userData - Optional user data containing profile location (stateName, countryIsoCode)
     * @returns Array of offline events with distance information, sorted by proximity
     */
-   async getOfflineEvents(): Promise<OfflineEventWithDistance[]> {
+   async getOfflineEvents(
+      userData?: Pick<UserData, "stateName" | "countryIsoCode">
+   ): Promise<OfflineEventWithDistance[]> {
       try {
-         const response = await fetch("/api/offline-events/nearby")
+         // Build query params with user's profile location if available
+         const params = new URLSearchParams()
+         if (userData?.stateName && userData?.countryIsoCode) {
+            params.append("city", userData.stateName)
+            params.append("country", userData.countryIsoCode)
+         }
+
+         const url = `/api/offline-events/nearby${params.toString() ? `?${params.toString()}` : ""}`
+         const response = await fetch(url)
 
          if (!response.ok) {
             console.error(`API request failed with status: ${response.status}`)
