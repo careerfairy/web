@@ -109,7 +109,12 @@ const TopBar = ({ title, topBarAction, navigation }: Props) => {
                transition={{ duration: 0.2, ease: "easeOut" }}
                sx={styles.leftSection}
             >
-               <Typography role="heading" fontWeight={600} sx={styles.title}>
+               <Typography
+                  component="div"
+                  role="heading"
+                  fontWeight={600}
+                  sx={styles.title}
+               >
                   {title}
                </Typography>
             </Box>
