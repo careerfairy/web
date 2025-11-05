@@ -102,7 +102,7 @@ export const FUNCTION_NAMES = {
    // Transcription functions
    initiateTranscriptionOnRecordingAvailable:
       "initiateTranscriptionOnRecordingAvailable",
-   manualTranscription: "manualTranscription_v1",
+   manualLivestreamTranscription: "manualLivestreamTranscription",
 } as const
 
 /**
