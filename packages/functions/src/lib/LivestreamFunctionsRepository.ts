@@ -94,6 +94,14 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @returns A promise that resolves when all chat entries have been successfully deleted.
     */
    deleteAllLivestreamChatEntries(livestreamId: string): Promise<void>
+
+   /**
+    * Deletes all chapters from a specific livestream.
+    *
+    * @param livestreamId - The ID of the livestream from which the chapters will be deleted.
+    * @returns A promise that resolves when all chapters have been successfully deleted.
+    */
+   deleteAllLivestreamChapters(livestreamId: string): Promise<void>
    /**
     * Deletes a chat entry from a specific livestream.
     *
@@ -380,7 +388,8 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
    updateTranscriptionStatus(
       livestreamId: string,
-      status: TranscriptionStatus
+      status: TranscriptionStatus,
+      additionalData?: Partial<LivestreamTranscription>
    ): Promise<void>
 
    /**
@@ -998,6 +1007,33 @@ export class LivestreamFunctionsRepository
       await Promise.allSettled(promises)
    }
 
+   async deleteAllLivestreamChapters(livestreamId: string): Promise<void> {
+      const chaptersRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("chapters")
+
+      const snapshot = await chaptersRef.get()
+
+      if (snapshot.empty) {
+         return
+      }
+
+      const chunks = chunkArray(snapshot.docs, 450)
+
+      const promises = chunks.map(async (chunk) => {
+         const batch = this.firestore.batch()
+
+         chunk.forEach((doc) => {
+            batch.delete(doc.ref)
+         })
+
+         return batch.commit()
+      })
+
+      await Promise.allSettled(promises)
+   }
+
    async getLivestreamChatEntry(
       livestreamId: string,
       entryId: string
@@ -1535,11 +1571,13 @@ export class LivestreamFunctionsRepository
 
    async updateTranscriptionStatus(
       livestreamId: string,
-      status: TranscriptionStatus
+      status: TranscriptionStatus,
+      additionalData?: Partial<LivestreamTranscription>
    ): Promise<void> {
       const updateData: UpdateData<LivestreamTranscription> = {
          status,
          updatedAt: Timestamp.now(),
+         ...additionalData,
       }
 
       await this.firestore

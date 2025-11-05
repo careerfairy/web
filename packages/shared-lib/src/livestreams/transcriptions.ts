@@ -80,7 +80,7 @@ export type ASRProviders = "deepgram"
 /**
  * Language model providers
  */
-export type LLMProviders = "openai" | "google" | "whisper"
+export type LLMProviders = "anthropic"
 
 /**
  * Base state for running processes

@@ -317,6 +317,10 @@ exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 // Transcription Functions
 exports[FUNCTION_NAMES.manualLivestreamTranscription] =
    transcription.manualLivestreamTranscription
+exports[FUNCTION_NAMES.initiateChapterizationOnTranscriptionCompleted] =
+   transcription.initiateChapterizationOnTranscriptionCompleted
+exports[FUNCTION_NAMES.manualLivestreamChapterization] =
+   transcription.manualLivestreamChapterization
 
 // Group Spark Functions
 exports[FUNCTION_NAMES.createSpark] = groupSparks.createSpark

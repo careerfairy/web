@@ -429,6 +429,19 @@ export interface UserLivestreamData extends Identifiable {
    }
 }
 
+export interface Chapter {
+   title: string
+   startSec: number
+   endSec: number
+   summary: string
+}
+
+export interface LivestreamChapter extends Identifiable, Chapter {
+   documentType: "livestreamChapter"
+   chapterIndex: number
+   livestreamId: string
+   createdAt: Timestamp
+}
 export interface RecordingToken extends Identifiable {
    recourseId: string
    sid: string

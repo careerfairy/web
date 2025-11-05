@@ -2,13 +2,12 @@ import { Timestamp } from "firebase-admin/firestore"
 import { logger } from "firebase-functions/v2"
 import { storage } from "../../api/firestoreAdmin"
 import { ILivestreamFunctionsRepository } from "../LivestreamFunctionsRepository"
-
 import { ITranscriptionClient, ITranscriptionResult } from "./types"
 
-const GCS_BASE_PATH = "transcriptions/livestreams"
-const STORAGE_BUCKET = "careerfairy-e1fd9.appspot.com"
+export const STORAGE_BUCKET = "careerfairy-e1fd9.appspot.com"
+export const MAX_RETRIES = 5
 
-const MAX_RETRIES = 5
+const GCS_BASE_PATH = "transcriptions/livestreams"
 const BASE_DELAY_MS = 180_000 // 3 minutes
 const MAX_DELAY_MS = 1_200_000 // 20 minutes
 
