@@ -31,3 +31,9 @@ export interface ITranscriptionClient {
     */
    transcribeAudio(audioUrl: string): Promise<ITranscriptionResult>
 }
+
+export const getTranscriptionClientStub =
+   (): Partial<ITranscriptionClient> => ({
+      provider: "deepgram",
+      transcribeAudio: async () => Promise.resolve({} as ITranscriptionResult),
+   })

@@ -1,134 +1,31 @@
-import { Timestamp } from "firebase-admin/firestore"
 import { logger } from "firebase-functions/v2"
-import { storage } from "../../api/firestoreAdmin"
+import { Timestamp } from "../../api/firestoreAdmin"
 import { ILivestreamFunctionsRepository } from "../LivestreamFunctionsRepository"
-
-import { ITranscriptionClient, ITranscriptionResult } from "./types"
-
-const GCS_BASE_PATH = "transcriptions/livestreams"
-const STORAGE_BUCKET = "careerfairy-e1fd9.appspot.com"
+import { BaseTranscriptionService } from "./BaseTranscriptionService"
+import { saveTranscriptionToGCS } from "./storage"
+import { ITranscriptionClient } from "./types"
+import { calculateBackoffDelay, getErrorMessage, sleep } from "./utils"
 
 const MAX_RETRIES = 5
-const BASE_DELAY_MS = 180_000 // 3 minutes
-const MAX_DELAY_MS = 1_200_000 // 20 minutes
-
-/**
- * Extract error message from unknown error type
- *
- * @param error - The error to extract message from
- * @returns The error message string
- */
-export function getErrorMessage(error: unknown): string {
-   return error instanceof Error ? error.message : String(error)
-}
 
 type ProcessTranscriptionOptions = {
    retryCount?: number
-   force?: boolean
-}
-
-/**
- * Calculate exponential backoff delay with progression:
- * - Retry 1: 3 minutes
- * - Retry 2: 6 minutes
- * - Retry 3: 12 minutes
- * - Retry 4: 20 minutes (capped)
- * - Retry 5: 20 minutes (capped)
- * Total: ~61 minutes, utilizing most of the 1-hour function timeout
- *
- * @param retryCount - Current retry attempt (0-based)
- * @returns Delay in milliseconds
- */
-function calculateBackoffDelay(retryCount: number): number {
-   const delay = BASE_DELAY_MS * Math.pow(2, retryCount)
-   return Math.min(delay, MAX_DELAY_MS)
+   isRetry?: boolean
 }
 
 /**
  * TranscriptionService handles the entire transcription workflow
  * including retries with exponential backoff
  */
-export class TranscriptionService {
+export class TranscriptionService extends BaseTranscriptionService {
    private transcriptionClient: ITranscriptionClient
-   private livestreamRepo: ILivestreamFunctionsRepository
 
    constructor(
       livestreamRepo: ILivestreamFunctionsRepository,
       transcriptionClient: ITranscriptionClient
    ) {
+      super(livestreamRepo)
       this.transcriptionClient = transcriptionClient
-      this.livestreamRepo = livestreamRepo
-   }
-
-   /**
-    * Mark transcription as completed with results
-    */
-   private async markTranscriptionCompleted(
-      livestreamId: string,
-      result: ITranscriptionResult,
-      recordingUrl: string,
-      gcsPath: string
-   ): Promise<void> {
-      const transcriptText = result.transcript.substring(0, 500)
-
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
-         state: "transcription-completed",
-         completedAt: Timestamp.now(),
-         transcriptText,
-         confidenceAvg: result.confidence,
-         metadata: {
-            language: result.language,
-            languageConfidence: result.languageConfidence,
-            recordingId: recordingUrl,
-            transcriptionFilePath: gcsPath,
-         },
-      })
-
-      await this.livestreamRepo.updateLivestreamTranscriptionCompleted(
-         livestreamId
-      )
-   }
-
-   /**
-    * Mark transcription as failed with retry information
-    */
-   private async markTranscriptionFailedWithRetry(
-      livestreamId: string,
-      error: unknown,
-      retryCount: number,
-      recordingUrl: string,
-      nextRetryAt: Timestamp
-   ): Promise<void> {
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
-         state: "transcription-failed",
-         errorMessage: getErrorMessage(error),
-         failedAt: Timestamp.now(),
-         retryCount,
-         nextRetryAt,
-         metadata: {
-            recordingId: recordingUrl,
-         },
-      })
-   }
-
-   /**
-    * Mark transcription as permanently failed after all retries exhausted
-    */
-   private async markTranscriptionPermanentlyFailed(
-      livestreamId: string,
-      error: unknown,
-      retryCount: number,
-      recordingUrl: string
-   ): Promise<void> {
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
-         state: "transcription-failed",
-         errorMessage: `Max retries reached: ${getErrorMessage(error)}`,
-         failedAt: Timestamp.now(),
-         retryCount,
-         metadata: {
-            recordingId: recordingUrl,
-         },
-      })
    }
 
    /**
@@ -137,41 +34,56 @@ export class TranscriptionService {
     *
     * @param livestreamId - The livestream ID
     * @param recordingUrl - The recording URL to transcribe
-    * @param options - Processing options
-    * @param options.retryCount - Current retry attempt (default: 0)
-    * @param options.force - Force processing even if already in progress (default: false)
     * @returns Promise that resolves when transcription completes or all retries are exhausted
     */
-   async processTranscription(
+   async processLivestreamTranscription(
+      livestreamId: string,
+      recordingUrl: string
+   ): Promise<void> {
+      return this.transcribeLivestream(livestreamId, recordingUrl)
+   }
+
+   private async transcribeLivestream(
       livestreamId: string,
       recordingUrl: string,
       options?: ProcessTranscriptionOptions
    ): Promise<void> {
-      const { retryCount = 0, force = false } = options ?? {}
+      const { retryCount = 0, isRetry = false } = options ?? {}
 
-      logger.info("Starting transcription process", {
-         livestreamId,
-         recordingUrl,
-         retryCount,
-      })
+      let failedBecauseAnotherTranscriptionIsInProcess = false
 
       try {
-         const inProgress = await this.livestreamRepo.isTranscriptionInProgress(
-            livestreamId,
-            MAX_RETRIES
+         const status = await this.livestreamRepo.getTranscriptionStatus(
+            livestreamId
          )
 
-         if (inProgress && retryCount === 0 && !force) {
+         // Skip if transcription is already in progress, or if it failed but hasn't exhausted retries yet
+         // (retries are handled internally, so we don't want to start a new process)
+         const shouldSkip =
+            status?.state === "transcribing" ||
+            (status?.state === "transcription-failed" &&
+               status?.retryCount < MAX_RETRIES)
+
+         if (!isRetry && shouldSkip) {
             logger.warn("Transcription already in progress, skipping", {
                livestreamId,
             })
-            return
+            failedBecauseAnotherTranscriptionIsInProcess = true
+            throw new Error("Transcription already in progress, skipping")
          }
 
-         await this.livestreamRepo.initiateTranscription(
+         logger.info("Starting transcription process", {
             livestreamId,
-            this.transcriptionClient.provider
-         )
+            recordingUrl,
+            retryCount,
+         })
+
+         if (!isRetry) {
+            await this.livestreamRepo.initiateTranscription(
+               livestreamId,
+               this.transcriptionClient.provider
+            )
+         }
 
          logger.info(`Calling ${this.transcriptionClient.provider} API`, {
             livestreamId,
@@ -181,6 +93,10 @@ export class TranscriptionService {
          const result = await this.transcriptionClient.transcribeAudio(
             recordingUrl
          )
+
+         if (!result || !result?.transcript) {
+            throw new Error("Transcription result is missing")
+         }
 
          logger.info(
             `${this.transcriptionClient.provider} transcription completed`,
@@ -215,6 +131,12 @@ export class TranscriptionService {
             error,
             errorMessage: getErrorMessage(error),
          })
+
+         // If the transcription failed because another transcription is in process, throw the error
+         // and do not attempt to retry
+         if (failedBecauseAnotherTranscriptionIsInProcess) {
+            throw error
+         }
 
          // Handle retry logic
          if (retryCount < MAX_RETRIES) {
@@ -251,9 +173,9 @@ export class TranscriptionService {
                livestreamId,
                retryCount: retryCount + 1,
             })
-            return await this.processTranscription(livestreamId, recordingUrl, {
+            return await this.transcribeLivestream(livestreamId, recordingUrl, {
                retryCount: retryCount + 1,
-               force,
+               isRetry: true,
             })
          } else {
             // Max retries reached
@@ -273,72 +195,4 @@ export class TranscriptionService {
          }
       }
    }
-}
-
-/**
- * Get the GCS file path for a transcription
- *
- * @param livestreamId - The livestream ID
- * @returns The GCS path for the transcription file
- */
-export function getTranscriptionFilePath(livestreamId: string): string {
-   return `${GCS_BASE_PATH}/${livestreamId}/transcription.json`
-}
-
-/**
- * Save transcription data to Google Cloud Storage
- *
- * @param livestreamId - The livestream ID
- * @param transcriptionData - The transcription data to save
- * @returns The GCS path where the file was saved
- */
-export async function saveTranscriptionToGCS(
-   livestreamId: string,
-   transcriptionData: ITranscriptionResult
-): Promise<string> {
-   logger.info("Saving transcription to GCS", { livestreamId })
-
-   const bucket = storage.bucket(STORAGE_BUCKET)
-   const filePath = getTranscriptionFilePath(livestreamId)
-   const file = bucket.file(filePath)
-
-   try {
-      // Convert data to JSON string
-      const jsonData = JSON.stringify(transcriptionData, null, 2)
-
-      // Convert to Buffer for proper upload
-      const buffer = Buffer.from(jsonData, "utf-8")
-
-      // Save to GCS using save method with Buffer
-      await file.save(buffer, {
-         contentType: "application/json",
-         metadata: {
-            metadata: {
-               livestreamId,
-               uploadedAt: new Date().toISOString(),
-            },
-         },
-      })
-
-      logger.info("Transcription saved to GCS successfully", {
-         livestreamId,
-         filePath,
-         size: buffer.length,
-      })
-
-      // Return the GCS path
-      return `gs://${bucket.name}/${filePath}`
-   } catch (error) {
-      logger.error("Failed to save transcription to GCS", {
-         livestreamId,
-         filePath,
-         error,
-         errorMessage: getErrorMessage(error),
-      })
-      throw error
-   }
-}
-
-function sleep(ms: number): Promise<void> {
-   return new Promise((resolve) => setTimeout(resolve, ms))
 }

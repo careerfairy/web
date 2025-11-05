@@ -1,13 +1,13 @@
-import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
-import Timestamp = firebase.firestore.Timestamp
+import { Timestamp } from "../firebaseTypes"
 
 /**
- * Collection: /livestreamTranscriptions
- * Document in the livestreamTranscriptions collection track the status of
+ * Collection: /livestreamTranscriptionsGenerationStatus
+ * Document in the livestreamTranscriptionsGenerationStatus collection track the status of
  * transcription and chapter generation for a livestream (whole process end to end, not just transcription).
+ * Status is stored in subcollection: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-export interface LivestreamTranscription extends Identifiable {
+export interface LivestreamTranscriptionsGenerationStatus extends Identifiable {
    /**
     * The identifiable.id could be the livestreamId or the recordingId as well
     */
@@ -19,14 +19,9 @@ export interface LivestreamTranscription extends Identifiable {
    transcriptionProvider: ASRProviders
 
    /**
-    * Provider used for chapter generation
+    * Latest status for quick access (denormalized from status subcollection)
     */
-   chapterProvider: LLMProviders
-
-   /**
-    * Current status of the transcription/chapter generation process
-    */
-   status: TranscriptionStatus
+   lastStatus?: TranscriptionStatus
 
    /**
     * Timestamp when the document was last updated
@@ -53,114 +48,59 @@ export type TranscriptMetadata = {
 }
 
 /**
- * Metadata for chapter generation results
- */
-export type ChaptersMetadata = {
-   transcriptionFilePath: string
-   /**
-    * Id of the result document stored in Firestore, only provided when state is complete.
-    */
-   chaptersCount: number
-}
-
-/**
- * Union type representing all possible transcription states
- */
-export type TranscriptionStatus =
-   | RunningState
-   | CompletedState
-   | FailedState
-   | CancelledState
-
-/**
  * Automatic speech recognition providers
  */
 export type ASRProviders = "deepgram"
 
 /**
- * Language model providers
+ * Base status type for all transcription status variants
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-export type LLMProviders = "openai" | "google" | "whisper"
+type BaseTranscriptionStatus = {
+   documentType: "transcriptionStatus"
+}
 
 /**
- * Base state for running processes
+ * Running state for transcription
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-type BaseRunningState = {
+export type TranscriptionRunningState = {
+   state: "transcribing"
    startedAt: Timestamp
 }
 
 /**
- * State when transcription is in progress
+ * Completed state for transcription
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-type TranscriptionRunningState = {
-   state: "transcribing"
-   // We might want to add transcription specific metadata here, such as
-   // requestId: string // Deepgram requestId, Google operation name, etc. not needed for now as there is no polling.
-}
-
-/**
- * State when chapter generation is in progress
- */
-type TranscriptionChapterRunningState = {
-   state: "generating-chapter"
-   // We might want to add chapter specific metadata here (none needed for now)
-}
-
-/**
- * Combined running state
- */
-type RunningState = BaseRunningState &
-   (TranscriptionRunningState | TranscriptionChapterRunningState)
-
-type TranscriptionCompletedState = {
+export type TranscriptionCompletedState = {
    state: "transcription-completed"
+   completedAt: Timestamp
+   confidenceAvg: number
    transcriptText: string // minimal denormalized result for quick reads
    metadata: TranscriptMetadata
 }
 
-type ChapterizationCompletedState = {
-   state: "chapterization-completed"
-   chaptersCount: number
-   metadata: ChaptersMetadata
-}
-
-type BaseCompletedState = {
-   completedAt: Timestamp
-   confidenceAvg: number
-}
 /**
- * State when transcription or chapter generation is completed
+ * Failed state for transcription
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-type CompletedState = BaseCompletedState &
-   (TranscriptionCompletedState | ChapterizationCompletedState)
-
-type TranscriptionFailedState = {
+export type TranscriptionFailedState = {
    state: "transcription-failed"
    metadata: TranscriptMetadata
-}
-
-type ChapterizationFailedState = {
-   state: "chapterization-failed"
-   metadata: ChaptersMetadata
-}
-
-type BaseFailedState = {
    errorMessage: string
    failedAt: Timestamp
    retryCount: number
    nextRetryAt?: Timestamp
 }
-/**
- * State when transcription or chapter generation has failed
- */
-type FailedState = BaseFailedState &
-   (TranscriptionFailedState | ChapterizationFailedState)
 
 /**
- * State when process is cancelled
+ * Union type representing all possible transcription states
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-type CancelledState = {
-   state: "cancelled"
-   cancelledAt: Timestamp
-   cancelledReason: string
-}
+export type TranscriptionStatus = BaseTranscriptionStatus &
+   (
+      | TranscriptionRunningState
+      | TranscriptionCompletedState
+      | TranscriptionFailedState
+   )

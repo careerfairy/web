@@ -18,10 +18,12 @@
       "@careerfairy/shared-lib": "../shared-lib"
    },
    "dependencies": {
+      "@ai-sdk/anthropic": "^2.0.41",
       "@careerfairy/shared-lib": "*",
       "@deepgram/sdk": "^4.11.2",
       "@google-cloud/bigquery": "^7.9.0",
       "agora-token": "^2.0.3",
+      "ai": "^5.0.87",
       "algoliasearch": "^4.22.0",
       "axios": "^0.27.2",
       "country-state-city": "^3.2.1",
@@ -45,7 +47,8 @@
       "postmark": "^3.0.18",
       "stripe": "^14.20.0",
       "uuid-random": "^1.3.2",
-      "yup": "^0.32.11"
+      "yup": "^0.32.11",
+      "zod": "^4.1.12"
    },
    "engines": {
       "node": "22"

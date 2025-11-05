@@ -7,25 +7,45 @@ import {
    createClient,
 } from "@deepgram/sdk"
 import { logger } from "firebase-functions/v2"
-import { getErrorMessage } from "../TranscriptionService"
+import { isLocalEnvironment, isTestEnvironment } from "../../../util"
 import {
    ITranscriptionClient,
    ITranscriptionResult,
    TranscriptionParagraph,
+   getTranscriptionClientStub,
 } from "../types"
+import { getErrorMessage } from "../utils"
 
 export class DeepgramTranscriptionClient implements ITranscriptionClient {
    provider: ASRProviders = "deepgram"
    private readonly client: DeepgramClient
 
-   constructor() {
-      const apiKey = process.env.DEEPGRAM_API_KEY
+   private constructor(apiKey: string) {
+      this.client = createClient(apiKey)
+   }
+
+   static create(): ITranscriptionClient {
+      if (isTestEnvironment()) {
+         logger.info("Using Deepgram transcription client mock")
+         return getTranscriptionClientStub() as ITranscriptionClient
+      }
+
+      let apiKey = process.env.DEEPGRAM_API_KEY
+
+      if (isLocalEnvironment()) {
+         apiKey = process.env.DEV_DEEPGRAM_API_KEY
+         if (!apiKey) {
+            throw new Error(
+               "DEV_DEEPGRAM_API_KEY environment variable is not set"
+            )
+         }
+      }
 
       if (!apiKey) {
          throw new Error("DEEPGRAM_API_KEY environment variable is not set")
       }
 
-      this.client = createClient(apiKey)
+      return new DeepgramTranscriptionClient(apiKey)
    }
 
    async transcribeAudio(audioUrl: string): Promise<ITranscriptionResult> {

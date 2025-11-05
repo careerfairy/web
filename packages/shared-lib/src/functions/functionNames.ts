@@ -100,9 +100,10 @@ export const FUNCTION_NAMES = {
    fetchStripeSessionStatus: "fetchStripeSessionStatus_v3",
 
    // Transcription functions
-   initiateTranscriptionOnRecordingAvailable:
-      "initiateTranscriptionOnRecordingAvailable",
-   manualLivestreamTranscription: "manualLivestreamTranscription",
+   startLivestreamTranscription: "startLivestreamTranscription",
+   startLivestreamChapterization: "startLivestreamChapterization",
+   initiateChapterizationOnTranscriptionCompleted:
+      "initiateChapterizationOnTranscriptionCompleted",
 } as const
 
 /**
