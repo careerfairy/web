@@ -317,7 +317,8 @@ exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 // Transcription Functions
 exports.initiateTranscriptionOnRecordingAvailable =
    transcription.initiateTranscriptionOnRecordingAvailable
-exports[FUNCTION_NAMES.manualTranscription] = transcription.manualTranscription
+exports[FUNCTION_NAMES.manualLivestreamTranscription] =
+   transcription.manualLivestreamTranscription
 
 // Group Spark Functions
 exports[FUNCTION_NAMES.createSpark] = groupSparks.createSpark

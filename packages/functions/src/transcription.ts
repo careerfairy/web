@@ -72,7 +72,7 @@ export const initiateTranscriptionOnRecordingAvailable = onDocumentUpdated(
  * Manual HTTP function for testing transcription
  * Usage: GET /manualTranscription?livestreamId=<id>
  */
-export const manualTranscription = onRequest(
+export const manualLivestreamTranscription = onRequest(
    transcriptionConfig,
    async (req, res) => {
       logger.info("Manual transcription triggered", {
