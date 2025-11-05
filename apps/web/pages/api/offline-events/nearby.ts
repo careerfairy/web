@@ -13,8 +13,59 @@ import {
 } from "../../../util/firebaseSerializer"
 
 /**
+ * Geocodes a city name to coordinates using OpenStreetMap's Nominatim API
+ * @param city - City name (e.g., "Zurich", "Munich")
+ * @param countryCode - ISO country code (e.g., "CH", "DE")
+ * @returns Coordinates or null if geocoding fails
+ */
+async function geocodeCity(
+   city: string,
+   countryCode: string
+): Promise<{ latitude: number; longitude: number } | null> {
+   try {
+      const response = await fetch(
+         `https://nominatim.openstreetmap.org/search?` +
+            new URLSearchParams({
+               q: city,
+               countrycodes: countryCode.toLowerCase(),
+               format: "json",
+               limit: "1",
+            }),
+         {
+            headers: {
+               "User-Agent": "CareerFairy/1.0", // Nominatim requires User-Agent
+            },
+         }
+      )
+
+      if (!response.ok) {
+         console.error(
+            `Nominatim API error: ${response.status} ${response.statusText}`
+         )
+         return null
+      }
+
+      const data = await response.json()
+
+      if (data && data.length > 0) {
+         const result = data[0]
+         return {
+            latitude: parseFloat(result.lat),
+            longitude: parseFloat(result.lon),
+         }
+      }
+
+      return null
+   } catch (error) {
+      console.error(`Error geocoding city ${city}, ${countryCode}:`, error)
+      return null
+   }
+}
+
+/**
  * API route to get offline events within 150km of user's location
- * Uses Vercel's geolocation headers to determine user's coordinates
+ * Prioritizes user's profile location over IP-based geolocation
+ * Uses Vercel's geolocation headers as fallback
  * Falls back to Zurich, Switzerland for local development
  */
 export default async function handler(
@@ -27,22 +78,56 @@ export default async function handler(
       const RADIUS_KM = 150
       const RADIUS_METERS = RADIUS_KM * 1000
 
-      // Get coordinates from Vercel headers
-      const latStr = req.headers["x-vercel-ip-latitude"] as string | undefined
-      const lonStr = req.headers["x-vercel-ip-longitude"] as string | undefined
-
       let latitude: number
       let longitude: number
+      let locationSource: string
 
-      // Check if we have Vercel headers (production/preview)
-      if (latStr && lonStr) {
-         latitude = parseFloat(latStr)
-         longitude = parseFloat(lonStr)
-         console.log(`📍 Using Vercel geolocation: [${latitude}, ${longitude}]`)
-      } else {
-         // Local development fallback - Zurich, Switzerland
+      // Priority 1: Check for user profile location in query params
+      const userCity = req.query.city as string | undefined
+      const userCountry = req.query.country as string | undefined
+
+      if (userCity && userCountry) {
+         // Geocode the user's profile location
+         const coords = await geocodeCity(userCity, userCountry)
+         if (coords) {
+            latitude = coords.latitude
+            longitude = coords.longitude
+            locationSource = "profile"
+            console.log(
+               `📍 Using profile location (${userCity}, ${userCountry}): [${latitude}, ${longitude}]`
+            )
+         } else {
+            console.warn(
+               `⚠️  Failed to geocode profile location: ${userCity}, ${userCountry}`
+            )
+            // Fall through to IP-based location
+         }
+      }
+
+      // Priority 2: Get coordinates from Vercel headers (IP-based)
+      if (!latitude || !longitude) {
+         const latStr = req.headers["x-vercel-ip-latitude"] as
+            | string
+            | undefined
+         const lonStr = req.headers["x-vercel-ip-longitude"] as
+            | string
+            | undefined
+
+         if (latStr && lonStr) {
+            latitude = parseFloat(latStr)
+            longitude = parseFloat(lonStr)
+            locationSource = "ip"
+            console.log(
+               `📍 Using IP geolocation: [${latitude}, ${longitude}]`
+            )
+         }
+      }
+
+      // Priority 3: Local development fallback - Zurich, Switzerland
+      if (!latitude || !longitude) {
          latitude = 47.3769
          longitude = 8.5417
+         locationSource = "fallback"
          console.log(
             `📍 Local development detected, using Zurich coordinates: [${latitude}, ${longitude}]`
          )
