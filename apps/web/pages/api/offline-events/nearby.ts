@@ -6,6 +6,7 @@ import {
 import { collection, GeoPoint, getDocs, query, where } from "firebase/firestore"
 import { distanceBetween, geohashQueryBounds } from "geofire-common"
 import type { NextApiRequest, NextApiResponse } from "next"
+import { State } from "country-state-city"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import {
    SerializedDocument,
@@ -13,51 +14,34 @@ import {
 } from "../../../util/firebaseSerializer"
 
 /**
- * Geocodes a city name to coordinates using OpenStreetMap's Nominatim API
- * @param city - City name (e.g., "Zurich", "Munich")
- * @param countryCode - ISO country code (e.g., "CH", "DE")
- * @returns Coordinates or null if geocoding fails
+ * Gets coordinates for a state/city using the country-state-city package
+ * No external API calls - data is bundled locally
+ * @param stateIsoCode - State ISO code (e.g., "ZH" for Zurich)
+ * @param countryCode - Country ISO code (e.g., "CH")
+ * @returns Coordinates or null if not found
  */
-async function geocodeCity(
-   city: string,
+function getStateCoordinates(
+   stateIsoCode: string,
    countryCode: string
-): Promise<{ latitude: number; longitude: number } | null> {
+): { latitude: number; longitude: number } | null {
    try {
-      const response = await fetch(
-         `https://nominatim.openstreetmap.org/search?` +
-            new URLSearchParams({
-               q: city,
-               countrycodes: countryCode.toLowerCase(),
-               format: "json",
-               limit: "1",
-            }),
-         {
-            headers: {
-               "User-Agent": "CareerFairy/1.0", // Nominatim requires User-Agent
-            },
-         }
-      )
+      const state = State.getStateByCodeAndCountry(stateIsoCode, countryCode)
 
-      if (!response.ok) {
-         console.error(
-            `Nominatim API error: ${response.status} ${response.statusText}`
-         )
-         return null
-      }
+      if (state?.latitude && state?.longitude) {
+         const latitude = parseFloat(state.latitude)
+         const longitude = parseFloat(state.longitude)
 
-      const data = await response.json()
-
-      if (data && data.length > 0) {
-         const result = data[0]
-         return {
-            latitude: parseFloat(result.lat),
-            longitude: parseFloat(result.lon),
+         if (!isNaN(latitude) && !isNaN(longitude)) {
+            return { latitude, longitude }
          }
       }
 
       return null
    } catch (error) {
-      console.error(`Error geocoding city ${city}, ${countryCode}:`, error)
+      console.error(
+         `Error getting coordinates for state ${stateIsoCode}, ${countryCode}:`,
+         error
+      )
       return null
    }
 }
@@ -83,22 +67,22 @@ export default async function handler(
       let locationSource: string
 
       // Priority 1: Check for user profile location in query params
-      const userCity = req.query.city as string | undefined
-      const userCountry = req.query.country as string | undefined
+      const userStateCode = req.query.stateCode as string | undefined
+      const userCountryCode = req.query.countryCode as string | undefined
 
-      if (userCity && userCountry) {
-         // Geocode the user's profile location
-         const coords = await geocodeCity(userCity, userCountry)
+      if (userStateCode && userCountryCode) {
+         // Get coordinates from user's profile location using country-state-city package
+         const coords = getStateCoordinates(userStateCode, userCountryCode)
          if (coords) {
             latitude = coords.latitude
             longitude = coords.longitude
             locationSource = "profile"
             console.log(
-               `📍 Using profile location (${userCity}, ${userCountry}): [${latitude}, ${longitude}]`
+               `📍 Using profile location (${userStateCode}, ${userCountryCode}): [${latitude}, ${longitude}]`
             )
          } else {
             console.warn(
-               `⚠️  Failed to geocode profile location: ${userCity}, ${userCountry}`
+               `⚠️  Failed to get coordinates for profile location: ${userStateCode}, ${userCountryCode}`
             )
             // Fall through to IP-based location
          }

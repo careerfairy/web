@@ -8,13 +8,13 @@ export const useOfflineEvents = () => {
    const { userData } = useAuth()
 
    return useSWR<OfflineEventWithDistance[]>(
-      ["offline-events", userData?.stateName, userData?.countryIsoCode],
+      ["offline-events", userData?.stateIsoCode, userData?.countryIsoCode],
       async () => {
          // Pass user's profile location if available
          const userLocation =
-            userData?.stateName && userData?.countryIsoCode
+            userData?.stateIsoCode && userData?.countryIsoCode
                ? {
-                    stateName: userData.stateName,
+                    stateIsoCode: userData.stateIsoCode,
                     countryIsoCode: userData.countryIsoCode,
                  }
                : undefined
