@@ -6,6 +6,7 @@ import type {
 } from "@deepgram/sdk"
 import { createClient } from "@deepgram/sdk"
 import { logger } from "firebase-functions/v2"
+import { getErrorMessage } from "../transcription/TranscriptionService"
 import { ProcessedTranscription } from "./types"
 
 /**
@@ -79,9 +80,7 @@ export class DeepgramClient {
          logger.error("Deepgram transcription failed", {
             error,
             audioUrl,
-            errorMessage:
-               error instanceof Error ? error.message : String(error),
-            errorStack: error instanceof Error ? error.stack : undefined,
+            errorMessage: getErrorMessage(error),
          })
          throw error
       }
