@@ -13,7 +13,6 @@ import {
    ASRProviders,
    EventRating,
    EventRatingAnswer,
-   LLMProviders,
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamQueryOptions,
@@ -370,23 +369,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
    initiateTranscription(
       livestreamId: string,
-      transcriptionProvider?: ASRProviders,
-      chapterProvider?: LLMProviders
-   ): Promise<void>
-
-   /**
-    * Create a new transcription status document in Firestore
-    * @param livestreamId - The livestream ID
-    * @param status - Initial transcription status
-    * @param transcriptionProvider - ASR provider (default: "deepgram")
-    * @param chapterProvider - LLM provider (default: "openai")
-    * @returns The created document ID
-    */
-   createTranscriptionStatus(
-      livestreamId: string,
-      status: TranscriptionStatus,
-      transcriptionProvider?: ASRProviders,
-      chapterProvider?: LLMProviders
+      transcriptionProvider: ASRProviders
    ): Promise<void>
 
    /**
@@ -1526,8 +1509,7 @@ export class LivestreamFunctionsRepository
 
    async initiateTranscription(
       livestreamId: string,
-      transcriptionProvider: ASRProviders = "deepgram",
-      chapterProvider: LLMProviders = "openai"
+      transcriptionProvider: ASRProviders = "deepgram"
    ): Promise<void> {
       const now = Timestamp.now()
 
@@ -1535,7 +1517,7 @@ export class LivestreamFunctionsRepository
          id: livestreamId,
          livestreamId,
          transcriptionProvider,
-         chapterProvider,
+         chapterProvider: null,
          status: {
             state: "transcribing",
             startedAt: now,
@@ -1549,30 +1531,6 @@ export class LivestreamFunctionsRepository
          .collection("livestreamTranscriptions")
          .doc(livestreamId)
          .set(doc, { merge: true })
-   }
-
-   async createTranscriptionStatus(
-      livestreamId: string,
-      status: TranscriptionStatus,
-      transcriptionProvider: ASRProviders = "deepgram",
-      chapterProvider: LLMProviders = "openai"
-   ): Promise<void> {
-      const now = Timestamp.now()
-
-      const doc: LivestreamTranscription = {
-         id: livestreamId,
-         livestreamId,
-         transcriptionProvider,
-         chapterProvider,
-         status,
-         createdAt: now,
-         updatedAt: now,
-      }
-
-      await this.firestore
-         .collection("livestreamTranscriptions")
-         .doc(doc.id)
-         .set(doc)
    }
 
    async updateTranscriptionStatus(
@@ -1628,9 +1586,9 @@ export class LivestreamFunctionsRepository
 
       return (
          state === "transcribing" ||
-         state === "generating-chapter" ||
-         (status.status.state === "chapterization-failed" &&
-            status.status.retryCount < maxRetries) ||
+         // state === "generating-chapter" ||
+         // (status.status.state === "chapterization-failed" &&
+         //    status.status.retryCount < maxRetries) ||
          (status.status.state === "transcription-failed" &&
             status.status.retryCount < maxRetries)
       )
