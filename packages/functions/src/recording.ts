@@ -1,3 +1,4 @@
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    downloadLink,
@@ -8,6 +9,7 @@ import { onDocumentUpdated } from "firebase-functions/firestore"
 import { onCall } from "firebase-functions/https"
 import { onSchedule } from "firebase-functions/scheduler"
 import AgoraClient from "./api/agora"
+import functionsAxios from "./api/axios"
 import {
    livestreamGetRecordingToken,
    livestreamGetSecureToken,
@@ -313,6 +315,23 @@ const stopRecording = async (
       }
    })
 
+   // Wait for recording to complete and files to be uploaded to S3
+   if (recordingToken?.resourceId && recordingToken?.sid) {
+      await waitForRecordingCompletion(
+         agora,
+         recordingToken.resourceId,
+         recordingToken.sid,
+         livestreamId,
+         breakoutRoomId
+      )
+
+      // Trigger transcription after recording is complete
+      // Only trigger for main livestream, not breakout rooms
+      if (!breakoutRoomId) {
+         await triggerTranscription(livestreamId)
+      }
+   }
+
    functions.logger.info(
       `Download recorded file: ${downloadLink(
          livestreamId,
@@ -320,6 +339,125 @@ const stopRecording = async (
          breakoutRoomId
       )}`
    )
+}
+
+/**
+ * Poll Agora API to check if recording has completed and files are uploaded
+ * Status: 0 = recording, 1 = idle, 2 = exit (completed)
+ */
+const waitForRecordingCompletion = async (
+   agora: AgoraClient,
+   resourceId: string,
+   sid: string,
+   livestreamId: string,
+   breakoutRoomId?: string,
+   maxWaitTime = 600000, // 10 minutes max wait
+   pollInterval = 5000 // Poll every 5 seconds
+): Promise<void> => {
+   const startTime = Date.now()
+   let attempts = 0
+
+   functions.logger.info(`Waiting for recording completion: ${livestreamId}`, {
+      resourceId,
+      sid,
+      breakoutRoomId,
+   })
+
+   while (Date.now() - startTime < maxWaitTime) {
+      try {
+         attempts++
+         const queryResponse = await agora.recordingQuery(resourceId, sid)
+         const serverResponse = queryResponse.data?.serverResponse
+
+         if (!serverResponse) {
+            functions.logger.warn(
+               `No serverResponse in query result for: ${livestreamId}`,
+               { attempt: attempts }
+            )
+            await sleep(pollInterval)
+            continue
+         }
+
+         const status = serverResponse.status
+
+         functions.logger.info(`Recording query result for: ${livestreamId}`, {
+            status,
+            attempt: attempts,
+            fileListMode: serverResponse.fileListMode,
+            fileCount: serverResponse.fileList?.length || 0,
+         })
+
+         // Status 2 means recording has exited/completed
+         if (status === 2) {
+            functions.logger.info(`Recording completed for: ${livestreamId}`, {
+               resourceId,
+               sid,
+               breakoutRoomId,
+               totalAttempts: attempts,
+               fileList: serverResponse.fileList,
+            })
+            return
+         }
+
+         // Status 0 = still recording, 1 = idle (waiting)
+         // Continue polling
+         await sleep(pollInterval)
+      } catch (error) {
+         functions.logger.error(
+            `Error querying recording status for: ${livestreamId}`,
+            {
+               error,
+               attempt: attempts,
+               resourceId,
+               sid,
+            }
+         )
+         // Continue polling even on error
+         await sleep(pollInterval)
+      }
+   }
+
+   throw new Error(
+      `Recording completion timeout for ${livestreamId} after ${maxWaitTime}ms (${attempts} attempts)`
+   )
+}
+
+/**
+ * Trigger transcription for a completed recording by calling the cloud function
+ */
+const triggerTranscription = async (livestreamId: string): Promise<void> => {
+   functions.logger.info(
+      `Triggering transcription for completed recording: ${livestreamId}`
+   )
+
+   try {
+      await functionsAxios.get(
+         `/${FUNCTION_NAMES.manualLivestreamTranscription}`,
+         {
+            params: {
+               livestreamId,
+            },
+            timeout: 30000, // 30 second timeout
+         }
+      )
+
+      functions.logger.info(
+         `Transcription triggered successfully for: ${livestreamId}`
+      )
+   } catch (error) {
+      functions.logger.error(
+         `Failed to trigger transcription for: ${livestreamId}`,
+         {
+            error,
+            livestreamId,
+         }
+      )
+      // Don't throw - transcription failure shouldn't block recording completion
+   }
+}
+
+function sleep(ms: number): Promise<void> {
+   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 /**
