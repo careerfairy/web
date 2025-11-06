@@ -314,6 +314,15 @@ const stopRecording = async (
          )
       }
    })
+   functions.logger.info(
+      `Download recorded file: ${downloadLink(
+         livestreamId,
+         recordingToken?.sid,
+         breakoutRoomId
+      )}`
+   )
+
+   if (livestreamId !== "RjrqWmsgzq79CaDGDwrs") return
 
    // Wait for recording to complete and files to be uploaded to S3
    if (recordingToken?.resourceId && recordingToken?.sid) {
@@ -331,14 +340,6 @@ const stopRecording = async (
          await triggerTranscription(livestreamId)
       }
    }
-
-   functions.logger.info(
-      `Download recorded file: ${downloadLink(
-         livestreamId,
-         recordingToken?.sid,
-         breakoutRoomId
-      )}`
-   )
 }
 
 /**
