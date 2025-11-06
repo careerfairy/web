@@ -328,6 +328,7 @@ const stopRecording = async (
          )
       }
    })
+
    functions.logger.info(
       `Download recorded file: ${downloadLink(
          livestreamId,
@@ -336,23 +337,19 @@ const stopRecording = async (
       )}`
    )
 
-   if (livestreamId !== "RjrqWmsgzq79CaDGDwrs") return
-
    // Wait for recording to complete and files to be uploaded to S3
-   if (recordingToken?.resourceId && recordingToken?.sid) {
-      await waitForRecordingCompletion(
-         agora,
-         recordingToken.resourceId,
-         recordingToken.sid,
-         livestreamId,
-         breakoutRoomId
-      )
+   await waitForRecordingCompletion(
+      agora,
+      recordingToken.resourceId,
+      recordingToken.sid,
+      livestreamId,
+      breakoutRoomId
+   )
 
-      // Trigger transcription after recording is complete
-      // Only trigger for main livestream, not breakout rooms
-      if (!breakoutRoomId) {
-         await triggerTranscription(livestreamId)
-      }
+   // Trigger transcription after recording is complete
+   // Only trigger for main livestream, not breakout rooms
+   if (!breakoutRoomId) {
+      await triggerTranscription(livestreamId)
    }
 }
 
@@ -366,7 +363,7 @@ const waitForRecordingCompletion = async (
    sid: string,
    livestreamId: string,
    breakoutRoomId?: string,
-   maxWaitTime = 600000, // 10 minutes max wait
+   maxWaitTime = 10000, // 10 minutes max wait
    pollInterval = 5000 // Poll every 5 seconds
 ): Promise<void> => {
    const startTime = Date.now()
