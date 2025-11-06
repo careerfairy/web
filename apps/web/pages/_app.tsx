@@ -43,6 +43,7 @@ import UserReminderProvider from "../HOCs/UserReminderProvider"
 import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
 import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
+import useShowConsent from "../components/custom-hook/useShowConsent"
 import { useTrackPageViews } from "../components/custom-hook/utils/useTrackPageViews"
 import "../util/FirebaseUtils"
 
@@ -79,6 +80,7 @@ function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
+   useShowConsent()
    useWebviewConsoleProxy()
    useTrackPageViews()
 

@@ -21,7 +21,10 @@ module.exports = {
       "react/jsx-handler-names": "warn",
       "@typescript-eslint/no-unused-vars": [
          "warn",
-         { argsIgnorePattern: "^_" },
+         {
+            argsIgnorePattern: "^_",
+            varsIgnorePattern: "^_",
+         },
       ],
       "@typescript-eslint/ban-ts-ignore": "off",
       "@typescript-eslint/ban-ts-comment": "off",
