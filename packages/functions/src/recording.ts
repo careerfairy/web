@@ -363,7 +363,7 @@ const waitForRecordingCompletion = async (
    sid: string,
    livestreamId: string,
    breakoutRoomId?: string,
-   maxWaitTime = 10000, // 10 minutes max wait
+   maxWaitTime = 100000, // 10 minutes max wait
    pollInterval = 5000 // Poll every 5 seconds
 ): Promise<void> => {
    const startTime = Date.now()
