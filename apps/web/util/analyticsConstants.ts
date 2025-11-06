@@ -64,6 +64,21 @@ export const AnalyticsEvents = {
    SignupStarted: "signup_started",
    SignupCompleteRedirect: "signup_complete_redirect",
 
+   /**
+    * Dispatched when the consent dialog is opened via URL parameter
+    * Triggered by ?showConsent=true query parameter
+    */
+   ConsentDialogOpened: "consent_dialog_opened",
+   /**
+    * Dispatched when the user makes a consent choice (accept/deny/save)
+    */
+   ConsentChoiceMade: "consent_choice_made",
+   /**
+    * Dispatched when the consent dialog is NOT shown despite ?showConsent=true
+    * This occurs when the user has not previously declined consent
+    */
+   ConsentDialogSkipped: "consent_dialog_skipped",
+
    ProfileCvUpload: "profile_cv_upload",
    ProfileLinkedinUpload: "profile_linkedin_upload",
    ProfileLinkUpload: "profile_link_upload",
