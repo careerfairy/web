@@ -7,10 +7,10 @@ import {
    OfflineEvent,
    OfflineEventStats,
    OfflineEventStatsAction,
+   OfflineEventWithDistance,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { UserData } from "@careerfairy/shared-lib/users"
 import {
-   Timestamp,
    collection,
    deleteDoc,
    doc,
@@ -21,10 +21,15 @@ import {
    orderBy,
    query,
    setDoc,
+   Timestamp,
    updateDoc,
    where,
 } from "firebase/firestore"
 import { httpsCallable } from "firebase/functions"
+import {
+   deserializeDocument,
+   SerializedDocument,
+} from "util/firebaseSerializer"
 import { FirestoreInstance, FunctionsInstance } from "./FirebaseInstance"
 
 export class OfflineEventService {
@@ -126,20 +131,40 @@ export class OfflineEventService {
    }
 
    /**
-    * Get offline events
-    * @returns Array of offline events
+    * Get offline events within 150km of user's location
+    * Prioritizes user's profile location over IP-based geolocation
+    * @param userData - Optional user data containing profile location (stateIsoCode, countryIsoCode)
+    * @returns Array of offline events with distance information, sorted by proximity
     */
-   async getOfflineEvents(): Promise<OfflineEvent[]> {
-      const snapshots = await getDocs(
-         query(
-            collection(FirestoreInstance, "offlineEvents"),
-            where("hidden", "==", false),
-            where("published", "==", true),
-            where("startAt", ">", new Date())
-         ).withConverter(createGenericConverter<OfflineEvent>())
-      )
+   async getOfflineEvents(
+      userData?: Pick<UserData, "stateIsoCode" | "countryIsoCode">
+   ): Promise<OfflineEventWithDistance[]> {
+      try {
+         // Build query params with user's profile location if available
+         const params = new URLSearchParams()
+         if (userData?.stateIsoCode && userData?.countryIsoCode) {
+            params.append("stateCode", userData.stateIsoCode)
+            params.append("countryCode", userData.countryIsoCode)
+         }
 
-      return snapshots.docs.map((doc) => doc.data())
+         const url = `/api/offline-events/nearby${
+            params.toString() ? `?${params.toString()}` : ""
+         }`
+         const response = await fetch(url)
+
+         if (!response.ok) {
+            console.error(`API request failed with status: ${response.status}`)
+            return []
+         }
+
+         const serializedEvents: SerializedDocument<OfflineEventWithDistance>[] =
+            await response.json()
+
+         return serializedEvents.map(deserializeDocument)
+      } catch (error) {
+         console.error("Error fetching offline events by location:", error)
+         return []
+      }
    }
 
    /**
