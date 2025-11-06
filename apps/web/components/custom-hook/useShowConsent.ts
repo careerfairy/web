@@ -5,6 +5,7 @@ import { analyticsTrackEvent } from "../../util/analyticsUtils"
 import {
    hasUserDeclinedConsent,
    onConsentChange,
+   waitForUsercentrics,
 } from "../../util/ConsentUtils"
 import { getWindow } from "../../util/PathUtils"
 
@@ -21,93 +22,121 @@ import { getWindow } from "../../util/PathUtils"
 const useShowConsent = () => {
    const router = useRouter()
    const cleanupRef = useRef<(() => void) | null>(null)
-   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+   type TimeoutHandle = ReturnType<typeof setTimeout> | number
+
+   const timeoutRef = useRef<TimeoutHandle | null>(null)
    const hasSetupListenerRef = useRef(false)
 
    useEffect(() => {
-      // Check if showConsent query parameter is present
-      if (router.query.showConsent === "true" && !hasSetupListenerRef.current) {
-         const ucUI = getWindow()?.UC_UI
+      if (!router.isReady) return
 
-         if (ucUI && typeof ucUI.showSecondLayer === "function") {
-            // Check if user has previously declined consent
-            const userHasDeclined = hasUserDeclinedConsent()
+      if (router.query.showConsent !== "true" || hasSetupListenerRef.current) {
+         return
+      }
 
-            if (!userHasDeclined) {
-               // Clean up URL parameter
-               const { showConsent: _showConsent, ...remainingQuery } =
-                  router.query
-               router.replace(
-                  {
-                     pathname: router.pathname,
-                     query: remainingQuery,
-                  },
-                  undefined,
-                  { shallow: true }
-               )
+      const abortController = new AbortController()
+      let isActive = true
 
-               return // Exit early - don't show dialog
+      const removeShowConsentQueryParam = () => {
+         const { showConsent: _showConsent, ...remainingQuery } = router.query
+
+         void router.replace(
+            {
+               pathname: router.pathname,
+               query: remainingQuery,
+            },
+            undefined,
+            { shallow: true }
+         )
+      }
+
+      const setupConsentListener = () => {
+         let removeListener: (() => void) | null = null
+
+         const cleanup = () => {
+            if (timeoutRef.current) {
+               clearTimeout(timeoutRef.current)
+               timeoutRef.current = null
             }
 
-            // User has declined - show the dialog
-            // Track that the consent dialog was opened via URL parameter
+            if (removeListener) {
+               removeListener()
+               removeListener = null
+            }
+
+            cleanupRef.current = null
+            hasSetupListenerRef.current = false
+         }
+
+         removeListener = onConsentChange((detail) => {
             try {
-               analyticsTrackEvent(AnalyticsEvents.ConsentDialogOpened, {
+               analyticsTrackEvent(AnalyticsEvents.ConsentChoiceMade, {
+                  choice: detail.type,
                   page: router.pathname,
-                  url: window.location.href,
-                  userPreviouslyDeclined: true,
                })
             } catch (error) {
-               console.error("Failed to track consent dialog event:", error)
+               console.error("Failed to track consent choice:", error)
             }
 
-            // Listen for consent decision
-            const cleanupListener = onConsentChange((detail) => {
-               try {
-                  analyticsTrackEvent(AnalyticsEvents.ConsentChoiceMade, {
-                     choice: detail.type, // ACCEPT_ALL, DENY_ALL, or SAVE
-                     page: router.pathname,
-                  })
-               } catch (error) {
-                  console.error("Failed to track consent choice:", error)
-               }
-            })
+            cleanup()
+         })
 
-            // Store cleanup function in ref so it persists across effect re-runs
-            cleanupRef.current = cleanupListener
-            hasSetupListenerRef.current = true
+         cleanupRef.current = cleanup
+         hasSetupListenerRef.current = true
 
-            // Clean up listener after 30 seconds (dialog interaction complete)
-            timeoutRef.current = setTimeout(() => {
-               cleanupListener()
-               cleanupRef.current = null
-               timeoutRef.current = null
-               hasSetupListenerRef.current = false
-            }, 30000)
+         return cleanup
+      }
 
-            // Open the consent dialog
-            ucUI.showSecondLayer()
+      const openConsentDialog = async () => {
+         const ucUI = await waitForUsercentrics({
+            signal: abortController.signal,
+         })
 
-            // Remove the query parameter from URL to clean it up
-            // This will cause the effect to re-run, but listener persists
-            const { showConsent: _showConsent, ...remainingQuery } =
-               router.query
-            router.replace(
-               {
-                  pathname: router.pathname,
-                  query: remainingQuery,
-               },
-               undefined,
-               { shallow: true }
-            )
-         } else {
+         if (!isActive) return
+
+         if (!ucUI || typeof ucUI.showSecondLayer !== "function") {
             console.warn(
                "Usercentrics UI not available. The consent dialog cannot be shown."
             )
+            return
          }
+
+         const userHasDeclined = hasUserDeclinedConsent()
+
+         if (!userHasDeclined) {
+            removeShowConsentQueryParam()
+            return
+         }
+
+         try {
+            analyticsTrackEvent(AnalyticsEvents.ConsentDialogOpened, {
+               page: router.pathname,
+               url: getWindow()?.location?.href,
+               userPreviouslyDeclined: true,
+            })
+         } catch (error) {
+            console.error("Failed to track consent dialog event:", error)
+         }
+
+         const cleanupConsentListener = setupConsentListener()
+
+         timeoutRef.current = window.setTimeout(() => {
+            timeoutRef.current = null
+            cleanupConsentListener()
+         }, 30000)
+
+         ucUI.showSecondLayer()
+         removeShowConsentQueryParam()
+      }
+
+      void openConsentDialog()
+
+      return () => {
+         isActive = false
+         abortController.abort()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [router.query.showConsent])
+   }, [router.isReady, router.query.showConsent])
 
    // Separate effect for cleanup on unmount only
    useEffect(() => {

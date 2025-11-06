@@ -18,6 +18,17 @@ interface UC_UI {
    areAllConsentsAccepted(): boolean
 }
 
+export type UsercentricsUI = UC_UI
+
+type WaitForUsercentricsOptions = {
+   timeoutMs?: number
+   pollIntervalMs?: number
+   signal?: AbortSignal
+}
+
+const DEFAULT_WAIT_TIMEOUT_MS = 5000
+const DEFAULT_WAIT_POLL_INTERVAL_MS = 100
+
 interface UCEventDetail {
    type: "ACCEPT_ALL" | "DENY_ALL" | "SAVE"
    event?: string
@@ -141,4 +152,82 @@ export const hasUserDeclinedConsent = (): boolean => {
       console.error("Error checking declined consent:", e)
       return false
    }
+}
+
+export const waitForUsercentrics = (
+   options: WaitForUsercentricsOptions = {}
+): Promise<UsercentricsUI | null> => {
+   const {
+      timeoutMs = DEFAULT_WAIT_TIMEOUT_MS,
+      pollIntervalMs = DEFAULT_WAIT_POLL_INTERVAL_MS,
+      signal,
+   } = options
+
+   const win = getWindow()
+
+   if (!win) {
+      return Promise.resolve(null)
+   }
+
+   if (win.UC_UI?.showSecondLayer) {
+      return Promise.resolve(win.UC_UI)
+   }
+
+   return new Promise((resolve) => {
+      let elapsed = 0
+      let resolved = false
+      let timeoutId: number | null = null
+      let abortListener: (() => void) | null = null
+
+      const cleanup = () => {
+         if (timeoutId !== null) {
+            win.clearTimeout(timeoutId)
+            timeoutId = null
+         }
+
+         if (signal && abortListener) {
+            signal.removeEventListener("abort", abortListener)
+            abortListener = null
+         }
+      }
+
+      const finalize = (value: UsercentricsUI | null) => {
+         if (resolved) return
+
+         resolved = true
+         cleanup()
+         resolve(value)
+      }
+
+      const checkAvailability = () => {
+         const instance = getWindow()?.UC_UI
+
+         if (instance?.showSecondLayer) {
+            finalize(instance)
+            return
+         }
+
+         elapsed += pollIntervalMs
+
+         if (elapsed >= timeoutMs) {
+            finalize(null)
+            return
+         }
+
+         timeoutId = win.setTimeout(checkAvailability, pollIntervalMs)
+      }
+
+      if (signal) {
+         abortListener = () => finalize(null)
+
+         if (signal.aborted) {
+            finalize(null)
+            return
+         }
+
+         signal.addEventListener("abort", abortListener)
+      }
+
+      checkAvailability()
+   })
 }
