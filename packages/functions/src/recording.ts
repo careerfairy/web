@@ -5,9 +5,13 @@ import {
    MAX_RECORDING_HOURS,
    S3_ROOT_PATH,
 } from "@careerfairy/shared-lib/livestreams/recordings"
-import { onDocumentUpdated } from "firebase-functions/firestore"
 import { onCall } from "firebase-functions/https"
 import { onSchedule } from "firebase-functions/scheduler"
+import { onDocumentUpdated as onDocumentUpdatedV2 } from "firebase-functions/v2/firestore"
+import {
+   CallableRequest,
+   onCall as onCallV2,
+} from "firebase-functions/v2/https"
 import AgoraClient from "./api/agora"
 import functionsAxios from "./api/axios"
 import {
@@ -26,7 +30,7 @@ import functions = require("firebase-functions")
  * Starts when the live stream starts
  * Stops when the live stream ends
  */
-export const automaticallyRecordLivestream = onDocumentUpdated(
+export const automaticallyRecordLivestream = onDocumentUpdatedV2(
    "livestreams/{livestreamId}",
    async (event) => {
       const previousValue = event.data?.before?.data() as LivestreamEvent
@@ -46,7 +50,7 @@ export const automaticallyRecordLivestream = onDocumentUpdated(
  * Starts when the breakout room starts/is opened
  * Stops when the breakout room is closed
  */
-export const automaticallyRecordLivestreamBreakoutRoom = onDocumentUpdated(
+export const automaticallyRecordLivestreamBreakoutRoom = onDocumentUpdatedV2(
    "livestreams/{livestreamId}/breakoutRooms/{breakoutRoomId}",
    async (event) => {
       const previousValue = event.data?.before?.data() as LivestreamEvent
@@ -79,13 +83,23 @@ export const startRecordingLivestream = onCall(async ({ data }) => {
  *
  * Works for both live streams and breakout rooms
  */
-export const stopRecordingLivestream = onCall(async ({ data }) => {
-   functions.logger.info(
-      `Manually stopping recording for stream: ${data.streamId}`,
-      { breakoutRoomId: data.breakoutRoomId }
-   )
-   await stopRecording(data.streamId, data.token, data.breakoutRoomId)
-})
+export const stopRecordingLivestream = onCallV2(
+   async (
+      request: CallableRequest<{
+         streamId: string
+         token: string
+         breakoutRoomId: string
+      }>
+   ) => {
+      const { streamId, token, breakoutRoomId } = request.data
+
+      functions.logger.info(
+         `Manually stopping recording for stream: ${streamId}`,
+         { breakoutRoomId }
+      )
+      await stopRecording(streamId, token, breakoutRoomId)
+   }
+)
 
 // Business Logic
 
