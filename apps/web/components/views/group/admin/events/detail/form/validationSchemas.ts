@@ -19,6 +19,10 @@ export const summaryValidation = yup
    .required(REQUIRED_FIELD_MESSAGE)
    .min(50, getMinCharactersMessage("Live stream summary", 50))
 
+export const bannerImageUrlValidation = yup
+   .string()
+   .required("Please provide a banner image")
+
 const getSelectAtLeastOneMessage = (fieldName: string) =>
    `Please select at least one ${fieldName}`
 
@@ -54,9 +58,7 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .notRequired(),
       companyLogoUrl: yup.string().notRequired(),
       panelLogoUrl: yup.string().notRequired(),
-      backgroundImageUrl: yup
-         .string()
-         .required("Please provide a banner image"),
+      backgroundImageUrl: bannerImageUrlValidation,
       startDate: yup
          .date()
          .nullable()
@@ -197,6 +199,17 @@ const livestreamFormValidationSchema = yup.object().shape({
 const recordingFormValidationSchema = yup.object({
    title: titleValidation,
    summary: summaryValidation,
+   backgroundImageUrl: bannerImageUrlValidation,
+   contentTopics: yup
+      .array()
+      .of(yup.string().required())
+      .required()
+      .min(1, getSelectAtLeastOneMessage("live stream content topic")),
+   businessFunctions: yup
+      .array()
+      .of(yup.string().required())
+      .required()
+      .min(1, getSelectAtLeastOneMessage("presented business function")),
 })
 
 export {

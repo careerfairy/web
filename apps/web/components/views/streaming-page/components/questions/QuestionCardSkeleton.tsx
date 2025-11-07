@@ -2,7 +2,7 @@ import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { forwardRef } from "react"
 import { sxStyles } from "types/commonTypes"
 import { CommentCardSkeleton } from "./CommentCardSkeleton"
-import { questionCardStyles } from "./QuestionCard"
+import { questionCardStyles } from "./QuestionCardStyles"
 
 const styles = sxStyles({
    input: {

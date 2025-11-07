@@ -3,7 +3,6 @@ import { useYupForm } from "components/custom-hook/form/useYupForm"
 import { ReactNode, createContext, useContext, useEffect, useMemo } from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
 import * as yup from "yup"
-import { LivestreamFormGeneralTabValues } from "../types"
 import { recordingFormValidationSchema } from "../validationSchemas"
 
 export type RecordingFormValues = yup.InferType<
@@ -48,12 +47,15 @@ export const RecordingFormProvider = ({
    )
 }
 
-const getInitialValues = (
-   livestream: LivestreamEvent
-): Pick<LivestreamFormGeneralTabValues, "title" | "summary"> => ({
-   title: livestream?.title ?? "",
-   summary: livestream?.summary ?? "",
-})
+const getInitialValues = (livestream: LivestreamEvent): RecordingFormValues => {
+   return {
+      title: livestream?.title ?? "",
+      summary: livestream?.summary ?? "",
+      backgroundImageUrl: livestream?.backgroundImageUrl ?? "",
+      contentTopics: livestream?.contentTopicsTagIds ?? [],
+      businessFunctions: livestream?.businessFunctionsTagIds ?? [],
+   }
+}
 
 export const useRecordingForm = () => useFormContext<RecordingFormValues>()
 
