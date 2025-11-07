@@ -6,53 +6,13 @@ import { useMarkQuestionAsCurrent } from "components/custom-hook/streaming/quest
 import BrandedOptions from "components/views/common/inputs/BrandedOptions"
 import { Fragment, forwardRef } from "react"
 import { CheckCircle } from "react-feather"
-import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context"
 import { CommentInput } from "./CommentInput"
 import { CommentsList } from "./CommentsList"
+import { questionCardStyles } from "./QuestionCardStyles"
 import { useQuestionsVisibilityControls } from "./QuestionOptionsMenu"
 import { useQuestionsListContext } from "./QuestionsListProvider"
 import { ToggleUpvoteButton } from "./ToggleUpvoteButton"
-
-export const questionCardStyles = sxStyles({
-   root: (theme) => ({
-      border: (theme) => `1px solid ${theme.brand.white[500]}`,
-      backgroundColor: theme.brand.white[100],
-      borderRadius: "12px",
-      transition: theme.transitions.create("border"),
-      overflow: "hidden",
-      position: "relative",
-   }),
-   greenBorder: {
-      border: (theme) => `1px solid ${theme.palette.primary.main}`,
-   },
-   whiteBorder: {
-      border: (theme) => `2px solid ${theme.brand.white[500]}`,
-   },
-
-   questionHeaderGreen: (theme) => ({
-      color: theme.brand.white[100],
-      backgroundColor: "primary.main",
-   }),
-   checkCircle: {
-      width: 16,
-      height: 16,
-   },
-   options: {
-      position: "absolute",
-      top: 11,
-      right: 12,
-   },
-   whiteOptions: {
-      "& svg": {
-         color: (theme) => theme.brand.white[100],
-      },
-   },
-   title: {
-      wordBreak: "break-word",
-      whiteSpace: "pre-line",
-   },
-})
 
 type Props = {
    question: LivestreamQuestion

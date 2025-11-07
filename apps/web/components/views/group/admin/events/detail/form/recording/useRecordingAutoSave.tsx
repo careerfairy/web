@@ -27,7 +27,15 @@ export const useRecordingAutoSave = () => {
 
    // Initialize previousValues when form first loads
    useEffect(() => {
-      if (currentValues.title !== "" || currentValues.summary !== "") {
+      if (
+         currentValues.title !== "" ||
+         currentValues.summary !== "" ||
+         (currentValues.contentTopics &&
+            currentValues.contentTopics.length > 0) ||
+         (currentValues.businessFunctions &&
+            currentValues.businessFunctions.length > 0) ||
+         currentValues.backgroundImageUrl !== ""
+      ) {
          setPreviousValues(currentValues)
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -44,6 +52,9 @@ export const useRecordingAutoSave = () => {
             id: livestream.id,
             title: values.title || null,
             summary: values.summary || null,
+            backgroundImageUrl: values.backgroundImageUrl || null,
+            contentTopicsTagIds: values.contentTopics || [],
+            businessFunctionsTagIds: values.businessFunctions || [],
          }
 
          await firebaseService.updateLivestream(recording, "livestreams", {})
@@ -54,8 +65,8 @@ export const useRecordingAutoSave = () => {
    const handleAutoSave = useCallback(async () => {
       if (haveValuesChanged && isAutoSaving && formState.isValid) {
          try {
-            setPreviousValues(currentValues)
             await updateRecording(currentValues)
+            setPreviousValues(currentValues)
          } catch (error) {
             console.error("Auto-save failed:", error)
             enqueueSnackbar("Failed to auto-save recording", {
@@ -73,9 +84,12 @@ export const useRecordingAutoSave = () => {
    ])
 
    useEffect(() => {
+      // If form is invalid or no changes, ensure we're not showing saving state
       if (!haveValuesChanged || !formState.isValid) {
+         setIsAutoSaving(false)
          return
       }
+
       setIsAutoSaving(true)
 
       const debounceTimeout = setTimeout(async () => {

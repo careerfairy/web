@@ -11,20 +11,41 @@ const reactFireOptions: ReactFireOptions = {
 }
 
 type Options = {
-   type: "upcoming" | "answered"
+   type: "upcoming" | "answered" | "all"
    limit: number
 }
 
 const getBaseQuery = (livestreamId: string, type: Options["type"]) => {
+   const baseCollection = collection(
+      FirestoreInstance,
+      "livestreams",
+      livestreamId,
+      "questions"
+   )
+
+   if (type === "all") {
+      // Fetch all questions without type filtering
+      return query(
+         baseCollection,
+         orderBy("votes", "desc"),
+         orderBy("timestamp", "asc")
+      )
+   }
+
+   if (type === "answered") {
+      return query(
+         baseCollection,
+         where("type", "==", "done"),
+         orderBy("timestamp", "asc")
+      )
+   }
+
+   // type === "upcoming"
    return query(
-      collection(FirestoreInstance, "livestreams", livestreamId, "questions"),
-      ...(type === "answered"
-         ? [where("type", "==", "done")]
-         : [
-              where("type", "in", ["new", "current"]),
-              orderBy("type", "asc"),
-              orderBy("votes", "desc"),
-           ]),
+      baseCollection,
+      where("type", "in", ["new", "current"]),
+      orderBy("type", "asc"),
+      orderBy("votes", "desc"),
       orderBy("timestamp", "asc")
    )
 }
@@ -32,7 +53,7 @@ const getBaseQuery = (livestreamId: string, type: Options["type"]) => {
 /**
  * Custom hook to fetch a collection of live stream questions based on the specified type and limit.
  * @param livestreamId - The unique identifier for the live stream.
- * @param options - Configuration options including type and limit of questions.
+ * @param options - Configuration options including type ("upcoming", "answered", or "all") and limit of questions.
  * @returns A collection of livestream questions.
  */
 export const useLivestreamQuestions = (
@@ -51,7 +72,7 @@ export const useLivestreamQuestions = (
 /**
  * Custom hook to fetch the total count of livestream questions based on the type.
  * @param livestreamId - The unique identifier for the livestream.
- * @param type - The type of questions to count, either "upcoming" or "answered".
+ * @param type - The type of questions to count, either "upcoming", "answered", or "all".
  * @returns The total count of questions as an SWR response.
  */
 export const useLivestreamQuestionsTotalCount = (
