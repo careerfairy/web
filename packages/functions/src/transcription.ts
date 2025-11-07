@@ -93,11 +93,11 @@ export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
       } catch (error) {
          const isTimeoutError =
             error?.code === "ECONNABORTED" ||
-            error?.message?.toLowerCase().includes("timeout")
+            error?.message?.toLowerCase()?.includes("timeout")
 
          if (isTimeoutError) {
             logger.warn(
-               "Chapterization trigger timed out (called unction will continue)",
+               "Chapterization trigger timed out (called function will continue)",
                {
                   livestreamId,
                }
