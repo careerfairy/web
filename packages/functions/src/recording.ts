@@ -6,6 +6,7 @@ import {
    S3_ROOT_PATH,
 } from "@careerfairy/shared-lib/livestreams/recordings"
 import { onSchedule } from "firebase-functions/scheduler"
+
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { CallableRequest, onCall } from "firebase-functions/v2/https"
 import AgoraClient from "./api/agora"

@@ -4,6 +4,18 @@ import { Chapter } from "./livestreams"
 
 export type LLMProviders = "anthropic"
 
+export type ChapterizationMetadata = {
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   providerData: Record<string, any>
+   // The usage data for the chapterization in terms of tokens
+   tokens: {
+      input: number
+      output: number
+      total: number
+      reasoning: number
+      cachedInput: number
+   }
+}
 type BaseChapterizationStatus = {
    transcriptionFilePath: string
 }
@@ -17,6 +29,7 @@ type CompletedState = {
    state: "chapterization-completed"
    chaptersCount: number
    firstChapter: Chapter
+   metadata: ChapterizationMetadata
 }
 
 type FailedState = {

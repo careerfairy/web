@@ -65,28 +65,12 @@ export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
       const newLivestreamEvent = event.data?.after?.data() as LivestreamEvent
 
       const transcriptionCompletedChanged =
-         newLivestreamEvent?.transcriptionCompleted !=
-         oldLivestreamEvent?.transcriptionCompleted
+         oldLivestreamEvent?.transcriptionCompleted !== true &&
+         newLivestreamEvent?.transcriptionCompleted === true
 
-      const test =
-         transcriptionCompletedChanged &&
-         !(
-            !oldLivestreamEvent?.transcriptionCompleted &&
-            newLivestreamEvent?.transcriptionCompleted
-         )
-      console.log("🚀 ~ test:", test)
-
-      // if (!oldLivestreamEvent?.transcriptionCompleted) {
-      //    logger.info(
-      //       "Transcription completed status not changed, skipping chapterization",
-      //       { livestreamId }
-      //    )
-      //    return
-      // }
-
-      if (!newLivestreamEvent?.transcriptionCompleted) {
+      if (!transcriptionCompletedChanged) {
          logger.info(
-            "Transcription is not completed, skipping chapterization",
+            "Transcription is not completed, skipping chapterization call",
             { livestreamId }
          )
          return

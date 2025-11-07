@@ -109,12 +109,12 @@ export class ChapterizationService extends BaseChapterizationService {
          })
 
          // Generate chapters
-         const { chapters } = await this.chapterizationClient.generateChapters(
+         const result = await this.chapterizationClient.generateChapters(
             transcriptionData,
             MAX_RETRIES
          )
 
-         if (!chapters?.length) {
+         if (!result?.chapters?.length) {
             throw new Error("No chapters generated")
          }
 
@@ -122,26 +122,26 @@ export class ChapterizationService extends BaseChapterizationService {
             `${this.chapterizationClient.provider} chapterization completed`,
             {
                livestreamId,
-               chaptersCount: chapters.length,
+               chaptersCount: result.chapters.length,
             }
          )
 
          // Save chapters to Firestore
-         await this.saveChaptersToFirestore(livestreamId, chapters)
+         await this.saveChaptersToFirestore(livestreamId, result.chapters)
 
          // Mark chapterization as completed
          await this.markChapterizationCompleted(
             livestreamId,
-            chapters,
+            result,
             transcriptionFilePath
          )
 
          logger.info("Chapterization process completed successfully", {
             livestreamId,
-            chaptersCount: chapters.length,
+            chaptersCount: result.chapters.length,
          })
 
-         return chapters
+         return result.chapters
       } catch (error) {
          logger.error("Chapterization process failed", {
             livestreamId,
@@ -178,7 +178,7 @@ export class ChapterizationService extends BaseChapterizationService {
             )
 
             // await sleep(delay)
-            await sleep(30000)
+            await sleep(5000)
 
             // Retry the chapterization - this will await completion
             logger.info("Starting retry attempt", {

@@ -5,6 +5,7 @@ import { logger } from "firebase-functions/v2"
 import { Timestamp, firestore } from "../../api/firestoreAdmin"
 import { ILivestreamFunctionsRepository } from "../LivestreamFunctionsRepository"
 import { getErrorMessage } from "../transcription/utils"
+import { IChapterizationResult } from "./types"
 
 const WRITE_BATCH = 20 // There will hardly more than 40 chapters per livestream
 
@@ -20,16 +21,17 @@ export class BaseChapterizationService {
     */
    protected async markChapterizationCompleted(
       livestreamId: string,
-      chapters: Chapter[],
+      result: IChapterizationResult,
       transcriptionFilePath: string
    ): Promise<void> {
-      const firstChapter = chapters[0]
+      const firstChapter = result.chapters[0]
 
       const status: ChapterizationStatus = {
          state: "chapterization-completed",
-         chaptersCount: chapters.length,
+         chaptersCount: result.chapters.length,
          firstChapter,
          transcriptionFilePath,
+         metadata: result.metadata,
       }
 
       await this.livestreamRepo.updateChapterizationStatus(livestreamId, status)

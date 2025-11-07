@@ -26,9 +26,10 @@ export class ClaudeChapterClient implements IChapterizationClient {
       transcription: ITranscriptionResult,
       retries: number
    ): Promise<IChapterizationResult> {
-      logger.info("Starting Claude chapterization", {
+      logger.info("Starting chapterization", {
          duration: transcription.duration,
          paragraphsCount: transcription.paragraphs.length,
+         provider: this.provider,
       })
 
       try {
@@ -41,7 +42,7 @@ export class ClaudeChapterClient implements IChapterizationClient {
             chapters: ChaptersSchema,
          })
 
-         const { object } = await generateObject({
+         const { object, usage, providerMetadata } = await generateObject({
             model: this.model,
             schema: ClaudeChaptersSchema,
             providerOptions: {
@@ -54,17 +55,29 @@ export class ClaudeChapterClient implements IChapterizationClient {
             maxRetries: retries,
          })
 
-         logger.info("Claude chapterization successful", {
+         logger.info("Chapterization successful", {
             chaptersCount: object.chapters.length,
+            provider: this.provider,
          })
 
          return {
             chapters: object.chapters,
+            metadata: {
+               providerData: providerMetadata,
+               tokens: {
+                  input: usage.inputTokens ?? 0,
+                  output: usage.outputTokens ?? 0,
+                  total: usage.totalTokens ?? 0,
+                  reasoning: usage.reasoningTokens ?? 0,
+                  cachedInput: usage.cachedInputTokens ?? 0,
+               },
+            },
          }
       } catch (error) {
-         logger.error("Claude chapterization failed", {
+         logger.error("Chapterization failed", {
             error,
             errorMessage: getErrorMessage(error),
+            provider: this.provider,
          })
          throw error
       }

@@ -1,9 +1,13 @@
 import { Chapter } from "@careerfairy/shared-lib/livestreams"
-import { LLMProviders } from "@careerfairy/shared-lib/livestreams/chapters"
+import {
+   ChapterizationMetadata,
+   LLMProviders,
+} from "@careerfairy/shared-lib/livestreams/chapters"
 import { ITranscriptionResult } from "../transcription/types"
 
 export interface IChapterizationResult {
    chapters: Chapter[]
+   metadata: ChapterizationMetadata
 }
 
 export interface IChapterizationClient {
