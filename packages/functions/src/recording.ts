@@ -95,6 +95,12 @@ export const stopRecordingLivestream = onCall(
          { breakoutRoomId }
       )
       await stopRecording(streamId, token, breakoutRoomId)
+
+      /**
+       * Ignore await here because we want to continue with the function even if transcription fails
+       */
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      triggerTranscription(streamId)
    }
 )
 
@@ -148,6 +154,12 @@ const automaticallyRecord = async (
          await livestreamGetSecureToken(livestreamId, breakoutRoomId)
       )?.value
       await stopRecording(livestreamId, token, breakoutRoomId)
+
+      /**
+       * Ignore await here because we want to continue with the function even if transcription fails
+       */
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      triggerTranscription(livestreamId)
    }
 
    // for some reason the event has already ended, but it's still recording
@@ -172,6 +184,11 @@ const automaticallyRecord = async (
          await livestreamGetSecureToken(livestreamId, breakoutRoomId)
       )?.value
       await stopRecording(livestreamId, token, breakoutRoomId)
+      /**
+       * Ignore await here because we want to continue with the function even if transcription fails
+       */
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      triggerTranscription(livestreamId)
    }
 }
 
@@ -333,12 +350,6 @@ const stopRecording = async (
          breakoutRoomId
       )}`
    )
-
-   // Trigger transcription after recording is complete
-   // Only trigger for main livestream, not breakout rooms
-   if (!breakoutRoomId) {
-      await triggerTranscription(livestreamId)
-   }
 }
 
 /**
