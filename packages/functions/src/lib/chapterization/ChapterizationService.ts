@@ -177,8 +177,7 @@ export class ChapterizationService extends BaseChapterizationService {
                nextRetryAt
             )
 
-            // await sleep(delay)
-            await sleep(5000)
+            await sleep(delay)
 
             // Retry the chapterization - this will await completion
             logger.info("Starting retry attempt", {
