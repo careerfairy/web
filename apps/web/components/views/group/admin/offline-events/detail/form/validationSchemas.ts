@@ -64,7 +64,10 @@ const offlineEventFormGeneralTabSchema = yup.object().shape({
          "Please select a date in the future (+1 hour)"
       )
       .required(REQUIRED_FIELD_MESSAGE),
-   backgroundImageUrl: yup.string().url("Please enter a valid URL").optional(),
+   backgroundImageUrl: yup
+      .string()
+      .url("Please provide a valid background image")
+      .optional(),
    hidden: yup.bool().optional(),
 })
 

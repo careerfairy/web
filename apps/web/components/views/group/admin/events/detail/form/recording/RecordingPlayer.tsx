@@ -36,6 +36,17 @@ const styles = sxStyles({
       p: 2,
       textAlign: "center",
    },
+   thumbnail: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+      cursor: "pointer",
+   },
    playButtonOverlay: {
       position: "absolute",
       top: "50%",
@@ -79,6 +90,8 @@ export const RecordingPlayer = () => {
       setIsPlaying(true)
    }, [])
 
+   const hasThumbnail = !isPlaying && livestream.backgroundImageUrl
+
    if (isLoading) {
       return (
          <Box sx={styles.playerWrapper}>
@@ -111,9 +124,22 @@ export const RecordingPlayer = () => {
             controls={isPlaying}
             width="100%"
             height="100%"
+            playsInline
             onPlay={handlePlayClick}
             onEnded={() => setIsPlaying(false)}
          />
+         {Boolean(hasThumbnail) && (
+            <Box
+               onClick={handlePlayClick}
+               sx={{
+                  ...styles.thumbnail,
+                  backgroundImage: `url(${livestream.backgroundImageUrl})`,
+               }}
+               aria-label="Play recording"
+               role="button"
+               tabIndex={0}
+            />
+         )}
          {!isPlaying && (
             <IconButton
                sx={styles.playButtonOverlay}
