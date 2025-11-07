@@ -5,13 +5,9 @@ import {
    MAX_RECORDING_HOURS,
    S3_ROOT_PATH,
 } from "@careerfairy/shared-lib/livestreams/recordings"
-import { onCall } from "firebase-functions/https"
 import { onSchedule } from "firebase-functions/scheduler"
-import { onDocumentUpdated as onDocumentUpdatedV2 } from "firebase-functions/v2/firestore"
-import {
-   CallableRequest,
-   onCall as onCallV2,
-} from "firebase-functions/v2/https"
+import { onDocumentUpdated } from "firebase-functions/v2/firestore"
+import { CallableRequest, onCall } from "firebase-functions/v2/https"
 import AgoraClient from "./api/agora"
 import functionsAxios from "./api/axios"
 import config from "./config"
@@ -31,7 +27,7 @@ import functions = require("firebase-functions")
  * Starts when the live stream starts
  * Stops when the live stream ends
  */
-export const automaticallyRecordLivestream = onDocumentUpdatedV2(
+export const automaticallyRecordLivestream = onDocumentUpdated(
    "livestreams/{livestreamId}",
    async (event) => {
       const previousValue = event.data?.before?.data() as LivestreamEvent
@@ -51,7 +47,7 @@ export const automaticallyRecordLivestream = onDocumentUpdatedV2(
  * Starts when the breakout room starts/is opened
  * Stops when the breakout room is closed
  */
-export const automaticallyRecordLivestreamBreakoutRoom = onDocumentUpdatedV2(
+export const automaticallyRecordLivestreamBreakoutRoom = onDocumentUpdated(
    "livestreams/{livestreamId}/breakoutRooms/{breakoutRoomId}",
    async (event) => {
       const previousValue = event.data?.before?.data() as LivestreamEvent
@@ -84,7 +80,7 @@ export const startRecordingLivestream = onCall(async ({ data }) => {
  *
  * Works for both live streams and breakout rooms
  */
-export const stopRecordingLivestream = onCallV2(
+export const stopRecordingLivestream = onCall(
    async (
       request: CallableRequest<{
          streamId: string
