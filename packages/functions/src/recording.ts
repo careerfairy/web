@@ -355,7 +355,7 @@ const triggerTranscription = async (livestreamId: string): Promise<void> => {
             params: {
                livestreamId,
             },
-            timeout: 500, // 30 second timeout
+            timeout: 500,
          }
       )
 
