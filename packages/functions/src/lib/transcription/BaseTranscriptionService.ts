@@ -10,9 +10,6 @@ export class BaseTranscriptionService {
       this.livestreamRepo = livestreamRepo
    }
 
-   /**
-    * Mark transcription as completed with results
-    */
    protected async markTranscriptionCompleted(
       livestreamId: string,
       result: ITranscriptionResult,
@@ -39,9 +36,6 @@ export class BaseTranscriptionService {
       )
    }
 
-   /**
-    * Mark transcription as failed with retry information
-    */
    protected async markTranscriptionFailedWithRetry(
       livestreamId: string,
       error: unknown,
@@ -61,9 +55,6 @@ export class BaseTranscriptionService {
       })
    }
 
-   /**
-    * Mark transcription as permanently failed after all retries exhausted
-    */
    protected async markTranscriptionPermanentlyFailed(
       livestreamId: string,
       error: unknown,

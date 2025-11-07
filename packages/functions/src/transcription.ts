@@ -38,19 +38,11 @@ const chapterizationService = new ChapterizationService(
    chapterizationProviders[CHAPTERIZATION_PROVIDER]
 )
 
-/**
- * Runtime configuration for transcription functions
- * Timeout set to 1 hour to accommodate full retry cycle (up to 61 minutes with backoff)
- */
 const transcriptionConfig = {
    timeoutSeconds: 3600, // 1 hour - accommodates full retry cycle
    memory: "1GiB" as const,
 }
 
-/**
- * Could be on /livestreams and check for transcriptionCompleted but prefer to use the transcription status document
- * because it's more accurate and up to date. And we can use the transcription status document to trigger the chapterization.
- */
 export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
    {
       memory: "1GiB",

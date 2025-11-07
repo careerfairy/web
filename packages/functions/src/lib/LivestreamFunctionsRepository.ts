@@ -414,16 +414,6 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    updateLivestreamTranscriptionCompleted(livestreamId: string): Promise<void>
 
    /**
-    * Check if transcription is already in progress or completed
-    * @param livestreamId - The livestream ID
-    * @returns true if transcription is in progress or completed
-    */
-   // isTranscriptionInProgress(
-   //    livestreamId: string,
-   //    maxRetries: number
-   // ): Promise<boolean>
-
-   /**
     * Initiate chapterization by creating or updating the status to "chapterizing"
     * @param livestreamId - The livestream ID
     * @param chapterProvider - LLM provider
@@ -457,17 +447,6 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    getChapterizationStatus(
       livestreamId: string
    ): Promise<LivestreamChapterStatus | null>
-
-   /**
-    * Check if chapterization is already in progress
-    * @param livestreamId - The livestream ID
-    * @param maxRetries - Maximum number of retries
-    * @returns true if chapterization is in progress
-    */
-   // isChapterizationInProgress(
-   //    livestreamId: string,
-   //    maxRetries: number
-   // ): Promise<boolean>
 }
 
 export class LivestreamFunctionsRepository
@@ -1644,6 +1623,10 @@ export class LivestreamFunctionsRepository
          .doc(livestreamId)
          .get()
 
+      if (!doc.exists) {
+         return null
+      }
+
       return doc.data() as LivestreamTranscription
    }
 
@@ -1659,28 +1642,6 @@ export class LivestreamFunctionsRepository
          .doc(livestreamId)
          .update(updateData)
    }
-
-   // async isTranscriptionInProgress(
-   //    livestreamId: string,
-   //    maxRetries: number
-   // ): Promise<boolean> {
-   //    const livestreamTranscription = await this.getTranscriptionStatus(
-   //       livestreamId
-   //    )
-
-   //    if (!livestreamTranscription) {
-   //       return false
-   //    }
-
-   //    const transcriptionStatus = livestreamTranscription.status
-   //    const state = transcriptionStatus.state
-
-   //    return (
-   //       state === "transcribing" ||
-   //       (state === "transcription-failed" &&
-   //          transcriptionStatus.retryCount < maxRetries)
-   //    )
-   // }
 
    async initiateChapterization(
       livestreamId: string,
@@ -1734,24 +1695,10 @@ export class LivestreamFunctionsRepository
          .doc(livestreamId)
          .get()
 
-      return doc.data() as LivestreamChapterStatus | null
+      if (!doc.exists) {
+         return null
+      }
+
+      return doc.data() as LivestreamChapterStatus
    }
-
-   // async isChapterizationInProgress(
-   //    livestreamId: string,
-   //    maxRetries: number
-   // ): Promise<boolean> {
-   //    const chapterizationStatus = await this.getChapterizationStatus(
-   //       livestreamId
-   //    )
-
-   //    if (!chapterizationStatus) {
-   //       return false
-   //    }
-
-   //    const status = chapterizationStatus.status
-   //    const state = status.state
-
-   //    return state === "chapterizing"
-   // }
 }

@@ -9,7 +9,7 @@ import { getErrorMessage } from "../../../lib/transcription/utils"
 import { IChapterizationClient, IChapterizationResult } from "../types"
 
 export class ClaudeChapterClient implements IChapterizationClient {
-   provider: LLMProviders = "anthropic" // Using "openai" as LLMProviders type, but actually using Claude
+   provider: LLMProviders = "anthropic"
    private readonly model: LanguageModel
 
    constructor() {

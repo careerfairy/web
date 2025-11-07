@@ -7,7 +7,7 @@ import { ILivestreamFunctionsRepository } from "../LivestreamFunctionsRepository
 import { getErrorMessage } from "../transcription/utils"
 import { IChapterizationResult } from "./types"
 
-const WRITE_BATCH = 20 // There will hardly more than 40 chapters per livestream
+const WRITE_BATCH = 20 // There will hardly more than 20 chapters per livestream, 1h livestream -> 10-15 chapters
 
 export class BaseChapterizationService {
    protected livestreamRepo: ILivestreamFunctionsRepository
@@ -16,9 +16,6 @@ export class BaseChapterizationService {
       this.livestreamRepo = livestreamRepo
    }
 
-   /**
-    * Mark chapterization as completed with results
-    */
    protected async markChapterizationCompleted(
       livestreamId: string,
       result: IChapterizationResult,
@@ -37,9 +34,6 @@ export class BaseChapterizationService {
       await this.livestreamRepo.updateChapterizationStatus(livestreamId, status)
    }
 
-   /**
-    * Mark chapterization as failed with retry information
-    */
    protected async markChapterizationFailedWithRetry(
       livestreamId: string,
       error: unknown,
@@ -59,9 +53,6 @@ export class BaseChapterizationService {
       await this.livestreamRepo.updateChapterizationStatus(livestreamId, status)
    }
 
-   /**
-    * Mark chapterization as permanently failed after all retries exhausted
-    */
    protected async markChapterizationPermanentlyFailed(
       livestreamId: string,
       error: unknown,
@@ -82,9 +73,6 @@ export class BaseChapterizationService {
       await this.livestreamRepo.updateChapterizationStatus(livestreamId, status)
    }
 
-   /**
-    * Save chapters to Firestore subcollection using bulkWriter
-    */
    protected async saveChaptersToFirestore(
       livestreamId: string,
       chapters: Chapter[]
