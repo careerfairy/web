@@ -14,6 +14,7 @@ import {
 } from "firebase-functions/v2/https"
 import AgoraClient from "./api/agora"
 import functionsAxios from "./api/axios"
+import config from "./config"
 import {
    livestreamGetRecordingToken,
    livestreamGetSecureToken,
@@ -350,7 +351,7 @@ const stopRecording = async (
 const triggerTranscription = async (livestreamId: string): Promise<void> => {
    try {
       await functionsAxios.get(
-         `/${FUNCTION_NAMES.manualLivestreamTranscription}`,
+         `${config.functionsBaseUrl}/${FUNCTION_NAMES.manualLivestreamTranscription}`,
          {
             params: {
                livestreamId,
