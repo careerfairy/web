@@ -217,13 +217,6 @@ exports.stopRecordingLivestream_eu = recording.stopRecordingLivestream
 exports.automaticallyRecordLivestream = recording.automaticallyRecordLivestream
 exports.automaticallyRecordLivestreamBreakoutRoom =
    recording.automaticallyRecordLivestreamBreakoutRoom
-
-exports[FUNCTION_NAMES.stopRecordingLivestream_eu] =
-   recording.stopRecordingLivestream
-exports[FUNCTION_NAMES.automaticallyRecordLivestream] =
-   recording.automaticallyRecordLivestream
-exports[FUNCTION_NAMES.automaticallyRecordLivestreamBreakoutRoom] =
-   recording.automaticallyRecordLivestreamBreakoutRoom
 exports.checkForUnfinishedLivestreamsAndStopRecording =
    recording.checkForUnfinishedLivestreamsAndStopRecording
 exports[FUNCTION_NAMES.getRecordingViews] = recordingAnalytics.getRecordingViews
@@ -322,8 +315,6 @@ exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 
 // Transcription Functions
-exports.initiateTranscriptionOnRecordingAvailable =
-   transcription.initiateTranscriptionOnRecordingAvailable
 exports[FUNCTION_NAMES.manualLivestreamTranscription] =
    transcription.manualLivestreamTranscription
 
