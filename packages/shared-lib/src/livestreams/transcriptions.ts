@@ -1,6 +1,5 @@
-import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
-import Timestamp = firebase.firestore.Timestamp
+import { Timestamp } from "../firebaseTypes"
 
 /**
  * Collection: /livestreamTranscriptions
@@ -17,11 +16,6 @@ export interface LivestreamTranscription extends Identifiable {
     * Having providers listed is not very useful, only for quick view
     */
    transcriptionProvider: ASRProviders
-
-   /**
-    * Provider used for chapter generation
-    */
-   chapterProvider: LLMProviders
 
    /**
     * Current status of the transcription/chapter generation process
@@ -53,24 +47,9 @@ export type TranscriptMetadata = {
 }
 
 /**
- * Metadata for chapter generation results
- */
-export type ChaptersMetadata = {
-   transcriptionFilePath: string
-   /**
-    * Id of the result document stored in Firestore, only provided when state is complete.
-    */
-   chaptersCount: number
-}
-
-/**
  * Union type representing all possible transcription states
  */
-export type TranscriptionStatus =
-   | RunningState
-   | CompletedState
-   | FailedState
-   | CancelledState
+export type TranscriptionStatus = RunningState | CompletedState | FailedState
 
 /**
  * Automatic speech recognition providers
@@ -78,89 +57,32 @@ export type TranscriptionStatus =
 export type ASRProviders = "deepgram"
 
 /**
- * Language model providers
+ * Combined running state
  */
-export type LLMProviders = "anthropic"
-
-/**
- * Base state for running processes
- */
-type BaseRunningState = {
+type RunningState = {
+   state: "transcribing"
    startedAt: Timestamp
 }
 
 /**
- * State when transcription is in progress
+ * State when transcription or chapter generation is completed
  */
-type TranscriptionRunningState = {
-   state: "transcribing"
-   // We might want to add transcription specific metadata here, such as
-   // requestId: string // Deepgram requestId, Google operation name, etc. not needed for now as there is no polling.
-}
-
-/**
- * State when chapter generation is in progress
- */
-type TranscriptionChapterRunningState = {
-   state: "generating-chapter"
-   // We might want to add chapter specific metadata here (none needed for now)
-}
-
-/**
- * Combined running state
- */
-type RunningState = BaseRunningState &
-   (TranscriptionRunningState | TranscriptionChapterRunningState)
-
-type TranscriptionCompletedState = {
+type CompletedState = {
    state: "transcription-completed"
+   completedAt: Timestamp
+   confidenceAvg: number
    transcriptText: string // minimal denormalized result for quick reads
    metadata: TranscriptMetadata
 }
 
-type ChapterizationCompletedState = {
-   state: "chapterization-completed"
-   chaptersCount: number
-   metadata: ChaptersMetadata
-}
-
-type BaseCompletedState = {
-   completedAt: Timestamp
-   confidenceAvg: number
-}
 /**
- * State when transcription or chapter generation is completed
+ * State when transcription or chapter generation has failed
  */
-type CompletedState = BaseCompletedState &
-   (TranscriptionCompletedState | ChapterizationCompletedState)
-
-type TranscriptionFailedState = {
+type FailedState = {
    state: "transcription-failed"
    metadata: TranscriptMetadata
-}
-
-type ChapterizationFailedState = {
-   state: "chapterization-failed"
-   metadata: ChaptersMetadata
-}
-
-type BaseFailedState = {
    errorMessage: string
    failedAt: Timestamp
    retryCount: number
    nextRetryAt?: Timestamp
-}
-/**
- * State when transcription or chapter generation has failed
- */
-type FailedState = BaseFailedState &
-   (TranscriptionFailedState | ChapterizationFailedState)
-
-/**
- * State when process is cancelled
- */
-type CancelledState = {
-   state: "cancelled"
-   cancelledAt: Timestamp
-   cancelledReason: string
 }

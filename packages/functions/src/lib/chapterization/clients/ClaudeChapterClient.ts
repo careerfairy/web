@@ -1,5 +1,5 @@
 import { AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic"
-import { LLMProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
+import { LLMProviders } from "@careerfairy/shared-lib/livestreams/chapters"
 import { LanguageModel, generateObject } from "ai"
 import { logger } from "firebase-functions/v2"
 import { ITranscriptionResult } from "src/lib/transcription/types"

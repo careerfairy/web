@@ -1,15 +1,12 @@
-import {
-   LivestreamEvent
-} from "@careerfairy/shared-lib/livestreams/livestreams"
+import { LLMProviders } from "@careerfairy/shared-lib/livestreams/chapters"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { downloadLink } from "@careerfairy/shared-lib/livestreams/recordings"
-import {
-   ASRProviders,
-   LLMProviders,
-} from "@careerfairy/shared-lib/livestreams/transcriptions"
+import { ASRProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
 import { logger } from "firebase-functions/v2"
 import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { livestreamsRepo } from "./api/repositories"
+import { ChapterizationService } from "./lib/chapterization/ChapterizationService"
 import { ClaudeChapterClient } from "./lib/chapterization/clients/ClaudeChapterClient"
 import { IChapterizationClient } from "./lib/chapterization/types"
 import { TranscriptionService } from "./lib/transcription/TranscriptionService"
@@ -30,7 +27,11 @@ const chapterizationProviders: Record<LLMProviders, IChapterizationClient> = {
 
 const transcriptionService = new TranscriptionService(
    livestreamsRepo,
-   transcriptionProviders[TRANSCRIPTION_PROVIDER],
+   transcriptionProviders[TRANSCRIPTION_PROVIDER]
+)
+
+const chapterizationService = new ChapterizationService(
+   livestreamsRepo,
    chapterizationProviders[CHAPTERIZATION_PROVIDER]
 )
 
@@ -50,6 +51,7 @@ const transcriptionConfig = {
 export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
    {
       ...transcriptionConfig,
+      timeoutSeconds: 540,
       document: "livestreams/{livestreamId}",
    },
    async (event) => {
@@ -63,16 +65,24 @@ export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
       const newLivestreamEvent = event.data?.after?.data() as LivestreamEvent
 
       const transcriptionCompletedChanged =
-         newLivestreamEvent?.transcriptionCompleted !==
+         newLivestreamEvent?.transcriptionCompleted !=
          oldLivestreamEvent?.transcriptionCompleted
 
-      if (!transcriptionCompletedChanged) {
-         logger.info(
-            "Transcription completed status not changed, skipping chapterization",
-            { livestreamId }
+      const test =
+         transcriptionCompletedChanged &&
+         !(
+            !oldLivestreamEvent?.transcriptionCompleted &&
+            newLivestreamEvent?.transcriptionCompleted
          )
-         return
-      }
+      console.log("🚀 ~ test:", test)
+
+      // if (!oldLivestreamEvent?.transcriptionCompleted) {
+      //    logger.info(
+      //       "Transcription completed status not changed, skipping chapterization",
+      //       { livestreamId }
+      //    )
+      //    return
+      // }
 
       if (!newLivestreamEvent?.transcriptionCompleted) {
          logger.info(
@@ -85,9 +95,10 @@ export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
       try {
          logger.info("Chapterization initiated successfully", { livestreamId })
 
-         const chapters = await transcriptionService.processChapterization(
-            livestreamId
-         )
+         const chapters =
+            await chapterizationService.processLivestreamChapterization(
+               livestreamId
+            )
 
          logger.info(
             "Chapterization process completed (including all retries)",
@@ -108,7 +119,7 @@ export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
    }
 )
 
-export const manualLivestreamChapterization = onRequest(
+export const startLivestreamChapterization = onRequest(
    transcriptionConfig,
    async (req, res) => {
       logger.info("Manual chapterization triggered", {
@@ -127,25 +138,41 @@ export const manualLivestreamChapterization = onRequest(
          return
       }
 
-      const chapters = await transcriptionService.processChapterization(
-         livestreamId
-      )
+      try {
+         const livestream = await livestreamsRepo.getById(livestreamId)
 
-      res.status(200)
-         .json({
-            success: true,
-            message: "Chapterization completed successfully",
-            livestreamId,
-            chapters,
-         })
-         .end()
+         if (!livestream) throw new Error("Livestream not found")
+
+         const chapters =
+            await chapterizationService.processLivestreamChapterization(
+               livestreamId
+            )
+
+         res.status(200)
+            .json({
+               success: true,
+               message: "Chapterization completed successfully",
+               livestreamId,
+               chapters,
+            })
+            .end()
+      } catch (error) {
+         res.status(500)
+            .json({
+               success: false,
+               error: "Chapterization failed after all retries",
+               livestreamId,
+               errorMessage: getErrorMessage(error),
+            })
+            .end()
+      }
    }
 )
 /**
  * Manual HTTP function for testing transcription
  * Usage: GET /manualLivestreamTranscription?livestreamId=<id>
  */
-export const manualLivestreamTranscription = onRequest(
+export const startLivestreamTranscription = onRequest(
    transcriptionConfig,
    async (req, res) => {
       logger.info("Manual transcription triggered", {
@@ -158,10 +185,12 @@ export const manualLivestreamTranscription = onRequest(
 
       if (!livestreamId) {
          logger.error("Missing livestreamId query parameter")
-         res.status(400).json({
-            error: "Missing required query parameter: livestreamId",
-            usage: "GET /manualTranscription?livestreamId=<id>",
-         })
+         res.status(400)
+            .json({
+               error: "Missing required query parameter: livestreamId",
+               usage: "GET /manualTranscription?livestreamId=<id>",
+            })
+            .end()
          return
       }
 
@@ -173,29 +202,30 @@ export const manualLivestreamTranscription = onRequest(
 
       if (!tokenData?.sid) {
          logger.error("Recording token sid is missing", { livestreamId })
-         res.status(400).json({
-            error: "Recording token sid is missing",
-         })
+         res.status(400)
+            .json({
+               error: "Recording token sid is missing",
+            })
+            .end()
          return
       }
 
       const recordingUrl = downloadLink(livestreamId, tokenData.sid)
       // Initialize service and start transcription
       try {
-         await transcriptionService.processTranscription(
+         await transcriptionService.processLivestreamTranscription(
             livestreamId,
-            recordingUrl,
-            {
-               force: true,
-            }
+            recordingUrl
          )
 
-         res.status(200).json({
-            success: true,
-            message:
-               "Transcription completed successfully (including all retries if needed).",
-            livestreamId,
-         })
+         res.status(200)
+            .json({
+               success: true,
+               message:
+                  "Transcription completed successfully (including all retries if needed).",
+               livestreamId,
+            })
+            .end()
       } catch (error) {
          const errorMessage = getErrorMessage(error)
 

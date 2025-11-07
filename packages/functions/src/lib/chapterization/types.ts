@@ -1,5 +1,5 @@
 import { Chapter } from "@careerfairy/shared-lib/livestreams"
-import { LLMProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
+import { LLMProviders } from "@careerfairy/shared-lib/livestreams/chapters"
 import { ITranscriptionResult } from "../transcription/types"
 
 export interface IChapterizationResult {

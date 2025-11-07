@@ -29,6 +29,11 @@ import {
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import {
+   ChapterizationStatus,
+   LLMProviders,
+   LivestreamChapter as LivestreamChapterStatus,
+} from "@careerfairy/shared-lib/livestreams/chapters"
+import {
    HandRaise,
    HandRaiseState,
 } from "@careerfairy/shared-lib/livestreams/hand-raise"
@@ -413,10 +418,56 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @param livestreamId - The livestream ID
     * @returns true if transcription is in progress or completed
     */
-   isTranscriptionInProgress(
+   // isTranscriptionInProgress(
+   //    livestreamId: string,
+   //    maxRetries: number
+   // ): Promise<boolean>
+
+   /**
+    * Initiate chapterization by creating or updating the status to "chapterizing"
+    * @param livestreamId - The livestream ID
+    * @param chapterProvider - LLM provider
+    * @param transcriptionFilePath - Path to the transcription file
+    * @returns Promise that resolves when status is initiated
+    */
+   initiateChapterization(
       livestreamId: string,
-      maxRetries: number
-   ): Promise<boolean>
+      chapterProvider: LLMProviders,
+      transcriptionFilePath: string
+   ): Promise<void>
+
+   /**
+    * Update an existing chapterization status document in Firestore
+    * @param livestreamId - The livestream ID
+    * @param status - Updated chapterization status
+    * @param additionalData - Additional data to update
+    * @returns Promise that resolves when update is complete
+    */
+   updateChapterizationStatus(
+      livestreamId: string,
+      status: ChapterizationStatus,
+      additionalData?: Partial<LivestreamChapterStatus>
+   ): Promise<void>
+
+   /**
+    * Get chapterization status for a livestream
+    * @param livestreamId - The livestream ID
+    * @returns The chapterization document or null if not found
+    */
+   getChapterizationStatus(
+      livestreamId: string
+   ): Promise<LivestreamChapterStatus | null>
+
+   /**
+    * Check if chapterization is already in progress
+    * @param livestreamId - The livestream ID
+    * @param maxRetries - Maximum number of retries
+    * @returns true if chapterization is in progress
+    */
+   // isChapterizationInProgress(
+   //    livestreamId: string,
+   //    maxRetries: number
+   // ): Promise<boolean>
 }
 
 export class LivestreamFunctionsRepository
@@ -1553,7 +1604,6 @@ export class LivestreamFunctionsRepository
          id: livestreamId,
          livestreamId,
          transcriptionProvider,
-         chapterProvider: null,
          status: {
             state: "transcribing",
             startedAt: now,
@@ -1610,25 +1660,98 @@ export class LivestreamFunctionsRepository
          .update(updateData)
    }
 
-   async isTranscriptionInProgress(
-      livestreamId: string,
-      maxRetries: number
-   ): Promise<boolean> {
-      const livestreamTranscription = await this.getTranscriptionStatus(
-         livestreamId
-      )
+   // async isTranscriptionInProgress(
+   //    livestreamId: string,
+   //    maxRetries: number
+   // ): Promise<boolean> {
+   //    const livestreamTranscription = await this.getTranscriptionStatus(
+   //       livestreamId
+   //    )
 
-      if (!livestreamTranscription) {
-         return false
+   //    if (!livestreamTranscription) {
+   //       return false
+   //    }
+
+   //    const transcriptionStatus = livestreamTranscription.status
+   //    const state = transcriptionStatus.state
+
+   //    return (
+   //       state === "transcribing" ||
+   //       (state === "transcription-failed" &&
+   //          transcriptionStatus.retryCount < maxRetries)
+   //    )
+   // }
+
+   async initiateChapterization(
+      livestreamId: string,
+      chapterProvider: LLMProviders,
+      transcriptionFilePath: string
+   ): Promise<void> {
+      const now = Timestamp.now()
+
+      const doc: LivestreamChapterStatus = {
+         id: livestreamId,
+         livestreamId,
+         chapterProvider,
+         status: {
+            state: "chapterizing",
+            startedAt: now,
+            transcriptionFilePath,
+         },
+         createdAt: now,
+         updatedAt: now,
       }
 
-      const transcriptionStatus = livestreamTranscription.status
-      const state = transcriptionStatus.state
-
-      return (
-         state === "transcribing" ||
-         (state === "transcription-failed" &&
-            transcriptionStatus.retryCount < maxRetries)
-      )
+      // Use set with merge to handle both create and update cases
+      await this.firestore
+         .collection("livestreamChapters")
+         .doc(livestreamId)
+         .set(doc, { merge: true })
    }
+
+   async updateChapterizationStatus(
+      livestreamId: string,
+      status: ChapterizationStatus,
+      additionalData?: Partial<LivestreamChapterStatus>
+   ): Promise<void> {
+      const updateData: UpdateData<LivestreamChapterStatus> = {
+         status,
+         updatedAt: Timestamp.now(),
+         ...additionalData,
+      }
+
+      await this.firestore
+         .collection("livestreamChapters")
+         .doc(livestreamId)
+         .update(updateData)
+   }
+
+   async getChapterizationStatus(
+      livestreamId: string
+   ): Promise<LivestreamChapterStatus | null> {
+      const doc = await this.firestore
+         .collection("livestreamChapters")
+         .doc(livestreamId)
+         .get()
+
+      return doc.data() as LivestreamChapterStatus | null
+   }
+
+   // async isChapterizationInProgress(
+   //    livestreamId: string,
+   //    maxRetries: number
+   // ): Promise<boolean> {
+   //    const chapterizationStatus = await this.getChapterizationStatus(
+   //       livestreamId
+   //    )
+
+   //    if (!chapterizationStatus) {
+   //       return false
+   //    }
+
+   //    const status = chapterizationStatus.status
+   //    const state = status.state
+
+   //    return state === "chapterizing"
+   // }
 }

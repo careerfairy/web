@@ -315,12 +315,13 @@ exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
 
 // Transcription Functions
-exports[FUNCTION_NAMES.manualLivestreamTranscription] =
-   transcription.manualLivestreamTranscription
+
+exports[FUNCTION_NAMES.startLivestreamTranscription] =
+   transcription.startLivestreamTranscription
 exports[FUNCTION_NAMES.initiateChapterizationOnTranscriptionCompleted] =
    transcription.initiateChapterizationOnTranscriptionCompleted
-exports[FUNCTION_NAMES.manualLivestreamChapterization] =
-   transcription.manualLivestreamChapterization
+exports[FUNCTION_NAMES.startLivestreamChapterization] =
+   transcription.startLivestreamChapterization
 
 // Group Spark Functions
 exports[FUNCTION_NAMES.createSpark] = groupSparks.createSpark

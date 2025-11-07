@@ -26,3 +26,7 @@ export function calculateBackoffDelay(retryCount: number): number {
 export function getErrorMessage(error: unknown): string {
    return error instanceof Error ? error.message : String(error)
 }
+
+export function sleep(ms: number): Promise<void> {
+   return new Promise((resolve) => setTimeout(resolve, ms))
+}

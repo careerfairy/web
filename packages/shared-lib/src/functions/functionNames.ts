@@ -102,8 +102,8 @@ export const FUNCTION_NAMES = {
    // Transcription functions
    initiateTranscriptionOnRecordingAvailable:
       "initiateTranscriptionOnRecordingAvailable",
-   manualLivestreamTranscription: "manualLivestreamTranscription",
-   manualLivestreamChapterization: "manualLivestreamChapterization",
+   startLivestreamTranscription: "startLivestreamTranscription",
+   startLivestreamChapterization: "startLivestreamChapterization",
    initiateChapterizationOnTranscriptionCompleted:
       "initiateChapterizationOnTranscriptionCompleted",
 } as const
