@@ -7,7 +7,6 @@ import {
    OfflineEvent,
    OfflineEventStats,
    OfflineEventStatsAction,
-   OfflineEventWithDistance,
 } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { UserData } from "@careerfairy/shared-lib/users"
 import {
@@ -134,11 +133,11 @@ export class OfflineEventService {
     * Get offline events within 150km of user's location
     * Prioritizes user's profile location over IP-based geolocation
     * @param userData - Optional user data containing profile location (stateIsoCode, countryIsoCode)
-    * @returns Array of offline events with distance information, sorted by proximity
+    * @returns Array of offline events within the radius
     */
    async getOfflineEvents(
       userData?: Pick<UserData, "stateIsoCode" | "countryIsoCode">
-   ): Promise<OfflineEventWithDistance[]> {
+   ): Promise<OfflineEvent[]> {
       try {
          // Build query params with user's profile location if available
          const params = new URLSearchParams()
@@ -157,7 +156,7 @@ export class OfflineEventService {
             return []
          }
 
-         const serializedEvents: SerializedDocument<OfflineEventWithDistance>[] =
+         const serializedEvents: SerializedDocument<OfflineEvent>[] =
             await response.json()
 
          return serializedEvents.map(deserializeDocument)

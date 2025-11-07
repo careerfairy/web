@@ -1,4 +1,4 @@
-import { OfflineEventWithDistance } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { Box, Stack, Typography } from "@mui/material"
 import { getMaxLineStyles } from "components/helperFunctions/HelperFunctions"
 import CircularLogo from "components/views/common/logos/CircularLogo"
@@ -68,13 +68,12 @@ const styles = sxStyles({
 })
 
 type Props = {
-   event: OfflineEventWithDistance
+   event: OfflineEvent
 }
 
 export const OfflineEventCard = ({ event }: Props) => {
    const { pathname } = useRouter()
-   const { backgroundImageUrl, group, title, address, startAt, distanceInKm } =
-      event
+   const { backgroundImageUrl, group, title, address, startAt } = event
 
    return (
       <Box
@@ -124,7 +123,6 @@ export const OfflineEventCard = ({ event }: Props) => {
                <Box component={MapPin} sx={styles.icon} />
                <Typography variant="small" sx={styles.detailText}>
                   {address?.city}, {address?.state}
-                  {distanceInKm !== undefined && ` · ${distanceInKm} km away`}
                </Typography>
             </Box>
 

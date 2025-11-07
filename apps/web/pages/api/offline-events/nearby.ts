@@ -1,8 +1,5 @@
 import { BUNDLE_NAMES } from "@careerfairy/shared-lib/functions"
-import {
-   OfflineEvent,
-   OfflineEventWithDistance,
-} from "@careerfairy/shared-lib/offline-events/offline-events"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { State } from "country-state-city"
 import { GeoPoint } from "firebase/firestore"
 import { distanceBetween, geohashQueryBounds } from "geofire-common"
@@ -56,14 +53,11 @@ type Location = {
 /**
  * API route to get offline events within 150km of user's location(s)
  * Queries both profile location (state ISO code) and IP-based location simultaneously
- * Merges results and uses minimum distance when events appear in both sets
  * Falls back to Zurich, Switzerland for local development
  */
 export default async function handler(
    req: NextApiRequest,
-   res: NextApiResponse<
-      SerializedDocument<OfflineEventWithDistance>[] | { error: string }
-   >
+   res: NextApiResponse<SerializedDocument<OfflineEvent>[] | { error: string }>
 ) {
    try {
       const RADIUS_KM = 150
@@ -174,8 +168,12 @@ export default async function handler(
 
       console.log(`✅ Found ${eventMap.size} events within geohash bounds`)
 
-      // Calculate distances from all locations and track minimum per event
-      const eventsWithDistanceMap = new Map<string, OfflineEventWithDistance>()
+      // Calculate distances from all locations and filter events within radius
+      // Store events with their minimum distance for sorting (but don't include distance in response)
+      const eventsWithMinDistance: Array<{
+         event: OfflineEvent
+         minDistance: number
+      }> = []
 
       for (const event of eventMap.values()) {
          // Skip events without valid geoPoint
@@ -205,26 +203,25 @@ export default async function handler(
             }
          }
 
-         // If event is within radius of at least one location, use minimum distance
+         // If event is within radius of at least one location, include it
          if (distances.length > 0) {
             const minDistance = Math.min(...distances)
-            eventsWithDistanceMap.set(event.id, {
-               ...event,
-               distanceInKm: Math.round(minDistance * 10) / 10, // Round to 1 decimal place
-            })
+            eventsWithMinDistance.push({ event, minDistance })
          }
       }
 
-      // Convert map to array and sort by distance (nearest first)
-      const eventsWithDistance = Array.from(eventsWithDistanceMap.values())
-      eventsWithDistance.sort((a, b) => a.distanceInKm - b.distanceInKm)
+      // Sort by minimum distance (nearest first) for better UX
+      eventsWithMinDistance.sort((a, b) => a.minDistance - b.minDistance)
+
+      // Extract just the events (without distance) for response
+      const eventsWithinRadius = eventsWithMinDistance.map((item) => item.event)
 
       console.log(
-         `🎯 Returning ${eventsWithDistance.length} offline events within ${RADIUS_KM}km (from ${locations.length} location(s))`
+         `🎯 Returning ${eventsWithinRadius.length} offline events within ${RADIUS_KM}km (from ${locations.length} location(s))`
       )
 
       // Serialize Firestore Timestamps and GeoPoints before sending
-      const serializedEvents = eventsWithDistance.map(serializeDocument)
+      const serializedEvents = eventsWithinRadius.map(serializeDocument)
 
       return res.status(200).json(serializedEvents)
    } catch (error) {

@@ -1,4 +1,4 @@
-import { OfflineEventWithDistance } from "@careerfairy/shared-lib/offline-events/offline-events"
+import { OfflineEvent } from "@careerfairy/shared-lib/offline-events/offline-events"
 import { offlineEventService } from "data/firebase/OfflineEventService"
 import { useAuth } from "HOCs/AuthProvider"
 import useSWR from "swr"
@@ -10,7 +10,7 @@ export const useOfflineEvents = () => {
    // Only fetch when auth/userData is fully loaded
    const shouldFetch = !isLoadingUserData
 
-   return useSWR<OfflineEventWithDistance[]>(
+   return useSWR<OfflineEvent[]>(
       shouldFetch
          ? ["offline-events", userData?.stateIsoCode, userData?.countryIsoCode]
          : null, // null key prevents fetching
