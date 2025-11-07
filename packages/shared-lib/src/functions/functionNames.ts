@@ -49,10 +49,6 @@ export const FUNCTION_NAMES = {
 
    // Recording functions
    getRecordingViews: "getRecordingViews",
-   automaticallyRecordLivestream: "automaticallyRecordLivestream_v2",
-   automaticallyRecordLivestreamBreakoutRoom:
-      "automaticallyRecordLivestreamBreakoutRoom_v2",
-   stopRecordingLivestream_eu: "stopRecordingLivestream_eu_v2",
 
    // Sparks functions
    removeAndSyncUserSparkNotification: "removeAndSyncUserSparkNotification_v4",
