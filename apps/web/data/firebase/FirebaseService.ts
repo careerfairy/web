@@ -123,7 +123,7 @@ class FirebaseService {
 
    stopLivestreamRecording = async (data) => {
       const stopLivestreamRecording = this.functions.httpsCallable(
-         FUNCTION_NAMES.stopRecordingLivestream_eu
+         "stopRecordingLivestream_eu"
       )
       return await stopLivestreamRecording(data)
    }

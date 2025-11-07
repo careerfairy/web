@@ -1,8 +1,6 @@
-import { RecordingToken } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { downloadLink } from "@careerfairy/shared-lib/livestreams/recordings"
 import { ASRProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
 import { logger } from "firebase-functions/v2"
-import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
 import { livestreamsRepo } from "./api/repositories"
 import {
@@ -25,59 +23,6 @@ const transcriptionConfig = {
    timeoutSeconds: 3600, // 1 hour - accommodates full retry cycle
    memory: "1GiB" as const,
 }
-
-/**
- * Firestore trigger that initiates transcription when a recording token is created
- * Triggers on: livestreams/{livestreamId}/recordingToken/token
- */
-export const initiateTranscriptionOnRecordingAvailable = onDocumentUpdated(
-   {
-      ...transcriptionConfig,
-      document: "livestreams/{livestreamId}/recordingToken/token",
-   },
-   async (event) => {
-      const livestreamId = event.params.livestreamId
-
-      logger.info("Recording token updated, initiating transcription", {
-         livestreamId,
-      })
-
-      // Get the recording token data
-      const recordingTokenData = event.data?.after?.data() as RecordingToken
-
-      if (!recordingTokenData?.sid) {
-         logger.error("Recording token sid is missing", { livestreamId })
-         return
-      }
-
-      // Initialize service and start transcription
-      const service = new TranscriptionService(
-         livestreamsRepo,
-         transcriptionProviders[TRANSCRIPTION_PROVIDER]
-      )
-
-      const recordingUrl = downloadLink(livestreamId, recordingTokenData.sid)
-
-      try {
-         logger.info("Transcription initiated successfully", { livestreamId })
-
-         await service.processTranscription(livestreamId, recordingUrl)
-
-         logger.info(
-            "Transcription process completed (including all retries)",
-            {
-               livestreamId,
-            }
-         )
-      } catch (error) {
-         logger.error("Transcription failed after all retries", {
-            livestreamId,
-            error,
-            errorMessage: getErrorMessage(error),
-         })
-      }
-   }
-)
 
 /**
  * Manual HTTP function for testing transcription
