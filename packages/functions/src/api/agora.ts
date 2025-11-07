@@ -141,29 +141,6 @@ export default class AgoraClient {
       )
    }
 
-   /**
-    * Query the status of a recording session
-    * Use this to check if recording files have finished uploading to S3
-    *
-    * Response includes:
-    * - serverResponse.status: Recording status (0 = recording, 1 = idle, 2 = exit)
-    * - serverResponse.fileListMode: File list mode
-    * - serverResponse.fileList: Array of recording files with upload status
-    *
-    * [link to docs](https://docs.agora.io/en/cloud-recording/cloud_recording_api_query?platform=RESTful)
-    *
-    * @param resourceId - The resource ID from recordingAcquire
-    * @param sid - The recording session ID from recordingStart
-    * @returns Recording status including file upload progress
-    */
-   recordingQuery(resourceId: string, sid: string) {
-      return this.authRequest(
-         `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resourceId}/sid/${sid}/mode/web/query`,
-         undefined,
-         "get"
-      )
-   }
-
    private authRequest(url: string, data?: any, method: Method = "post") {
       return axios({
          method,
