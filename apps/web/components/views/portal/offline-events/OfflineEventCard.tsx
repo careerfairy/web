@@ -122,7 +122,7 @@ export const OfflineEventCard = ({ event }: Props) => {
             <Box pt={1} sx={styles.detailRow}>
                <Box component={MapPin} sx={styles.icon} />
                <Typography variant="small" sx={styles.detailText}>
-                  {address?.city}, {address?.state}
+                  {address?.city}, {address?.country}
                </Typography>
             </Box>
 

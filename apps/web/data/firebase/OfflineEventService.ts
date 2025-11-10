@@ -105,7 +105,7 @@ export class OfflineEventService {
     * @param offlineEventId - The ID of the offline event to fetch
     * @returns Promise with the offline event data
     */
-   async getById(offlineEventId: string): Promise<OfflineEvent> {
+   async getById(offlineEventId: string): Promise<OfflineEvent | null> {
       const ref = doc(
          this.firestore,
          "offlineEvents",
@@ -114,7 +114,7 @@ export class OfflineEventService {
 
       const docSnap = await getDoc(ref)
 
-      return docSnap.data()
+      return docSnap.exists() ? docSnap.data() : null
    }
 
    /**
