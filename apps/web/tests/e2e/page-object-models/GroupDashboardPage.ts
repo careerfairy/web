@@ -566,38 +566,23 @@ export class GroupDashboardPage extends CommonPage {
       }
       simpleCard?: boolean
    }): Promise<void> {
-      const { value, ...fieldsToFilter } = options.fields
-      const baseIdentifier = options.simpleCard ? "simple-card" : "card"
-
       let filteredCards = this.page.getByTestId("card-custom")
 
-      for (const field in fieldsToFilter) {
-         const expectedValue = fieldsToFilter[field]
-
-         if (!expectedValue) continue
-
+      for (const field in options.fields) {
+         const baseIdentifier = options.simpleCard ? "simple-card" : "card"
          const fullTestId = `${baseIdentifier}-${field}`
 
+         // Filter the cards by the given fields
          filteredCards = filteredCards.filter({
             has: this.page.getByTestId(fullTestId).filter({
-               hasText: new RegExp(`\\b${expectedValue}\\b`),
+               hasText: new RegExp(`\\b${options.fields[field]}\\b`), // \b is a word boundary to prevent partial matches
             }),
          })
       }
 
-      const card = filteredCards.first()
-
-      await expect(card).toBeVisible({
-         timeout: 40000,
+      await expect(filteredCards).toBeVisible({
+         timeout: 60000, // Give the trigger functions some time buffer to sync the live stream stats
       })
-
-      if (value) {
-         const valueLocator = card.getByTestId(`${baseIdentifier}-value`)
-
-         await expect(valueLocator).toHaveText(new RegExp(`\\b${value}\\b`), {
-            timeout: 60000,
-         })
-      }
    }
 
    /**
