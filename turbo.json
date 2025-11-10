@@ -19,8 +19,7 @@
       "webapp:report": {},
       "test:e2e-webapp": {
          "dependsOn": ["build"],
-         "outputs": ["test-results/**", "playwright-report/**"],
-         "cache": false
+         "outputs": ["test-results/**", "playwright-report/**"]
       },
       "test:e2e-webapp-debug": {
          "dependsOn": ["build"],
