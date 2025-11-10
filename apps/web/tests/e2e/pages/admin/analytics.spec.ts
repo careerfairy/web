@@ -1,18 +1,20 @@
+import { firestore } from "@careerfairy/seed-data/lib/firebase"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { BrowserContext, expect } from "@playwright/test"
+import type { GroupAdminFixtureOptions } from "../../fixtures"
 import { groupAdminFixture as test } from "../../fixtures"
 import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
 import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
 import { setupLivestreamData } from "../../setupData"
 
-const testWithPrivacyPolicyActive = test.extend({
-   // eslint-disable-next-line no-empty-pattern
-   options: async ({}, use) => {
-      await use({
-         createUser: true,
-         atsGroupType: "COMPLETE",
-         privacyPolicy: true,
-      })
+const testWithPrivacyPolicyActive = test.extend<{
+   options: GroupAdminFixtureOptions
+}>({
+   options: {
+      createUser: true,
+      atsGroupType: "COMPLETE",
+      privacyPolicy: true,
    },
 })
 
@@ -70,7 +72,8 @@ test.describe("Group Analytics", () => {
 
    testWithPrivacyPolicyActive(
       "Live stream analytics update when user registers to live stream",
-      async ({ groupPage, group, context, user }) => {
+      async ({ groupPage, group, context, user }, testInfo) => {
+         testInfo.setTimeout(120000)
          const { livestream } = await setupLivestreamData(group)
 
          const livestreamDialogPage = await setupLivestreamDialogPage(
@@ -79,6 +82,7 @@ test.describe("Group Analytics", () => {
          )
 
          await completeRegistration(livestreamDialogPage, true)
+         await waitForLivestreamRegistrationsStat(livestream.id, 1)
 
          await groupPage.goToAnalyticsPage()
          await groupPage.goToLivestreamAnalyticsPage()
@@ -143,6 +147,32 @@ async function verifyAnalyticsCard(
          value,
       },
    })
+}
+
+async function waitForLivestreamRegistrationsStat(
+   livestreamId: string,
+   expectedRegistrations: number
+) {
+   await expect
+      .poll(
+         async () => {
+            const statsDoc = await firestore
+               .collection("livestreams")
+               .doc(livestreamId)
+               .collection("stats")
+               .doc("livestreamStats")
+               .get()
+
+            const statsData = statsDoc.data() as LiveStreamStats | undefined
+
+            return statsData?.generalStats?.numberOfRegistrations ?? 0
+         },
+         {
+            timeout: 90000,
+            intervals: [1000, 2000, 4000, 5000],
+         }
+      )
+      .toBeGreaterThanOrEqual(expectedRegistrations)
 }
 
 /**

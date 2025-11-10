@@ -135,6 +135,8 @@ const config: PlaywrightTestConfig = {
          NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
          // Reduce Java heap size for Firestore/Storage emulators (default is much higher)
          JAVA_TOOL_OPTIONS: "-Xmx2g",
+         // Cap Node.js heap usage for Firebase CLI/emulators to avoid excessive memory consumption
+         NODE_OPTIONS: "--max-old-space-size=4096",
       },
       port: 3000,
       // emulators need some time to boot
