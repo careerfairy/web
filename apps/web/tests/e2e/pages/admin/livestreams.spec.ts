@@ -47,19 +47,15 @@ test.describe("Group Admin Livestreams", () => {
    }) => {
       await setupLivestreamData()
 
-      const livestreamToPublish: LivestreamEvent = LivestreamSeed.random()
+      const livestreamToPublish: LivestreamEvent = LivestreamSeed.random({
+         levelOfStudyIds: levelOfStudyIds.slice(0, 1).map((f) => f.id),
+         fieldOfStudyIds: fieldOfStudyIds.slice(0, 3).map((l) => l.id),
+         isDraft: true,
+      })
 
       // create draft - with missing required fields
       await groupPage.clickCreateNewLivestreamTop()
-      await groupPage.fillLivestreamForm(
-         {
-            ...livestreamToPublish,
-            levelOfStudyIds: levelOfStudyIds.slice(0, 1).map((f) => f.id),
-            fieldOfStudyIds: fieldOfStudyIds.slice(0, 3).map((l) => l.id),
-            isDraft: true,
-         },
-         true
-      )
+      await groupPage.fillLivestreamForm(livestreamToPublish, true)
 
       const livestreamsPage = new LivestreamsAdminPage(groupPage)
 
@@ -73,6 +69,8 @@ test.describe("Group Admin Livestreams", () => {
 
       // Click on the specific event to navigate to the edit page
       await livestreamsPage.clickEventToEditByTitle(livestreamToPublish.title)
+
+      await groupPage.page.reload()
 
       // edit livestream title
       const title = "Livestream New Title"
