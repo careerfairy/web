@@ -411,6 +411,11 @@ export class GroupDashboardPage extends CommonPage {
             )
 
             await this.page.getByRole("button", { name: "Create" }).click()
+
+            // Wait for the create speaker dialog to fully close
+            await this.page
+               .getByRole("heading", { name: /Create.*new.*contributor/i })
+               .waitFor({ state: "hidden" })
          }
       }
    }
