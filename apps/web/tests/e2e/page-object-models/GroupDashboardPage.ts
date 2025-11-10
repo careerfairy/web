@@ -517,19 +517,16 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    async addCompanyPhotos() {
-      // upload 3 photos
-      await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "Add photo" }),
-         imageLogoPath
-      )
-      await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "Add photo" }),
-         imageLogoPath
-      )
-      await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "Add photo" }),
-         imageLogoPath
-      )
+      const addPhotoButton = this.page.getByRole("button", {
+         name: "Add photo",
+      })
+      const photoFrames = this.page.locator(".photo-frame")
+      const initialPhotoCount = await photoFrames.count()
+
+      for (let index = 1; index <= 3; index++) {
+         await this.clickAndUploadFiles(addPhotoButton, imageLogoPath)
+         await expect(photoFrames).toHaveCount(initialPhotoCount + index)
+      }
    }
 
    async addCompanyVideo() {

@@ -1,8 +1,8 @@
 import JobsSeed from "@careerfairy/seed-data/jobs"
 import LivestreamSeed from "@careerfairy/seed-data/livestreams"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamsAdminPage } from "tests/e2e/page-object-models/admin/LivestreamsAdminPage"
 import { setupLivestreamData } from "tests/e2e/setupData"
-import { sleep } from "tests/e2e/utils"
 import { groupAdminFixture as test } from "../../fixtures"
 
 test.describe("Group Admin Livestreams", () => {
@@ -47,55 +47,41 @@ test.describe("Group Admin Livestreams", () => {
    }) => {
       await setupLivestreamData()
 
-      const livestream = LivestreamSeed.randomDraft({})
+      const livestreamToPublish: LivestreamEvent = LivestreamSeed.random()
 
       // create draft - with missing required fields
       await groupPage.clickCreateNewLivestreamTop()
-      await groupPage.fillLivestreamForm(livestream)
+      await groupPage.fillLivestreamForm(
+         {
+            ...livestreamToPublish,
+            levelOfStudyIds: levelOfStudyIds.slice(0, 1).map((f) => f.id),
+            fieldOfStudyIds: fieldOfStudyIds.slice(0, 3).map((l) => l.id),
+            isDraft: true,
+         },
+         true
+      )
 
-      // Publish draft
-      const livestreamsPage = await groupPage.goToLivestreams()
-      await livestreamsPage.filterByStatus("Draft")
-      // Click on the specific event to navigate to the edit page
-      await livestreamsPage.clickEventToEditByTitle(livestream.title)
-
-      // Fill in missing required fields
-
-      const overrideFields = {
-         ...livestream,
-         businessFunctionsTagIds: null, // Mandatory field which is already filled, and during updates set to null to not remove
-         levelOfStudyIds: levelOfStudyIds.slice(0, 1).map((f) => f.id),
-         fieldOfStudyIds: fieldOfStudyIds.slice(0, 3).map((l) => l.id),
-      }
-
-      // Deleting before calling random to force recalculation, if not these values would be transported from the base stream
-      delete overrideFields["contentTopicsTagIds"]
-      delete overrideFields["summary"]
-
-      const livestreamToPublish: LivestreamEvent =
-         LivestreamSeed.random(overrideFields)
-
-      // Fill form and publish after auto save
-      await groupPage.fillLivestreamForm(livestreamToPublish, true)
+      const livestreamsPage = new LivestreamsAdminPage(groupPage)
 
       // Assert promoted livestream dialog is visible right after publishing
       await livestreamsPage.waitForPromoteDialog()
       await livestreamsPage.assertPromoteDialogCopyLinkWorks()
       await livestreamsPage.closePromoteDialog()
 
-      // go back to the main page
-      await groupPage.open()
+      // Publish draft
+      await livestreamsPage.filterByStatus("Published")
 
-      // should also be in the main page
-      await groupPage.assertTextIsVisible(livestream.title)
+      // Click on the specific event to navigate to the edit page
+      await livestreamsPage.clickEventToEditByTitle(livestreamToPublish.title)
 
       // edit livestream title
       const title = "Livestream New Title"
-      await groupPage.clickManageLivestream()
+
+      // Fill form and publish after auto save
       await groupPage.fillLivestreamForm({ title })
+
       // new title should be visible
       await groupPage.goToLivestreams()
-      await sleep(5000)
       await groupPage.assertTextIsVisible(title)
    })
 
