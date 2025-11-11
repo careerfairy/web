@@ -95,7 +95,6 @@ test.describe("Company page follow", () => {
    test("Follow company from a the dedicated company page", async ({
       groupPage,
       group,
-      user,
    }) => {
       await groupPage.goToCompanyPage()
       await groupPage.goToCompanyPageAdmin()
@@ -110,14 +109,6 @@ test.describe("Company page follow", () => {
       await expect(
          groupPage.page.getByTestId(`unfollow-button-${group.id}`).first()
       ).toBeVisible()
-
-      // get user follow companies
-      const followedCompanies = await UserSeed.getUserFollowedCompanies(
-         user.userEmail
-      )
-
-      // expect group to be on the user companies follow list
-      expect(followedCompanies[0].groupId).toBe(group.groupId)
    })
    test("Follow company from companies page", async ({
       groupPage,

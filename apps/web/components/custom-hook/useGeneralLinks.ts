@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react"
-import { User as ProfileIcon } from "react-feather"
+import AutoModeIcon from "@mui/icons-material/AutoMode"
 import NextLivestreamsIcon from "@mui/icons-material/Contacts"
 import PortalIcon from "@mui/icons-material/DynamicFeed"
-import { useAuth } from "../../HOCs/AuthProvider"
-import { OverridableComponent } from "@mui/material/OverridableComponent"
-import { SvgIconTypeMap } from "@mui/material"
 import ReferralIcon from "@mui/icons-material/GroupAdd"
 import GroupsIcon from "@mui/icons-material/Groups"
-import ContactPageIcon from "@mui/icons-material/ContactPage"
-import AutoModeIcon from "@mui/icons-material/AutoMode"
+import { SvgIconTypeMap } from "@mui/material"
+import { OverridableComponent } from "@mui/material/OverridableComponent"
+import React, { useEffect, useState } from "react"
+import { User as ProfileIcon } from "react-feather"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 const initialMainLinks = [
    {
@@ -67,12 +66,6 @@ const authenticatedUserTopLinks: PageLinkProps[] = [
       icon: ReferralIcon,
    },
    {
-      href: "/profile/saved-recruiters",
-      title: "My Recruiters",
-      basePath: "/profile/saved-recruiters",
-      icon: ContactPageIcon,
-   },
-   {
       href: "/profile/groups",
       title: "Groups",
       basePath: "/profile/groups",
@@ -105,6 +98,7 @@ export interface PageLinkProps {
    href: string
    title: string
    basePath?: string
+   // eslint-disable-next-line @typescript-eslint/ban-types
    icon?: React.ReactElement | OverridableComponent<SvgIconTypeMap<{}, "svg">>
 }
 
@@ -125,6 +119,7 @@ const eventLinks: PageLinkProps[] = [
 ]
 const useGeneralLinks = () => {
    const { isLoggedOut } = useAuth()
+   // eslint-disable-next-line react/hook-use-state
    const [mainLinks] = useState<PageLinkProps[]>(initialMainLinks)
    const [secondaryLinks, setSecondaryLinks] = useState<PageLinkProps[]>(
       initialSecondaryLinks

@@ -28,14 +28,6 @@ export default class ProfilePage extends CommonPage {
       return this.resilientGoto(`/profile/groups`)
    }
 
-   openMyRecruiters() {
-      return this.resilientGoto(`/profile/saved-recruiters`)
-   }
-
-   openCareerSkills() {
-      return this.resilientGoto(`/profile/career-skills`)
-   }
-
    async clickDeleteAccountButton() {
       return this.deleteAccountButton.click()
    }

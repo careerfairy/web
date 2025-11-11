@@ -1,7 +1,6 @@
 import { useRouter } from "next/router"
 
 // material-ui
-import ContentPasteOutlinedIcon from "@mui/icons-material/ContentPasteOutlined"
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined"
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
@@ -469,16 +468,6 @@ const ProfileMenu = () => {
                         </ListItemIcon>
                         <Typography color={"text.secondary"}>
                            Referrals
-                        </Typography>
-                     </MenuItem>
-                     <MenuItem
-                        onClick={() => push("/profile/saved-recruiters")}
-                     >
-                        <ListItemIcon>
-                           <ContentPasteOutlinedIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography color={"text.secondary"}>
-                           My Recruiters
                         </Typography>
                      </MenuItem>
                   </ConditionalWrapper>
