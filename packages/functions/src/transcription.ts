@@ -1,14 +1,10 @@
-import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions/functionNames"
 import { LLMProviders } from "@careerfairy/shared-lib/livestreams/chapters"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams/livestreams"
 import { downloadLink } from "@careerfairy/shared-lib/livestreams/recordings"
 import { ASRProviders } from "@careerfairy/shared-lib/livestreams/transcriptions"
-import axios from "axios"
 import { logger } from "firebase-functions/v2"
-import { onDocumentUpdated } from "firebase-functions/v2/firestore"
 import { onRequest } from "firebase-functions/v2/https"
+import { onObjectFinalized } from "firebase-functions/v2/storage"
 import { livestreamsRepo } from "./api/repositories"
-import config from "./config"
 import { ChapterizationService } from "./lib/chapterization/ChapterizationService"
 import { ClaudeChapterClient } from "./lib/chapterization/clients/ClaudeChapterClient"
 import { IChapterizationClient } from "./lib/chapterization/types"
@@ -43,76 +39,57 @@ const transcriptionConfig = {
    memory: "1GiB" as const,
 }
 
-export const initiateChapterizationOnTranscriptionCompleted = onDocumentUpdated(
+const PATH_REGEX = /^transcriptions\/livestreams\/([^/]+)\/transcription\.json$/
+
+export const initiateChapterizationOnTranscriptionCompleted = onObjectFinalized(
    {
-      memory: "1GiB",
-      timeoutSeconds: 180, // 3 minutes, could be increased if needed according the axios timeout
-      document: "livestreams/{livestreamId}",
+      memory: "256MiB",
+      timeoutSeconds: 540,
+      bucket: "careerfairy-e1fd9.appspot.com",
    },
    async (event) => {
-      const livestreamId = event.params.livestreamId
+      const filePath = event.data.name
 
-      logger.info("Initiating chapterization on transcription completed", {
-         livestreamId,
-      })
+      logger.info("GCS transcription file finalized", { filePath })
 
-      const oldLivestreamEvent = event.data?.before?.data() as LivestreamEvent
-      const newLivestreamEvent = event.data?.after?.data() as LivestreamEvent
-
-      const transcriptionCompletedChanged =
-         oldLivestreamEvent?.transcriptionCompleted !== true &&
-         newLivestreamEvent?.transcriptionCompleted === true
-
-      if (!transcriptionCompletedChanged) {
+      const match = filePath.match(PATH_REGEX)
+      if (!match) {
          logger.info(
-            "Transcription is not completed, skipping chapterization call",
-            { livestreamId }
+            "File path does not match transcription pattern, skipping",
+            {
+               filePath,
+            }
          )
          return
       }
 
-      logger.info("Triggering chapterization", { livestreamId })
+      const livestreamId = match[1]
+
+      if (!livestreamId) {
+         logger.warn("Could not extract livestreamId from file path", {
+            filePath,
+         })
+         return
+      }
+
+      logger.info("Initiating chapterization from GCS trigger", {
+         livestreamId,
+         filePath,
+      })
 
       try {
-         await axios.get(
-            `${config.functionsBaseUrl}/${FUNCTION_NAMES.startLivestreamChapterization}?livestreamId=${livestreamId}`,
-            {
-               /**
-                * 2 minute timeout, should be more than enough for the chapterization to complete.
-                *
-                * Otherwise it will throw timeout error, which can be ignored since the called function will continue
-                * with a longer timeout and retries.
-                *
-                * It takes usually 30 seconds to 1 minute to complete.
-                */
-               timeout: 2 * 60 * 1000,
-            }
+         await chapterizationService.processLivestreamChapterization(
+            livestreamId
          )
 
          logger.info("Chapterization completed successfully", { livestreamId })
       } catch (error) {
-         const isTimeoutError =
-            error?.code === "ECONNABORTED" ||
-            error?.message?.toLowerCase()?.includes("timeout")
-
-         if (isTimeoutError) {
-            logger.warn(
-               "Chapterization trigger timed out (called function will continue)",
-               {
-                  livestreamId,
-               }
-            )
-         } else {
-            logger.error(
-               "Chapterization trigger failed with non-timeout error",
-               {
-                  livestreamId,
-                  error,
-                  errorMessage: getErrorMessage(error),
-               }
-            )
-            throw error
-         }
+         logger.error("Chapterization failed", {
+            livestreamId,
+            error,
+            errorMessage: getErrorMessage(error),
+         })
+         throw error
       }
    }
 )
@@ -167,7 +144,6 @@ export const startLivestreamChapterization = onRequest(
    }
 )
 /**
- * Manual HTTP function for testing transcription
  * Usage: GET /manualLivestreamTranscription?livestreamId=<id>
  */
 export const startLivestreamTranscription = onRequest(

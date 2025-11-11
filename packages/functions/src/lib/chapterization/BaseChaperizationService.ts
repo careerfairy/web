@@ -1,5 +1,4 @@
 import { Chapter, LivestreamChapter } from "@careerfairy/shared-lib/livestreams"
-import { ChapterizationStatus } from "@careerfairy/shared-lib/livestreams/chapters"
 import { BulkWriter } from "firebase-admin/firestore"
 import { logger } from "firebase-functions/v2"
 import { Timestamp, firestore } from "../../api/firestoreAdmin"
@@ -21,17 +20,14 @@ export class BaseChapterizationService {
       result: IChapterizationResult,
       transcriptionFilePath: string
    ): Promise<void> {
-      const firstChapter = result.chapters[0]
-
-      const status: ChapterizationStatus = {
+      return this.livestreamRepo.updateChapterizationStatus(livestreamId, {
          state: "chapterization-completed",
+         documentType: "chapterizationStatus",
          chaptersCount: result.chapters.length,
-         firstChapter,
+         firstChapter: result.chapters[0],
          transcriptionFilePath,
          metadata: result.metadata,
-      }
-
-      await this.livestreamRepo.updateChapterizationStatus(livestreamId, status)
+      })
    }
 
    protected async markChapterizationFailedWithRetry(
@@ -41,16 +37,15 @@ export class BaseChapterizationService {
       transcriptionFilePath: string,
       nextRetryAt: Timestamp
    ): Promise<void> {
-      const status: ChapterizationStatus = {
+      return this.livestreamRepo.updateChapterizationStatus(livestreamId, {
          state: "chapterization-failed",
+         documentType: "chapterizationStatus",
          errorMessage: getErrorMessage(error),
          failedAt: Timestamp.now(),
          transcriptionFilePath,
          retryCount,
          nextRetryAt,
-      }
-
-      await this.livestreamRepo.updateChapterizationStatus(livestreamId, status)
+      })
    }
 
    protected async markChapterizationPermanentlyFailed(
@@ -59,18 +54,95 @@ export class BaseChapterizationService {
       retryCount: number,
       transcriptionFilePath: string
    ): Promise<void> {
-      const status: ChapterizationStatus = {
+      return this.livestreamRepo.updateChapterizationStatus(livestreamId, {
          state: "chapterization-failed",
          errorMessage: `Failed after max retries reached: ${getErrorMessage(
             error
          )}`,
          failedAt: Timestamp.now(),
+         documentType: "chapterizationStatus",
          transcriptionFilePath,
          retryCount,
          nextRetryAt: null,
-      }
+      })
+   }
 
-      await this.livestreamRepo.updateChapterizationStatus(livestreamId, status)
+   /**
+    * Generic method to batch write items to a Firestore subcollection
+    * @param livestreamId - The ID of the livestream
+    * @param items - Array of items to write
+    * @param collectionName - Name of the subcollection (e.g., "chapters", "generatedQuestions")
+    * @param transform - Function to transform each item into the Firestore document format
+    * @param itemType - Type name for logging (e.g., "chapter", "question")
+    */
+   private async batchWriteToSubcollection<T, R>(
+      livestreamId: string,
+      items: T[],
+      collectionName: string,
+      transform: (
+         item: T,
+         index: number,
+         docRef: FirebaseFirestore.DocumentReference
+      ) => R,
+      itemType: string
+   ): Promise<void> {
+      const bulkWriter: BulkWriter = firestore.bulkWriter()
+      let writeCount = 0
+
+      try {
+         for (const [index, item] of items.entries()) {
+            const docRef = firestore
+               .collection("livestreams")
+               .doc(livestreamId)
+               .collection(collectionName)
+               .doc()
+
+            const transformedItem = transform(item, index, docRef)
+
+            bulkWriter
+               .set(docRef, transformedItem)
+               .then(() => writeCount++)
+               .catch((error) => {
+                  logger.error(`bulkWriter.set failed for ${itemType}`, {
+                     livestreamId,
+                     index,
+                     error,
+                     errorMessage: getErrorMessage(error),
+                  })
+               })
+
+            // Flush periodically to avoid memory issues
+            if ((index + 1) % WRITE_BATCH === 0) {
+               await bulkWriter.flush()
+               logger.info("Flushed bulkWriter batch", {
+                  livestreamId,
+                  collectionName,
+                  batchNumber: Math.floor((index + 1) / WRITE_BATCH),
+               })
+            }
+         }
+
+         // Final flush for any remaining writes
+         await bulkWriter.flush()
+
+         // Close bulkWriter to ensure all writes are committed
+         await bulkWriter.close()
+
+         logger.info("Items saved to Firestore successfully", {
+            livestreamId,
+            collectionName,
+            itemsCount: items.length,
+            writeCount,
+         })
+      } catch (error) {
+         logger.error(`Failed to save ${itemType}s to Firestore`, {
+            livestreamId,
+            collectionName,
+            error,
+            errorMessage: getErrorMessage(error),
+         })
+         throw error
+      }
    }
 
    protected async saveChaptersToFirestore(
@@ -85,66 +157,22 @@ export class BaseChapterizationService {
       // Delete all existing chapters before saving new ones
       await this.livestreamRepo.deleteAllLivestreamChapters(livestreamId)
 
-      const bulkWriter: BulkWriter = firestore.bulkWriter()
-      let writeCount = 0
-
-      try {
-         for (const [index, chapter] of chapters.entries()) {
-            const chapterRef = firestore
-               .collection("livestreams")
-               .doc(livestreamId)
-               .collection("chapters")
-               .doc()
-
+      await this.batchWriteToSubcollection<Chapter, LivestreamChapter>(
+         livestreamId,
+         chapters,
+         "chapters",
+         (chapter, index, docRef) => {
             const livestreamChapter: LivestreamChapter = {
                ...chapter,
                documentType: "livestreamChapter",
-               id: chapterRef.id,
+               id: docRef.id,
                livestreamId,
                createdAt: Timestamp.now(),
                chapterIndex: index,
             }
-
-            bulkWriter
-               .set(chapterRef, livestreamChapter)
-               .then(() => writeCount++)
-               .catch((error) => {
-                  logger.error("bulkWriter.set failed for chapter", {
-                     livestreamId,
-                     chapterIndex: index,
-                     error,
-                     errorMessage: getErrorMessage(error),
-                  })
-               })
-
-            // Flush periodically to avoid memory issues
-            if ((index + 1) % WRITE_BATCH === 0) {
-               await bulkWriter.flush()
-               logger.info("Flushed bulkWriter batch", {
-                  livestreamId,
-                  batchNumber: Math.floor((index + 1) / WRITE_BATCH),
-               })
-            }
-         }
-
-         // Final flush for any remaining writes
-         await bulkWriter.flush()
-
-         // Close bulkWriter to ensure all writes are committed
-         await bulkWriter.close()
-
-         logger.info("Chapters saved to Firestore successfully", {
-            livestreamId,
-            chaptersCount: chapters.length,
-            writeCount,
-         })
-      } catch (error) {
-         logger.error("Failed to save chapters to Firestore", {
-            livestreamId,
-            error,
-            errorMessage: getErrorMessage(error),
-         })
-         throw error
-      }
+            return livestreamChapter
+         },
+         "chapter"
+      )
    }
 }

@@ -17,7 +17,7 @@ import {
    LivestreamEvent,
    LivestreamQueryOptions,
    LivestreamReminderTask,
-   LivestreamTranscription,
+   LivestreamTranscriptionsGenerationStatus,
    Speaker,
    TranscriptionStatus,
    UserLivestreamData,
@@ -31,7 +31,7 @@ import {
 import {
    ChapterizationStatus,
    LLMProviders,
-   LivestreamChapter as LivestreamChapterStatus,
+   LivestreamChaptersGenerationStatus,
 } from "@careerfairy/shared-lib/livestreams/chapters"
 import {
    HandRaise,
@@ -394,24 +394,17 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    updateTranscriptionStatus(
       livestreamId: string,
       status: TranscriptionStatus,
-      additionalData?: Partial<LivestreamTranscription>
+      additionalData?: Partial<LivestreamTranscriptionsGenerationStatus>
    ): Promise<void>
 
    /**
     * Get transcription status for a livestream
     * @param livestreamId - The livestream ID
-    * @returns The transcription document or null if not found
+    * @returns The latest transcription status or null if not found
     */
    getTranscriptionStatus(
       livestreamId: string
-   ): Promise<LivestreamTranscription | null>
-
-   /**
-    * Update the livestream document to mark transcription as completed
-    * @param livestreamId - The livestream ID
-    * @returns true if update was successful
-    */
-   updateLivestreamTranscriptionCompleted(livestreamId: string): Promise<void>
+   ): Promise<TranscriptionStatus | null>
 
    /**
     * Initiate chapterization by creating or updating the status to "chapterizing"
@@ -436,17 +429,17 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    updateChapterizationStatus(
       livestreamId: string,
       status: ChapterizationStatus,
-      additionalData?: Partial<LivestreamChapterStatus>
+      additionalData?: Partial<LivestreamChaptersGenerationStatus>
    ): Promise<void>
 
    /**
     * Get chapterization status for a livestream
     * @param livestreamId - The livestream ID
-    * @returns The chapterization document or null if not found
+    * @returns The latest chapterization status or null if not found
     */
    getChapterizationStatus(
       livestreamId: string
-   ): Promise<LivestreamChapterStatus | null>
+   ): Promise<ChapterizationStatus | null>
 }
 
 export class LivestreamFunctionsRepository
@@ -1575,51 +1568,62 @@ export class LivestreamFunctionsRepository
 
    async initiateTranscription(
       livestreamId: string,
-      transcriptionProvider: ASRProviders = "deepgram"
+      transcriptionProvider: ASRProviders
    ): Promise<void> {
       const now = Timestamp.now()
 
-      const doc: LivestreamTranscription = {
+      const doc: LivestreamTranscriptionsGenerationStatus = {
          id: livestreamId,
          livestreamId,
          transcriptionProvider,
-         status: {
-            state: "transcribing",
-            startedAt: now,
-         },
          createdAt: now,
          updatedAt: now,
       }
 
-      // Use set with merge to handle both create and update cases
+      const statusDoc: TranscriptionStatus = {
+         state: "transcribing",
+         documentType: "transcriptionStatus",
+         startedAt: now,
+      }
+
       await this.firestore
-         .collection("livestreamTranscriptions")
+         .collection("livestreamTranscriptionsGenerationStatus")
          .doc(livestreamId)
-         .set(doc, { merge: true })
+         .set({ ...doc, lastStatus: statusDoc }, { merge: true })
+
+      await this.firestore
+         .collection("livestreamTranscriptionsGenerationStatus")
+         .doc(livestreamId)
+         .collection("status")
+         .doc()
+         .set(statusDoc)
    }
 
    async updateTranscriptionStatus(
       livestreamId: string,
       status: TranscriptionStatus,
-      additionalData?: Partial<LivestreamTranscription>
+      additionalData?: Partial<LivestreamTranscriptionsGenerationStatus>
    ): Promise<void> {
-      const updateData: UpdateData<LivestreamTranscription> = {
-         status,
-         updatedAt: Timestamp.now(),
+      const now = Timestamp.now()
+      const mainDocRef = this.firestore
+         .collection("livestreamTranscriptionsGenerationStatus")
+         .doc(livestreamId)
+
+      const updateData: UpdateData<LivestreamTranscriptionsGenerationStatus> = {
+         lastStatus: status,
+         updatedAt: now,
          ...additionalData,
       }
+      await mainDocRef.update(updateData)
 
-      await this.firestore
-         .collection("livestreamTranscriptions")
-         .doc(livestreamId)
-         .update(updateData)
+      await mainDocRef.collection("status").doc().set(status)
    }
 
    async getTranscriptionStatus(
       livestreamId: string
-   ): Promise<LivestreamTranscription | null> {
+   ): Promise<TranscriptionStatus | null> {
       const doc = await this.firestore
-         .collection("livestreamTranscriptions")
+         .collection("livestreamTranscriptionsGenerationStatus")
          .doc(livestreamId)
          .get()
 
@@ -1627,20 +1631,8 @@ export class LivestreamFunctionsRepository
          return null
       }
 
-      return doc.data() as LivestreamTranscription
-   }
-
-   async updateLivestreamTranscriptionCompleted(
-      livestreamId: string
-   ): Promise<void> {
-      const updateData: UpdateData<LivestreamEvent> = {
-         transcriptionCompleted: true,
-      }
-
-      await this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .update(updateData)
+      const data = doc.data() as LivestreamTranscriptionsGenerationStatus
+      return data.lastStatus || null
    }
 
    async initiateChapterization(
@@ -1650,48 +1642,65 @@ export class LivestreamFunctionsRepository
    ): Promise<void> {
       const now = Timestamp.now()
 
-      const doc: LivestreamChapterStatus = {
+      const doc: LivestreamChaptersGenerationStatus = {
          id: livestreamId,
          livestreamId,
          chapterProvider,
-         status: {
-            state: "chapterizing",
-            startedAt: now,
-            transcriptionFilePath,
-         },
          createdAt: now,
          updatedAt: now,
       }
 
-      // Use set with merge to handle both create and update cases
+      const statusDoc: ChapterizationStatus = {
+         state: "chapterizing",
+         documentType: "chapterizationStatus",
+         startedAt: now,
+         transcriptionFilePath,
+      }
+
       await this.firestore
-         .collection("livestreamChapters")
+         .collection("livestreamChaptersGenerationStatus")
          .doc(livestreamId)
-         .set(doc, { merge: true })
+         .set(
+            {
+               ...doc,
+               lastStatus: statusDoc,
+            },
+            { merge: true }
+         )
+
+      await this.firestore
+         .collection("livestreamChaptersGenerationStatus")
+         .doc(livestreamId)
+         .collection("status")
+         .doc()
+         .set(statusDoc)
    }
 
    async updateChapterizationStatus(
       livestreamId: string,
       status: ChapterizationStatus,
-      additionalData?: Partial<LivestreamChapterStatus>
+      additionalData?: Partial<LivestreamChaptersGenerationStatus>
    ): Promise<void> {
-      const updateData: UpdateData<LivestreamChapterStatus> = {
-         status,
-         updatedAt: Timestamp.now(),
+      const now = Timestamp.now()
+      const mainDocRef = this.firestore
+         .collection("livestreamChaptersGenerationStatus")
+         .doc(livestreamId)
+
+      const updateData: UpdateData<LivestreamChaptersGenerationStatus> = {
+         lastStatus: status,
+         updatedAt: now,
          ...additionalData,
       }
+      await mainDocRef.update(updateData)
 
-      await this.firestore
-         .collection("livestreamChapters")
-         .doc(livestreamId)
-         .update(updateData)
+      await mainDocRef.collection("status").doc().set(status)
    }
 
    async getChapterizationStatus(
       livestreamId: string
-   ): Promise<LivestreamChapterStatus | null> {
+   ): Promise<ChapterizationStatus | null> {
       const doc = await this.firestore
-         .collection("livestreamChapters")
+         .collection("livestreamChaptersGenerationStatus")
          .doc(livestreamId)
          .get()
 
@@ -1699,6 +1708,7 @@ export class LivestreamFunctionsRepository
          return null
       }
 
-      return doc.data() as LivestreamChapterStatus
+      const data = doc.data() as LivestreamChaptersGenerationStatus
+      return data.lastStatus || null
    }
 }

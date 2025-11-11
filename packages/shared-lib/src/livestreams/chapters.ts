@@ -16,23 +16,41 @@ export type ChapterizationMetadata = {
       cachedInput: number
    }
 }
+
+/**
+ * Base status type for all chapterization status variants
+ * Subcollection path: /livestreamChaptersGenerationStatus/{livestreamId}/status/{statusId}
+ */
 type BaseChapterizationStatus = {
+   documentType: "chapterizationStatus"
    transcriptionFilePath: string
 }
 
-type RunningState = {
+/**
+ * Running state for chapterization
+ * Subcollection path: /livestreamChaptersGenerationStatus/{livestreamId}/status/{statusId}
+ */
+export type ChapterizationRunningState = {
    state: "chapterizing"
    startedAt: Timestamp
 }
 
-type CompletedState = {
+/**
+ * Completed state for chapterization
+ * Subcollection path: /livestreamChaptersGenerationStatus/{livestreamId}/status/{statusId}
+ */
+export type ChapterizationCompletedState = {
    state: "chapterization-completed"
    chaptersCount: number
    firstChapter: Chapter
    metadata: ChapterizationMetadata
 }
 
-type FailedState = {
+/**
+ * Failed state for chapterization
+ * Subcollection path: /livestreamChaptersGenerationStatus/{livestreamId}/status/{statusId}
+ */
+export type ChapterizationFailedState = {
    state: "chapterization-failed"
    errorMessage: string
    failedAt: Timestamp
@@ -40,24 +58,34 @@ type FailedState = {
    nextRetryAt?: Timestamp
 }
 
+/**
+ * Union type representing all possible chapterization states
+ * Subcollection path: /livestreamChaptersGenerationStatus/{livestreamId}/status/{statusId}
+ */
 export type ChapterizationStatus = BaseChapterizationStatus &
-   (RunningState | CompletedState | FailedState)
+   (
+      | ChapterizationRunningState
+      | ChapterizationCompletedState
+      | ChapterizationFailedState
+   )
 
 /**
- * Collection: /livestreamChapters
- * Document in the livestreamChapters collection track the status of
+ * Collection: /livestreamChaptersGenerationStatus
+ * Document in the livestreamChaptersGenerationStatus collection track the status of
  * chapter generation for a livestream.
+ * Status is stored in subcollection: /livestreamChaptersGenerationStatus/{livestreamId}/status/{statusId}
  */
-export interface LivestreamChapter extends Identifiable {
+export interface LivestreamChaptersGenerationStatus extends Identifiable {
    /**
     * The identifiable.id could be the livestreamId or the recordingId as well
     */
    livestreamId: string
    chapterProvider: LLMProviders
+
    /**
-    * Current status of the transcription/chapter generation process
+    * Latest status for quick access (denormalized from status subcollection)
     */
-   status: ChapterizationStatus
+   lastStatus?: ChapterizationStatus
 
    /**
     * Timestamp when the document was last updated

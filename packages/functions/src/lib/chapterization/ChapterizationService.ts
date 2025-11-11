@@ -59,13 +59,16 @@ export class ChapterizationService extends BaseChapterizationService {
       let failedBecauseAnotherTranscriptionIsInProcess = false
 
       try {
-         const chapterizationStatus =
-            await this.livestreamRepo.getChapterizationStatus(livestreamId)
+         const status = await this.livestreamRepo.getChapterizationStatus(
+            livestreamId
+         )
 
+         // Skip if chapterization is already in progress, or if it failed but hasn't exhausted retries yet
+         // (retries are handled internally, so we don't want to start a new process)
          const shouldSkip =
-            chapterizationStatus?.status?.state === "chapterizing" ||
-            (chapterizationStatus?.status?.state === "chapterization-failed" &&
-               chapterizationStatus?.status?.retryCount < MAX_RETRIES)
+            status?.state === "chapterizing" ||
+            (status?.state === "chapterization-failed" &&
+               status?.retryCount < MAX_RETRIES)
 
          if (!isRetry && shouldSkip) {
             logger.warn(

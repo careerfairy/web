@@ -16,12 +16,11 @@ export class BaseTranscriptionService {
       recordingUrl: string,
       gcsPath: string
    ): Promise<void> {
-      const transcriptText = result.transcript.substring(0, 500)
-
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
+      return this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
          state: "transcription-completed",
+         documentType: "transcriptionStatus",
          completedAt: Timestamp.now(),
-         transcriptText,
+         transcriptText: result.transcript.substring(0, 500),
          confidenceAvg: result.confidence,
          metadata: {
             language: result.language,
@@ -30,10 +29,6 @@ export class BaseTranscriptionService {
             transcriptionFilePath: gcsPath,
          },
       })
-
-      await this.livestreamRepo.updateLivestreamTranscriptionCompleted(
-         livestreamId
-      )
    }
 
    protected async markTranscriptionFailedWithRetry(
@@ -43,8 +38,9 @@ export class BaseTranscriptionService {
       recordingUrl: string,
       nextRetryAt: Timestamp
    ): Promise<void> {
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
+      return this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
          state: "transcription-failed",
+         documentType: "transcriptionStatus",
          errorMessage: getErrorMessage(error),
          failedAt: Timestamp.now(),
          retryCount,
@@ -61,8 +57,9 @@ export class BaseTranscriptionService {
       retryCount: number,
       recordingUrl: string
    ): Promise<void> {
-      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
+      return this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
          state: "transcription-failed",
+         documentType: "transcriptionStatus",
          errorMessage: `Max retries reached: ${getErrorMessage(error)}`,
          failedAt: Timestamp.now(),
          retryCount,

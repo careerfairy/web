@@ -53,14 +53,16 @@ export class TranscriptionService extends BaseTranscriptionService {
       let failedBecauseAnotherTranscriptionIsInProcess = false
 
       try {
-         const transcription = await this.livestreamRepo.getTranscriptionStatus(
+         const status = await this.livestreamRepo.getTranscriptionStatus(
             livestreamId
          )
 
+         // Skip if transcription is already in progress, or if it failed but hasn't exhausted retries yet
+         // (retries are handled internally, so we don't want to start a new process)
          const shouldSkip =
-            transcription?.status?.state === "transcribing" ||
-            (transcription?.status?.state === "transcription-failed" &&
-               transcription?.status?.retryCount < MAX_RETRIES)
+            status?.state === "transcribing" ||
+            (status?.state === "transcription-failed" &&
+               status?.retryCount < MAX_RETRIES)
 
          if (!isRetry && shouldSkip) {
             logger.warn("Transcription already in progress, skipping", {

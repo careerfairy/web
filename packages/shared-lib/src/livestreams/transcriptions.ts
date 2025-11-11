@@ -2,11 +2,12 @@ import { Identifiable } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
 
 /**
- * Collection: /livestreamTranscriptions
- * Document in the livestreamTranscriptions collection track the status of
+ * Collection: /livestreamTranscriptionsGenerationStatus
+ * Document in the livestreamTranscriptionsGenerationStatus collection track the status of
  * transcription and chapter generation for a livestream (whole process end to end, not just transcription).
+ * Status is stored in subcollection: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-export interface LivestreamTranscription extends Identifiable {
+export interface LivestreamTranscriptionsGenerationStatus extends Identifiable {
    /**
     * The identifiable.id could be the livestreamId or the recordingId as well
     */
@@ -18,9 +19,9 @@ export interface LivestreamTranscription extends Identifiable {
    transcriptionProvider: ASRProviders
 
    /**
-    * Current status of the transcription/chapter generation process
+    * Latest status for quick access (denormalized from status subcollection)
     */
-   status: TranscriptionStatus
+   lastStatus?: TranscriptionStatus
 
    /**
     * Timestamp when the document was last updated
@@ -47,27 +48,32 @@ export type TranscriptMetadata = {
 }
 
 /**
- * Union type representing all possible transcription states
- */
-export type TranscriptionStatus = RunningState | CompletedState | FailedState
-
-/**
  * Automatic speech recognition providers
  */
 export type ASRProviders = "deepgram"
 
 /**
- * Combined running state
+ * Base status type for all transcription status variants
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-type RunningState = {
+type BaseTranscriptionStatus = {
+   documentType: "transcriptionStatus"
+}
+
+/**
+ * Running state for transcription
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
+ */
+export type TranscriptionRunningState = {
    state: "transcribing"
    startedAt: Timestamp
 }
 
 /**
- * State when transcription or chapter generation is completed
+ * Completed state for transcription
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-type CompletedState = {
+export type TranscriptionCompletedState = {
    state: "transcription-completed"
    completedAt: Timestamp
    confidenceAvg: number
@@ -76,9 +82,10 @@ type CompletedState = {
 }
 
 /**
- * State when transcription or chapter generation has failed
+ * Failed state for transcription
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
  */
-type FailedState = {
+export type TranscriptionFailedState = {
    state: "transcription-failed"
    metadata: TranscriptMetadata
    errorMessage: string
@@ -86,3 +93,14 @@ type FailedState = {
    retryCount: number
    nextRetryAt?: Timestamp
 }
+
+/**
+ * Union type representing all possible transcription states
+ * Subcollection path: /livestreamTranscriptionsGenerationStatus/{livestreamId}/status/{statusId}
+ */
+export type TranscriptionStatus = BaseTranscriptionStatus &
+   (
+      | TranscriptionRunningState
+      | TranscriptionCompletedState
+      | TranscriptionFailedState
+   )
