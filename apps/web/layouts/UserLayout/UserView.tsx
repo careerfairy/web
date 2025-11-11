@@ -12,7 +12,6 @@ import CareerSkills from "../../components/views/profile/career-skills/CareerSki
 import ProfileCustomJobs from "../../components/views/profile/custom-jobs/ProfileCustomJobs"
 import Groups from "../../components/views/profile/my-groups/Groups"
 import ReferralProfileTab from "../../components/views/profile/referral/ReferralProfileTab"
-import MyRecruitersTab from "../../components/views/profile/saved-recruiters/MyRecruitersTab"
 import UserData from "../../components/views/profile/userData"
 import { StylesProps } from "../../types/commonTypes"
 
@@ -75,13 +74,6 @@ const pages = {
          full: "Referrals",
       },
       component: ReferralProfileTab,
-   },
-   "/profile/saved-recruiters": {
-      title: {
-         compact: "Recruiters",
-         full: "My Recruiters",
-      },
-      component: MyRecruitersTab,
    },
    "/profile/groups": {
       title: {

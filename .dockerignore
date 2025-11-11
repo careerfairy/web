@@ -7,3 +7,12 @@ apps/web/playwright-report
 **/.turbo
 **/dist
 emulatorData
+**/emulatorData
+packages/functions/firebase-export-*
+packages/functions/firebase-debug.log
+packages/functions/firestore-debug.log
+packages/fetch-firestore-data/firebase-debug.log
+packages/fetch-firestore-data/firestore-debug.log
+packages/fetch-firestore-data/emulatorData/**
+firebase-debug.log
+firestore-debug.log

@@ -17,7 +17,7 @@ import { credentials } from "../constants"
 import { GroupDashboardPage } from "./page-object-models/GroupDashboardPage"
 import { LoginPage } from "./page-object-models/LoginPage"
 
-type GroupAdminFixtureOptions = {
+export type GroupAdminFixtureOptions = {
    /**
     * give the option for tests to not create a user
     */

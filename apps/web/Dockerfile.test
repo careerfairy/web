@@ -1,21 +1,51 @@
-FROM mcr.microsoft.com/playwright:v1.39.0-jammy
+# Base image matching GitHub Actions ubuntu-22.04 runner
+# GitHub Actions uses ubuntu-22.04 runner image (version 20251021.115.1)
+# This Dockerfile mirrors that environment for local testing
+#
+# Build from the monorepo root with:
+#   docker build -f apps/web/Dockerfile.test -t careerfairy-test .
+#
+# See README.md for usage examples including sharding support
+FROM ubuntu:22.04
 
-COPY ../../. /app
-
+# Set environment variables
 ENV CI=true
+ENV NODE_ENV=test
+ENV DEBIAN_FRONTEND=noninteractive
 
-# install java for the emulators
+# Install Node.js 22 (matching GitHub Actions setup)
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get -y install default-jre-headless && \
+    apt-get install -y curl ca-certificates gnupg && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-RUN npm install
-RUN npx playwright install
+# Install Java for Firebase emulators, uuid-runtime, and lsof (matching GitHub Actions setup)
+RUN apt-get update && \
+    apt-get install -y default-jre-headless uuid-runtime lsof && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-ENV NODE_ENV test
+# Set working directory
+WORKDIR /app
+
+# Copy all files (Docker will cache layers based on file changes)
+# The original Dockerfile used COPY ../../. /app, assuming build context is from root
+COPY . .
+
+# Install dependencies (matching GitHub Actions: npm ci --ignore-scripts)
+RUN npm ci --ignore-scripts
+
+# Install Playwright dependencies (matching GitHub Actions: npx playwright install --with-deps)
+RUN npx playwright install --with-deps
+
+# Build the application
 RUN npm run build
 
-ENTRYPOINT ["npm", "run", "test:e2e-webapp"]
+# Copy and set up entrypoint script for generating workflow ID
+COPY apps/web/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD ["npm", "run", "test:e2e-webapp"]
