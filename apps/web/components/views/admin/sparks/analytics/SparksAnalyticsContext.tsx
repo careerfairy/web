@@ -19,6 +19,7 @@ interface SparksAnalyticsContextType {
    updatedAtLabel: string
    industriesOptions: { value: string; label: string }[]
    industriesOptionsTopCompanies: { value: string; label: string }[]
+   analyticsUpdatedAt: Date | null
 }
 
 const SparksAnalyticsContext = createContext<
@@ -122,6 +123,8 @@ export const SparksAnalyticsProvider = ({ children }) => {
       return result
    }, [analytics, group?.companyIndustries])
 
+   const analyticsUpdatedAt = analytics?.updatedAt ?? null
+
    const value = useMemo(() => {
       return {
          filteredAnalytics,
@@ -134,6 +137,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
          updatedAtLabel,
          industriesOptions,
          industriesOptionsTopCompanies,
+         analyticsUpdatedAt,
       }
    }, [
       filteredAnalytics,
@@ -145,6 +149,7 @@ export const SparksAnalyticsProvider = ({ children }) => {
       updatedAtLabel,
       industriesOptions,
       industriesOptionsTopCompanies,
+      analyticsUpdatedAt,
    ])
 
    useEffect(() => {

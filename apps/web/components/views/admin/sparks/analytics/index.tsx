@@ -2,6 +2,7 @@ import { TimePeriodParams } from "@careerfairy/shared-lib/sparks/analytics"
 import { Box, Button, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useRouter } from "next/router"
+import { useEffect, useRef } from "react"
 import { RefreshCw } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { SparksAudienceTab } from "./audience-tab"
@@ -12,6 +13,7 @@ import { useSparksAnalytics } from "./SparksAnalyticsContext"
 import { SparksAnalyticsTabs, TabValue } from "./SparksAnalyticsTabs"
 
 const UPDATE_ICON_SIZE = 18
+const AUTO_REFRESH_THRESHOLD_MS = 15 * 60 * 1000 // 15 minutes
 
 const styles = sxStyles({
    root: {
@@ -144,8 +146,31 @@ type TimeFilter = {
 
 const GroupSparkAnalytics = () => {
    const { query } = useRouter()
-   const { selectTimeFilter, setSelectTimeFilter, updateAnalytics, isLoading } =
-      useSparksAnalytics()
+   const {
+      selectTimeFilter,
+      setSelectTimeFilter,
+      updateAnalytics,
+      isLoading,
+      analyticsUpdatedAt,
+   } = useSparksAnalytics()
+
+   const hasTriggeredAutoRefreshRef = useRef(false)
+
+   // Refresh analytics on mount only when data is stale
+   useEffect(() => {
+      if (hasTriggeredAutoRefreshRef.current) return
+
+      const lastUpdatedTime = analyticsUpdatedAt?.getTime?.()
+      const shouldRefresh =
+         !lastUpdatedTime ||
+         Date.now() - lastUpdatedTime >= AUTO_REFRESH_THRESHOLD_MS
+
+      hasTriggeredAutoRefreshRef.current = true
+
+      if (shouldRefresh) {
+         updateAnalytics()
+      }
+   }, [analyticsUpdatedAt, updateAnalytics])
 
    // Get tab value from query params for conditional rendering
    const tabValue = (query.tab as TabValue) || "overview"
