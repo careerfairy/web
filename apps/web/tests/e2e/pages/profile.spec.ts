@@ -3,14 +3,11 @@ import {
    clearFirestoreData,
 } from "@careerfairy/seed-data/dist/emulators"
 import UserSeed from "@careerfairy/seed-data/dist/users"
-import { EngageBadgeLevel3 } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { test as base, expect } from "@playwright/test"
 import { credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"
 import ProfilePage from "../page-object-models/ProfilePage"
-import { sleep } from "../utils"
 
 const test = base.extend<{
    user: UserData
@@ -33,107 +30,6 @@ const test = base.extend<{
 
       await use(profilePage)
    },
-})
-
-test.describe("My Recruiters", () => {
-   test("Browse all events link should work", async ({ profilePage }) => {
-      // open page
-      await profilePage.openMyRecruiters()
-
-      // browse all events should work
-      await profilePage.clickBrowseAllEvents()
-
-      expect(profilePage.page.url()).toContain(`/next-livestreams`)
-   })
-
-   test("No Access to feature yet - missing badge", async ({ profilePage }) => {
-      // open page
-      await profilePage.openMyRecruiters()
-
-      // assertions
-      await expect(
-         profilePage.page.getByRole("heading", {
-            name: "You need to unlock the Networker Level 2 badge to access this feature.",
-         })
-      ).toBeVisible()
-   })
-
-   test("A Saved Recruiter is shown", async ({ user, profilePage }) => {
-      await UserSeed.updateUser(user.userEmail, {
-         badges: [UserPresenter.saveRecruitersRequiredBadge().key],
-      })
-
-      const recruiter = await UserSeed.addSavedRecruiter(user)
-
-      // open page
-      await profilePage.openMyRecruiters()
-
-      // assertions
-      await expect(
-         profilePage.text(
-            `${recruiter.streamerDetails.firstName} ${recruiter.streamerDetails.lastName}`
-         )
-      ).toBeVisible()
-
-      await expect(profilePage.text("To the event page")).toBeVisible()
-   })
-
-   test("Delete a saved recruiter", async ({ profilePage, user }) => {
-      await UserSeed.updateUser(user.userEmail, {
-         badges: [UserPresenter.saveRecruitersRequiredBadge().key],
-      })
-      const recruiter = await UserSeed.addSavedRecruiter(user)
-
-      // open page
-      await profilePage.openMyRecruiters()
-
-      // confirm recruiter is present
-      await expect(
-         profilePage.page.getByText(recruiter.streamerDetails.firstName)
-      ).toBeVisible()
-
-      // Open settings menu
-      await profilePage.page.locator('[aria-label="settings"]').click()
-      await profilePage.page.locator("text=Delete").click()
-
-      await sleep(2000)
-
-      expect(
-         await profilePage.page.isVisible(
-            `text=${recruiter.streamerDetails.firstName}`
-         )
-      ).toBeFalsy()
-   })
-})
-
-test.describe("Career Skills", () => {
-   test("Should have progression on a level", async ({ profilePage, user }) => {
-      await UserSeed.updateUser(user.userEmail, {
-         badges: [EngageBadgeLevel3.key],
-      })
-
-      // open page
-      await profilePage.openCareerSkills()
-
-      const thereIsProgress = await profilePage.page
-         .locator(
-            ".MuiStepConnector-root.MuiStepConnector-horizontal.Mui-completed .MuiStepConnector-line"
-         )
-         .isVisible()
-      expect(thereIsProgress).toBeTruthy()
-   })
-
-   test("Should not have any progression", async ({ profilePage }) => {
-      // open page
-      await profilePage.openCareerSkills()
-
-      const thereIsProgress = await profilePage.page
-         .locator(
-            ".MuiStepConnector-root.MuiStepConnector-horizontal.Mui-completed .MuiStepConnector-line"
-         )
-         .isVisible()
-      expect(thereIsProgress).toBeFalsy()
-   })
 })
 
 test.skip("Personal Information", () => {

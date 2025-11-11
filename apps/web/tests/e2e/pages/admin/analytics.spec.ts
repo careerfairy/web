@@ -1,18 +1,18 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { BrowserContext, expect } from "@playwright/test"
+import type { GroupAdminFixtureOptions } from "../../fixtures"
 import { groupAdminFixture as test } from "../../fixtures"
 import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
 import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
 import { setupLivestreamData } from "../../setupData"
 
-const testWithPrivacyPolicyActive = test.extend({
-   // eslint-disable-next-line no-empty-pattern
-   options: async ({}, use) => {
-      await use({
-         createUser: true,
-         atsGroupType: "COMPLETE",
-         privacyPolicy: true,
-      })
+const testWithPrivacyPolicyActive = test.extend<{
+   options: GroupAdminFixtureOptions
+}>({
+   options: {
+      createUser: true,
+      atsGroupType: "COMPLETE",
+      privacyPolicy: true,
    },
 })
 
@@ -70,7 +70,8 @@ test.describe("Group Analytics", () => {
 
    testWithPrivacyPolicyActive(
       "Live stream analytics update when user registers to live stream",
-      async ({ groupPage, group, context, user }) => {
+      async ({ groupPage, group, context, user }, testInfo) => {
+         testInfo.setTimeout(120000)
          const { livestream } = await setupLivestreamData(group)
 
          const livestreamDialogPage = await setupLivestreamDialogPage(

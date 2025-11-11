@@ -49,6 +49,9 @@ const BrandedDialog = ({
          PaperProps={{
             sx: combineStyles(styles.dialogPaper, paperSx),
          }}
+         TransitionProps={{
+            unmountOnExit: true,
+         }}
       >
          {children}
       </Dialog>

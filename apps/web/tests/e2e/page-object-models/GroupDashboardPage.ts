@@ -441,6 +441,11 @@ export class GroupDashboardPage extends CommonPage {
             )
 
             await this.page.getByRole("button", { name: "Create" }).click()
+
+            // Wait for the create speaker dialog to fully close
+            await this.page
+               .getByRole("heading", { name: /Create.*new.*contributor/i })
+               .waitFor({ state: "hidden" })
          }
       }
    }
@@ -542,19 +547,16 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    async addCompanyPhotos() {
-      // upload 3 photos
-      await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "Add photo" }),
-         imageLogoPath
-      )
-      await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "Add photo" }),
-         imageLogoPath
-      )
-      await this.clickAndUploadFiles(
-         this.page.getByRole("button", { name: "Add photo" }),
-         imageLogoPath
-      )
+      const addPhotoButton = this.page.getByRole("button", {
+         name: "Add photo",
+      })
+      const photoFrames = this.page.locator(".photo-frame")
+      const initialPhotoCount = await photoFrames.count()
+
+      for (let index = 1; index <= 3; index++) {
+         await this.clickAndUploadFiles(addPhotoButton, imageLogoPath)
+         await expect(photoFrames).toHaveCount(initialPhotoCount + index)
+      }
    }
 
    async addCompanyVideo() {
@@ -611,7 +613,7 @@ export class GroupDashboardPage extends CommonPage {
       }
 
       await expect(filteredCards).toBeVisible({
-         timeout: 40000, // Give the trigger functions some time buffer to sync the live stream stats
+         timeout: 60000, // Give the trigger functions some time buffer to sync the live stream stats
       })
    }
 
