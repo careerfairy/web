@@ -1,3 +1,4 @@
+import { BundleName } from "@careerfairy/shared-lib/functions"
 import axios, { AxiosInstance } from "axios"
 import {
    getDocs,
@@ -6,7 +7,6 @@ import {
    namedQuery,
 } from "firebase/firestore"
 import { firestoreClientSDK } from "../api/firestoreClient"
-import { BundleName } from "../bundles"
 import config from "../config"
 import { isTestEnvironment, logAxiosErrorAndThrow } from "../util"
 

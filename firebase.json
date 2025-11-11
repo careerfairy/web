@@ -28,6 +28,10 @@
          {
             "source": "/bundle-allSparksStats",
             "function": "bundle-allSparksStats"
+         },
+         {
+            "source": "/bundle-allFutureOfflineEvents",
+            "function": "bundle-allFutureOfflineEvents"
          }
       ]
    },
