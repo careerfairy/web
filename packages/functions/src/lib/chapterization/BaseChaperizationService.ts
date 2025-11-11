@@ -23,6 +23,7 @@ export class BaseChapterizationService {
       return this.livestreamRepo.updateChapterizationStatus(livestreamId, {
          state: "chapterization-completed",
          documentType: "chapterizationStatus",
+         completedAt: Timestamp.now(),
          chaptersCount: result.chapters.length,
          firstChapter: result.chapters[0],
          transcriptionFilePath,

@@ -41,6 +41,7 @@ export type ChapterizationRunningState = {
  */
 export type ChapterizationCompletedState = {
    state: "chapterization-completed"
+   completedAt: Timestamp
    chaptersCount: number
    firstChapter: Chapter
    metadata: ChapterizationMetadata
