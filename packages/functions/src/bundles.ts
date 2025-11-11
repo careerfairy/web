@@ -1,3 +1,4 @@
+import { BUNDLE_NAMES, BundleName } from "@careerfairy/shared-lib/functions"
 import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
 import { DateTime } from "luxon"
 import { Bundle } from "./lib/bundleGenerator"
@@ -14,8 +15,8 @@ import { Bundle } from "./lib/bundleGenerator"
  * You'll need to deploy both the new function, and the new hosting config.
  */
 export const bundles = {
-   allFutureLivestreams: {
-      name: "allFutureLivestreams",
+   [BUNDLE_NAMES.allFutureLivestreams]: {
+      name: BUNDLE_NAMES.allFutureLivestreams,
       cacheControl: "public, max-age=900", // 15min
       queries: {
          "future-livestreams-query": (firestore) =>
@@ -27,8 +28,8 @@ export const bundles = {
                .where("hidden", "==", false),
       },
    },
-   futureLivestreamsNext15Days: {
-      name: "futureLivestreamsNext15Days",
+   [BUNDLE_NAMES.futureLivestreamsNext15Days]: {
+      name: BUNDLE_NAMES.futureLivestreamsNext15Days,
       cacheControl: "public, max-age=900", // 15min
       queries: {
          "future-livestreams-query": (firestore) =>
@@ -47,8 +48,8 @@ export const bundles = {
    },
 
    // Warning: may take ~20s to generate when not cached
-   pastYearLivestreams: {
-      name: "pastYearLivestreams",
+   [BUNDLE_NAMES.pastYearLivestreams]: {
+      name: BUNDLE_NAMES.pastYearLivestreams,
       cacheControl: "public, max-age=86400", // 1 day, this list is big
       queries: {
          "past-livestreams-query": (firestore) =>
@@ -65,8 +66,8 @@ export const bundles = {
                .where("hidden", "==", false),
       },
    },
-   allSparksStats: {
-      name: "allSparksStats",
+   [BUNDLE_NAMES.allSparksStats]: {
+      name: BUNDLE_NAMES.allSparksStats,
       cacheControl: "public, max-age=900", // 15min
       queries: {
          "all-sparks-stats": (firestore) =>
@@ -77,6 +78,21 @@ export const bundles = {
                .where("deleted", "==", false),
       },
    },
-} satisfies { [key: string]: Bundle }
-
-export type BundleName = keyof typeof bundles
+   [BUNDLE_NAMES.allFutureOfflineEvents]: {
+      name: BUNDLE_NAMES.allFutureOfflineEvents,
+      cacheControl: "public, max-age=900", // 15min
+      queries: {
+         "future-offline-events-query": (firestore) =>
+            firestore
+               .collection("offlineEvents")
+               .where("hidden", "==", false)
+               .where("published", "==", true)
+               // Include events from today onwards (start of today) so events happening today are still shown
+               .where(
+                  "startAt",
+                  ">",
+                  DateTime.local().startOf("day").toJSDate()
+               ),
+      },
+   },
+} satisfies Record<BundleName, Bundle>

@@ -99,3 +99,17 @@ export const FUNCTION_NAMES = {
    fetchStripePrice: "fetchStripePrice_v3",
    fetchStripeSessionStatus: "fetchStripeSessionStatus_v3",
 } as const
+
+/**
+ * Bundle function names
+ * These are HTTP endpoints that return Firebase bundles with cached queries
+ */
+export const BUNDLE_NAMES = {
+   allFutureLivestreams: "allFutureLivestreams",
+   futureLivestreamsNext15Days: "futureLivestreamsNext15Days",
+   pastYearLivestreams: "pastYearLivestreams",
+   allSparksStats: "allSparksStats",
+   allFutureOfflineEvents: "allFutureOfflineEvents",
+} as const
+
+export type BundleName = (typeof BUNDLE_NAMES)[keyof typeof BUNDLE_NAMES]
