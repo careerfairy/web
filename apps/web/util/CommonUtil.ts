@@ -228,6 +228,18 @@ export const shouldUseEmulators = () => {
 }
 
 /**
+ * Gets the hosting URL for bundle loading
+ * In production, uses CDN. In development, uses emulator.
+ * @returns The hosting URL for Firebase bundles
+ */
+export const getHostingUrl = (): string => {
+   if (shouldUseEmulators()) {
+      return "http://127.0.0.1:5001/careerfairy-e1fd9/europe-west1"
+   }
+   return "https://cdn.careerfairy.io"
+}
+
+/**
  * Get the workflow ID for isolating test data and operations
  *
  * This function prioritizes:
