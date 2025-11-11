@@ -25,6 +25,14 @@ type CoffeeChatsDialogProps = {
 const styles = sxStyles({
    paper: {
       borderRadius: "20px",
+      borderBottomLeftRadius: {
+         md: "20px",
+         xs: "0px",
+      },
+      borderBottomRightRadius: {
+         md: "20px",
+         xs: "0px",
+      },
       maxWidth: { xs: "100%", md: "517px" },
    },
    drawerRoot: {
@@ -35,6 +43,7 @@ const styles = sxStyles({
       flexDirection: "column",
       gap: 3,
       p: { xs: 1.5, md: 1.5 },
+      pb: { xs: 3, md: 3 },
       position: "relative",
    },
    headerImage: (theme) => ({
@@ -129,7 +138,8 @@ const styles = sxStyles({
       alignItems: "center",
    },
    button: {
-      minWidth: { xs: "100%", md: "auto" },
+      width: { xs: "100%", md: "auto" },
+      flex: { xs: "none", md: 1 },
       px: 3,
       py: 1,
       borderRadius: "20px",
