@@ -1601,8 +1601,7 @@ export class LivestreamFunctionsRepository
 
    async updateTranscriptionStatus(
       livestreamId: string,
-      status: TranscriptionStatus,
-      additionalData?: Partial<LivestreamTranscriptionsGenerationStatus>
+      status: TranscriptionStatus
    ): Promise<void> {
       const now = Timestamp.now()
       const mainDocRef = this.firestore
@@ -1612,7 +1611,6 @@ export class LivestreamFunctionsRepository
       const updateData: UpdateData<LivestreamTranscriptionsGenerationStatus> = {
          lastStatus: status,
          updatedAt: now,
-         ...additionalData,
       }
       await mainDocRef.update(updateData)
 
@@ -1678,8 +1676,7 @@ export class LivestreamFunctionsRepository
 
    async updateChapterizationStatus(
       livestreamId: string,
-      status: ChapterizationStatus,
-      additionalData?: Partial<LivestreamChaptersGenerationStatus>
+      status: ChapterizationStatus
    ): Promise<void> {
       const now = Timestamp.now()
       const mainDocRef = this.firestore
@@ -1689,7 +1686,6 @@ export class LivestreamFunctionsRepository
       const updateData: UpdateData<LivestreamChaptersGenerationStatus> = {
          lastStatus: status,
          updatedAt: now,
-         ...additionalData,
       }
       await mainDocRef.update(updateData)
 
