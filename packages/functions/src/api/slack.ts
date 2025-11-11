@@ -69,6 +69,26 @@ export const notifyLivestreamCreated = (
       Company: livestreamObj.company,
       Speakers: livestreamObj.speakers?.length,
       Duration: `${livestreamObj.duration} minutes`,
+      ...(livestreamObj.companyCountries?.length
+         ? {
+              "Client Country": livestreamObj.companyCountries.join(", "),
+           }
+         : {}),
+      ...(livestreamObj.targetFieldsOfStudy?.length
+         ? {
+              "Target Fields of Study": livestreamObj.targetFieldsOfStudy
+                 .map((field) => field.name)
+                 .join(", "),
+           }
+         : {}),
+      ...(livestreamObj.targetLevelsOfStudy?.length
+         ? {
+              "Target Level of Study": livestreamObj.targetLevelsOfStudy
+                 .map((level) => level.name)
+                 .join(", "),
+           }
+         : {}),
+      "Live Stream Details": eventLink,
    }
 
    return generateRequest(webhookUrl, {
