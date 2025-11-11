@@ -5,8 +5,7 @@ import { Chapter } from "./livestreams"
 export type LLMProviders = "anthropic"
 
 export type ChapterizationMetadata = {
-   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-   providerData: Record<string, any>
+   providerData: Record<string, unknown>
    // The usage data for the chapterization in terms of tokens
    tokens: {
       input: number
