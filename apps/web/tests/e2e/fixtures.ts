@@ -22,7 +22,7 @@ type OfflineEventStatus =
    | "out-of-events" // Previously purchased but no credits left, shows table
    | "has-available-events" // Has available offline event credits
 
-type GroupAdminFixtureOptions = {
+export type GroupAdminFixtureOptions = {
    /**
     * give the option for tests to not create a user
     */
