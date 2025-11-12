@@ -26,6 +26,7 @@ export const fetchChannelMembers = async (channel: RtmChannel) => {
 const sortMembers = (a: string, b: string) => {
    const precedence = [
       STREAM_IDENTIFIERS.SPEAKER,
+      STREAM_IDENTIFIERS.ASSISTANT,
       STREAM_IDENTIFIERS.SCREEN_SHARE,
       STREAM_IDENTIFIERS.USER,
       STREAM_IDENTIFIERS.ANONYMOUS,

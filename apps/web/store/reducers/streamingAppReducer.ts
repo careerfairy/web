@@ -120,6 +120,7 @@ export interface StreamingAppState {
    virtualBackgroundMode: VirtualBackgroundMode
    isLoggedInOnDifferentBrowser: boolean
    isSpyMode: boolean
+   isAssistantMode: boolean
    autoplayState: "failed" | "should-play-again" | "playing"
 }
 
@@ -172,6 +173,7 @@ const initialState: StreamingAppState = {
    virtualBackgroundMode: VirtualBackgroundMode.OFF,
    isLoggedInOnDifferentBrowser: false,
    isSpyMode: false,
+   isAssistantMode: false,
    autoplayState: "playing",
 }
 
@@ -424,6 +426,9 @@ const streamingAppSlice = createSlice({
       setIsSpyMode(state, action: PayloadAction<boolean>) {
          state.isSpyMode = action.payload
       },
+      setAssistantMode(state, action: PayloadAction<boolean>) {
+         state.isAssistantMode = action.payload
+      },
       setSpeakerId(state, action: PayloadAction<string | null>) {
          state.speakerId = action.payload
          state.userUid = null
@@ -480,6 +485,7 @@ export const {
       setIsRecordingWindow,
       setIsRecordingBotInRoom,
       setIsSpyMode,
+      setAssistantMode,
       setSpeakerId,
       setUserUid,
       setAutoplayState,

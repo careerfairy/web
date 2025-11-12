@@ -8,13 +8,19 @@ import {
    useReducer,
 } from "react"
 import { usePrevious } from "react-use"
-import { setSpeakerId, setUserUid } from "store/reducers/streamingAppReducer"
+import {
+   setAssistantMode,
+   setIsSpyMode,
+   setSpeakerId,
+   setUserUid,
+} from "store/reducers/streamingAppReducer"
 
 export enum ProfileSelectEnum {
    SELECT_SPEAKER,
    EDIT_SPEAKER,
    CREATE_SPEAKER,
    JOIN_WITH_SPEAKER,
+   ASSISTANT_INFO,
 }
 
 type State = {
@@ -28,6 +34,7 @@ type Action =
    | { type: ProfileSelectEnum.JOIN_WITH_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.EDIT_SPEAKER; payload: Speaker }
    | { type: ProfileSelectEnum.CREATE_SPEAKER }
+   | { type: ProfileSelectEnum.ASSISTANT_INFO }
 
 const reducer = (state: State, action: Action): State => {
    state.direction = state.activeView > action.type ? -1 : 1
@@ -55,6 +62,11 @@ const reducer = (state: State, action: Action): State => {
             selectedSpeaker: null,
             activeView: ProfileSelectEnum.CREATE_SPEAKER,
          }
+      case ProfileSelectEnum.ASSISTANT_INFO:
+         return {
+            ...state,
+            activeView: ProfileSelectEnum.ASSISTANT_INFO,
+         }
       default:
          return state
    }
@@ -63,10 +75,12 @@ const reducer = (state: State, action: Action): State => {
 type ProfileSelectContextType = {
    joinLiveStreamWithSpeaker: (speakerId: string) => void
    joinLiveStreamWithUser: (userId: string) => void
+   joinLiveStreamAsAssistant: () => void
    goBackToSelectSpeaker: () => void
    editSpeaker: (speaker: Speaker) => void
    selectSpeaker: (speaker: Speaker) => void
    goToCreateNewSpeaker: () => void
+   goToAssistantInfo: () => void
    selectedSpeaker: Speaker | null
    activeView: ProfileSelectEnum
    prevActiveView: ProfileSelectEnum | null
@@ -113,6 +127,9 @@ export const ProfileSelectProvider = ({ children }: Props) => {
          goToCreateNewSpeaker: () => {
             return dispatch({ type: ProfileSelectEnum.CREATE_SPEAKER })
          },
+         goToAssistantInfo: () => {
+            return dispatch({ type: ProfileSelectEnum.ASSISTANT_INFO })
+         },
          goBackToSelectSpeaker: () => {
             return dispatch({ type: ProfileSelectEnum.SELECT_SPEAKER })
          },
@@ -121,6 +138,10 @@ export const ProfileSelectProvider = ({ children }: Props) => {
          },
          joinLiveStreamWithUser: (userId: string) => {
             return appDispatch(setUserUid(userId))
+         },
+         joinLiveStreamAsAssistant: () => {
+            appDispatch(setAssistantMode(true))
+            return appDispatch(setIsSpyMode(true))
          },
       }),
       [state, dispatch, appDispatch, prevActiveView]
