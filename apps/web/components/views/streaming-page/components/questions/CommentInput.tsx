@@ -7,7 +7,6 @@ import { livestreamService } from "data/firebase/LivestreamService"
 import { Fragment } from "react"
 import { Send } from "react-feather"
 import { Controller } from "react-hook-form"
-import { useAssistantMode } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import * as Yup from "yup"
 import { useStreamingContext } from "../../context"
@@ -65,22 +64,10 @@ type Props = {
    onCommentPosted?: () => void
 }
 
-const getAuthorType = (args: {
-   isAdmin: boolean
-   isHost: boolean
-   isAssistant: boolean
-}) => {
-   if (args.isAdmin) return "careerfairy"
-   if (args.isAssistant) return "assistant"
-   if (args.isHost) return "streamer"
-   return "viewer"
-}
-
 export const CommentInput = ({ questionId, onCommentPosted }: Props) => {
    const { errorNotification } = useSnackbarNotifications()
    const { agoraUserId, streamRef, isHost } = useStreamingContext()
    const { userData, authenticatedUser } = useAuth()
-   const isAssistant = useAssistantMode()
 
    const { data: streamerDetails } = useStreamerDetails(agoraUserId)
 
@@ -102,11 +89,11 @@ export const CommentInput = ({ questionId, onCommentPosted }: Props) => {
                streamerDetails?.firstName,
                streamerDetails?.lastName
             ),
-            authorType: getAuthorType({
-               isAdmin: userData?.isAdmin,
-               isHost: isHost,
-               isAssistant: isAssistant,
-            }),
+            authorType: userData?.isAdmin
+               ? "careerfairy"
+               : isHost
+               ? "streamer"
+               : "viewer",
             title: data.message,
             agoraUserId,
             userUid: authenticatedUser?.uid,
