@@ -7,10 +7,7 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import { livestreamService } from "data/firebase/LivestreamService"
 import { Send } from "react-feather"
 import { Controller } from "react-hook-form"
-import {
-   useAssistantMode,
-   useOpenStream,
-} from "store/selectors/streamingAppSelectors"
+import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "util/analyticsUtils"
@@ -61,19 +58,12 @@ type Props = {
    onMessageSend?: () => void
 }
 
-const getAuthorType = (args: { isHost: boolean; isAssistant: boolean }) => {
-   if (args.isAssistant) return "assistant"
-   if (args.isHost) return "streamer"
-   return "viewer"
-}
-
 export const ChatInput = ({ onMessageSend }: Props) => {
    const { livestreamId, isHost, agoraUserId } = useStreamingContext()
    const { authenticatedUser, userData } = useAuth()
    const { data: streamerDetails } = useStreamerDetails(agoraUserId)
    const currentLivestream = useLivestreamData()
    const isOpenStream = useOpenStream()
-   const isAssistant = useAssistantMode()
 
    const { control, handleSubmit, reset, formState } = useYupForm({
       schema,
@@ -106,22 +96,18 @@ export const ChatInput = ({ onMessageSend }: Props) => {
             message: "",
          })
 
-         const displayName =
-            userData.isAdmin && !isAssistant
-               ? "CareerFairy"
-               : getStreamerDisplayName(
-                    streamerDetails?.firstName,
-                    streamerDetails?.lastName
-                 )
+         const displayName = userData?.isAdmin
+            ? "CareerFairy"
+            : getStreamerDisplayName(
+                 streamerDetails?.firstName,
+                 streamerDetails?.lastName
+              )
 
          onMessageSend?.()
          await livestreamService.addChatEntry({
             livestreamId,
             message: data.message,
-            type: getAuthorType({
-               isHost: isHost,
-               isAssistant: isAssistant,
-            }),
+            type: isHost ? "streamer" : "viewer",
             displayName: displayName,
             authorEmail: getAuthorEmail(),
             agoraUserId,

@@ -11,18 +11,9 @@ export const getIsCareerFairyFromComment = (
    return comment.authorType === "careerfairy"
 }
 
-export const getIsAssistantFromComment = (
-   comment: LivestreamQuestionComment
-) => {
-   return comment.authorType === "assistant"
-}
-
 export const getUserTypeFromComment = (comment: LivestreamQuestionComment) => {
    if (getIsCareerFairyFromComment(comment)) {
       return UserType.CareerFairy
-   }
-   if (getIsAssistantFromComment(comment)) {
-      return UserType.Assistant
    }
    if (getIsHostFromComment(comment)) {
       return UserType.Streamer
