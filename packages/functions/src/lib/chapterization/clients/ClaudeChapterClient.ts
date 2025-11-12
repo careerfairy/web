@@ -24,7 +24,7 @@ export class ClaudeChapterClient implements IChapterizationClient {
 
    static create(): IChapterizationClient {
       if (isTestEnvironment()) {
-         logger.info("Using Customer.io track client mock")
+         logger.info("Using Claude client mock")
          return getChapterizationClientStub() as IChapterizationClient
       }
 
