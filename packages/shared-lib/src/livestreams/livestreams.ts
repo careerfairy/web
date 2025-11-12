@@ -662,7 +662,7 @@ export interface LivestreamQuestion extends Identifiable {
 
 // Collection Path: livestreams/{livestreamId}/questions/{questionId}/comments/{commentId}
 export interface LivestreamQuestionComment extends Identifiable {
-   authorType: "careerfairy" | "streamer" | "viewer" | "assistant"
+   authorType: "careerfairy" | "streamer" | "viewer"
    /**
     * Display name of the user that created the comment
     */
@@ -722,7 +722,6 @@ export interface LivestreamChatEntry extends Identifiable {
       // used to identify a chat entry that was sent by a host (only used in the UI)
       | "streamer"
       | "viewer"
-      | "assistant"
 
    /*
     * Array of userIds who reacted with 😮

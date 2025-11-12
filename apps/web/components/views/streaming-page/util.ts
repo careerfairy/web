@@ -146,5 +146,4 @@ export enum UserType {
    Viewer = "Viewer",
    Streamer = "Streamer",
    CareerFairy = "CareerFairy",
-   Assistant = "Assistant",
 }

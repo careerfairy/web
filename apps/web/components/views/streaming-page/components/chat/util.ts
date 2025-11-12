@@ -23,16 +23,9 @@ export const getIsCareerFairy = (entry: LivestreamChatEntry) => {
    return entry.authorEmail.includes("@careerfairy.io")
 }
 
-export const getIsAssistant = (entry: LivestreamChatEntry) => {
-   return entry.type === "assistant"
-}
-
 export const getChatAuthor = (entry: LivestreamChatEntry) => {
    if (getIsCareerFairy(entry)) {
       return UserType.CareerFairy
-   }
-   if (getIsAssistant(entry)) {
-      return UserType.Assistant
    }
    if (getIsHost(entry)) {
       return UserType.Streamer

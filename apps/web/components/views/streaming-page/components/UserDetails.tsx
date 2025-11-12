@@ -23,9 +23,6 @@ const styles = sxStyles({
       [UserType.Streamer]: {
          color: "secondary.main",
       },
-      [UserType.Assistant]: {
-         color: "secondary.main",
-      },
       [UserType.CareerFairy]: {
          color: "primary.main",
       },
@@ -73,7 +70,7 @@ export const UserDetails = ({
                ]}
             >
                {userType === UserType.CareerFairy ? "CareerFairy" : displayName}
-               {isHost(userType) && (
+               {userType === UserType.Streamer && (
                   <Typography
                      component="span"
                      sx={[styles.hostTag, color && { color }]}
@@ -104,7 +101,7 @@ const EntryAvatar = ({
 
    if (
       userType === UserType.Viewer ||
-      (isHost(userType) && !companyLogoUrl) // Edge-case: When livestream is missing company logo, we use initials
+      (userType === UserType.Streamer && !companyLogoUrl) // Edge-case: When livestream is missing company logo, we use initials
    ) {
       return (
          <ColorizedAvatar
@@ -117,13 +114,11 @@ const EntryAvatar = ({
 
    return (
       <CircularLogo
-         src={isHost(userType) ? companyLogoUrl : "/logo-green.png"}
+         src={
+            userType === UserType.Streamer ? companyLogoUrl : "/logo-green.png"
+         }
          size={AVATAR_SIZE}
          alt={getStreamerDisplayName(firstName, lastName)}
       />
    )
-}
-
-const isHost = (userType: UserType) => {
-   return userType === UserType.Streamer || userType === UserType.Assistant
 }
