@@ -18,10 +18,12 @@ export const onUserRegistration = onDocumentWritten(
          `Processing registration for live stream ${livestreamId} and user ${userEmail}`
       )
 
-      const newUserLivestreamData =
-         event.data.after.data() as UserLivestreamData
-      const oldUserLivestreamData =
-         event.data.before.data() as UserLivestreamData
+      const newUserLivestreamData = event.data.after?.data() as
+         | UserLivestreamData
+         | undefined
+      const oldUserLivestreamData = event.data.before?.data() as
+         | UserLivestreamData
+         | undefined
 
       // on backfill, we don't need to check for registration changes, we need to update all documents
       const registrationChanged = hasRegistrationChanged(
@@ -139,8 +141,8 @@ export const syncUserInRegisteredLivestreams = onDocumentWritten(
    }
 )
 function hasRegistrationChanged(
-   oldData: UserLivestreamData,
-   newData: UserLivestreamData
+   oldData: UserLivestreamData | undefined,
+   newData: UserLivestreamData | undefined
 ): boolean {
    return (
       Boolean(oldData?.registered?.date) !== Boolean(newData?.registered?.date)
@@ -170,13 +172,20 @@ function getOrCreateRegisteredLivestreams(
 
 function updateRegisteredLivestreams(
    livestreamId: string,
-   newUserLivestreamData: UserLivestreamData,
+   newUserLivestreamData: UserLivestreamData | undefined,
    userData: UserData
 ): Partial<RegisteredLivestreams> {
    const updateData: Partial<RegisteredLivestreams> = {
       unsubscribed: Boolean(userData.unsubscribed),
       lastActivityAt: userData?.lastActivityAt || null,
       universityCountryCode: userData?.universityCountryCode || "",
+   }
+
+   if (!newUserLivestreamData) {
+      logger.warn(
+         `newUserLivestreamData is undefined for livestream ${livestreamId} and user ${userData.id}`
+      )
+      return updateData
    }
 
    if (newUserLivestreamData.registered?.date) {
