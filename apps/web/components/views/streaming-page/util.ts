@@ -10,11 +10,16 @@ export type GetUserStreamIdOptions = {
    streamId: string
    userId?: string
    speakerId?: string
+   isAssistant?: boolean
 }
 
 export const getAgoraUserId = (options: GetUserStreamIdOptions) => {
    if (options.isRecordingWindow) {
       return `${STREAM_IDENTIFIERS.RECORDING}-${randomId}-${options.streamId}` as const
+   }
+
+   if (options.isAssistant) {
+      return `${STREAM_IDENTIFIERS.ASSISTANT}-${randomId}-${options.streamId}` as const
    }
 
    if (options.speakerId) {
@@ -141,4 +146,5 @@ export enum UserType {
    Viewer = "Viewer",
    Streamer = "Streamer",
    CareerFairy = "CareerFairy",
+   Assistant = "Assistant",
 }
