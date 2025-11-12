@@ -49,13 +49,8 @@ export const BottomBarActions = {
 
 export type BottomBarActionName = ActionName | "SpeedDial"
 
-type ActionBuilder = {
-   add: (...actions: BottomBarActionName[]) => void
-   addIf: (condition: boolean, ...actions: BottomBarActionName[]) => void
-   value: () => BottomBarActionName[]
-}
-
-const createActionBuilder = (): ActionBuilder => {
+// Helper that keeps action ordering consistent while toggling entries on and off
+const createActionBuilder = () => {
    const actions: BottomBarActionName[] = []
 
    const add = (...items: BottomBarActionName[]) => {
