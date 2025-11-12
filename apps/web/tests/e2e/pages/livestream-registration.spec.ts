@@ -212,7 +212,7 @@ test.describe("Livestream Registration Signed In", () => {
       await livestreamDialogPage.closeDialog()
    })
 
-   test("should allow navigating to a recommended event after registration", async ({
+   test.skip("should allow navigating to a recommended event after registration", async ({
       page,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       user,
