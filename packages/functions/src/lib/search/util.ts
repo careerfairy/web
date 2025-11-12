@@ -1,6 +1,6 @@
 import { SearchIndex } from "algoliasearch"
 import { logger } from "firebase-functions"
-import { getAlgoliaClient } from "src/api/algolia"
+import { getAlgoliaClient } from "../../api/algolia"
 import { isProductionEnvironment, isTestEnvironment } from "../../util"
 import { IndexSettings } from "./searchIndexGenerator"
 
