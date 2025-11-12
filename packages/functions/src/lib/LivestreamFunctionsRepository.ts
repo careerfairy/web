@@ -393,8 +393,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
    updateTranscriptionStatus(
       livestreamId: string,
-      status: TranscriptionStatus,
-      additionalData?: Partial<LivestreamTranscriptionsGenerationStatus>
+      status: TranscriptionStatus
    ): Promise<void>
 
    /**
@@ -428,8 +427,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
    updateChapterizationStatus(
       livestreamId: string,
-      status: ChapterizationStatus,
-      additionalData?: Partial<LivestreamChaptersGenerationStatus>
+      status: ChapterizationStatus
    ): Promise<void>
 
    /**
