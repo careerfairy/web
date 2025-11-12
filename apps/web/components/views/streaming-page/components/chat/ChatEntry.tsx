@@ -50,6 +50,9 @@ const styles = sxStyles({
       [UserType.Streamer]: {
          bgcolor: "#FAF9FF",
       },
+      [UserType.Assistant]: {
+         bgcolor: "#FAF9FF",
+      },
       [UserType.CareerFairy]: {
          bgcolor: "#F9FFFE",
       },

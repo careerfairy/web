@@ -48,11 +48,13 @@ export const BottomBarActions = {
 
 export type BottomBarActionName = keyof typeof BottomBarActions
 
-const getHostActionNames = (
-   isMobile: boolean,
-   isAdmin: boolean,
+const getHostActionNames = (args: {
+   isMobile: boolean
+   isAdmin: boolean
    isSpyMode: boolean
-): BottomBarActionName[] => {
+}): BottomBarActionName[] => {
+   const { isMobile, isAdmin, isSpyMode } = args
+
    if (isMobile) {
       return [
          ...(isSpyMode ? [] : (["Mic"] as const)),
@@ -90,22 +92,32 @@ const HostView = () => {
    return (
       <ActionsBar>
          <CheckPermissions />
-         {getHostActionNames(isMobile, userData?.isAdmin, isSpyMode).map(
-            (action, index) => {
-               const Component = BottomBarActions[action]
-               return <Component enableTooltip key={index} />
-            }
-         )}
+         {getHostActionNames({
+            isMobile,
+            isAdmin: userData?.isAdmin,
+            isSpyMode,
+         }).map((action, index) => {
+            const Component = BottomBarActions[action]
+            return <Component enableTooltip key={index} />
+         })}
       </ActionsBar>
    )
 }
-const getViewerActionNames = (
-   isMobile: boolean,
-   isStreaming: boolean,
-   handRaiseEnabled: boolean,
-   userCanJoinPanel: boolean,
+const getViewerActionNames = (args: {
+   isMobile: boolean
+   isStreaming: boolean
+   handRaiseEnabled: boolean
+   userCanJoinPanel: boolean
    isAdmin: boolean
-): BottomBarActionName[] => {
+}): BottomBarActionName[] => {
+   const {
+      isMobile,
+      isStreaming,
+      handRaiseEnabled,
+      userCanJoinPanel,
+      isAdmin,
+   } = args
+
    const showRaiseHandButton = handRaiseEnabled && !userCanJoinPanel
    if (isStreaming) {
       if (isMobile) {
@@ -159,13 +171,13 @@ const ViewerView = () => {
 
    const { userCanJoinPanel } = useUserHandRaiseState(livestreamId, agoraUserId)
 
-   const filteredActions = getViewerActionNames(
+   const filteredActions = getViewerActionNames({
       isMobile,
-      shouldStream,
+      isStreaming: shouldStream,
       handRaiseEnabled,
       userCanJoinPanel,
-      userData?.isAdmin
-   )
+      isAdmin: userData?.isAdmin,
+   })
 
    return (
       <ActionsBar>
