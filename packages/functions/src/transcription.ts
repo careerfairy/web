@@ -1,13 +1,14 @@
 import { downloadLink } from "@careerfairy/shared-lib/livestreams/recordings"
 import { logger } from "firebase-functions/v2"
 import { onRequest } from "firebase-functions/v2/https"
+import { onSchedule } from "firebase-functions/v2/scheduler"
 import { onObjectFinalized } from "firebase-functions/v2/storage"
 import { livestreamsRepo } from "./api/repositories"
 import { ChapterizationService } from "./lib/chapterization/ChapterizationService"
 import { ClaudeChapterClient } from "./lib/chapterization/clients/ClaudeChapterClient"
 import { TranscriptionService } from "./lib/transcription/TranscriptionService"
 import { DeepgramTranscriptionClient } from "./lib/transcription/clients/DeepgramTranscriptionClient"
-import { getErrorMessage } from "./lib/transcription/utils"
+import { getErrorMessage, sleep } from "./lib/transcription/utils"
 
 const transcriptionConfig = {
    timeoutSeconds: 3600, // 1 hour - accommodates full retry cycle
@@ -15,6 +16,22 @@ const transcriptionConfig = {
 }
 
 const PATH_REGEX = /^transcriptions\/livestreams\/([^/]+)\/transcription\.json$/
+
+/**
+ * Batch processing configuration for scheduled transcription
+ *
+ * Batch size calculation:
+ * - Max timeout: 3600 seconds (1 hour)
+ * - Time per livestream: ~40s transcription + ~60s wait = ~100s
+ * - Buffer for overhead: ~200 seconds
+ * - Safe batch size: (3600 - 200) / 100 = ~34 livestreams
+ * - Using 30 as default to be conservative
+ */
+const BATCH_TRANSCRIPTION_CONFIG = {
+   BATCH_SIZE: 30, // Easily configurable batch size
+   MAX_AGE_YEARS: 2, // Maximum age of livestreams to process (2 years)
+   WAIT_AFTER_TRANSCRIPTION_MS: 60 * 1000, // 1 minute wait after transcription
+} as const
 
 export const initiateChapterizationOnTranscriptionCompleted = onObjectFinalized(
    {
@@ -205,6 +222,141 @@ export const startLivestreamTranscription = onRequest(
             message: errorMessage,
             livestreamId,
          })
+      }
+   }
+)
+
+/**
+ * Scheduled function that runs every hour to process a batch of past livestreams for transcription
+ *
+ * This function:
+ * - Queries past livestreams (max 2 years old, not test, not hidden)
+ * - Checks if transcription already exists in GCS
+ * - Processes transcription for livestreams that need it
+ * - Waits 1 minute after each transcription to allow chapterization to start automatically via GCS trigger
+ * - Respects batch size limits based on timeout constraints
+ */
+export const processBatchLivestreamTranscriptions = onSchedule(
+   {
+      schedule: "every 1 hours",
+      timeZone: "UTC",
+      ...transcriptionConfig,
+   },
+   async () => {
+      logger.info("Starting batch transcription processing", {
+         batchSize: BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE,
+         maxAgeYears: BATCH_TRANSCRIPTION_CONFIG.MAX_AGE_YEARS,
+      })
+
+      try {
+         // Query livestreams that need transcription
+         const livestreamsNeedingTranscription =
+            await livestreamsRepo.getLivestreamsNeedingTranscription(
+               BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE,
+               BATCH_TRANSCRIPTION_CONFIG.MAX_AGE_YEARS
+            )
+
+         logger.info("Found livestreams needing transcription", {
+            count: livestreamsNeedingTranscription.length,
+         })
+
+         if (livestreamsNeedingTranscription.length === 0) {
+            logger.info("No livestreams found needing transcription")
+            return
+         }
+
+         // Initialize transcription service
+         const transcriptionService = new TranscriptionService(
+            livestreamsRepo,
+            DeepgramTranscriptionClient.create()
+         )
+
+         // Process each livestream in the batch
+         const results = {
+            success: 0,
+            failed: 0,
+            errors: [] as Array<{ livestreamId: string; error: string }>,
+         }
+
+         for (const livestream of livestreamsNeedingTranscription) {
+            try {
+               logger.info("Processing livestream transcription", {
+                  livestreamId: livestream.id,
+                  title: livestream.title,
+               })
+
+               // Get recording token to build download URL
+               const tokenData =
+                  await livestreamsRepo.getLivestreamRecordingToken(
+                     livestream.id
+                  )
+
+               if (!tokenData?.sid) {
+                  logger.warn("Recording token sid is missing, skipping", {
+                     livestreamId: livestream.id,
+                  })
+                  results.failed++
+                  results.errors.push({
+                     livestreamId: livestream.id,
+                     error: "Recording token sid is missing",
+                  })
+                  continue
+               }
+
+               const recordingUrl = downloadLink(livestream.id, tokenData.sid)
+
+               // Process transcription
+               await transcriptionService.processLivestreamTranscription(
+                  livestream.id,
+                  recordingUrl
+               )
+
+               logger.info(
+                  "Transcription completed, waiting before next livestream",
+                  {
+                     livestreamId: livestream.id,
+                     waitMs:
+                        BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS,
+                  }
+               )
+
+               // Wait 1 minute to allow chapterization to start automatically via GCS trigger
+               await sleep(
+                  BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS
+               )
+
+               logger.info("Livestream transcription completed", {
+                  livestreamId: livestream.id,
+               })
+
+               results.success++
+            } catch (error) {
+               logger.error("Failed to process livestream transcription", {
+                  livestreamId: livestream.id,
+                  error,
+                  errorMessage: getErrorMessage(error),
+               })
+               results.failed++
+               results.errors.push({
+                  livestreamId: livestream.id,
+                  error: getErrorMessage(error),
+               })
+               // Continue processing other livestreams even if one fails
+            }
+         }
+
+         logger.info("Batch transcription processing completed", {
+            total: livestreamsNeedingTranscription.length,
+            success: results.success,
+            failed: results.failed,
+            errors: results.errors,
+         })
+      } catch (error) {
+         logger.error("Batch transcription processing failed", {
+            error,
+            errorMessage: getErrorMessage(error),
+         })
+         throw error
       }
    }
 )

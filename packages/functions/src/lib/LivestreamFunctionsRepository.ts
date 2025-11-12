@@ -438,6 +438,28 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    getChapterizationStatus(
       livestreamId: string
    ): Promise<ChapterizationStatus | null>
+
+   /**
+    * Query past livestreams that need transcription
+    * Filters: max age (years), not test, not hidden, has ended, transcription not completed
+    * @param limit - Maximum number of livestreams to return
+    * @param maxAgeYears - Maximum age in years (default: 2)
+    * @returns Array of LivestreamEvent that need transcription
+    */
+   getLivestreamsNeedingTranscription(
+      limit: number,
+      maxAgeYears?: number
+   ): Promise<LivestreamEvent[]>
+
+   /**
+    * Update the transcriptionCompleted field on a livestream document
+    * @param livestreamId - The livestream ID
+    * @param completed - Whether transcription is completed
+    */
+   updateLivestreamTranscriptionCompleted(
+      livestreamId: string,
+      completed: boolean
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -942,6 +964,51 @@ export class LivestreamFunctionsRepository
       }
 
       return admins
+   }
+
+   async getLivestreamsNeedingTranscription(
+      limit: number,
+      maxAgeYears = 2
+   ): Promise<LivestreamEvent[]> {
+      const now = new Date()
+      const earliestStartDate = DateTime.local()
+         .minus({ years: maxAgeYears })
+         .toJSDate()
+
+      // @ts-ignore - Type mismatch between Admin SDK and compat converter, but works at runtime
+      let q = this.firestore
+         .collection("livestreams")
+         .withConverter(
+            createCompatGenericConverter<LivestreamEvent>()
+         ) as unknown as firebase.firestore.Query<LivestreamEvent>
+
+      q = q
+         .where("start", "<", now)
+         .where("start", ">", earliestStartDate)
+         .where("test", "==", false)
+         .where("hidden", "==", false)
+         .where("livestreamType", "==", "livestream")
+         .where("hasEnded", "==", true)
+         .where("transcriptionCompleted", "!=", true)
+         .orderBy("start", "desc")
+         .limit(limit)
+
+      const snapshot = await q.get()
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async updateLivestreamTranscriptionCompleted(
+      livestreamId: string,
+      completed: boolean
+   ): Promise<void> {
+      const updateData: UpdateData<LivestreamEvent> = {
+         transcriptionCompleted: completed,
+      }
+
+      await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .update(updateData)
    }
 
    async createLivestreamStartUserNotifications(

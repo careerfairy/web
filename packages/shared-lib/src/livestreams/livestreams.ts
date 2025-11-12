@@ -61,6 +61,7 @@ export interface LivestreamEvent extends Identifiable {
    startedAt?: firebase.firestore.Timestamp
    endedAt?: firebase.firestore.Timestamp
    hasEnded?: boolean
+   transcriptionCompleted?: boolean
    targetCategories?: string[]
    mode?: LivestreamMode
 

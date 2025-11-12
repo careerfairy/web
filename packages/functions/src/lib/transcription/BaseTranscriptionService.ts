@@ -16,7 +16,8 @@ export class BaseTranscriptionService {
       recordingUrl: string,
       gcsPath: string
    ): Promise<void> {
-      return this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
+      // Update transcription status
+      await this.livestreamRepo.updateTranscriptionStatus(livestreamId, {
          state: "transcription-completed",
          documentType: "transcriptionStatus",
          completedAt: Timestamp.now(),
@@ -29,6 +30,12 @@ export class BaseTranscriptionService {
             transcriptionFilePath: gcsPath,
          },
       })
+
+      // Update livestream document with transcriptionCompleted flag
+      await this.livestreamRepo.updateLivestreamTranscriptionCompleted(
+         livestreamId,
+         true
+      )
    }
 
    protected async markTranscriptionFailedWithRetry(
