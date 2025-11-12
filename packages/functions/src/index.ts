@@ -207,7 +207,7 @@ exports.postmarkWebhook = postmark.postmarkWebhook
 exports.bundle = generateFunctionsFromBundles(bundles)
 
 // Analytics
-exports.updateUserDataAnalytcicsOnWrite_eu =
+exports.updateUserDataAnalytcicsOnWrite =
    analytics.updateUserDataAnalyticsOnWrite
 
 // Recording
