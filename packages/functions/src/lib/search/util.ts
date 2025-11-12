@@ -1,8 +1,8 @@
-import { logger } from "firebase-functions"
-import { algoliaClient } from "../../api/algolia"
 import { SearchIndex } from "algoliasearch"
-import { IndexSettings } from "./searchIndexGenerator"
+import { logger } from "firebase-functions"
+import { getAlgoliaClient } from "src/api/algolia"
 import { isProductionEnvironment, isTestEnvironment } from "../../util"
+import { IndexSettings } from "./searchIndexGenerator"
 
 export const logCreateIndex = (id: string, data: object) => {
    logger.info(`Creating new Algolia index for document ${id}`, data)
@@ -34,7 +34,7 @@ export const prependEnvPrefix = <T extends string>(value: T) => {
 }
 
 export const initAlgoliaIndex = (indexName: string) => {
-   return algoliaClient.initIndex(prependEnvPrefix(indexName))
+   return getAlgoliaClient().initIndex(prependEnvPrefix(indexName))
 }
 
 type ReplicaEntry = `${string}_${string}_${"asc" | "desc"}`
@@ -49,7 +49,9 @@ async function configureReplica(
       "asc" | "desc" // order
    ]
 
-   const replicaIndex = algoliaClient.initIndex(prependEnvPrefix(replicaEntry))
+   const replicaIndex = getAlgoliaClient().initIndex(
+      prependEnvPrefix(replicaEntry)
+   )
 
    const replicaSettings = {
       ...indexSettings,
