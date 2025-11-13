@@ -451,7 +451,10 @@ export const notifySlackWhenALivestreamStarts = onDocumentUpdated(
    "livestreams/{livestreamId}",
    async (event) => {
       const previousValue = event.data.before.data()
-      const newValue = event.data.after.data()
+      const newValue = {
+         ...event.data.after.data(),
+         id: event.params.livestreamId,
+      } as LivestreamEvent
 
       if (!newValue.test && !previousValue.hasStarted && newValue.hasStarted) {
          functions.logger.log("Detected the livestream has started")
