@@ -8,6 +8,17 @@ const REQUIRED_FIELD_MESSAGE = "This is a required field"
 const getMinCharactersMessage = (fieldName: string, numCharacters: number) =>
    `The ${fieldName} needs to have at least ${numCharacters} characters`
 
+// Shared field validations that can be reused across forms
+export const titleValidation = yup
+   .string()
+   .required(REQUIRED_FIELD_MESSAGE)
+   .min(10, getMinCharactersMessage("title", 10))
+
+export const summaryValidation = yup
+   .string()
+   .required(REQUIRED_FIELD_MESSAGE)
+   .min(50, getMinCharactersMessage("Live stream summary", 50))
+
 const getSelectAtLeastOneMessage = (fieldName: string) =>
    `Please select at least one ${fieldName}`
 
@@ -25,10 +36,7 @@ const language: yup.SchemaOf<LivestreamLanguage> = yup.object().shape({
 const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValues> =
    yup.object().shape({
       id: yup.string(),
-      title: yup
-         .string()
-         .required(REQUIRED_FIELD_MESSAGE)
-         .min(10, getMinCharactersMessage("title", 10)),
+      title: titleValidation,
       hidden: yup.bool().notRequired(),
       isDraft: yup.bool().notRequired(),
       company: yup
@@ -83,10 +91,7 @@ const livestreamFormGeneralTabSchema: yup.SchemaOf<LivestreamFormGeneralTabValue
          .required(REQUIRED_FIELD_MESSAGE),
       duration: yup.number().nullable().required(REQUIRED_FIELD_MESSAGE),
       language: language.required(REQUIRED_FIELD_MESSAGE),
-      summary: yup
-         .string()
-         .required(REQUIRED_FIELD_MESSAGE)
-         .min(50, getMinCharactersMessage("Live stream summary", 50)),
+      summary: summaryValidation,
       reasonsToJoin: yup
          .array()
          .min(3)
@@ -189,10 +194,16 @@ const livestreamFormValidationSchema = yup.object().shape({
    jobs: livestreamFormJobsTabSchema,
 })
 
+const recordingFormValidationSchema = yup.object({
+   title: titleValidation,
+   summary: summaryValidation,
+})
+
 export {
    livestreamFormGeneralTabSchema,
    livestreamFormJobsTabSchema,
    livestreamFormQuestionsTabSchema,
    livestreamFormSpeakersTabSchema,
    livestreamFormValidationSchema,
+   recordingFormValidationSchema,
 }
