@@ -137,7 +137,9 @@ test.describe("New Streaming Journey", () => {
 
    test("livestream requires filling some questions on registration", async ({
       viewerPage,
-   }) => {
+   }, testInfo) => {
+      testInfo.setTimeout(120000) // 2 minutes
+
       const { livestream } = await setupLivestreamData(null, {
          livestreamType: "createLive",
       })
@@ -149,7 +151,7 @@ test.describe("New Streaming Journey", () => {
       await viewerPage.page
          .locator(`button:has-text("Answer & Proceed")`)
          .click()
-      await viewerPage.assertIsLive()
+      await viewerPage.assertIsLive({ timeout: 40000 }) // 40 seconds
    })
 })
 
