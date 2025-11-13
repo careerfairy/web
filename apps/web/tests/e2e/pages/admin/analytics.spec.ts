@@ -42,7 +42,7 @@ test.describe("Group Analytics", () => {
       ])
    })
 
-   testWithPrivacyPolicyActive.skip(
+   testWithPrivacyPolicyActive(
       "Talent pool analytics are visible and update when user registers",
       async ({ groupPage, group, context, user }) => {
          const { livestream } = await setupLivestreamData(group)
