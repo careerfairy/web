@@ -177,7 +177,17 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
+           run: |
+              set +e
+              echo "Executing Playwright shard ${{ matrix.shard }}/${{ matrix.total }} with a 22 minute timeout window"
+              timeout --signal=SIGINT --kill-after=30s 22m npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
+              exit_code=$?
+              if [ $exit_code -eq 124 ]; then
+                 echo "Playwright shard ${{ matrix.shard }} exceeded 22 minutes and was interrupted early to allow artifact upload"
+              elif [ $exit_code -eq 125 ]; then
+                 echo "The timeout command itself failed while running Playwright shard ${{ matrix.shard }}"
+              fi
+              exit $exit_code
 
          - name: Upload test results
            if: ${{ failure() }}
@@ -199,7 +209,7 @@ jobs:
    deploy:
       name: "Deploy"
       needs: [unit_tests, e2e_tests]
-      runs-on: ubuntu-latest
+      runs-on: self-hosted
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v4
