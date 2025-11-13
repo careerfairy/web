@@ -20,6 +20,7 @@ firebase-export-*/
 /coverage
 test-results/
 playwright-report/
+.playwright-mcp/
 
 .DS_Store
 !/packages/fetch-firestore-data/.env
