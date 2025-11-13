@@ -78,6 +78,13 @@ export const flagsInitialState = {
       enabled: true,
    },
    /**
+    * New recordings form rollout
+    * Hide or Show
+    */
+   newRecordingsFormFlag: {
+      enabled: false,
+   },
+   /**
     * Coffee Chats rollout
     * Hide or Show
     */

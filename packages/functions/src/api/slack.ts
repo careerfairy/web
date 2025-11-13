@@ -440,8 +440,9 @@ function generateBodyStr(fieldsObj) {
 }
 
 function generateRequest(url, body): AxiosPromise {
-   // do not send slack notifications during tests in CI
-   if (process.env.CI) {
+   // do not send slack notifications during tests in CI or in development
+   // For testing locally, re-enable sending in development here
+   if (process.env.CI || process.env.NODE_ENV !== "production") {
       return Promise.resolve() as any
    }
 
