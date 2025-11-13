@@ -80,8 +80,8 @@ export default class LivestreamDialogPage extends CommonPage {
       groupConsentRequired?: boolean
       questionsViewArgs?: CompleteLivestreamQuestionsViewOptions
    } = {}) {
-      // Wait for dialog to be ready by waiting for registration button to be actionable
-      await expect(this.registrationButton).toBeVisible()
+      // Wait for dialog to open fully
+      await this.page.waitForTimeout(500)
 
       // register
       await this.clickRegistrationButton()
@@ -99,59 +99,18 @@ export default class LivestreamDialogPage extends CommonPage {
       if (this.livestream.groupQuestionsMap) {
          await this.selectRandomCategoriesFromEvent(this.livestream)
 
-         // Wait for any open dropdowns to close by waiting for listboxes to be hidden
-         // This ensures dropdowns are fully closed before clicking the button
-         await this.page
-            .waitForFunction(
-               () => {
-                  const listboxes =
-                     document.querySelectorAll('[role="listbox"]')
-                  if (listboxes.length === 0) {
-                     return true // No listboxes found, consider them closed
-                  }
-                  return Array.from(listboxes).every(
-                     (lb) =>
-                        lb.getAttribute("aria-hidden") === "true" ||
-                        window.getComputedStyle(lb).display === "none" ||
-                        window.getComputedStyle(lb).visibility === "hidden" ||
-                        !lb.isConnected // Element removed from DOM
-                  )
-               },
-               { timeout: 5000 }
-            )
-            .catch(() => {
-               // If no listboxes exist or timeout, continue - button should still be clickable
-            })
-
          let buttonText = answerButtonText
          if (consentRequired) {
             buttonText = acceptButtonText
          }
 
-         // Get the button locator and ensure it's ready
-         const button = this.page.getByRole("button", { name: buttonText })
-
-         // Wait for button to be visible and enabled (Playwright auto-waits, but explicit for clarity)
-         await expect(button).toBeVisible()
-         await expect(button).toBeEnabled()
-
-         // Scroll button into view explicitly to ensure it's not blocked
-         // scrollIntoViewIfNeeded already waits for the element to be stable
-         await button.scrollIntoViewIfNeeded()
-
-         // Click the button - Playwright will auto-wait for it to be actionable and stable
-         await button.click()
+         await this.page.getByRole("button", { name: buttonText }).click()
 
          return
       }
 
       if (consentRequired) {
-         const button = this.page.getByRole("button", {
-            name: acceptButtonText,
-         })
-         await expect(button).toBeVisible()
-         await button.scrollIntoViewIfNeeded()
-         await button.click()
+         await this.page.getByRole("button", { name: acceptButtonText }).click()
       }
    }
 
