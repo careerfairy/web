@@ -73,6 +73,6 @@ export const ActionTooltips = {
    MicUnmute: "Unmute",
    VideoTurnOff: "Switch camera off",
    VideoTurnOn: "Switch camera on",
-   Admin: "Admin controls",
+   Admin: "CareerFairy admin controls",
    Phone: "Join with camera and microphone",
 } as const

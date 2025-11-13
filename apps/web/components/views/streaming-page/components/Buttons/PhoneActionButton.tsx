@@ -1,6 +1,6 @@
 import { Box } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
-import { forwardRef, useCallback } from "react"
+import { forwardRef } from "react"
 import { Phone } from "react-feather"
 import { setIsSpyMode } from "store/reducers/streamingAppReducer"
 import {
@@ -8,7 +8,6 @@ import {
    useIsSpyMode,
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
-import { useLocalTracks } from "../../context"
 import { BrandedTooltip } from "../BrandedTooltip"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
@@ -37,33 +36,8 @@ export const PhoneActionButton = forwardRef<
    const dispatch = useAppDispatch()
    const isSpyMode = useIsSpyMode()
    const isAssistantMode = useAssistantMode()
-   const {
-      toggleMicMuted,
-      toggleCamera,
-      microphoneMuted: micMuted,
-      cameraOn,
-   } = useLocalTracks()
 
    const active = !isSpyMode
-
-   const onClickHandler = useCallback(() => {
-      const newSpyMode = !isSpyMode
-      dispatch(setIsSpyMode(newSpyMode))
-
-      // Reset readiness: if joining (spy mode off), ensure mic/video are muted/off
-      // If returning to assistant (spy mode on), keep current state
-      if (!newSpyMode) {
-         // Joining: mute mic and turn off video
-         // if (!micMuted) {
-         //    toggleMicMuted()
-         // }
-         // if (cameraOn) {
-         //    toggleCamera()
-         // }
-      }
-
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [dispatch, isSpyMode, micMuted, cameraOn, toggleMicMuted, toggleCamera])
 
    // Only show when assistant mode is active
    if (!isAssistantMode) {
@@ -83,7 +57,7 @@ export const PhoneActionButton = forwardRef<
          <ActionBarButtonStyled
             color="default"
             ref={ref}
-            onClick={onClickHandler}
+            onClick={() => dispatch(setIsSpyMode(!isSpyMode))}
             sx={active ? styles.active : styles.inactive}
             {...props}
          >
