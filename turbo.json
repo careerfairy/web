@@ -1,6 +1,10 @@
 {
    "$schema": "https://turborepo.org/schema.json",
-   "pipeline": {
+   "globalEnv": ["NODE_ENV"],
+   "remoteCache": {
+      "enabled": true
+   },
+   "tasks": {
       "build": {
          "dependsOn": ["^build"],
          "outputs": ["dist/**", ".next/**", "build/**", "!.next/cache/**"]
@@ -32,6 +36,5 @@
       "native": {
          "cache": false
       }
-   },
-   "globalEnv": ["NODE_ENV"]
+   }
 }
