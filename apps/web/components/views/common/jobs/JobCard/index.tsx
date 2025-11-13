@@ -27,7 +27,7 @@ const styles = sxStyles({
    jobState: {
       display: "flex",
       borderRadius: "8px 0 0 8px",
-      width: "8px",
+      width: "4px",
    },
    listItemContainer: {
       display: "flex",
