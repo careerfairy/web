@@ -1,10 +1,24 @@
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import axios, { AxiosPromise } from "axios"
 import { firestore } from "firebase-admin"
 import { DateTime } from "luxon"
 import { getCount } from "../util/firestore-admin"
 
-export const notifyLivestreamStarting = async (webhookUrl, livestreamObj) => {
+/**
+ * Get the count of all fields of study
+ * This is used to detect when "any field of study" was selected
+ */
+const getFieldsOfStudyCount = async (): Promise<number> => {
+   const fieldsQuery = firestore().collection("fieldsOfStudy")
+   return await getCount(fieldsQuery)
+}
+
+export const notifyLivestreamStarting = async (
+   webhookUrl: string,
+   livestreamObj: LivestreamEvent
+) => {
    const link = makeLivestreamEventDetailsUrl(livestreamObj.id)
 
    const registeredUsersCountQuery = firestore()
@@ -55,13 +69,33 @@ export const notifyLivestreamStarting = async (webhookUrl, livestreamObj) => {
    })
 }
 
-export const notifyLivestreamCreated = (
-   webhookUrl,
-   publisherEmailOrName,
-   livestreamObj
+export const notifyLivestreamCreated = async (
+   webhookUrl: string,
+   publisherEmailOrName: string,
+   livestreamObj: LivestreamEvent
 ) => {
    const adminLink = `https://www.careerfairy.io/group/${livestreamObj.author?.groupId}/admin/events?eventId=${livestreamObj.id}`
    const eventLink = makeLivestreamEventDetailsUrl(livestreamObj.id)
+
+   // Format country codes to country names using the map
+   const formattedCountries = livestreamObj.companyCountries?.length
+      ? livestreamObj.companyCountries
+           .map((code) => universityCountryMap[code] || code)
+           .join(", ")
+      : null
+
+   // Check if "any field of study" was selected
+   // When "any field of study" is selected, the backend saves ALL fields
+   // We detect this by comparing with the actual count from Firestore
+   const totalFieldsCount = await getFieldsOfStudyCount()
+   const fieldsOfStudyText =
+      livestreamObj.targetFieldsOfStudy?.length === totalFieldsCount
+         ? "Any field of study"
+         : livestreamObj.targetFieldsOfStudy?.length
+         ? livestreamObj.targetFieldsOfStudy
+              .map((field) => field.name)
+              .join(", ")
+         : null
 
    const body = {
       "Start Date": formatEventStartDate(livestreamObj.start?.toDate?.()),
@@ -69,6 +103,24 @@ export const notifyLivestreamCreated = (
       Company: livestreamObj.company,
       Speakers: livestreamObj.speakers?.length,
       Duration: `${livestreamObj.duration} minutes`,
+      ...(formattedCountries
+         ? {
+              "Client Country": formattedCountries,
+           }
+         : {}),
+      ...(fieldsOfStudyText
+         ? {
+              "Target Fields of Study": fieldsOfStudyText,
+           }
+         : {}),
+      ...(livestreamObj.targetLevelsOfStudy?.length
+         ? {
+              "Target Level of Study": livestreamObj.targetLevelsOfStudy
+                 .map((level) => level.name)
+                 .join(", "),
+           }
+         : {}),
+      "Live Stream Details": eventLink,
    }
 
    return generateRequest(webhookUrl, {
@@ -120,10 +172,10 @@ export const notifyLivestreamCreated = (
 }
 
 export const notifyLivestreamRecordingCreated = (
-   webhookUrl,
-   livestreamObj,
-   downloadLink
-) => {
+   webhookUrl: string,
+   livestreamObj: LivestreamEvent,
+   downloadLink: string
+): AxiosPromise => {
    const eventLink = makeLivestreamEventDetailsUrl(livestreamObj.id)
 
    return generateRequest(webhookUrl, {
