@@ -147,8 +147,8 @@ jobs:
       strategy:
          fail-fast: false
          matrix:
-            shard: [1, 2, 3, 4]
-            total: [4]
+            shard: [1, 2, 3, 4, 5]
+            total: [5]
       runs-on: ubuntu-22.04
       timeout-minutes: 25
       steps:
@@ -170,12 +170,12 @@ jobs:
            run: npx playwright install --with-deps
          - name: Install uuid-runtime
            run: sudo apt-get install uuid-runtime
-         - name: Generate Workflow ID
-           run: echo "WORKFLOW_ID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
+         - name: Generate UUID
+           run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              WORKFLOW_ID: ${{ env.WORKFLOW_ID }}
+              NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
