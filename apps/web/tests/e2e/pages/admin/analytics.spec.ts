@@ -68,7 +68,7 @@ test.describe("Group Analytics", () => {
       }
    )
 
-   testWithPrivacyPolicyActive.skip(
+   testWithPrivacyPolicyActive(
       "Live stream analytics update when user registers to live stream",
       async ({ groupPage, group, context, user }, testInfo) => {
          testInfo.setTimeout(120000)
