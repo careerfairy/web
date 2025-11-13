@@ -194,8 +194,6 @@ describe("BottomBar host actions", () => {
          "Polls",
          "Jobs",
          "Chat",
-         "Divider",
-         "Settings",
       ])
    })
 
@@ -224,7 +222,7 @@ describe("BottomBar host actions", () => {
       ])
    })
 
-   it("prepends phone and keeps settings for assistant host in spy mode on mobile", () => {
+   it("prepends phone controls for assistant host in spy mode on mobile", () => {
       expect(
          getHostActionNames({
             isMobile: true,
@@ -240,8 +238,6 @@ describe("BottomBar host actions", () => {
          "Q&A",
          "Chat",
          "SpeedDial",
-         "Divider",
-         "Settings",
       ])
    })
 

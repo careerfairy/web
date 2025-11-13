@@ -93,11 +93,8 @@ const getHostMobileActionNames = ({
    builder.addIf(!isAdmin, "Q&A")
    builder.add("Chat", "SpeedDial")
 
-   if (isAssistantMode) {
-      builder.add("Divider", "Settings")
-      if (!isSpyMode) {
-         builder.add("Phone")
-      }
+   if (isAssistantMode && !isSpyMode) {
+      builder.add("Divider", "Settings", "Phone")
    }
    builder.addIf(isAdmin, "Divider", "Admin")
 
@@ -114,7 +111,9 @@ const getHostDesktopActionNames = ({
    if (isAssistantMode && isSpyMode) {
       builder.add("Phone", "Divider")
    }
+
    builder.addIf(!isSpyMode, "Mic", "Video")
+
    builder.add(
       "Share",
       "CTA",
@@ -125,14 +124,11 @@ const getHostDesktopActionNames = ({
       "Jobs",
       "Chat"
    )
-   if (isAssistantMode) {
-      builder.add("Divider", "Settings")
-      if (!isSpyMode) {
-         builder.add("Phone")
-      }
-   } else {
-      builder.addIf(!isSpyMode, "Divider", "Settings")
-   }
+
+   builder.addIf(!isSpyMode, "Divider", "Settings")
+
+   builder.addIf(isAssistantMode && !isSpyMode, "Phone")
+
    builder.addIf(isAdmin, "Divider", "Admin")
 
    return builder.value()
