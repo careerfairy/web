@@ -129,12 +129,14 @@ const config: PlaywrightTestConfig = {
          FIRESTORE_EMULATOR_HOST: "127.0.0.1:8080",
          NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
          APP_ENV: "test",
+         ALGOLIA_APP_ID: process.env.ALGOLIA_APP_ID,
+         ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
          NEXT_DISABLE_IMAGE_OPTIMIZATION: "true",
          NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
             process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
          NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
          // Reduce Java heap size for Firestore/Storage emulators (default is much higher)
-         JAVA_TOOL_OPTIONS: "-Xmx4g",
+         JAVA_TOOL_OPTIONS: "-Xmx4g -Xms2g",
          // Cap Node.js heap usage for Firebase CLI/emulators to avoid excessive memory consumption
          NODE_OPTIONS: "--max-old-space-size=4096",
       },
