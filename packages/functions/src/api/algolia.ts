@@ -14,7 +14,7 @@ export const getAlgoliaClient = (): SearchClient => {
       )
    } else if (isTestEnvironment()) {
       logger.info(
-         `Using Algolia in PROD mode, last api key ends in: ${algoliaApiKey?.slice(
+         `Using Algolia in TEST mode (prod credentials), last api key ends in: ${algoliaApiKey?.slice(
             -10
          )}`
       )
