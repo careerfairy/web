@@ -1,6 +1,20 @@
 {
    "$schema": "https://turborepo.org/schema.json",
-   "globalEnv": ["NODE_ENV"],
+   "globalEnv": [
+      "NODE_ENV",
+      "ENABLE_ROOT_PATH_BUILD_CACHE",
+      "SENTRY_AUTH_TOKEN",
+      "GRAPHCMS_PROJECT_API",
+      "GRAPHCMS_PROD_AUTH_TOKEN",
+      "GRAPHCMS_DEV_AUTH_TOKEN",
+      "GRAPHCMS_PREVIEW_SECRET",
+      "WEBFLOW_URL",
+      "POSTMARK_TEMPLATE_TRIAL_END_SPARKS",
+      "POSTMARK_TEMPLATE_MANUAL_EMAIL",
+      "HYGRAPH_TALENT_GUIDE_PROD_TOKEN",
+      "HYGRAPH_TALENT_GUIDE_PREVIEW_TOKEN",
+      "HYGRAPH_TALENT_GUIDE_PREVIEW_SECRET"
+   ],
    "remoteCache": {
       "enabled": true
    },
