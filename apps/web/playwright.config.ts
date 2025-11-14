@@ -142,8 +142,8 @@ const config: PlaywrightTestConfig = {
       },
       port: 3000,
       // emulators need some time to boot
-      timeout: 40 * 2000,
-      reuseExistingServer: true,
+      timeout: 40 * 1000,
+      // reuseExistingServer: true,
       stdout: "pipe",
       stderr: "pipe",
    },
