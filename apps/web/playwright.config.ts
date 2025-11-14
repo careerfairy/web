@@ -133,6 +133,8 @@ const config: PlaywrightTestConfig = {
          NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
             process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
          NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+         ALGOLIA_APP_ID: process.env.ALGOLIA_APP_ID,
+         ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
          // Reduce Java heap size for Firestore/Storage emulators (default is much higher)
          JAVA_TOOL_OPTIONS: "-Xmx2g",
          // Cap Node.js heap usage for Firebase CLI/emulators to avoid excessive memory consumption
