@@ -358,7 +358,7 @@ const stopRecording = async (
 const triggerTranscription = async (livestreamId: string): Promise<void> => {
    try {
       await functionsAxios.get(
-         `${config.functionsBaseUrl}/${FUNCTION_NAMES.manualLivestreamTranscription}`,
+         `${config.functionsBaseUrl}/${FUNCTION_NAMES.startLivestreamTranscription}`,
          {
             params: {
                livestreamId,

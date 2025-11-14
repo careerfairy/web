@@ -52,6 +52,7 @@ export const updateUserDataAnalyticsOnWrite = onDocumentWritten(
                   total: FieldValue.increment(-1),
                }
             }
+
             // Use set with merge to handle case where document doesn't exist yet
             await analyticsUserDataRef.set(newData, { merge: true })
             logger.info(
