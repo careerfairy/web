@@ -276,6 +276,11 @@ export interface LivestreamEvent extends Identifiable {
     * The trailer url of the panel
     */
    panelTrailerUrl?: string
+
+   /**
+    * Indicates whether the transcription is finished for the live stream.
+    */
+   transcriptionCompleted?: boolean
 }
 
 const LivestreamTypes = {
