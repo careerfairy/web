@@ -144,8 +144,6 @@ const config: PlaywrightTestConfig = {
          NODE_OPTIONS: "--max-old-space-size=4096",
       },
       port: 3000,
-      // Health check URL - ensures Next.js is fully ready, not just port is open
-      url: "http://localhost:3000",
       // Emulators need significant time to boot, especially on CI
       // Increased from 40s to 120s for CI, 60s for local
       timeout: process.env.CI ? 120 * 1000 : 60 * 1000,
