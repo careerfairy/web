@@ -1,4 +1,4 @@
-import { Group } from "@careerfairy/shared-lib/groups"
+import { Group, PublicGroup } from "@careerfairy/shared-lib/groups"
 import {
    GroupEventActions,
    InteractionSources,
@@ -7,7 +7,9 @@ import { sxStyles } from "@careerfairy/shared-ui"
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useGroup from "components/custom-hook/group/useGroup"
+import { useUserIsCompanyTargeted } from "components/custom-hook/group/useUserIsCompanyTargeted"
 import { useUserFollowingCompanies } from "components/custom-hook/user/useUserFollowingCompanies"
+import { CoffeeChatsBadge } from "components/views/common/icons/CoffeeChatsIcon"
 import FeaturedCompanySparksBadge from "components/views/common/icons/FeaturedCompanySparksBadge"
 import { useCompaniesTracker } from "context/group/CompaniesTrackerProvider"
 import { groupRepo } from "data/RepositoryInstances"
@@ -144,6 +146,11 @@ export const FeaturedCompanyCard = ({
    const industries = company.companyIndustries
       .map((industry) => industry.name)
       .join(", ")
+   const isInCoffeeChatsAudience = useUserIsCompanyTargeted(
+      company as PublicGroup
+   )
+   const showCoffeeChatsBadge =
+      company?.hasCoffeeChats && isInCoffeeChatsAudience
 
    const toggleFollow = useCallback(
       async (groupId: string) => {
@@ -190,8 +197,11 @@ export const FeaturedCompanyCard = ({
                   <Typography variant="medium" sx={styles.companyName}>
                      {company.universityName}
                   </Typography>
-                  {company.publicSparks ? (
+                  {company.publicSparks && !showCoffeeChatsBadge ? (
                      <FeaturedCompanySparksBadge sx={styles.badge} />
+                  ) : null}
+                  {showCoffeeChatsBadge ? (
+                     <CoffeeChatsBadge sx={styles.badge} />
                   ) : null}
                </Stack>
                <Typography variant="small" sx={styles.companyIndustries}>
