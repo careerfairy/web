@@ -129,29 +129,18 @@ const config: PlaywrightTestConfig = {
          FIRESTORE_EMULATOR_HOST: "127.0.0.1:8080",
          NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
          APP_ENV: "test",
-         NODE_ENV: "test",
-         // Algolia credentials with fallback defaults for test environment
-         ALGOLIA_APP_ID: process.env.ALGOLIA_APP_ID,
-         ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
          NEXT_DISABLE_IMAGE_OPTIMIZATION: "true",
          NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
             process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
          NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
-         // Set Java heap size for Firestore emulator
-         // Removed -Xms2g to avoid Storage rules runtime errors
-         JAVA_TOOL_OPTIONS: "-Xmx4g",
+         // Reduce Java heap size for Firestore/Storage emulators (default is much higher)
+         JAVA_TOOL_OPTIONS: "-Xmx2g",
          // Cap Node.js heap usage for Firebase CLI/emulators to avoid excessive memory consumption
          NODE_OPTIONS: "--max-old-space-size=4096",
       },
       port: 3000,
-      // Emulators need significant time to boot, especially on CI
-      // Increased from 40s to 120s for CI, 60s for local
-      timeout: process.env.CI ? 120 * 1000 : 60 * 1000,
-      // Don't reuse server - each shard needs its own isolated environment
-      reuseExistingServer: false,
-      // Keep stdout/stderr for debugging, but don't fail on stderr output
-      stdout: "pipe",
-      stderr: "pipe",
+      // emulators need some time to boot
+      timeout: 40 * 1000,
    },
 }
 
