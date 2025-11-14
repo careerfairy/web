@@ -7,8 +7,9 @@ export const getAlgoliaClient = (): SearchClient => {
    let algoliaApiKey = process.env.ALGOLIA_API_KEY
 
    if (isLocalEnvironment() && !isTestEnvironment()) {
-      algoliaAppId = process.env.DEV_ALGOLIA_APP_ID || algoliaAppId
-      algoliaApiKey = process.env.DEV_ALGOLIA_API_KEY || algoliaApiKey
+      algoliaAppId = process.env.DEV_ALGOLIA_APP_ID
+      algoliaApiKey = process.env.DEV_ALGOLIA_API_KEY
+
       logger.info(
          `Using Algolia in DEV mode (${process.env.DEV_NAME}), please ensure you have the correct credentials for your OWN Algolia application`
       )
