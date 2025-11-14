@@ -186,8 +186,11 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
+              # Algolia credentials - secrets will be used if available, otherwise playwright.config.ts has fallbacks
               ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
               ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+              # Enable debug logging for webServer to troubleshoot startup issues
+              DEBUG: pw:webserver
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
