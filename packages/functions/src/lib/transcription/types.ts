@@ -27,7 +27,13 @@ export interface ITranscriptionClient {
     * Generates a structured transcription, from  an audio/video file, while
     * automatically detecting the language.
     * @param audioUrl - The URL of the audio file to transcribe
-    * @returns The transcription result
+    * @returns The transcription result.
     */
    transcribeAudio(audioUrl: string): Promise<ITranscriptionResult>
 }
+
+export const getTranscriptionClientStub =
+   (): Partial<ITranscriptionClient> => ({
+      provider: "deepgram",
+      transcribeAudio: async () => Promise.resolve({} as ITranscriptionResult),
+   })
