@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
    optimize_ci:
-      runs-on: ubuntu-latest
+      runs-on: ubicloud-standard-2
       outputs:
          skip: ${{ steps.check_skip.outputs.skip }}
       steps:
@@ -43,7 +43,7 @@ jobs:
       name: "Pre-build cache for tests"
       needs: optimize_ci
       if: needs.optimize_ci.outputs.skip == 'false'
-      runs-on: ubuntu-latest
+      runs-on: ubicloud-standard-2
       timeout-minutes: 15
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
@@ -110,7 +110,7 @@ jobs:
          needs.build_app_for_tests.outputs.shared-ui == 'true' ||
          needs.build_app_for_tests.outputs.config-mui == 'true' ||
          needs.build_app_for_tests.outputs.workflow == 'true'
-      runs-on: ubuntu-latest
+      runs-on: ubicloud-standard-2
       timeout-minutes: 10
       env:
          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -149,7 +149,7 @@ jobs:
          matrix:
             shard: [1, 2, 3, 4, 5]
             total: [5]
-      runs-on: ubuntu-22.04
+      runs-on: ubicloud-standard-2
       timeout-minutes: 25
       steps:
          - uses: actions/checkout@v4
@@ -177,17 +177,7 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
-           run: |
-              set +e
-              echo "Executing Playwright shard ${{ matrix.shard }}/${{ matrix.total }} with a 22 minute timeout window"
-              timeout --signal=SIGINT --kill-after=30s 22m npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
-              exit_code=$?
-              if [ $exit_code -eq 124 ]; then
-                 echo "Playwright shard ${{ matrix.shard }} exceeded 22 minutes and was interrupted early to allow artifact upload"
-              elif [ $exit_code -eq 125 ]; then
-                 echo "The timeout command itself failed while running Playwright shard ${{ matrix.shard }}"
-              fi
-              exit $exit_code
+           run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
            if: ${{ failure() }}
@@ -209,7 +199,7 @@ jobs:
    deploy:
       name: "Deploy"
       needs: [unit_tests, e2e_tests]
-      runs-on: ubuntu-latest
+      runs-on: ubicloud-standard-2
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v4
