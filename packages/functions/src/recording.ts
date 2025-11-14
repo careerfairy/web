@@ -1,13 +1,16 @@
+import { FUNCTION_NAMES } from "@careerfairy/shared-lib/functions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    downloadLink,
    MAX_RECORDING_HOURS,
    S3_ROOT_PATH,
 } from "@careerfairy/shared-lib/livestreams/recordings"
-import { onDocumentUpdated } from "firebase-functions/firestore"
-import { onCall } from "firebase-functions/https"
 import { onSchedule } from "firebase-functions/scheduler"
+import { onDocumentUpdated } from "firebase-functions/v2/firestore"
+import { CallableRequest, onCall } from "firebase-functions/v2/https"
 import AgoraClient from "./api/agora"
+import functionsAxios from "./api/axios"
+import config from "./config"
 import {
    livestreamGetRecordingToken,
    livestreamGetSecureToken,
@@ -77,13 +80,29 @@ export const startRecordingLivestream = onCall(async ({ data }) => {
  *
  * Works for both live streams and breakout rooms
  */
-export const stopRecordingLivestream = onCall(async ({ data }) => {
-   functions.logger.info(
-      `Manually stopping recording for stream: ${data.streamId}`,
-      { breakoutRoomId: data.breakoutRoomId }
-   )
-   await stopRecording(data.streamId, data.token, data.breakoutRoomId)
-})
+export const stopRecordingLivestream = onCall(
+   async (
+      request: CallableRequest<{
+         streamId: string
+         token: string
+         breakoutRoomId: string
+      }>
+   ) => {
+      const { streamId, token, breakoutRoomId } = request.data
+
+      functions.logger.info(
+         `Manually stopping recording for stream: ${streamId}`,
+         { breakoutRoomId }
+      )
+      await stopRecording(streamId, token, breakoutRoomId)
+
+      /**
+       * Ignore await here because we want to continue with the function even if transcription fails
+       */
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      triggerTranscription(streamId)
+   }
+)
 
 // Business Logic
 
@@ -135,6 +154,12 @@ const automaticallyRecord = async (
          await livestreamGetSecureToken(livestreamId, breakoutRoomId)
       )?.value
       await stopRecording(livestreamId, token, breakoutRoomId)
+
+      /**
+       * Ignore await here because we want to continue with the function even if transcription fails
+       */
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      triggerTranscription(livestreamId)
    }
 
    // for some reason the event has already ended, but it's still recording
@@ -159,6 +184,11 @@ const automaticallyRecord = async (
          await livestreamGetSecureToken(livestreamId, breakoutRoomId)
       )?.value
       await stopRecording(livestreamId, token, breakoutRoomId)
+      /**
+       * Ignore await here because we want to continue with the function even if transcription fails
+       */
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      triggerTranscription(livestreamId)
    }
 }
 
@@ -320,6 +350,30 @@ const stopRecording = async (
          breakoutRoomId
       )}`
    )
+}
+
+/**
+ * Trigger transcription for a completed recording by calling the cloud function
+ */
+const triggerTranscription = async (livestreamId: string): Promise<void> => {
+   try {
+      await functionsAxios.get(
+         `${config.functionsBaseUrl}/${FUNCTION_NAMES.manualLivestreamTranscription}`,
+         {
+            params: {
+               livestreamId,
+            },
+            timeout: 500,
+         }
+      )
+
+      functions.logger.info(
+         `Transcription triggered successfully for: ${livestreamId}`
+      )
+   } catch (error) {
+      // Timeout error is expected
+      // Don't throw - transcription failure shouldn't block recording completion
+   }
 }
 
 /**

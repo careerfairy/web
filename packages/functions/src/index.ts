@@ -92,6 +92,7 @@ import levels = require("./levels")
 import remindersNew = require("./reminders-new")
 import followups = require("./followups")
 import livestreamPromotion = require("./livestreamPromotion")
+import transcription = require("./transcription")
 
 // Auth
 exports[FUNCTION_NAMES.createNewUserAccount] = auth.createNewUserAccount
@@ -312,6 +313,10 @@ exports.onDeleteLivestreamPopularityEvents =
    onDeleteTriggers.onDeleteLivestreamPopularityEvents
 exports.onDeleteUserSparkFeed = onDeleteTriggers.onDeleteUserSparkFeed
 exports.onDeleteDraft = onDeleteTriggers.onDeleteDraft
+
+// Transcription Functions
+exports[FUNCTION_NAMES.manualLivestreamTranscription] =
+   transcription.manualLivestreamTranscription
 
 // Group Spark Functions
 exports[FUNCTION_NAMES.createSpark] = groupSparks.createSpark

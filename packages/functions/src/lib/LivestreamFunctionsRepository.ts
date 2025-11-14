@@ -10,13 +10,16 @@ import {
    mapCreatorToSpeaker,
 } from "@careerfairy/shared-lib/groups/creators"
 import {
+   ASRProviders,
    EventRating,
    EventRatingAnswer,
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamQueryOptions,
    LivestreamReminderTask,
+   LivestreamTranscription,
    Speaker,
+   TranscriptionStatus,
    UserLivestreamData,
    getEarliestEventBufferTime,
    pickPublicDataFromLivestream,
@@ -50,6 +53,7 @@ import {
 } from "@careerfairy/shared-lib/utils"
 import { getHost } from "@careerfairy/shared-lib/utils/urls"
 import { Expo, ExpoPushMessage } from "expo-server-sdk"
+import { UpdateData } from "firebase-admin/firestore"
 import type { Change } from "firebase-functions"
 import * as functions from "firebase-functions"
 import firebase from "firebase/compat"
@@ -355,6 +359,55 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string,
       collection: "livestreams" | "draftLivestreams"
    ): Promise<void>
+
+   /**
+    * Initiate transcription by creating or updating the status to "transcribing"
+    * @param livestreamId - The livestream ID
+    * @param transcriptionProvider - ASR provider
+    * @param chapterProvider - LLM provider
+    * @returns The document ID
+    */
+   initiateTranscription(
+      livestreamId: string,
+      transcriptionProvider: ASRProviders
+   ): Promise<void>
+
+   /**
+    * Update an existing transcription status document in Firestore
+    * @param livestreamId - The livestream ID
+    * @param status - Updated transcription status
+    * @returns true if update was successful
+    */
+   updateTranscriptionStatus(
+      livestreamId: string,
+      status: TranscriptionStatus
+   ): Promise<void>
+
+   /**
+    * Get transcription status for a livestream
+    * @param livestreamId - The livestream ID
+    * @returns The transcription document or null if not found
+    */
+   getTranscriptionStatus(
+      livestreamId: string
+   ): Promise<LivestreamTranscription | null>
+
+   /**
+    * Update the livestream document to mark transcription as completed
+    * @param livestreamId - The livestream ID
+    * @returns true if update was successful
+    */
+   updateLivestreamTranscriptionCompleted(livestreamId: string): Promise<void>
+
+   /**
+    * Check if transcription is already in progress or completed
+    * @param livestreamId - The livestream ID
+    * @returns true if transcription is in progress or completed
+    */
+   isTranscriptionInProgress(
+      livestreamId: string,
+      maxRetries: number
+   ): Promise<boolean>
 }
 
 export class LivestreamFunctionsRepository
@@ -1452,5 +1505,92 @@ export class LivestreamFunctionsRepository
             livestreamId,
          })
       }
+   }
+
+   async initiateTranscription(
+      livestreamId: string,
+      transcriptionProvider: ASRProviders = "deepgram"
+   ): Promise<void> {
+      const now = Timestamp.now()
+
+      const doc: LivestreamTranscription = {
+         id: livestreamId,
+         livestreamId,
+         transcriptionProvider,
+         chapterProvider: null,
+         status: {
+            state: "transcribing",
+            startedAt: now,
+         },
+         createdAt: now,
+         updatedAt: now,
+      }
+
+      // Use set with merge to handle both create and update cases
+      await this.firestore
+         .collection("livestreamTranscriptions")
+         .doc(livestreamId)
+         .set(doc, { merge: true })
+   }
+
+   async updateTranscriptionStatus(
+      livestreamId: string,
+      status: TranscriptionStatus
+   ): Promise<void> {
+      const updateData: UpdateData<LivestreamTranscription> = {
+         status,
+         updatedAt: Timestamp.now(),
+      }
+
+      await this.firestore
+         .collection("livestreamTranscriptions")
+         .doc(livestreamId)
+         .update(updateData)
+   }
+
+   async getTranscriptionStatus(
+      livestreamId: string
+   ): Promise<LivestreamTranscription | null> {
+      const doc = await this.firestore
+         .collection("livestreamTranscriptions")
+         .doc(livestreamId)
+         .get()
+
+      return doc.data() as LivestreamTranscription
+   }
+
+   async updateLivestreamTranscriptionCompleted(
+      livestreamId: string
+   ): Promise<void> {
+      const updateData: UpdateData<LivestreamEvent> = {
+         transcriptionCompleted: true,
+      }
+
+      await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .update(updateData)
+   }
+
+   async isTranscriptionInProgress(
+      livestreamId: string,
+      maxRetries: number
+   ): Promise<boolean> {
+      const livestreamTranscription = await this.getTranscriptionStatus(
+         livestreamId
+      )
+
+      if (!livestreamTranscription) {
+         return false
+      }
+
+      const transcriptionStatus = livestreamTranscription.status
+      const state = transcriptionStatus.state
+
+      return (
+         state === "transcribing" ||
+         (state === "transcription-failed" &&
+            transcriptionStatus.retryCount < maxRetries)
+      )
    }
 }

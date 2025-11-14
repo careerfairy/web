@@ -19,6 +19,7 @@
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",
+      "@deepgram/sdk": "^4.11.2",
       "@google-cloud/bigquery": "^7.9.0",
       "agora-token": "^2.0.3",
       "algoliasearch": "^4.22.0",
