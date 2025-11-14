@@ -209,7 +209,7 @@ jobs:
    deploy:
       name: "Deploy"
       needs: [unit_tests, e2e_tests]
-      runs-on: self-hosted
+      runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v4
