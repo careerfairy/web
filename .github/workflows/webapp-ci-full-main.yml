@@ -76,11 +76,10 @@ jobs:
                  ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
          - name: Build
-           run: npm run build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-
+           run: npm run build
          # Check which folders have changed
          # So that we can skip future jobs
          - uses: dorny/paths-filter@v3
@@ -130,6 +129,14 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
 
+         - name: Cache .next/cache folder
+           uses: ubicloud/cache@v4
+           with:
+              path: ${{ github.workspace }}/apps/web/.next/cache
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+              restore-keys: |
+                 ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
          - name: Run Jest Unit Tests
            run: npm run test
 
@@ -170,12 +177,21 @@ jobs:
            run: npx playwright install --with-deps
          - name: Install uuid-runtime
            run: sudo apt-get install uuid-runtime
+
+         - name: Cache .next/cache folder
+           uses: ubicloud/cache@v4
+           with:
+              path: ${{ github.workspace }}/apps/web/.next/cache
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+              restore-keys: |
+                 ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
          - name: Generate UUID
            run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
+              WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
