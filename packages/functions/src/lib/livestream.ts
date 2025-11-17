@@ -197,9 +197,11 @@ const addUsersDataOnStreams = async (
          .doc(stream.id)
          .collection("userLivestreamData")
 
-      const query = skimData
-         ? collectionRef.select("id", "registered", "userId", "livestreamId")
-         : collectionRef
+      let query = collectionRef.where("registered.date", "!=", null)
+
+      if (skimData) {
+         query = query.select("id", "registered", "userId", "livestreamId")
+      }
 
       const collection = await query.get()
 
