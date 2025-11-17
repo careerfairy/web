@@ -33,7 +33,6 @@ const PATH_REGEX = /^transcriptions\/livestreams\/([^/]+)\/transcription\.json$/
  */
 const BATCH_TRANSCRIPTION_CONFIG = {
    BATCH_SIZE: 2, // Calculated for 540s timeout - see comment above for calculation
-   MAX_AGE_YEARS: 2, // Maximum age of livestreams to process (2 years)
    /**
     * Wait 3 minutes after each transcription to allow chapterization to start automatically via GCS trigger
     * and to avoid Claude API rate limiting.
@@ -276,7 +275,6 @@ export const manualBatchLivestreamTranscriptions = onRequest(
 const handleBatchLivestreamTranscriptions = async () => {
    logger.info("Starting batch transcription processing", {
       batchSize: BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE,
-      maxAgeYears: BATCH_TRANSCRIPTION_CONFIG.MAX_AGE_YEARS,
    })
 
    try {
