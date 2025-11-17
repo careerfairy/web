@@ -2,6 +2,15 @@ import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
 import { isDefinedAndEqual } from "@careerfairy/shared-lib/utils"
 import { UserType } from "../../util"
 
+export type ReactionType = "thumbsUp" | "wow" | /* "laughing" | */ "heart"
+
+export const REACTION_EMOJIS: Record<ReactionType, string> = {
+   thumbsUp: "👍",
+   wow: "😮",
+   // laughing: "😂",
+   heart: "❤️",
+}
+
 export const getIsMe = (
    entry: LivestreamChatEntry,
    agoraUserId: string,

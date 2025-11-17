@@ -16,7 +16,6 @@ import {
    useCallback,
    useEffect,
    useLayoutEffect,
-   useMemo,
    useState,
 } from "react"
 import { ChevronDown } from "react-feather"
@@ -77,6 +76,7 @@ export const Content = ({ scrollToBottom }: Props) => {
    const { livestreamId } = useStreamingContext()
    const { data: chatEntries } = useChatEntries(livestreamId, {
       limit: MAX_STREAM_CHAT_ENTRIES,
+      sortOrder: "asc",
    })
 
    const [selectedEntryId, setSelectedEntryId] = useState<string | null>(null)
@@ -109,24 +109,19 @@ export const Content = ({ scrollToBottom }: Props) => {
       setSelectedEntryId(null)
    }, [handleClose])
 
-   const sortedChatEntries = useMemo(
-      () => [...chatEntries].reverse(),
-      [chatEntries]
-   )
-
    if (!chatEntries.length) return <EmptyChatView />
 
    return (
       <Fragment>
          <Box id="chat-list" sx={styles.list} component={TransitionGroup}>
-            {sortedChatEntries.map((entry, index) => (
+            {chatEntries.map((entry, index) => (
                <Collapse key={entry.id}>
                   <ChatEntry
                      onOptionsClick={(event) =>
                         handleOpenOptions(event, entry.id)
                      }
                      entry={entry}
-                     ref={index === sortedChatEntries.length - 1 ? ref : null}
+                     ref={index === chatEntries.length - 1 ? ref : null}
                   />
                </Collapse>
             ))}
