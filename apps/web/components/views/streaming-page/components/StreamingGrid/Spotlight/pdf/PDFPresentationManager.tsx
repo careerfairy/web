@@ -39,7 +39,7 @@ export const PDFPresentationManager = ({
 
    const { fileUploaderProps, dragActive } = useFileUploader({
       acceptedFileTypes: ["pdf", "PDF"],
-      maxFileSize: 20, // MB
+      maxFileSize: 40, // MB
       multiple: false,
       onValidated: async (file) => {
          const newFile = Array.isArray(file) ? file[0] : file
