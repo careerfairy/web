@@ -439,22 +439,10 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string
    ): Promise<ChapterizationStatus | null>
 
-   /**
-    * Query past livestreams that need transcription
-    * Filters: max age (years), not test, not hidden, has ended, transcription not completed
-    * @param limit - Maximum number of livestreams to return
-    * @param maxAgeYears - Maximum age in years (default: 2)
-    * @returns Array of LivestreamEvent that need transcription
-    */
    getLivestreamsNeedingTranscription(
       maxAgeYears?: number
    ): Promise<LivestreamEvent[]>
 
-   /**
-    * Update the transcriptionCompleted field on a livestream document
-    * @param livestreamId - The livestream ID
-    * @param completed - Whether transcription is completed
-    */
    updateLivestreamTranscriptionCompleted(
       livestreamId: string,
       completed: boolean
@@ -980,7 +968,7 @@ export class LivestreamFunctionsRepository
          .where("start", ">", earliestStartDate)
          .where("test", "==", false)
          .where("hidden", "==", false)
-         // .where("livestreamType", "==", "livestream")
+         .where("livestreamType", "==", "livestream")
          .where("hasEnded", "==", true)
          .orderBy("start", "desc")
 

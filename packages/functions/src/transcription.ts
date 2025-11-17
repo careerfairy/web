@@ -356,10 +356,6 @@ const handleBatchLivestreamTranscriptions = async () => {
 
             await sleep(BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS)
 
-            logger.info("Livestream transcription completed", {
-               livestreamId: livestream.id,
-            })
-
             results.success++
          } catch (error) {
             logger.error("Failed to process livestream transcription", {
