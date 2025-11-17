@@ -94,6 +94,7 @@ export const onLivestreamStartScheduleNoShowReminder = onDocumentUpdated(
 export const sendLivestreamNoShowReminder = onRequest(
    {
       timeoutSeconds: 3600, // 1 hour timeout (Gen2 functions support up to 1 hour)
+      memory: "1GiB",
    },
    async (req, res) => {
       const { livestreamId } = req.body || {}
