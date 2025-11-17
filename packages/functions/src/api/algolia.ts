@@ -13,12 +13,6 @@ export const getAlgoliaClient = (): SearchClient => {
       logger.info(
          `Using Algolia in DEV mode (${process.env.DEV_NAME}), please ensure you have the correct credentials for your OWN Algolia application`
       )
-   } else if (isTestEnvironment()) {
-      logger.info(
-         `Using Algolia in TEST mode (prod credentials), last api key ends in: ${algoliaApiKey?.slice(
-            -10
-         )}`
-      )
    }
 
    return algoliasearch(algoliaAppId, algoliaApiKey)
