@@ -5,10 +5,8 @@ import {
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
-import { WriteBatch } from "firebase-admin/firestore"
 import { firestore } from "../api/firestoreAdmin"
 import { livestreamsRepo } from "../api/repositories"
-import { EmailChunks } from "../reminders"
 import { addMinutesDate, delay, removeMinutesDate } from "../util"
 
 const MAX_RETRIES = 3
@@ -224,24 +222,6 @@ const addUsersDataOnStreams = async (
    }
 
    return formattedStreams
-}
-
-/**
- * Update all the successfully sent reminders for each livestream
- */
-export const updateLiveStreamsWithEmailSent = (
-   batch: WriteBatch,
-   emailsToSave: EmailChunks
-) => {
-   Object.values(emailsToSave).forEach((email) => {
-      const { streamId, reminderKey, chunks } = email
-
-      const ref = firestore.collection("livestreams").doc(streamId)
-
-      batch.update(ref, {
-         [`reminderEmailsSent.${reminderKey}`]: chunks,
-      })
-   })
 }
 
 /**

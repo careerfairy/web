@@ -47,7 +47,6 @@ import agora = require("./agora")
 import backup = require("./backup")
 import groupAdmin = require("./groupAdmin")
 import admin = require("./admin")
-import reminders = require("./reminders")
 import remindersNoShow = require("./reminders-no-show")
 import livestreams = require("./livestreams")
 import analytics = require("./analytics")
@@ -128,9 +127,6 @@ exports[FUNCTION_NAMES.getGroupTalentEngagement] =
    groupAnalytics.getGroupTalentEngagement
 exports[FUNCTION_NAMES.getTotalUsersMatchingTargeting] =
    groupAnalytics.getTotalUsersMatchingTargeting
-
-// Reminders (Old) TODO: delete functions in file after testing new reminders
-exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
 
 exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
