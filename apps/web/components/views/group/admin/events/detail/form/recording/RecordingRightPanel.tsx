@@ -1,7 +1,7 @@
 import { Box, Slide } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BrandedSwipeableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { SwitchTransition } from "react-transition-group"
 import { sxStyles } from "types/commonTypes"
 import { ChaptersView } from "./views/ChaptersView"
@@ -73,28 +73,67 @@ export const RecordingRightPanel = () => {
    const [currentView, setCurrentView] = useState<RecordingPanelView>("menu")
    const [isDrawerOpen, setIsDrawerOpen] = useState(false)
    const transitionContainerRef = useRef<HTMLDivElement | null>(null)
+   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+   const scrollPositionsRef = useRef<
+      Partial<Record<RecordingPanelView, number>>
+   >({})
+
+   const storeScrollPosition = useCallback(() => {
+      if (!isMobile) {
+         return
+      }
+
+      const container = scrollContainerRef.current
+      if (!container) {
+         return
+      }
+
+      scrollPositionsRef.current[currentView] = container.scrollTop
+   }, [currentView, isMobile])
+
+   useEffect(() => {
+      if (!isMobile || !isDrawerOpen) {
+         return
+      }
+
+      const container = scrollContainerRef.current
+      if (!container) {
+         return
+      }
+
+      const storedPosition = scrollPositionsRef.current[currentView] ?? 0
+      container.scrollTo({ top: storedPosition })
+   }, [currentView, isDrawerOpen, isMobile])
 
    const handleNavigate = useCallback(
       (view: RecordingPanelView) => {
+         if (isMobile) {
+            storeScrollPosition()
+         }
+
          setCurrentView(view)
          if (isMobile) {
             setIsDrawerOpen(true)
          }
       },
-      [isMobile]
+      [isMobile, storeScrollPosition]
    )
 
    const handleBack = useCallback(() => {
       if (isMobile) {
+         storeScrollPosition()
          setIsDrawerOpen(false)
       }
       setCurrentView("menu")
-   }, [isMobile])
+   }, [isMobile, storeScrollPosition])
 
    const handleDrawerClose = useCallback(() => {
+      if (isMobile) {
+         storeScrollPosition()
+      }
       setIsDrawerOpen(false)
       setCurrentView("menu")
-   }, [])
+   }, [isMobile, storeScrollPosition])
 
    const transitionDirection = currentView !== "menu" ? "left" : "right"
 
@@ -110,7 +149,7 @@ export const RecordingRightPanel = () => {
                sx={styles.drawer}
                hideDragHandle
             >
-               <Box sx={styles.drawerContent}>
+               <Box sx={styles.drawerContent} ref={scrollContainerRef}>
                   {renderPanelView(currentView, {
                      handleBack,
                      handleNavigate,
