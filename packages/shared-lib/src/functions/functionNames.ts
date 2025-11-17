@@ -101,6 +101,8 @@ export const FUNCTION_NAMES = {
 
    // Transcription functions
    startLivestreamTranscription: "startLivestreamTranscription",
+   manualBatchLivestreamTranscriptions: "manualBatchLivestreamTranscriptions",
+   processBatchLivestreamTranscriptions: "processBatchLivestreamTranscriptions",
    startLivestreamChapterization: "startLivestreamChapterization",
    initiateChapterizationOnTranscriptionCompleted:
       "initiateChapterizationOnTranscriptionCompleted",

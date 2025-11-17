@@ -322,6 +322,10 @@ exports[FUNCTION_NAMES.initiateChapterizationOnTranscriptionCompleted] =
    transcription.initiateChapterizationOnTranscriptionCompleted
 exports[FUNCTION_NAMES.startLivestreamChapterization] =
    transcription.startLivestreamChapterization
+exports[FUNCTION_NAMES.manualBatchLivestreamTranscriptions] =
+   transcription.manualBatchLivestreamTranscriptions
+exports[FUNCTION_NAMES.processBatchLivestreamTranscriptions] =
+   transcription.processBatchLivestreamTranscriptions
 
 // Group Spark Functions
 exports[FUNCTION_NAMES.createSpark] = groupSparks.createSpark

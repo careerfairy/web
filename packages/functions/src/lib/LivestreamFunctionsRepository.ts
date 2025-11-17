@@ -447,7 +447,6 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @returns Array of LivestreamEvent that need transcription
     */
    getLivestreamsNeedingTranscription(
-      limit: number,
       maxAgeYears?: number
    ): Promise<LivestreamEvent[]>
 
@@ -967,7 +966,6 @@ export class LivestreamFunctionsRepository
    }
 
    async getLivestreamsNeedingTranscription(
-      limit: number,
       maxAgeYears = 2
    ): Promise<LivestreamEvent[]> {
       const now = new Date()
@@ -975,25 +973,23 @@ export class LivestreamFunctionsRepository
          .minus({ years: maxAgeYears })
          .toJSDate()
 
-      // @ts-ignore - Type mismatch between Admin SDK and compat converter, but works at runtime
-      let q = this.firestore
+      const query = this.firestore
          .collection("livestreams")
-         .withConverter(
-            createCompatGenericConverter<LivestreamEvent>()
-         ) as unknown as firebase.firestore.Query<LivestreamEvent>
-
-      q = q
+         .withConverter(createCompatGenericConverter<LivestreamEvent>())
          .where("start", "<", now)
          .where("start", ">", earliestStartDate)
          .where("test", "==", false)
          .where("hidden", "==", false)
-         .where("livestreamType", "==", "livestream")
+         // .where("livestreamType", "==", "livestream")
          .where("hasEnded", "==", true)
-         .where("transcriptionCompleted", "!=", true)
          .orderBy("start", "desc")
-         .limit(limit)
 
-      const snapshot = await q.get()
+      const snapshot = await query.get()
+
+      if (snapshot.empty) {
+         return []
+      }
+
       return snapshot.docs.map((doc) => doc.data())
    }
 
