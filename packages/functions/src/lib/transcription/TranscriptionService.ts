@@ -94,7 +94,7 @@ export class TranscriptionService extends BaseTranscriptionService {
             recordingUrl
          )
 
-         if (!result || !result?.transcript) {
+         if (!result) {
             throw new Error("Transcription result is missing")
          }
 

@@ -22,15 +22,29 @@ const PATH_REGEX = /^transcriptions\/livestreams\/([^/]+)\/transcription\.json$/
  *
  * Batch size calculation:
  * - Max timeout: 3600 seconds (1 hour)
- * - Time per livestream: ~40s transcription + ~60s wait = ~100s
+ * - Time per livestream: ~40s transcription + ~180s wait (3 minutes) = ~220s
  * - Buffer for overhead: ~200 seconds
- * - Safe batch size: (3600 - 200) / 100 = ~34 livestreams
- * - Using 30 as default to be conservative
+ * - Theoretical max batch size: (3600 - 200) / 220 = ~15 livestreams
+ * - Using 20 as configured value (may complete faster in practice, but risks timeout if all take full time)
+ * - Reduced from higher values to avoid Claude API rate limiting errors
  */
 const BATCH_TRANSCRIPTION_CONFIG = {
-   BATCH_SIZE: 30, // Easily configurable batch size
+   BATCH_SIZE: 20, // Reduced to avoid rate limiting - see comment above for calculation
    MAX_AGE_YEARS: 2, // Maximum age of livestreams to process (2 years)
-   WAIT_AFTER_TRANSCRIPTION_MS: 60 * 1000, // 1 minute wait after transcription
+   /**
+    * Wait 3 minutes after each transcription to allow chapterization to start automatically via GCS trigger
+    * and to avoid Claude API rate limiting.
+    *
+    * Rate limiting context:
+    * - Multiple transcription jobs can run simultaneously, but too many concurrent chapterization requests
+    *   will trigger Claude API rate limits
+    * - This wait period helps stagger chapterization requests to stay within rate limits
+    * - Error encountered when rate limits are exceeded:
+    *   "Failed after max retries reached: This request would exceed the rate limit for your organization
+    *   of 10,000 input tokens per minute. For details, refer to: https://docs.claude.com/en/api/rate-limits. You can see the response headers
+    *   for current usage. Contact sales at https://www.anthropic.com/contact-sales to discuss rate limit increases"
+    */
+   WAIT_AFTER_TRANSCRIPTION_MS: 3 * 60 * 1000, // 3 minutes wait after transcription
 } as const
 
 export const initiateChapterizationOnTranscriptionCompleted = onObjectFinalized(
@@ -242,121 +256,137 @@ export const processBatchLivestreamTranscriptions = onSchedule(
       timeZone: "UTC",
       ...transcriptionConfig,
    },
-   async () => {
-      logger.info("Starting batch transcription processing", {
-         batchSize: BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE,
-         maxAgeYears: BATCH_TRANSCRIPTION_CONFIG.MAX_AGE_YEARS,
-      })
+   async () => await handleBatchLivestreamTranscriptions()
+)
 
-      try {
-         // Query livestreams that need transcription
-         const livestreamsNeedingTranscription =
-            await livestreamsRepo.getLivestreamsNeedingTranscription(
-               BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE,
-               BATCH_TRANSCRIPTION_CONFIG.MAX_AGE_YEARS
-            )
+export const manualBatchLivestreamTranscriptions = onRequest(
+   transcriptionConfig,
+   async (_req, res) => {
+      await handleBatchLivestreamTranscriptions()
+      res.status(200)
+         .json({ message: "Batch transcription processing completed" })
+         .end()
+   }
+)
 
-         logger.info("Found livestreams needing transcription", {
-            count: livestreamsNeedingTranscription.length,
-         })
+const handleBatchLivestreamTranscriptions = async () => {
+   logger.info("Starting batch transcription processing", {
+      batchSize: BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE,
+      maxAgeYears: BATCH_TRANSCRIPTION_CONFIG.MAX_AGE_YEARS,
+   })
 
-         if (livestreamsNeedingTranscription.length === 0) {
-            logger.info("No livestreams found needing transcription")
-            return
-         }
-
-         // Initialize transcription service
-         const transcriptionService = new TranscriptionService(
-            livestreamsRepo,
-            DeepgramTranscriptionClient.create()
+   try {
+      const livestreams =
+         await livestreamsRepo.getLivestreamsNeedingTranscription(
+            BATCH_TRANSCRIPTION_CONFIG.MAX_AGE_YEARS
          )
 
-         // Process each livestream in the batch
-         const results = {
-            success: 0,
-            failed: 0,
-            errors: [] as Array<{ livestreamId: string; error: string }>,
-         }
+      // Applying in memory filter due to firestore limitations
+      // See more: https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
+      const livestreamsNeedingTranscription = livestreams
+         .filter((livestream) => !livestream.transcriptionCompleted)
+         .slice(0, BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE)
 
-         for (const livestream of livestreamsNeedingTranscription) {
-            try {
-               logger.info("Processing livestream transcription", {
+      if (livestreamsNeedingTranscription.length === 0) {
+         logger.info("No livestreams found needing transcription... skipping")
+         return
+      }
+
+      logger.info("Found livestreams needing transcription... processing", {
+         count: livestreamsNeedingTranscription.length,
+      })
+
+      const transcriptionService = new TranscriptionService(
+         livestreamsRepo,
+         DeepgramTranscriptionClient.create()
+      )
+
+      const results = {
+         success: 0,
+         failed: 0,
+         errors: [] as Array<{ livestreamId: string; error: string }>,
+      }
+
+      for (const [
+         index,
+         livestream,
+      ] of livestreamsNeedingTranscription.entries()) {
+         try {
+            logger.info(
+               `Processing batch livestream transcription ${index + 1} of ${
+                  livestreamsNeedingTranscription.length
+               }`,
+               {
                   livestreamId: livestream.id,
                   title: livestream.title,
-               })
-
-               // Get recording token to build download URL
-               const tokenData =
-                  await livestreamsRepo.getLivestreamRecordingToken(
-                     livestream.id
-                  )
-
-               if (!tokenData?.sid) {
-                  logger.warn("Recording token sid is missing, skipping", {
-                     livestreamId: livestream.id,
-                  })
-                  results.failed++
-                  results.errors.push({
-                     livestreamId: livestream.id,
-                     error: "Recording token sid is missing",
-                  })
-                  continue
                }
+            )
 
-               const recordingUrl = downloadLink(livestream.id, tokenData.sid)
+            const tokenData = await livestreamsRepo.getLivestreamRecordingToken(
+               livestream.id
+            )
 
-               // Process transcription
-               await transcriptionService.processLivestreamTranscription(
-                  livestream.id,
-                  recordingUrl
-               )
-
-               logger.info(
-                  "Transcription completed, waiting before next livestream",
-                  {
-                     livestreamId: livestream.id,
-                     waitMs:
-                        BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS,
-                  }
-               )
-
-               // Wait 1 minute to allow chapterization to start automatically via GCS trigger
-               await sleep(
-                  BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS
-               )
-
-               logger.info("Livestream transcription completed", {
+            if (!tokenData?.sid) {
+               logger.warn("Recording token sid is missing, skipping", {
                   livestreamId: livestream.id,
-               })
-
-               results.success++
-            } catch (error) {
-               logger.error("Failed to process livestream transcription", {
-                  livestreamId: livestream.id,
-                  error,
-                  errorMessage: getErrorMessage(error),
                })
                results.failed++
                results.errors.push({
                   livestreamId: livestream.id,
-                  error: getErrorMessage(error),
+                  error: "Recording token sid is missing",
                })
-               // Continue processing other livestreams even if one fails
+               continue
             }
-         }
 
-         logger.info("Batch transcription processing completed", {
-            total: livestreamsNeedingTranscription.length,
-            success: results.success,
-            failed: results.failed,
-            errors: results.errors,
-         })
-      } catch (error) {
-         logger.error("Batch transcription processing failed", {
-            error,
-            errorMessage: getErrorMessage(error),
-         })
-         throw error
+            const recordingUrl = downloadLink(livestream.id, tokenData.sid)
+
+            await transcriptionService.processLivestreamTranscription(
+               livestream.id,
+               recordingUrl
+            )
+
+            logger.info(
+               "Transcription completed, waiting before next livestream",
+               {
+                  livestreamId: livestream.id,
+                  waitMs:
+                     BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS,
+               }
+            )
+
+            await sleep(BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS)
+
+            logger.info("Livestream transcription completed", {
+               livestreamId: livestream.id,
+            })
+
+            results.success++
+         } catch (error) {
+            logger.error("Failed to process livestream transcription", {
+               livestreamId: livestream.id,
+               error,
+               errorMessage: getErrorMessage(error),
+            })
+            results.failed++
+            results.errors.push({
+               livestreamId: livestream.id,
+               error: getErrorMessage(error),
+            })
+            // Continue processing other livestreams even if one fails
+         }
       }
+
+      logger.info("Batch transcription processing completed", {
+         total: livestreamsNeedingTranscription.length,
+         success: results.success,
+         failed: results.failed,
+         errors: results.errors,
+      })
+   } catch (error) {
+      logger.error("Batch transcription processing failed", {
+         error,
+         errorMessage: getErrorMessage(error),
+      })
+      throw error
    }
-)
+}
