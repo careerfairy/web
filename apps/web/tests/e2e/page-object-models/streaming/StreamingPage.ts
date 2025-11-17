@@ -7,10 +7,8 @@ import { CommonPage } from "../CommonPage"
  * /streaming/viewer/:id
  */
 export class StreamingPage extends CommonPage {
-   public assertIsLive(args?: { timeout?: number }) {
-      return expect(this.exactText("LIVE")).toBeVisible({
-         timeout: args?.timeout,
-      })
+   public assertIsLive() {
+      return expect(this.exactText("LIVE")).toBeVisible()
    }
 
    public async assertStreamerDetailsExist(streamer) {

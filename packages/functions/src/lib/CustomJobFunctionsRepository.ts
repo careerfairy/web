@@ -179,11 +179,9 @@ export class CustomJobFunctionsRepository
 
       // Check if document exists before updating
       const doc = await ref.get()
+
       if (!doc.exists) {
-         functions.logger.warn(
-            `CustomJobStats document for job ${deletedCustomJob.id} does not exist. Skipping deletion update.`
-         )
-         return
+         await this.createCustomJobStats(deletedCustomJob)
       }
 
       return ref.update({
