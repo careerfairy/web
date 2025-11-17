@@ -201,7 +201,7 @@ const JobCard = ({
                      </Grid>
                   ) : null}
 
-                  {!isMobile && !smallCard && (
+                  {Boolean(!isMobile && !smallCard) && (
                      <JobCardAction
                         job={job}
                         previewMode={previewMode}
