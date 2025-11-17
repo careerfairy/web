@@ -439,9 +439,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string
    ): Promise<ChapterizationStatus | null>
 
-   getLivestreamsNeedingTranscription(
-      maxAgeYears?: number
-   ): Promise<LivestreamEvent[]>
+   getLivestreamsNeedingTranscription(): Promise<LivestreamEvent[]>
 
    updateLivestreamTranscriptionCompleted(
       livestreamId: string,
@@ -953,19 +951,13 @@ export class LivestreamFunctionsRepository
       return admins
    }
 
-   async getLivestreamsNeedingTranscription(
-      maxAgeYears = 2
-   ): Promise<LivestreamEvent[]> {
+   async getLivestreamsNeedingTranscription(): Promise<LivestreamEvent[]> {
       const now = new Date()
-      const earliestStartDate = DateTime.local()
-         .minus({ years: maxAgeYears })
-         .toJSDate()
 
       const query = this.firestore
          .collection("livestreams")
          .withConverter(createCompatGenericConverter<LivestreamEvent>())
          .where("start", "<", now)
-         .where("start", ">", earliestStartDate)
          .where("test", "==", false)
          .where("hidden", "==", false)
          .where("livestreamType", "==", "livestream")
