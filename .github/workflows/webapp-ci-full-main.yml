@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
    optimize_ci:
-      runs-on: ubuntu-latest
+      runs-on: ubicloud-standard-2
       outputs:
          skip: ${{ steps.check_skip.outputs.skip }}
       steps:
@@ -43,7 +43,7 @@ jobs:
       name: "Pre-build cache for tests"
       needs: optimize_ci
       if: needs.optimize_ci.outputs.skip == 'false'
-      runs-on: ubuntu-latest
+      runs-on: ubicloud-standard-2
       timeout-minutes: 15
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
@@ -53,12 +53,12 @@ jobs:
          workflow: ${{ steps.changes.outputs.workflow }}
       steps:
          - uses: actions/checkout@v4
-         - uses: actions/setup-node@v4
+         - uses: ubicloud/setup-node@v4
            with:
               node-version: "22"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v4
+           uses: ubicloud/cache@v4
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -67,7 +67,7 @@ jobs:
            run: npm ci --ignore-scripts
 
          - name: Cache .next/cache folder
-           uses: actions/cache@v4
+           uses: ubicloud/cache@v4
            with:
               path: ${{ github.workspace }}/apps/web/.next/cache
               key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
@@ -110,19 +110,19 @@ jobs:
          needs.build_app_for_tests.outputs.shared-ui == 'true' ||
          needs.build_app_for_tests.outputs.config-mui == 'true' ||
          needs.build_app_for_tests.outputs.workflow == 'true'
-      runs-on: ubuntu-latest
+      runs-on: ubicloud-standard-2
       timeout-minutes: 10
       env:
          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
          NODE_ENV: test
       steps:
          - uses: actions/checkout@v4
-         - uses: actions/setup-node@v4
+         - uses: ubicloud/setup-node@v4
            with:
               node-version: "22"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v4
+           uses: ubicloud/cache@v4
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -149,16 +149,16 @@ jobs:
          matrix:
             shard: [1, 2, 3, 4, 5]
             total: [5]
-      runs-on: ubuntu-22.04
+      runs-on: ubicloud-standard-2
       timeout-minutes: 25
       steps:
          - uses: actions/checkout@v4
-         - uses: actions/setup-node@v4
+         - uses: ubicloud/setup-node@v4
            with:
               node-version: "22"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v4
+           uses: ubicloud/cache@v4
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -176,6 +176,9 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
+              ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+              ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+              TEST_STRIPE_SECRET_KEY: ${{ secrets.TEST_STRIPE_SECRET_KEY }}
               NODE_ENV: test
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
@@ -199,7 +202,7 @@ jobs:
    deploy:
       name: "Deploy"
       needs: [unit_tests, e2e_tests]
-      runs-on: ubuntu-latest
+      runs-on: ubicloud-standard-2
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v4

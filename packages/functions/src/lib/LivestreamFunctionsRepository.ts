@@ -438,6 +438,13 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    getChapterizationStatus(
       livestreamId: string
    ): Promise<ChapterizationStatus | null>
+
+   getLivestreamsNeedingTranscription(): Promise<LivestreamEvent[]>
+
+   updateLivestreamTranscriptionCompleted(
+      livestreamId: string,
+      completed: boolean
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -942,6 +949,42 @@ export class LivestreamFunctionsRepository
       }
 
       return admins
+   }
+
+   async getLivestreamsNeedingTranscription(): Promise<LivestreamEvent[]> {
+      const now = new Date()
+
+      const query = this.firestore
+         .collection("livestreams")
+         .withConverter(createCompatGenericConverter<LivestreamEvent>())
+         .where("start", "<", now)
+         .where("test", "==", false)
+         .where("hidden", "==", false)
+         .where("livestreamType", "==", "livestream")
+         .where("hasEnded", "==", true)
+         .orderBy("start", "desc")
+
+      const snapshot = await query.get()
+
+      if (snapshot.empty) {
+         return []
+      }
+
+      return snapshot.docs.map((doc) => doc.data())
+   }
+
+   async updateLivestreamTranscriptionCompleted(
+      livestreamId: string,
+      completed: boolean
+   ): Promise<void> {
+      const updateData: UpdateData<LivestreamEvent> = {
+         transcriptionCompleted: completed,
+      }
+
+      await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .update(updateData)
    }
 
    async createLivestreamStartUserNotifications(
