@@ -1,6 +1,6 @@
 import { Box } from "@mui/material"
 import { useAppDispatch } from "components/custom-hook/store"
-import { forwardRef } from "react"
+import { forwardRef, useCallback } from "react"
 import { Phone } from "react-feather"
 import { setIsSpyMode } from "store/reducers/streamingAppReducer"
 import {
@@ -8,6 +8,7 @@ import {
    useIsSpyMode,
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
+import { useLocalTracks } from "../../context"
 import { BrandedTooltip } from "../BrandedTooltip"
 import { ActionBarButtonStyled, ActionButtonProps } from "./ActionBarButton"
 
@@ -36,8 +37,25 @@ export const PhoneActionButton = forwardRef<
    const dispatch = useAppDispatch()
    const isSpyMode = useIsSpyMode()
    const isAssistantMode = useAssistantMode()
+   const { toggleCamera, cameraOn } = useLocalTracks()
 
    const active = !isSpyMode
+
+   const onClick = useCallback(() => {
+      const nextIsSpyMode = !isSpyMode
+
+      // Ensure camera is off while in spy mode
+      if (nextIsSpyMode && cameraOn) {
+         toggleCamera()
+      }
+
+      // Ensure camera is on when joining the stream
+      if (!nextIsSpyMode && !cameraOn) {
+         toggleCamera()
+      }
+
+      dispatch(setIsSpyMode(nextIsSpyMode))
+   }, [cameraOn, dispatch, isSpyMode, toggleCamera])
 
    // Only show when assistant mode is active
    if (!isAssistantMode) {
@@ -57,7 +75,7 @@ export const PhoneActionButton = forwardRef<
          <ActionBarButtonStyled
             color="default"
             ref={ref}
-            onClick={() => dispatch(setIsSpyMode(!isSpyMode))}
+            onClick={onClick}
             sx={active ? styles.active : styles.inactive}
             {...props}
          >
