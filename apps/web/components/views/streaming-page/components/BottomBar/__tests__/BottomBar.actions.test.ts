@@ -65,15 +65,7 @@ describe("BottomBar host actions", () => {
             isSpyMode: false,
             isAssistantMode: false,
          })
-      ).toEqual([
-         "Mic",
-         "Video",
-         "Share",
-         "Divider",
-         "Q&A",
-         "Chat",
-         "SpeedDial",
-      ])
+      ).toEqual(["Mic", "Video", "Share", "Divider", "Chat", "SpeedDial"])
    })
 
    it("adds admin actions for host mobile admin", () => {
@@ -150,7 +142,7 @@ describe("BottomBar host actions", () => {
             isSpyMode: true,
             isAssistantMode: false,
          })
-      ).toEqual(["Share", "Divider", "Q&A", "Chat", "SpeedDial"])
+      ).toEqual(["Share", "Divider", "Chat", "SpeedDial"])
    })
 
    it("retains admin shortcuts for desktop host in spy mode", () => {
@@ -230,15 +222,7 @@ describe("BottomBar host actions", () => {
             isSpyMode: true,
             isAssistantMode: true,
          })
-      ).toEqual([
-         "Phone",
-         "Divider",
-         "Share",
-         "Divider",
-         "Q&A",
-         "Chat",
-         "SpeedDial",
-      ])
+      ).toEqual(["Phone", "Divider", "Share", "Divider", "Chat", "SpeedDial"])
    })
 
    it("appends settings and phone for assistant host on mobile after joining", () => {
@@ -254,11 +238,9 @@ describe("BottomBar host actions", () => {
          "Video",
          "Share",
          "Divider",
-         "Q&A",
          "Chat",
          "SpeedDial",
          "Divider",
-         "Settings",
          "Phone",
       ])
    })

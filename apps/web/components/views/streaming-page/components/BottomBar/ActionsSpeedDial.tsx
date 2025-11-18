@@ -1,4 +1,3 @@
-import { useAuth } from "HOCs/AuthProvider"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import {
    BrandedSpeedDial,
@@ -22,12 +21,11 @@ export type Action = {
 
 const getStreamerActions = (
    isMobile: boolean,
-   isSpyMode: boolean,
-   isAdmin: boolean
+   isSpyMode: boolean
 ): ActionName[] => {
    if (isMobile) {
       return [
-         ...(isAdmin ? (["Q&A"] as const) : []),
+         "Q&A",
          "Hand raise",
          "Polls",
          "Jobs",
@@ -54,13 +52,11 @@ export const ActionsSpeedDial = () => {
    const numberOfHandRaiseNotifications = useNumberOfHandRaiseNotifications()
    const [open, setOpen] = useState(false)
    const ref = useRef(null)
-   const { userData } = useAuth()
 
    const { isHost, shouldStream } = useStreamingContext()
 
    const isMobile = useStreamIsMobile()
    const isSpyMode = useIsSpyMode()
-   const isAdmin = userData?.isAdmin
 
    const handleToggle = () => setOpen((prevOpen) => !prevOpen)
 
@@ -71,7 +67,7 @@ export const ActionsSpeedDial = () => {
    })
 
    const actions = isHost
-      ? getStreamerActions(isMobile, isSpyMode, isAdmin)
+      ? getStreamerActions(isMobile, isSpyMode)
       : getViewerActions(isMobile, shouldStream)
 
    const hasHandRaiseButton = actions.includes("Hand raise")
