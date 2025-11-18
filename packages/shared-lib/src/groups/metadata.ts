@@ -26,9 +26,9 @@ export const getMetaDataFromCustomJobGroup = (
    const publicGroupData = pickPublicDataFromGroup(group)
    const meta: CustomJobMetaData = {
       companyCountry: publicGroupData.companyCountry?.id,
-      companyIndustries: publicGroupData?.companyIndustries?.map(
-         (industry) => industry.id
-      ),
+      companyIndustries:
+         publicGroupData?.companyIndustries?.map((industry) => industry.id) ??
+         [],
       companySize: publicGroupData.companySize,
    }
 
@@ -44,8 +44,8 @@ export const hasCustomJobsGroupMetaDataChanged = (
 
    const industriesChanged = Boolean(
       getArrayDifference(
-         previousValue?.companyIndustries.map((industry) => industry.id),
-         currentValue?.companyIndustries.map((industry) => industry.id)
+         previousValue?.companyIndustries?.map((industry) => industry.id) ?? [],
+         currentValue?.companyIndustries?.map((industry) => industry.id) ?? []
       ).length
    )
 

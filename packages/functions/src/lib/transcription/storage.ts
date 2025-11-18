@@ -36,6 +36,32 @@ export async function fetchTranscriptionFromGCS(
 }
 
 /**
+ * Check if transcription already exists in GCS for a livestream
+ *
+ * @param livestreamId - The livestream ID
+ * @returns True if transcription file exists, false otherwise
+ */
+export async function transcriptionExistsInGCS(
+   livestreamId: string
+): Promise<boolean> {
+   try {
+      const bucket = storage.bucket(STORAGE_BUCKET)
+      const filePath = getTranscriptionFilePath(livestreamId)
+      const file = bucket.file(filePath)
+      const [exists] = await file.exists()
+      return exists
+   } catch (error) {
+      logger.error("Error checking transcription existence in GCS", {
+         livestreamId,
+         error,
+         errorMessage: getErrorMessage(error),
+      })
+      // If we can't check, assume it doesn't exist to avoid skipping
+      return false
+   }
+}
+
+/**
  * Save transcription data to Google Cloud Storage
  *
  * @param livestreamId - The livestream ID
