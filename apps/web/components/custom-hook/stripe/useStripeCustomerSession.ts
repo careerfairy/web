@@ -77,6 +77,7 @@ export const useStripeCustomerSession = <
       fetcher,
       {
          ...swrOptions,
+         suspense: false,
          onError: (error) =>
             errorLogAndNotify(error, {
                message: `Error fetching Stripe Customer Session with`,
