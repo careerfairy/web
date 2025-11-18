@@ -438,6 +438,7 @@ export interface Chapter {
 // Collection Path: livestreams/{livestreamId}/chapters/{chapterId}
 export interface LivestreamChapter extends Identifiable, Chapter {
    documentType: "livestreamChapter"
+   type: "generated" | "manual"
    chapterIndex: number
    livestreamId: string
    createdAt: Timestamp
