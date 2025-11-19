@@ -28,6 +28,7 @@ const styles = sxStyles({
    mainContent: {
       flex: 1,
       minWidth: 0,
+      width: "100%",
    },
    rightPanelContainer: {
       p: 1,
