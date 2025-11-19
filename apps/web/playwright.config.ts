@@ -133,6 +133,11 @@ const config: PlaywrightTestConfig = {
          NEXT_DISABLE_IMAGE_OPTIMIZATION: "true",
          WORKFLOW_ID: workflowId,
          NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
+         // Pass Stripe API key to Firebase functions emulator
+         // This is required for Stripe-related functions to work in tests
+         TEST_STRIPE_SECRET_KEY: process.env.TEST_STRIPE_SECRET_KEY,
+         ALGOLIA_APP_ID: process.env.ALGOLIA_APP_ID,
+         ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
          // Reduce Java heap size for Firestore/Storage emulators (default is much higher)
          JAVA_TOOL_OPTIONS: "-Xmx2g",
          // Cap Node.js heap usage for Firebase CLI/emulators to avoid excessive memory consumption
