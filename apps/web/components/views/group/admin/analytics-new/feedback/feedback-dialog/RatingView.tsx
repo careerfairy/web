@@ -1,48 +1,95 @@
-import { Box, Stack, Tooltip, Typography } from "@mui/material"
+import {
+   Box,
+   LinearProgress,
+   linearProgressClasses,
+   Stack,
+   Typography,
+} from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 
 const styles = sxStyles({
    ratingBox: {
-      p: 1,
+      p: 1.5,
       borderRadius: 1,
       border: 1,
-      borderColor: "neutral.100",
-      backgroundColor: "neutral.50",
+      borderColor: (theme) => theme.brand.white[400],
+      backgroundColor: (theme) => theme.brand.black[100],
       width: "100%",
+      overflow: "auto",
+      scrollbarWidth: "thin",
+      scrollbarColor: "#E1E1E1 transparent",
+      "&::-webkit-scrollbar": {
+         height: 4,
+      },
+      "&::-webkit-scrollbar-track": {
+         backgroundColor: "transparent",
+      },
+      "&::-webkit-scrollbar-thumb": {
+         backgroundColor: (theme) => theme.brand.black[500],
+         borderRadius: 2,
+         "&:hover": {
+            backgroundColor: (theme) => theme.brand.black[600],
+         },
+      },
    },
    averageBox: {
       p: 2,
-      borderRadius: 1,
-      backgroundColor: (theme) => `${theme.palette.neutral[200]}80`, // Using alpha
+      borderRadius: 0.5,
+      backgroundColor: (theme) => theme.brand.black[400],
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      width: 150,
+      width: 151,
       flexShrink: 0,
    },
-   chartRow: {
+   chartContainer: {
       display: "flex",
-      alignItems: "center",
-      gap: 2,
-      width: "100%",
-   },
-   chartBarBg: {
+      flexDirection: "row",
+      gap: 2.5,
       flex: 1,
-      height: 8,
+      justifyContent: "space-between",
+      alignItems: "center",
+      minWidth: "max-content",
+   },
+   chartColumn: {
+      display: "flex",
+      flexDirection: "column",
+      flex: 1,
+      minWidth: 0,
+      width: 132,
+      flexShrink: 0,
+      scrollSnapAlign: "start",
+      px: {
+         md: 1,
+      },
+      py: {
+         xs: 1,
+         md: 1.5,
+      },
+   },
+   chartHeader: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+      whiteSpace: "nowrap",
+      mb: 1.25,
+      color: "text.secondary",
+   },
+   linearProgress: {
+      width: "100%",
+      height: 4,
       borderRadius: 4,
       backgroundColor: "neutral.100",
-      position: "relative",
-      overflow: "hidden",
+      [`& .${linearProgressClasses.bar}`]: {
+         borderRadius: 4,
+         backgroundColor: "secondary.main",
+      },
    },
-   chartBarFill: () => ({
-      position: "absolute",
-      left: 0,
-      top: 0,
-      height: "100%",
-      borderRadius: 4,
-      backgroundColor: "secondary.main",
-   }),
 })
 
 const RATING_LABELS = {
@@ -60,74 +107,69 @@ type RatingViewProps = {
 }
 
 export const RatingView = ({ stats, average, total }: RatingViewProps) => {
+   const isMobile = useIsMobile()
    return (
-      <Stack spacing={3}>
-         <Box sx={styles.ratingBox}>
-            <Stack direction="row" spacing={3} alignItems="center">
-               <Box sx={styles.averageBox}>
-                  <Typography variant="small" color="text.primary">
-                     Average rating
-                  </Typography>
-                  <Typography variant="brandedH1" sx={{ fontSize: "2.5rem" }}>
-                     {average.toFixed(1)}
-                  </Typography>
-                  <Typography variant="xsmall" color="text.secondary">
-                     {total} total answers
-                  </Typography>
-               </Box>
-               <Stack flex={1} spacing={1.5}>
-                  {[5, 4, 3, 2, 1].map((star) => {
-                     const count = stats[star] || 0
-                     const percentage = total > 0 ? (count / total) * 100 : 0
-                     return (
-                        <Tooltip
-                           key={star}
-                           title={
-                              RATING_LABELS[star as keyof typeof RATING_LABELS]
-                           }
-                           arrow
-                           placement="left"
-                        >
-                           <Box sx={styles.chartRow}>
+      <Box sx={styles.ratingBox}>
+         <Stack
+            direction="row"
+            spacing={2.5}
+            alignItems="stretch"
+            sx={{ minWidth: "max-content" }}
+         >
+            <Box sx={{ ...styles.averageBox, scrollSnapAlign: "start" }}>
+               <Typography
+                  variant="small"
+                  color={isMobile ? "text.secondary" : "neutral.800"}
+               >
+                  Average rating
+               </Typography>
+               <Typography
+                  variant="brandedH1"
+                  fontWeight={600}
+                  color="neutral.800"
+               >
+                  {average.toFixed(1)}
+               </Typography>
+               <Typography variant="xsmall" color="text.secondary">
+                  {total} total answers
+               </Typography>
+            </Box>
+            <Box sx={styles.chartContainer}>
+               {[1, 2, 3, 4, 5].map((rating) => {
+                  const count = stats[rating] || 0
+                  const percentage = total > 0 ? (count / total) * 100 : 0
+                  return (
+                     <BrandedTooltip
+                        key={rating}
+                        title={
+                           RATING_LABELS[rating as keyof typeof RATING_LABELS]
+                        }
+                        arrow
+                        placement="top"
+                     >
+                        <Box sx={styles.chartColumn}>
+                           <Box sx={styles.chartHeader}>
                               <Typography
-                                 variant="brandedH5"
-                                 sx={{
-                                    width: 20,
-                                    textAlign: "center",
-                                    color: "neutral.500",
-                                 }}
+                                 variant="desktopBrandedH5"
+                                 fontWeight={600}
                               >
-                                 {star}
+                                 {rating}
                               </Typography>
-                              <Typography
-                                 variant="small"
-                                 color="text.secondary"
-                                 sx={{ minWidth: 100 }}
-                              >
+                              <Typography variant="small" sx={{ ml: 1 }}>
                                  {count} votes ({Math.round(percentage)}%)
                               </Typography>
-                              <Box sx={styles.chartBarBg}>
-                                 <Box
-                                    sx={[
-                                       styles.chartBarFill,
-                                       { width: `${percentage}%` },
-                                       star === 5
-                                          ? { bgcolor: "secondary.main" }
-                                          : star === 4
-                                          ? { bgcolor: "secondary.light" }
-                                          : star === 3
-                                          ? { bgcolor: "neutral.300" }
-                                          : { bgcolor: "neutral.200" },
-                                    ]}
-                                 />
-                              </Box>
                            </Box>
-                        </Tooltip>
-                     )
-                  })}
-               </Stack>
-            </Stack>
-         </Box>
-      </Stack>
+                           <LinearProgress
+                              variant="determinate"
+                              value={percentage}
+                              sx={styles.linearProgress}
+                           />
+                        </Box>
+                     </BrandedTooltip>
+                  )
+               })}
+            </Box>
+         </Stack>
+      </Box>
    )
 }
