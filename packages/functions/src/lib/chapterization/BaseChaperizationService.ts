@@ -166,6 +166,7 @@ export class BaseChapterizationService {
             const livestreamChapter: LivestreamChapter = {
                ...chapter,
                documentType: "livestreamChapter",
+               type: "generated",
                id: docRef.id,
                livestreamId,
                createdAt: Timestamp.now(),
