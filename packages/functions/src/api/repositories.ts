@@ -164,44 +164,16 @@ export const emailNotificationsRepo: IEmailNotificationRepository =
 export const offlineEventRepo: IOfflineEventFunctionsRepository =
    new OfflineEventFunctionsRepository(firestore, logger)
 
-// Cache for repository instances to avoid recreating them
-const stripeRepoCache: Partial<
-   Record<StripeEnvironment, IStripeFunctionsRepository>
-> = {}
+const prodStripeRepo = new StripeFunctionsRepository(
+   new Stripe(process.env.STRIPE_SECRET_KEY)
+)
 
-export const getStripeRepoInstance = (
-   environment: StripeEnvironment
-): IStripeFunctionsRepository => {
-   // Return cached instance if available
-   const cachedRepo = stripeRepoCache[environment]
-   if (cachedRepo) {
-      return cachedRepo
+const testStripeRepo = new StripeFunctionsRepository(
+   new Stripe(process.env.TEST_STRIPE_SECRET_KEY)
+)
+
+export const stripeRepo: Record<StripeEnvironment, IStripeFunctionsRepository> =
+   {
+      prod: prodStripeRepo,
+      test: testStripeRepo,
    }
-
-   // Validate and get the appropriate API key
-   let apiKey: string | undefined
-   if (environment === "prod") {
-      apiKey = process.env.STRIPE_SECRET_KEY
-      if (!apiKey) {
-         throw new Error(
-            "STRIPE_SECRET_KEY environment variable is not set. Required for production Stripe environment."
-         )
-      }
-   } else {
-      apiKey = process.env.TEST_STRIPE_SECRET_KEY
-      if (!apiKey) {
-         throw new Error(
-            "TEST_STRIPE_SECRET_KEY environment variable is not set. Required for test Stripe environment."
-         )
-      }
-   }
-
-   // Create Stripe instance and repository
-   const stripe = new Stripe(apiKey)
-   const repo = new StripeFunctionsRepository(stripe)
-
-   // Cache the repository instance
-   stripeRepoCache[environment] = repo
-
-   return repo
-}
