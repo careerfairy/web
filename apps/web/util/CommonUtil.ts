@@ -4,7 +4,6 @@ import {
    StripeEnvironments,
 } from "@careerfairy/shared-lib/stripe/types"
 import * as Sentry from "@sentry/nextjs"
-import getConfig from "next/config"
 import { v4 as uuid } from "uuid"
 import LocalStorageUtil from "./LocalStorageUtil"
 
@@ -260,12 +259,8 @@ export const getHostingUrl = (): string => {
  *
  * This function prioritizes:
  * 1. The workflow ID from localStorage (set by tests)
- * 2. The NEXT_PUBLIC_UNIQUE_WORKFLOW_ID set at build time
- * 3. The NEXT_PUBLIC_DEV_NAME environment variable (for local development)
- * 4. "unknown" as a fallback
- *
- * Using next/config ensures consistent values across server and client-side rendering,
- * solving issues related to Docker deployments and environment variables.
+ * 2. The WORKFLOW_ID environment variable set at runtime
+ * 3. "unknown" as a fallback
  */
 export const getWorkflowId = (): string => {
    // For browser-side code, check for workflow ID in localStorage
@@ -276,11 +271,8 @@ export const getWorkflowId = (): string => {
       }
    }
 
-   const { publicRuntimeConfig } = getConfig()
    return (
-      publicRuntimeConfig?.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID ||
-      process.env.NEXT_PUBLIC_DEV_NAME ||
-      "unknown"
+      process.env.WORKFLOW_ID || process.env.NEXT_PUBLIC_DEV_NAME || "unknown"
    )
 }
 

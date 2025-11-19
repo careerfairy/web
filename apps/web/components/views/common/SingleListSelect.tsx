@@ -1,19 +1,17 @@
-import React, { Dispatch, memo } from "react"
-import Autocomplete from "@mui/material/Autocomplete"
+import CheckBoxIcon from "@mui/icons-material/CheckBox"
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import {
    Checkbox,
-   ChipProps,
    CircularProgress,
    Collapse,
    FormControl,
    FormHelperText,
    TextField,
 } from "@mui/material"
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
-import CheckBoxIcon from "@mui/icons-material/CheckBox"
-import isEqual from "react-fast-compare"
+import Autocomplete from "@mui/material/Autocomplete"
 import { makeStyles } from "@mui/styles"
-import { sxStyles } from "types/commonTypes"
+import React, { Dispatch, memo } from "react"
+import isEqual from "react-fast-compare"
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
@@ -32,23 +30,32 @@ const useStyles = makeStyles({
    },
 })
 
+// Default prop values to avoid creating new references on each render
+const defaultOnSelectItem = () => {}
+const defaultGetLabelFn = (option: { [key: string]: any }) => option.name
+const defaultSetFieldValue = () => {}
+const defaultGetValueFn = (option: { [key: string]: any }) => option.id
+const defaultGetKeyFn = (option: { [key: string]: any }) => option.id
+const defaultGetGroupByFn = () => ""
+const defaultExtraOptions = {}
+const defaultDisabledValues: string[] = []
+
 const SingleListSelect = <T extends { [key: string]: any }>({
    inputName,
    options,
    selectedItem = null,
-   onSelectItem = () => {},
+   onSelectItem = defaultOnSelectItem,
    disabled = false,
-   getLabelFn = (option: T) => option.name, // displayed name
+   getLabelFn = defaultGetLabelFn, // displayed name
    inputProps,
    isCheckbox = false, // Select items are checkboxes
    checkboxProps,
-   chipProps = {},
-   extraOptions = {}, // props to pass to autocomplete
-   setFieldValue = () => {}, // formik field
-   getValueFn = (option: T) => option.id, // field value
-   getKeyFn = (option: T) => option.id, // field id
-   getGroupByFn = () => "",
-   disabledValues = [],
+   extraOptions = defaultExtraOptions, // props to pass to autocomplete
+   setFieldValue = defaultSetFieldValue, // formik field
+   getValueFn = defaultGetValueFn, // field value
+   getKeyFn = defaultGetKeyFn, // field id
+   getGroupByFn = defaultGetGroupByFn,
+   disabledValues = defaultDisabledValues,
    loading,
    noColorOnSelect,
 }: Props<T>) => {
@@ -124,7 +131,6 @@ const SingleListSelect = <T extends { [key: string]: any }>({
                   {...inputProps}
                   name={inputName}
                   InputProps={{
-                     disableUnderline: true,
                      ...params.InputProps,
                      endAdornment: (
                         <React.Fragment>
@@ -158,7 +164,6 @@ interface Props<T> {
    getKeyFn?: (obj: T) => string
    getGroupByFn?: (obj: T) => string
    inputProps?: any
-   chipProps?: ChipProps
    isCheckbox?: boolean
    checkboxProps?: any
    options: T[]

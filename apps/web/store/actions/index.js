@@ -54,7 +54,6 @@ export {
    setNumberOfViewers,
    setScreenShareDeniedError,
    setSessionIsUsingCloudProxy,
-   setSessionShouldUseCloudProxy,
    setSpyMode,
    setStreamerIsPublished,
    setVideoIsMuted,

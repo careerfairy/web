@@ -179,23 +179,21 @@ function updateRegisteredLivestreams(
       universityCountryCode: userData?.universityCountryCode || "",
    }
 
-   if (newUserLivestreamData.registered?.date) {
+   if (newUserLivestreamData?.registered?.date) {
       updateData[`registeredLivestreams.${livestreamId}`] =
          newUserLivestreamData.registered.date
       logger.info(
-         `User ${newUserLivestreamData.userId} registered for live stream ${livestreamId}`
+         `User ${userData.authId} registered for live stream ${livestreamId}`
       )
    } else {
       updateData[`registeredLivestreams.${livestreamId}`] =
          firestore.FieldValue.delete()
       logger.info(
-         `User ${newUserLivestreamData.userId} unregistered from live stream ${livestreamId}`
+         `User ${userData.authId} unregistered from live stream ${livestreamId}`
       )
    }
 
-   logger.info(
-      `Updated RegisteredLivestreams for user ${newUserLivestreamData.userId}`
-   )
+   logger.info(`Updated RegisteredLivestreams for user ${userData.authId}`)
 
    return updateData
 }

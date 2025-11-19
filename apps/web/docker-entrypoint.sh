@@ -3,7 +3,7 @@ set -e
 
 # Generate unique workflow ID similar to CI
 # Format: uuidgen output + optional shard number
-if [ -z "$NEXT_PUBLIC_UNIQUE_WORKFLOW_ID" ]; then
+if [ -z "$WORKFLOW_ID" ]; then
    # Extract shard number from arguments if present (e.g., --shard=1/5)
    # Need to look through all arguments recursively in case they're nested
    SHARD_NUM=""
@@ -16,9 +16,9 @@ if [ -z "$NEXT_PUBLIC_UNIQUE_WORKFLOW_ID" ]; then
    done
    
    if [ -n "$SHARD_NUM" ]; then
-      export NEXT_PUBLIC_UNIQUE_WORKFLOW_ID="$(uuidgen)-${SHARD_NUM}"
+      export WORKFLOW_ID="$(uuidgen)-${SHARD_NUM}"
    else
-      export NEXT_PUBLIC_UNIQUE_WORKFLOW_ID="$(uuidgen)"
+      export WORKFLOW_ID="$(uuidgen)"
    fi
 fi
 
