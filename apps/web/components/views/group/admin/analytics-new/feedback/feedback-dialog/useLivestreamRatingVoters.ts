@@ -1,12 +1,12 @@
-import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
+import { EventRatingAnswer } from "@careerfairy/shared-lib/livestreams"
 import { collection, orderBy, query } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
-import { EventRatingAnswer } from "@careerfairy/shared-lib/livestreams"
+import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
 
 const useLivestreamRatingVoters = (
    livestreamId: string,
    ratingId: string,
-   hasText: boolean
+   hasText?: boolean
 ) => {
    return useFirestoreCollection<EventRatingAnswer>(
       query(

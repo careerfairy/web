@@ -59,7 +59,7 @@ export const GeneralOverviewContent = ({
             </SuspenseWithBoundary>
 
             <SuspenseWithBoundary fallback={<CardVotesSectionSkeleton />}>
-               <GroupQuestions />
+               <GroupQuestions livestreamId={livestreamStats.livestream.id} />
             </SuspenseWithBoundary>
 
             <SuspenseWithBoundary fallback={<CardVotesSectionSkeleton />}>

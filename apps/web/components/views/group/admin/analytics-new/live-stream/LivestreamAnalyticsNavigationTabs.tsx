@@ -2,7 +2,7 @@ import { Box } from "@mui/material"
 import { BrandedTabs } from "components/views/common/BrandedTabs"
 import { useRouter } from "next/router"
 import { SyntheticEvent } from "react"
-import { AtSign, Hexagon, MessageCircle, Users } from "react-feather"
+import { AtSign, Hexagon, Users } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
 const styles = sxStyles({
@@ -32,12 +32,6 @@ const tabs = [
       pathname:
          "/group/[groupId]/admin/analytics/live-streams/registration-sources",
       icon: <Users />,
-   },
-   {
-      label: "Feedback",
-      pathname:
-         "/group/[groupId]/admin/analytics/live-streams/feedback/[[...feedback]]",
-      icon: <MessageCircle />,
    },
 ] as const
 
