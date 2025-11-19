@@ -1,7 +1,4 @@
-import {
-   LivestreamChapter,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/src/livestreams"
+import { LivestreamChapter } from "@careerfairy/shared-lib/src/livestreams"
 import {
    CollectionGroup,
    DocumentReference,
@@ -86,28 +83,26 @@ type UpdateDocumentsConfig<T = unknown> =
    | UpdateDocumentsConfigCollectionGroup<T>
 
 // Configure your update here - Leaving this here for reference of a query based update
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const queryConfig: UpdateDocumentsConfig<LivestreamEvent> = {
-   // Query for livestreams, excluding test livestreams
-   query: firestore
-      .collection("livestreams")
-      .where("groupIds", "array-contains", "i8NjOiRu85ohJWDuFPwo")
-      .orderBy("start", "desc"),
-   // Set livestreamType from legacy isPanel: panels => "panel", others => "livestream"
-   updateData: () => ({
-      livestreamType: "livestream",
-      migrationTrigger: Date.now(),
-   }),
-   batchSize: 200, // Increased batch size for faster processing
-   waitTimeBetweenBatches: 3_000, // Longer wait time to allow functions to process
-   dryRun: true, // Set to false to run the migration
-}
+// const queryConfig: UpdateDocumentsConfig<LivestreamEvent> = {
+//    // Query for livestreams, excluding test livestreams
+//    query: firestore
+//       .collection("livestreams")
+//       .where("groupIds", "array-contains", "i8NjOiRu85ohJWDuFPwo")
+//       .orderBy("start", "desc"),
+//    // Set livestreamType from legacy isPanel: panels => "panel", others => "livestream"
+//    updateData: () => ({
+//       livestreamType: "livestream",
+//       migrationTrigger: Date.now(),
+//    }),
+//    batchSize: 200, // Increased batch size for faster processing
+//    waitTimeBetweenBatches: 3_000, // Longer wait time to allow functions to process
+//    dryRun: true, // Set to false to run the migration
+// }
 
 const config: UpdateDocumentsConfig<LivestreamChapter> = {
    type: "collection-group",
    collectionGroupName: "chapters",
    documentType: "livestreamChapter",
-   // Optional: Add additional query constraints (where clauses, orderBy, etc.)
    queryBuilder: (query) => query.where("chapterIndex", ">", 0),
    updateData: {
       type: "generated",
