@@ -164,16 +164,21 @@ export const emailNotificationsRepo: IEmailNotificationRepository =
 export const offlineEventRepo: IOfflineEventFunctionsRepository =
    new OfflineEventFunctionsRepository(firestore, logger)
 
-const prodStripeRepo = new StripeFunctionsRepository(
-   new Stripe(process.env.STRIPE_SECRET_KEY)
-)
+export const getStripeRepoInstance = (
+   environment: StripeEnvironment
+): IStripeFunctionsRepository => {
+   const prodStripeRepo = new StripeFunctionsRepository(
+      new Stripe(process.env.STRIPE_SECRET_KEY)
+   )
 
-const testStripeRepo = new StripeFunctionsRepository(
-   new Stripe(process.env.TEST_STRIPE_SECRET_KEY)
-)
+   const testStripeRepo = new StripeFunctionsRepository(
+      new Stripe(process.env.TEST_STRIPE_SECRET_KEY)
+   )
 
-export const stripeRepo: Record<StripeEnvironment, IStripeFunctionsRepository> =
-   {
+   const stripeRepos: Record<StripeEnvironment, IStripeFunctionsRepository> = {
       prod: prodStripeRepo,
       test: testStripeRepo,
    }
+
+   return stripeRepos[environment]
+}
