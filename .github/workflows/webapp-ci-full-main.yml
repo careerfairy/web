@@ -185,6 +185,7 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               NODE_ENV: test
+              TEST_STRIPE_SECRET_KEY: ${{ secrets.TEST_STRIPE_SECRET_KEY }}
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
