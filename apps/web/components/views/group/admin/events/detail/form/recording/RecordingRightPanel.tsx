@@ -48,11 +48,14 @@ type RenderViewHandlers = {
 
 const renderPanelView = (
    view: RecordingPanelView,
+   isMobile: boolean,
    handlers: RenderViewHandlers
 ): React.ReactNode => {
    switch (view) {
       case "menu":
-         return <MenuView onNavigate={handlers.handleNavigate} />
+         return !isMobile ? (
+            <MenuView onNavigate={handlers.handleNavigate} />
+         ) : null
       case "edit-details":
          return <EditDetailsView onBack={handlers.handleBack} />
       case "questions":
@@ -150,7 +153,7 @@ export const RecordingRightPanel = () => {
                hideDragHandle
             >
                <Box sx={styles.drawerContent} ref={scrollContainerRef}>
-                  {renderPanelView(currentView, {
+                  {renderPanelView(currentView, isMobile, {
                      handleBack,
                      handleNavigate,
                   })}
@@ -172,7 +175,10 @@ export const RecordingRightPanel = () => {
                container={transitionContainerRef.current}
             >
                <Box sx={styles.transitionItem}>
-                  {renderPanelView(currentView, { handleBack, handleNavigate })}
+                  {renderPanelView(currentView, isMobile, {
+                     handleBack,
+                     handleNavigate,
+                  })}
                </Box>
             </Slide>
          </SwitchTransition>
