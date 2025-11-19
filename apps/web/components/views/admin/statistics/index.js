@@ -1,8 +1,13 @@
 import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import { Backdrop, CircularProgress, Container, Grid } from "@mui/material"
-import UniversityCountriesChart from "./UniversityCountriesChart"
+import dynamic from "next/dynamic"
 import { useFirestoreConnect } from "react-redux-firebase"
+
+const UniversityCountriesChart = dynamic(
+   () => import("./UniversityCountriesChart"),
+   { ssr: false }
+)
 
 const useStyles = makeStyles((theme) => ({
    root: {

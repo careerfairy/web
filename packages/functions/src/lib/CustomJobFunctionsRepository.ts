@@ -153,6 +153,16 @@ export class CustomJobFunctionsRepository
          .collection("customJobStats")
          .doc(updatedCustomJob.id)
 
+      // Check if document exists before updating
+      const doc = await ref.get()
+      if (!doc.exists) {
+         functions.logger.warn(
+            `CustomJobStats document for job ${updatedCustomJob.id} does not exist. Creating it.`
+         )
+         // Create the document if it doesn't exist
+         return this.createCustomJobStats(updatedCustomJob)
+      }
+
       return ref.update({ job: updatedCustomJob })
    }
 
@@ -166,6 +176,13 @@ export class CustomJobFunctionsRepository
       const ref = this.firestore
          .collection("customJobStats")
          .doc(deletedCustomJob.id)
+
+      // Check if document exists before updating
+      const doc = await ref.get()
+
+      if (!doc.exists) {
+         await this.createCustomJobStats(deletedCustomJob)
+      }
 
       return ref.update({
          deleted: true,

@@ -1,12 +1,16 @@
 import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { Grid } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
+import dynamic from "next/dynamic"
 import { useMemo } from "react"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import EmptyDisplay from "../displays/EmptyDisplay"
 import LoadingDisplay from "../displays/LoadingDisplay"
-import AudienceCategoryChart from "./AudienceCategoryChart"
 import TalentPoolPercentage from "./TalentPoolPercentage"
+
+const AudienceCategoryChart = dynamic(() => import("./AudienceCategoryChart"), {
+   ssr: false,
+})
 
 const useStyles = makeStyles((theme) => ({
    root: {

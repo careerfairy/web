@@ -187,7 +187,7 @@ docker run --rm --memory=8g --cpus=2 careerfairy-test -- -- --project=chromium -
 -  `-e VAR=value` - Set environment variables inside the container
 -  `--entrypoint` - Override the default entrypoint command
 
-> The container entrypoint now generates `NEXT_PUBLIC_UNIQUE_WORKFLOW_ID` automatically (and appends the shard number when provided), so the runtime environment matches the GitHub Actions runners without additional flags.
+> The container entrypoint now generates `WORKFLOW_ID` automatically (and appends the shard number when provided), so the runtime environment matches the GitHub Actions runners without additional flags.
 
 ### Emulator Functions - Sending Emails
 
