@@ -290,7 +290,7 @@ const performTieredLocationSearch = (
    }
 
    // Return results with cities first (user experience priority)
-   return [...cityResults, ...stateResults, ...countryResults].slice(0, limit)
+   return [...countryResults, ...cityResults, ...stateResults].slice(0, limit)
 }
 
 export const searchCountries = onCall<SearchCountryOptions>((request) => {
