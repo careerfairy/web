@@ -16,7 +16,7 @@ import {
 } from "firebase-functions/v2/https"
 import { Stripe } from "stripe"
 import { object, string } from "yup"
-import { stripeRepo } from "./api/repositories"
+import { getStripeRepoInstance } from "./api/repositories"
 import { createEventHandlers } from "./lib/stripe/events"
 import { IStripeFunctionsRepository } from "./lib/stripe/index"
 import { createSessionHandlers } from "./lib/stripe/sessions"
@@ -245,7 +245,10 @@ export const fetchStripeCustomerSession = onCall(
       userShouldBeGroupAdmin(),
       async (request) => {
          const { environment } = request.data
-         return getStripeCustomerSession(request, stripeRepo[environment])
+         return getStripeCustomerSession(
+            request,
+            getStripeRepoInstance(environment)
+         )
       }
    )
 )
@@ -261,7 +264,7 @@ export const fetchStripePrice = onCall(
       userShouldBeGroupAdmin(),
       async (request) => {
          const { environment } = request.data
-         return getStripePrice(request, stripeRepo[environment])
+         return getStripePrice(request, getStripeRepoInstance(environment))
       }
    )
 )
@@ -277,7 +280,10 @@ export const fetchStripeSessionStatus = onCall(
       userShouldBeGroupAdmin(),
       async (request) => {
          const { environment } = request.data
-         return getStripeSessionStatus(request, stripeRepo[environment])
+         return getStripeSessionStatus(
+            request,
+            getStripeRepoInstance(environment)
+         )
       }
    )
 )
@@ -290,7 +296,7 @@ export const stripeWebHook = onRequest(
          request,
          response,
          webhookSecret,
-         stripeRepo[StripeEnvironments.Prod]
+         getStripeRepoInstance(StripeEnvironments.Prod)
       )
    }
 )
