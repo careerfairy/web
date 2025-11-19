@@ -103,7 +103,6 @@ const config: UpdateDocumentsConfig<LivestreamChapter> = {
    type: "collection-group",
    collectionGroupName: "chapters",
    documentType: "livestreamChapter",
-   queryBuilder: (query) => query.where("chapterIndex", ">", 0),
    updateData: {
       type: "generated",
       migrationTrigger: Date.now(),
