@@ -17,6 +17,8 @@ import { devices } from "@playwright/test"
  *
  * On our laptops, the timeouts should be lowered so that tests can fail faster
  */
+const workflowId = process.env.WORKFLOW_ID || "test"
+
 const config: PlaywrightTestConfig = {
    testDir: "./tests/e2e",
    testIgnore: "**/streaming/test**",
@@ -61,8 +63,7 @@ const config: PlaywrightTestConfig = {
                   localStorage: [
                      {
                         name: "x-workflow-id",
-                        value:
-                           process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID || "test",
+                        value: workflowId,
                      },
                   ],
                },
@@ -130,13 +131,12 @@ const config: PlaywrightTestConfig = {
          NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
          APP_ENV: "test",
          NEXT_DISABLE_IMAGE_OPTIMIZATION: "true",
-         NEXT_PUBLIC_UNIQUE_WORKFLOW_ID:
-            process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID,
+         WORKFLOW_ID: workflowId,
          NEXT_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
          // Reduce Java heap size for Firestore/Storage emulators (default is much higher)
          JAVA_TOOL_OPTIONS: "-Xmx2g",
          // Cap Node.js heap usage for Firebase CLI/emulators to avoid excessive memory consumption
-         NODE_OPTIONS: "--max-old-space-size=4096",
+         NODE_OPTIONS: "--max-old-space-size=8192",
       },
       port: 3000,
       // emulators need some time to boot

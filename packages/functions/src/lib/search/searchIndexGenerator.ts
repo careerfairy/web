@@ -21,11 +21,11 @@ type DocumentTransformer<DataType = any, DataTypeTransformed = DataType> = (
 /**
  * Get the workflow id from the environment variables
  * This is used to isolate test data and operations
- * @returns the workflow id or the dev name or "unknown" if neither is set
+ * @returns the workflow id or "unknown" if not available
  */
 export const getWorkflowId = () => {
-   if (process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID) {
-      return process.env.NEXT_PUBLIC_UNIQUE_WORKFLOW_ID
+   if (process.env.WORKFLOW_ID) {
+      return process.env.WORKFLOW_ID
    }
 
    if (isTestEnvironment()) {

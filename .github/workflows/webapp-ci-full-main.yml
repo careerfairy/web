@@ -76,11 +76,10 @@ jobs:
                  ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
          - name: Build
-           run: npm run build
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-
+           run: npm run build
          # Check which folders have changed
          # So that we can skip future jobs
          - uses: dorny/paths-filter@v3
@@ -170,12 +169,21 @@ jobs:
            run: npx playwright install --with-deps
          - name: Install uuid-runtime
            run: sudo apt-get install uuid-runtime
+
+         - name: Cache .next/cache folder
+           uses: ubicloud/cache@v4
+           with:
+              path: ${{ github.workspace }}/apps/web/.next/cache
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+              restore-keys: |
+                 ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
+
          - name: Generate UUID
            run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              NEXT_PUBLIC_UNIQUE_WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
+              WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
               ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
               TEST_STRIPE_SECRET_KEY: ${{ secrets.TEST_STRIPE_SECRET_KEY }}

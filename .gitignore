@@ -48,5 +48,8 @@ yarn-error.log*
 /build
 .cursor/mcp.json
 
+# Turborepo
+.turbo
+
 # local keys
 gtm-service-account-key.json
