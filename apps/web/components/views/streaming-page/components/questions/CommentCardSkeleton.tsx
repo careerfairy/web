@@ -1,7 +1,7 @@
 import { Skeleton, Stack, Typography } from "@mui/material"
 import { forwardRef } from "react"
 import { UserDetailsSkeleton } from "../UserDetailsSkeleton"
-import { commentCardStyles } from "./CommentCard"
+import { commentCardStyles } from "./QuestionCardStyles"
 
 export const CommentCardSkeleton = forwardRef<HTMLDivElement>((_, ref) => {
    return (

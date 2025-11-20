@@ -265,7 +265,7 @@ const RecordingPlayer = ({
             key={videoUrl}
             ref={playerRef}
             playing={Boolean(isVideoReady && playingVideo)}
-            playsinline
+            playsInline
             width="100%"
             height="100%"
             className="player"

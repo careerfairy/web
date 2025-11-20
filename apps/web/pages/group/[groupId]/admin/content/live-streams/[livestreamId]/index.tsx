@@ -7,7 +7,7 @@ import { BackToStreamsHeader } from "components/views/group/admin/events/detail/
 import LivestreamForm from "components/views/group/admin/events/detail/form/LivestreamForm"
 import LivestreamFormikProvider from "components/views/group/admin/events/detail/form/LivestreamFormikProvider"
 import { RecordingAutoSaveContextProvider } from "components/views/group/admin/events/detail/form/recording/RecordingAutoSaveContext"
-import RecordingForm from "components/views/group/admin/events/detail/form/recording/RecordingForm"
+import { RecordingForm } from "components/views/group/admin/events/detail/form/recording/RecordingForm"
 import { RecordingFormProvider } from "components/views/group/admin/events/detail/form/recording/RecordingFormProvider"
 import { RecordingTopActions } from "components/views/group/admin/events/detail/form/recording/RecordingTopActions"
 import { LivestreamAutoSaveContextProvider } from "components/views/group/admin/events/detail/LivestreamAutoSaveContext"
