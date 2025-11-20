@@ -20,6 +20,10 @@ const config = {
          "https://hooks.slack.com/services/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",
       offlineEventIncreaseFailed:
          "https://hooks.slack.com/services/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",
+      transcriptionPermanentlyFailed:
+         "https://hooks.slack.com/services/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", // TODO: Add Slack webhook URL
+      chapterizationPermanentlyFailed:
+         "https://hooks.slack.com/services/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", // TODO: Add Slack webhook URL
    },
 
    // Firebase Hosting Domain
@@ -40,6 +44,10 @@ if (process.env.NODE_ENV !== "production") {
    config.slackWebhooks.offlineEventPublished = testSlackIntegrationsChannel
    config.slackWebhooks.offlineEventPurchased = testSlackIntegrationsChannel
    config.slackWebhooks.offlineEventIncreaseFailed =
+      testSlackIntegrationsChannel
+   config.slackWebhooks.transcriptionPermanentlyFailed =
+      testSlackIntegrationsChannel
+   config.slackWebhooks.chapterizationPermanentlyFailed =
       testSlackIntegrationsChannel
 
    // Target the firebase functions emulator when loading the bundles

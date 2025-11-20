@@ -475,6 +475,125 @@ export const notifyOfflineEventIncreaseFailed = (
    })
 }
 
+/**
+ * Sends a Slack notification when transcription permanently fails after max retries.
+ *
+ * @returns Promise that resolves when the notification is sent
+ */
+export const notifyTranscriptionPermanentlyFailed = (
+   webhookUrl: string,
+   params: {
+      livestreamId: string
+      provider: string
+      errorMessage: string
+      retryCount: number
+      recordingUrl: string
+   }
+) => {
+   const eventLink = `https://www.careerfairy.io/portal/livestream/${params.livestreamId}`
+
+   const body: Record<string, string> = {
+      "Livestream ID": params.livestreamId,
+      Provider: params.provider,
+      "Error Message": params.errorMessage,
+      "Retry Count": params.retryCount.toString(),
+      "Recording URL": params.recordingUrl || "Not available",
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `🚨 Transcription Permanently Failed: *Livestream ${params.livestreamId}*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "View Event",
+                  },
+                  url: eventLink,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
+/**
+ * Sends a Slack notification when chapterization permanently fails after max retries.
+ *
+ * @returns Promise that resolves when the notification is sent
+ */
+export const notifyChapterizationPermanentlyFailed = (
+   webhookUrl: string,
+   params: {
+      livestreamId: string
+      provider: string
+      errorMessage: string
+      retryCount: number
+      transcriptionFilePath: string
+   }
+) => {
+   const eventLink = `https://www.careerfairy.io/portal/livestream/${params.livestreamId}`
+
+   const body: Record<string, string> = {
+      "Livestream ID": params.livestreamId,
+      Provider: params.provider,
+      "Error Message": params.errorMessage,
+      "Retry Count": params.retryCount.toString(),
+      "Transcription File Path":
+         params.transcriptionFilePath || "Not available",
+   }
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `🚨 Chapterization Permanently Failed: *Livestream ${params.livestreamId}*`,
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: generateBodyStr(body),
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "View Event",
+                  },
+                  url: eventLink,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
 function formatEventStartDate(date) {
    const luxonDate = DateTime.fromJSDate(date)
    return luxonDate.toLocaleString(DateTime.DATETIME_FULL)
