@@ -3,32 +3,10 @@ import { Box, Stack, Typography } from "@mui/material"
 import LinkifyText from "components/util/LinkifyText"
 import BrandedOptions from "components/views/common/inputs/BrandedOptions"
 import { forwardRef } from "react"
-import { sxStyles } from "types/commonTypes"
 import { UserDetails } from "../UserDetails"
 import { useCommentVisibilityControls } from "./CommentOptionsMenu"
+import { commentCardStyles } from "./QuestionCardStyles"
 import { getUserTypeFromComment } from "./util"
-
-export const commentCardStyles = sxStyles({
-   root: (theme) => ({
-      borderRadius: "8px",
-      border: `1px solid ${theme.brand.black[300]}`,
-      backgroundColor: theme.brand.white[200],
-      py: 1,
-      pl: 1.5,
-      pr: 0.5,
-   }),
-   optionsIcon: {
-      "& svg": {
-         width: 21,
-         height: 21,
-         color: (theme) => theme.brand.black[600],
-      },
-   },
-   title: {
-      wordBreak: "break-word",
-      whiteSpace: "pre-line",
-   },
-})
 
 type Props = {
    comment: LivestreamQuestionComment
