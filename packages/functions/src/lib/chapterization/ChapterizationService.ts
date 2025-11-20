@@ -14,7 +14,7 @@ import {
 import { BaseChapterizationService } from "./BaseChaperizationService"
 import { IChapterizationClient } from "./types"
 
-const MAX_RETRIES = 5
+const MAX_RETRIES = 0
 
 type ProcessChapterizationOptions = {
    retryCount?: number
