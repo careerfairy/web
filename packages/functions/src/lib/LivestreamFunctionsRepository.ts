@@ -952,12 +952,12 @@ export class LivestreamFunctionsRepository
    }
 
    async getLivestreamsNeedingTranscription(): Promise<LivestreamEvent[]> {
-      const now = new Date()
+      const twoDaysAgo = DateTime.now().minus({ days: 2 }).toJSDate()
 
       const query = this.firestore
          .collection("livestreams")
          .withConverter(createCompatGenericConverter<LivestreamEvent>())
-         .where("start", "<", now)
+         .where("start", "<", twoDaysAgo)
          .where("test", "==", false)
          .where("hidden", "==", false)
          .where("livestreamType", "==", "livestream")

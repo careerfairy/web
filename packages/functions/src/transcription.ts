@@ -32,7 +32,7 @@ const PATH_REGEX = /^transcriptions\/livestreams\/([^/]+)\/transcription\.json$/
  * - Reduced batch size from previous values to accommodate shorter timeout and avoid Claude API rate limiting
  */
 const BATCH_TRANSCRIPTION_CONFIG = {
-   BATCH_SIZE: 2, // Calculated for 540s timeout - see comment above for calculation
+   BATCH_SIZE: 4, // Calculated for 540s timeout - see comment above for calculation
    /**
     * Wait 3 minutes after each transcription to allow chapterization to start automatically via GCS trigger
     * and to avoid Claude API rate limiting.
@@ -46,7 +46,7 @@ const BATCH_TRANSCRIPTION_CONFIG = {
     *   of 10,000 input tokens per minute. For details, refer to: https://docs.claude.com/en/api/rate-limits. You can see the response headers
     *   for current usage. Contact sales at https://www.anthropic.com/contact-sales to discuss rate limit increases"
     */
-   WAIT_AFTER_TRANSCRIPTION_MS: 3 * 60 * 1000, // 3 minutes wait after transcription
+   WAIT_AFTER_TRANSCRIPTION_MS: 30_000, // 30 seconds
 } as const
 
 export const initiateChapterizationOnTranscriptionCompleted = onObjectFinalized(
