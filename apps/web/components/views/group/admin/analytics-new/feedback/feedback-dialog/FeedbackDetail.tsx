@@ -1,4 +1,5 @@
 import { Box, CircularProgress, Stack, Typography } from "@mui/material"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { AnimatePresence, motion } from "framer-motion"
 import { useMemo } from "react"
 import { FeedbackQuestionType } from "../../../events/detail/form/views/questions/commons"
@@ -10,6 +11,7 @@ import useLivestreamRatingVoters from "./useLivestreamRatingVoters"
 import { WrittenView } from "./WrittenView"
 
 export const FeedbackDetail = () => {
+   const isMobile = useIsMobile()
    const { selectedFeedbackQuestion, liveStreamStats } =
       useFeedbackDialogContext()
 
@@ -72,9 +74,13 @@ export const FeedbackDetail = () => {
                exit={{ opacity: 0, y: -10 }}
                transition={{ duration: 0.2 }}
             >
-               <Stack spacing={4}>
+               <Stack spacing={2}>
                   <Stack spacing={1}>
-                     <Typography variant="brandedH4" color="text.primary">
+                     <Typography
+                        variant={isMobile ? "medium" : "desktopBrandedH5"}
+                        color="neutral.800"
+                        fontWeight={600}
+                     >
                         {selectedFeedbackQuestion.question}
                      </Typography>
                   </Stack>
@@ -93,7 +99,7 @@ export const FeedbackDetail = () => {
                   )}
                   {selectedFeedbackQuestion.type ===
                      FeedbackQuestionType.TEXT && (
-                     <WrittenView voters={voters} total={total} />
+                     <WrittenView voters={voters} />
                   )}
                </Stack>
             </motion.div>

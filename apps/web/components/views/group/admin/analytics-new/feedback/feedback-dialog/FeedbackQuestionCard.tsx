@@ -9,6 +9,7 @@ import {
    EventRatingWithType,
    FeedbackQuestionsLabels,
    FeedbackQuestionType,
+   SENTIMENT_EMOJIS,
 } from "../../../events/detail/form/views/questions/commons"
 import { useFeedbackDialogContext } from "./FeedbackDialog"
 
@@ -74,8 +75,8 @@ export const FeedbackQuestionCard = ({
    const averageRating =
       liveStreamStats?.ratings?.[question.id]?.averageRating ?? 0
 
-   const shouldFetchCount =
-      question.type === FeedbackQuestionType.TEXT && statsCount === 0
+   const shouldFetchCount = true
+   // question.type === FeedbackQuestionType.TEXT && statsCount === 0
 
    const votersQuery = query(
       collection(
@@ -101,18 +102,13 @@ export const FeedbackQuestionCard = ({
       }
 
       if (question.type === FeedbackQuestionType.SENTIMENT_RATING) {
-         // Logic to determine top sentiment emoji would go here if available in stats
-         // For summary card in design, it shows top emoji + percentage
-         // Since stats only has average, we might need to just show average or simplify
-         // Design shows: Emoji + Percentage. We assume average maps to sentiment for now or hide if complex
-         // Stats only gives us average 1-5.
-         // 1=Bad, 3=Neutral, 5=Good.
-         let emoji = "😐"
-         if (averageRating >= 4) emoji = "😁"
-         else if (averageRating >= 3.5) emoji = "😊"
-         else if (averageRating >= 2.5) emoji = "😐"
-         else if (averageRating >= 1.5) emoji = "☹️"
-         else emoji = "😞"
+         // Map average rating to closest sentiment emoji
+         const roundedRating = Math.round(averageRating)
+         const clampedRating = Math.max(
+            1,
+            Math.min(5, roundedRating)
+         ) as keyof typeof SENTIMENT_EMOJIS
+         const emoji = SENTIMENT_EMOJIS[clampedRating]
 
          return (
             <Box sx={styles.sentimentBadge}>
@@ -120,7 +116,6 @@ export const FeedbackQuestionCard = ({
                   {emoji}
                </Typography>
                <Typography variant="small" color="text.secondary">
-                  {/* Percentage is hard without breakdown, maybe omit or show avg */}
                   {averageRating.toFixed(1)}
                </Typography>
             </Box>
