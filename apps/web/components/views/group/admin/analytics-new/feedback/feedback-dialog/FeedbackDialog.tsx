@@ -1,6 +1,7 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
+import useIsMobile from "components/custom-hook/useIsMobile"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { SlideUpTransition } from "components/views/common/transitions"
 import {
@@ -23,15 +24,33 @@ const styles = sxStyles({
    paper: {
       maxWidth: 996,
       borderRadius: 3,
-      p: 3,
+      p: {
+         xs: 1.5,
+         md: 4,
+      },
       maxHeight: "90vh",
    },
-   dialogContent: {
-      p: 0,
-      mt: 3,
-   },
+   dialogContent: (theme) => ({
+      p: "0px !important",
+      mt: {
+         xs: `${theme.spacing(3)} !important`,
+         md: `${theme.spacing(4)} !important`,
+      },
+   }),
    header: {
-      p: 0,
+      p: "0px !important",
+      position: "relative",
+      "& .close-button": {
+         position: "absolute",
+         top: {
+            xs: 0,
+            md: -16,
+         },
+         right: {
+            xs: 0,
+            md: -16,
+         },
+      },
    },
 })
 
@@ -140,6 +159,7 @@ export const FeedbackDialog = ({
          TransitionProps={{ unmountOnExit: true }}
          SlideProps={{ unmountOnExit: true }}
          dataTestId="feedback-dialog"
+         hideDragHandle
       >
          <SuspenseWithBoundary fallback={<></>}>
             {Boolean(stats) && <Content stats={stats} onClose={onClose} />}
@@ -154,6 +174,7 @@ type ContentProps = {
 }
 
 const Content = ({ stats, onClose }: ContentProps) => {
+   const isMobile = useIsMobile()
    return (
       <Fragment>
          <ResponsiveDialogLayout.Header
@@ -168,7 +189,11 @@ const Content = ({ stats, onClose }: ContentProps) => {
                        )
                      : ""}
                </Typography>
-               <Typography variant="brandedH3" color="text.primary">
+               <Typography
+                  variant={isMobile ? "mobileBrandedH4" : "desktopBrandedH5"}
+                  color="neutral.800"
+                  fontWeight={isMobile ? 600 : 700}
+               >
                   {stats?.livestream?.title}
                </Typography>
             </Stack>

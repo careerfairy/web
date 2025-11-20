@@ -1,49 +1,103 @@
 import { EventRatingAnswer } from "@careerfairy/shared-lib/livestreams"
-import { Avatar, Box, Stack, Typography } from "@mui/material"
+import { Box, Button, Stack, Typography } from "@mui/material"
+import UserAvatar from "components/views/common/UserAvatar"
+import { useState } from "react"
+import { ChevronDown } from "react-feather"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 
 const styles = sxStyles({
-   avatar: {
-      width: 28,
-      height: 28,
-      fontSize: 12,
-      bgcolor: "secondary.main",
+   container: {
+      minHeight: 200,
+      overflowY: "auto",
+      width: "100%",
+      "&::-webkit-scrollbar": {
+         display: "none",
+      },
+      scrollbarWidth: "none",
    },
    answerCard: {
       p: 2,
-      borderRadius: 1,
+      borderRadius: "8px",
+      border: 1,
+      borderColor: (theme) => theme.brand.white[500],
+      backgroundColor: (theme) => theme.brand.white[200],
+      display: "flex",
+      flexDirection: "row",
+      gap: 1,
+      alignItems: "flex-start",
+   },
+   loadMoreButton: {
+      borderRadius: "20px",
       border: 1,
       borderColor: "neutral.200",
-      backgroundColor: "white",
+      color: "neutral.600",
+      textTransform: "none",
+      px: 3,
+      py: 1,
+      width: "100%",
+      justifyContent: "center",
+      gap: 1,
+      "&:hover": {
+         backgroundColor: "neutral.50",
+         borderColor: "neutral.300",
+      },
    },
 })
 
 type WrittenViewProps = {
    voters: EventRatingAnswer[]
-   total: number
 }
 
-export const WrittenView = ({ voters, total }: WrittenViewProps) => {
+const INITIAL_VISIBLE_COUNT = 3
+
+export const WrittenView = ({ voters }: WrittenViewProps) => {
+   const [showAll, setShowAll] = useState(false)
+   const hasMore = voters.length > INITIAL_VISIBLE_COUNT && !showAll
+
+   const handleLoadMore = () => {
+      setShowAll(true)
+   }
+
+   const visibleVoters = showAll
+      ? voters
+      : voters.slice(0, INITIAL_VISIBLE_COUNT)
+
    return (
       <Stack spacing={2}>
-         <Typography variant="small" color="text.secondary">
-            {total} answers
+         <Typography variant="small" color="neutral.800">
+            {visibleVoters.length} answers
          </Typography>
-         <Stack spacing={2}>
-            {voters.map((answer) => (
-               <Box key={answer.id} sx={styles.answerCard}>
-                  <Stack direction="row" spacing={2} alignItems="flex-start">
-                     <Avatar src={answer.user?.avatarUrl} sx={styles.avatar}>
-                        {answer.user?.firstName?.[0] ||
-                           answer.user?.lastName?.[0] ||
-                           "?"}
-                     </Avatar>
-                     <Typography variant="body2" color="text.secondary">
+         <Stack spacing={1.5} width="100%">
+            <Stack spacing={1.5} sx={styles.container}>
+               {visibleVoters.map((answer) => (
+                  <Box key={answer.id} sx={styles.answerCard}>
+                     <UserAvatar
+                        size={28}
+                        data={{
+                           authId: answer.user?.id,
+                           firstName: answer.user?.firstName,
+                           lastName: answer.user?.lastName,
+                           avatar: answer.user?.avatarUrl,
+                        }}
+                     />
+                     <Typography variant="medium" color="neutral.700">
                         {answer.message}
                      </Typography>
-                  </Stack>
-               </Box>
-            ))}
+                  </Box>
+               ))}
+            </Stack>
+            {hasMore ? (
+               <Button
+                  variant="text"
+                  sx={styles.loadMoreButton}
+                  onClick={handleLoadMore}
+               >
+                  <Typography variant="medium" color="inherit">
+                     Load more answers
+                  </Typography>
+                  <ChevronDown size={18} />
+               </Button>
+            ) : null}
          </Stack>
       </Stack>
    )
