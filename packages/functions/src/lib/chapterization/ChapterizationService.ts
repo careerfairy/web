@@ -227,13 +227,6 @@ export class ChapterizationService extends BaseChapterizationService {
       transcriptionFilePath: string
    ): Promise<void> {
       try {
-         logger.info(
-            "Sending Slack notification about permanent chapterization failure",
-            {
-               livestreamId,
-            }
-         )
-
          await notifyChapterizationPermanentlyFailed(
             config.slackWebhooks.chapterizationPermanentlyFailed,
             {

@@ -213,13 +213,6 @@ export class TranscriptionService extends BaseTranscriptionService {
       recordingUrl: string
    ): Promise<void> {
       try {
-         logger.info(
-            "Sending Slack notification about permanent transcription failure",
-            {
-               livestreamId,
-            }
-         )
-
          await notifyTranscriptionPermanentlyFailed(
             config.slackWebhooks.transcriptionPermanentlyFailed,
             {
