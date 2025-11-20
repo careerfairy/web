@@ -7,6 +7,7 @@ import {
    Typography,
 } from "@mui/material"
 import Image from "next/image"
+import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { BrandedTooltip } from "../../../../streaming-page/components/BrandedTooltip"
 
@@ -66,7 +67,16 @@ type Props = {
 }
 
 export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
-   if (!speakers || speakers.length === 0) {
+   // Deduplicate speakers by ID
+   const uniqueSpeakers = useMemo(() => {
+      if (!speakers?.length) return []
+      return speakers.filter(
+         (speaker, index, self) =>
+            index === self.findIndex((t) => t.id === speaker.id)
+      )
+   }, [speakers])
+
+   if (!uniqueSpeakers || uniqueSpeakers.length === 0) {
       return (
          <Avatar sx={styles.avatar}>
             <Image
@@ -81,13 +91,13 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
    }
 
    const renderSurplus = (surplus: number) => {
-      const nextSpeaker = speakers[maxVisible] // Get the first hidden speaker
+      const nextSpeaker = uniqueSpeakers[maxVisible] // Get the first hidden speaker
       return (
          <Box
             sx={styles.surplusContainer}
             zIndex={
                // Always on top of the other avatars
-               speakers.length
+               uniqueSpeakers.length
             }
          >
             {/* overlay */}
@@ -113,7 +123,7 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
          spacing={14}
          renderSurplus={renderSurplus}
       >
-         {speakers.map((speaker, index) => (
+         {uniqueSpeakers.map((speaker, index) => (
             <Avatar
                key={speaker.id}
                alt={`${speaker.firstName} ${speaker.lastName}`}
@@ -141,7 +151,7 @@ export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
 
    return (
       <BrandedTooltip
-         title={`Speaker${speakers.length > 1 ? "s" : ""}`}
+         title={`Speaker${uniqueSpeakers.length > 1 ? "s" : ""}`}
          placement="top"
          arrow
          wrapperStyles={styles.tooltipWrapper}

@@ -1,7 +1,10 @@
 import { Box, CircularProgress, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
+import { EmptyItemsView } from "components/views/common/EmptyItemsView"
 import { AnimatePresence, motion } from "framer-motion"
 import { useMemo } from "react"
+import { Users } from "react-feather"
+import { useMeasure } from "react-use"
 import { FeedbackQuestionType } from "../../../events/detail/form/views/questions/commons"
 import { useFeedbackDialogContext } from "./FeedbackDialog"
 import { FeedbackQuestionList } from "./FeedbackQuestionList"
@@ -14,6 +17,7 @@ export const FeedbackDetail = () => {
    const isMobile = useIsMobile()
    const { selectedFeedbackQuestion, liveStreamStats } =
       useFeedbackDialogContext()
+   const [ref, { height }] = useMeasure<HTMLDivElement>()
 
    const { data: voters = [], status: votersStatus } =
       useLivestreamRatingVoters(
@@ -56,56 +60,87 @@ export const FeedbackDetail = () => {
       }
    }, [voters])
 
-   if (loading) {
-      return (
-         <Box display="flex" justifyContent="center" p={4}>
-            <CircularProgress />
-         </Box>
-      )
-   }
-
    return (
-      <Stack spacing={4}>
-         <AnimatePresence mode="wait">
-            <motion.div
-               key={selectedFeedbackQuestion.id}
-               initial={{ opacity: 0, y: 10 }}
-               animate={{ opacity: 1, y: 0 }}
-               exit={{ opacity: 0, y: -10 }}
-               transition={{ duration: 0.2 }}
-            >
-               <Stack spacing={2}>
-                  <Stack spacing={1}>
-                     <Typography
-                        variant={isMobile ? "medium" : "desktopBrandedH5"}
-                        color="neutral.800"
-                        fontWeight={600}
+      <motion.div
+         animate={{ height: height || "auto" }}
+         style={{ overflow: "hidden" }}
+         transition={{ duration: 0.2 }}
+      >
+         <div ref={ref}>
+            {loading ? (
+               <Box display="flex" justifyContent="center" p={4}>
+                  <CircularProgress />
+               </Box>
+            ) : (
+               <Stack spacing={4}>
+                  <AnimatePresence mode="wait">
+                     <motion.div
+                        key={selectedFeedbackQuestion.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
                      >
-                        {selectedFeedbackQuestion.question}
-                     </Typography>
-                  </Stack>
+                        <Stack spacing={2}>
+                           <Stack spacing={1}>
+                              <Typography
+                                 variant={
+                                    isMobile ? "medium" : "desktopBrandedH5"
+                                 }
+                                 color="neutral.800"
+                                 fontWeight={600}
+                              >
+                                 {selectedFeedbackQuestion.question}
+                              </Typography>
+                           </Stack>
 
-                  {selectedFeedbackQuestion.type ===
-                     FeedbackQuestionType.STAR_RATING && (
-                     <RatingView
-                        stats={stats}
-                        average={average}
-                        total={total}
-                     />
-                  )}
-                  {selectedFeedbackQuestion.type ===
-                     FeedbackQuestionType.SENTIMENT_RATING && (
-                     <SentimentView stats={stats} total={total} />
-                  )}
-                  {selectedFeedbackQuestion.type ===
-                     FeedbackQuestionType.TEXT && (
-                     <WrittenView voters={voters} />
-                  )}
+                           {!loading && total === 0 ? (
+                              <EmptyItemsView
+                                 title={
+                                    selectedFeedbackQuestion.type ===
+                                    FeedbackQuestionType.TEXT
+                                       ? "No answers"
+                                       : "No votes"
+                                 }
+                                 description={
+                                    selectedFeedbackQuestion.type ===
+                                    FeedbackQuestionType.TEXT
+                                       ? "This question didn't receive any answers."
+                                       : "This question didn't receive any votes."
+                                 }
+                                 icon={<Users size={40} />}
+                              />
+                           ) : (
+                              <>
+                                 {selectedFeedbackQuestion.type ===
+                                    FeedbackQuestionType.STAR_RATING && (
+                                    <RatingView
+                                       stats={stats}
+                                       average={average}
+                                       total={total}
+                                    />
+                                 )}
+                                 {selectedFeedbackQuestion.type ===
+                                    FeedbackQuestionType.SENTIMENT_RATING && (
+                                    <SentimentView
+                                       stats={stats}
+                                       total={total}
+                                    />
+                                 )}
+                                 {selectedFeedbackQuestion.type ===
+                                    FeedbackQuestionType.TEXT && (
+                                    <WrittenView voters={voters} />
+                                 )}
+                              </>
+                           )}
+                        </Stack>
+                     </motion.div>
+                  </AnimatePresence>
+
+                  <FeedbackQuestionList />
                </Stack>
-            </motion.div>
-         </AnimatePresence>
-
-         <FeedbackQuestionList />
-      </Stack>
+            )}
+         </div>
+      </motion.div>
    )
 }

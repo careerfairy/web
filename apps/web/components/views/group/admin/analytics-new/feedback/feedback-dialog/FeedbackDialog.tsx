@@ -1,9 +1,13 @@
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { getQueryStringArray } from "@careerfairy/shared-lib/utils"
 import { Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { SlideUpTransition } from "components/views/common/transitions"
+import { doc, getDoc } from "firebase/firestore"
+import { useRouter } from "next/router"
 import {
    createContext,
    Fragment,
@@ -11,8 +15,9 @@ import {
    useCallback,
    useContext,
    useMemo,
-   useState,
 } from "react"
+import { useFirestore } from "reactfire"
+import useSWR from "swr"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import DateUtil from "../../../../../../../util/DateUtil"
 import { ResponsiveDialogLayout } from "../../../../../common/ResponsiveDialog"
@@ -22,7 +27,7 @@ import { FeedbackDetail } from "./FeedbackDetail"
 
 const styles = sxStyles({
    paper: {
-      maxWidth: 996,
+      maxWidth: 1100,
       borderRadius: 3,
       p: {
          xs: 1.5,
@@ -87,20 +92,28 @@ const FeedbackDialogProvider = ({
    onClose,
    children,
 }: FeedbackDialogProviderProps) => {
+   const router = useRouter()
    const { feedbackQuestions: allFeedbackQuestions } = useFeedbackQuestions(
       liveStreamStats.livestream.id,
       "livestreams"
    )
 
-   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(
-      Object.keys(liveStreamStats.ratings)?.[0] ?? null
-   )
+   const currentId = getQueryStringArray(router.query.feedbackId)[0]
+
+   const selectedQuestionId = currentId || allFeedbackQuestions?.[0]?.id || null
 
    const onFeedbackQuestionClick = useCallback(
       (question: EventRatingWithType) => {
-         setSelectedQuestionId(question.id)
+         router.push(
+            {
+               pathname: router.pathname,
+               query: { ...router.query, feedbackId: question.id },
+            },
+            undefined,
+            { shallow: true }
+         )
       },
-      []
+      [router]
    )
 
    const selectedFeedbackQuestion = useMemo(
@@ -140,19 +153,44 @@ const FeedbackDialogProvider = ({
 }
 
 type FeedbackDialogProps = {
-   stats: LiveStreamStats
    onClose: () => void
-   open: boolean
 }
 
-export const FeedbackDialog = ({
-   stats,
-   onClose,
-   open,
-}: FeedbackDialogProps) => {
+const useLivestreamStats = (livestreamId: string | undefined) => {
+   const firestore = useFirestore()
+
+   const { data: stats } = useSWR(
+      livestreamId ? `livestream-stats-${livestreamId}` : null,
+      async () => {
+         if (!livestreamId) return null
+
+         const statsRef = doc(
+            firestore,
+            "livestreams",
+            livestreamId,
+            "stats",
+            "livestreamStats"
+         ).withConverter(createGenericConverter<LiveStreamStats>())
+
+         const statsSnap = await getDoc(statsRef)
+
+         if (!statsSnap.exists()) return null
+
+         return statsSnap.data()
+      }
+   )
+
+   return { stats }
+}
+
+export const FeedbackDialog = ({ onClose }: FeedbackDialogProps) => {
+   const router = useRouter()
+   const feedbackLivestreamId = router.query.feedbackLivestreamId as string
+   const { stats } = useLivestreamStats(feedbackLivestreamId)
+
    return (
       <ResponsiveDialogLayout
-         open={open}
+         open={Boolean(feedbackLivestreamId)}
          handleClose={onClose}
          dialogPaperStyles={styles.paper}
          TransitionComponent={SlideUpTransition}
@@ -162,7 +200,7 @@ export const FeedbackDialog = ({
          hideDragHandle
       >
          <SuspenseWithBoundary fallback={<></>}>
-            {Boolean(stats) && <Content stats={stats} onClose={onClose} />}
+            {Boolean(stats) && <Content stats={stats!} onClose={onClose} />}
          </SuspenseWithBoundary>
       </ResponsiveDialogLayout>
    )
@@ -183,11 +221,10 @@ const Content = ({ stats, onClose }: ContentProps) => {
          >
             <Stack spacing={0.5}>
                <Typography variant="small" color="neutral.400">
-                  {stats?.livestream?.start
-                     ? DateUtil.formatFullDateWithTime(
-                          stats.livestream.start.toDate()
-                       )
-                     : ""}
+                  {Boolean(stats?.livestream?.start) &&
+                     DateUtil.formatFullDateWithTime(
+                        stats.livestream.start.toDate()
+                     )}
                </Typography>
                <Typography
                   variant={isMobile ? "mobileBrandedH4" : "desktopBrandedH5"}

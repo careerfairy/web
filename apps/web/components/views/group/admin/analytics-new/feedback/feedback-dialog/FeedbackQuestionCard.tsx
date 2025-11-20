@@ -2,7 +2,7 @@ import { Box, ButtonBase, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { collection, query } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { ChevronRight } from "react-feather"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import {
@@ -70,30 +70,29 @@ export const FeedbackQuestionCard = ({
 }: FeedbackQuestionCardProps) => {
    const { liveStreamStats, onFeedbackQuestionClick } =
       useFeedbackDialogContext()
-   const statsCount =
-      liveStreamStats?.ratings?.[question.id]?.numberOfRatings ?? 0
+
    const averageRating =
       liveStreamStats?.ratings?.[question.id]?.averageRating ?? 0
 
-   const shouldFetchCount = true
-   // question.type === FeedbackQuestionType.TEXT && statsCount === 0
-
-   const votersQuery = query(
-      collection(
-         FirestoreInstance,
-         "livestreams",
-         liveStreamStats.livestream.id,
-         "rating",
-         question.id,
-         "voters"
-      )
+   const votersCollection = collection(
+      FirestoreInstance,
+      "livestreams",
+      liveStreamStats.livestream.id,
+      "rating",
+      question.id,
+      "voters"
    )
 
-   const { count: fetchedCount } = useSWRCountQuery(votersQuery, {
-      disabled: !shouldFetchCount,
-   })
+   const votersQuery = query(
+      votersCollection,
+      ...(question.type === FeedbackQuestionType.TEXT
+         ? [where("message", "!=", "")]
+         : [])
+   )
 
-   const numberOfAnswers = shouldFetchCount ? fetchedCount ?? 0 : statsCount
+   const { count: fetchedCount } = useSWRCountQuery(votersQuery)
+
+   const numberOfAnswers = fetchedCount ?? 0
 
    const renderMetric = () => {
       if (question.type === FeedbackQuestionType.TEXT) {

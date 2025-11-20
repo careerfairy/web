@@ -14,7 +14,7 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 const styles = sxStyles({
    ratingBox: {
       p: 1.5,
-      borderRadius: 1,
+      borderRadius: 2,
       border: 1,
       width: "100%",
       overflow: "hidden",
@@ -29,14 +29,15 @@ const styles = sxStyles({
    },
    averageBox: {
       p: 2,
-      borderRadius: 0.5,
+      borderRadius: 2,
       backgroundColor: (theme) => theme.brand.black[400],
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      width: 151,
+      width: { xs: "100%", md: 151 },
       flexShrink: 0,
+      scrollSnapAlign: "start",
    },
    chartContainer: {
       display: "flex",
@@ -112,6 +113,77 @@ export const FeedbackStatsView = ({
 }: FeedbackStatsViewProps) => {
    const isMobile = useIsMobile()
 
+   const AverageSection = (
+      <Box sx={styles.averageBox}>
+         <Typography
+            variant="small"
+            color={isMobile ? "text.secondary" : "neutral.800"}
+         >
+            {summaryTitle}
+         </Typography>
+         <Typography
+            variant="brandedH1"
+            component="div"
+            sx={styles.summaryValue}
+         >
+            {summaryValue}
+         </Typography>
+         <Typography variant="xsmall" color="text.secondary">
+            {total} total answers
+         </Typography>
+      </Box>
+   )
+
+   const ChartSection = (
+      <Box sx={styles.chartContainer}>
+         {[1, 2, 3, 4, 5].map((value) => {
+            const count = stats[value] || 0
+            const percentage = total > 0 ? (count / total) * 100 : 0
+            return (
+               <BrandedTooltip
+                  key={value}
+                  title={getItemTooltip(value)}
+                  arrow
+                  placement="top"
+               >
+                  <Box sx={styles.chartColumn}>
+                     <Box sx={styles.chartHeader}>
+                        <Typography
+                           variant="desktopBrandedH5"
+                           fontWeight={600}
+                           component="div"
+                        >
+                           {getItemLabel(value)}
+                        </Typography>
+                        <Typography variant="small" sx={{ ml: 1 }}>
+                           {count} votes ({Math.round(percentage)}%)
+                        </Typography>
+                     </Box>
+                     <LinearProgress
+                        variant="determinate"
+                        value={percentage}
+                        sx={styles.linearProgress}
+                     />
+                  </Box>
+               </BrandedTooltip>
+            )
+         })}
+      </Box>
+   )
+
+   if (isMobile) {
+      return (
+         <Box sx={styles.ratingBox}>
+            <Stack direction="column" spacing={1.25}>
+               {AverageSection}
+               <HorizontalScroll sx={{ width: "100%" }}>
+                  {ChartSection}
+               </HorizontalScroll>
+            </Stack>
+         </Box>
+      )
+   }
+
    return (
       <HorizontalScroll sx={styles.ratingBox}>
          <Stack
@@ -120,58 +192,8 @@ export const FeedbackStatsView = ({
             alignItems="stretch"
             sx={{ minWidth: "max-content" }}
          >
-            <Box sx={{ ...styles.averageBox, scrollSnapAlign: "start" }}>
-               <Typography
-                  variant="small"
-                  color={isMobile ? "text.secondary" : "neutral.800"}
-               >
-                  {summaryTitle}
-               </Typography>
-               <Typography
-                  variant="brandedH1"
-                  component="div"
-                  sx={styles.summaryValue}
-               >
-                  {summaryValue}
-               </Typography>
-               <Typography variant="xsmall" color="text.secondary">
-                  {total} total answers
-               </Typography>
-            </Box>
-            <Box sx={styles.chartContainer}>
-               {[1, 2, 3, 4, 5].map((value) => {
-                  const count = stats[value] || 0
-                  const percentage = total > 0 ? (count / total) * 100 : 0
-                  return (
-                     <BrandedTooltip
-                        key={value}
-                        title={getItemTooltip(value)}
-                        arrow
-                        placement="top"
-                     >
-                        <Box sx={styles.chartColumn}>
-                           <Box sx={styles.chartHeader}>
-                              <Typography
-                                 variant="desktopBrandedH5"
-                                 fontWeight={600}
-                                 component="div"
-                              >
-                                 {getItemLabel(value)}
-                              </Typography>
-                              <Typography variant="small" sx={{ ml: 1 }}>
-                                 {count} votes ({Math.round(percentage)}%)
-                              </Typography>
-                           </Box>
-                           <LinearProgress
-                              variant="determinate"
-                              value={percentage}
-                              sx={styles.linearProgress}
-                           />
-                        </Box>
-                     </BrandedTooltip>
-                  )
-               })}
-            </Box>
+            {AverageSection}
+            {ChartSection}
          </Stack>
       </HorizontalScroll>
    )
