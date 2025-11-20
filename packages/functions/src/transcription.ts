@@ -354,7 +354,11 @@ const handleBatchLivestreamTranscriptions = async () => {
                }
             )
 
-            await sleep(BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS)
+            if (index < livestreamsNeedingTranscription.length - 1) {
+               await sleep(
+                  BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS
+               )
+            }
 
             results.success++
          } catch (error) {
