@@ -32,7 +32,7 @@ const PATH_REGEX = /^transcriptions\/livestreams\/([^/]+)\/transcription\.json$/
  * - Reduced batch size from previous values to accommodate shorter timeout and avoid Claude API rate limiting
  */
 const BATCH_TRANSCRIPTION_CONFIG = {
-   BATCH_SIZE: 4, // Calculated for 540s timeout - see comment above for calculation
+   BATCH_SIZE: 2, // Calculated for 540s timeout - see comment above for calculation
    /**
     * Wait 3 minutes after each transcription to allow chapterization to start automatically via GCS trigger
     * and to avoid Claude API rate limiting.
