@@ -6,7 +6,7 @@ import { saveTranscriptionToGCS } from "./storage"
 import { ITranscriptionClient } from "./types"
 import { calculateBackoffDelay, getErrorMessage, sleep } from "./utils"
 
-const MAX_RETRIES = 5
+const MAX_RETRIES = 0
 
 type ProcessTranscriptionOptions = {
    retryCount?: number
