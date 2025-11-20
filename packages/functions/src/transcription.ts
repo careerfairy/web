@@ -46,7 +46,7 @@ const BATCH_TRANSCRIPTION_CONFIG = {
     *   of 10,000 input tokens per minute. For details, refer to: https://docs.claude.com/en/api/rate-limits. You can see the response headers
     *   for current usage. Contact sales at https://www.anthropic.com/contact-sales to discuss rate limit increases"
     */
-   WAIT_AFTER_TRANSCRIPTION_MS: 10_000, // 30 seconds
+   WAIT_AFTER_TRANSCRIPTION_MS: 30_000, // 30 seconds
 } as const
 
 export const initiateChapterizationOnTranscriptionCompleted = onObjectFinalized(
