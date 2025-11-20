@@ -1,17 +1,13 @@
 import { Box, ButtonBase, Typography } from "@mui/material"
-import Stack from "@mui/material/Stack"
-import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
-import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { collection, query, where } from "firebase/firestore"
 import { ChevronRight } from "react-feather"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import {
    EventRatingWithType,
    FeedbackQuestionsLabels,
    FeedbackQuestionType,
-   SENTIMENT_EMOJIS,
 } from "../../../events/detail/form/views/questions/commons"
 import { useFeedbackDialogContext } from "./FeedbackDialog"
+import { useFeedbackQuestionStats } from "./useFeedbackQuestionStats"
 
 const styles = sxStyles({
    questionCard: {
@@ -35,10 +31,10 @@ const styles = sxStyles({
       display: "flex",
       alignItems: "center",
       gap: 1,
-      px: 1,
-      py: 0.5,
-      borderRadius: 1,
-      backgroundColor: "neutral.100",
+      p: 1,
+      borderRadius: 2,
+      backgroundColor: "rgba(232, 232, 232, 0.50)",
+      minWidth: 65,
    },
    ratingBadge: {
       display: "flex",
@@ -46,8 +42,8 @@ const styles = sxStyles({
       justifyContent: "center",
       width: 65,
       height: 36,
-      borderRadius: 1,
-      backgroundColor: "neutral.100",
+      borderRadius: 2,
+      backgroundColor: "rgba(232, 232, 232, 0.50)",
       fontWeight: 600,
       color: "neutral.600",
    },
@@ -68,31 +64,13 @@ type FeedbackQuestionCardProps = {
 export const FeedbackQuestionCard = ({
    question,
 }: FeedbackQuestionCardProps) => {
-   const { liveStreamStats, onFeedbackQuestionClick } =
-      useFeedbackDialogContext()
-
-   const averageRating =
-      liveStreamStats?.ratings?.[question.id]?.averageRating ?? 0
-
-   const votersCollection = collection(
-      FirestoreInstance,
-      "livestreams",
-      liveStreamStats.livestream.id,
-      "rating",
-      question.id,
-      "voters"
-   )
-
-   const votersQuery = query(
-      votersCollection,
-      ...(question.type === FeedbackQuestionType.TEXT
-         ? [where("message", "!=", "")]
-         : [])
-   )
-
-   const { count: fetchedCount } = useSWRCountQuery(votersQuery)
-
-   const numberOfAnswers = fetchedCount ?? 0
+   const { onFeedbackQuestionClick } = useFeedbackDialogContext()
+   const {
+      averageRating,
+      numberOfAnswers,
+      sentimentEmoji,
+      sentimentPercentage,
+   } = useFeedbackQuestionStats(question)
 
    const renderMetric = () => {
       if (question.type === FeedbackQuestionType.TEXT) {
@@ -101,21 +79,15 @@ export const FeedbackQuestionCard = ({
       }
 
       if (question.type === FeedbackQuestionType.SENTIMENT_RATING) {
-         // Map average rating to closest sentiment emoji
-         const roundedRating = Math.round(averageRating)
-         const clampedRating = Math.max(
-            1,
-            Math.min(5, roundedRating)
-         ) as keyof typeof SENTIMENT_EMOJIS
-         const emoji = SENTIMENT_EMOJIS[clampedRating]
-
          return (
             <Box sx={styles.sentimentBadge}>
                <Typography fontSize={18} lineHeight={1}>
-                  {emoji}
+                  {sentimentEmoji}
                </Typography>
                <Typography variant="small" color="text.secondary">
-                  {averageRating.toFixed(1)}
+                  {sentimentPercentage !== null
+                     ? `${sentimentPercentage}%`
+                     : "0%"}
                </Typography>
             </Box>
          )
@@ -130,28 +102,32 @@ export const FeedbackQuestionCard = ({
          sx={styles.questionCard}
          onClick={() => onFeedbackQuestionClick(question)}
       >
-         <Stack direction="row" alignItems="center" spacing={2} flex={1}>
-            <Typography variant="body1" color="text.secondary" sx={{ flex: 2 }}>
-               {question.question}
-            </Typography>
-            <Typography variant="small" color="text.secondary" sx={{ flex: 1 }}>
-               {FeedbackQuestionsLabels[question.type]}
-            </Typography>
-            <Typography
-               variant="small"
-               color="text.secondary"
-               sx={{ flex: 0.5 }}
-            >
-               {numberOfAnswers} answers
-            </Typography>
-         </Stack>
+         <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ width: 331, flexShrink: 0 }}
+         >
+            {question.question}
+         </Typography>
+         <Typography
+            variant="small"
+            color="text.secondary"
+            sx={{ width: 117, flexShrink: 0 }}
+         >
+            {FeedbackQuestionsLabels[question.type]}
+         </Typography>
+         <Typography
+            variant="small"
+            color="text.secondary"
+            sx={{ width: 96, flexShrink: 0 }}
+         >
+            {numberOfAnswers} answers
+         </Typography>
 
-         <Stack direction="row" alignItems="center" spacing={2}>
-            {renderMetric()}
-            <Box sx={styles.iconWrapper}>
-               <ChevronRight size={20} />
-            </Box>
-         </Stack>
+         {renderMetric()}
+         <Box sx={styles.iconWrapper}>
+            <ChevronRight size={20} />
+         </Box>
       </ButtonBase>
    )
 }
