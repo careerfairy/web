@@ -1,5 +1,7 @@
 import { logger } from "firebase-functions/v2"
 import { Timestamp } from "../../api/firestoreAdmin"
+import { notifyTranscriptionPermanentlyFailed } from "../../api/slack"
+import config from "../../config"
 import { ILivestreamFunctionsRepository } from "../LivestreamFunctionsRepository"
 import { BaseTranscriptionService } from "./BaseTranscriptionService"
 import { saveTranscriptionToGCS } from "./storage"
@@ -191,8 +193,49 @@ export class TranscriptionService extends BaseTranscriptionService {
                recordingUrl
             )
 
+            // Notify Slack about permanent failure
+            await this.notifySlackOfPermanentFailure(
+               livestreamId,
+               error,
+               retryCount,
+               recordingUrl
+            )
+
             throw error
          }
+      }
+   }
+
+   private async notifySlackOfPermanentFailure(
+      livestreamId: string,
+      error: unknown,
+      retryCount: number,
+      recordingUrl: string
+   ): Promise<void> {
+      try {
+         logger.info(
+            "Sending Slack notification about permanent transcription failure",
+            {
+               livestreamId,
+            }
+         )
+
+         await notifyTranscriptionPermanentlyFailed(
+            config.slackWebhooks.transcriptionPermanentlyFailed,
+            {
+               livestreamId,
+               provider: this.transcriptionClient.provider,
+               errorMessage: getErrorMessage(error),
+               retryCount,
+               recordingUrl,
+            }
+         )
+      } catch (notificationError) {
+         logger.error("Failed to send Slack notification", {
+            livestreamId,
+            notificationError,
+            errorMessage: getErrorMessage(notificationError),
+         })
       }
    }
 }
