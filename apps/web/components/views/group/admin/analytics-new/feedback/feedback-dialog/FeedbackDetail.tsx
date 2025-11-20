@@ -25,7 +25,6 @@ export const FeedbackDetail = () => {
          selectedFeedbackQuestion.id,
          selectedFeedbackQuestion.type === FeedbackQuestionType.TEXT
       )
-   const loading = votersStatus === "loading"
 
    const { stats, average, total } = useMemo(() => {
       if (!voters) return { stats: {}, average: 0, total: 0 }
@@ -37,17 +36,6 @@ export const FeedbackDetail = () => {
       const counts: Record<number, number> = {}
 
       voters.forEach((v) => {
-         // For sentiment, rating is 1-3 usually in backend?
-         // Wait, livestreams.ts: "assign a 1-5 rating based on the sentiment(1-3)" in normalizeRating
-         // But raw data might be 1-3.
-         // Let's check raw rating values. Assuming standard 1-5 for now based on usage.
-         // If question.isSentimentRating, backend might store 1, 2, 3.
-         // normalizeRating maps: 1->1, 2->3, 3->5.
-         // BUT the new design has 5 emojis.
-         // If the question type is the OLD sentiment (3 options), we map to 1, 3, 5.
-         // If it's NEW sentiment, it might use 1-5.
-         // For backward compatibility, we'll use the `rating` field directly if it exists.
-
          const val = v.rating || 0
          counts[val] = (counts[val] || 0) + 1
          sum += val
@@ -59,6 +47,8 @@ export const FeedbackDetail = () => {
          total,
       }
    }, [voters])
+
+   const loading = votersStatus === "loading"
 
    return (
       <motion.div
