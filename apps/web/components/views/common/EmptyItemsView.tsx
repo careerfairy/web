@@ -9,9 +9,6 @@ const styles = sxStyles({
       backgroundColor: (theme) => theme.brand.white[300],
       border: (theme) => `1px solid ${theme.brand.white[400]}`,
       borderRadius: "8px",
-      "& svg": {
-         color: "secondary.main",
-      },
    },
    title: {
       fontSize: "16px",
