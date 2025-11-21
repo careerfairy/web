@@ -13,7 +13,6 @@ import { correctCompany, imageLogoPath } from "../../constants"
 import { sleep } from "../utils"
 import { CommonPage } from "./CommonPage"
 import { ATSAdminPage } from "./admin/ATSAdminPage"
-import { FeedbackPage } from "./admin/FeedbackPage"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
@@ -128,12 +127,6 @@ export class GroupDashboardPage extends CommonPage {
 
    public async goToLivestreamAnalyticsPage() {
       await this.goToPage("Live stream analytics")
-   }
-
-   public async goToFeedbackAnalyticsPage() {
-      await this.goToPage("Feedback")
-
-      return new FeedbackPage(this)
    }
 
    // Team Members page
@@ -446,7 +439,6 @@ export class GroupDashboardPage extends CommonPage {
          // Analytics sub-pages that might still be accessed directly
          | "Live stream analytics"
          | "Registration sources"
-         | "Feedback"
          | "All live streams on CareerFairy"
    ) {
       await Promise.all([
