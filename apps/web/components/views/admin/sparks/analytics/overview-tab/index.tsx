@@ -10,13 +10,13 @@ import { SparksOverviewTabSkeleton } from "./SparksOverviewTabSkeleton"
 
 export const SparksOverviewTab = () => {
    const { isLocked } = useAnalyticsLocking("overview")
-   const { isLoading, isMutating } = useSparksAnalytics()
+   const { filteredAnalytics } = useSparksAnalytics()
 
    if (isLocked) {
       return <LockedSparksAnalytics />
    }
 
-   if (isLoading && !isMutating) {
+   if (!filteredAnalytics) {
       return <SparksOverviewTabSkeleton />
    }
 

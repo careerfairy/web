@@ -144,8 +144,12 @@ type TimeFilter = {
 
 const GroupSparkAnalytics = () => {
    const { query } = useRouter()
-   const { selectTimeFilter, setSelectTimeFilter, updateAnalytics, isLoading } =
-      useSparksAnalytics()
+   const {
+      selectTimeFilter,
+      setSelectTimeFilter,
+      updateAnalytics,
+      isValidating,
+   } = useSparksAnalytics()
 
    // Get tab value from query params for conditional rendering
    const tabValue = (query.tab as TabValue) || "overview"
@@ -168,11 +172,11 @@ const GroupSparkAnalytics = () => {
                   <Button
                      onClick={updateAnalytics}
                      sx={styles.updateButton}
-                     disabled={isLoading}
+                     disabled={isValidating}
                   >
                      <Box
                         sx={[
-                           isLoading ? styles.spinningAnimation : {},
+                           isValidating ? styles.spinningAnimation : {},
                            styles.updateIcon,
                         ]}
                      >
