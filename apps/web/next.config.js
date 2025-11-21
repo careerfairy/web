@@ -359,6 +359,28 @@ const moduleExports = {
             permanent: false,
          },
          /**
+          * Redirect deprecated feedback analytics page to Events with dialog
+          */
+         {
+            source:
+               "/group/:groupId/admin/analytics/live-streams/feedback/:livestreamId/:questionPath*",
+            destination:
+               "/group/:groupId/admin/content/live-streams?feedbackLivestreamId=:livestreamId",
+            permanent: false,
+         },
+         {
+            source:
+               "/group/:groupId/admin/analytics/live-streams/feedback/:livestreamId",
+            destination:
+               "/group/:groupId/admin/content/live-streams?feedbackLivestreamId=:livestreamId",
+            permanent: false,
+         },
+         {
+            source: "/group/:groupId/admin/analytics/live-streams/feedback",
+            destination: "/group/:groupId/admin/content/live-streams",
+            permanent: false,
+         },
+         /**
           * Redirect upcoming-livestreams page to content/live-streams
           */
          {
