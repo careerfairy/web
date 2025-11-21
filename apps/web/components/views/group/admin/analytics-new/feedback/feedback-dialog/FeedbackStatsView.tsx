@@ -12,21 +12,21 @@ import { ReactNode } from "react"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 
 const styles = sxStyles({
-   ratingBox: {
+   ratingBox: (theme) => ({
       p: 1.5,
       borderRadius: 2,
       border: 1,
       width: "100%",
-      overflow: "hidden",
-      backgroundColor: (theme) => ({
+      ...theme.utils.hideScrollbar,
+      backgroundColor: {
          xs: theme.brand.white[200],
          md: theme.brand.black[100],
-      }),
-      borderColor: (theme) => ({
+      },
+      borderColor: {
          xs: theme.brand.white[500],
          md: theme.brand.white[400],
-      }),
-   },
+      },
+   }),
    averageBox: {
       p: 2,
       borderRadius: 2,
@@ -53,7 +53,7 @@ const styles = sxStyles({
       flexDirection: "column",
       flex: 1,
       minWidth: 0,
-      width: 132,
+      width: 148,
       flexShrink: 0,
       scrollSnapAlign: "start",
       px: {
@@ -92,6 +92,10 @@ const styles = sxStyles({
       justifyContent: "center",
       display: "flex",
    },
+   mobileHorizontalScroll: (theme) => ({
+      width: "100%",
+      ...theme.utils.hideScrollbar,
+   }),
 })
 
 type FeedbackStatsViewProps = {
@@ -155,7 +159,7 @@ export const FeedbackStatsView = ({
                         >
                            {getItemLabel(value)}
                         </Typography>
-                        <Typography variant="small" sx={{ ml: 1 }}>
+                        <Typography variant="small" ml={1}>
                            {count} votes ({Math.round(percentage)}%)
                         </Typography>
                      </Box>
@@ -176,7 +180,7 @@ export const FeedbackStatsView = ({
          <Box sx={styles.ratingBox}>
             <Stack direction="column" spacing={1.25}>
                {AverageSection}
-               <HorizontalScroll sx={{ width: "100%" }}>
+               <HorizontalScroll sx={styles.mobileHorizontalScroll}>
                   {ChartSection}
                </HorizontalScroll>
             </Stack>
@@ -190,7 +194,7 @@ export const FeedbackStatsView = ({
             direction="row"
             spacing={2.5}
             alignItems="stretch"
-            sx={{ minWidth: "max-content" }}
+            minWidth="max-content"
          >
             {AverageSection}
             {ChartSection}

@@ -35,6 +35,17 @@ export const createBrandedTheme = ({
       typography: getTypography(fontFamily),
 
       legacy: legacyStyles,
+
+      // Utility styles
+      utils: {
+         hideScrollbar: {
+            scrollbarWidth: "none", // Firefox
+            msOverflowStyle: "none", // IE and Edge
+            "&::-webkit-scrollbar": {
+               display: "none", // Chrome, Safari, Opera
+            },
+         },
+      },
    } satisfies ThemeOptions
 
    // Create the base theme, which is the theme without custom components/typography
