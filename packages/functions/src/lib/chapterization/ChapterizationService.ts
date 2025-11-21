@@ -1,6 +1,8 @@
 import { Chapter } from "@careerfairy/shared-lib/livestreams"
 import { logger } from "firebase-functions/v2"
 import { Timestamp } from "../../api/firestoreAdmin"
+import { notifyChapterizationPermanentlyFailed } from "../../api/slack"
+import config from "../../config"
 import { ILivestreamFunctionsRepository } from "../LivestreamFunctionsRepository"
 import {
    fetchTranscriptionFromGCS,
@@ -205,8 +207,42 @@ export class ChapterizationService extends BaseChapterizationService {
                transcriptionFilePath
             )
 
+            // Notify Slack about permanent failure
+            await this.notifySlackOfPermanentFailure(
+               livestreamId,
+               error,
+               retryCount,
+               transcriptionFilePath
+            )
+
             throw error
          }
+      }
+   }
+
+   private async notifySlackOfPermanentFailure(
+      livestreamId: string,
+      error: unknown,
+      retryCount: number,
+      transcriptionFilePath: string
+   ): Promise<void> {
+      try {
+         await notifyChapterizationPermanentlyFailed(
+            config.slackWebhooks.chapterizationPermanentlyFailed,
+            {
+               livestreamId,
+               provider: this.chapterizationClient.provider,
+               errorMessage: getErrorMessage(error),
+               retryCount,
+               transcriptionFilePath,
+            }
+         )
+      } catch (notificationError) {
+         logger.error("Failed to send Slack notification", {
+            livestreamId,
+            notificationError,
+            errorMessage: getErrorMessage(notificationError),
+         })
       }
    }
 }
