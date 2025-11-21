@@ -65,7 +65,7 @@ export const WrittenView = ({ voters }: WrittenViewProps) => {
    return (
       <Stack spacing={2}>
          <Typography variant="small" color="neutral.800">
-            {visibleVoters.length} answers
+            {voters.length} answers
          </Typography>
          <Stack spacing={1.5} width="100%">
             <Stack spacing={1.5} sx={styles.container}>
