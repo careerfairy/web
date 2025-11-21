@@ -21,9 +21,9 @@ const config = {
       offlineEventIncreaseFailed:
          "https://hooks.slack.com/services/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",
       transcriptionPermanentlyFailed:
-         "https://hooks.slack.com/services/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", // TODO: Add Slack webhook URL
+         "https://hooks.slack.com/services/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",
       chapterizationPermanentlyFailed:
-         "https://hooks.slack.com/services/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", // TODO: Add Slack webhook URL
+         "https://hooks.slack.com/services/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",
    },
 
    // Firebase Hosting Domain
