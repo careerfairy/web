@@ -99,7 +99,13 @@ export const FeedbackDetail = () => {
                                        ? "This question didn't receive any answers."
                                        : "This question didn't receive any votes."
                                  }
-                                 icon={<Users size={40} />}
+                                 icon={
+                                    <Box
+                                       component={Users}
+                                       color="secondary.main"
+                                       size={40}
+                                    />
+                                 }
                               />
                            ) : (
                               <>
