@@ -21,6 +21,7 @@ const styles = sxStyles({
 export const FeedbackQuestionList = () => {
    const { allFeedbackQuestions, selectedFeedbackQuestion } =
       useFeedbackDialogContext()
+
    const isMobile = useIsMobile()
    const [emblaRef, emblaApi] = useEmblaCarousel({
       align: "start",

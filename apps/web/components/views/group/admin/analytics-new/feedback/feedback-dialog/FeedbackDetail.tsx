@@ -17,6 +17,7 @@ export const FeedbackDetail = () => {
    const isMobile = useIsMobile()
    const { selectedFeedbackQuestion, liveStreamStats } =
       useFeedbackDialogContext()
+
    const [ref, { height }] = useMeasure<HTMLDivElement>()
 
    const { data: voters = [], status: votersStatus } =
@@ -102,8 +103,10 @@ export const FeedbackDetail = () => {
                               />
                            ) : (
                               <>
-                                 {selectedFeedbackQuestion.type ===
-                                    FeedbackQuestionType.STAR_RATING && (
+                                 {(selectedFeedbackQuestion.type ===
+                                    FeedbackQuestionType.STAR_RATING ||
+                                    selectedFeedbackQuestion.type ===
+                                       FeedbackQuestionType.TEXT_WITH_RATING) && (
                                     <RatingView
                                        stats={stats}
                                        average={average}

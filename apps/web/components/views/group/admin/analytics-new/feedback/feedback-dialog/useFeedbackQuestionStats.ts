@@ -1,6 +1,6 @@
 import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { collection, query, where } from "firebase/firestore"
+import { collection, orderBy, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import {
    EventRatingWithType,
@@ -28,8 +28,9 @@ export const useFeedbackQuestionStats = (question: EventRatingWithType) => {
    const votersQuery = query(
       votersCollection,
       ...(question.type === FeedbackQuestionType.TEXT
-         ? [where("message", "!=", "")]
-         : [])
+         ? [where("message", "!=", ""), orderBy("message", "desc")]
+         : []),
+      orderBy("rating", "desc")
    )
 
    const { count: fetchedCount } = useSWRCountQuery(votersQuery)

@@ -17,6 +17,7 @@ export enum FeedbackQuestionType {
 
 export const FeedbackQuestionsLabels = {
    [FeedbackQuestionType.STAR_RATING]: "Rating",
+   [FeedbackQuestionType.TEXT_WITH_RATING]: "Rating",
    [FeedbackQuestionType.SENTIMENT_RATING]: "Sentiment rating",
    [FeedbackQuestionType.TEXT]: "Written review",
 }
