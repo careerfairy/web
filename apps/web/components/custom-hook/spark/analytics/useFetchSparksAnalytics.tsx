@@ -106,8 +106,7 @@ export const useFetchSparksAnalytics = (groupId: string) => {
    return {
       analytics,
       error,
-      // Only show loading skeleton if there's no previous data
-      isLoading: isLoading && !analytics,
+      isLoading,
       isValidating: isValidating || isMutating,
       updateAnalytics,
       isMutating,
