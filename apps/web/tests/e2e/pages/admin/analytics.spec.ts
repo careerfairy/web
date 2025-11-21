@@ -103,14 +103,28 @@ test.describe("Group Analytics", () => {
          feedbackQuestions,
       })
 
-      await groupPage.goToAnalyticsPage()
-      const feedbackPage = await groupPage.goToFeedbackAnalyticsPage()
+      const livestreamsPage = await groupPage.goToLivestreams()
 
-      await feedbackPage.openFeedbackCard(livestream.title)
+      await livestreamsPage.searchEvents(livestream.title)
+
+      await livestreamsPage.assertEventIsVisible(livestream.title)
+
+      await livestreamsPage.hoverOverEventRow(livestream.title)
+
+      await livestreamsPage.clickActionButton("feedback")
+
+      await livestreamsPage.waitForFeedbackDialog()
+
+      // Verify the livestream title is visible in the dialog
+      await expect(
+         livestreamsPage.feedbackDialog.getByText(livestream.title)
+      ).toBeVisible()
 
       // Check the feedback dialog for each feedback question
-      for (const rating of feedbackQuestions) {
-         await expect(feedbackPage.page.getByText(rating)).toBeVisible()
+      for (const question of feedbackQuestions) {
+         await expect(
+            livestreamsPage.feedbackDialog.getByText(question)
+         ).toBeVisible()
       }
    })
 })
