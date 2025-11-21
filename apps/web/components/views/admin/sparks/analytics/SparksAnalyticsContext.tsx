@@ -11,6 +11,7 @@ import { timeFrameLabels } from "./util"
 interface SparksAnalyticsContextType {
    filteredAnalytics: SparkAnalyticsClient | null
    isLoading: boolean
+   isValidating: boolean
    isMutating: boolean
    error: string | null
    updateAnalytics: () => void
@@ -19,7 +20,6 @@ interface SparksAnalyticsContextType {
    updatedAtLabel: string
    industriesOptions: { value: string; label: string }[]
    industriesOptionsTopCompanies: { value: string; label: string }[]
-   analyticsUpdatedAt: Date | null
 }
 
 const SparksAnalyticsContext = createContext<
@@ -44,8 +44,14 @@ export const SparksAnalyticsProvider = ({ children }) => {
    const [selectTimeFilter, setSelectTimeFilter] =
       useState<TimePeriodParams>("30days")
 
-   const { analytics, error, isLoading, updateAnalytics, isMutating } =
-      useFetchSparksAnalytics(group.id)
+   const {
+      analytics,
+      error,
+      isLoading,
+      isValidating,
+      updateAnalytics,
+      isMutating,
+   } = useFetchSparksAnalytics(group.id)
 
    const filteredAnalytics = useMemo<SparkAnalyticsClient>(() => {
       return analytics?.[selectTimeFilter]
@@ -123,12 +129,11 @@ export const SparksAnalyticsProvider = ({ children }) => {
       return result
    }, [analytics, group?.companyIndustries])
 
-   const analyticsUpdatedAt = analytics?.updatedAt ?? null
-
    const value = useMemo(() => {
       return {
          filteredAnalytics,
          isLoading,
+         isValidating,
          isMutating,
          error,
          updateAnalytics,
@@ -137,11 +142,11 @@ export const SparksAnalyticsProvider = ({ children }) => {
          updatedAtLabel,
          industriesOptions,
          industriesOptionsTopCompanies,
-         analyticsUpdatedAt,
       }
    }, [
       filteredAnalytics,
       isLoading,
+      isValidating,
       isMutating,
       error,
       updateAnalytics,
@@ -149,7 +154,6 @@ export const SparksAnalyticsProvider = ({ children }) => {
       updatedAtLabel,
       industriesOptions,
       industriesOptionsTopCompanies,
-      analyticsUpdatedAt,
    ])
 
    useEffect(() => {

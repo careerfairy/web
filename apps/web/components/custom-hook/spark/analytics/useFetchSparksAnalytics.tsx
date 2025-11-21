@@ -31,33 +31,47 @@ export const useFetchSparksAnalytics = (groupId: string) => {
 
    const fetcher = useCallback(
       async (groupId: string, updateCache: boolean) => {
-         const fetchFromFirestore = async () => {
-            const collectionRef = collection(
-               FirestoreInstance,
-               "sparksAnalytics"
-            )
-            const docRef = doc(collectionRef, groupId).withConverter(
-               createGenericConverter<SparksAnalyticsDTO>()
-            )
-            const docSnap = await getDoc(docRef)
+         const MAX_AGE = 60 * 60 * 1000 // 1 HOUR
 
-            if (!docSnap.exists() || updateCache) {
-               const fetchedAnalytics =
-                  await sparksAnalyticsService.fetchSparksAnalytics(groupId)
-               return fetchedAnalytics
-            }
+         const collectionRef = collection(FirestoreInstance, "sparksAnalytics")
+         const docRef = doc(collectionRef, groupId).withConverter(
+            createGenericConverter<SparksAnalyticsDTO>()
+         )
+         const docSnap = await getDoc(docRef)
+
+         // Determine if we need to refresh cache
+         const needsRefresh = () => {
+            if (updateCache) return true
+            if (!docSnap.exists()) return true
 
             const data = docSnap.data()
-            return data
+            if (!data.updatedAt) return true
+
+            const cacheAge = Date.now() - data.updatedAt.toDate().getTime()
+            if (cacheAge > MAX_AGE) {
+               return true
+            }
+
+            return false
          }
 
-         const firestoreData = await fetchFromFirestore()
+         // Fetch from BigQuery if needed, otherwise use cache
+         let firestoreData: SparksAnalyticsDTO
+         if (needsRefresh()) {
+            firestoreData = await sparksAnalyticsService.fetchSparksAnalytics(
+               groupId
+            )
+         } else {
+            firestoreData = docSnap.data()
+         }
 
-         return convertToClientModel(
+         const result = convertToClientModel(
             firestoreData,
             fieldsOfStudyLookup,
             levelsOfStudyLookup
          )
+
+         return result
       },
       [fieldsOfStudyLookup, levelsOfStudyLookup]
    )
@@ -66,12 +80,16 @@ export const useFetchSparksAnalytics = (groupId: string) => {
       data: analytics,
       error,
       isLoading,
+      isValidating,
    } = useSWR(
       ["sparks-analytics", groupId],
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ([_, groupId]) => fetcher(groupId, false),
+      ([_, groupId]) => {
+         return fetcher(groupId, false)
+      },
       {
          revalidateOnFocus: false,
+         keepPreviousData: true,
       }
    )
 
@@ -88,7 +106,9 @@ export const useFetchSparksAnalytics = (groupId: string) => {
    return {
       analytics,
       error,
-      isLoading: isLoading || isMutating,
+      // Only show loading skeleton if there's no previous data
+      isLoading: isLoading && !analytics,
+      isValidating: isValidating || isMutating,
       updateAnalytics,
       isMutating,
    }
