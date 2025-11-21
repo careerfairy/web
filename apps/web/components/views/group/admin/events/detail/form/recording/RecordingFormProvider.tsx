@@ -1,7 +1,17 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useYupForm } from "components/custom-hook/form/useYupForm"
-import { ReactNode, createContext, useContext, useMemo } from "react"
+import {
+   ReactNode,
+   createContext,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import { FormProvider, useFormContext } from "react-hook-form"
+import ReactPlayer from "react-player"
 import * as yup from "yup"
 import { recordingFormValidationSchema } from "../validationSchemas"
 
@@ -11,6 +21,10 @@ export type RecordingFormValues = yup.InferType<
 
 type RecordingFormContextType = {
    livestream: LivestreamEvent
+   seekToAndPlay: (seconds: number) => void
+   playerRef: React.RefObject<ReactPlayer>
+   setIsPlaying: (playing: boolean) => void
+   isPlaying: boolean
 }
 
 const RecordingFormContext = createContext<
@@ -33,7 +47,34 @@ export const RecordingFormProvider = ({
       defaultValues: getInitialValues(livestream),
    })
 
-   const contextValue = useMemo(() => ({ livestream }), [livestream])
+   const playerRef = useRef<ReactPlayer>(null)
+   const [isPlaying, setIsPlaying] = useState(false)
+
+   useEffect(() => {
+      methods.reset(getInitialValues(livestream))
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [livestream])
+
+   const seekToAndPlay = useCallback(
+      (seconds: number) => {
+         if (playerRef.current && setIsPlaying) {
+            playerRef.current.seekTo(seconds, "seconds")
+            setIsPlaying(true)
+         }
+      },
+      [setIsPlaying]
+   )
+
+   const contextValue = useMemo(
+      () => ({
+         livestream,
+         seekToAndPlay,
+         playerRef,
+         setIsPlaying,
+         isPlaying,
+      }),
+      [livestream, seekToAndPlay, setIsPlaying, isPlaying]
+   )
 
    return (
       <RecordingFormContext.Provider value={contextValue}>

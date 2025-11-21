@@ -2,7 +2,7 @@ import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/record
 import { Box, CircularProgress, IconButton, Typography } from "@mui/material"
 import { useRecordingTokenSWR } from "components/custom-hook/recordings/useRecordingTokenSWR"
 import useIsMobile from "components/custom-hook/useIsMobile"
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 import { Play } from "react-feather"
 import ReactPlayer from "react-player"
 import { sxStyles } from "types/commonTypes"
@@ -69,9 +69,9 @@ const styles = sxStyles({
 })
 
 export const RecordingPlayer = () => {
-   const { livestream } = useRecordingFormContext()
+   const { livestream, playerRef, setIsPlaying, isPlaying } =
+      useRecordingFormContext()
    const isMobile = useIsMobile()
-   const [isPlaying, setIsPlaying] = useState(false)
    const {
       data: recordingToken,
       isLoading,
@@ -88,7 +88,7 @@ export const RecordingPlayer = () => {
 
    const handlePlayClick = useCallback(() => {
       setIsPlaying(true)
-   }, [])
+   }, [setIsPlaying])
 
    const hasThumbnail = !isPlaying && livestream.backgroundImageUrl
 
@@ -119,6 +119,7 @@ export const RecordingPlayer = () => {
    return (
       <Box sx={styles.playerWrapper}>
          <ReactPlayer
+            ref={playerRef}
             url={recordingUrl}
             playing={isPlaying}
             controls={isPlaying}

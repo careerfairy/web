@@ -1,11 +1,12 @@
-import { collection, limit, orderBy, query } from "firebase/firestore"
-import { useFirestoreCollection } from "../utils/useFirestoreCollection"
-import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/livestreams"
+import { FirestoreInstance } from "data/firebase/FirebaseInstance"
+import { collection, limit, orderBy, query } from "firebase/firestore"
 import { ReactFireOptions } from "reactfire"
+import { useFirestoreCollection } from "../utils/useFirestoreCollection"
 
 type Options = {
-   limit: number
+   limit?: number
+   sortOrder?: "asc" | "desc"
 }
 
 const reactFireOptions: ReactFireOptions = {
@@ -14,9 +15,10 @@ const reactFireOptions: ReactFireOptions = {
 }
 
 export const useChatEntries = (livestreamId: string, options?: Options) => {
+   const sortOrder = options?.sortOrder || "desc"
    let q = query(
       collection(FirestoreInstance, "livestreams", livestreamId, "chatEntries"),
-      orderBy("timestamp", "desc")
+      orderBy("timestamp", sortOrder)
    )
    if (options?.limit) {
       q = query(q, limit(options.limit))
