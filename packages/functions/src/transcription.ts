@@ -83,10 +83,10 @@ export const initiateChapterizationOnTranscriptionCompleted = onObjectFinalized(
          return
       }
 
-      logger.info("Initiating chapterization from GCS trigger", {
-         livestreamId,
-         filePath,
-      })
+      logger.info(
+         `Initiating chapterization from GCS trigger for livestream ${livestreamId}`,
+         { filePath }
+      )
 
       const chapterizationService = new ChapterizationService(
          livestreamsRepo,
@@ -98,7 +98,9 @@ export const initiateChapterizationOnTranscriptionCompleted = onObjectFinalized(
             livestreamId
          )
 
-         logger.info("Chapterization completed successfully", { livestreamId })
+         logger.info(
+            `Chapterization completed successfully for livestream ${livestreamId}`
+         )
       } catch (error) {
          logger.error("Chapterization failed", {
             livestreamId,
@@ -189,7 +191,9 @@ export const startLivestreamTranscription = onRequest(
          return
       }
 
-      logger.info("Processing manual transcription request", { livestreamId })
+      logger.info(
+         `Processing manual transcription request for livestream ${livestreamId}`
+      )
 
       const tokenData = await livestreamsRepo.getLivestreamRecordingToken(
          livestreamId
@@ -325,9 +329,8 @@ const handleBatchLivestreamTranscriptions = async () => {
             logger.info(
                `Processing batch livestream transcription ${index + 1} of ${
                   livestreamsNeedingTranscription.length
-               }`,
+               } for livestream ${livestream.id}`,
                {
-                  livestreamId: livestream.id,
                   title: livestream.title,
                }
             )
@@ -337,9 +340,9 @@ const handleBatchLivestreamTranscriptions = async () => {
             )
 
             if (!tokenData?.sid) {
-               logger.warn("Recording token sid is missing, skipping", {
-                  livestreamId: livestream.id,
-               })
+               logger.warn(
+                  `Recording token sid is missing for livestream ${livestream.id}, skipping`
+               )
                results.failed++
                results.errors.push({
                   livestreamId: livestream.id,
@@ -360,9 +363,8 @@ const handleBatchLivestreamTranscriptions = async () => {
             )
 
             logger.info(
-               "Transcription completed, waiting before next livestream",
+               `Transcription completed for livestream ${livestream.id}, waiting before next livestream`,
                {
-                  livestreamId: livestream.id,
                   waitMs:
                      BATCH_TRANSCRIPTION_CONFIG.WAIT_AFTER_TRANSCRIPTION_MS,
                }
@@ -376,11 +378,13 @@ const handleBatchLivestreamTranscriptions = async () => {
 
             results.success++
          } catch (error) {
-            logger.error("Failed to process livestream transcription", {
-               livestreamId: livestream.id,
-               error,
-               errorMessage: getErrorMessage(error),
-            })
+            logger.error(
+               `Failed to process livestream transcription for livestream ${livestream.id}`,
+               {
+                  error,
+                  errorMessage: getErrorMessage(error),
+               }
+            )
             results.failed++
             results.errors.push({
                livestreamId: livestream.id,
