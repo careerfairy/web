@@ -1,4 +1,7 @@
-import { downloadLink } from "@careerfairy/shared-lib/livestreams/recordings"
+import {
+   downloadLink,
+   downloadLinkWithDate,
+} from "@careerfairy/shared-lib/livestreams/recordings"
 import { logger } from "firebase-functions/v2"
 import { onRequest } from "firebase-functions/v2/https"
 import { onSchedule } from "firebase-functions/v2/scheduler"
@@ -281,20 +284,26 @@ const handleBatchLivestreamTranscriptions = async () => {
       const livestreams =
          await livestreamsRepo.getLivestreamsNeedingTranscription()
 
+      const totalLivestreamsNeedingWithoutTranscription = livestreams.filter(
+         (livestream) => !livestream.transcriptionCompleted
+      )
+
       // Applying in memory filter due to firestore limitations
       // See more: https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
-      const livestreamsNeedingTranscription = livestreams
-         .filter((livestream) => !livestream.transcriptionCompleted)
-         .slice(0, BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE)
+      const livestreamsNeedingTranscription =
+         totalLivestreamsNeedingWithoutTranscription.slice(
+            0,
+            BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE
+         )
 
       if (livestreamsNeedingTranscription.length === 0) {
          logger.info("No livestreams found needing transcription... skipping")
          return
       }
 
-      logger.info("Found livestreams needing transcription... processing", {
-         count: livestreamsNeedingTranscription.length,
-      })
+      logger.info(
+         `Found ${livestreamsNeedingTranscription.length} livestreams (out of ${totalLivestreamsNeedingWithoutTranscription.length}) needing transcription... processing`
+      )
 
       const transcriptionService = new TranscriptionService(
          livestreamsRepo,
@@ -338,7 +347,11 @@ const handleBatchLivestreamTranscriptions = async () => {
                continue
             }
 
-            const recordingUrl = downloadLink(livestream.id, tokenData.sid)
+            const recordingUrl = downloadLinkWithDate(
+               livestream.start.toDate(),
+               livestream.id,
+               tokenData.sid
+            )
 
             await transcriptionService.processLivestreamTranscription(
                livestream.id,
