@@ -24,20 +24,20 @@ const PATH_REGEX = /^transcriptions\/livestreams\/([^/]+)\/transcription\.json$/
  * Batch processing configuration for scheduled transcription
  *
  * Batch size calculation:
- * - Max timeout: 540 seconds (9 minutes) - scheduler timeout limit
+ * - Max timeout: 3600 seconds (60 minutes) - Gen 2 onSchedule HTTP function timeout limit
  * - Scheduler runs: every 10 minutes
- * - Time per livestream: ~40s transcription + ~180s wait (3 minutes) = ~220s
+ * - Time per livestream: ~40s transcription + 30s wait = ~70s
  * - Buffer for overhead: ~60 seconds
- * - Theoretical max batch size: (540 - 60) / 220 = ~2.18 livestreams
- * - Using 2 as configured value to safely stay within timeout while maximizing throughput
- * - With 2 livestreams per batch: 2 × 220s = 440s + 60s buffer = 500s < 540s ✓
- * - Processing rate: 2 livestreams every 10 minutes = 12 livestreams per hour
- * - Reduced batch size from previous values to accommodate shorter timeout and avoid Claude API rate limiting
+ * - Theoretical max batch size: (3600 - 60) / 70 = ~50.57 livestreams
+ * - Using 40 as configured value to safely stay within timeout while maximizing throughput
+ * - With 40 livestreams per batch: 40 × 70s = 2800s + 60s buffer = 2860s < 3600s ✓
+ * - Processing rate: 40 livestreams every 10 minutes = 240 livestreams per hour
+ * - Increased batch size to take advantage of 60-minute timeout limit for Gen 2 scheduled functions
  */
 const BATCH_TRANSCRIPTION_CONFIG = {
-   BATCH_SIZE: 2, // Calculated for 540s timeout - see comment above for calculation
+   BATCH_SIZE: 40, // Calculated for 3600s timeout - see comment above for calculation
    /**
-    * Wait 3 minutes after each transcription to allow chapterization to start automatically via GCS trigger
+    * Wait 30 seconds after each transcription to allow chapterization to start automatically via GCS trigger
     * and to avoid Claude API rate limiting.
     *
     * Rate limiting context:
@@ -252,15 +252,16 @@ export const startLivestreamTranscription = onRequest(
  * - Queries past livestreams (max 2 years old, not test, not hidden)
  * - Checks if transcription already exists in GCS
  * - Processes transcription for livestreams that need it
- * - Waits 3 minutes after each transcription to allow chapterization to start automatically via GCS trigger
- * - Respects batch size limits based on 540-second timeout constraints
+ * - Waits 30 seconds after each transcription to allow chapterization to start automatically via GCS trigger
+ * - Respects batch size limits based on 3600-second (60-minute) timeout constraints
  */
 export const processBatchLivestreamTranscriptions = onSchedule(
    {
       ...transcriptionConfig,
-      timeoutSeconds: 540,
+      timeoutSeconds: 3600, // 60 minutes - max timeout for Gen 2 onSchedule functions
       schedule: "every 10 minutes",
       timeZone: "Europe/Zurich",
+      memory: "1GiB",
    },
    async () => await handleBatchLivestreamTranscriptions()
 )
