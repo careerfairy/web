@@ -263,7 +263,7 @@ export const processBatchLivestreamTranscriptions = onSchedule(
    {
       ...transcriptionConfig,
       timeoutSeconds: 3600, // 60 minutes - max timeout for Gen 2 onSchedule functions
-      schedule: "every 1 hour",
+      schedule: "0 * * * *", // top of every hour
       timeZone: "Europe/Zurich",
       memory: "1GiB",
    },
