@@ -289,14 +289,17 @@ const handleBatchLivestreamTranscriptions = async () => {
       const livestreams =
          await livestreamsRepo.getLivestreamsNeedingTranscription()
 
-      const totalLivestreamsNeedingWithoutTranscription = livestreams.filter(
-         (livestream) => !livestream.transcriptionCompleted
+      // Filter to livestreams not yet completed or skipped
+      // Using in-memory filter due to Firestore limitations on inequality queries
+      // See more: https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
+      const totalLivestreamsNeedingTranscription = livestreams.filter(
+         (livestream) =>
+            !livestream.transcriptionCompleted &&
+            !livestream.transcriptionSkipped
       )
 
-      // Applying in memory filter due to firestore limitations
-      // See more: https://firebase.google.com/docs/firestore/query-data/queries#query_limitations
       const livestreamsNeedingTranscription =
-         totalLivestreamsNeedingWithoutTranscription.slice(
+         totalLivestreamsNeedingTranscription.slice(
             0,
             BATCH_TRANSCRIPTION_CONFIG.BATCH_SIZE
          )
@@ -307,7 +310,7 @@ const handleBatchLivestreamTranscriptions = async () => {
       }
 
       logger.info(
-         `Found ${livestreamsNeedingTranscription.length} livestreams (out of ${totalLivestreamsNeedingWithoutTranscription.length}) needing transcription... processing`
+         `Found ${livestreamsNeedingTranscription.length} livestreams (out of ${totalLivestreamsNeedingTranscription.length}) needing transcription... processing`
       )
 
       const transcriptionService = new TranscriptionService(
@@ -341,7 +344,12 @@ const handleBatchLivestreamTranscriptions = async () => {
 
             if (!tokenData?.sid) {
                logger.warn(
-                  `Recording token sid is missing for livestream ${livestream.id}, skipping`
+                  `Recording token sid is missing for livestream ${livestream.id}, marking as skipped`
+               )
+               // Mark as skipped so it's not refetched
+               await livestreamsRepo.updateLivestreamTranscriptionSkipped(
+                  livestream.id,
+                  true
                )
                results.failed++
                results.errors.push({

@@ -445,6 +445,11 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string,
       completed: boolean
    ): Promise<void>
+
+   updateLivestreamTranscriptionSkipped(
+      livestreamId: string,
+      skipped: boolean
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -979,6 +984,20 @@ export class LivestreamFunctionsRepository
    ): Promise<void> {
       const updateData: UpdateData<LivestreamEvent> = {
          transcriptionCompleted: completed,
+      }
+
+      await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .update(updateData)
+   }
+
+   async updateLivestreamTranscriptionSkipped(
+      livestreamId: string,
+      skipped: boolean
+   ): Promise<void> {
+      const updateData: UpdateData<LivestreamEvent> = {
+         transcriptionSkipped: skipped,
       }
 
       await this.firestore

@@ -62,6 +62,11 @@ export interface LivestreamEvent extends Identifiable {
    endedAt?: firebase.firestore.Timestamp
    hasEnded?: boolean
    transcriptionCompleted?: boolean
+   /**
+    * Set to true for livestreams that should be permanently skipped
+    * (e.g., missing recording SID)
+    */
+   transcriptionSkipped?: boolean
    targetCategories?: string[]
    mode?: LivestreamMode
 
