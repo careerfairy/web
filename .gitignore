@@ -26,6 +26,11 @@ playwright-report/
 !/packages/fetch-firestore-data/.env
 packages/functions/.env
 packages/functions/.env.local
+
+# Service account keys - NEVER commit these
+**/keys/*.json
+**/service-account*.json
+**/*credentials*.json
 /test-results/
 /playwright-report/
 /blob-report/
