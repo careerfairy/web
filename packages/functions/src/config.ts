@@ -8,22 +8,19 @@ const config = {
 
    // https://api.slack.com/apps/A0344EKBJ8Z/incoming-webhooks
    slackWebhooks: {
-      livestreamAlerts:
-         "https://hooks.slack.com/services/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",
-      livestreamCreated:
-         "https://hooks.slack.com/services/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",
-      sparksTrialStarted:
-         "https://hooks.slack.com/services/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",
+      livestreamAlerts: process.env.SLACK_WEBHOOK_LIVESTREAM_ALERTS || "",
+      livestreamCreated: process.env.SLACK_WEBHOOK_LIVESTREAM_CREATED || "",
+      sparksTrialStarted: process.env.SLACK_WEBHOOK_SPARKS_TRIAL_STARTED || "",
       offlineEventPublished:
-         "https://hooks.slack.com/services/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",
+         process.env.SLACK_WEBHOOK_OFFLINE_EVENT_PUBLISHED || "",
       offlineEventPurchased:
-         "https://hooks.slack.com/services/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",
+         process.env.SLACK_WEBHOOK_OFFLINE_EVENT_PURCHASED || "",
       offlineEventIncreaseFailed:
-         "https://hooks.slack.com/services/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",
+         process.env.SLACK_WEBHOOK_OFFLINE_EVENT_INCREASE_FAILED || "",
       transcriptionPermanentlyFailed:
-         "https://hooks.slack.com/services/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",
+         process.env.SLACK_WEBHOOK_TRANSCRIPTION_PERMANENTLY_FAILED || "",
       chapterizationPermanentlyFailed:
-         "https://hooks.slack.com/services/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",
+         process.env.SLACK_WEBHOOK_CHAPTERIZATION_PERMANENTLY_FAILED || "",
    },
 
    // Firebase Hosting Domain
@@ -36,7 +33,7 @@ if (process.env.NODE_ENV !== "production") {
    // avoid real slack notifications during development/testing
    // all messages are sent to #test-slack-integrations
    const testSlackIntegrationsChannel =
-      "https://hooks.slack.com/services/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"
+      process.env.SLACK_WEBHOOK_TEST_CHANNEL || ""
 
    config.slackWebhooks.livestreamAlerts = testSlackIntegrationsChannel
    config.slackWebhooks.livestreamCreated = testSlackIntegrationsChannel
