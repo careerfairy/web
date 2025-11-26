@@ -55,3 +55,6 @@ yarn-error.log*
 
 # Turborepo
 .turbo
+
+# local keys
+gtm-service-account-key.json

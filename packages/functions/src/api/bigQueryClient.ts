@@ -1,16 +1,21 @@
 import { BigQuery, BigQueryOptions } from "@google-cloud/bigquery"
-import { isLocalEnvironment } from "../util"
+import path from "path"
+import { isTestEnvironment } from "../util"
 
-let options: BigQueryOptions = {
-   projectId: "careerfairy-e1fd9",
-   keyFile: require("../keys/big_query_service_account.json"),
-   location: "EU",
+const getOptions = (): BigQueryOptions => {
+   if (isTestEnvironment()) {
+      return {}
+   }
+   return {
+      projectId: "careerfairy-e1fd9",
+      keyFilename: path.resolve(
+         __dirname,
+         "../keys/big_query_service_account.json"
+      ),
+      location: "EU",
+   }
 }
 
-if (isLocalEnvironment()) {
-   options = {}
-}
-
-const bigQueryClient = new BigQuery(options)
+const bigQueryClient = new BigQuery(getOptions())
 
 export default bigQueryClient
