@@ -386,17 +386,34 @@ const handleBatchLivestreamTranscriptions = async () => {
 
             results.success++
          } catch (error) {
+            const errorMessage = getErrorMessage(error)
             logger.error(
                `Failed to process livestream transcription for livestream ${livestream.id}`,
                {
                   error,
-                  errorMessage: getErrorMessage(error),
+                  errorMessage,
                }
             )
+
+            // Check if recording file doesn't exist (403 from S3)
+            const isRecordingNotFound =
+               errorMessage.includes("403 Forbidden") ||
+               errorMessage.includes("REMOTE_CONTENT_ERROR")
+
+            if (isRecordingNotFound) {
+               logger.warn(
+                  `Recording not found for livestream ${livestream.id}, marking as skipped`
+               )
+               await livestreamsRepo.updateLivestreamTranscriptionSkipped(
+                  livestream.id,
+                  true
+               )
+            }
+
             results.failed++
             results.errors.push({
                livestreamId: livestream.id,
-               error: getErrorMessage(error),
+               error: errorMessage,
             })
             // Continue processing other livestreams even if one fails
          }
