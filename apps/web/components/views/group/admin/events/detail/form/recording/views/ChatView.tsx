@@ -125,6 +125,7 @@ const useTimeSinceEntry = (
    entry: LivestreamChatEntry,
    livestream?: LivestreamEvent
 ) => {
+   // Test: just a test
    return useMemo(() => {
       if (!livestream || !entry.timestamp) {
          return { formattedTime: null, seconds: null }
