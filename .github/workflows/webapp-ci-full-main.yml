@@ -179,11 +179,10 @@ jobs:
                  ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
          - name: Generate UUID
-           run: echo "UNIQUE_UUID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
+           run: echo "WORKFLOW_ID=$(uuidgen)-${{ matrix.shard }}" >> $GITHUB_ENV
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              WORKFLOW_ID: ${{ env.UNIQUE_UUID }}
               ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
               ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
               TEST_STRIPE_SECRET_KEY: ${{ secrets.TEST_STRIPE_SECRET_KEY }}
