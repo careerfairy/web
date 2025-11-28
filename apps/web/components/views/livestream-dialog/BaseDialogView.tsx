@@ -1,6 +1,12 @@
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
-import { Box, Container, IconButton, Typography } from "@mui/material"
+import {
+   Box,
+   Container,
+   IconButton,
+   Typography,
+   TypographyProps,
+} from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SxProps } from "@mui/system"
@@ -97,6 +103,7 @@ const styles = sxStyles({
       textAlign: "center",
       fontWeight: 600,
       maxWidth: 655,
+      whiteSpace: "pre-line",
    },
    backgroundImage: {
       objectFit: "cover",
@@ -294,9 +301,14 @@ export const MainContent: FC<MainContentProps> = ({
    )
 }
 
-export const HeroTitle = ({ children }) => {
+type HeroTitleProps = {
+   children: ReactNode
+   variant?: TypographyProps["variant"]
+}
+
+export const HeroTitle: FC<HeroTitleProps> = ({ children, variant }) => {
    return (
-      <Typography variant={"brandedH2"} sx={styles.heroTitle}>
+      <Typography variant={variant || "brandedH2"} sx={styles.heroTitle}>
          {children}
       </Typography>
    )
