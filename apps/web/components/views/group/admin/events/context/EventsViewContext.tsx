@@ -14,7 +14,7 @@ import {
 } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { LivestreamStatsSortOption } from "../../../../../custom-hook/live-stream/useGroupLivestreamsWithStats"
-import { FeedbackDialogProvider } from "../../analytics-new/feedback/feedback-dialog/FeedbackDialogProvider"
+import FeedbackDialog from "../../analytics-new/feedback/feedback-dialog/FeedbackDialog"
 import { EnterStreamDialog } from "../EnterStreamDialog"
 import { LivestreamEventStatus } from "../events-table-new/utils"
 import { QuestionsDialog } from "../feedback-dialogs/QuestionsDialog"
@@ -104,12 +104,6 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
       useState<LivestreamEventPublicData | null>(null)
    const [promoteDialogLivestream, setPromoteDialogLivestream] =
       useState<LivestreamEventPublicData | null>(null)
-   const [feedbackDialogLivestreamId, setFeedbackDialogLivestreamId] = useState<
-      string | null
-   >(null)
-   const [feedbackDialogQuestionId, setFeedbackDialogQuestionId] = useState<
-      string | null
-   >(null)
    const [questionsDialogLivestream, setQuestionsDialogLivestream] =
       useState<LivestreamEventPublicData | null>(null)
    const [enterStreamDialogLivestreamId, setEnterStreamDialogLivestreamId] =
@@ -200,12 +194,21 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
       setQuestionsDialogLivestream(stat.livestream)
    }, [])
 
-   const handleFeedback = useCallback((stat: LiveStreamStats) => {
-      if (stat.livestream.isDraft) return
-      // Open feedback dialog for past livestreams
-      setFeedbackDialogLivestreamId(stat.livestream.id)
-      setFeedbackDialogQuestionId(null)
-   }, [])
+   const handleFeedback = useCallback(
+      (stat: LiveStreamStats) => {
+         if (stat.livestream.isDraft) return
+         // Open feedback dialog via URL
+         push(
+            {
+               pathname,
+               query: { ...query, feedbackLivestreamId: stat.livestream.id },
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [pathname, push, query]
+   )
 
    const handleEdit = useCallback(
       (stat: LiveStreamStats) => {
@@ -247,17 +250,20 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
    }, [])
 
    const handleCloseFeedbackDialog = useCallback(() => {
-      setFeedbackDialogLivestreamId(null)
-      setFeedbackDialogQuestionId(null)
-   }, [])
-
-   const handleFeedbackRatingQuestionClick = useCallback((ratingId: string) => {
-      setFeedbackDialogQuestionId(ratingId)
-   }, [])
-
-   const handleFeedbackBackToFeedback = useCallback(() => {
-      setFeedbackDialogQuestionId(null)
-   }, [])
+      const {
+         feedbackLivestreamId: _feedbackLivestreamId,
+         feedbackId: _feedbackId,
+         ...rest
+      } = query
+      push(
+         {
+            pathname,
+            query: rest,
+         },
+         undefined,
+         { shallow: true }
+      )
+   }, [pathname, push, query])
 
    const handleCloseQuestionsDialog = useCallback(() => {
       setQuestionsDialogLivestream(null)
@@ -360,13 +366,7 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
             companyCountryCode={group?.companyCountry?.id}
             onClose={handleClosePromoteDialog}
          />
-         <FeedbackDialogProvider
-            livestreamId={feedbackDialogLivestreamId}
-            feedbackQuestionId={feedbackDialogQuestionId}
-            onCloseFeedbackDialog={handleCloseFeedbackDialog}
-            onRatingQuestionClick={handleFeedbackRatingQuestionClick}
-            onBackToFeedback={handleFeedbackBackToFeedback}
-         />
+         <FeedbackDialog onClose={handleCloseFeedbackDialog} />
 
          <QuestionsDialog
             livestream={questionsDialogLivestream}

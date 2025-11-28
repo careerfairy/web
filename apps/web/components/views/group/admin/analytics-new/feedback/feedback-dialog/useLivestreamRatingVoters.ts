@@ -1,12 +1,12 @@
-import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
-import { collection, orderBy, query } from "firebase/firestore"
-import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
 import { EventRatingAnswer } from "@careerfairy/shared-lib/livestreams"
+import { collection, orderBy, query, where } from "firebase/firestore"
+import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
+import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
 
 const useLivestreamRatingVoters = (
    livestreamId: string,
    ratingId: string,
-   hasText: boolean
+   hasText?: boolean
 ) => {
    return useFirestoreCollection<EventRatingAnswer>(
       query(
@@ -18,8 +18,13 @@ const useLivestreamRatingVoters = (
             ratingId,
             "voters"
          ),
-         orderBy("rating", "desc"),
-         ...(hasText ? [orderBy("message", "desc")] : []) // if there is text, secondary sort by text as well
+         ...(hasText
+            ? [
+                 where("message", "!=", ""), // filter out empty string message
+                 orderBy("message", "desc"), // filter out undefined message
+                 orderBy("rating", "desc"),
+              ]
+            : [orderBy("rating", "desc")])
       )
    )
 }

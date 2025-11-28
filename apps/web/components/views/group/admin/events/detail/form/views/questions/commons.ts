@@ -17,8 +17,25 @@ export enum FeedbackQuestionType {
 
 export const FeedbackQuestionsLabels = {
    [FeedbackQuestionType.STAR_RATING]: "Rating",
+   [FeedbackQuestionType.TEXT_WITH_RATING]: "Rating",
    [FeedbackQuestionType.SENTIMENT_RATING]: "Sentiment rating",
    [FeedbackQuestionType.TEXT]: "Written review",
+}
+
+export const SENTIMENT_LABELS = {
+   1: "Very unhappy",
+   2: "Unhappy",
+   3: "Neutral",
+   4: "Happy",
+   5: "Very happy",
+}
+
+export const SENTIMENT_EMOJIS = {
+   1: "😞",
+   2: "☹️",
+   3: "😐",
+   4: "😊",
+   5: "😁",
 }
 
 export type FeedbackQuestionFormValues = {
