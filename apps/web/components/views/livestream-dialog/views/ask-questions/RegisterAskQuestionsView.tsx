@@ -28,6 +28,33 @@ import { useLiveStreamDialog } from "../../LivestreamDialog"
 import { QuestionsComponent } from "../livestream-details/main-content/Questions"
 import RegisterAskQuestionsViewSkeleton from "./RegisterAskQuestionsViewSkeleton"
 
+const getQuestionPrompt = (languageCode?: string): string => {
+   //test
+   switch (languageCode) {
+      case "de":
+         return "Welche Fragen sollten\ndie Sprecher beantworten?"
+      case "fr":
+         return "Quelles questions les intervenants\ndevraient-ils répondre?"
+      case "it":
+         return "Quali domande dovrebbero\nrispondere i relatori?"
+      default:
+         return "What questions should\nthe speakers answer?"
+   }
+}
+
+const getPlaceholder = (languageCode?: string): string => {
+   switch (languageCode) {
+      case "de":
+         return "Schreiben Sie Ihre Frage"
+      case "fr":
+         return "Écrivez votre question"
+      case "it":
+         return "Scrivi la tua domanda"
+      default:
+         return "Write your question"
+   }
+}
+
 const styles = sxStyles({
    questionForm: {
       width: "100%",
@@ -150,10 +177,10 @@ const RegisterAskQuestionsView = () => {
                         size={isMobile ? 80 : 104}
                      />
                   )}
-                  <HeroTitle>
-                     What questions should
-                     <br />
-                     the speakers answer?
+                  <HeroTitle
+                     variant={isMobile ? "desktopBrandedH5" : "brandedH2"}
+                  >
+                     {getQuestionPrompt(livestream.language?.code)}
                   </HeroTitle>
                </Stack>
             </HeroContent>
@@ -207,7 +234,9 @@ const RegisterAskQuestionsView = () => {
                               name="question"
                               rows={2}
                               multiline
-                              placeholder="Write your question"
+                              placeholder={getPlaceholder(
+                                 livestream.language?.code
+                              )}
                               error={errors.question ? touched.question : null}
                            />
                            <Typography sx={styles.errorText}>

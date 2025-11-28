@@ -112,6 +112,19 @@ const styles = sxStyles({
    },
 })
 
+export const getOtherUsersQuestionsPrompt = (languageCode?: string): string => {
+   switch (languageCode) {
+      case "de":
+         return "Fragen anderer Nutzer"
+      case "fr":
+         return "Questions des autres utilisateurs"
+      case "it":
+         return "Domande di altri utenti"
+      default:
+         return "Other users' questions"
+   }
+}
+
 interface Props {
    livestream: LivestreamEvent
 }
@@ -174,7 +187,9 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
                         variant="brandedH5"
                         sx={styles.questionListTitle}
                      >
-                        {"Other users' questions"}
+                        {getOtherUsersQuestionsPrompt(
+                           livestream.language?.code
+                        )}
                      </Typography>
                   ) : null}
                   <Grid container rowSpacing={1.25} columnSpacing={3}>

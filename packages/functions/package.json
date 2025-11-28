@@ -10,7 +10,7 @@
       "test": "jest",
       "watch": "npm run clean && npm run copy-files && tsc --watch",
       "copy-files": "cpx \"src/**/*.{json,html}\" dist/functions/src",
-      "kill-emulators": "npx kill-port 8080 9099 4000 5001 9199 4000",
+      "kill-emulators": "bash -c 'for port in 8080 9099 4000 5001 9199 4000; do pids=$(lsof -ti tcp:$port 2>/dev/null); if [ -n \"$pids\" ]; then kill -9 $pids; fi; done'",
       "clean": "rimraf dist/",
       "logs": "firebase functions:log"
    },
