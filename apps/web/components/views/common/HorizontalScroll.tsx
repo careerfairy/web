@@ -1,6 +1,6 @@
-import { Box, SxProps } from "@mui/material"
+import { Box } from "@mui/material"
 import { BoxProps } from "@mui/material/Box"
-import React, { FC, useCallback, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { combineStyles, sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
@@ -13,7 +13,6 @@ const styles = sxStyles({
       },
    },
 })
-type Props = BoxProps
 
 /**
  * HorizontalScroll component provides a horizontally scrollable area
@@ -24,13 +23,30 @@ type Props = BoxProps
  * @param {SxProps} [props.sx] Additional styles to apply to the component.
  * @returns {ReactElement} The rendered component.
  */
-const HorizontalScroll: FC<Props> = ({ children, sx, ...boxProps }) => {
+const HorizontalScroll = ({ children, sx, ...boxProps }: BoxProps) => {
    const [isDragging, setIsDragging] = useState(false)
    const [shouldDrag, setShouldDrag] = useState(false)
    const [startX, setStartX] = useState(0)
    const [scrollLeft, setScrollLeft] = useState(0)
+   const [isOverflowing, setIsOverflowing] = useState(false)
 
    const ref = useRef<HTMLDivElement>(null)
+
+   useEffect(() => {
+      const element = ref.current
+      if (!element) return
+
+      const checkOverflow = () => {
+         setIsOverflowing(element.scrollWidth > element.clientWidth)
+      }
+
+      checkOverflow()
+
+      const resizeObserver = new ResizeObserver(checkOverflow)
+      resizeObserver.observe(element)
+
+      return () => resizeObserver.disconnect()
+   }, [])
 
    const mouseDownHandler = useCallback((e: React.MouseEvent) => {
       setShouldDrag(true)
@@ -64,13 +80,13 @@ const HorizontalScroll: FC<Props> = ({ children, sx, ...boxProps }) => {
       () =>
          combineStyles(
             styles.root,
-            {
+            isOverflowing && {
                cursor: isDragging ? "grabbing" : "grab",
             },
             isDragging ? styles.rootDragging : null,
             sx
          ),
-      [isDragging, sx]
+      [isDragging, isOverflowing, sx]
    )
 
    return (

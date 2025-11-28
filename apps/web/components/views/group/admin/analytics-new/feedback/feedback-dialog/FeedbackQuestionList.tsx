@@ -37,7 +37,7 @@ export const FeedbackQuestionList = () => {
 
    return (
       <Stack spacing={2} sx={styles.container}>
-         <Typography variant="brandedH5" color="text.primary">
+         <Typography variant="brandedBody" color="neutral.800">
             Other feedback questions
          </Typography>
 

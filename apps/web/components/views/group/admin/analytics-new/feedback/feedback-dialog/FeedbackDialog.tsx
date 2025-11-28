@@ -227,7 +227,7 @@ const Content = ({ stats, onClose }: ContentProps) => {
                      )}
                </Typography>
                <Typography
-                  variant={isMobile ? "mobileBrandedH4" : "desktopBrandedH5"}
+                  variant={isMobile ? "mobileBrandedH4" : "desktopBrandedH3"}
                   color="neutral.800"
                   fontWeight={isMobile ? 600 : 700}
                >

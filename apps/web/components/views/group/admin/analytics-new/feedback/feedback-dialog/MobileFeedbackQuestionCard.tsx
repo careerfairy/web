@@ -73,12 +73,7 @@ export const MobileFeedbackQuestionCard = ({
       if (question.type === FeedbackQuestionType.SENTIMENT_RATING) {
          return (
             <Box sx={styles.metricBox}>
-               <Typography
-                  fontSize={18}
-                  lineHeight={1}
-                  color="neutral.600"
-                  sx={{ mb: 0.5 }} // adjust for emoji alignment
-               >
+               <Typography fontSize={18} lineHeight={1} color="neutral.600">
                   {sentimentEmoji}
                </Typography>
                <Typography variant="small" color="neutral.700">
