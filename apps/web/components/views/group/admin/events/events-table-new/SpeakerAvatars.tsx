@@ -67,7 +67,9 @@ type Props = {
 }
 
 export const SpeakerAvatars = ({ speakers, maxVisible = 3 }: Props) => {
-   // Deduplicate speakers by ID
+   // Deduplicate speakers by ID to handle legacy livestreams that have duplicate
+   // speaker entries. This prevents React duplicate key warnings and incorrect
+   // avatar counts. See CF-1642 for details on the data source issue.
    const uniqueSpeakers = useMemo(() => {
       if (!speakers?.length) return []
       return speakers.filter(
