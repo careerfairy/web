@@ -280,9 +280,30 @@ export class LivestreamService {
       return null
    }
 
-   private getTagAndIdentifierFromUid(
-      uid: string
-   ): [StreamIdentifier, string, string] {
+   private async getAssistantDetails(
+      assistantId: string,
+      livestreamId: string
+   ): Promise<ParticipantDetails | null> {
+      const livestream = await getDoc(this.getLivestreamRef(livestreamId))
+
+      if (livestream.exists()) {
+         const data = livestream.data()
+         return {
+            firstName: data.company || "Assistant",
+            lastName: "",
+            role: "Assistant",
+            avatarUrl: data.companyLogoUrl || "",
+            linkedInUrl: "",
+            id: assistantId,
+            companyName: data.company || "",
+            companyLogoUrl: data.companyLogoUrl || "",
+         }
+      }
+
+      return null
+   }
+
+   getTagAndIdentifierFromUid(uid: string): [StreamIdentifier, string, string] {
       return uid.split("-") as [
          StreamIdentifier,
          string, // Identifier is the speaker/user id
@@ -305,6 +326,9 @@ export class LivestreamService {
                linkedInUrl: "",
                id: identifier,
             }
+            break
+         case STREAM_IDENTIFIERS.ASSISTANT:
+            details = await this.getAssistantDetails(identifier, livestreamId)
             break
          case STREAM_IDENTIFIERS.SPEAKER:
             details = await this.getLivestreamSpeakerDetails(
@@ -337,6 +361,12 @@ export class LivestreamService {
             }
             if (userTag === STREAM_IDENTIFIERS.USER) {
                details = await this.getUserDetails(userIdentifier)
+            }
+            if (userTag === STREAM_IDENTIFIERS.ASSISTANT) {
+               details = await this.getAssistantDetails(
+                  userIdentifier,
+                  userLivestreamId
+               )
             }
             if (details) {
                details.role = "Screen Share"

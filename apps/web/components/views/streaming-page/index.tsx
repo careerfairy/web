@@ -10,7 +10,10 @@ import { useAuth } from "HOCs/AuthProvider"
 import ConditionalWrapper from "components/util/ConditionalWrapper"
 import dynamic from "next/dynamic"
 import { useRouter } from "next/router"
-import { useSpeakerId } from "store/selectors/streamingAppSelectors"
+import {
+   useAssistantMode,
+   useSpeakerId,
+} from "store/selectors/streamingAppSelectors"
 import { MiddleContentLayout } from "./components/MiddleContent/MiddleContentLayout"
 import { LivestreamStateTrackers } from "./components/streaming/LivestreamStateTrackers"
 import { WaitingRoom } from "./components/waiting-room/WaitingRoom"
@@ -251,12 +254,14 @@ const Component = ({ isHost }: Props) => {
       )
    )
 
+   const isAssistantMode = useAssistantMode()
    const agoraUserId = getAgoraUserId({
       isRecordingWindow: Boolean(query.isRecordingWindow),
       useTempId: livestream.openStream && !isHost, // Use a temporary ID for viewers of open streams
       streamId: livestream.id,
       userId: authenticatedUser.uid,
       speakerId,
+      isAssistant: isAssistantMode,
    })
 
    /**

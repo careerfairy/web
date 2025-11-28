@@ -11,6 +11,7 @@ import { Edit2 } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { buildAgoraSpeakerId } from "../../util"
 import { AddNewSpeakerButton } from "./AddNewSpeakerButton"
+import { AssistantButton } from "./AssistantButton"
 import { HostProfileButton } from "./HostProfileButton"
 import { useHostProfileSelection } from "./HostProfileSelectionProvider"
 
@@ -143,6 +144,9 @@ export const SpeakersList = () => {
                      />
                   </ItemAnimation>
                ))}
+               <ItemAnimation key="assistant">
+                  <AssistantButton />
+               </ItemAnimation>
                <ItemAnimation key="add-speaker">
                   <AddNewSpeakerButton />
                </ItemAnimation>

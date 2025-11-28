@@ -153,6 +153,9 @@ export const useIsRecordingBotInRoom = () =>
 export const useIsSpyMode = () =>
    useAppSelector((state) => state.streamingApp.isSpyMode)
 
+export const useAssistantMode = () =>
+   useAppSelector((state) => state.streamingApp.isAssistantMode)
+
 export const useSpeakerId = () =>
    useAppSelector((state) => state.streamingApp.speakerId)
 
