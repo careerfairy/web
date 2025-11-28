@@ -24,6 +24,7 @@ import { ResponsiveDialogLayout } from "../../../../../common/ResponsiveDialog"
 import { EventRatingWithType } from "../../../events/detail/form/views/questions/commons"
 import { useFeedbackQuestions } from "../../../events/detail/form/views/questions/useFeedbackQuestions"
 import { FeedbackDetail } from "./FeedbackDetail"
+import { FeedbackDialogSkeleton } from "./FeedbackDialogSkeleton"
 
 const styles = sxStyles({
    paper: {
@@ -199,8 +200,12 @@ export const FeedbackDialog = ({ onClose }: FeedbackDialogProps) => {
          dataTestId="feedback-dialog"
          hideDragHandle
       >
-         <SuspenseWithBoundary fallback={<></>}>
-            {Boolean(stats) && <Content stats={stats!} onClose={onClose} />}
+         <SuspenseWithBoundary fallback={<FeedbackDialogSkeleton />}>
+            {stats ? (
+               <Content stats={stats} onClose={onClose} />
+            ) : (
+               <FeedbackDialogSkeleton />
+            )}
          </SuspenseWithBoundary>
       </ResponsiveDialogLayout>
    )
