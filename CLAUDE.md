@@ -162,7 +162,7 @@ Material-UI theme, component overrides, global styles. Import via `import { bran
 
 -  **Auth**: createNewUserAccount, validateUserEmailWithPin_v2, deleteLoggedInUserAccount_v2
 -  **Streaming**: fetchAgoraRtcToken_v2, notifyUsersWhenLivestreamStarts, startRecordingLivestream_eu, interactive features
--  **Groups**: createGroup_eu, joinGroupDashboard_eu, changeRole_eu, analytics
+-  **Groups**: createGroup, joinGroupDashboard_eu, changeRole_eu, analytics
 -  **Sparks**: CRUD operations, getSparksFeed, trackSparkEvents_v6, analytics
 -  **Integrations**: stripeWebHook, fetchATSJobs_eu, syncUserToCustomerIO, customerIOWebhook
 -  **Bundles**: Event and analytics aggregation APIs

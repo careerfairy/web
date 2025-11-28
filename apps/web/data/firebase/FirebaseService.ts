@@ -156,7 +156,7 @@ class FirebaseService {
       group: Omit<Group, "id" | "groupId" | "triGrams">
       groupQuestions?: GroupQuestion[]
    }) => {
-      return this.functions.httpsCallable("createGroup_eu")(args)
+      return this.functions.httpsCallable("createGroup")(args)
    }
 
    changeRole = async (args: {
