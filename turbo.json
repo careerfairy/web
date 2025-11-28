@@ -18,7 +18,8 @@
       "HYGRAPH_TALENT_GUIDE_PREVIEW_SECRET",
       "TEST_STRIPE_SECRET_KEY",
       "ALGOLIA_APP_ID",
-      "ALGOLIA_API_KEY"
+      "ALGOLIA_API_KEY",
+      "SLACK_WEBHOOK_TEST_CHANNEL"
    ],
    "remoteCache": {
       "enabled": true
