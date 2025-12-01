@@ -20,6 +20,8 @@ export class ClaudeChapterClient implements IChapterizationClient {
    private constructor(private readonly apiKey: string) {
       const anthropicModel = createAnthropic({ apiKey: this.apiKey })
       this.model = anthropicModel("claude-sonnet-4-5")
+
+      logger.log("Yode")
    }
 
    static create(): IChapterizationClient {
