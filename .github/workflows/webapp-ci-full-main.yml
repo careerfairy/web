@@ -187,8 +187,6 @@ jobs:
               ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
               TEST_STRIPE_SECRET_KEY: ${{ secrets.TEST_STRIPE_SECRET_KEY }}
               NODE_ENV: test
-              ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
-              ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
               WORKFLOW_ID: ${{ env.WORKFLOW_ID }}
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
