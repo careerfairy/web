@@ -184,6 +184,9 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
+              ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+              ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+              WORKFLOW_ID: ${{ env.WORKFLOW_ID }}
            run: npm run test:e2e-webapp -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
