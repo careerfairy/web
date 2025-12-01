@@ -1,5 +1,5 @@
 # CareerFairy Apps
-
+WG
 Monorepo with all the apps, managed by npm workspaces and turborepo.
 
 ### Requirements
