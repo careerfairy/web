@@ -21,6 +21,8 @@ import { QuestionsDialog } from "../feedback-dialogs/QuestionsDialog"
 import { PromoteLivestreamDialog } from "../PromoteLivestreamDialog"
 import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
 
+const FEEDBACK_DIALOG_QUERY_PARAM = "questionsLivestreamId"
+
 type EventsViewContextValue = {
    sortBy: LivestreamStatsSortOption
    setSortBy: (sortBy: LivestreamStatsSortOption) => void
@@ -109,6 +111,7 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
    const [enterStreamDialogLivestreamId, setEnterStreamDialogLivestreamId] =
       useState<string | null>(null)
    const { push } = useRouter()
+   const feedbackLivestreamId = query[FEEDBACK_DIALOG_QUERY_PARAM] as string
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
    const handleTableSort = useCallback(
@@ -201,7 +204,10 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
          push(
             {
                pathname,
-               query: { ...query, feedbackLivestreamId: stat.livestream.id },
+               query: {
+                  ...query,
+                  [FEEDBACK_DIALOG_QUERY_PARAM]: stat.livestream.id,
+               },
             },
             undefined,
             { shallow: true }
@@ -251,7 +257,7 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
 
    const handleCloseFeedbackDialog = useCallback(() => {
       const {
-         feedbackLivestreamId: _feedbackLivestreamId,
+         [FEEDBACK_DIALOG_QUERY_PARAM]: _feedbackLivestreamId,
          feedbackId: _feedbackId,
          ...rest
       } = query
@@ -366,7 +372,10 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
             companyCountryCode={group?.companyCountry?.id}
             onClose={handleClosePromoteDialog}
          />
-         <FeedbackDialog onClose={handleCloseFeedbackDialog} />
+         <FeedbackDialog
+            livestreamId={feedbackLivestreamId}
+            onClose={handleCloseFeedbackDialog}
+         />
 
          <QuestionsDialog
             livestream={questionsDialogLivestream}

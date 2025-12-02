@@ -154,6 +154,7 @@ const FeedbackDialogProvider = ({
 }
 
 type FeedbackDialogProps = {
+   livestreamId: string
    onClose: () => void
 }
 
@@ -182,14 +183,15 @@ const useLivestreamStats = (livestreamId: string | undefined) => {
    return { stats }
 }
 
-export const FeedbackDialog = ({ onClose }: FeedbackDialogProps) => {
-   const router = useRouter()
-   const feedbackLivestreamId = router.query.feedbackLivestreamId as string
-   const { stats } = useLivestreamStats(feedbackLivestreamId)
+export const FeedbackDialog = ({
+   livestreamId,
+   onClose,
+}: FeedbackDialogProps) => {
+   const { stats } = useLivestreamStats(livestreamId)
 
    return (
       <ResponsiveDialogLayout
-         open={Boolean(feedbackLivestreamId)}
+         open={Boolean(livestreamId)}
          handleClose={onClose}
          dialogPaperStyles={styles.paper}
          TransitionComponent={SlideUpTransition}
