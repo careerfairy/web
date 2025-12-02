@@ -7,8 +7,7 @@ import { CSVDialogDownload } from "components/custom-hook/useMetaDataActions"
 import useClientSidePagination from "components/custom-hook/utils/useClientSidePagination"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { SlideUpTransition } from "components/views/common/transitions"
-import { useRouter } from "next/router"
-import { Fragment, useCallback } from "react"
+import { Fragment } from "react"
 import { DownloadCloud } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { StyledPagination } from "../../common/CardCustom"
@@ -46,26 +45,12 @@ export const QuestionsDialog = ({
    onClose,
    livestreamId,
 }: QuestionsDialogProps) => {
-   const router = useRouter()
    const { data: livestream } = useLivestreamSWR(livestreamId)
-
-   const handleClose = useCallback(() => {
-      const { questionsLivestreamId: _, ...rest } = router.query
-      router.push(
-         {
-            pathname: router.pathname,
-            query: rest,
-         },
-         undefined,
-         { shallow: true }
-      )
-      onClose()
-   }, [onClose, router])
 
    return (
       <ResponsiveDialogLayout
          open={Boolean(livestreamId)}
-         handleClose={handleClose}
+         handleClose={onClose}
          hideDragHandle
          dialogPaperStyles={{
             maxWidth: 1100,
@@ -80,10 +65,7 @@ export const QuestionsDialog = ({
          dataTestId="livestream-questions-dialog"
       >
          {livestream ? (
-            <QuestionsDialogContent
-               livestream={livestream}
-               onClose={handleClose}
-            />
+            <QuestionsDialogContent livestream={livestream} onClose={onClose} />
          ) : (
             <Loader />
          )}

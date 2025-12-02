@@ -399,7 +399,7 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
          />
 
          <QuestionsDialog
-            livestreamId={questionsLivestreamId as string}
+            livestreamId={questionsLivestreamId}
             onClose={handleCloseQuestionsDialog}
          />
          <EnterStreamDialog
