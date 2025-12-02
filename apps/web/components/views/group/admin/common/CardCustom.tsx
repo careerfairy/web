@@ -215,7 +215,8 @@ export const StyledPagination = styled(Pagination)(({ theme }) => ({
       content: "'Next'",
       marginRight: theme.spacing(1),
       [theme.breakpoints.down("sm")]: {
-         marginRight: theme.spacing(0.5),
+         marginRight: theme.spacing(0.1),
+         content: "''",
       },
    },
    "& .MuiPagination-ul li:first-of-type": {
@@ -225,7 +226,8 @@ export const StyledPagination = styled(Pagination)(({ theme }) => ({
       content: "'Previous'",
       marginLeft: theme.spacing(1),
       [theme.breakpoints.down("sm")]: {
-         marginLeft: theme.spacing(0.5),
+         marginLeft: theme.spacing(0.1),
+         content: "''",
       },
    },
    "& .MuiPagination-ul li button": {
