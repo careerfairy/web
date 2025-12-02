@@ -22,6 +22,7 @@ import { PromoteLivestreamDialog } from "../PromoteLivestreamDialog"
 import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
 
 const FEEDBACK_DIALOG_QUERY_PARAM = "feedbackLivestreamId"
+const QUESTIONS_DIALOG_QUERY_PARAM = "questionsLivestreamId"
 
 type EventsViewContextValue = {
    sortBy: LivestreamStatsSortOption
@@ -106,12 +107,11 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
       useState<LivestreamEventPublicData | null>(null)
    const [promoteDialogLivestream, setPromoteDialogLivestream] =
       useState<LivestreamEventPublicData | null>(null)
-   const [questionsDialogLivestream, setQuestionsDialogLivestream] =
-      useState<LivestreamEventPublicData | null>(null)
    const [enterStreamDialogLivestreamId, setEnterStreamDialogLivestreamId] =
       useState<string | null>(null)
    const { push } = useRouter()
    const feedbackLivestreamId = query[FEEDBACK_DIALOG_QUERY_PARAM] as string
+   const questionsLivestreamId = query[QUESTIONS_DIALOG_QUERY_PARAM] as string
 
    /** Toggles sort direction for a field - defaults to desc, switches to asc if already desc */
    const handleTableSort = useCallback(
@@ -191,11 +191,24 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
       [group?.id, push]
    )
 
-   const handleQuestions = useCallback((stat: LiveStreamStats) => {
-      if (stat.livestream.isDraft) return
-      // Open questions dialog
-      setQuestionsDialogLivestream(stat.livestream)
-   }, [])
+   const handleQuestions = useCallback(
+      (stat: LiveStreamStats) => {
+         if (stat.livestream.isDraft) return
+         // Open questions dialog via URL
+         push(
+            {
+               pathname,
+               query: {
+                  ...query,
+                  [QUESTIONS_DIALOG_QUERY_PARAM]: stat.livestream.id,
+               },
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [pathname, push, query]
+   )
 
    const handleFeedback = useCallback(
       (stat: LiveStreamStats) => {
@@ -272,8 +285,16 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
    }, [pathname, push, query])
 
    const handleCloseQuestionsDialog = useCallback(() => {
-      setQuestionsDialogLivestream(null)
-   }, [])
+      const { [QUESTIONS_DIALOG_QUERY_PARAM]: _, ...rest } = query
+      push(
+         {
+            pathname,
+            query: rest,
+         },
+         undefined,
+         { shallow: true }
+      )
+   }, [pathname, push, query])
 
    const handleCloseEnterStreamDialog = useCallback(() => {
       setEnterStreamDialogLivestreamId(null)
@@ -378,7 +399,7 @@ export const EventsViewProvider = ({ children }: EventsViewProviderProps) => {
          />
 
          <QuestionsDialog
-            livestream={questionsDialogLivestream}
+            livestreamId={questionsLivestreamId as string}
             onClose={handleCloseQuestionsDialog}
          />
          <EnterStreamDialog

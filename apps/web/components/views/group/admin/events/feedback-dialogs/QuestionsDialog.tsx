@@ -1,11 +1,14 @@
-import { LivestreamEventPublicData } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Stack, Typography } from "@mui/material"
+import { useLivestreamSWR } from "components/custom-hook/live-stream/useLivestreamSWR"
 import { useAllLivestreamQuestions } from "components/custom-hook/streaming/question/useAllLivestreamQuestions"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { CSVDialogDownload } from "components/custom-hook/useMetaDataActions"
 import useClientSidePagination from "components/custom-hook/utils/useClientSidePagination"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { SlideUpTransition } from "components/views/common/transitions"
+import { useRouter } from "next/router"
+import { Fragment, useCallback } from "react"
 import { DownloadCloud } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { StyledPagination } from "../../common/CardCustom"
@@ -32,17 +35,71 @@ const styles = sxStyles({
    },
 })
 
+const ITEMS_PER_PAGE = 7
+
 type QuestionsDialogProps = {
-   livestream: LivestreamEventPublicData | null
+   onClose: () => void
+   livestreamId: string
+}
+
+export const QuestionsDialog = ({
+   onClose,
+   livestreamId,
+}: QuestionsDialogProps) => {
+   const router = useRouter()
+   const { data: livestream } = useLivestreamSWR(livestreamId)
+
+   const handleClose = useCallback(() => {
+      const { questionsLivestreamId: _, ...rest } = router.query
+      router.push(
+         {
+            pathname: router.pathname,
+            query: rest,
+         },
+         undefined,
+         { shallow: true }
+      )
+      onClose()
+   }, [onClose, router])
+
+   return (
+      <ResponsiveDialogLayout
+         open={Boolean(livestreamId)}
+         handleClose={handleClose}
+         hideDragHandle
+         dialogPaperStyles={{
+            maxWidth: 1100,
+         }}
+         TransitionComponent={SlideUpTransition}
+         SlideProps={{
+            unmountOnExit: true,
+         }}
+         TransitionProps={{
+            unmountOnExit: true,
+         }}
+         dataTestId="livestream-questions-dialog"
+      >
+         {livestream ? (
+            <QuestionsDialogContent
+               livestream={livestream}
+               onClose={handleClose}
+            />
+         ) : (
+            <Loader />
+         )}
+      </ResponsiveDialogLayout>
+   )
+}
+
+type QuestionsDialogContentProps = {
+   livestream: LivestreamEvent
    onClose: () => void
 }
 
-const ITEMS_PER_PAGE = 7
-
-export const QuestionsDialog = ({
+const QuestionsDialogContent = ({
    livestream,
    onClose,
-}: QuestionsDialogProps) => {
+}: QuestionsDialogContentProps) => {
    const isMobile = useIsMobile()
 
    const { data: questions = [], isLoading } = useAllLivestreamQuestions(
@@ -72,22 +129,7 @@ export const QuestionsDialog = ({
    }
 
    return (
-      <ResponsiveDialogLayout
-         open={Boolean(livestream?.id)}
-         handleClose={onClose}
-         hideDragHandle
-         dialogPaperStyles={{
-            maxWidth: 1100,
-         }}
-         TransitionComponent={SlideUpTransition}
-         SlideProps={{
-            unmountOnExit: true,
-         }}
-         TransitionProps={{
-            unmountOnExit: true,
-         }}
-         dataTestId="livestream-questions-dialog"
-      >
+      <Fragment>
          <Header
             title={livestream?.title}
             start={livestream?.start?.toDate?.()}
@@ -162,7 +204,7 @@ export const QuestionsDialog = ({
             {/* Polls Section */}
             <PollsSection livestreamId={livestream?.id} />
          </Content>
-      </ResponsiveDialogLayout>
+      </Fragment>
    )
 }
 
