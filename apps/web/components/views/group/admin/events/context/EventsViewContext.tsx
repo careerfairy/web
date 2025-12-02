@@ -21,7 +21,7 @@ import { QuestionsDialog } from "../feedback-dialogs/QuestionsDialog"
 import { PromoteLivestreamDialog } from "../PromoteLivestreamDialog"
 import { DeleteLivestreamDialog } from "./DeleteLivestreamDialog"
 
-const FEEDBACK_DIALOG_QUERY_PARAM = "questionsLivestreamId"
+const FEEDBACK_DIALOG_QUERY_PARAM = "feedbackLivestreamId"
 
 type EventsViewContextValue = {
    sortBy: LivestreamStatsSortOption
