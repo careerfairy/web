@@ -93,6 +93,7 @@ const styles = sxStyles({
 })
 
 const RegisterAskQuestionsView = () => {
+   //test
    const { livestream, goToView, handleStartSuccessAnimation } =
       useLiveStreamDialog()
    const { userPresenter, authenticatedUser } = useAuth()
