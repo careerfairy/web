@@ -7,7 +7,8 @@ import * as ModuleAlias from "module-alias"
  * https://github.com/firebase/firebase-tools/issues/986
  *
  * NOTE: With Gen2 Cloud Functions, this might be removable as dependencies
- * are now installed in the container build context. Should be tested.
+ * are now installed in the container build context. After testing, this breaks the usage locally, so we're leaving it in for now.
+ * There are alternative solutions but they are more complex and require more configuration.
  */
 ModuleAlias.addAliases({
    "@careerfairy/shared-lib": __dirname + "../../../shared-lib/src",
