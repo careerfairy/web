@@ -11,6 +11,8 @@ import {
 } from "@mui/material"
 import { sxStyles } from "types/commonTypes"
 
+export const POLL_COLORS = ["#00D2AA", "#FF103C", "#FFD204", "#5978FF"] as const
+
 const styles = sxStyles({
    root: (theme) => ({
       fontFamily: "inherit",

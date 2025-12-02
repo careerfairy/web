@@ -1,15 +1,14 @@
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
-import { Skeleton, Typography } from "@mui/material"
-import { Box, Stack } from "@mui/material"
-import { PollOptionResult } from "./PollOptionResult"
-import { Fragment, useCallback, useMemo } from "react"
+import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import { useLivestreamPollVoters } from "components/custom-hook/streaming/useLivestreamPollVoters"
-import { useStreamingContext } from "../../context"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { sxStyles } from "types/commonTypes"
-import { useAuth } from "HOCs/AuthProvider"
-import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { useVoteLivestreamPollOption } from "components/custom-hook/streaming/useVoteLivestreamPollOption"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useAuth } from "HOCs/AuthProvider"
+import { Fragment, useCallback, useMemo } from "react"
+import { useOpenStream } from "store/selectors/streamingAppSelectors"
+import { sxStyles } from "types/commonTypes"
+import { useStreamingContext } from "../../context"
+import { POLL_COLORS, PollOptionResult } from "./PollOptionResult"
 
 const styles = sxStyles({
    root: {
@@ -36,8 +35,6 @@ type PollOptionsProps = {
    poll: LivestreamPoll
    showResults?: boolean
 }
-
-const POLL_COLORS = ["#00D2AA", "#FF103C", "#FFD204", "#5978FF"] as const
 
 export const PollOptions = ({ poll, showResults }: PollOptionsProps) => {
    return (
