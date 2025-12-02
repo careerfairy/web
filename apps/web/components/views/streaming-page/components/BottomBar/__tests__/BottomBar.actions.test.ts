@@ -214,7 +214,7 @@ describe("BottomBar host actions", () => {
       ])
    })
 
-   it("prepends phone controls for assistant host in spy mode on mobile", () => {
+   it("shows Q&A for assistant host in spy mode on mobile", () => {
       expect(
          getHostActionNames({
             isMobile: true,
@@ -222,10 +222,18 @@ describe("BottomBar host actions", () => {
             isSpyMode: true,
             isAssistantMode: true,
          })
-      ).toEqual(["Phone", "Divider", "Share", "Divider", "Chat", "SpeedDial"])
+      ).toEqual([
+         "Phone",
+         "Divider",
+         "Share",
+         "Divider",
+         "Q&A",
+         "Chat",
+         "SpeedDial",
+      ])
    })
 
-   it("appends settings and phone for assistant host on mobile after joining", () => {
+   it("appends phone for assistant host on mobile after joining stream", () => {
       expect(
          getHostActionNames({
             isMobile: true,

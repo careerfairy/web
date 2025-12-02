@@ -90,6 +90,7 @@ const getHostMobileActionNames = ({
       builder.addIf(!isSpyMode, "Mic", "Video")
    }
    builder.add("Share", "Divider")
+   builder.addIf(isAssistantMode && isSpyMode, "Q&A")
    builder.add("Chat", "SpeedDial")
 
    if (isAssistantMode && !isSpyMode) {

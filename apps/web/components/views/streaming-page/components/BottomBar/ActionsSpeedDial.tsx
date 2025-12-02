@@ -9,6 +9,7 @@ import { ReactNode, useMemo, useRef, useState } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
 import {
+   useAssistantMode,
    useIsSpyMode,
    useNumberOfHandRaiseNotifications,
 } from "store/selectors/streamingAppSelectors"
@@ -21,11 +22,14 @@ export type Action = {
 
 const getStreamerActions = (
    isMobile: boolean,
-   isSpyMode: boolean
+   isSpyMode: boolean,
+   isAssistantMode: boolean
 ): ActionName[] => {
    if (isMobile) {
+      // Q&A is shown in the main bar for assistant in spy mode, so exclude it from SpeedDial
+      const showQAndAInSpeedDial = !(isAssistantMode && isSpyMode)
       return [
-         "Q&A",
+         ...(showQAndAInSpeedDial ? (["Q&A"] as const) : []),
          "Hand raise",
          "Polls",
          "Jobs",
@@ -57,6 +61,7 @@ export const ActionsSpeedDial = () => {
 
    const isMobile = useStreamIsMobile()
    const isSpyMode = useIsSpyMode()
+   const isAssistantMode = useAssistantMode()
 
    const handleToggle = () => setOpen((prevOpen) => !prevOpen)
 
@@ -67,7 +72,7 @@ export const ActionsSpeedDial = () => {
    })
 
    const actions = isHost
-      ? getStreamerActions(isMobile, isSpyMode)
+      ? getStreamerActions(isMobile, isSpyMode, isAssistantMode)
       : getViewerActions(isMobile, shouldStream)
 
    const hasHandRaiseButton = actions.includes("Hand raise")
