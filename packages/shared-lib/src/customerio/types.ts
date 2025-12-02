@@ -87,6 +87,9 @@ export interface CustomerIOUserData {
    has_resume: boolean
    has_completed_sparks_onboarding: boolean
    highest_proficiency_language_code?: string
+
+   // Demographics
+   gender?: string
 }
 
 /**

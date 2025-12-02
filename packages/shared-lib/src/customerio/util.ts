@@ -233,6 +233,9 @@ export function transformUserDataForCustomerIO(
       // Denormalized highest proficiency language for messaging
       highest_proficiency_language_code:
          userData.highestProficiencyLanguageCode,
+
+      // Demographics
+      gender: userData.gender,
    }
 }
 
