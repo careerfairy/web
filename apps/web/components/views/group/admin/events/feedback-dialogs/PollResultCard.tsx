@@ -3,8 +3,8 @@ import { PollWithVoters } from "components/custom-hook/streaming/useAllLivestrea
 import {
    POLL_COLORS,
    PollOptionResult,
+   PollOptionResultSkeleton,
 } from "components/views/streaming-page/components/polls/PollOptionResult"
-import { PollOptionResultSkeleton } from "components/views/streaming-page/components/polls/PollOptions"
 import { useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
 

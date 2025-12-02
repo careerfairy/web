@@ -5,10 +5,12 @@ import {
    Collapse,
    Grow,
    LinearProgress,
+   Skeleton,
    Stack,
    Typography,
    linearProgressClasses,
 } from "@mui/material"
+import { Fragment } from "react"
 import { sxStyles } from "types/commonTypes"
 
 export const POLL_COLORS = ["#00D2AA", "#FF103C", "#FFD204", "#5978FF"] as const
@@ -223,6 +225,65 @@ const VoteIcon = ({ hasVoted, disabled }: VoteIconProps) => {
                sx={[styles.voteIconDot, disabled && styles.voteIconDotDisabled]}
             />
          </Grow>
+      </Box>
+   )
+}
+
+const skeletonStyles = sxStyles({
+   root: {
+      border: "1px solid #F8F8F8",
+      borderRadius: "12px",
+      p: 2,
+      position: "relative",
+      overflow: "hidden",
+   },
+   coloredEdge: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: 5,
+      height: "100%",
+      backgroundColor: "grey.500",
+   },
+   skeletonProgress: {
+      borderRadius: "8px",
+   },
+})
+
+export const PollOptionResultSkeleton = ({
+   showResultsSkeleton = true,
+}: {
+   showResultsSkeleton?: boolean
+}) => {
+   return (
+      <Box sx={skeletonStyles.root}>
+         <Stack spacing={1}>
+            <Stack direction="row" justifyContent="space-between">
+               <Typography variant="medium">
+                  <Skeleton variant="text" width={30} />
+               </Typography>
+               {Boolean(showResultsSkeleton) && (
+                  <Typography variant="medium">
+                     <Skeleton variant="text" width={20} />
+                  </Typography>
+               )}
+            </Stack>
+            {Boolean(showResultsSkeleton) && (
+               <Fragment>
+                  <Skeleton
+                     sx={skeletonStyles.skeletonProgress}
+                     variant="rounded"
+                     animation="wave"
+                     width={`${Math.random() * 100}%`}
+                     height={5}
+                  />
+                  <Typography variant="xsmall">
+                     <Skeleton variant="text" width={100} />
+                  </Typography>
+               </Fragment>
+            )}
+         </Stack>
+         <Box sx={skeletonStyles.coloredEdge} />
       </Box>
    )
 }

@@ -1,7 +1,7 @@
 import { Box, Skeleton, Stack, Typography } from "@mui/material"
 import React from "react"
 import { sxStyles } from "types/commonTypes"
-import { PollOptionResultSkeleton } from "./PollOptions"
+import { PollOptionResultSkeleton } from "./PollOptionResult"
 
 const styles = sxStyles({
    root: {
