@@ -106,14 +106,14 @@ npm run build -w @careerfairy/functions
 
 ```sh
 cd packages/functions
-npx firelink deploy --only functions:slackHandleInteractions
+npx firebase deploy --only functions:slackHandleInteractions
 ```
 
 ## Deploy a bundle
 
 ```sh
 cd packages/functions
-npx firelink deploy --only functions:bundle-pastYearLivestreams
+npx firebase deploy --only functions:bundle-pastYearLivestreams
 ```
 
 When adding new bundles, it's likely that you'd want to ensure the Firebase Hosting mappings are also updated

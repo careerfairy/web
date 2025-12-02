@@ -5,6 +5,9 @@ import * as ModuleAlias from "module-alias"
  *
  * https://stackoverflow.com/a/56584739
  * https://github.com/firebase/firebase-tools/issues/986
+ *
+ * NOTE: With Gen2 Cloud Functions, this might be removable as dependencies
+ * are now installed in the container build context. Should be tested.
  */
 ModuleAlias.addAliases({
    "@careerfairy/shared-lib": __dirname + "../../../shared-lib/src",
@@ -197,7 +200,7 @@ exports.fetchTagsContentHits = tags.fetchContentHits
 exports.postmarkWebhook = postmark.postmarkWebhook
 
 // Deploy each bundle as a separate function
-// npx firelink deploy --only functions:bundle-allFutureLivestreams
+// npx firebase deploy --only functions:bundle-allFutureLivestreams
 //
 // When adding new bundles, you probably also want to update the
 // Firebase Hosting mappings: npx firebase deploy --only hosting
@@ -370,7 +373,7 @@ exports.manualCheckExpiredPlans = groupPlans.manualCheckExpiredPlans
 exports.fullIndexSync = search.fullIndexSync
 
 // Deploy each index as a separate function
-// npx firelink deploy --only functions:searchIndex-livestreams
+// npx firebase deploy --only functions:searchIndex-livestreams
 //
 exports.searchIndex = generateFunctionsFromIndexes(knownIndexes)
 
