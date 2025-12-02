@@ -163,8 +163,6 @@ const useLivestreamStats = (livestreamId: string | undefined) => {
    const { data: stats } = useSWR(
       livestreamId ? `livestream-stats-${livestreamId}` : null,
       async () => {
-         if (!livestreamId) return null
-
          const statsRef = doc(
             firestore,
             "livestreams",
