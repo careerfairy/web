@@ -5,10 +5,11 @@ import { useAllLivestreamQuestions } from "components/custom-hook/streaming/ques
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { CSVDialogDownload } from "components/custom-hook/useMetaDataActions"
 import useClientSidePagination from "components/custom-hook/utils/useClientSidePagination"
+import { EmptyItemsView } from "components/views/common/EmptyItemsView"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { SlideUpTransition } from "components/views/common/transitions"
 import { Fragment } from "react"
-import { DownloadCloud } from "react-feather"
+import { DownloadCloud, Users } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import { StyledPagination } from "../../common/CardCustom"
 import { PollsSection } from "./PollsSection"
@@ -45,7 +46,7 @@ export const QuestionsDialog = ({
    onClose,
    livestreamId,
 }: QuestionsDialogProps) => {
-   const { data: livestream } = useLivestreamSWR(livestreamId)
+   const { data: livestream, isLoading } = useLivestreamSWR(livestreamId)
 
    return (
       <ResponsiveDialogLayout
@@ -64,10 +65,18 @@ export const QuestionsDialog = ({
          }}
          dataTestId="livestream-questions-dialog"
       >
-         {livestream ? (
+         {isLoading ? (
+            <Loader />
+         ) : livestream ? (
             <QuestionsDialogContent livestream={livestream} onClose={onClose} />
          ) : (
-            <Loader />
+            <EmptyItemsView
+               title={"Live stream not found"}
+               description={
+                  "The live stream you're looking for doesn't exist or has been deleted."
+               }
+               icon={<Box component={Users} color="secondary.main" size={40} />}
+            />
          )}
       </ResponsiveDialogLayout>
    )
