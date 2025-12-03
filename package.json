@@ -28,7 +28,6 @@
       "build:webapp": "turbo run build --filter=@careerfairy/webapp",
       "lint:functions": "turbo run lint --filter=@careerfairy/functions",
       "deploy:rules": "firebase deploy --only firestore:rules",
-      "deploy:functions": "firebase deploy --only functions",
       "deploy:hosting": "firebase deploy --only hosting",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
       "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions,storage",

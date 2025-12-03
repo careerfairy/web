@@ -121,23 +121,11 @@ You can pass function names directly to the deploy command:
 
 ```sh
 # Deploy a single function
-# From root
-npm run deploy:functions -- --only functions:slackHandleInteractions
 
-# Or from functions package
-cd packages/functions
-npm run deploy -- --only functions:slackHandleInteractions
-
-# Or use firebase directly (no npx needed)
-cd packages/functions
 firebase deploy --only functions:slackHandleInteractions
 
 # Deploy multiple functions (comma-separated)
-cd packages/functions
 firebase deploy --only functions:slackHandleInteractions,functions:fetchUserCountryCode,functions:trackOfflineEventAction
-
-# Or using npm script
-npm run deploy -- --only functions:slackHandleInteractions,functions:fetchUserCountryCode
 ```
 
 ### Deploy a bundle
@@ -153,12 +141,8 @@ When adding new bundles, it's likely that you'd want to ensure the Firebase Host
 # From root
 npm run deploy:hosting
 
-# Or from functions package
-cd packages/functions
-npm run deploy:hosting
 
 # Or use firebase directly
-cd packages/functions
 firebase deploy --only hosting
 ```
 
