@@ -82,10 +82,6 @@ export const BusinessFunctionTagsOptions = BusinessFunctionsTagValues.map(
 )
 
 export const ContentTopicsTags = {
-   MyApplicationProcess: {
-      id: "MyCustomProcess",
-      name: "My custom process",
-   },
    ApplicationProcess: {
       id: "ApplicationProcess",
       name: "Application process",
