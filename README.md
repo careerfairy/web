@@ -104,20 +104,7 @@ npm run build -w @careerfairy/functions
 
 ## Deploy functions
 
-### Deploy all functions
-
-```sh
-# From root
-npm run deploy:functions
-
-# Or from functions package
-cd packages/functions
-npm run deploy
-```
-
 ### Deploy specific functions (single or multiple)
-
-You can pass function names directly to the deploy command:
 
 ```sh
 # Deploy a single function
