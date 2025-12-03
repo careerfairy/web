@@ -9,6 +9,7 @@ import { ChangeType, getChangeTypeEnum } from "../../util"
 export const onUserRegistration = onDocumentWritten(
    {
       document: "livestreams/{livestreamId}/userLivestreamData/{userEmail}",
+      concurrency: 10,
    },
    async (event) => {
       const { params } = event
