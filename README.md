@@ -36,7 +36,6 @@ npm run start -w @careerfairy/fetch-firestore-data
 
 # Dev environment with hot reload
 # web app + local emulators with data imported from emulatorData/fetched
-# test
 # Since this runs the firebase emulators, you need 10GB of memory available, check (/packages/fetch-firestore-data/README.md)
 npm run dev
 
