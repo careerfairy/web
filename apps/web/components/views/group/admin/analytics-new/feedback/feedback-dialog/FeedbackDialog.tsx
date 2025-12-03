@@ -29,7 +29,8 @@ import { FeedbackDialogSkeleton } from "./FeedbackDialogSkeleton"
 const styles = sxStyles({
    paper: {
       maxWidth: 1100,
-      borderRadius: 3,
+      borderTopLeftRadius: 3,
+      borderTopRightRadius: 3,
       p: {
          xs: 1.5,
          md: 4,

@@ -1,6 +1,3 @@
-import useSWRCountQuery from "components/custom-hook/useSWRCountQuery"
-import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { collection, orderBy, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import {
    EventRatingWithType,
@@ -13,36 +10,38 @@ import useLivestreamRatingVoters from "./useLivestreamRatingVoters"
 export const useFeedbackQuestionStats = (question: EventRatingWithType) => {
    const { liveStreamStats } = useFeedbackDialogContext()
 
-   const averageRating =
-      liveStreamStats?.ratings?.[question.id]?.averageRating ?? 0
-
-   const votersCollection = collection(
-      FirestoreInstance,
-      "livestreams",
-      liveStreamStats.livestream.id,
-      "rating",
-      question.id,
-      "voters"
-   )
-
-   const votersQuery = query(
-      votersCollection,
-      ...(question.type === FeedbackQuestionType.TEXT
-         ? [where("message", "!=", ""), orderBy("message", "desc")]
-         : []),
-      orderBy("rating", "desc")
-   )
-
-   const { count: fetchedCount } = useSWRCountQuery(votersQuery)
-
-   const numberOfAnswers = fetchedCount ?? 0
-
-   // For sentiment ratings, fetch voters to calculate percentage
    const { data: voters = [] } = useLivestreamRatingVoters(
       liveStreamStats.livestream.id,
       question.id,
       question.type === FeedbackQuestionType.TEXT
    )
+
+   const { averageRating, numberOfAnswers } = useMemo(() => {
+      // For text-only questions, count is simply the number of responses
+      if (question.type === FeedbackQuestionType.TEXT) {
+         return { averageRating: 0, numberOfAnswers: voters.length }
+      }
+
+      if (voters.length === 0) {
+         return { averageRating: 0, numberOfAnswers: 0 }
+      }
+
+      let sum = 0
+      let count = 0
+
+      voters.forEach((voter) => {
+         const rating = voter.rating
+         if (typeof rating === "number") {
+            sum += rating
+            count++
+         }
+      })
+
+      return {
+         averageRating: count > 0 ? sum / count : 0,
+         numberOfAnswers: count,
+      }
+   }, [voters, question.type])
 
    // Helper for sentiment emoji
    const getSentimentEmoji = () => {
@@ -67,7 +66,6 @@ export const useFeedbackQuestionStats = (question: EventRatingWithType) => {
       const roundedRating = Math.round(averageRating)
       const displayedRating = Math.max(1, Math.min(5, roundedRating))
 
-      // Count voters with rating matching the displayed emoji
       let matchingCount = 0
       voters.forEach((voter) => {
          const voterRating = voter.rating || 0
