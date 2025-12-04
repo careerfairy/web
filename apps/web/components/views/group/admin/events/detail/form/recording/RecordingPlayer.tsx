@@ -125,7 +125,7 @@ export const RecordingPlayer = () => {
             controls={isPlaying}
             width="100%"
             height="100%"
-            playsInline
+            playsinline
             onPlay={handlePlayClick}
             onEnded={() => setIsPlaying(false)}
          />
