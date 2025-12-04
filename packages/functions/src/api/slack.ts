@@ -135,6 +135,13 @@ export const notifyLivestreamCreated = async (
             type: "section",
             text: {
                type: "mrkdwn",
+               text: "Livestream created:",
+            },
+         },
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
                text: generateBodyStr(body),
             },
             accessory: {
