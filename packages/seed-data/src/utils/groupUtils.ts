@@ -31,7 +31,6 @@ export async function createGroupDocument(
       universityName,
       normalizedUniversityName: universityName.toLowerCase(),
       triGrams: groupTriGrams(universityName),
-      atsAdminPageFlag: true,
    }
 
    data = Object.assign(data, overrideFields)

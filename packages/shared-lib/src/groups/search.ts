@@ -36,7 +36,6 @@ export const COMPANY_FIELDS_TO_INDEX = [
    "privacyPolicyUrl",
    "inActive",
    "bannerImageUrl",
-   "atsAdminPageFlag",
    "careerPageUrl",
    "sparksAdminPageFlag",
    "maxPublicSparks",

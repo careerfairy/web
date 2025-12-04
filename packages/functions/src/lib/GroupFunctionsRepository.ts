@@ -446,7 +446,6 @@ export class GroupFunctionsRepository
          logoUrl: group.logoUrl || "",
          universityName: group.universityName || "",
          universityCode: group.universityCode || "",
-         atsAdminPageFlag: group.atsAdminPageFlag || false,
          companyCountry: group.companyCountry || null,
          companyIndustries: group.companyIndustries || [],
          companySize: group.companySize || "",

@@ -31,13 +31,6 @@ export type GroupAdminFixtureOptions = {
     * give the option to create a complete group
     */
    completedGroup?: boolean
-   /**
-    * Sets up the ATS integration for the group
-    * - "COMPLETE" - creates a completly snyced ATS group with the application test already done
-    * - "NEEDS_APPLICATION_TEST" - creates an ATS group that needs a candidate application test
-    *
-    * */
-   atsGroupType?: "COMPLETE" | "NEEDS_APPLICATION_TEST" | "NONE"
 
    /**
     * Whether or not to set the privacy policy for the group
@@ -75,7 +68,6 @@ export const groupAdminFixture = base.extend<{
    options: {
       createUser: true,
       completedGroup: false,
-      atsGroupType: "NONE",
       privacyPolicy: false,
       offlineEventStatus: "first-timer",
    },
@@ -89,9 +81,6 @@ export const groupAdminFixture = base.extend<{
          overrideFields.privacyPolicyActive = true
          overrideFields.privacyPolicyUrl = "https://careerfairy.io"
       }
-
-      if (!options.atsGroupType || options.atsGroupType === "NONE")
-         overrideFields.atsAdminPageFlag = false
 
       // Set offline events options based on status
       if (options.offlineEventStatus) {
@@ -124,13 +113,6 @@ export const groupAdminFixture = base.extend<{
          })
       } else {
          group = await GroupSeed.createGroup(overrideFields)
-      }
-
-      switch (options.atsGroupType) {
-         case "COMPLETE":
-            break
-         case "NEEDS_APPLICATION_TEST":
-            break
       }
 
       await JobsSeed.createCustomJobs(group.groupId, [])

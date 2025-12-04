@@ -26,8 +26,6 @@ export const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
    const { setMobileFullScreenMenu } = useGroupDashboard()
    const isMobile = useIsMobile()
 
-   const hasAtsIntegration = false
-
    const handleMobileNavigate = () => {
       if (isMobile) {
          setMobileFullScreenMenu(false)
@@ -60,18 +58,14 @@ export const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
          },
 
          // 3. Jobs - Keep job section exactly as is (recently reworked in job hub V2)
-         ...(hasAtsIntegration
-            ? []
-            : [
-                 {
-                    id: "jobs",
-                    href: `/${BASE_HREF_PATH}/${group.id}/admin/jobs`,
-                    pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/jobs/[[...jobId]]`,
-                    Icon: JobsIcon,
-                    title: "Jobs",
-                    shallow: true,
-                 },
-              ]),
+         {
+            id: "jobs",
+            href: `/${BASE_HREF_PATH}/${group.id}/admin/jobs`,
+            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/jobs/[[...jobId]]`,
+            Icon: JobsIcon,
+            title: "Jobs",
+            shallow: true,
+         },
 
          // 4. Talent pool - Move existing analytics/talent-pool page to new section
          ...(group.universityCode // Hide talent pool for universities
@@ -123,7 +117,7 @@ export const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
          ...link,
          shrunk: shrunkLeftMenuIsActive,
       }))
-   }, [group, hasAtsIntegration, shrunkLeftMenuIsActive, allowedLinkIds])
+   }, [group, shrunkLeftMenuIsActive, allowedLinkIds])
 
    return (
       <NavList

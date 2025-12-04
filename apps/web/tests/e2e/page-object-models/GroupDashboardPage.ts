@@ -141,11 +141,6 @@ export class GroupDashboardPage extends CommonPage {
       return new OfflineEventsAdminPage(this)
    }
 
-   public async goToATSPage() {
-      await this.goToPage("ATS Integration")
-      throw new Error("ATS integration is no longer supported")
-   }
-
    // Analytics page
 
    public async goToAnalyticsPage() {
@@ -312,7 +307,6 @@ export class GroupDashboardPage extends CommonPage {
    }
    /**
     * Selects the jobs from the dropdown, currently you can only select one job
-    * and it does not support ATS Jobs
     * */
 
    public async assertJobIsAttachedToStream(jobLinks: string[]) {
@@ -498,7 +492,6 @@ export class GroupDashboardPage extends CommonPage {
          | "Content"
          | "Settings"
          | "Company Profile"
-         | "ATS Integration"
          | "Analytics"
          | "Talent Pool"
          | "Jobs"

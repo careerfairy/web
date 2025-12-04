@@ -82,21 +82,22 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.assertTextIsVisible(title)
    })
 
-   test("Create a draft live stream with job openings - No ATS", async ({
+   test("Create a draft live stream with job openings", async ({
       groupPage,
       customJobs,
    }) => {
       await setupLivestreamData()
 
+      const selectedCustomJobs = customJobs.slice(0, 2)
+
       const livestream = LivestreamSeed.randomDraft({
          hasJobs: true,
          speakers: [],
-         customJobs: customJobs,
       })
 
       await groupPage.clickCreateNewLivestreamTop()
       await groupPage.fillLivestreamForm(livestream, {
-         customJobs: customJobs.slice(0, 2),
+         customJobs: selectedCustomJobs,
       })
 
       // Finish editing the draft
@@ -107,7 +108,6 @@ test.describe("Group Admin Livestreams", () => {
       // Click on the specific event to navigate to the edit page
       await livestreamsPage.clickEventToEditByTitle(livestream.title)
 
-      const selectedCustomJobs = customJobs.slice(0, 2)
       const addedJobLinks = selectedCustomJobs.map((job) => job.postingUrl)
       await groupPage.assertJobIsAttachedToStream(addedJobLinks)
    })
