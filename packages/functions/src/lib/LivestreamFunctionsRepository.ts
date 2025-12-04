@@ -11,8 +11,10 @@ import {
 } from "@careerfairy/shared-lib/groups/creators"
 import {
    ASRProviders,
+   Chapter,
    EventRating,
    EventRatingAnswer,
+   LivestreamChapter,
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamQueryOptions,
@@ -107,6 +109,54 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @returns A promise that resolves when all chapters have been successfully deleted.
     */
    deleteAllLivestreamChapters(livestreamId: string): Promise<void>
+
+   /**
+    * Creates a chapter for a livestream.
+    *
+    * @param livestreamId - The ID of the livestream.
+    * @param chapter - The chapter data to create.
+    * @returns A promise that resolves to the created LivestreamChapter.
+    */
+   createChapter(
+      livestreamId: string,
+      chapter: Chapter
+   ): Promise<LivestreamChapter>
+
+   /**
+    * Retrieves a single chapter from a specific livestream.
+    *
+    * @param livestreamId - The ID of the livestream.
+    * @param chapterId - The ID of the chapter to retrieve.
+    * @returns A promise that resolves to the requested LivestreamChapter, or null if not found.
+    */
+   getChapter(
+      livestreamId: string,
+      chapterId: string
+   ): Promise<LivestreamChapter | null>
+
+   /**
+    * Updates a chapter for a livestream.
+    *
+    * @param livestreamId - The ID of the livestream.
+    * @param chapterId - The ID of the chapter to update.
+    * @param chapter - The chapter data to update.
+    * @returns A promise that resolves when the chapter has been updated.
+    */
+   updateChapter(
+      livestreamId: string,
+      chapterId: string,
+      chapter: Partial<Chapter>
+   ): Promise<void>
+
+   /**
+    * Deletes a chapter from a livestream.
+    *
+    * @param livestreamId - The ID of the livestream.
+    * @param chapterId - The ID of the chapter to delete.
+    * @returns A promise that resolves when the chapter has been deleted.
+    */
+   deleteChapter(livestreamId: string, chapterId: string): Promise<void>
+
    /**
     * Deletes a chat entry from a specific livestream.
     *
@@ -1115,6 +1165,186 @@ export class LivestreamFunctionsRepository
       })
 
       await Promise.allSettled(promises)
+   }
+
+   /**
+    * Reindexes all chapters for a livestream so their chapterIndex matches the chronological order.
+    * Accepts optional overrides to include additional document updates within the same batch.
+    * @param chaptersRef - Reference to the livestream chapters collection
+    * @param options - Optional configuration for the reindexing flow
+    * @param options.snapshot - Pre-fetched snapshot to avoid duplicate queries (useful when caller already has the data)
+    * @param options.pendingUpdates - Map of chapterId -> updates to apply alongside index changes (e.g., when updating startSec)
+    * @param options.skipChapterId - Chapter ID to exclude from reindexing (useful when a chapter is being deleted)
+    */
+   protected async syncChapterOrdering(
+      chaptersRef: firebase.firestore.CollectionReference<LivestreamChapter>,
+      options: {
+         snapshot?: firebase.firestore.QuerySnapshot<LivestreamChapter>
+         pendingUpdates?: Record<string, Partial<LivestreamChapter>>
+         skipChapterId?: string
+      } = {}
+   ): Promise<void> {
+      const { snapshot, pendingUpdates, skipChapterId } = options
+      const chaptersSnapshot =
+         snapshot ?? (await chaptersRef.orderBy("startSec", "asc").get())
+
+      if (chaptersSnapshot.empty) {
+         return
+      }
+
+      const batch = this.firestore.batch()
+      let hasChanges = false
+      let targetIndex = 0
+
+      for (const doc of chaptersSnapshot.docs) {
+         // Skip the chapter if it's being excluded (e.g., during deletion)
+         if (doc.id === skipChapterId) {
+            continue
+         }
+
+         const chapter = doc.data()
+         const update: Partial<LivestreamChapter> = {}
+         let requiresUpdate = false
+
+         // Check if this chapter's index needs to be corrected
+         // If chapterIndex doesn't match its position in chronological order, update it
+         if ((chapter.chapterIndex ?? -1) !== targetIndex) {
+            update.chapterIndex = targetIndex
+            requiresUpdate = true
+         }
+
+         // Apply any pending updates for this chapter (e.g., field changes from updateChapter)
+         const override = pendingUpdates?.[doc.id]
+         if (override && Object.keys(override).length > 0) {
+            Object.assign(update, override)
+            requiresUpdate = true
+         }
+
+         if (requiresUpdate) {
+            batch.update(doc.ref, update)
+            hasChanges = true
+         }
+
+         targetIndex += 1
+      }
+
+      if (hasChanges) {
+         await batch.commit()
+      }
+   }
+
+   async createChapter(
+      livestreamId: string,
+      chapter: Chapter
+   ): Promise<LivestreamChapter> {
+      const chaptersRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("chapters")
+         .withConverter(createCompatGenericConverter<LivestreamChapter>())
+
+      const docRef = chaptersRef.doc()
+
+      const now = Timestamp.now()
+
+      const livestreamChapter: LivestreamChapter = {
+         ...chapter,
+         documentType: "livestreamChapter",
+         type: "manual",
+         id: docRef.id,
+         livestreamId,
+         chapterIndex: 0,
+         createdAt: now,
+      }
+
+      await docRef.set(livestreamChapter)
+      await this.syncChapterOrdering(chaptersRef)
+
+      const updatedChapterSnap = await docRef.get()
+      const updatedChapter = updatedChapterSnap.data()
+
+      if (!updatedChapter) {
+         throw new Error("Failed to create livestream chapter")
+      }
+
+      return updatedChapter
+   }
+
+   async updateChapter(
+      livestreamId: string,
+      chapterId: string,
+      chapter: Partial<Chapter>
+   ): Promise<void> {
+      const chaptersRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("chapters")
+         .withConverter(createCompatGenericConverter<LivestreamChapter>())
+
+      const chapterRef = chaptersRef.doc(chapterId)
+      const existingChapterSnap = await chapterRef.get()
+
+      if (!existingChapterSnap.exists) {
+         throw new Error(`Chapter ${chapterId} does not exist`)
+      }
+
+      const existingChapter = existingChapterSnap.data()
+      if (!existingChapter) {
+         throw new Error(`Chapter ${chapterId} data is missing`)
+      }
+
+      const updateData: Partial<LivestreamChapter> = {
+         ...chapter,
+         // Manually edited chapters (even if initially generated) always become "manual" type
+         type: "manual",
+      }
+
+      const requiresOrderingSync =
+         chapter?.startSec !== existingChapter.startSec
+
+      await chapterRef.update(updateData)
+
+      if (requiresOrderingSync) {
+         await this.syncChapterOrdering(chaptersRef)
+      }
+   }
+
+   async deleteChapter(livestreamId: string, chapterId: string): Promise<void> {
+      const chaptersRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("chapters")
+         .withConverter(createCompatGenericConverter<LivestreamChapter>())
+
+      const chapterRef = chaptersRef.doc(chapterId)
+      const chapterSnap = await chapterRef.get()
+
+      if (!chapterSnap.exists) {
+         return
+      }
+
+      await chapterRef.delete()
+      await this.syncChapterOrdering(chaptersRef)
+   }
+
+   async getChapter(
+      livestreamId: string,
+      chapterId: string
+   ): Promise<LivestreamChapter | null> {
+      const chapterRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("chapters")
+         .doc(chapterId)
+         .withConverter(createCompatGenericConverter<LivestreamChapter>())
+
+      const snap = await chapterRef.get()
+
+      if (!snap.exists) {
+         return null
+      }
+
+      return snap.data()
    }
 
    async getLivestreamChatEntry(

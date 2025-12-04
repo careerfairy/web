@@ -2,6 +2,7 @@ import functions = require("firebase-functions")
 import { GROUP_DASHBOARD_ROLE, Group } from "@careerfairy/shared-lib/groups"
 import {
    LivestreamCTA,
+   LivestreamChapter,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
@@ -227,6 +228,18 @@ export async function validateCTAExists(
       logAndThrow("CTA does not exist", livestreamId, ctaId)
    }
    return livestreamCTA
+}
+
+export async function validateChapterExists(
+   livestreamId: string,
+   chapterId: string
+): Promise<LivestreamChapter> {
+   const chapter = await livestreamsRepo.getChapter(livestreamId, chapterId)
+
+   if (!chapter) {
+      logAndThrow("Chapter does not exist", livestreamId, chapterId)
+   }
+   return chapter
 }
 
 // Helper to log errors properly with context

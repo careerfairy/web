@@ -36,6 +36,7 @@ import { bundles } from "./bundles"
 import { fetchUserCountryCode } from "./fetchUserCountryCode"
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import * as customerio from "./lib/customerio"
+import * as liveStreams from "./lib/live-streams"
 import { generateFunctionsFromIndexes } from "./lib/search/searchIndexGenerator"
 import { knownIndexes } from "./lib/search/searchIndexes"
 import * as streaming from "./lib/streaming"
@@ -399,6 +400,9 @@ exports.createCTA = streaming.createCTA
 exports.deleteCTA = streaming.deleteCTA
 exports.updateCTA = streaming.updateCTA
 exports.toggleActiveCTA = streaming.toggleActiveCTA
+exports.createChapter = liveStreams.createChapter
+exports.updateChapter = liveStreams.updateChapter
+exports.deleteChapter = liveStreams.deleteChapter
 exports.onUserRegistration = streaming.onUserRegistration
 exports.syncUserInRegisteredLivestreams =
    streaming.syncUserInRegisteredLivestreams

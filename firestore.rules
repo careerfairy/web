@@ -712,6 +712,11 @@ service cloud.firestore {
               allow write: if isSignedIn() && request.resource.data.userId == request.auth.token.email;
             }
 
+            match /chapters/{chapter} {
+                allow read: if true;
+                allow write: if userIsGroupAdmin() || isCFAdmin();
+            }
+
         }
 
         match /livestreams/{livestream}/breakoutRooms/{breakoutRoom} {
