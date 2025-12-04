@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    CustomJobApplicationSourceTypes,
    PublicCustomJob,
@@ -24,7 +23,6 @@ import {
    useStreamIsMobile,
 } from "components/custom-hook/streaming"
 import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
-import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import CircularLogo from "components/views/common/logos/CircularLogo"
@@ -129,7 +127,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | PublicCustomJob
+   job: PublicCustomJob
    handleDialogClose: () => unknown
    livestreamId: string
    open: boolean
@@ -262,16 +260,8 @@ const JobDialogContent = ({
    const isMobile = useStreamIsMobile()
    const isLandscape = useStreamIsLandscape()
 
-   const isAtsJob = useIsAtsJob(job)
-   let jobName: string, jobDepartment: string
-
-   if (isAtsJob) {
-      jobName = job.name
-      jobDepartment = job.getDepartment()
-   } else {
-      jobName = job.title
-      jobDepartment = job.jobType
-   }
+   const jobName = job.title
+   const jobDepartment = job.jobType
 
    return (
       <Stack spacing={3} sx={styles.dialogContentWrapper}>
@@ -306,7 +296,7 @@ const JobDialogContent = ({
          <Stack spacing={2}>
             <JobDescription job={job} />
          </Stack>
-         {isConfirmationDialogOpen && !isAtsJob ? (
+         {isConfirmationDialogOpen ? (
             <CustomJobApplyConfirmation
                handleClose={handleCloseConfirmationDialog}
                job={job as PublicCustomJob}
@@ -329,7 +319,6 @@ const JobDialogActions = ({
    livestreamId,
    handleOpenConfirmationDialog,
 }) => {
-   const isAtsJob = useIsAtsJob(job)
    const [isSendingEmail, setIsSendingEmail] = useState(false)
    const firebaseService = useFirebaseService()
    const { authenticatedUser } = useAuth()
@@ -356,39 +345,31 @@ const JobDialogActions = ({
 
    return (
       <Stack
-         direction={
-            !isAtsJob && {
-               xs: "column-reverse",
-               sm: "row",
-            }
-         }
-         width={
-            !isAtsJob && {
-               xs: "100%",
-               sm: "unset",
-            }
-         }
+         direction={{
+            xs: "column-reverse",
+            sm: "row",
+         }}
+         width={{
+            xs: "100%",
+            sm: "unset",
+         }}
          sx={[styles.dialogActionsContent]}
       >
          <JobButton
             job={job}
             handleOpen={handleOpenConfirmationDialog}
-            isSecondary={!isAtsJob}
+            isSecondary={true}
             livestreamId={livestreamId}
          />
-         {!isAtsJob && (
-            <>
-               <LoadingButton
-                  variant="contained"
-                  fullWidth
-                  loading={isSendingEmail}
-                  onClick={sendEmailReminderForApplication}
-                  sx={styles.dialogActionsContent}
-               >
-                  Send email reminder
-               </LoadingButton>
-            </>
-         )}
+         <LoadingButton
+            variant="contained"
+            fullWidth
+            loading={isSendingEmail}
+            onClick={sendEmailReminderForApplication}
+            sx={styles.dialogActionsContent}
+         >
+            Send email reminder
+         </LoadingButton>
       </Stack>
    )
 }

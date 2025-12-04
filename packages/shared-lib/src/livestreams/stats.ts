@@ -66,7 +66,7 @@ export type LivestreamStatsMap = {
    numberOfParticipants: number
    // Total number of people that joined the talent pool
    numberOfTalentPoolProfiles: number
-   // Total number of applications that came in through the ATS integration
+   // Total number of applicants
    numberOfApplicants: number
 }
 

@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    CustomJob,
    CustomJobApplicationSourceTypes,
@@ -73,7 +72,7 @@ export const Content = ({ groupId }: ContentProps) => {
             {`Don't miss out! Apply now for the exciting jobs you saw live.`}
          </Heading>
          <Stack spacing={1.5}>
-            {jobsToShow.map((job: Job | CustomJob) => (
+            {jobsToShow.map((job: CustomJob) => (
                <JobCard
                   key={job.id}
                   job={job}

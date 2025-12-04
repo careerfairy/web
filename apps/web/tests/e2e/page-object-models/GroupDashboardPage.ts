@@ -1,10 +1,7 @@
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
+import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Group } from "@careerfairy/shared-lib/groups"
-import {
-   LivestreamEvent,
-   LivestreamJobAssociation,
-   Speaker,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent, Speaker } from "@careerfairy/shared-lib/livestreams"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { Locator, Page, expect } from "@playwright/test"
@@ -12,10 +9,14 @@ import DateUtil from "util/DateUtil"
 import { correctCompany, imageLogoPath } from "../../constants"
 import { sleep } from "../utils"
 import { CommonPage } from "./CommonPage"
-import { ATSAdminPage } from "./admin/ATSAdminPage"
 import { FeedbackPage } from "./admin/FeedbackPage"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { OfflineEventsAdminPage } from "./admin/OfflineEventsAdminPage"
+
+type FillLivestreamFormOptions = {
+   publish?: boolean
+   customJobs?: CustomJob[]
+}
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
@@ -140,12 +141,6 @@ export class GroupDashboardPage extends CommonPage {
       return new OfflineEventsAdminPage(this)
    }
 
-   public async goToATSPage() {
-      await this.goToPage("ATS Integration")
-
-      return new ATSAdminPage(this)
-   }
-
    // Analytics page
 
    public async goToAnalyticsPage() {
@@ -202,8 +197,9 @@ export class GroupDashboardPage extends CommonPage {
 
    public async fillLivestreamForm(
       data: Partial<LivestreamEvent>,
-      publish?: boolean
+      options?: FillLivestreamFormOptions
    ) {
+      const opts = options || {}
       const SUMMARY_PLACEHOLDER = `Describe your live stream
   • [Company] is one of the leading companies in the [industry]. We have [XYZ] employees globally...
   • We are going to present how a day in the life of our consultants looks like
@@ -269,17 +265,16 @@ export class GroupDashboardPage extends CommonPage {
          await this.createSpeakers(data.speakers)
       }
 
-      if (data.jobs) {
-         await this.clickJobOpenings()
-         await this.skipRequiredFields()
-         await this.selectJobs(data.jobs)
+      // Select custom jobs if provided
+      if (opts.customJobs?.length) {
+         await this.selectCustomJobs(opts.customJobs)
       }
 
       await expect(
          this.page.getByText(`${data.isDraft ? "Draft" : "Changes"} saved`)
       ).toBeVisible()
 
-      if (publish) {
+      if (opts.publish) {
          const isPublishDisabled = await this.page
             .getByRole("button", { name: "Publish" })
             .isDisabled()
@@ -312,24 +307,7 @@ export class GroupDashboardPage extends CommonPage {
    }
    /**
     * Selects the jobs from the dropdown, currently you can only select one job
-    * and it does not support ATS Jobs
     * */
-   public async selectJobs(
-      jobs: LivestreamJobAssociation[],
-      atsJobs?: boolean
-   ) {
-      if (atsJobs) {
-         // TODO: Use atsJobs, implementing tests for ATS jobs
-         return
-      }
-      await this.page.getByPlaceholder("Select jobs you want to attach").click()
-
-      for (const job of jobs) {
-         // TODO: Check if job is visible, if not create via UI
-         // How to test a draft stream with saved job ?
-         await this.page.getByText(job.name).click()
-      }
-   }
 
    public async assertJobIsAttachedToStream(jobLinks: string[]) {
       await this.clickJobOpenings()
@@ -453,6 +431,51 @@ export class GroupDashboardPage extends CommonPage {
    public async clickJobOpenings() {
       await this.page.getByRole("tab", { name: "Job openings" }).click()
    }
+
+   /**
+    * Selects the given custom jobs from the dropdown on the Job openings tab.
+    * Uses expect assertions for proper Playwright waiting without explicit timeouts.
+    */
+   private async selectCustomJobs(customJobs: CustomJob[]) {
+      // Early return if no custom jobs provided
+      if (!customJobs?.length) {
+         return
+      }
+
+      // Navigate to Job openings tab
+      await this.clickJobOpenings()
+      await this.skipRequiredFields()
+
+      // Check if the dropdown exists and is visible
+      const dropdown = this.page.getByPlaceholder(
+         "Select jobs you want to attach"
+      )
+      await expect(dropdown).toBeVisible()
+
+      // Click the dropdown to open it
+      await dropdown.click()
+
+      // Wait for the autocomplete options list to appear using expect
+      const optionsList = this.page.locator('[role="listbox"]')
+      await expect(optionsList).toBeVisible()
+
+      // Select each custom job by its title
+      for (const job of customJobs) {
+         // Wait for the option with the job title to appear and be visible
+         const jobOption = this.page
+            .locator('[role="option"]')
+            .filter({ hasText: job.title })
+            .first()
+
+         // Use expect to wait for the option to be visible
+         await expect(jobOption).toBeVisible()
+         await jobOption.click()
+      }
+
+      // Close the dropdown by pressing Escape
+      await this.page.keyboard.press("Escape")
+   }
+
    public async clickPublish() {
       await this.page.getByRole("button", { name: "Publish" }).click()
    }
@@ -469,7 +492,6 @@ export class GroupDashboardPage extends CommonPage {
          | "Content"
          | "Settings"
          | "Company Profile"
-         | "ATS Integration"
          | "Analytics"
          | "Talent Pool"
          | "Jobs"

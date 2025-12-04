@@ -408,11 +408,6 @@ export class CustomJobFunctionsRepository
 
       const livestreamsToUpdate = linkedLivestreams.filter(
          (livestream: LivestreamEvent) => {
-            // If the livestream has associated ATS jobs, do nothing
-            if (livestream.jobs.length > 0) {
-               return false
-            }
-
             // Check if any other custom job in the group links to this livestream
             const hasMoreCustomJobsThanTheDeletedOne = filteredGroupJobs.some(
                (customJob) =>

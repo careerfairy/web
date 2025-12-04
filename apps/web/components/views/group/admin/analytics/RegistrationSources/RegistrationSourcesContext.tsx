@@ -1,7 +1,6 @@
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "../../../../../custom-hook/utils/useFunctionsSWRFetcher"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import useSWR from "swr"
 import { createContext, ReactElement, useContext, useMemo } from "react"
 import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"

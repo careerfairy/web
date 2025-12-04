@@ -1,4 +1,3 @@
-import { UserJobApplicationDocument } from "@careerfairy/shared-lib/dist/users"
 import Card from "@mui/material/Card"
 import { CardContent, CardHeader, Divider, Typography } from "@mui/material"
 import React, { useMemo } from "react"
@@ -38,7 +37,8 @@ const styles = sxStyles({
 })
 
 type JobApplicationCardProps = {
-   jobApplication: UserJobApplicationDocument
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   jobApplication: any
 }
 export const JobApplicationCard = ({
    jobApplication,

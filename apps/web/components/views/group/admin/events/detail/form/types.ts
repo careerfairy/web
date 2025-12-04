@@ -5,10 +5,7 @@ import {
 } from "@careerfairy/shared-lib/fieldOfStudy"
 import { Group, GroupOption } from "@careerfairy/shared-lib/groups"
 import { Creator } from "@careerfairy/shared-lib/groups/creators"
-import {
-   LivestreamEvent,
-   LivestreamLanguage,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamLanguage } from "@careerfairy/shared-lib/livestreams"
 import {
    FeedbackQuestionFormValues,
    RegistrationQuestionFormValues,
@@ -56,7 +53,6 @@ export type LivestreamFormQuestionsTabValues = {
 }
 
 export type LivestreamFormJobsTabValues = {
-   jobs: LivestreamEvent["jobs"]
    customJobs: PublicCustomJob[]
 }
 

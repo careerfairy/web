@@ -67,8 +67,7 @@ const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
          values: { general, speakers, jobs },
       } = useLivestreamFormValues()
       const { group } = useGroup()
-      const hasJobs = jobs.jobs.length > 0 || jobs.customJobs.length > 0
-      const isAtsJobs = jobs.jobs.length > 0
+      const hasJobs = jobs.customJobs.length > 0
 
       const scaledStyles = useMemo(() => {
          if (!scale) return {}
@@ -163,7 +162,7 @@ const PreviewContent = forwardRef<HTMLDivElement, PreviewContentProps>(
                   </Section>
                   {hasJobs ? (
                      <Section navOffset={44}>
-                        <Jobs jobs={isAtsJobs ? jobs.jobs : jobs.customJobs} />
+                        <Jobs jobs={jobs.customJobs} />
                      </Section>
                   ) : null}
                   <Section>

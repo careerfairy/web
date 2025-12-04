@@ -62,7 +62,6 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
          companySize: group.companySize || "",
          companyIndustries: group.companyIndustries || [],
          companyCountry: group.companyCountry || null,
-         isATSEnabled: group.isATSEnabled || false,
       }),
       [
          group.companyCountry,
@@ -70,7 +69,6 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
          group.companySize,
          group.description,
          group.extraInfo,
-         group.isATSEnabled,
          group.universityName,
       ]
    )

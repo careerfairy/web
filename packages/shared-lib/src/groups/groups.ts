@@ -1,6 +1,4 @@
-import firebase from "firebase/compat/app"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
-import { MergeExtraRequiredData } from "../ats/merge/MergeResponseTypes"
 import { Identifiable, ImageType, OptionGroup } from "../commonTypes"
 import { FieldOfStudyCategory } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
@@ -31,7 +29,6 @@ export interface Group extends Identifiable {
    privacyPolicyUrl?: string
    inActive?: boolean
    bannerImageUrl?: string
-   atsAdminPageFlag?: boolean
    careerPageUrl?: string
    /*
     * This flag is used to determine if the group has access to sparks
@@ -236,48 +233,6 @@ export const convertGroupQuestionOptionsToSortedArray = (
    sortProperty: keyof GroupQuestionOption = "name"
 ): GroupQuestionOption[] => {
    return convertDictToDocArray(optionsDict).sort(dynamicSort(sortProperty))
-}
-
-/**
- * Document that lives in /careerCenterData/:id/ats/:integrationId
- * Contains information about the ATS integration for a single linked account
- *
- * When supporting multiple providers (others than merge) just add a new map key
- */
-export interface GroupATSAccountDocument extends Identifiable {
-   groupId: string
-   merge?: {
-      end_user_origin_id?: string
-      integration_name?: string
-      image?: string
-      square_image?: string
-      color?: string
-      slug?: string
-      // used to confirm if the first sync is complete for the integration
-      firstSyncCompletedAt?: firebase.firestore.Timestamp
-      // confirm the application test was completed
-      // required to be able to associate jobs with livestreams
-      applicationTestCompletedAt?: firebase.firestore.Timestamp
-      lastFetchedAt?: firebase.firestore.Timestamp
-      extraRequiredData?: MergeExtraRequiredData
-   }
-   createdAt: firebase.firestore.Timestamp
-   updatedAt: firebase.firestore.Timestamp
-}
-
-/**
- * Document that lives in /careerCenterData/:id/ats/:integrationId/tokens/tokens
- * Contains sensitive tokens used to fetch data in the company behalf
- * (in case of merge, it also requires our own api key that's injected to the cloud functions)
- *
- * This data shouldn't be fetched via apps (webapp), only via backends (cloud functions)
- */
-export interface GroupATSIntegrationTokensDocument extends Identifiable {
-   groupId: string
-   integrationId: string
-   merge?: {
-      account_token?: string
-   }
 }
 
 /*

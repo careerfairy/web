@@ -1,10 +1,6 @@
 {
    "fields": [
       {
-         "name": "atsAdminPageFlag",
-         "type": "boolean"
-      },
-      {
          "fields": [
             {
                "name": "id",

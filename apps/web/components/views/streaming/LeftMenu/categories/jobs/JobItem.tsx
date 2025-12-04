@@ -1,5 +1,4 @@
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
 import {
@@ -13,7 +12,6 @@ import { memo, useCallback } from "react"
 import { AnalyticsEvents } from "util/analyticsConstants"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { dataLayerLivestreamEvent } from "../../../../../../util/analyticsUtils"
-import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 
 const styles = sxStyles({
    itemWrapper: {
@@ -31,21 +29,12 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | CustomJob
-   handleSelectJob: (job: Job | CustomJob) => void
+   job: CustomJob
+   handleSelectJob: (job: CustomJob) => void
    livestream: LivestreamEvent
 }
 const JobItem = ({ job, handleSelectJob, livestream }: Props) => {
-   const isAtsJob = useIsAtsJob(job)
-
-   let hiringManager: string, jobName: string
-
-   if (isAtsJob) {
-      hiringManager = job.getHiringManager()
-      jobName = job.name
-   } else {
-      jobName = job.title
-   }
+   const jobName = job.title
 
    const handleClick = useCallback(() => {
       handleSelectJob(job)
@@ -70,12 +59,6 @@ const JobItem = ({ job, handleSelectJob, livestream }: Props) => {
                <Typography variant="subtitle1" fontWeight="bold">
                   {jobName}
                </Typography>
-
-               {hiringManager ? (
-                  <Typography variant="body2" mt={1} fontStyle="italic">
-                     {`Posted by ${hiringManager}`}
-                  </Typography>
-               ) : null}
             </ListItemText>
          </ListItemButton>
       </ListItem>

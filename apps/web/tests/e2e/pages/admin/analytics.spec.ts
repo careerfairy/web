@@ -11,7 +11,6 @@ const testWithPrivacyPolicyActive = test.extend<{
 }>({
    options: {
       createUser: true,
-      atsGroupType: "COMPLETE",
       privacyPolicy: true,
    },
 })

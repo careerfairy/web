@@ -1,7 +1,6 @@
 import { ParsedUrlQuery } from "querystring"
 
 export type FeatureFlagKey =
-   | "atsAdminPageFlag"
    | "sparksAdminPageFlag"
    | "sparksB2BOnboardingFlag"
    | "mentorsV1"

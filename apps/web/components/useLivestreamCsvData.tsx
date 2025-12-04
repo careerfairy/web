@@ -153,8 +153,6 @@ const getTitle = (userType: LivestreamUserAction) => {
    switch (userType) {
       case "talentPool":
          return "Talent Pool"
-      case "jobApplications":
-         return "Job Applicants"
       case "registered":
          return "Registered Users"
       case "participated":
@@ -168,8 +166,6 @@ const getDescription = (userType: LivestreamUserAction) => {
    switch (userType) {
       case "talentPool":
          return "Download a CSV with the details of the students who opted to put themselves in the talent pool"
-      case "jobApplications":
-         return "Download a CSV with the details of the students who applied for a job"
       case "registered":
          return "Download a CSV with the details of the students who registered to your event"
       case "participated":

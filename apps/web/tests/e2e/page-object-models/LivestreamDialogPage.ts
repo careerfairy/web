@@ -1,5 +1,4 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { Locator, Page, expect } from "@playwright/test"
 import { CommonPage } from "./CommonPage"
 
@@ -170,14 +169,6 @@ export default class LivestreamDialogPage extends CommonPage {
       await expect(
          this.page.getByTestId("PlayArrowRoundedIcon").locator("path")
       ).toBeVisible()
-   }
-
-   public async assertJobsAreVisible(jobs: LivestreamJobAssociation[]) {
-      await Promise.all(
-         jobs.map(async (job) => {
-            await expect(this.page.getByText(job.name)).toBeVisible()
-         })
-      )
    }
 
    async waitForRecommendationsToAppear() {

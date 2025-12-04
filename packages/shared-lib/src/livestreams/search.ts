@@ -62,7 +62,6 @@ export const LIVESTREAM_FIELDS_TO_INDEX = [
    "universities",
    "questionsDisabled",
    "denyRecordingAccess",
-   "jobs",
    "hasJobs",
    "isHybrid",
    "address",

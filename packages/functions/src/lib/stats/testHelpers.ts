@@ -7,7 +7,6 @@ type NewAndOldUserLivestreamDataOptions = {
    registered?: boolean
    talentPool?: boolean
    participated?: boolean
-   numberOfJobApplications?: number
    universityData?: {
       countryCode: string
       code: string
@@ -61,7 +60,6 @@ type UserLivestreamDataOptions = {
    talentPool?: boolean
    registered?: boolean
    participated?: boolean
-   numberOfJobApplications?: number
 }
 const generateUserLivestreamDataObj = (
    options: UserLivestreamDataOptions
@@ -72,9 +70,6 @@ const generateUserLivestreamDataObj = (
       talentPool: options.talentPool ? generateTalentPool() : null,
       registered: options.registered ? generateRegistered() : null,
       participated: options.participated ? generateParticipated() : null,
-      jobApplications: options.numberOfJobApplications
-         ? generateJobApplications(options.numberOfJobApplications)
-         : null,
       userId: options.user.authId,
       livestreamId: options.livestreamId,
    }
@@ -136,27 +131,6 @@ const generateParticipated = (): UserLivestreamData["participated"] => {
    return {
       date: timestampFromDate(pastDate),
    }
-}
-
-const generateJobApplications = (
-   numberOfApplications?: number
-): UserLivestreamData["jobApplications"] => {
-   const jobApplications: UserLivestreamData["jobApplications"] = {}
-
-   if (!numberOfApplications) return jobApplications
-
-   for (let i = 0; i < numberOfApplications; i++) {
-      const jobId = uuidv4()
-      jobApplications[jobId] = {
-         applicationId: uuidv4(),
-         jobId,
-         job: {},
-         groupId: uuidv4(),
-         integrationId: uuidv4(),
-         date: timestampFromDate(pastDate),
-      }
-   }
-   return jobApplications
 }
 
 const pastDate = new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 2)

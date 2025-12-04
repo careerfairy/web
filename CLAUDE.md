@@ -164,7 +164,7 @@ Material-UI theme, component overrides, global styles. Import via `import { bran
 -  **Streaming**: fetchAgoraRtcToken_v2, notifyUsersWhenLivestreamStarts, startRecordingLivestream_eu, interactive features
 -  **Groups**: createGroup, joinGroupDashboard_eu, changeRole_eu, analytics
 -  **Sparks**: CRUD operations, getSparksFeed, trackSparkEvents_v6, analytics
--  **Integrations**: stripeWebHook, fetchATSJobs_eu, syncUserToCustomerIO, customerIOWebhook
+-  **Integrations**: stripeWebHook, syncUserToCustomerIO, customerIOWebhook
 -  **Bundles**: Event and analytics aggregation APIs
 
 See `packages/functions/src/index.ts` for complete list.
@@ -333,7 +333,6 @@ External services (summary):
 | Mapbox           | Location search                |
 | Facebook/TikTok  | Event tracking                 |
 | Sentry           | Error tracking                 |
-| Merge API        | ATS integration                |
 | ImageKit         | CDN media delivery             |
 
 See `apps/web/data/` for client implementations.

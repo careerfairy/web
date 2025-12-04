@@ -131,14 +131,12 @@ const CreateBaseGroup = ({
          companySize: baseGroupInfo.companySize || "",
          companyIndustries: baseGroupInfo.companyIndustries || [],
          companyCountry: baseGroupInfo.companyCountry || null,
-         isATSEnabled: baseGroupInfo.isATSEnabled || false,
       }),
       [
          baseGroupInfo.companyCountry,
          baseGroupInfo.companyIndustries,
          baseGroupInfo.companySize,
          baseGroupInfo.description,
-         baseGroupInfo.isATSEnabled,
          baseGroupInfo.isUniversity,
          baseGroupInfo.logoFileObj,
          baseGroupInfo.logoUrl,
@@ -160,7 +158,6 @@ const CreateBaseGroup = ({
             companySize: values.companySize,
             companyIndustries: values.companyIndustries,
             companyCountry: values.companyCountry,
-            isATSEnabled: values.isATSEnabled,
          }
          setBaseGroupInfo(careerCenter)
          setSubmitting(false)
@@ -278,22 +275,6 @@ const CreateBaseGroup = ({
                         handleBlur={handleBlur}
                         touched={touched}
                         isSubmitting={isSubmitting}
-                     />
-
-                     <FormControlLabel
-                        control={
-                           <Checkbox
-                              value={values.isATSEnabled}
-                              checked={values.isATSEnabled}
-                              onChange={(event) => {
-                                 setFieldValue(
-                                    "isATSEnabled",
-                                    event.target.checked
-                                 )
-                              }}
-                           />
-                        }
-                        label="ATS integration enabled"
                      />
 
                      <FormControlLabel

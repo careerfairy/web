@@ -37,20 +37,14 @@ export async function run() {
          `Start confirming ${allLiveStreamsWithJobs?.length} live stream documents`
       )
 
-      // Filter live streams that do not have any associated custom jobs and have no Ats jobs listed
       const liveStreamsToTurnFlagToFalse: LivestreamEventWithRef[] =
-         allLiveStreamsWithJobs
-            .filter((event: LivestreamEvent) => {
-               return !allCustomJobs.some((customJob: CustomJob) => {
-                  return customJob.livestreams.some(
-                     (livestreamId) => livestreamId === event.id
-                  )
-               })
+         allLiveStreamsWithJobs.filter((event: LivestreamEvent) => {
+            return !allCustomJobs.some((customJob: CustomJob) => {
+               return customJob.livestreams.some(
+                  (livestreamId) => livestreamId === event.id
+               )
             })
-            .filter(
-               (event: LivestreamEvent) =>
-                  !event.jobs || event.jobs.length === 0
-            )
+         })
 
       console.log(
          `Start updating ${liveStreamsToTurnFlagToFalse?.length} live stream documents`

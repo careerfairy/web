@@ -26,21 +26,12 @@ const createFeatureFlagEnableCondition = (groupIds: string[]) => {
  * All feature flags with initial state
  *
  * They can be activated via query string, e.g:
- * - ?atsAdminPageFlag=true
  * - ?sparksAdminPageFlag=true
  * - ?sparksB2BOnboardingFlag=true
  * - ?levelsV1=true
  * - ?newEventsTableFlag=true
  */
 export const flagsInitialState = {
-   /**
-    * Group Admin Dashboard ATS
-    * Hide or Show
-    */
-   atsAdminPageFlag: {
-      enabled: false,
-      conditionalEnable: createFeatureFlagEnableCondition(testGoups),
-   },
    /**
     * Group Admin Dashboard Sparks
     * Hide or Show

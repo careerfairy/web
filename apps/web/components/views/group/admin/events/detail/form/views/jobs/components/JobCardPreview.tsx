@@ -1,5 +1,4 @@
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import {
    Box,
    Divider,
@@ -9,7 +8,6 @@ import {
    Stack,
    Typography,
 } from "@mui/material"
-import useIsAtsLivestreamJobAssociation from "components/custom-hook/useIsAtsLivestreamJobAssociation"
 import useMenuState from "components/custom-hook/useMenuState"
 import BrandedMenu from "components/views/common/inputs/BrandedMenu"
 import CollapsibleText from "components/views/common/inputs/CollapsibleText"
@@ -67,20 +65,18 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: PublicCustomJob | LivestreamJobAssociation
+   job: PublicCustomJob
    handleRemoveJob: (jobId: string) => void
    handleEditJob: (job: PublicCustomJob) => void
 }
 
 const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
    const { anchorEl, handleClick, handleClose, open } = useMenuState()
-   const isAtsLivestreamAssociation = useIsAtsLivestreamJobAssociation(job)
 
-   const jobIsPermanentlyExpired =
-      (job as PublicCustomJob)?.isPermanentlyExpired ?? false
+   const jobIsPermanentlyExpired = job?.isPermanentlyExpired ?? false
 
    const handleClickEdit = () => {
-      handleEditJob(job as PublicCustomJob)
+      handleEditJob(job)
       handleClose()
    }
 
@@ -89,10 +85,10 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
          <Grid container>
             <Grid xs={12} item sx={styles.titleSection}>
                <Typography variant="brandedH4" fontWeight="bold">
-                  {isAtsLivestreamAssociation ? job.name : job.title}
+                  {job.title}
                </Typography>
 
-               {!isAtsLivestreamAssociation && !jobIsPermanentlyExpired && (
+               {!jobIsPermanentlyExpired && (
                   <Box>
                      <IconButton onClick={handleClick} size="small">
                         <MoreVertical size={24} />
@@ -135,53 +131,49 @@ const JobCardPreview = ({ job, handleRemoveJob, handleEditJob }: Props) => {
                )}
             </Grid>
 
-            {!isAtsLivestreamAssociation && (
-               <Grid xs={12} item sx={styles.infoSection} mt={2}>
-                  <Stack spacing={2} direction={"row"}>
-                     {job.salary ? (
-                        <>
-                           <Typography variant="brandedBody">
-                              {job.salary}
-                           </Typography>
-                           <Divider orientation="vertical" />
-                        </>
-                     ) : null}
+            <Grid xs={12} item sx={styles.infoSection} mt={2}>
+               <Stack spacing={2} direction={"row"}>
+                  {job.salary ? (
+                     <>
+                        <Typography variant="brandedBody">
+                           {job.salary}
+                        </Typography>
+                        <Divider orientation="vertical" />
+                     </>
+                  ) : null}
 
-                     {job.jobType ? (
-                        <>
-                           <Typography variant="brandedBody">
-                              {job.jobType}
-                           </Typography>
-                           <Divider orientation="vertical" />
-                        </>
-                     ) : null}
+                  {job.jobType ? (
+                     <>
+                        <Typography variant="brandedBody">
+                           {job.jobType}
+                        </Typography>
+                        <Divider orientation="vertical" />
+                     </>
+                  ) : null}
 
-                     {job.deadline ? (
-                        <>
-                           <Typography variant="brandedBody">
-                              {DateUtil.formatDateToString(
-                                 job.deadline.toDate()
-                              )}
-                           </Typography>
-                        </>
-                     ) : null}
-                  </Stack>
+                  {job.deadline ? (
+                     <>
+                        <Typography variant="brandedBody">
+                           {DateUtil.formatDateToString(job.deadline.toDate())}
+                        </Typography>
+                     </>
+                  ) : null}
+               </Stack>
 
-                  <Typography sx={styles.postingUrl}>
-                     <Link
-                        href={job.postingUrl}
-                        color={"inherit"}
-                        underline={"none"}
-                        target={"_blank"}
-                        variant="brandedBody"
-                     >
-                        {job.postingUrl}
-                     </Link>
-                  </Typography>
-               </Grid>
-            )}
+               <Typography sx={styles.postingUrl}>
+                  <Link
+                     href={job.postingUrl}
+                     color={"inherit"}
+                     underline={"none"}
+                     target={"_blank"}
+                     variant="brandedBody"
+                  >
+                     {job.postingUrl}
+                  </Link>
+               </Typography>
+            </Grid>
 
-            <Grid xs={12} item mt={isAtsLivestreamAssociation ? 2 : 4}>
+            <Grid xs={12} item mt={4}>
                <CollapsibleText
                   text={job.description}
                   textStyle={styles.description}

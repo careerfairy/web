@@ -1,10 +1,7 @@
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { useTheme } from "@mui/material"
 import { useJobDialogRouter } from "components/custom-hook/custom-job/useJobDialogRouter"
-import useFeatureFlags from "components/custom-hook/useFeatureFlags"
-import { useGroup } from "layouts/GroupDashboardLayout"
-import { useCallback, useMemo } from "react"
+import { useCallback } from "react"
 import { Briefcase } from "react-feather"
 import EmptyFormSection from "../../../EmptyFormSection"
 import { useLivestreamFormValues } from "../../../useLivestreamFormValues"
@@ -16,23 +13,13 @@ type Props = {
 const JobList = ({ fieldId }: Props) => {
    const theme = useTheme()
    const { openJobDialog } = useJobDialogRouter()
-   const featureFlags = useFeatureFlags()
-   const { group } = useGroup()
-
-   const hasAtsIntegration =
-      featureFlags.atsAdminPageFlag || group.atsAdminPageFlag
 
    const {
       values: {
-         jobs: { customJobs, jobs: atsJobs },
+         jobs: { customJobs },
       },
       setFieldValue,
    } = useLivestreamFormValues()
-
-   const selectedJobs = useMemo(
-      () => (hasAtsIntegration ? atsJobs : customJobs),
-      [atsJobs, customJobs, hasAtsIntegration]
-   )
 
    const handleRemoveJob = useCallback(
       (jobId: string) => {
@@ -49,7 +36,7 @@ const JobList = ({ fieldId }: Props) => {
       [openJobDialog]
    )
 
-   if (selectedJobs.length === 0) {
+   if (customJobs.length === 0) {
       return (
          <EmptyFormSection
             icon={<Briefcase size={70} color={theme.palette.secondary.main} />}
@@ -61,16 +48,14 @@ const JobList = ({ fieldId }: Props) => {
       )
    }
 
-   return selectedJobs.map(
-      (job: PublicCustomJob | LivestreamJobAssociation, index: number) => (
-         <JobCardPreview
-            key={index}
-            job={job}
-            handleRemoveJob={handleRemoveJob}
-            handleEditJob={handleEditJob}
-         />
-      )
-   )
+   return customJobs.map((job: PublicCustomJob, index: number) => (
+      <JobCardPreview
+         key={index}
+         job={job}
+         handleRemoveJob={handleRemoveJob}
+         handleEditJob={handleEditJob}
+      />
+   ))
 }
 
 export default JobList

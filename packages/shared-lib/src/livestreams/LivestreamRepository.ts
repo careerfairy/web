@@ -5,7 +5,6 @@ import BaseFirebaseRepository, {
    mapFirestoreDocuments,
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
-import { Job, JobIdentifier } from "../ats/Job"
 import { Create, ImageType } from "../commonTypes"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Timestamp } from "../firebaseTypes"
@@ -18,7 +17,6 @@ import {
    LivestreamEventParsed,
    LivestreamEventPublicData,
    LivestreamEventSerialized,
-   LivestreamJobApplicationDetails,
    LivestreamPoll,
    LivestreamQuestion,
    LivestreamRecordingDetails,
@@ -155,22 +153,6 @@ export interface ILivestreamRepository {
    ): firebase.firestore.Query
 
    getById(id: string): Promise<LivestreamEvent>
-
-   /**
-    * Update the userLivestreamData/{userId} document with the job application details
-    * @param livestreamId
-    * @param userId
-    * @param jobIdentifier
-    * @param job
-    * @param applicationId
-    */
-   saveJobApplication(
-      livestreamId: string,
-      userId: string,
-      jobIdentifier: JobIdentifier,
-      job: Job,
-      applicationId: string
-   ): Promise<void>
 
    /**
     * Fetches the userLivestreamData documents that contains job applications for the given
@@ -1014,37 +996,6 @@ export class FirebaseLivestreamRepository
          .where(`${userAction}.date`, "!=", null)
    }
 
-   saveJobApplication(
-      livestreamId: string,
-      userId: string,
-      jobIdentifier: JobIdentifier,
-      job: Job,
-      applicationId: string
-   ): Promise<void> {
-      // should already exist since the user registered & participated
-      const docRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("userLivestreamData")
-         .doc(userId)
-
-      const details: LivestreamJobApplicationDetails = {
-         jobId: jobIdentifier.jobId,
-         groupId: jobIdentifier.groupId,
-         integrationId: jobIdentifier.integrationId,
-         // @ts-ignore
-         date: this.fieldValue.serverTimestamp(),
-         applicatonId: applicationId,
-         job: job.serializeToPlainObject(),
-      }
-
-      const toUpdate: Partial<UserLivestreamData> = {
-         [`jobApplications.${jobIdentifier.jobId}`]: details,
-      }
-
-      return docRef.update(toUpdate)
-   }
-
    async getLivestreamsWithJobs(
       groupId: string
    ): Promise<LivestreamEvent[] | null> {
@@ -1850,9 +1801,7 @@ export class LivestreamsDataParser {
    }
 
    filterByHasJobs() {
-      this.livestreams = this.livestreams?.filter(
-         ({ jobs, hasJobs }) => jobs?.length > 0 || hasJobs
-      )
+      this.livestreams = this.livestreams?.filter(({ hasJobs }) => hasJobs)
       return this
    }
 

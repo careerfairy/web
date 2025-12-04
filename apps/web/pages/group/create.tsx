@@ -46,7 +46,6 @@ export type BaseGroupInfo = {
    companySize?: string
    companyIndustries?: OptionGroup[]
    companyCountry?: OptionGroup
-   isATSEnabled?: boolean
 }
 const CreateGroup = () => {
    const firebase = useFirebaseService()
@@ -186,7 +185,6 @@ const CreateGroup = () => {
             description: baseGroupInfo.description?.trim(),
             test: false,
             universityCode: baseGroupInfo.university?.id || "",
-            atsAdminPageFlag: baseGroupInfo.isATSEnabled,
             companyCountry: baseGroupInfo.companyCountry,
             companyIndustries: baseGroupInfo.companyIndustries,
             companySize: baseGroupInfo.companySize,

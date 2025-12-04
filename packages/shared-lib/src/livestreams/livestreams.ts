@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import { Job, JobIdentifier } from "../ats/Job"
 import { Identifiable, OptionGroup, UTMParams } from "../commonTypes"
 import { PublicCustomJob } from "../customJobs/customJobs"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
@@ -172,14 +171,9 @@ export interface LivestreamEvent extends Identifiable {
     */
    denyRecordingAccess?: boolean
 
-   // ATS Jobs
    /**
-    * During livestream creating, jobs can be associated with the livestream
-    */
-   jobs?: LivestreamJobAssociation[]
-
-   /**
-    * Firestore has limitations when querying for jobs != []
+    * Flag indicating if the livestream has CustomJobs linked to it
+    * Updated via functions when CustomJobs are linked/unlinked
     */
    hasJobs?: boolean
 
@@ -330,14 +324,6 @@ export interface LivestreamStatus {
    seen?: boolean
 }
 
-export interface LivestreamJobAssociation {
-   groupId: string
-   integrationId: string
-   jobId: string
-   name: string
-   description?: string
-}
-
 export type LivestreamCustomJobAssociationPresenter = Omit<
    PublicCustomJob,
    "deadline"
@@ -347,7 +333,7 @@ export type LivestreamCustomJobAssociationPresenter = Omit<
 
 export type LivestreamUserAction = keyof Pick<
    UserLivestreamData,
-   "talentPool" | "registered" | "participated" | "jobApplications"
+   "talentPool" | "registered" | "participated"
 >
 
 /*
@@ -425,9 +411,6 @@ export interface UserLivestreamData extends Identifiable {
       // Origin source when added to calendar
       originSource?: ImpressionLocation | string
    } | null
-   jobApplications?: {
-      [jobId: string]: LivestreamJobApplicationDetails
-   }
 }
 
 /**
@@ -480,12 +463,6 @@ export interface RecordingStatsUser extends Identifiable {
    minutesWatched?: number
    date: firebase.firestore.Timestamp
    lastSecondWatched?: number
-}
-
-export interface LivestreamJobApplicationDetails extends JobIdentifier {
-   date: firebase.firestore.Timestamp
-   applicationId?: string
-   job: Partial<Job>
 }
 
 // Collection Path: livestreams/{livestreamId}/recordingStats/stats

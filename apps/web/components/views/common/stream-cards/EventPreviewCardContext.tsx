@@ -103,8 +103,8 @@ export const EventPreviewCardProvider: FC<EventPreviewCardProviderProps> = ({
 
       if (jobsCount === 0) return false
 
-      return Boolean(livestream?.hasJobs || livestream?.jobs?.length > 0)
-   }, [livestream?.hasJobs, livestream?.jobs?.length, jobsCount, loading])
+      return Boolean(livestream?.hasJobs)
+   }, [livestream?.hasJobs, jobsCount, loading])
 
    const isLive = useMemo(
       () => livestream?.hasStarted && !isPast,
