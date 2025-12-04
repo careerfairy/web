@@ -98,6 +98,7 @@ export const notifyLivestreamCreated = async (
          : null
 
    const body = {
+      Title: livestreamObj.title,
       "Start Date": formatEventStartDate(livestreamObj.start?.toDate?.()),
       Publisher: publisherEmailOrName,
       Company: livestreamObj.company,
@@ -120,6 +121,11 @@ export const notifyLivestreamCreated = async (
                  .join(", "),
            }
          : {}),
+      ...(livestreamObj.summary
+         ? {
+              Description: livestreamObj.summary,
+           }
+         : {}),
       "Live Stream Details": eventLink,
    }
 
@@ -129,7 +135,6 @@ export const notifyLivestreamCreated = async (
             type: "section",
             text: {
                type: "mrkdwn",
-               text: `Livestream created:\n*${livestreamObj.title}*`,
             },
          },
          {
