@@ -14,7 +14,6 @@ import {
    LivestreamEvent,
    LivestreamEventPublicData,
    LivestreamGroupQuestionsMap,
-   LivestreamJobAssociation,
    LivestreamLanguage,
    LivestreamMode,
    LivestreamStatus,
@@ -75,11 +74,6 @@ export class LivestreamPresenter extends BaseModel {
       public readonly hasJobs: boolean,
       public readonly useOldUI: boolean,
       public readonly livestreamType: "livestream" | "panel",
-      // ATS Jobs
-      /**
-       * During livestream creating, jobs can be associated with the livestream
-       */
-      public readonly jobs: LivestreamJobAssociation[],
 
       /**
        * An empty array means the livestream should target all the fields of study
@@ -272,10 +266,6 @@ export class LivestreamPresenter extends BaseModel {
       }
    }
 
-   getAssociatedJob(jobId: string): LivestreamJobAssociation | null {
-      return this.jobs.find((job) => job.jobId === jobId) ?? null
-   }
-
    getViewerEventRoomLink(): string {
       if (this.useOldUI) {
          return `/streaming/${this.id}/viewer`
@@ -331,7 +321,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.livestreamType === "panel" || livestream.isPanel
             ? "panel"
             : "livestream",
-         livestream.jobs ?? [],
          livestream.targetCountries ?? [],
          livestream.targetUniversities ?? [],
          livestream.targetFieldsOfStudy ?? [],
@@ -400,7 +389,6 @@ export class LivestreamPresenter extends BaseModel {
          livestream.hasJobs,
          livestream.useOldUI,
          livestream.livestreamType,
-         livestream.jobs,
          livestream.targetCountries,
          livestream.targetUniversities,
          livestream.targetFieldsOfStudy,
@@ -488,7 +476,6 @@ export class LivestreamPresenter extends BaseModel {
          isFaceToFace: this.isFaceToFace,
          isHybrid: this.isHybrid,
          hasJobs: this.hasJobs,
-         jobs: this.jobs,
          targetCountries: this.targetCountries,
          targetUniversities: this.targetUniversities,
          targetFieldsOfStudy: this.targetFieldsOfStudy,

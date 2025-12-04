@@ -104,17 +104,6 @@ export const SimpleCardAnalyticSkeleton: FC = () => {
 }
 
 type AggregationCardProps = Pick<Props, "value">
-export const ATSCard: FC<AggregationCardProps> = (props) => {
-   const { group } = useGroup()
-   return (
-      <CardAnalytic
-         title="In-stream applications"
-         value={props.value}
-         linkDescription={"Go to applicants"}
-         link={`/group/${group.id}/admin/ats-integration?section=1`}
-      />
-   )
-}
 
 export const TalentPoolCard: FC<AggregationCardProps> = (props) => {
    const { group } = useGroup()

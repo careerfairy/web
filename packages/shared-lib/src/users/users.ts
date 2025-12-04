@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import { Job } from "../ats/Job"
 import { Identifiable, UTMParams } from "../commonTypes"
 import { CustomJob } from "../customJobs/customJobs"
 import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
@@ -11,11 +10,7 @@ import {
    PublicGroup,
    UserGroupQuestionsWithAnswerMap,
 } from "../groups"
-import {
-   LivestreamEvent,
-   LivestreamEventPublicData,
-   LivestreamGroupQuestionsMap,
-} from "../livestreams"
+import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import Timestamp = firebase.firestore.Timestamp
 
 export interface UserData extends Identifiable {
@@ -345,30 +340,6 @@ export interface TalentProfile extends Identifiable {
    joinedAt: Timestamp
 }
 
-/**
- * Document /userData/{id}/ats/ats
- *
- * Will store the user ATS existent relationships
- */
-export interface UserATSDocument {
-   userId: string
-
-   // Map of AccountIds -> ATS Object IDs
-   // Stores the relation between each group linked account (Greenhouse, Teamtailor, etc)
-   // and Merge objects (Candidate id, Attachment ids, etc)
-   // We'll be able to answer the questions:
-   // - The user already has a Candidate ATS Model on the group TeamTailor account?
-   // - The user has already applied for a certain job?
-   atsRelations?: { [index: string]: UserATSRelations }
-}
-
-export interface UserATSRelations {
-   candidateId?: string
-   cvAttachmentId?: string
-   // map job id -> application id
-   jobApplications?: { [jobId: string]: string }
-}
-
 /*
  * Key is the groupId and value is a dictionary of keys questionId and values answerId
  * */
@@ -412,22 +383,6 @@ export type UserDataAnalytics = {
 } & Identifiable
 
 /**
- * userData/{id}/jobApplications/{doc}
- */
-export interface UserJobApplicationDocument extends Identifiable {
-   groupId: string
-   integrationId: string
-   jobId: string
-   date: Timestamp
-   updatedAt: Timestamp
-   job: Job // will be serialized to plain object
-   livestream: LivestreamEventPublicData
-   rejectedAt?: Timestamp
-   currentStage?: string
-   rejectReason?: string
-}
-
-/**
  * Public information about a user
  *
  * Useful to save on relationship documents
@@ -463,27 +418,9 @@ export const getLivestreamGroupQuestionAnswers = (
 }
 
 /**
- * Confirm if the user has already applied for a id in the
- * saved relations
- *
- * @param relations
- * @param jobId
+ * User Admin Groups
+ * Path: /userData/{userId}/userAdminGroups/{groupId}
  */
-export const userAlreadyAppliedForJob = (
-   relations: UserATSDocument,
-   jobId: string
-) => {
-   for (const relation of Object.values(relations?.atsRelations)) {
-      if (relation?.jobApplications?.[jobId]) {
-         return true
-      }
-   }
-
-   return false
-}
-
-// User Admin Groups
-// Path: /userData/{userId}/userAdminGroups/{groupId}
 export interface UserAdminGroup extends PublicGroup {
    userId: string
 }

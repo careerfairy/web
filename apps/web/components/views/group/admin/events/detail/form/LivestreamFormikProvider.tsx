@@ -66,7 +66,6 @@ const formQuestionsTabInitialValues: LivestreamFormQuestionsTabValues = {
 }
 
 const formJobsTabInitialValues: LivestreamFormJobsTabValues = {
-   jobs: [],
    customJobs: [],
 }
 
@@ -252,9 +251,8 @@ const convertLivestreamObjectToForm = ({
          hosts: formQuestionsTabInitialValues.hosts,
       },
       jobs: {
-         jobs: livestream.jobs || formJobsTabInitialValues.jobs,
          customJobs: customJobs.map(pickPublicDataFromCustomJob),
-      } as LivestreamFormJobsTabValues,
+      },
    }
 }
 

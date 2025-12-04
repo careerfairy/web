@@ -1,8 +1,8 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { Box, Typography, Grid } from "@mui/material"
-import { useFirestoreDocument } from "components/custom-hook/utils/useFirestoreDocument"
+import { Box, Typography } from "@mui/material"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useFirestoreDocument } from "components/custom-hook/utils/useFirestoreDocument"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { Briefcase, User } from "react-feather"
 import { useNextLivestreamCardLogic } from "./NextLivestreamCard"
@@ -17,9 +17,7 @@ export const LivestreamStats = ({
    const applications = (
       <Box display="flex" alignItems="center">
          <Briefcase width={20} />
-         <Typography ml={2}>
-            In-stream application: {livestream.jobs?.length > 0 ? "Yes" : "No"}
-         </Typography>
+         <Typography ml={2}>In-stream application: No</Typography>
       </Box>
    )
 

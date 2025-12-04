@@ -1,12 +1,3 @@
-import { useMemo } from "react"
-
-// react feather
-import { Sliders as ATSIcon } from "react-feather"
-
-// material-ui
-import Skeleton from "@mui/material/Skeleton"
-
-// project imports
 import {
    CompanyProfileIcon,
    ContentIcon,
@@ -15,12 +6,10 @@ import {
 import { AnalyticsIcon } from "components/views/common/icons/AnalyticsIcon"
 import { DashboardIcon } from "components/views/common/icons/DashboardIcon"
 import { JobsIcon } from "components/views/common/icons/JobsIcon"
-import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
+import { useMemo } from "react"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
-import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
 import NavList from "../common/NavList"
 import { INavLink } from "../types"
-import ATSStatus from "./ATSStatus"
 import { CompanyProfileStatus } from "./CompanyProfileStatus"
 import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 import { useGroup } from "./index"
@@ -37,10 +26,7 @@ export const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
    const { setMobileFullScreenMenu } = useGroupDashboard()
    const isMobile = useIsMobile()
 
-   const featureFlags = useFeatureFlags()
-
-   const hasAtsIntegration =
-      featureFlags.atsAdminPageFlag || group.atsAdminPageFlag
+   const hasAtsIntegration = false
 
    const handleMobileNavigate = () => {
       if (isMobile) {
@@ -124,19 +110,6 @@ export const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
          },
       ]
 
-      if (hasAtsIntegration) {
-         // Insert ATS integration before Support
-         links.push({
-            id: "ats",
-            href: `/${BASE_HREF_PATH}/${group.id}/admin/ats-integration`,
-            pathname: `/${BASE_HREF_PATH}/${BASE_PARAM}/admin/ats-integration`,
-            Icon: ATSIcon,
-            title: "ATS integration",
-            rightElement: <SuspensefulATSStatus groupId={group.id} />,
-            shallow: true,
-         })
-      }
-
       let filteredLinks = links
 
       // Filter links if allowedLinkIds is provided
@@ -158,23 +131,5 @@ export const GroupNavList = ({ allowedLinkIds }: Props = {}) => {
          links={navLinks}
          onMobileNavigate={handleMobileNavigate}
       />
-   )
-}
-
-const SuspensefulATSStatus = ({ groupId }: { groupId: string }) => {
-   return (
-      <SuspenseWithBoundary
-         fallback={
-            <Skeleton
-               variant="circular"
-               animation="pulse"
-               width={8}
-               height={8}
-            />
-         }
-         hide
-      >
-         <ATSStatus groupId={groupId} />
-      </SuspenseWithBoundary>
    )
 }

@@ -8,13 +8,11 @@ import {
    JobType,
    jobTypeOptions,
 } from "@careerfairy/shared-lib/dist/customJobs/customJobs"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import { faker } from "@faker-js/faker"
 import { randomInt } from "crypto"
 import * as admin from "firebase-admin"
 import { v4 as uuidv4 } from "uuid"
 import { fieldValue, firestore } from "./lib/firebase"
-const INTEGRATION_ID = "testIntegrationId"
 
 interface JobsSeed {
    /**
@@ -23,7 +21,7 @@ interface JobsSeed {
    createCustomJobs(
       groupId: string,
       livestreamIds: string[]
-   ): Promise<LivestreamJobAssociation[]>
+   ): Promise<CustomJob[]>
 
    /**
     * Creates a random customJob with the possibility of overriding the customJob fields.
@@ -46,8 +44,6 @@ interface JobsSeed {
    ): Promise<CustomJob[]>
 
    getCustomJobs(groupId: string): Promise<CustomJob[]>
-
-   getJobAssociations(jobs: CustomJob[]): LivestreamJobAssociation[]
 }
 
 class JobsFirebaseSeed implements JobsSeed {
@@ -71,9 +67,7 @@ class JobsFirebaseSeed implements JobsSeed {
       )
 
       const dummyData = await Promise.all(promise)
-      return dummyData.map((customJob) => {
-         return generateJobAssociation(groupId, customJob.id, customJob.title)
-      })
+      return dummyData
    }
 
    async randomJob(
@@ -132,32 +126,6 @@ class JobsFirebaseSeed implements JobsSeed {
       const snap = await query.get()
 
       return snap?.docs.map((doc) => doc.data() as CustomJob)
-   }
-
-   getJobAssociations(jobs: CustomJob[]) {
-      return jobs.map((job) => {
-         return generateJobAssociation(job.groupId, job.id, job.title)
-      })
-   }
-}
-
-export const generateLivestreamJob = (
-   groupId: string,
-   jobId: string
-): LivestreamJobAssociation => {
-   return generateJobAssociation(jobId, groupId, faker.random.word())
-}
-
-export const generateJobAssociation = (
-   groupId: string,
-   jobId: string,
-   name: string
-): LivestreamJobAssociation => {
-   return {
-      integrationId: INTEGRATION_ID,
-      groupId,
-      jobId,
-      name,
    }
 }
 

@@ -62,8 +62,6 @@ import rewards = require("./rewards")
 import wishes = require("./wishes")
 import cms = require("./cms")
 import marketing = require("./marketing")
-import atsUser = require("./atsUser")
-import atsGroup = require("./atsGroup")
 import bigQuery = require("./bigQuery")
 import groupAnalytics = require("./groupAnalytics")
 import cacheClear = require("./cacheClear")
@@ -242,22 +240,6 @@ exports.syncFieldsOfStudyToHygraph = cms.syncFieldsOfStudyToHygraph
 
 // Marketing
 exports.createMarketingUser_eu = marketing.createMarketingUser
-
-// ATS
-// Group
-exports.mergeGenerateLinkToken_eu = atsGroup.mergeGenerateLinkToken
-exports.mergeGetAccountToken_eu = atsGroup.mergeGetAccountToken
-exports.mergeMetaEndpoint_eu = atsGroup.mergeMetaEndpoint
-exports.mergeRemoveAccount_eu = atsGroup.mergeRemoveAccount
-exports.fetchATSJobs_eu = atsGroup.fetchATSJobs
-exports.fetchATSRecruiters_eu = atsGroup.fetchATSRecruiters
-exports.fetchATSSyncStatus_eu = atsGroup.fetchATSSyncStatus
-exports.candidateApplicationTest_eu = atsGroup.candidateApplicationTest
-
-// User
-exports.atsUserApplyToJob_eu = atsUser.atsUserApplyToJob
-exports.fetchLivestreamJobs_eu = atsUser.fetchLivestreamJobs
-exports.updateUserJobApplications_eu = atsUser.updateUserJobApplications
 
 // BigQuery
 exports.getBigQueryUsers_v2 = bigQuery.getBigQueryUsers

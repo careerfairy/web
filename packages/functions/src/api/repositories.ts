@@ -28,12 +28,10 @@ import {
    GroupFunctionsRepository,
    IGroupFunctionsRepository,
 } from "../lib/GroupFunctionsRepository"
-import { IATSRepository } from "../lib/IATSRepository"
 import {
    IUserFunctionsRepository,
    UserFunctionsRepository,
 } from "../lib/UserFunctionsRepository"
-import { getATSRepository } from "../lib/merge/util"
 import {
    ISparkFunctionsRepository,
    SparkFunctionsRepository,
@@ -108,13 +106,6 @@ export const universityRepo: IUniversityRepository =
 
 export const livestreamsRepo: ILivestreamFunctionsRepository =
    new LivestreamFunctionsRepository(firestore as any, FieldValue)
-
-export const atsRepo = (
-   apiKey: string,
-   accountToken: string
-): IATSRepository => {
-   return getATSRepository(apiKey, accountToken, firestore as any)
-}
 
 export const marketingUsersRepo: IMarketingUsersRepository =
    new FirebaseMarketingUsersRepository(firestore as any, FieldValue)

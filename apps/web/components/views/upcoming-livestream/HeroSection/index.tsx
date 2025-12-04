@@ -16,11 +16,9 @@ import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifica
 import Image from "next/legacy/image"
 import { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { AnalyticsEvents } from "../../../../util/analyticsConstants"
 import { dataLayerLivestreamEvent } from "../../../../util/analyticsUtils"
-import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 import useCountTime from "../../../custom-hook/useCountTime"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
@@ -33,7 +31,6 @@ import RecordingPlayer from "../RecordingPlayer"
 import CountDown from "./CountDown"
 import HeroHosts from "./HeroHosts"
 import HeroSpeakers from "./HeroSpeakers"
-import JobApply from "./JobApply"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
    if (showBigVideoPlayer) {
@@ -265,7 +262,7 @@ const HeroSection = ({
          // update to a bigger screen on desktop
          setShowBigVideoPlayer(true)
       }
-      
+
       // track recording play event when playback actually starts
       dataLayerLivestreamEvent(AnalyticsEvents.RecordingPlay, stream)
    }, [isMobile, startCounting, stream])
@@ -336,13 +333,6 @@ const HeroSection = ({
                         userEmailFromServer={userEmailFromServer}
                         streamPresenter={streamPresenter}
                      />
-                     {stream?.jobs?.length > 0 && (
-                        <EnsureUserIsLoggedIn>
-                           <SuspenseWithBoundary hide fallback="">
-                              <JobApply livestream={stream} />
-                           </SuspenseWithBoundary>
-                        </EnsureUserIsLoggedIn>
-                     )}
                   </Paper>
                </Box>
             </Grid>

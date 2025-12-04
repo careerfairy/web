@@ -21,7 +21,6 @@ import { useCallback, useMemo } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
-import { TableTitle } from "../../ats-integration/AccountJobs"
 import { useUtmData } from "./RegistrationSourcesContext"
 
 const LivestreamsTable = () => {
@@ -56,7 +55,7 @@ const LivestreamsTable = () => {
             onRowClick={rowOnClick}
             data={rows}
             key={tableKey}
-            title={<TableTitle title="Livestreams" />}
+            title={<Typography variant="h6">Livestreams</Typography>}
             options={{
                toolbar: false,
                draggable: false,

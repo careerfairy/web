@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    CustomJob,
    PublicCustomJob,
@@ -14,7 +13,6 @@ import {
 } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import useIsJobExpired from "components/custom-hook/custom-job/useIsJobExpired"
-import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { useCallback } from "react"
 import { sxStyles } from "types/commonTypes"
@@ -71,12 +69,12 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | CustomJob
+   job: CustomJob
    clicks?: number
    applicants?: number
    views?: number
    previewMode?: boolean
-   handleClick?: (job: Job | CustomJob, event?: React.MouseEvent) => void
+   handleClick?: (job: CustomJob, event?: React.MouseEvent) => void
    smallCard?: boolean
    hideJobUrl?: boolean
    titleSx?: SxProps<DefaultTheme>
@@ -106,7 +104,6 @@ const JobCard = ({
    selected,
 }: Props) => {
    const isJobExpired = useIsJobExpired(job as PublicCustomJob)
-   const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
    const theme = useTheme()
    const showAdditionalInfo = clicks !== undefined && applicants !== undefined
@@ -149,11 +146,9 @@ const JobCard = ({
                   selected && styles.selectedJobCard,
                ]}
             >
-               {isAtsJob ? null : (
-                  <Box
-                     sx={[styles.jobState, { background: getStateColor(job) }]}
-                  />
-               )}
+               <Box
+                  sx={[styles.jobState, { background: getStateColor(job) }]}
+               />
                <Box sx={styles.itemWrapper}>
                   <Grid
                      item

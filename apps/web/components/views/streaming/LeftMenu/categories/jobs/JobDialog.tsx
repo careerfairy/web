@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    CustomJobApplicationSourceTypes,
    PublicCustomJob,
@@ -22,14 +21,11 @@ import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import DateUtil from "../../../../../../util/DateUtil"
-import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 import Link from "../../../../common/Link"
 import CustomJobApplyConfirmationDialog from "./CustomJobApplyConfirmationDialog"
 import CustomJobEntryApply from "./CustomJobEntryApply"
-import CvUploadSection from "./CvUploadSection"
-import JobEntryApply from "./JobEntryApply"
 
 const styles = sxStyles({
    header: {
@@ -100,7 +96,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | PublicCustomJob
+   job: PublicCustomJob
    handleClose: () => unknown
    livestream: LivestreamEvent
    open: boolean
@@ -109,28 +105,15 @@ type Props = {
 const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
    const { userData } = useAuth()
    const { isStreamer } = useCurrentStream()
-   const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
-   const [alreadyApplied, setAlreadyApplied] = useState(false)
    const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
 
-   let hiringManager: string,
-      jobName: string,
-      jobType: string,
-      jobSalary: string,
-      jobDeadline: string
-
-   if (isAtsJob) {
-      hiringManager = job.getHiringManager()
-      jobName = job.name
-   } else {
-      jobName = job.title
-      jobType = job.jobType
-      jobSalary = job.salary
-      jobDeadline = job.deadline
-         ? DateUtil.formatDateToString(job.deadline.toDate())
-         : ""
-   }
+   const jobName = job.title
+   const jobType = job.jobType
+   const jobSalary = job.salary
+   const jobDeadline = job.deadline
+      ? DateUtil.formatDateToString(job.deadline.toDate())
+      : ""
 
    const handleShowConfirmation = useCallback(() => {
       setShowConfirmationDialog(true)
@@ -155,19 +138,6 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
    )
 
    const renderApplyButton = useMemo((): ReactElement => {
-      if (isAtsJob) {
-         return (
-            <Box mr={4}>
-               <JobEntryApply
-                  job={job}
-                  livestreamId={livestream.id}
-                  isApplied={alreadyApplied}
-                  handleAlreadyApply={setAlreadyApplied}
-               />
-            </Box>
-         )
-      }
-
       if (!userData) {
          return renderNeedsLogin
       }
@@ -184,17 +154,9 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
             />
          </Box>
       )
-   }, [
-      alreadyApplied,
-      handleShowConfirmation,
-      isAtsJob,
-      job,
-      livestream.id,
-      renderNeedsLogin,
-      userData,
-   ])
+   }, [handleShowConfirmation, job, livestream.id, renderNeedsLogin, userData])
 
-   if (showConfirmationDialog && !isAtsJob) {
+   if (showConfirmationDialog) {
       return (
          <CustomJobApplyConfirmationDialog
             open={open}
@@ -248,17 +210,6 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
 
          <DialogContent sx={styles.content}>
             <Stack spacing={2} sx={{ height: "100%" }}>
-               {hiringManager ? (
-                  <Box>
-                     <Typography variant={"subtitle1"} sx={styles.subTitle}>
-                        Hiring Manager
-                     </Typography>
-                     <Typography variant={"body1"} sx={styles.jobValues}>
-                        {hiringManager}
-                     </Typography>
-                  </Box>
-               ) : null}
-
                <Box>
                   <Typography variant={"subtitle1"} sx={styles.subTitle}>
                      Job description
@@ -285,18 +236,6 @@ const JobDialog = ({ job, handleClose, livestream, open }: Props) => {
                      <Typography variant={"body1"} sx={styles.jobValues}>
                         {jobDeadline}
                      </Typography>
-                  </Box>
-               ) : null}
-
-               {isAtsJob ? (
-                  <Box sx={styles.bottomSection}>
-                     <Box mt={2}>
-                        {userData ? (
-                           <CvUploadSection alreadyApplied={alreadyApplied} />
-                        ) : (
-                           renderNeedsLogin
-                        )}
-                     </Box>
                   </Box>
                ) : null}
             </Stack>

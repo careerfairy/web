@@ -174,7 +174,6 @@ const formValuesLivestreamEventPropertyMap = [
    ["general.targetLevelsOfStudy", "targetLevelsOfStudy"],
    ["general.groupIds", "groupIds"],
    ["questions.registrationQuestions.values", "groupQuestionsMap"],
-   ["jobs.jobs", "jobs"],
 ] as const
 
 export const mapFormValuesToLivestreamObject = (
@@ -274,10 +273,8 @@ export const mapFormValuesToLivestreamObject = (
       result.triGrams = livestreamTriGrams(result.title, result.company)
    }
 
-   if (formValues.jobs.customJobs || formValues.jobs.jobs) {
-      result.hasJobs =
-         formValues.jobs?.customJobs?.length > 0 ||
-         formValues.jobs?.jobs?.length > 0
+   if (formValues.jobs.customJobs) {
+      result.hasJobs = formValues.jobs?.customJobs?.length > 0
    }
 
    result.lastUpdated =

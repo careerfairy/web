@@ -1,19 +1,17 @@
-import React, { FC, useMemo } from "react"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Grid } from "@mui/material"
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import Skeleton from "@mui/material/Skeleton"
+import { FC, useMemo } from "react"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import useGroupCompanyPageProgress from "../../../../../../custom-hook/useGroupCompanyPageProgress"
 import {
-   ATSCard,
    AverageRegistrationsPerStreamCard,
    CardAnalytic,
    TalentPoolCard,
 } from "../../../common/CardAnalytic"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import AggregatedCompanyFollowersValue from "./AggregatedCompanyFollowersValue"
-import useGroupATSAccounts from "../../../../../../custom-hook/useGroupATSAccounts"
-import Skeleton from "@mui/material/Skeleton"
-import useGroupCompanyPageProgress from "../../../../../../custom-hook/useGroupCompanyPageProgress"
 
 const styles = sxStyles({
    gridItem: {
@@ -28,15 +26,8 @@ type Props = {
    progress: ReturnType<typeof useGroupCompanyPageProgress>
 }
 const AggregatedAnalytics: FC<Props> = ({ progress }) => {
-   const { groupPresenter, group, stats } = useGroup()
+   const { stats } = useGroup()
    const { livestreamStats } = useAnalyticsPageContext()
-
-   const { data: accounts } = useGroupATSAccounts(
-      groupPresenter.id,
-      groupPresenter
-   )
-
-   const hasAts = accounts.length > 0
 
    const companyPageReady = progress?.isReady
 
@@ -81,27 +72,16 @@ const AggregatedAnalytics: FC<Props> = ({ progress }) => {
                </Grid>
             </>
          ) : null}
-         {hasAts ? (
-            <>
-               <Grid xs={6} item style={styles.gridItem}>
-                  {talentPoolCard}
-               </Grid>
-               <Grid xs={6} item style={styles.gridItem}>
-                  <ATSCard value={summedResults.numberOfApplications} />
-               </Grid>
-            </>
-         ) : (
-            <>
-               <Grid xs={6} item style={styles.gridItem}>
-                  {talentPoolCard}
-               </Grid>
-               <Grid xs={6} item style={styles.gridItem}>
-                  <AverageRegistrationsPerStreamCard
-                     value={averageNumberOfRegistrations}
-                  />
-               </Grid>
-            </>
-         )}
+         <>
+            <Grid xs={6} item style={styles.gridItem}>
+               {talentPoolCard}
+            </Grid>
+            <Grid xs={6} item style={styles.gridItem}>
+               <AverageRegistrationsPerStreamCard
+                  value={averageNumberOfRegistrations}
+               />
+            </Grid>
+         </>
       </Grid>
    )
 }

@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
@@ -7,7 +6,6 @@ import Stack from "@mui/material/Stack"
 import { FC } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import DateUtil from "../../../../../../util/DateUtil"
-import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import SanitizedHTML from "../../../../../util/SanitizedHTML"
 
 const styles = sxStyles({
@@ -52,20 +50,14 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | PublicCustomJob
+   job: PublicCustomJob
 }
 
 const JobDescription: FC<Props> = ({ job }) => {
-   const isAtsJob = useIsAtsJob(job)
-
-   let jobSalary: string, jobDeadline: string
-
-   if (!isAtsJob) {
-      jobSalary = job.salary
-      jobDeadline = job.deadline
-         ? DateUtil.formatDateToString(job.deadline.toDate())
-         : ""
-   }
+   const jobSalary = job.salary
+   const jobDeadline = job.deadline
+      ? DateUtil.formatDateToString(job.deadline.toDate())
+      : ""
 
    return (
       <Stack spacing={"24px"}>

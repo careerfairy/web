@@ -20,7 +20,6 @@ const securePaths = [
    "/group/[groupId]/admin/analytics/live-streams/feedback/[[...feedback]]",
    "/group/[groupId]/admin/analytics/live-streams/registration-sources",
    "/group/[groupId]/admin/analytics/sparks",
-   "/group/[groupId]/admin/ats-integration",
    "/group/[groupId]/admin/profile",
    "/group/[groupId]/admin/jobs",
    "/group/[groupId]/admin/jobs/[[...jobId]]",

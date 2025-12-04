@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Box, Button, Skeleton, Stack, Typography } from "@mui/material"
@@ -7,7 +6,6 @@ import CircularLogo from "components/views/common/logos/CircularLogo"
 import { FC } from "react"
 import { Briefcase, Edit, Zap } from "react-feather"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import useIsAtsJob from "../../../../../custom-hook/useIsAtsJob"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
@@ -75,7 +73,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | PublicCustomJob
+   job: PublicCustomJob
    companyName: string
    companyLogoUrl: string
    editMode?: boolean
@@ -89,21 +87,13 @@ const JobHeader = ({
    editMode,
    handleClick,
 }: Props) => {
-   const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
 
-   let jobName: string, jobType: string, jobBusinessFunctionsTagIds: string[]
-
-   if (isAtsJob) {
-      jobName = job.name
-      jobType = job.getDepartment()
-   } else {
-      jobName = job.title
-      jobType = job.jobType
-      jobBusinessFunctionsTagIds = (job.businessFunctionsTagIds || []).map(
-         (tagId) => TagValuesLookup[tagId]
-      )
-   }
+   const jobName = job.title
+   const jobType = job.jobType
+   const jobBusinessFunctionsTagIds = (job.businessFunctionsTagIds || []).map(
+      (tagId) => TagValuesLookup[tagId]
+   )
 
    return (
       <>

@@ -58,8 +58,8 @@ export const addOperations = (
    )
 
    addOperationWithNumberCheck(
-      Object.keys(newData?.jobApplications || {}).length,
-      Object.keys(oldData?.jobApplications || {}).length,
+      0,
+      0,
       operationsToMakeObject,
       getAValidLivestreamStatsUpdateField(
          "numberOfApplicants",

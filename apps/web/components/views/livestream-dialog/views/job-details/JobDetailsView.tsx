@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    CustomJob,
    CustomJobApplicationSource,
@@ -21,18 +20,14 @@ import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-import useLivestreamJob from "../../../../custom-hook/ats/useLivestreamJob"
 import useCustomJob from "../../../../custom-hook/custom-job/useCustomJob"
 import useDialogStateHandler from "../../../../custom-hook/useDialogStateHandler"
-import useIsAtsJob from "../../../../custom-hook/useIsAtsJob"
+
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
+import { HeroContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import NotFoundView from "../common/NotFoundView"
 import JobDetailsViewSkeleton from "./JobDetailsViewSkeleton"
-import JobCTAButton from "./main-content/JobCTAButton"
-import JobDescription from "./main-content/JobDescription"
-import JobHeader from "./main-content/JobHeader"
 
 const styles = sxStyles({
    btnWrapper: {
@@ -113,17 +108,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 
    const isAutoApply = autoActionType === AutomaticActions.APPLY
 
-   let job: Job | PublicCustomJob
-
-   job = useLivestreamJob(livestreamPresenter.getAssociatedJob(jobId))
-
-   if (!job && customJob) {
-      // If entered here, it means that the current job is no Ats Job or don't exist
-      // In this situation, let's validate if it's a customJob
-      job = pickPublicDataFromCustomJob(customJob)
-   }
-
-   const isAtsJob = useIsAtsJob(job)
+   const job = pickPublicDataFromCustomJob(customJob)
 
    useEffect(() => {
       if (job && isAutoApply) {
@@ -175,31 +160,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
       </HeroContent>
    )
 
-   return isAtsJob ? (
-      <BaseDialogView
-         heroContent={livestreamDetailCustomJobHeroContent}
-         mainContent={
-            <MainContent>
-               <Stack spacing={3}>
-                  <JobHeader
-                     job={job}
-                     companyName={livestreamPresenter.company}
-                     companyLogoUrl={livestreamPresenter.companyLogoUrl}
-                  />
-
-                  <JobDescription job={job} />
-               </Stack>
-            </MainContent>
-         }
-         fixedBottomContent={
-            <JobButton
-               job={job as Job}
-               livestreamId={livestream.id}
-               handleOpen={handleOpen}
-            />
-         }
-      />
-   ) : (
+   return (
       <CustomJobDetailsProvider
          customJob={job as CustomJob}
          source={applicationSource}
@@ -219,7 +180,7 @@ const JobDetails: FC<Props> = ({ jobId }) => {
 }
 
 type JobButtonProps = {
-   job: Job
+   job: PublicCustomJob
    livestreamId: string
    isSecondary?: boolean
    handleOpen: () => void
@@ -228,35 +189,17 @@ type JobButtonProps = {
 export const JobButton: FC<JobButtonProps> = ({
    job,
    livestreamId,
-   isSecondary = false,
    handleOpen,
-   ...props
 }) => {
-   const isAtsJob = useIsAtsJob(job)
-   const { isLoggedIn } = useAuth()
-
    return (
-      <>
-         {isAtsJob ? (
-            isLoggedIn && (
-               <JobCTAButton
-                  livestreamId={livestreamId}
-                  job={job as Job}
-                  isSecondary={isSecondary}
-                  {...props}
-               />
-            )
-         ) : (
-            <CustomJobCTAButtons
-               applicationSource={{
-                  id: livestreamId,
-                  source: CustomJobApplicationSourceTypes.Livestream,
-               }}
-               job={job as PublicCustomJob}
-               handleApplyClick={handleOpen}
-            />
-         )}
-      </>
+      <CustomJobCTAButtons
+         applicationSource={{
+            id: livestreamId,
+            source: CustomJobApplicationSourceTypes.Livestream,
+         }}
+         job={job}
+         handleApplyClick={handleOpen}
+      />
    )
 }
 

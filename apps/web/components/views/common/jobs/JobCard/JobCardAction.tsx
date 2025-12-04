@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Button, Grid } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
@@ -32,14 +31,14 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | CustomJob
+   job: CustomJob
    previewMode: boolean
    applied: boolean
 }
 
 const JobCardAction = ({ job, previewMode, applied }: Props) => {
-   const jobPublished = (job as CustomJob)?.published ?? true
-   const isJobEditable = !(job as CustomJob)?.isPermanentlyExpired ?? true
+   const jobPublished = job?.published ?? true
+   const isJobEditable = !job?.isPermanentlyExpired ?? true
 
    if (previewMode) {
       return <JobButtonAction published={jobPublished || applied} />

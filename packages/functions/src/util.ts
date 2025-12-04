@@ -1,4 +1,3 @@
-import { ATSPaginatedResults } from "@careerfairy/shared-lib/ats/Functions"
 import { BaseModel } from "@careerfairy/shared-lib/BaseModel"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { mainProductionDomainWithProtocol } from "@careerfairy/shared-lib/utils/urls"
@@ -296,19 +295,6 @@ export const onCallWrapperV2 = <T>(
  */
 export function serializeModels<T extends BaseModel>(result: T[]) {
    return result.map((entry) => entry.serializeToPlainObject())
-}
-
-/**
- * Convert business models into plain objects (arrays)
- * @param result
- */
-export function serializePaginatedModels<T extends BaseModel>(
-   result: ATSPaginatedResults<T>
-): ATSPaginatedResults<object> {
-   return {
-      ...result,
-      results: result?.results?.map((e) => e.serializeToPlainObject()),
-   }
 }
 
 /**

@@ -1,4 +1,3 @@
-import JobsSeed from "@careerfairy/seed-data/jobs"
 import LivestreamSeed from "@careerfairy/seed-data/livestreams"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamsAdminPage } from "tests/e2e/page-object-models/admin/LivestreamsAdminPage"
@@ -55,7 +54,7 @@ test.describe("Group Admin Livestreams", () => {
 
       // create draft - with missing required fields
       await groupPage.clickCreateNewLivestreamTop()
-      await groupPage.fillLivestreamForm(livestreamToPublish, true)
+      await groupPage.fillLivestreamForm(livestreamToPublish, { publish: true })
 
       const livestreamsPage = new LivestreamsAdminPage(groupPage)
 
@@ -83,24 +82,22 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.assertTextIsVisible(title)
    })
 
-   // TODO: different tests for ats and not ats
-
    test("Create a draft live stream with job openings - No ATS", async ({
       groupPage,
       customJobs,
    }) => {
       await setupLivestreamData()
 
-      const jobs = customJobs.slice(0, 2) // only select some
-      const livestreamJobAssociations = JobsSeed.getJobAssociations(jobs)
-
       const livestream = LivestreamSeed.randomDraft({
-         jobs: livestreamJobAssociations,
+         hasJobs: true,
          speakers: [],
+         customJobs: customJobs,
       })
 
       await groupPage.clickCreateNewLivestreamTop()
-      await groupPage.fillLivestreamForm(livestream)
+      await groupPage.fillLivestreamForm(livestream, {
+         customJobs: customJobs.slice(0, 2),
+      })
 
       // Finish editing the draft
       const livestreamsPage = await groupPage.goToLivestreams()
@@ -110,7 +107,8 @@ test.describe("Group Admin Livestreams", () => {
       // Click on the specific event to navigate to the edit page
       await livestreamsPage.clickEventToEditByTitle(livestream.title)
 
-      const addedJobLinks = jobs.map((job) => job.postingUrl)
+      const selectedCustomJobs = customJobs.slice(0, 2)
+      const addedJobLinks = selectedCustomJobs.map((job) => job.postingUrl)
       await groupPage.assertJobIsAttachedToStream(addedJobLinks)
    })
 

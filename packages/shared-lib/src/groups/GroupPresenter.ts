@@ -4,7 +4,6 @@ import { FeatureFlagsState } from "../feature-flags/types"
 import { toDate } from "../firebaseTypes"
 import { UserData } from "../users"
 import { IMAGE_CONSTANTS } from "../utils/image"
-import { GroupATSAccount } from "./GroupATSAccount"
 import {
    FeaturedGroup,
    Group,
@@ -23,7 +22,6 @@ import {
    getPlanConstants,
 } from "./planConstants"
 
-export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
 const DAYS_LEFT_TO_WARN_CONTENT_CREATION = 3
 const DAYS_LEFT_TO_WARN_TRIAL = 14
@@ -52,7 +50,6 @@ export const LOGO_IMAGE_SPECS = {
 }
 
 export class GroupPresenter implements IFeatureFlagsConsumer {
-   public atsAccounts: GroupATSAccount[]
    public hasLivestream: boolean
    public featureFlags: FeatureFlagsState
    public hasMentors: boolean
@@ -90,14 +87,6 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
 
    setFeatureFlags(featureFlags: FeatureFlagsState): void {
       this.featureFlags = featureFlags
-   }
-
-   setAtsAccounts(accounts: GroupATSAccount[]) {
-      this.atsAccounts = accounts
-   }
-
-   atsAllowLinkNewAccounts() {
-      return this.atsAccounts.length < ATS_MAX_LINKED_ACCOUNTS
    }
 
    static createFromDocument(group: Group) {

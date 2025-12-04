@@ -38,8 +38,6 @@ import {
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
-   GroupATSAccountDocument,
-   GroupATSIntegrationTokensDocument,
    GroupPhoto,
    GroupQuestion,
    GroupVideo,
@@ -67,33 +65,6 @@ export interface IGroupRepository {
    cleanAndSerializeGroup(
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
-
-   // ATS actions
-   getATSIntegrations(groupId: string): Promise<GroupATSAccountDocument[]>
-
-   removeATSIntegration(groupId: string, integrationId: string): Promise<void>
-
-   createATSIntegration(
-      groupId: string,
-      integrationId: string,
-      data: Partial<GroupATSAccountDocument>
-   ): Promise<void>
-
-   saveATSIntegrationTokens(
-      groupId: string,
-      integrationId: string,
-      data: Partial<GroupATSIntegrationTokensDocument>
-   ): Promise<void>
-
-   /**
-    * Should only be called from backends
-    * @param groupId
-    * @param integrationId
-    */
-   getATSIntegrationTokens(
-      groupId: string,
-      integrationId: string
-   ): Promise<GroupATSIntegrationTokensDocument>
 
    getGroupQuestions(groupId: string): Promise<GroupQuestion[]>
 
@@ -442,111 +413,6 @@ export class FirebaseGroupRepository
          .where("featured.targetCountries", "array-contains", countryIsoCode)
          .get()
          .then((snaps) => mapFirestoreDocuments<Group>(snaps))
-   }
-
-   /*
-   |--------------------------------------------------------------------------
-   | ATS Actions
-   |--------------------------------------------------------------------------
-   */
-   async getATSIntegrations(
-      groupId: string
-   ): Promise<GroupATSAccountDocument[]> {
-      const docs = await this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("ats")
-         .get()
-
-      if (docs.empty) {
-         return []
-      }
-
-      return this.addIdToDocs<GroupATSAccountDocument>(docs.docs)
-   }
-
-   createATSIntegration(
-      groupId: string,
-      integrationId: string,
-      data: Partial<GroupATSAccountDocument>
-   ) {
-      data.updatedAt =
-         this.fieldValue.serverTimestamp() as firebase.firestore.Timestamp
-      data.createdAt =
-         this.fieldValue.serverTimestamp() as firebase.firestore.Timestamp
-
-      return this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("ats")
-         .doc(integrationId)
-         .set(data)
-   }
-
-   saveATSIntegrationTokens(
-      groupId: string,
-      integrationId: string,
-      data: Partial<GroupATSIntegrationTokensDocument>
-   ) {
-      return this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("ats")
-         .doc(integrationId)
-         .collection("tokens")
-         .doc("tokens")
-         .set(data)
-   }
-
-   async getATSIntegrationTokens(groupId: string, integrationId: string) {
-      const doc = await this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("ats")
-         .doc(integrationId)
-         .collection("tokens")
-         .doc("tokens")
-         .get()
-
-      if (!doc.exists) {
-         return null
-      }
-
-      return this.addIdToDoc<GroupATSIntegrationTokensDocument>(doc)
-   }
-
-   /**
-    * Removes the ATS document and child documents
-    *
-    * @param groupId
-    * @param integrationId
-    */
-   async removeATSIntegration(
-      groupId: string,
-      integrationId: string
-   ): Promise<void> {
-      const batch = this.firestore.batch()
-
-      batch.delete(
-         this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("ats")
-            .doc(integrationId)
-      )
-
-      // Child documents
-      batch.delete(
-         this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("ats")
-            .doc(integrationId)
-            .collection("tokens")
-            .doc("tokens")
-      )
-
-      return await batch.commit()
    }
 
    async getGroupQuestions(groupId: string): Promise<GroupQuestion[]> {

@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import {
    CustomJob,
    CustomJobApplicationSourceTypes,
@@ -84,7 +83,7 @@ const Content = ({ livestreamId, isHost, hostCompanyId }) => {
    return (
       <>
          <Stack sx={styles.jobList}>
-            {jobsToShow.map((job: Job | CustomJob) => (
+            {jobsToShow.map((job: CustomJob) => (
                <Box key={job.id}>
                   <SuspenseWithBoundary fallback={<JobCardSkeleton />}>
                      <JobCard

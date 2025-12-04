@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { CircularProgress, List } from "@mui/material"
@@ -6,7 +5,6 @@ import { useCallback, useMemo, useState } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useGroupCustomJobs from "../../../../../custom-hook/custom-job/useGroupCustomJobs"
 import useDialogStateHandler from "../../../../../custom-hook/useDialogStateHandler"
-import useLivestreamJobs from "../../../../../custom-hook/useLivestreamJobs"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import JobDialog from "./JobDialog"
 import JobItem from "./JobItem"
@@ -22,15 +20,14 @@ type Props = {
    livestream: LivestreamEvent
 }
 const JobList = ({ livestream }: Props) => {
-   const { jobs: atsJobs } = useLivestreamJobs(undefined, livestream.jobs)
    const livestreamCustomJobs = useGroupCustomJobs(livestream.groupIds[0], {
       livestreamId: livestream.id,
    })
 
-   const [selectedJob, setSelectedJob] = useState(null)
+   const [selectedJob, setSelectedJob] = useState<CustomJob | null>(null)
    const jobsToShow = useMemo(
-      () => (atsJobs.length ? atsJobs : livestreamCustomJobs || []),
-      [atsJobs, livestreamCustomJobs]
+      () => livestreamCustomJobs || [],
+      [livestreamCustomJobs]
    )
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -41,7 +38,7 @@ const JobList = ({ livestream }: Props) => {
    }, [handleCloseDialog])
 
    const handleJobClick = useCallback(
-      (job: Job | CustomJob) => {
+      (job: CustomJob) => {
          setSelectedJob(job)
          handleOpenDialog()
       },
@@ -55,7 +52,7 @@ const JobList = ({ livestream }: Props) => {
    return (
       <>
          <List sx={styles.list}>
-            {jobsToShow.map((job: Job | CustomJob) => (
+            {jobsToShow.map((job: CustomJob) => (
                <JobItem
                   key={job.id}
                   job={job}

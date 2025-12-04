@@ -128,12 +128,8 @@ export const groupAdminFixture = base.extend<{
 
       switch (options.atsGroupType) {
          case "COMPLETE":
-            await GroupSeed.setupATSForGroup(group)
             break
          case "NEEDS_APPLICATION_TEST":
-            await GroupSeed.setupATSForGroup(group, {
-               needsApplicationTest: true,
-            })
             break
       }
 

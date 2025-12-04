@@ -1,5 +1,4 @@
 import { PublicCustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { sxStyles } from "@careerfairy/shared-ui"
 import { Typography } from "@mui/material"
 import Box from "@mui/material/Box"
@@ -51,7 +50,7 @@ const styles = sxStyles({
 })
 
 type JobsProps = {
-   jobs: (LivestreamJobAssociation | PublicCustomJob)[]
+   jobs: PublicCustomJob[]
 }
 
 const Jobs = ({ jobs }: JobsProps) => {
@@ -60,18 +59,9 @@ const Jobs = ({ jobs }: JobsProps) => {
          <SectionTitle>Jobs in focus</SectionTitle>
          <Stack spacing={2}>
             {jobs ? (
-               jobs.map((job, index) => {
-                  const isAtsLivestreamAssociation = "integrationId" in job
-
-                  return (
-                     <JobItem
-                        key={index}
-                        jobName={
-                           isAtsLivestreamAssociation ? job.name : job.title
-                        }
-                     />
-                  )
-               })
+               jobs.map((job, index) => (
+                  <JobItem key={index} jobName={job.title} />
+               ))
             ) : (
                <JobsSkeleton />
             )}

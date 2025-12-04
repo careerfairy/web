@@ -1,4 +1,3 @@
-import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { TagValuesLookup } from "@careerfairy/shared-lib/constants/tags"
 import { CustomJob } from "@careerfairy/shared-lib/customJobs/customJobs"
 import { Timestamp } from "@careerfairy/shared-lib/firebaseTypes"
@@ -7,7 +6,6 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCustomJobLocation } from "components/custom-hook/custom-job/useCustomJobLocation"
 import useUserJobApplication from "components/custom-hook/custom-job/useUserJobApplication"
-import useIsAtsJob from "components/custom-hook/useIsAtsJob"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
 import { DateTime } from "luxon"
@@ -115,7 +113,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   job: Job | CustomJob
+   job: CustomJob
    previewMode: boolean
    smallCard: boolean
    hideJobUrl?: boolean
@@ -136,7 +134,6 @@ const JobCardDetails = ({
    hideCompanyName,
 }: Props) => {
    const { userData } = useAuth()
-   const isAtsJob = useIsAtsJob(job)
    const isMobile = useIsMobile()
 
    const jobApplication = useUserJobApplication(userData?.id, job.id)
@@ -146,38 +143,21 @@ const JobCardDetails = ({
       othersCount,
       otherLocations,
       workplaceText,
-   } = useCustomJobLocation(job as CustomJob, {
+   } = useCustomJobLocation(job, {
       maxLocationsToShow: isMobile ? 1 : 3,
    })
 
-   const showWarning = useMemo(
-      () => !isAtsJob && isJobValidButNoLinkedContent(job),
-      [isAtsJob, job]
-   )
+   const showWarning = useMemo(() => isJobValidButNoLinkedContent(job), [job])
 
-   let jobName: string
-   let jobType: string
-   let jobDeadline: Timestamp
-   let jobPostingUrl: string
-   let jobPublished: boolean
-   let jobBusinessTags: string
-   let jobIsPermanentlyExpired: boolean
-
-   if (isAtsJob) {
-      jobName = job.name
-      jobType = job.getDepartment()
-   } else {
-      jobName = job?.title
-      jobType = job?.jobType
-      jobDeadline = job?.deadline
-      jobPostingUrl = job?.postingUrl
-      jobPublished = job?.published
-      jobBusinessTags = (job?.businessFunctionsTagIds || [])
-         .map((tagId) => TagValuesLookup[tagId])
-         .join(", ")
-
-      jobIsPermanentlyExpired = job?.isPermanentlyExpired
-   }
+   const jobName = job?.title
+   const jobType = job?.jobType
+   const jobDeadline = job?.deadline
+   const jobPostingUrl = job?.postingUrl
+   const jobPublished = job?.published
+   const jobBusinessTags = (job?.businessFunctionsTagIds || [])
+      .map((tagId) => TagValuesLookup[tagId])
+      .join(", ")
+   const jobIsPermanentlyExpired = job?.isPermanentlyExpired
 
    const published = jobPublished || jobApplication.alreadyApplied
 

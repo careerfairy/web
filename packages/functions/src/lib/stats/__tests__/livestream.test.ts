@@ -1,11 +1,11 @@
-import { addOperations } from "../livestream"
 import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
-import { increment } from "../util"
 import {
    LivestreamStatsKey,
    LivestreamStatsMap,
 } from "@careerfairy/shared-lib/livestreams/stats"
+import { addOperations } from "../livestream"
 import { createNewAndOldUserLivestreamData } from "../testHelpers"
+import { increment } from "../util"
 
 describe("Adding operations to livestream stats", () => {
    test("should not modify operationsToMakeObject when newUserLivestreamData and oldUserLivestreamData are identical", () => {
@@ -62,30 +62,6 @@ describe("Adding operations to livestream stats", () => {
 
       expect(operationsToMakeObject).toStrictEqual({
          [generalSat("numberOfRegistrations")]: increment(-1),
-      })
-   })
-
-   test("should increment numberOfApplicants when user applies to another job", () => {
-      const { newUserLivestreamData, oldUserLivestreamData } =
-         createNewAndOldUserLivestreamData(
-            {
-               numberOfJobApplications: 2,
-            },
-            {
-               numberOfJobApplications: 1,
-            }
-         )
-
-      const operationsToMakeObject: any = {}
-
-      addOperations(
-         newUserLivestreamData,
-         oldUserLivestreamData,
-         operationsToMakeObject
-      )
-
-      expect(operationsToMakeObject).toStrictEqual({
-         [generalSat("numberOfApplicants")]: increment(1),
       })
    })
 
