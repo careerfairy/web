@@ -195,7 +195,7 @@ const CompanyBanner: FC<CompanyBannerProps> = ({ url, groupId }) => {
 const DefaultLabel: FC = () => {
    return (
       <>
-         <Typography zIndex={1}>Recommended size: 2880x480px</Typography>
+         <Typography zIndex={1}>Recommended size: 2880x576px</Typography>
          <Button
             size="small"
             color="secondary"

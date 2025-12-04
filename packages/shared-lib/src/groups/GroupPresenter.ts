@@ -208,7 +208,7 @@ export class GroupPresenter implements IFeatureFlagsConsumer {
 
       return [
          {
-            label: "Add company logo and banner (recommended size: 2880x57px)",
+            label: "Add company logo and banner (recommended size: 2880x576px)",
             checkIsComplete: () => Boolean(this.logoUrl && this.bannerImageUrl),
             isInitial: true,
             section: "banner",
