@@ -1,123 +1,251 @@
-import { Dialog, DialogContent } from "@mui/material"
-import { useMemo } from "react"
-import SwipeableViews from "react-swipeable-views"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { AnimatedTabPanel } from "../../../../../../../materialUI/GlobalPanels/GlobalPanels"
-import { sxStyles } from "../../../../../../../types/commonTypes"
-import useIsMobile from "../../../../../../custom-hook/useIsMobile"
-
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { useListenToDocument } from "components/custom-hook/useListenToDocument"
+import { getQueryStringArray } from "@careerfairy/shared-lib/utils"
+import { Typography } from "@mui/material"
+import Stack from "@mui/material/Stack"
+import useIsMobile from "components/custom-hook/useIsMobile"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import { SlideUpTransition } from "components/views/common/transitions"
-import { useFeedbackDialogContext } from "./FeedbackDialogProvider"
-import { GeneralOverviewContent, GeneralOverviewTitle } from "./GeneralOverview"
-import { RatingOverviewContent, RatingOverviewTitle } from "./RatingOverview"
-import Title from "./Title"
+import { doc, getDoc } from "firebase/firestore"
+import { useRouter } from "next/router"
+import {
+   createContext,
+   Fragment,
+   ReactNode,
+   useCallback,
+   useContext,
+   useMemo,
+} from "react"
+import { useFirestore } from "reactfire"
+import useSWR from "swr"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import DateUtil from "../../../../../../../util/DateUtil"
+import { ResponsiveDialogLayout } from "../../../../../common/ResponsiveDialog"
+import { EventRatingWithType } from "../../../events/detail/form/views/questions/commons"
+import { useFeedbackQuestions } from "../../../events/detail/form/views/questions/useFeedbackQuestions"
+import { FeedbackDetail } from "./FeedbackDetail"
+import { FeedbackDialogSkeleton } from "./FeedbackDialogSkeleton"
 
 const styles = sxStyles({
-   content: {
-      px: {
-         mobile: 4.75,
-      },
-   },
    paper: {
-      maxWidth: 996,
+      maxWidth: 1100,
+      p: {
+         xs: 1.5,
+         md: 4,
+      },
+      maxHeight: "90vh",
+   },
+   dialogContent: (theme) => ({
+      p: "0px !important",
+      mt: {
+         xs: `${theme.spacing(3)} !important`,
+         md: `${theme.spacing(4)} !important`,
+      },
+   }),
+   header: {
+      p: "0px !important",
+      position: "relative",
+      "& .close-button": {
+         position: "absolute",
+         top: {
+            xs: 0,
+            md: -16,
+         },
+         right: {
+            xs: 0,
+            md: -16,
+         },
+      },
    },
 })
 
-const generalOverviewKey = 0
-const ratingOverviewKey = 1
+type FeedbackDialogContextValue = {
+   liveStreamStats: LiveStreamStats
+   onClose: () => void
+   selectedFeedbackQuestion: EventRatingWithType
+   allFeedbackQuestions: EventRatingWithType[]
+   onFeedbackQuestionClick: (question: EventRatingWithType) => void
+}
 
-type Value = typeof generalOverviewKey | typeof ratingOverviewKey
+const FeedbackDialogContext = createContext<
+   FeedbackDialogContextValue | undefined
+>(undefined)
 
-const FeedbackDialog = () => {
-   const {
-      livestreamId,
-      feedbackQuestionId,
-      onRatingQuestionClick,
-      onBackToFeedback,
-      onCloseFeedbackDialog,
-   } = useFeedbackDialogContext()
+export const useFeedbackDialogContext = (): FeedbackDialogContextValue => {
+   const context = useContext(FeedbackDialogContext)
+   if (!context) {
+      throw new Error(
+         "useFeedbackDialogContext must be used within a FeedbackDialogContext.Provider"
+      )
+   }
+   return context
+}
 
-   const { group } = useGroup()
-   const isMobile = useIsMobile()
+type FeedbackDialogProviderProps = {
+   liveStreamStats: LiveStreamStats
+   onClose: () => void
+   children: ReactNode
+}
 
-   const { data: livestreamStats } = useListenToDocument<LiveStreamStats>(
-      livestreamId ? `livestreams/${livestreamId}/stats/livestreamStats` : null
+const FeedbackDialogProvider = ({
+   liveStreamStats,
+   onClose,
+   children,
+}: FeedbackDialogProviderProps) => {
+   const router = useRouter()
+   const { feedbackQuestions: allFeedbackQuestions } = useFeedbackQuestions(
+      liveStreamStats.livestream.id,
+      "livestreams"
    )
 
-   const value = useMemo<Value>(() => {
-      if (feedbackQuestionId) {
-         return ratingOverviewKey
-      }
-      return generalOverviewKey
-   }, [feedbackQuestionId])
+   const currentId = getQueryStringArray(router.query.feedbackId)[0]
+
+   const selectedQuestionId = currentId || allFeedbackQuestions?.[0]?.id || null
+
+   const onFeedbackQuestionClick = useCallback(
+      (question: EventRatingWithType) => {
+         router.push(
+            {
+               pathname: router.pathname,
+               query: { ...router.query, feedbackId: question.id },
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [router]
+   )
+
+   const selectedFeedbackQuestion = useMemo(
+      () =>
+         allFeedbackQuestions.find(
+            (question) => question.id === selectedQuestionId
+         ) ?? null,
+      [allFeedbackQuestions, selectedQuestionId]
+   )
+
+   const contextValue = useMemo<FeedbackDialogContextValue>(
+      () => ({
+         liveStreamStats,
+         onClose,
+         selectedFeedbackQuestion,
+         allFeedbackQuestions,
+         onFeedbackQuestionClick,
+      }),
+      [
+         liveStreamStats,
+         onClose,
+         selectedFeedbackQuestion,
+         allFeedbackQuestions,
+         onFeedbackQuestionClick,
+      ]
+   )
+
+   if (!selectedFeedbackQuestion) {
+      return null
+   }
 
    return (
-      <Dialog
-         open={Boolean(livestreamStats)}
-         onClose={onCloseFeedbackDialog}
+      <FeedbackDialogContext.Provider value={contextValue}>
+         {children}
+      </FeedbackDialogContext.Provider>
+   )
+}
+
+type FeedbackDialogProps = {
+   livestreamId: string
+   onClose: () => void
+}
+
+const useLivestreamStats = (livestreamId: string | undefined) => {
+   const firestore = useFirestore()
+
+   const { data: stats } = useSWR(
+      livestreamId ? `livestream-stats-${livestreamId}` : null,
+      async () => {
+         const statsRef = doc(
+            firestore,
+            "livestreams",
+            livestreamId,
+            "stats",
+            "livestreamStats"
+         ).withConverter(createGenericConverter<LiveStreamStats>())
+
+         const statsSnap = await getDoc(statsRef)
+
+         if (!statsSnap.exists()) return null
+
+         return statsSnap.data()
+      }
+   )
+
+   return { stats }
+}
+
+export const FeedbackDialog = ({
+   livestreamId,
+   onClose,
+}: FeedbackDialogProps) => {
+   const { stats } = useLivestreamStats(livestreamId)
+
+   return (
+      <ResponsiveDialogLayout
+         open={Boolean(livestreamId)}
+         handleClose={onClose}
+         dialogPaperStyles={styles.paper}
          TransitionComponent={SlideUpTransition}
-         maxWidth="lg"
-         fullWidth
-         fullScreen={isMobile}
-         PaperProps={{
-            sx: styles.paper,
-         }}
-         TransitionProps={{
-            unmountOnExit: true,
-         }}
+         TransitionProps={{ unmountOnExit: true }}
+         SlideProps={{ unmountOnExit: true }}
+         dataTestId="feedback-dialog"
+         hideDragHandle
       >
-         <Title id="feedback-dialog-title" onClose={onCloseFeedbackDialog}>
-            <SwipeableViews index={value}>
-               <AnimatedTabPanel
-                  key={generalOverviewKey}
-                  value={generalOverviewKey}
-                  activeValue={value}
+         <SuspenseWithBoundary fallback={<FeedbackDialogSkeleton />}>
+            {stats ? (
+               <Content stats={stats} onClose={onClose} />
+            ) : (
+               <FeedbackDialogSkeleton />
+            )}
+         </SuspenseWithBoundary>
+      </ResponsiveDialogLayout>
+   )
+}
+
+type ContentProps = {
+   stats: LiveStreamStats
+   onClose: () => void
+}
+
+const Content = ({ stats, onClose }: ContentProps) => {
+   const isMobile = useIsMobile()
+   return (
+      <Fragment>
+         <ResponsiveDialogLayout.Header
+            handleClose={onClose}
+            sx={styles.header}
+         >
+            <Stack spacing={0.5}>
+               <Typography variant="small" color="neutral.400">
+                  {Boolean(stats?.livestream?.start) &&
+                     DateUtil.formatFullDateWithTime(
+                        stats.livestream.start.toDate()
+                     )}
+               </Typography>
+               <Typography
+                  variant={isMobile ? "mobileBrandedH4" : "desktopBrandedH3"}
+                  color="neutral.800"
+                  fontWeight={isMobile ? 600 : 700}
                >
-                  <GeneralOverviewTitle
-                     groupId={group.id}
-                     livestreamStats={livestreamStats}
-                  />
-               </AnimatedTabPanel>
-               <AnimatedTabPanel
-                  key={ratingOverviewKey}
-                  value={ratingOverviewKey}
-                  activeValue={value}
-               >
-                  <RatingOverviewTitle
-                     livestreamStats={livestreamStats}
-                     feedbackQuestionId={feedbackQuestionId}
-                     onBackToFeedback={onBackToFeedback}
-                  />
-               </AnimatedTabPanel>
-            </SwipeableViews>
-         </Title>
-         <DialogContent sx={styles.content} dividers>
-            <SwipeableViews index={value}>
-               <AnimatedTabPanel
-                  key={generalOverviewKey}
-                  value={generalOverviewKey}
-                  activeValue={value}
-               >
-                  <GeneralOverviewContent
-                     livestreamStats={livestreamStats}
-                     onRatingQuestionClick={onRatingQuestionClick}
-                  />
-               </AnimatedTabPanel>
-               <AnimatedTabPanel
-                  key={ratingOverviewKey}
-                  value={ratingOverviewKey}
-                  activeValue={value}
-               >
-                  <RatingOverviewContent
-                     livestreamStats={livestreamStats}
-                     feedbackQuestionId={feedbackQuestionId}
-                  />
-               </AnimatedTabPanel>
-            </SwipeableViews>
-         </DialogContent>
-      </Dialog>
+                  {stats?.livestream?.title}
+               </Typography>
+            </Stack>
+         </ResponsiveDialogLayout.Header>
+
+         <ResponsiveDialogLayout.Content sx={styles.dialogContent}>
+            <FeedbackDialogProvider liveStreamStats={stats} onClose={onClose}>
+               <FeedbackDetail />
+            </FeedbackDialogProvider>
+         </ResponsiveDialogLayout.Content>
+      </Fragment>
    )
 }
 

@@ -18,7 +18,6 @@ import {
    SectionContainer,
    VoteOptionSkeleton,
 } from "./CardVotes"
-import { useFeedbackDialogContext } from "./FeedbackDialogProvider"
 
 const styles = sxStyles({
    entryRoot: {
@@ -44,8 +43,11 @@ const styles = sxStyles({
    },
 })
 
-const GroupQuestions = () => {
-   const { livestreamId } = useFeedbackDialogContext()
+type Props = {
+   livestreamId: string
+}
+
+const GroupQuestions = ({ livestreamId }: Props) => {
    const { group } = useGroup()
    const { data: livestream, status } = useLivestream(livestreamId)
 

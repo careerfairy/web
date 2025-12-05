@@ -10,6 +10,7 @@ export class LivestreamsAdminPage extends CommonPage {
    public readonly livestreamQuestionsDialog: Locator
    public readonly csvDownloadDialog: Locator
    public readonly promoteLivestreamDialog: Locator
+   public readonly feedbackDialog: Locator
 
    constructor(private readonly parent: GroupDashboardPage) {
       super(parent.page)
@@ -19,9 +20,7 @@ export class LivestreamsAdminPage extends CommonPage {
          name: "Status",
       })
       this.applyFilterButton = this.page.getByRole("button", { name: "Apply" })
-      this.searchField = this.page.getByPlaceholder(
-         "Search"
-      )
+      this.searchField = this.page.getByPlaceholder("Search")
       this.livestreamQuestionsDialog = this.page.getByTestId(
          "livestream-questions-dialog"
       )
@@ -29,6 +28,7 @@ export class LivestreamsAdminPage extends CommonPage {
       this.promoteLivestreamDialog = this.page.getByTestId(
          "promote-livestream-dialog"
       )
+      this.feedbackDialog = this.page.getByTestId("feedback-dialog")
    }
 
    // Status filter methods for the new table structure
@@ -198,5 +198,17 @@ export class LivestreamsAdminPage extends CommonPage {
       await expect(
          this.promoteLivestreamDialog.getByText("Link copied!")
       ).toBeVisible()
+   }
+
+   // Feedback dialog helpers
+   public async waitForFeedbackDialog() {
+      await this.feedbackDialog.waitFor({ state: "visible" })
+   }
+
+   public async closeFeedbackDialog() {
+      const closeButton = this.feedbackDialog
+         .getByRole("button", { name: "Close" })
+         .first()
+      await closeButton.click()
    }
 }

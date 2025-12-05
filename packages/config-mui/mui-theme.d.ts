@@ -34,6 +34,19 @@ interface CustomThemeProps {
       whiteShadow?: string
       drawerWidth?: { small: string; medium: string }
    }
+
+   /**
+    * Utility styles for common UI patterns
+    */
+   utils: {
+      hideScrollbar: {
+         scrollbarWidth: string
+         msOverflowStyle: string
+         "&::-webkit-scrollbar": {
+            display: string
+         }
+      }
+   }
 }
 
 declare module "@mui/styles/defaultTheme" {
