@@ -2,7 +2,11 @@ import { Box } from "@mui/material"
 import FramerBox from "components/views/common/FramerBox"
 import { AnimatePresence, Variants } from "framer-motion"
 import { ReactNode, forwardRef } from "react"
-import { useSpeakerId, useUserUid } from "store/selectors/streamingAppSelectors"
+import {
+   useAssistantMode,
+   useSpeakerId,
+   useUserUid,
+} from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import {
    ProfileSelectEnum,
@@ -10,6 +14,7 @@ import {
    useHostProfileSelection,
 } from "./HostProfileSelectionProvider"
 import { SpeakerSelectHeader } from "./SpeakerSelectHeader"
+import { AssistantRoleInfoView } from "./views/AssistantRoleInfoView"
 import { CreateSpeakerView } from "./views/CreateSpeakerView"
 import { EditSpeakerView } from "./views/EditSpeakerView"
 import { JoinWithSpeakerView } from "./views/JoinWithSpeakerView"
@@ -42,8 +47,9 @@ type Props = {
 export const HostProfileSelection = ({ children, isHost }: Props) => {
    const speakerId = useSpeakerId()
    const userUid = useUserUid()
+   const isAssistantMode = useAssistantMode()
 
-   if (!speakerId && !userUid && isHost) {
+   if (!speakerId && !userUid && !isAssistantMode && isHost) {
       return <Content />
    }
 
@@ -75,6 +81,11 @@ const Content = () => {
                   {activeView === ProfileSelectEnum.JOIN_WITH_SPEAKER && (
                      <ViewFramerBox key={ProfileSelectEnum.JOIN_WITH_SPEAKER}>
                         <JoinWithSpeakerView />
+                     </ViewFramerBox>
+                  )}
+                  {activeView === ProfileSelectEnum.ASSISTANT_INFO && (
+                     <ViewFramerBox key={ProfileSelectEnum.ASSISTANT_INFO}>
+                        <AssistantRoleInfoView />
                      </ViewFramerBox>
                   )}
                </AnimatePresence>

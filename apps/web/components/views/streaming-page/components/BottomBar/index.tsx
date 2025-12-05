@@ -8,13 +8,14 @@ import { useUserHandRaiseState } from "components/custom-hook/streaming/hand-rai
 import { useStreamingContext } from "components/views/streaming-page/context"
 import { ReactNode } from "react"
 import {
+   useAssistantMode,
    useIsSpyMode,
    useStreamHandRaiseEnabled,
 } from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { CheckPermissions } from "../StreamSetupWidget/permissions/CheckPermissions"
 import { ActionsSpeedDial } from "./ActionsSpeedDial"
-import { AllActions } from "./AllActionComponents"
+import { ActionName, AllActions } from "./AllActionComponents"
 
 const styles = sxStyles({
    root: {
@@ -25,7 +26,7 @@ const styles = sxStyles({
       p: 1,
       borderRadius: 66,
       "& .MuiDivider-root": {
-         borderColor: "#F7F7F7",
+         borderColor: (theme) => theme.brand.white[400],
       },
    },
 })
@@ -46,29 +47,74 @@ export const BottomBarActions = {
    SpeedDial: () => <ActionsSpeedDial key="SpeedDial" />,
 } as const
 
-export type BottomBarActionName = keyof typeof BottomBarActions
+export type BottomBarActionName = ActionName | "SpeedDial"
 
-const getHostActionNames = (
-   isMobile: boolean,
-   isAdmin: boolean,
-   isSpyMode: boolean
-): BottomBarActionName[] => {
-   if (isMobile) {
-      return [
-         ...(isSpyMode ? [] : (["Mic"] as const)),
-         ...(isSpyMode ? [] : (["Video"] as const)),
-         "Share",
-         "Divider",
-         ...(isAdmin ? [] : (["Q&A"] as const)),
-         "Chat",
-         "SpeedDial",
-         ...(isAdmin ? (["Divider", "Admin"] as const) : []),
-      ]
+// Helper that keeps action ordering consistent while toggling entries on and off
+const createActionBuilder = () => {
+   const actions: BottomBarActionName[] = []
+
+   const add = (...items: BottomBarActionName[]) => {
+      actions.push(...items)
    }
 
-   return [
-      ...(isSpyMode ? [] : (["Mic"] as const)),
-      ...(isSpyMode ? [] : (["Video"] as const)),
+   const addIf = (condition: boolean, ...items: BottomBarActionName[]) => {
+      if (condition) {
+         add(...items)
+      }
+   }
+
+   return {
+      add,
+      addIf,
+      value: () => actions,
+   }
+}
+
+type HostActionArgs = {
+   isMobile: boolean
+   isAssistantMode: boolean
+   isAdmin?: boolean
+   isSpyMode: boolean
+}
+
+const getHostMobileActionNames = ({
+   isAdmin,
+   isSpyMode,
+   isAssistantMode,
+}: Omit<HostActionArgs, "isMobile">): BottomBarActionName[] => {
+   const builder = createActionBuilder()
+
+   if (isAssistantMode && isSpyMode) {
+      builder.add("Phone", "Divider")
+   } else {
+      builder.addIf(!isSpyMode, "Mic", "Video")
+   }
+   builder.add("Share", "Divider")
+   builder.addIf(isAssistantMode && isSpyMode, "Q&A")
+   builder.add("Chat", "SpeedDial")
+
+   if (isAssistantMode && !isSpyMode) {
+      builder.add("Divider", "Phone")
+   }
+   builder.addIf(isAdmin, "Divider", "Admin")
+
+   return builder.value()
+}
+
+const getHostDesktopActionNames = ({
+   isAdmin,
+   isSpyMode,
+   isAssistantMode,
+}: Omit<HostActionArgs, "isMobile">): BottomBarActionName[] => {
+   const builder = createActionBuilder()
+
+   if (isAssistantMode && isSpyMode) {
+      builder.add("Phone", "Divider")
+   }
+
+   builder.addIf(!isSpyMode, "Mic", "Video")
+
+   builder.add(
       "Share",
       "CTA",
       "Divider",
@@ -76,77 +122,151 @@ const getHostActionNames = (
       "Hand raise",
       "Polls",
       "Jobs",
-      "Chat",
+      "Chat"
+   )
 
-      ...(isSpyMode ? [] : (["Divider", "Settings"] as const)),
-      ...(isAdmin ? (["Divider", "Admin"] as const) : []),
-   ]
+   builder.addIf(!isSpyMode, "Divider", "Settings")
+
+   builder.addIf(isAssistantMode && !isSpyMode, "Phone")
+
+   builder.addIf(isAdmin, "Divider", "Admin")
+
+   return builder.value()
 }
+
+const getHostActionNames = (args: HostActionArgs): BottomBarActionName[] => {
+   const { isMobile, isAdmin, isSpyMode, isAssistantMode } = args
+   return isMobile
+      ? getHostMobileActionNames({ isAdmin, isSpyMode, isAssistantMode })
+      : getHostDesktopActionNames({ isAdmin, isSpyMode, isAssistantMode })
+}
+
 const HostView = () => {
    const isMobile = useStreamIsMobile()
    const { userData } = useAuth()
    const isSpyMode = useIsSpyMode()
+   const isAssistantMode = useAssistantMode()
 
    return (
       <ActionsBar>
          <CheckPermissions />
-         {getHostActionNames(isMobile, userData?.isAdmin, isSpyMode).map(
-            (action, index) => {
-               const Component = BottomBarActions[action]
-               return <Component enableTooltip key={index} />
-            }
-         )}
+         {getHostActionNames({
+            isMobile,
+            isAdmin: userData?.isAdmin,
+            isSpyMode,
+            isAssistantMode,
+         }).map((action, index) => {
+            const Component = BottomBarActions[action]
+            return <Component enableTooltip key={`${action}-${index}`} />
+         })}
       </ActionsBar>
    )
 }
-const getViewerActionNames = (
-   isMobile: boolean,
-   isStreaming: boolean,
-   handRaiseEnabled: boolean,
-   userCanJoinPanel: boolean,
-   isAdmin: boolean
-): BottomBarActionName[] => {
-   const showRaiseHandButton = handRaiseEnabled && !userCanJoinPanel
-   if (isStreaming) {
-      if (isMobile) {
-         return [
-            ...(userCanJoinPanel ? (["Mic", "Video"] as const) : []),
-            "Divider",
-            "Q&A",
-            ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
-            "Polls",
-            ...(userCanJoinPanel
-               ? (["SpeedDial"] as const)
-               : (["Chat"] as const)),
-            ...(userCanJoinPanel
-               ? (["Divider", "Stop hand raise"] as const)
-               : (["Reactions"] as const)),
-            ...(isAdmin ? (["Divider", "Admin"] as const) : []),
-         ]
-      }
 
-      return [
-         ...(userCanJoinPanel ? (["Mic", "Video"] as const) : []),
-         "Divider",
-         "Q&A",
-         ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
-         "Polls",
-         "Chat",
-         ...(userCanJoinPanel ? [] : (["Reactions"] as const)),
-         ...(userCanJoinPanel
-            ? (["Divider", "Settings", "Stop hand raise"] as const)
-            : []),
-         ...(isAdmin ? (["Divider", "Admin"] as const) : []),
-      ]
+type ViewerActionArgs = {
+   isMobile: boolean
+   isViewerBroadcasting: boolean
+   handRaiseEnabled: boolean
+   userCanJoinPanel: boolean
+   isAdmin?: boolean
+}
+
+const getViewerSpectatorActionNames = ({
+   handRaiseEnabled,
+   userCanJoinPanel,
+   isAdmin,
+}: Omit<
+   ViewerActionArgs,
+   "isMobile" | "isViewerBroadcasting"
+>): BottomBarActionName[] => {
+   const builder = createActionBuilder()
+   const showRaiseHandButton = handRaiseEnabled && !userCanJoinPanel
+
+   builder.add("Q&A")
+   builder.addIf(showRaiseHandButton, "Hand raise")
+   builder.add("Polls", "Chat", "Reactions")
+   builder.addIf(isAdmin, "Divider", "Admin")
+
+   return builder.value()
+}
+
+const getViewerMobileStreamingActionNames = ({
+   handRaiseEnabled,
+   userCanJoinPanel,
+   isAdmin,
+}: Omit<
+   ViewerActionArgs,
+   "isMobile" | "isViewerBroadcasting"
+>): BottomBarActionName[] => {
+   const builder = createActionBuilder()
+   const showRaiseHandButton = handRaiseEnabled && !userCanJoinPanel
+
+   builder.addIf(userCanJoinPanel, "Mic", "Video")
+   builder.add("Divider", "Q&A")
+   builder.addIf(showRaiseHandButton, "Hand raise")
+   builder.add("Polls")
+   builder.add(userCanJoinPanel ? "SpeedDial" : "Chat")
+   builder.addIf(userCanJoinPanel, "Divider", "Stop hand raise")
+   builder.addIf(!userCanJoinPanel, "Reactions")
+   builder.addIf(isAdmin, "Divider", "Admin")
+
+   return builder.value()
+}
+
+const getViewerDesktopStreamingActionNames = ({
+   handRaiseEnabled,
+   userCanJoinPanel,
+   isAdmin,
+}: Omit<
+   ViewerActionArgs,
+   "isMobile" | "isViewerBroadcasting"
+>): BottomBarActionName[] => {
+   const builder = createActionBuilder()
+   const showRaiseHandButton = handRaiseEnabled && !userCanJoinPanel
+
+   builder.addIf(userCanJoinPanel, "Mic", "Video")
+   builder.add("Divider", "Q&A")
+   builder.addIf(showRaiseHandButton, "Hand raise")
+   builder.add("Polls", "Chat")
+   builder.addIf(!userCanJoinPanel, "Reactions")
+   builder.addIf(userCanJoinPanel, "Divider", "Settings", "Stop hand raise")
+   builder.addIf(isAdmin, "Divider", "Admin")
+
+   return builder.value()
+}
+
+const getViewerActionNames = (
+   args: ViewerActionArgs
+): BottomBarActionName[] => {
+   const {
+      isMobile,
+      isViewerBroadcasting,
+      handRaiseEnabled,
+      userCanJoinPanel,
+      isAdmin,
+   } = args
+
+   if (!isViewerBroadcasting) {
+      return getViewerSpectatorActionNames({
+         handRaiseEnabled,
+         userCanJoinPanel,
+         isAdmin,
+      })
    }
-   return [
-      "Q&A",
-      ...(showRaiseHandButton ? (["Hand raise"] as const) : []),
-      "Polls",
-      "Chat",
-      "Reactions",
-      ...(isAdmin ? (["Divider", "Admin"] as const) : []),
-   ]
+
+   if (isMobile) {
+      return getViewerMobileStreamingActionNames({
+         handRaiseEnabled,
+         userCanJoinPanel,
+         isAdmin,
+      })
+   }
+
+   return getViewerDesktopStreamingActionNames({
+      handRaiseEnabled,
+      userCanJoinPanel,
+      isAdmin,
+   })
 }
 
 const ViewerView = () => {
@@ -159,20 +279,20 @@ const ViewerView = () => {
 
    const { userCanJoinPanel } = useUserHandRaiseState(livestreamId, agoraUserId)
 
-   const filteredActions = getViewerActionNames(
+   const filteredActions = getViewerActionNames({
       isMobile,
-      shouldStream,
+      isViewerBroadcasting: shouldStream,
       handRaiseEnabled,
       userCanJoinPanel,
-      userData?.isAdmin
-   )
+      isAdmin: userData?.isAdmin,
+   })
 
    return (
       <ActionsBar>
          {Boolean(userCanJoinPanel) && <CheckPermissions />}
          {filteredActions.map((action, index) => {
             const Component = BottomBarActions[action]
-            return <Component enableTooltip key={index} />
+            return <Component enableTooltip key={`${action}-${index}`} />
          })}
       </ActionsBar>
    )
@@ -188,3 +308,8 @@ const ActionsBar = ({ children }: ActionsBarProps) => {
       </Stack>
    )
 }
+
+export const bottomBarTestHelpers = {
+   getHostActionNames,
+   getViewerActionNames,
+} as const
