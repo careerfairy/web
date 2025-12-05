@@ -52,7 +52,12 @@ const fetchPollsWithVoters = async (
    ).withConverter(createGenericConverter<LivestreamPoll>())
 
    const pollsSnap = await getDocs(pollsRef)
-   const polls = pollsSnap.docs.map((doc) => doc.data())
+   const polls = pollsSnap.docs
+      .map((doc) => doc.data())
+      // Sort polls in the order they were closed (first closed appears first)
+      .sort(
+         (a, b) => a.closedAt.toDate().getTime() - b.closedAt.toDate().getTime()
+      )
 
    // Fetch voters for each poll in parallel
    const pollsWithVoters = await Promise.all(
