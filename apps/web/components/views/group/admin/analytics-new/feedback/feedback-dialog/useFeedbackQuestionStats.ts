@@ -78,7 +78,7 @@ export const useFeedbackQuestionStats = (question: EventRatingWithType) => {
    }, [question.type, numberOfAnswers, voters])
 
    // Calculate overall sentiment percentage (average rating as % of max)
-   const overallSentimentPercentage = useMemo(() => {
+   const sentimentPercentage = useMemo(() => {
       if (question.type !== FeedbackQuestionType.SENTIMENT_RATING) {
          return null
       }
@@ -87,15 +87,24 @@ export const useFeedbackQuestionStats = (question: EventRatingWithType) => {
          return 0
       }
 
-      // Convert average rating (1-5) to percentage (0-100%)
-      // Rating 5 = 100%, Rating 1 = 20%
-      return Math.round((averageRating / 5) * 100)
-   }, [question.type, numberOfAnswers, averageRating])
+      const roundedRating = Math.round(averageRating)
+      const displayedRating = Math.max(1, Math.min(5, roundedRating))
+
+      let matchingCount = 0
+      voters.forEach((voter) => {
+         const voterRating = voter.rating || 0
+         if (voterRating === displayedRating) {
+            matchingCount++
+         }
+      })
+
+      return Math.round((matchingCount / numberOfAnswers) * 100)
+   }, [question.type, averageRating, numberOfAnswers, voters])
 
    return {
       averageRating,
       numberOfAnswers,
       sentimentEmoji: mostVotedEmoji,
-      sentimentPercentage: overallSentimentPercentage,
+      sentimentPercentage,
    }
 }
