@@ -1,35 +1,32 @@
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { collection, getDocs, query, where } from "firebase/firestore"
+import { doc, getDoc } from "firebase/firestore"
 import { useFirestore } from "reactfire"
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
 import { errorLogAndNotify } from "util/CommonUtil"
 import { reducedRemoteCallsOptions } from "../utils/useFunctionsSWRFetcher"
 
-type Options = {
-   suspense?: boolean
-}
-
-export const useLivestreamSWR = (livestreamId: string, options?: Options) => {
-   const suspense = options?.suspense ?? false
-
+export const useLivestreamSWR = (
+   livestreamId: string,
+   options?: SWRConfiguration<LivestreamEvent | null>
+) => {
    const firestore = useFirestore()
 
-   return useSWR<LivestreamEvent>(
+   return useSWR(
       livestreamId ? `livestream-${livestreamId}` : null,
       async () => {
-         const livestreamsQuery = query(
-            collection(firestore, "livestreams"),
-            where("id", "==", livestreamId)
+         const docRef = doc(
+            firestore,
+            "livestreams",
+            livestreamId
          ).withConverter(createGenericConverter<LivestreamEvent>())
 
-         const querySnapshot = await getDocs(livestreamsQuery)
+         const docSnap = await getDoc(docRef)
 
-         return querySnapshot.docs?.at(0)?.data()
+         return docSnap.exists() ? docSnap.data() : null
       },
       {
          ...reducedRemoteCallsOptions,
-         suspense,
          onError: (error) =>
             errorLogAndNotify(error, {
                message: "Failed to fetch livestream",
@@ -37,6 +34,8 @@ export const useLivestreamSWR = (livestreamId: string, options?: Options) => {
                   livestreamId,
                },
             }),
+         suspense: false,
+         ...options,
       }
    )
 }

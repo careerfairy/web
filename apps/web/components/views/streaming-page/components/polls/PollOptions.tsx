@@ -1,43 +1,22 @@
 import { LivestreamPoll } from "@careerfairy/shared-lib/livestreams"
-import { Skeleton, Typography } from "@mui/material"
-import { Box, Stack } from "@mui/material"
-import { PollOptionResult } from "./PollOptionResult"
-import { Fragment, useCallback, useMemo } from "react"
+import { Stack } from "@mui/material"
 import { useLivestreamPollVoters } from "components/custom-hook/streaming/useLivestreamPollVoters"
-import { useStreamingContext } from "../../context"
-import { SuspenseWithBoundary } from "components/ErrorBoundary"
-import { sxStyles } from "types/commonTypes"
-import { useAuth } from "HOCs/AuthProvider"
-import { useOpenStream } from "store/selectors/streamingAppSelectors"
 import { useVoteLivestreamPollOption } from "components/custom-hook/streaming/useVoteLivestreamPollOption"
-
-const styles = sxStyles({
-   root: {
-      border: "1px solid #F8F8F8",
-      borderRadius: "12px",
-      p: 2,
-      position: "relative",
-      overflow: "hidden",
-   },
-   coloredEdge: {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: 5,
-      height: "100%",
-      backgroundColor: "grey.500",
-   },
-   skeletonProgress: {
-      borderRadius: "8px",
-   },
-})
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { useAuth } from "HOCs/AuthProvider"
+import { useCallback, useMemo } from "react"
+import { useOpenStream } from "store/selectors/streamingAppSelectors"
+import { useStreamingContext } from "../../context"
+import {
+   POLL_COLORS,
+   PollOptionResult,
+   PollOptionResultSkeleton,
+} from "./PollOptionResult"
 
 type PollOptionsProps = {
    poll: LivestreamPoll
    showResults?: boolean
 }
-
-const POLL_COLORS = ["#00D2AA", "#FF103C", "#FFD204", "#5978FF"] as const
 
 export const PollOptions = ({ poll, showResults }: PollOptionsProps) => {
    return (
@@ -110,43 +89,5 @@ const Content = ({ poll, showResults }: PollOptionsProps) => {
             />
          ))}
       </Stack>
-   )
-}
-
-export const PollOptionResultSkeleton = ({
-   showResultsSkeleton = true,
-}: {
-   showResultsSkeleton?: boolean
-}) => {
-   return (
-      <Box sx={styles.root}>
-         <Stack spacing={1}>
-            <Stack direction="row" justifyContent="space-between">
-               <Typography variant="medium">
-                  <Skeleton variant="text" width={30} />
-               </Typography>
-               {Boolean(showResultsSkeleton) && (
-                  <Typography variant="medium">
-                     <Skeleton variant="text" width={20} />
-                  </Typography>
-               )}
-            </Stack>
-            {Boolean(showResultsSkeleton) && (
-               <Fragment>
-                  <Skeleton
-                     sx={styles.skeletonProgress}
-                     variant="rounded"
-                     animation="wave"
-                     width={`${Math.random() * 100}%`}
-                     height={5}
-                  />
-                  <Typography variant="xsmall">
-                     <Skeleton variant="text" width={100} />
-                  </Typography>
-               </Fragment>
-            )}
-         </Stack>
-         <Box sx={styles.coloredEdge} />
-      </Box>
    )
 }

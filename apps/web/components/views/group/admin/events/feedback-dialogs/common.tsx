@@ -1,8 +1,8 @@
-import { Stack, Typography } from "@mui/material"
+import { Stack, SxProps, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ResponsiveDialogLayout } from "components/views/common/ResponsiveDialog"
 import { ReactNode } from "react"
-import { sxStyles } from "types/commonTypes"
+import { combineStyles, sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 
 export const styles = sxStyles({
@@ -64,14 +64,15 @@ export const Header = ({ title, start, onClose }: HeaderProps) => {
 
 type ContentProps = {
    children: ReactNode
+   sx?: SxProps
 }
 
 /**
  * Same content ui will be used for all feedback dialogs
  */
-export const Content = ({ children }: ContentProps) => {
+export const Content = ({ children, sx }: ContentProps) => {
    return (
-      <ResponsiveDialogLayout.Content sx={styles.content}>
+      <ResponsiveDialogLayout.Content sx={combineStyles(styles.content, sx)}>
          {children}
       </ResponsiveDialogLayout.Content>
    )
