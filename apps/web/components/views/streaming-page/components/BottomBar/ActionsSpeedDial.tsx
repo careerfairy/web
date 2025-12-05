@@ -1,4 +1,3 @@
-import { useAuth } from "HOCs/AuthProvider"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import {
    BrandedSpeedDial,
@@ -10,6 +9,7 @@ import { ReactNode, useMemo, useRef, useState } from "react"
 import { MoreHorizontal, X } from "react-feather"
 import { useClickAway } from "react-use"
 import {
+   useAssistantMode,
    useIsSpyMode,
    useNumberOfHandRaiseNotifications,
 } from "store/selectors/streamingAppSelectors"
@@ -23,11 +23,13 @@ export type Action = {
 const getStreamerActions = (
    isMobile: boolean,
    isSpyMode: boolean,
-   isAdmin: boolean
+   isAssistantMode: boolean
 ): ActionName[] => {
    if (isMobile) {
+      // Q&A is shown in the main bar for assistant in spy mode, so exclude it from SpeedDial
+      const showQAndAInSpeedDial = !(isAssistantMode && isSpyMode)
       return [
-         ...(isAdmin ? (["Q&A"] as const) : []),
+         ...(showQAndAInSpeedDial ? (["Q&A"] as const) : []),
          "Hand raise",
          "Polls",
          "Jobs",
@@ -54,13 +56,12 @@ export const ActionsSpeedDial = () => {
    const numberOfHandRaiseNotifications = useNumberOfHandRaiseNotifications()
    const [open, setOpen] = useState(false)
    const ref = useRef(null)
-   const { userData } = useAuth()
 
    const { isHost, shouldStream } = useStreamingContext()
 
    const isMobile = useStreamIsMobile()
    const isSpyMode = useIsSpyMode()
-   const isAdmin = userData?.isAdmin
+   const isAssistantMode = useAssistantMode()
 
    const handleToggle = () => setOpen((prevOpen) => !prevOpen)
 
@@ -71,7 +72,7 @@ export const ActionsSpeedDial = () => {
    })
 
    const actions = isHost
-      ? getStreamerActions(isMobile, isSpyMode, isAdmin)
+      ? getStreamerActions(isMobile, isSpyMode, isAssistantMode)
       : getViewerActions(isMobile, shouldStream)
 
    const hasHandRaiseButton = actions.includes("Hand raise")

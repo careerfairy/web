@@ -14,6 +14,7 @@ import {
    VideoActionButton,
 } from "../Buttons"
 import { AdminControlsButton } from "../Buttons/AdminControlsButton"
+import { PhoneActionButton } from "../Buttons/PhoneActionButton"
 import { StopHandRaisingButton } from "../Buttons/StopHandRaisingButton"
 
 export const AllActions = {
@@ -48,6 +49,9 @@ export const AllActions = {
    Admin: (props: ActionButtonProps) => (
       <AdminControlsButton {...props} key="Admin" />
    ),
+   Phone: (props: ActionButtonProps) => (
+      <PhoneActionButton {...props} key="Phone" />
+   ),
    Divider: () => <Divider orientation="vertical" flexItem />,
 } as const
 
@@ -69,5 +73,6 @@ export const ActionTooltips = {
    MicUnmute: "Unmute",
    VideoTurnOff: "Switch camera off",
    VideoTurnOn: "Switch camera on",
-   Admin: "Admin controls",
+   Admin: "CareerFairy admin controls",
+   Phone: "Join with camera and microphone",
 } as const

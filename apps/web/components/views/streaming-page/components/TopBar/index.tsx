@@ -3,7 +3,11 @@ import { Box, Stack, StackProps } from "@mui/material"
 import { useStreamIsMobile } from "components/custom-hook/streaming"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import { ReactNode } from "react"
-import { useIsPanel, useIsSpyMode } from "store/selectors/streamingAppSelectors"
+import {
+   useAssistantMode,
+   useIsPanel,
+   useIsSpyMode,
+} from "store/selectors/streamingAppSelectors"
 import { sxStyles } from "types/commonTypes"
 import { useStreamingContext } from "../../context/Streaming"
 import { CallsToActionButton } from "./CallsToActionButton"
@@ -42,8 +46,11 @@ export const TopBar = () => {
    const isStreamMobile = useStreamIsMobile()
 
    const isSpyMode = useIsSpyMode()
+   const isAssistantMode = useAssistantMode()
 
    const isNarrow = useIsMobile(TOOLBAR_WRAP_BREAKPOINT)
+
+   const showSpyModeBanner = isSpyMode && !isAssistantMode
 
    return (
       <>
@@ -60,14 +67,16 @@ export const TopBar = () => {
                   <LogoBackButton />
                   <Stack direction="row" sx={styles.leftSide}>
                      {isHost && isNarrow ? <HelpButton /> : null}
-                     {isSpyMode && isStreamMobile ? <SpyModeBanner /> : null}
+                     {showSpyModeBanner && isStreamMobile ? (
+                        <SpyModeBanner />
+                     ) : null}
                      <Timer />
                   </Stack>
                </StackComponent>
                {isHost ? <HostView /> : <ViewerView />}
             </Stack>
          </Header>
-         {isSpyMode && !isStreamMobile ? <SpyModeBanner /> : null}
+         {showSpyModeBanner && !isStreamMobile ? <SpyModeBanner /> : null}
       </>
    )
 }
