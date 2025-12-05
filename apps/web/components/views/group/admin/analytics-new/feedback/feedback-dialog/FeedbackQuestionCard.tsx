@@ -14,7 +14,7 @@ const styles = sxStyles({
       p: 2,
       borderRadius: 2,
       border: 1,
-      borderColor: "neutral.200",
+      borderColor: "neutral.50",
       backgroundColor: "white",
       width: "100%",
       display: "flex",
@@ -23,8 +23,7 @@ const styles = sxStyles({
       textAlign: "left",
       transition: "all 0.2s",
       "&:hover": {
-         backgroundColor: "neutral.50",
-         borderColor: "neutral.300",
+         backgroundColor: (theme) => theme.brand.white[300],
       },
    },
    sentimentBadge: {

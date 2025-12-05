@@ -43,18 +43,42 @@ export const useFeedbackQuestionStats = (question: EventRatingWithType) => {
       }
    }, [voters, question.type])
 
-   // Helper for sentiment emoji
-   const getSentimentEmoji = () => {
-      const roundedRating = Math.round(averageRating)
-      const clampedRating = Math.max(
-         1,
-         Math.min(5, roundedRating)
-      ) as keyof typeof SENTIMENT_EMOJIS
-      return SENTIMENT_EMOJIS[clampedRating]
-   }
+   // Get the most voted sentiment emoji
+   const mostVotedEmoji = useMemo(() => {
+      if (question.type !== FeedbackQuestionType.SENTIMENT_RATING) {
+         return "—"
+      }
 
-   // Calculate sentiment percentage for the displayed emoji
-   const sentimentPercentage = useMemo(() => {
+      if (numberOfAnswers === 0) {
+         return "—"
+      }
+
+      // Build stats: count votes per rating value
+      const stats: Record<number, number> = {}
+      voters.forEach((voter) => {
+         const rating = voter.rating
+         if (typeof rating === "number") {
+            stats[rating] = (stats[rating] || 0) + 1
+         }
+      })
+
+      // Find most voted
+      let mostVotedVal = 0
+      let maxVotes = -1
+      Object.entries(stats).forEach(([val, count]) => {
+         if (count > maxVotes) {
+            maxVotes = count
+            mostVotedVal = parseInt(val)
+         }
+      })
+
+      return (
+         SENTIMENT_EMOJIS[mostVotedVal as keyof typeof SENTIMENT_EMOJIS] || "—"
+      )
+   }, [question.type, numberOfAnswers, voters])
+
+   // Calculate overall sentiment percentage (average rating as % of max)
+   const overallSentimentPercentage = useMemo(() => {
       if (question.type !== FeedbackQuestionType.SENTIMENT_RATING) {
          return null
       }
@@ -63,24 +87,15 @@ export const useFeedbackQuestionStats = (question: EventRatingWithType) => {
          return 0
       }
 
-      const roundedRating = Math.round(averageRating)
-      const displayedRating = Math.max(1, Math.min(5, roundedRating))
-
-      let matchingCount = 0
-      voters.forEach((voter) => {
-         const voterRating = voter.rating || 0
-         if (voterRating === displayedRating) {
-            matchingCount++
-         }
-      })
-
-      return Math.round((matchingCount / numberOfAnswers) * 100)
-   }, [question.type, averageRating, numberOfAnswers, voters])
+      // Convert average rating (1-5) to percentage (0-100%)
+      // Rating 5 = 100%, Rating 1 = 20%
+      return Math.round((averageRating / 5) * 100)
+   }, [question.type, numberOfAnswers, averageRating])
 
    return {
       averageRating,
       numberOfAnswers,
-      sentimentEmoji: getSentimentEmoji(),
-      sentimentPercentage,
+      sentimentEmoji: mostVotedEmoji,
+      sentimentPercentage: overallSentimentPercentage,
    }
 }

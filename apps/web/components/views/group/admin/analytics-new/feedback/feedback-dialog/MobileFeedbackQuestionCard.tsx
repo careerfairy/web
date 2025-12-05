@@ -15,7 +15,7 @@ const styles = sxStyles({
       p: 1,
       borderRadius: "10px",
       border: 1,
-      borderColor: "neutral.200",
+      borderColor: "neutral.50",
       backgroundColor: "white",
       width: 224,
       height: "100%",
@@ -26,6 +26,9 @@ const styles = sxStyles({
       textAlign: "left",
       transition: "all 0.2s",
       gap: 2,
+      "&:hover": {
+         backgroundColor: (theme) => theme.brand.white[300],
+      },
    },
    bottomRow: {
       width: "100%",

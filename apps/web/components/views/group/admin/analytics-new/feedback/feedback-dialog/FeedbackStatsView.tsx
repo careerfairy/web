@@ -7,7 +7,9 @@ import {
 } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import HorizontalScroll from "components/views/common/HorizontalScroll"
+import { GenericCarousel } from "components/views/common/carousels/GenericCarousel"
 import { BrandedTooltip } from "components/views/streaming-page/components/BrandedTooltip"
+import useEmblaCarousel from "embla-carousel-react"
 import { ReactNode } from "react"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 
@@ -116,6 +118,11 @@ export const FeedbackStatsView = ({
    getItemTooltip,
 }: FeedbackStatsViewProps) => {
    const isMobile = useIsMobile()
+   const [emblaRef, emblaApi] = useEmblaCarousel({
+      align: "start",
+      dragFree: true,
+      containScroll: "trimSnaps",
+   })
 
    const AverageSection = (
       <Box sx={styles.averageBox}>
@@ -138,41 +145,59 @@ export const FeedbackStatsView = ({
       </Box>
    )
 
+   const ratingOrder = isMobile ? [5, 4, 3, 2, 1] : [1, 2, 3, 4, 5]
+
+   const renderChartColumn = (value: number) => {
+      const count = stats[value] || 0
+      const percentage = total > 0 ? (count / total) * 100 : 0
+      return (
+         <BrandedTooltip
+            key={value}
+            title={getItemTooltip(value)}
+            arrow
+            placement="top"
+         >
+            <Box sx={styles.chartColumn}>
+               <Box sx={styles.chartHeader}>
+                  <Typography
+                     variant="desktopBrandedH5"
+                     fontWeight={600}
+                     component="div"
+                  >
+                     {getItemLabel(value)}
+                  </Typography>
+                  <Typography variant="small" ml={1}>
+                     {count} votes ({Math.round(percentage)}%)
+                  </Typography>
+               </Box>
+               <LinearProgress
+                  variant="determinate"
+                  value={percentage}
+                  sx={styles.linearProgress}
+               />
+            </Box>
+         </BrandedTooltip>
+      )
+   }
+
    const ChartSection = (
-      <Box sx={styles.chartContainer}>
-         {[1, 2, 3, 4, 5].map((value) => {
-            const count = stats[value] || 0
-            const percentage = total > 0 ? (count / total) * 100 : 0
-            return (
-               <BrandedTooltip
-                  key={value}
-                  title={getItemTooltip(value)}
-                  arrow
-                  placement="top"
-               >
-                  <Box sx={styles.chartColumn}>
-                     <Box sx={styles.chartHeader}>
-                        <Typography
-                           variant="desktopBrandedH5"
-                           fontWeight={600}
-                           component="div"
-                        >
-                           {getItemLabel(value)}
-                        </Typography>
-                        <Typography variant="small" ml={1}>
-                           {count} votes ({Math.round(percentage)}%)
-                        </Typography>
-                     </Box>
-                     <LinearProgress
-                        variant="determinate"
-                        value={percentage}
-                        sx={styles.linearProgress}
-                     />
-                  </Box>
-               </BrandedTooltip>
-            )
-         })}
-      </Box>
+      <Box sx={styles.chartContainer}>{ratingOrder.map(renderChartColumn)}</Box>
+   )
+
+   const MobileChartSection = (
+      <GenericCarousel
+         emblaRef={emblaRef}
+         emblaApi={emblaApi}
+         gap="20px"
+         sx={styles.mobileHorizontalScroll}
+         preventEdgeTouch
+      >
+         {ratingOrder.map((value) => (
+            <GenericCarousel.Slide key={value} slideWidth="148px">
+               {renderChartColumn(value)}
+            </GenericCarousel.Slide>
+         ))}
+      </GenericCarousel>
    )
 
    if (isMobile) {
@@ -180,9 +205,7 @@ export const FeedbackStatsView = ({
          <Box sx={styles.ratingBox}>
             <Stack direction="column" spacing={1.25}>
                {AverageSection}
-               <HorizontalScroll sx={styles.mobileHorizontalScroll}>
-                  {ChartSection}
-               </HorizontalScroll>
+               {MobileChartSection}
             </Stack>
          </Box>
       )
