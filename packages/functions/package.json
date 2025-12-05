@@ -10,16 +10,13 @@
       "test": "jest",
       "watch": "npm run clean && npm run copy-files && tsc --watch",
       "copy-files": "cpx \"src/**/*.{json,html}\" dist/functions/src",
-      "kill-emulators": "npx kill-port 8080 9099 4000 5001 9199 4000",
+      "kill-emulators": "bash scripts/kill-emulator-ports.sh",
       "clean": "rimraf dist/",
       "logs": "firebase functions:log"
    },
-   "fireDependencies": {
-      "@careerfairy/shared-lib": "../shared-lib"
-   },
    "dependencies": {
       "@ai-sdk/anthropic": "^2.0.41",
-      "@careerfairy/shared-lib": "*",
+      "@careerfairy/shared-lib": "file:../shared-lib",
       "@deepgram/sdk": "^4.11.2",
       "@google-cloud/bigquery": "^7.9.0",
       "agora-token": "^2.0.3",

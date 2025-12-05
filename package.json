@@ -28,6 +28,7 @@
       "build:webapp": "turbo run build --filter=@careerfairy/webapp",
       "lint:functions": "turbo run lint --filter=@careerfairy/functions",
       "deploy:rules": "firebase deploy --only firestore:rules",
+      "deploy:hosting": "firebase deploy --only hosting",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
       "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions,storage",
       "native": "cd apps/mobile && npm run start",
@@ -64,7 +65,6 @@
    },
    "devDependencies": {
       "@careerfairy/config-tsconfig": "*",
-      "@rxdi/firelink": "^0.9.2",
       "@testing-library/dom": "9.3.3",
       "@testing-library/jest-dom": "5.17.0",
       "@testing-library/react": "14.0.0",

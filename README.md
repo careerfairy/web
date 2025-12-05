@@ -102,25 +102,35 @@ npm run build -w @careerfairy/functions
 # or npm run build
 ```
 
-## Deploy a function
+## Deploy functions
+
+### Deploy specific functions (single or multiple)
 
 ```sh
-cd packages/functions
-npx firelink deploy --only functions:slackHandleInteractions
+# Deploy a single function
+
+firebase deploy --only functions:slackHandleInteractions
+
+# Deploy multiple functions (comma-separated)
+firebase deploy --only functions:slackHandleInteractions,functions:fetchUserCountryCode,functions:trackOfflineEventAction
 ```
 
-## Deploy a bundle
+### Deploy a bundle
 
 ```sh
 cd packages/functions
-npx firelink deploy --only functions:bundle-pastYearLivestreams
+firebase deploy --only functions:bundle-pastYearLivestreams
 ```
 
 When adding new bundles, it's likely that you'd want to ensure the Firebase Hosting mappings are also updated
 
 ```sh
-cd packages/functions
-npx firebase deploy --only hosting
+# From root
+npm run deploy:hosting
+
+
+# Or use firebase directly
+firebase deploy --only hosting
 ```
 
 To verify the deployment of your bundle and ensure it is mapped correctly, visit: https://functions.careerfairy.io/bundle-pastYearLivestreams
