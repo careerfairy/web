@@ -51,7 +51,9 @@
       },
       "lint": {},
       "dev": {
-         "cache": false
+         "dependsOn": ["^build"],
+         "cache": false,
+         "persistent": true
       },
       "native": {
          "cache": false
