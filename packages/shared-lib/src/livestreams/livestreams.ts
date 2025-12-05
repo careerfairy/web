@@ -436,8 +436,8 @@ export interface UserLivestreamData extends Identifiable {
 export interface Chapter {
    title: string
    startSec: number
-   endSec: number
-   summary: string
+   endSec?: number
+   summary?: string
 }
 
 // Collection Path: livestreams/{livestreamId}/chapters/{chapterId}

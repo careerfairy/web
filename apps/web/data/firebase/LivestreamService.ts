@@ -12,8 +12,10 @@ import type {
 } from "@careerfairy/shared-lib/functions/types"
 import {
    CreateLivestreamCTARequest,
+   CreateLivestreamChapterRequest,
    CreateLivestreamPollRequest,
    DeleteLivestreamCTARequest,
+   DeleteLivestreamChapterRequest,
    DeleteLivestreamChatEntryRequest,
    DeleteLivestreamPollRequest,
    EmoteType,
@@ -43,6 +45,7 @@ import {
    ToggleActiveCTARequest,
    ToggleHandRaiseRequest,
    UpdateLivestreamCTARequest,
+   UpdateLivestreamChapterRequest,
    UpdateLivestreamPollRequest,
    UpsertSpeakerRequest,
    UserLivestreamData,
@@ -1522,6 +1525,30 @@ export class LivestreamService {
       await httpsCallable<ToggleActiveCTARequest>(
          this.functions,
          "toggleActiveCTA"
+      )(options)
+      return
+   }
+
+   createChapter = async (options: CreateLivestreamChapterRequest) => {
+      await httpsCallable<CreateLivestreamChapterRequest>(
+         this.functions,
+         FUNCTION_NAMES.createChapter
+      )(options)
+      return
+   }
+
+   updateChapter = async (options: UpdateLivestreamChapterRequest) => {
+      await httpsCallable<UpdateLivestreamChapterRequest>(
+         this.functions,
+         FUNCTION_NAMES.updateChapter
+      )(options)
+      return
+   }
+
+   deleteChapter = async (options: DeleteLivestreamChapterRequest) => {
+      await httpsCallable<DeleteLivestreamChapterRequest>(
+         this.functions,
+         FUNCTION_NAMES.deleteChapter
       )(options)
       return
    }

@@ -25,6 +25,7 @@ type RecordingFormContextType = {
    playerRef: React.RefObject<ReactPlayer>
    setIsPlaying: (playing: boolean) => void
    isPlaying: boolean
+   getCurrentTime: () => number
 }
 
 const RecordingFormContext = createContext<
@@ -65,6 +66,10 @@ export const RecordingFormProvider = ({
       [setIsPlaying]
    )
 
+   const getCurrentTime = useCallback(() => {
+      return playerRef.current?.getCurrentTime() ?? 0
+   }, [])
+
    const contextValue = useMemo(
       () => ({
          livestream,
@@ -72,8 +77,9 @@ export const RecordingFormProvider = ({
          playerRef,
          setIsPlaying,
          isPlaying,
+         getCurrentTime,
       }),
-      [livestream, seekToAndPlay, setIsPlaying, isPlaying]
+      [livestream, seekToAndPlay, setIsPlaying, isPlaying, getCurrentTime]
    )
 
    return (

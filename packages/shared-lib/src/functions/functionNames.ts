@@ -106,6 +106,11 @@ export const FUNCTION_NAMES = {
    startLivestreamChapterization: "startLivestreamChapterization",
    initiateChapterizationOnTranscriptionCompleted:
       "initiateChapterizationOnTranscriptionCompleted",
+
+   // Chapter functions
+   createChapter: "createChapter",
+   updateChapter: "updateChapter",
+   deleteChapter: "deleteChapter",
 } as const
 
 /**

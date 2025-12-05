@@ -17,9 +17,9 @@ export const importFileandPreview = (
    file: File,
    revoke?: boolean
 ): Promise<string> => {
-   return new Promise((resolve, reject) => {
+   return new Promise((resolve, _reject) => {
       window.URL = window.URL || window.webkitURL
-      let preview = window.URL.createObjectURL(file)
+      const preview = window.URL.createObjectURL(file)
       // remove reference
       if (revoke) {
          window.URL.revokeObjectURL(preview)
@@ -56,15 +56,16 @@ export const generateVideoThumbnails = async (
    numberOfThumbnails: number,
    cb?: (thumbnail: string, index: number) => void
 ): Promise<string[]> => {
-   let thumbnail: string[] = []
-   let fractions: number[] = []
+   const thumbnail: string[] = []
+   const fractions: number[] = []
 
-   return new Promise(async (resolve, reject) => {
+   return new Promise((resolve, reject) => {
       if (!videoFile.type?.includes("video")) {
          reject("not a valid video file")
+         return
       }
 
-      await getVideoDurationFromVideoFile(videoFile)
+      getVideoDurationFromVideoFile(videoFile)
          .then(async (duration) => {
             // divide the video timing into particular timestamps in respective to number of thumbnails
             // ex if time is 10 and numOfthumbnails is 4 then result will be -> 0, 2.5, 5, 7.5 ,10
@@ -73,7 +74,7 @@ export const generateVideoThumbnails = async (
                fractions.push(Math.floor(i))
             }
 
-            let promiseArray = fractions.map(async (time, index) => {
+            const promiseArray = fractions.map(async (time, index) => {
                const res = await getVideoThumbnail(
                   videoFile,
                   index >= fractions.length - 1 ? time - 2 : time
@@ -98,7 +99,6 @@ export const generateVideoThumbnails = async (
          .catch((err) => {
             reject(err)
          })
-      reject("something went wrong")
    })
 }
 
@@ -189,10 +189,10 @@ export const getVideoCover = (
                // then convert it to base 64
                ctx!.canvas.toBlob(
                   (blob) => {
-                     var reader = new FileReader()
+                     const reader = new FileReader()
                      reader.readAsDataURL(blob)
                      reader.onloadend = function () {
-                        var base64data = reader.result
+                        const base64data = reader.result
                         resolve(base64data as string)
                      }
                   },
@@ -207,83 +207,52 @@ export const getVideoCover = (
    })
 }
 
+const MAX_CONCURRENT_THUMBNAILS = 5
+let activeThumbnailJobs = 0
+const thumbnailJobQueue: Array<() => void> = []
+
+const enqueueThumbnailJob = <T>(job: () => Promise<T>): Promise<T> => {
+   return new Promise<T>((resolve, reject) => {
+      const run = () => {
+         activeThumbnailJobs++
+         job()
+            .then(resolve)
+            .catch(reject)
+            .finally(() => {
+               activeThumbnailJobs--
+               const next = thumbnailJobQueue.shift()
+               if (next) {
+                  next()
+               }
+            })
+      }
+
+      if (activeThumbnailJobs < MAX_CONCURRENT_THUMBNAILS) {
+         run()
+      } else {
+         thumbnailJobQueue.push(run)
+      }
+   })
+}
+
 /**
  * @param {string} urlOfFIle
  * @param {number} videoTimeInSeconds
  * @returns {string} base64 image string
+ * We enqueue thumbnail generation jobs so that only a limited number of
+ * `<video>` elements and seek operations run at once. Creating many video
+ * players concurrently (e.g. when generating lots of thumbnails) can spike
+ * memory/CPU usage and even crash the tab, so we throttle work through this
+ * simple queue instead of firing all thumbnails in parallel.
  */
 
 export const generateVideoThumbnailViaUrl = (
    urlOfFIle: string,
    videoTimeInSeconds: number
 ): Promise<string> => {
-   return new Promise((resolve, reject) => {
-      try {
-         var video = document.createElement("video")
-         var timeupdate = function () {
-            if (snapImage()) {
-               video.removeEventListener("timeupdate", timeupdate)
-               video.pause()
-            }
-         }
-         video.addEventListener("loadeddata", function () {
-            try {
-               if (snapImage()) {
-                  video.removeEventListener("timeupdate", timeupdate)
-               }
-            } catch (error) {
-               reject(error)
-            }
-         })
-         var snapImage = function () {
-            var canvas = document.createElement("canvas")
-            canvas.width = video.videoWidth
-            canvas.height = video.videoHeight
-            canvas!
-               .getContext("2d")!
-               .drawImage(video, 0, 0, canvas.width, canvas.height)
-            var image: string | undefined = canvas.toBlob(
-               (blob) => {
-                  var reader = new FileReader()
-                  reader.readAsDataURL(blob)
-                  reader.onloadend = function () {
-                     var base64data = reader.result
-                     resolve(base64data as string)
-                  }
-               },
-               "image/jpeg",
-               1 /* quality */
-            ) as unknown as string
-            var success = image?.length > 100000
-            if (success) {
-               URL.revokeObjectURL(urlOfFIle)
-               resolve(image as unknown as string)
-            }
-            return success
-         }
-         video.addEventListener("timeupdate", timeupdate)
-         video.preload = "metadata"
-         video.src = urlOfFIle
-         // Load video in Safari / IE11
-         video.muted = true
-         video.playsInline = true
-         // video.setAttribute('crossOrigin', '');
-         video.crossOrigin = "Anonymous"
-         video.currentTime = videoTimeInSeconds
-         video
-            .play()
-            .then()
-            .catch((err) => {
-               reject({
-                  status: 500,
-                  reason: `Access to video at ${urlOfFIle} from origin ${window.location.hostname} has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.`,
-                  message: err,
-               })
-            })
-      } catch (error) {
-         reject(error)
-      }
-   })
+   return enqueueThumbnailJob(() =>
+      getVideoCover(urlOfFIle, videoTimeInSeconds)
+   )
 }
 
 /**
@@ -322,8 +291,8 @@ export const getVideoDurationFromVideoFile = (
 
 // generate the video duration either via url
 const generateVideoDurationFromUrl = (url: string): Promise<number> => {
-   return new Promise((resolve, reject) => {
-      let video = document.createElement("video")
+   return new Promise((resolve, _reject) => {
+      const video = document.createElement("video")
       video.addEventListener("loadeddata", function () {
          resolve(video.duration)
          window.URL.revokeObjectURL(url)

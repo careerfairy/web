@@ -94,3 +94,28 @@ export type ToggleActiveCTARequest = {
    livestreamToken: string
    ctaId: string
 }
+
+export type CreateLivestreamChapterRequest = {
+   livestreamId: string
+   groupId: string
+   title: string
+   startSec: number
+   endSec?: number
+   summary?: string
+}
+
+export type UpdateLivestreamChapterRequest = {
+   livestreamId: string
+   groupId: string
+   chapterId: string
+   title?: string
+   startSec?: number
+   endSec?: number
+   summary?: string
+}
+
+export type DeleteLivestreamChapterRequest = {
+   livestreamId: string
+   groupId: string
+   chapterId: string
+}

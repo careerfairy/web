@@ -2,7 +2,6 @@ import { Box, Slide } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import BrandedSwipeableDrawer from "components/views/common/inputs/BrandedSwipeableDrawer"
 import { useCallback, useEffect, useRef, useState } from "react"
-import { SwitchTransition } from "react-transition-group"
 import { sxStyles } from "types/commonTypes"
 import { ChaptersView } from "./views/ChaptersView"
 import { ChatView } from "./views/ChatView"
@@ -39,7 +38,29 @@ const styles = sxStyles({
       flexDirection: "column",
       m: 1.5,
    },
+   mobileDrawerView: {
+      display: "flex",
+      flexDirection: "column",
+      height: "100%",
+   },
+   desktopViewContainer: {
+      position: "absolute",
+      inset: 0,
+      display: "flex",
+      flexDirection: "column",
+      pointerEvents: "auto",
+   },
 })
+
+const mobileViews: RecordingPanelView[] = [
+   "edit-details",
+   "questions",
+   "chat",
+   "highlights",
+   "chapters",
+]
+
+const allViews: RecordingPanelView[] = ["menu", ...mobileViews]
 
 type RenderViewHandlers = {
    handleBack: () => void
@@ -48,14 +69,11 @@ type RenderViewHandlers = {
 
 const renderPanelView = (
    view: RecordingPanelView,
-   isMobile: boolean,
    handlers: RenderViewHandlers
 ): React.ReactNode => {
    switch (view) {
       case "menu":
-         return !isMobile ? (
-            <MenuView onNavigate={handlers.handleNavigate} />
-         ) : null
+         return <MenuView onNavigate={handlers.handleNavigate} />
       case "edit-details":
          return <EditDetailsView onBack={handlers.handleBack} />
       case "questions":
@@ -126,7 +144,9 @@ export const RecordingRightPanel = () => {
       if (isMobile) {
          storeScrollPosition()
          setIsDrawerOpen(false)
+         return
       }
+
       setCurrentView("menu")
    }, [isMobile, storeScrollPosition])
 
@@ -135,10 +155,7 @@ export const RecordingRightPanel = () => {
          storeScrollPosition()
       }
       setIsDrawerOpen(false)
-      setCurrentView("menu")
    }, [isMobile, storeScrollPosition])
-
-   const transitionDirection = currentView !== "menu" ? "left" : "right"
 
    if (isMobile) {
       return (
@@ -153,10 +170,20 @@ export const RecordingRightPanel = () => {
                hideDragHandle
             >
                <Box sx={styles.drawerContent} ref={scrollContainerRef}>
-                  {renderPanelView(currentView, isMobile, {
-                     handleBack,
-                     handleNavigate,
-                  })}
+                  {mobileViews.map((view) => (
+                     <Box
+                        key={view}
+                        sx={[
+                           styles.mobileDrawerView,
+                           currentView !== view && { display: "none" },
+                        ]}
+                     >
+                        {renderPanelView(view, {
+                           handleBack,
+                           handleNavigate,
+                        })}
+                     </Box>
+                  ))}
                </Box>
             </BrandedSwipeableDrawer>
          </>
@@ -165,23 +192,27 @@ export const RecordingRightPanel = () => {
 
    return (
       <Box sx={styles.desktopContainer} ref={transitionContainerRef}>
-         <SwitchTransition mode="out-in">
-            <Slide
-               key={currentView}
-               direction={transitionDirection}
-               mountOnEnter
-               unmountOnExit
-               timeout={100}
-               container={transitionContainerRef.current}
+         {allViews.map((view) => (
+            <Box
+               key={view}
+               sx={[
+                  styles.desktopViewContainer,
+                  currentView !== view && { pointerEvents: "none" },
+               ]}
             >
-               <Box sx={styles.transitionItem}>
-                  {renderPanelView(currentView, isMobile, {
-                     handleBack,
-                     handleNavigate,
-                  })}
-               </Box>
-            </Slide>
-         </SwitchTransition>
+               <Slide
+                  direction={view === "menu" ? "right" : "left"}
+                  in={currentView === view}
+                  mountOnEnter
+                  timeout={100}
+                  container={transitionContainerRef.current}
+               >
+                  <Box sx={styles.transitionItem}>
+                     {renderPanelView(view, { handleBack, handleNavigate })}
+                  </Box>
+               </Slide>
+            </Box>
+         ))}
       </Box>
    )
 }

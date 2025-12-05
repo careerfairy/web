@@ -180,7 +180,6 @@ export const MenuView = ({ onNavigate }: MenuViewProps) => {
             icon={<List size={16} />}
             title="Chapters"
             description="Automatically generated chapters of your recording to help students easily find the most relevant topics!"
-            comingSoon
             onClick={() => onNavigate("chapters")}
          />
       </Stack>

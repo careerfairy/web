@@ -1,9 +1,13 @@
 import { Group } from "@careerfairy/shared-lib/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamChapter,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { object } from "yup"
 import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import {
+   validateChapterExists as validateChapterExistsFn,
    validateData,
    validateLivestreamExists,
    validateUserAuthExists,
@@ -103,6 +107,28 @@ export const livestreamExists = (): OnCallMiddleware<{
       context.middlewares = {
          ...context.middlewares,
          livestream,
+      }
+
+      return next()
+   }
+}
+
+export const chapterExists = (): OnCallMiddleware<{
+   chapter: LivestreamChapter
+}> => {
+   return async (context, next) => {
+      const data = context.data as unknown as {
+         livestreamId: string
+         chapterId: string
+      }
+      const chapter = await validateChapterExistsFn(
+         data.livestreamId,
+         data.chapterId
+      )
+
+      context.middlewares = {
+         ...context.middlewares,
+         chapter,
       }
 
       return next()
