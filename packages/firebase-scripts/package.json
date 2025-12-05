@@ -5,7 +5,7 @@
    "main": "./dist/index.js",
    "scripts": {
       "build": "npm run clean && npm run copy-files && tsc",
-      "dev": "npm run clean && npm run copy-files && tsc --watch",
+      "dev": "npm run copy-files && tsc --watch",
       "copy-files": "cpx \"src/**/*.{json}\" dist/",
       "clean": "rimraf dist/",
       "script": "node dist/",
